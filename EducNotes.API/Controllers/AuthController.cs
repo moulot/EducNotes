@@ -129,7 +129,7 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
             
-            var user = await _userManager.FindByNameAsync(userForLoginDto.Username);
+            var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
             if (!user.ValidatedCode)
                 return BadRequest("Compte non validé pour l'instant...");
 

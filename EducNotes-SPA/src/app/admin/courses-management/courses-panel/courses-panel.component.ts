@@ -3,6 +3,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from 'src/app/_services/admin.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
+import { ClassService } from 'src/app/_services/class.service';
 
 @Component({
   selector: 'app-courses-panel',
@@ -12,14 +13,21 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 })
 export class CoursesPanelComponent implements OnInit {
   constructor(private adminService: AdminService, private route: ActivatedRoute,
-    private router: Router, private alertify: AlertifyService) {}
+    private router: Router, private alertify: AlertifyService, private classService: ClassService) {}
 
- courses: any;
+ courses: any[];
  addNew = false;
 ngOnInit() {
     this.route.data.subscribe(data => {
        this.courses = data.courses;
     });
+    }
+
+    getCourses() {
+      this.courses = [];
+      this.classService.getAllCoursesDetails().subscribe((res: any[]) => {
+        this.courses = res;
+      });
     }
     newCourse() {
       this.addNew = !this.addNew;
@@ -27,11 +35,9 @@ ngOnInit() {
 
     resultMode(val: boolean) {
       if (val) {
-        this.router.navigateByUrl('/CoursesPanelComponent', {skipLocationChange: true}).then(() =>
-         this.router.navigate(['/courses']));
-      } else {
-        this.addNew = !this.addNew;
+       this.getCourses();
       }
+      this.addNew = !this.addNew;
     }
 
 }

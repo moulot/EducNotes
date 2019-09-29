@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace EducNotes.API.Dtos
@@ -18,6 +19,7 @@ namespace EducNotes.API.Dtos
 
          public string PhoneNumber { get; set; }
         public string SecondPhoneNumber { get; set; }
+        public DateTime DateOfBirth { get; set; }
         public List<int?> CourseIds { get; set; }
     }
 }

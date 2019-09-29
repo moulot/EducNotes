@@ -15,7 +15,7 @@ export class ClassesPanelComponent implements OnInit {
   constructor(private adminService: AdminService, private route: ActivatedRoute,
     private router: Router, private alertify: AlertifyService) {}
 
-  levels: any;
+  levels: any[];
   lev: any [] = [];
   addNew = false;
    ngOnInit() {
@@ -34,13 +34,28 @@ export class ClassesPanelComponent implements OnInit {
       this.addNew = !this.addNew;
     }
 
+    getlevels() {
+      this.levels = [];
+      this.adminService.getClassLevelsDetails().subscribe((res : any[]) => {
+        this.levels = res ;
+        for (let index = 0; index < this.levels.length; index++) {
+          const element: any = {
+            id: this.levels[index].id,
+            name: this.levels[index].name
+          };
+          this.lev = [...this.lev, element];
+        }
+      }, error => {
+        console.log(error);
+      }) ;
+    }
+
     resultMode(val: boolean) {
       if (val) {
-        this.router.navigateByUrl('/ClassesPanelComponent', {skipLocationChange: true}).then(() =>
-         this.router.navigate(['/classesPanel']));
-      } else {
-        this.addNew = !this.addNew;
+        this.getlevels();
       }
+      this.addNew = !this.addNew;
+
     }
 
 

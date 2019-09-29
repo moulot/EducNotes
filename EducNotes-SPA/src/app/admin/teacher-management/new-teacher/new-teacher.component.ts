@@ -65,12 +65,12 @@ export class NewTeacherComponent implements OnInit {
   createTeacherForm() {
 
     this.teacherForm = this.fb.group({
-      dateOfBirth: [this.editModel.dateOfBirth, Validators.nullValidator],
-       lastName: [this.editModel.lastName, Validators.required],
+      lastName: [this.editModel.lastName, Validators.required],
       firstName: [this.editModel.firstName, Validators.nullValidator],
-      courseIds: [this.editModel.courseIds, Validators.nullValidator],
-       phoneNumber: [this.editModel.phoneNumber, Validators.required],
+      dateOfBirth: [this.editModel.dateOfBirth, Validators.nullValidator],
       email: [this.editModel.email, [Validators.required, Validators.email]],
+      courseIds: [this.editModel.courseIds, Validators.nullValidator],
+      phoneNumber: [this.editModel.phoneNumber, Validators.required],
       secondPhoneNumber: [this.editModel.secondPhoneNumber, Validators.nullValidator]});
   }
 

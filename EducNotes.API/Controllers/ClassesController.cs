@@ -663,11 +663,11 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPost("AddCourse")]
-        public async Task<IActionResult> AddCourse([FromBody]NewCourseDto model)
+        public async Task<IActionResult> AddCourse([FromBody]NewCourseDto courseDto)
         {
-            var course = new Course{Name = model.name, Abbreviation=model.abbreviation};
+            var course = new Course{Name = courseDto.name, Abbreviation=courseDto.abbreviation};
             _repo.Add(course);
-            foreach (var item in model.classLevelIds)
+            foreach (var item in courseDto.classLevelIds)
             {
                 var classes = await _context.Classes.Where(a=>a.ClassLevelId == Convert.ToInt32(item)).Select(a=>a.Id).ToListAsync();
                 foreach (var classId in classes)
@@ -676,10 +676,8 @@ namespace EducNotes.API.Controllers
                 }
             }
             if(await _repo.SaveAll())
-            {
               return Ok();
-            }
-
+           
             return BadRequest("impossible d'ajouter ce cours");
         }
 
@@ -775,7 +773,7 @@ namespace EducNotes.API.Controllers
             foreach (var cours in allCourses)
             {
                 var c = new CoursesDetailsDto{Id=cours.Id,Name= cours.Name};
-                    c.TeachersNumber = await _context.ClassCourses.Where(a=>a.CourseId == cours.Id).Distinct().CountAsync();
+                    c.TeachersNumber = await _context.ClassCourses.Where(a=>a.CourseId == cours.Id && a.TeacherId != null).Distinct().CountAsync();
                     List<int?> classIds= await _context.ClassCourses.Where(a=>a.CourseId == cours.Id).Select(a=>a.ClassId).ToListAsync();
                     c.ClassesNumber = classIds.Count();
                     c.StudentsNumber = await _context.Users.Where(a=> classIds.Contains(Convert.ToInt32(a.ClassId))).CountAsync();
@@ -935,10 +933,9 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPost("{id}/UpdateTeacher")]
-        public async Task<IActionResult> UpdateTeacher(int id, UserForUpdateDto model)
+        public async Task<IActionResult> UpdateTeacher(int id, UserForUpdateDto teacherForUpdate)
         {
-          var message ="enregistrement terminé...";
-          var courseIds = model.CourseIds;
+          var courseIds = teacherForUpdate.CourseIds;
           var classCourses =await _context.ClassCourses.Include(c =>c.Class).Where(t => t.TeacherId == id).ToListAsync();
           var ccIds = classCourses.Select(c => c.CourseId).Distinct().ToList();
           foreach (var courId in courseIds.Except(ccIds))
@@ -950,17 +947,26 @@ namespace EducNotes.API.Controllers
 
           foreach (var courId in ccIds.Except(courseIds))
           {
-            var currentLine = classCourses.FirstOrDefault(c => c.CourseId == courId && c.TeacherId == id);
-            if (currentLine.ClassId != null)
-            message +="impossible de le retirer de la classe "+currentLine.Class.Name;
-            else {
-              // suppression de la ligne ******a revoir *************
-              _repo.Delete(currentLine);
-            }   
+                var currentLines = classCourses.Where(c => c.CourseId == courId && c.TeacherId == id);
+                if (currentLines != null)
+                {
+                    foreach (var item in currentLines)
+                    {
+                    _repo.Delete(item);
+                    }
+                    // suppression de la ligne ******a revoir *************
+                }   
           }
 
           var userFromRepo = await _repo.GetUser(id, false);
-           _mapper.Map(model, userFromRepo);
+          // _mapper.Map(model, userFromRepo);
+          userFromRepo.FirstName = teacherForUpdate.FirstName;
+          userFromRepo.LastName = teacherForUpdate.LastName;
+          userFromRepo.DateOfBirth = teacherForUpdate.DateOfBirth;
+          userFromRepo.Email = teacherForUpdate.Email;
+          userFromRepo.PhoneNumber = teacherForUpdate.PhoneNumber;
+          userFromRepo.SecondPhoneNumber = teacherForUpdate.SecondPhoneNumber;
+          _repo.Update(userFromRepo);
 
             if(await _repo.SaveAll())
                 return Ok();

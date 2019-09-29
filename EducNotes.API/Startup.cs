@@ -142,7 +142,6 @@ namespace EducNotes.API
                 app.UseHsts();
             }
             app.UseDeveloperExceptionPage();
-
             app.UseHttpsRedirection();
            // seeder.SeedUsers();
         //    app.UseCors(x => x.WithOrigins("http://localhost:4200")
