@@ -14,7 +14,7 @@ import { AlertsComponent } from './alerts/alerts.component';
 import { ToastrModule } from 'ngx-toastr';
 import { CardMetricsComponent } from './card-metrics/card-metrics.component';
 import { NgxEchartsModule } from 'ngx-echarts';
-import { BadgesComponent } from './badges/badges.component';
+// import { BadgesComponent } from './badges/badges.component';
 import { CardWidgetsComponent } from './card-widgets/card-widgets.component';
 import { LoadersComponent } from './loaders/loaders.component';
 import { SharedComponentsModule } from 'src/app/shared/components/shared-components.module';
@@ -51,5 +51,6 @@ import { RatingComponent } from './rating/rating.component';
       PopoverComponent,
       RatingComponent
     ]
+    // exports: [BadgesComponent]
 })
 export class UiKitsModule { }

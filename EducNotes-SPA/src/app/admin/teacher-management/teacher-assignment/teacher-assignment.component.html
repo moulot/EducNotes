@@ -15,7 +15,7 @@
               <nz-form-label [nzSm]="6" [nzXs]="24">Choisir le niveau </nz-form-label>
               <nz-form-control  [nzSm]="14" [nzXs]="24">
                 <nz-select [nzDisabled]="!courseId" style="width: 100%" [(ngModel)]="levelId"  [nzSize]="'default'" 
-                (ngModelChange)="getClasses($event)" nzPlaceHolder="Choisir le niveau">
+                (ngModelChange)="getClasses()" nzPlaceHolder="Choisir le niveau">
                   <nz-option *ngFor="let level of levels" [nzLabel]="level.name" [nzValue]="level.id"></nz-option>
                 </nz-select>
               </nz-form-control>

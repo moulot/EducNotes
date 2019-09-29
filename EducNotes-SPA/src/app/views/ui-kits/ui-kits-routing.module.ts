@@ -7,7 +7,7 @@ import { AccordionsComponent } from './accordions/accordions.component';
 import { ModalsComponent } from './modals/modals.component';
 import { AlertsComponent } from './alerts/alerts.component';
 import { CardMetricsComponent } from './card-metrics/card-metrics.component';
-import { BadgesComponent } from './badges/badges.component';
+// import { BadgesComponent } from './badges/badges.component';
 import { CardWidgetsComponent } from './card-widgets/card-widgets.component';
 import { LoadersComponent } from './loaders/loaders.component';
 import { ButtonsLoadingComponent } from './buttons-loading/buttons-loading.component';
@@ -23,10 +23,10 @@ const routes: Routes = [
     path: 'accordions',
     component: AccordionsComponent
   },
-  {
-    path: 'badges',
-    component: BadgesComponent
-  },
+  // {
+  //   path: 'badges',
+  //   component: BadgesComponent
+  // },
   {
     path: 'buttons',
     component: ButtonsComponent

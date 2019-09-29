@@ -143,10 +143,7 @@ import { GradeStudentComponent } from './grades/grade-student/grade-student.comp
 import { NewUserComponent } from './admin/user-management/new-user/new-user.component';
 import { ParentRegisterComponent } from './admin/selfs-registers/parent-register/parent-register.component';
 import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-assignment/teacher-assignment.component';
-import { BadgesComponent } from './views/ui-kits/badges/badges.component';
-import { ChatComponent } from './views/chat/chat/chat.component';
 
-const icons: IconDefinition[] = [ AccountBookFill, AlertOutline, AlertFill ];
 
 export function tokenGetter() {
    return localStorage.getItem('token');
@@ -243,14 +240,10 @@ export function tokenGetter() {
       GradeStudentComponent,
       NewUserComponent,
       ParentRegisterComponent,
-      RegisterComponent,
       TeacherAssignmentComponent,
       HomeParentComponent,
       AccountHistoryComponent,
-      RegisterComponent,
-      BadgesComponent,
-      ChatComponent
-
+      // BadgesComponent
    ],
    imports: [
      FormWizardModule,

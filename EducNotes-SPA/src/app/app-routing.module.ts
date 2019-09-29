@@ -31,10 +31,10 @@ const adminRoutes: Routes = [
       path: 'calendar',
       loadChildren: () => import('./views/calendar/calendar.module').then(m => m.CalendarAppModule)
     },
-    {
-      path: 'chat',
-      loadChildren: () => import('./views/chat/chat.module').then(m => m.ChatModule)
-    },
+    // {
+    //   path: 'chat',
+    //   loadChildren: () => import('./views/chat/chat.module').then(m => m.ChatModule)
+    // },
     {
       path: 'tables',
       loadChildren: () => import('./views/data-tables/data-tables.module').then(m => m.DataTablesModule)
