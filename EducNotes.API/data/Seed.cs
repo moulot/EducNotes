@@ -48,10 +48,7 @@ namespace EducNotes.API.Data
                     new District{Name = "2 Plateaux", CityId = 1},
                     new District{Name = "Djibi", CityId = 1},
                 };
-                foreach(var district in districts)
-                {
-                    context.Add(district);
-                }
+                context.AddRange(districts);
 
                 var AbsenceTypes = new List<AbsenceType>
                 {
@@ -59,20 +56,14 @@ namespace EducNotes.API.Data
                     new AbsenceType{Name = "Retard"},
                     new AbsenceType{Name = "Appel"}
                 };
-                foreach(var AbsenceType in AbsenceTypes)
-                {
-                    context.Add(AbsenceType);
-                }
+                context.AddRange(AbsenceTypes);
 
                 var inscTypes = new List<InscriptionType>
                 {
                     new InscriptionType{Name = "FromParent"},
                     new InscriptionType{Name = "FromSchool"}
                 };
-                foreach(var inscType in inscTypes)
-                {
-                    context.Add(inscType);
-                }
+                context.AddRange(inscTypes);
 
                 var classLevels = new List<ClassLevel>
                 {
@@ -92,10 +83,7 @@ namespace EducNotes.API.Data
                     new ClassLevel{Name = "1ere"},
                     new ClassLevel{Name = "terminale"}
                 };
-                foreach(var classLevel in classLevels)
-                {
-                    context.Add(classLevel);
-                }
+                context.AddRange(classLevels);
 
                 var skills = new List<Skill>
                 {
@@ -112,10 +100,7 @@ namespace EducNotes.API.Data
                     new Skill{Name = "skill11"},
                     new Skill{Name = "skill12"}
                 };
-                foreach(var skill in skills)
-                {
-                    context.Add(skill);
-                }
+                context.AddRange(skills);
                 context.SaveChanges();
 
                 var progElts = new List<ProgramElement>
@@ -133,10 +118,7 @@ namespace EducNotes.API.Data
                     new ProgramElement{Name = "progElt11", SkillId = 9},
                     new ProgramElement{Name = "progElt12", SkillId = 1}
                 };
-                foreach(var progElt in progElts)
-                {
-                    context.Add(progElt);
-                }
+                context.AddRange(progElts);
 
                 var paymentTypes = new List<PaymentType>
                 {
@@ -145,21 +127,21 @@ namespace EducNotes.API.Data
                     new PaymentType{Name = "virement"},
                     new PaymentType{Name = "paiement mobible"}
                 };
-                foreach(var paymentType in paymentTypes)
-                {
-                    context.Add(paymentType);
-                }
+                context.AddRange(paymentTypes);
 
-                var periods = new List<Period>
+                // var periods = new List<Period>
+                // {
+                //     new Period{Name = "1er trimestre", Active = 1},
+                //     new Period{Name = "2e trimestre", Active = 0},
+                //     new Period{Name = "3e trimestre", Active = 0}
+                // };
+                var pers = new List<Period>
                 {
                     new Period{Name = "1er trimestre", Active = 1},
-                    new Period{Name = "2e trimestre"},
-                    new Period{Name = "3e trimestre"}
+                    new Period{Name = "2e trimestre", Active = 0},
+                    new Period{Name = "3e trimestre", Active = 0}
                 };
-                foreach(var period in periods)
-                {
-                    context.Add(periods);
-                }
+                context.AddRange(pers);
 
                 var feeTypes = new List<FeeType>
                 {
@@ -168,10 +150,7 @@ namespace EducNotes.API.Data
                     new FeeType{Name = "bibliothèque"},
                     new FeeType{Name = "transport"}
                 };
-                foreach(var feeType in feeTypes)
-                {
-                    context.Add(feeType);
-                }
+                context.AddRange(feeTypes);
 
                 var evalTypes = new List<EvalType>
                 {
@@ -184,10 +163,7 @@ namespace EducNotes.API.Data
                     new EvalType{Name = "rapport de stage"},
                     new EvalType{Name = "tenue de cahier"}
                 };
-                foreach(var evalType in evalTypes)
-                {
-                    context.Add(evalType);
-                }
+                context.AddRange(evalTypes);
 
                 var userTypes = new List<UserType>
                 {
@@ -196,10 +172,7 @@ namespace EducNotes.API.Data
                     new UserType{Name = "parent"},
                     new UserType{Name = "admin"}
                 };
-                foreach(var userType in userTypes)
-                {
-                    context.Add(userType);
-                }
+                context.AddRange(userTypes);
                 context.SaveChanges();
 
                 foreach (var user in users)

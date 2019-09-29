@@ -49,9 +49,9 @@ import { LoginComponent } from './login/login.component';
 import { ClassService } from './_services/class.service';
 import { BooknoteComponent } from './admin/booknote/booknote.component';
 import { HomePanelComponent } from './home/home-panel/home-panel.component';
-// import { HomeParentComponent } from './home/home-parent/home-parent.component';
-// import { HomeStudentComponent } from './home/home-student/home-student.component';
-// import { HomeTeacherComponent } from './home/home-teacher/home-teacher.component';
+import { HomeParentComponent } from './home/home-parent/home-parent.component';
+import { HomeStudentComponent } from './home/home-student/home-student.component';
+import { HomeTeacherComponent } from './home/home-teacher/home-teacher.component';
 import { UserCardComponent } from './users/user-card/user-card.component';
 import { AgendaPanelComponent } from './agenda/agenda-panel/agenda-panel.component';
 import { AgendaListComponent } from './agenda/agenda-list/agenda-list.component';
@@ -60,7 +60,7 @@ import { NavStudentComponent } from './nav/nav-student/nav-student.component';
 import { NavParentComponent } from './nav/nav-parent/nav-parent.component';
 import { NavTeacherComponent } from './nav/nav-teacher/nav-teacher.component';
 import { NavAdminComponent } from './nav/nav-admin/nav-admin.component';
-// import { HomeAdminComponent } from './home/home-admin/home-admin.component';
+import { HomeAdminComponent } from './home/home-admin/home-admin.component';
 import { ClassPanelComponent } from './classes/class-panel/class-panel.component';
 import { StudentCardComponent } from './classes/student-card/student-card.component';
 import { ClassNavComponent } from './classes/class-nav/class-nav.component';
@@ -143,6 +143,8 @@ import { GradeStudentComponent } from './grades/grade-student/grade-student.comp
 import { NewUserComponent } from './admin/user-management/new-user/new-user.component';
 import { ParentRegisterComponent } from './admin/selfs-registers/parent-register/parent-register.component';
 import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-assignment/teacher-assignment.component';
+import { BadgesComponent } from './views/ui-kits/badges/badges.component';
+import { ChatComponent } from './views/chat/chat/chat.component';
 
 const icons: IconDefinition[] = [ AccountBookFill, AlertOutline, AlertFill ];
 
@@ -172,9 +174,9 @@ export function tokenGetter() {
       RolesModalComponent,
       LoginComponent,
       BooknoteComponent,
-      // HomeParentComponent,
-      // HomeStudentComponent,
-      // HomeTeacherComponent,
+      HomeParentComponent,
+      HomeStudentComponent,
+      HomeTeacherComponent,
       UserCardComponent,
       AgendaPanelComponent,
       AgendaListComponent,
@@ -183,7 +185,7 @@ export function tokenGetter() {
       NavParentComponent,
       NavTeacherComponent,
       NavAdminComponent,
-      // HomeAdminComponent,
+      HomeAdminComponent,
       ClassPanelComponent,
       StudentCardComponent,
       ClassNavComponent,
@@ -243,8 +245,11 @@ export function tokenGetter() {
       ParentRegisterComponent,
       RegisterComponent,
       TeacherAssignmentComponent,
-      // HomeParentComponent,
-      AccountHistoryComponent
+      HomeParentComponent,
+      AccountHistoryComponent,
+      RegisterComponent,
+      BadgesComponent,
+      ChatComponent
 
    ],
    imports: [

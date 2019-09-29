@@ -20,6 +20,10 @@ import { SharedPipesModule } from 'src/app/shared/pipes/shared-pipes.module';
     PerfectScrollbarModule,
     ChatRoutingModule
   ],
-  declarations: [ChatComponent, ChatLeftSidebarComponent, ChatContentsComponent]
+  declarations: [
+    ChatComponent,
+    ChatLeftSidebarComponent,
+    ChatContentsComponent
+  ]
 })
 export class ChatModule { }

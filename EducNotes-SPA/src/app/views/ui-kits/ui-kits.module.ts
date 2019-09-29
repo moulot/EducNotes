@@ -37,18 +37,18 @@ import { RatingComponent } from './rating/rating.component';
     UiKitsRoutingModule
   ],
   declarations: [
-      ButtonsComponent, 
-      CardsComponent, 
-      CardsEcommerceComponent, 
-      AccordionsComponent, 
-      ModalsComponent, 
-      AlertsComponent, 
-      CardMetricsComponent, 
-      BadgesComponent, 
-      CardWidgetsComponent, 
-      LoadersComponent, 
-      ButtonsLoadingComponent, 
-      PopoverComponent, 
+      ButtonsComponent,
+      CardsComponent,
+      CardsEcommerceComponent,
+      AccordionsComponent,
+      ModalsComponent,
+      AlertsComponent,
+      CardMetricsComponent,
+      // BadgesComponent,
+      CardWidgetsComponent,
+      LoadersComponent,
+      ButtonsLoadingComponent,
+      PopoverComponent,
       RatingComponent
     ]
 })
