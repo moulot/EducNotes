@@ -1,0 +1,22 @@
+<div class="d-flex">
+  <div class="" routerLinkActive="active">
+  <a class="text-15 text-muted mr-3" [routerLink]="['/admins']">accueil</a>
+</div>
+<div class="" ngbDropdown role="group" aria-label="Select all" placement="bottom-left">
+  <a class="dropdown-toggle text-15 text-muted mr-3 dd" ngbDropdownToggle>inscriptions</a>
+  <div class="dropdown-menu" ngbDropdownMenu>
+    <button [routerLink]="['/inscriptions']"  class="dropdown-item">pré-inscriptions (admin)</button>
+    <button [routerLink]="['/preregister']" class="dropdown-item">pré-inscription (email)</button>
+    <button [routerLink]="['/inscriptionsList']" class="dropdown-item">liste pré-inscris</button>
+  </div>
+</div>
+<div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/teachers']">enseignants</a>
+  </div>
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/classesPanel']">classes</a>
+  </div>
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/courses']">matières</a>
+  </div>
+</div>

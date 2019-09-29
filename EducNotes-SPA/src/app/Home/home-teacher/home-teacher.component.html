@@ -1,0 +1,72 @@
+<h5 class="ml-5 mt-3">bienvenue {{teacher.firstName}} {{teacher.lastName}}</h5>
+<div class="d-flex justify-content-center mt-3">
+    
+  <div class="card border-secondary mb-3 mr-3">
+    <div class="card-header">
+      <h4 class="card-title">mon agenda</h4>
+    </div>
+    <div   style="width:400px;max-width: 400px; overflow-y: scroll;max-height: 250px">
+      <div class="list-group" *ngFor="let course of teacherCourses">
+        <a href="#" class="list-group-item list-group-item-action">
+        {{course.startHourMin}} - {{course.endHourMin}}. {{course.courseName}}. classe : {{course.className}}
+        </a>
+      </div>
+    </div>
+  </div>
+    
+  <div class="card border-secondary mb-3 mr-3" style="width: 400px;">
+    <div class="card-header"><h4 class="card-title">mes classes</h4></div>
+    <div class="list-group" *ngFor="let class of teacherClasses">
+        <a href="#" class="list-group-item list-group-item-action" (click)="showModal(class)" data-toggle="modal" data-target="#myModal">
+          {{class.className}}
+        </a>
+    </div>
+  </div>
+
+  <div class="card border-secondary mb-3" style="width: 400px;">
+    <div class="card-header"><h4 class="card-title">information</h4></div>
+    <div class="card-body">
+      <h4 class="card-title">Secondary card title</h4>
+      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+    </div>
+  </div>
+        
+</div>
+
+
+  <div id="myModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><b> {{this.selectedClass?.className}} ({{students?.length}} étudiant(s))</b></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="alert-info" *ngIf="students?.length === 0">
+            <p>Aucune personne enregistrée dans cette classe ...</p>
+          </div>
+          <div style="overflow-y: scroll;max-height: 400px" *ngIf="students?.length != 0">
+              <table class="table table-striped"  style="vertical-align: middle">           
+                <tr *ngFor="let student of students; index as i" >
+                    <td style="vertical-align: bottom"><p>{{i+1}}</p></td>
+                    <td>
+                      <div class="form-inline">
+                          <img src="{{student.photoUrl|| '.././../../assets/user.png'}}" class="rounded-circle"
+                          style="height: 60px;width: 60px" c alt="">
+                          <label class="ml-3"><b>{{student.firstName}} {{student.lastName}}</b></label>
+                      </div>
+                      </td>
+                  </tr>              
+             </table> 
+          </div>
+                  
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>

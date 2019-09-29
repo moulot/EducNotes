@@ -1,0 +1,20 @@
+<div>
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-basic-title">{{session?.strDayDate}} - {{session?.className}} - {{session?.courseName}}</h5>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="tasksForm">
+      <div class="form-group">
+        <textarea formControlName="tasks" name="tasks" class="form-control" [value]="session?.tasks" id="tasks"
+          style="resize: none" rows="3"></textarea>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-default" (click)="activeModal.dismiss()">annuler</button>
+    <button type="button" class="btn btn-outline-primary" (click)="updateAgenda(session)">enregistrer les devoirs à faire</button>
+  </div>
+</div>

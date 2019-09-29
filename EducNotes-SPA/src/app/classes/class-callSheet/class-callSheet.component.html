@@ -1,0 +1,80 @@
+
+<div class="row m-2">
+
+  <div class="col-md-12">
+    <p class="lead text-15 m-0 pb-1">feuille d'appel - classe {{schedule?.className}}. {{schedule?.courseName}} de 
+      {{schedule?.strStartHourMin}} à {{schedule?.strEndHourMin}} 
+    </p>
+  </div>
+  
+  <div class="d-flex col-md-5 mb-1">
+    <input id="search" placeholder="recherche élèves" [formControl]="searchControl" class="d-flex form-control mr-1">
+    <button (click)="validateAbsences()" type="button" class="d-flex btn btn-sm btn-outline-primary">valider l'appel</button>
+  </div>
+
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-5">
+        <p class="text-15 text-muted m-0">clicker sur les élèves qui sont absents</p>
+      </div>
+      <div class="col-md-6">
+        <p class="text-15 text-danger m-0"><b>{{absents.length}} élèves absents</b></p>
+      </div>
+    </div>
+  </div>
+
+</div>
+    
+  <!-- DATA LIST -->
+<div class="row m-2" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
+  <!-- SINGLE LIST ITEM -->
+  <div *ngFor="let student of filteredStudents | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index" 
+    class="list-item"
+    [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-2': viewMode === 'grid'}"
+    [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}"
+  >
+    <a>
+      <div front class="card o-hidden mb-4 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
+        <div class="scene">
+          <div class="card-box" (click)="setAbsences(i, student.id)" [ngClass]="!isAbsent[i].absent ? 'card-box': 'is-flipped'">
+            <div class="cardFace">
+              <div class="list-thumb d-flex">
+                <!-- TUMBNAIL -->
+                <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
+              </div>
+              <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
+                <div class="card-body p-1 align-self-center d-flex flex-column justify-content-start align-items-lg-center"
+                  [ngClass]="{'flex-lg-row': viewMode === 'list'}">
+                  <!-- NAME -->
+                  <div class="w-100 w-sm-100">
+                    <div class="item-title">{{student.lastName}} {{student.firstName}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="cardFace cardFaceBack">
+              <div class="pic-blured d-flex">
+                <!-- TUMBNAIL -->
+                <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
+              </div>
+              <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
+                <div class="card-body p-1 align-self-center d-flex flex-column justify-content-start align-items-lg-center"
+                  [ngClass]="{'flex-lg-row': viewMode === 'list'}">
+                  <!-- NAME -->
+                  <div class="w-100 w-sm-100">
+                    <div class="item-title">{{student.lastName}} {{student.firstName}}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="centered"><p class="text-22"><b>absent</b></p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <!-- PAGINATION CONTROL -->
+  <div class="col-md-12 mt-3" *ngIf="students?.length">
+    <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
+  </div>
+</div>

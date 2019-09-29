@@ -1,0 +1,60 @@
+
+<form [formGroup]="absenceForm" (ngSubmit)="saveAbsence(false)">
+
+  <div class="form-group">
+    <nz-radio-group formControlName="type">
+      <label nz-radio nzValue="1">absence</label>
+      <label nz-radio nzValue="2">retard</label>
+    </nz-radio-group>
+    <div *ngIf="absenceForm.get('type').errors && absenceForm.get('type').touched"
+      class="text-danger">choisir un élève svp</div>
+  </div>
+  
+  <div class="form-group">
+    <nz-select style="width: 200px;" nzShowSearch nzAllowClear nzPlaceHolder="choisir un élève"
+      id="student" name="student" formControlName="student">
+      <nz-option *ngFor="let user of students" nzLabel="{{user.lastName}} {{user.firstName}}"
+        nzValue="{{user.id}}"></nz-option>
+    </nz-select>
+    <div *ngIf="absenceForm.get('student').errors && absenceForm.get('student').touched"
+      class="text-danger">choisir un élève svp</div>
+  </div>
+  
+  <div class="form-group">
+    <nz-range-picker id="dates" name="dates" class="mr-3"
+      formControlName="dates" nzShowTime nzFormat="dd-MM-yyyy HH:mm"></nz-range-picker>                  
+    <div *ngIf="absenceForm.get('dates').errors && absenceForm.get('dates').touched"
+      class="text-danger">précisez les dates</div>
+  </div>
+
+  <div class="form-group">
+    <nz-select style="width: 100px;" nzShowSearch nzAllowClear nzPlaceHolder="justifié ?"
+      id="justified" name="justified" formControlName="justified">
+      <nz-option nzLabel="NON" nzValue="0"></nz-option>
+      <nz-option nzLabel="OUI" nzValue="1"></nz-option>
+    </nz-select>
+    <div *ngIf="absenceForm.get('justified').errors && absenceForm.get('justified').touched"
+      class="text-danger">précisez si justifié</div>
+  </div>
+
+  <div class="form-group">
+    <input type="text" id="reason" name="reason"
+    class="form-control mr-3" formControlName="reason" placeholder="motif">
+    <div *ngIf="absenceForm.get('reason').errors && absenceForm.get('reason').touched"
+      class="text-danger">saisir le motif svp</div>
+  </div>
+
+  <div class="form-group">
+    <label for="comment" class="text-secondary">commentaire</label><br>
+    <textarea name="comment" class="form-control" formControlName="comment" 
+      id="comment" cols="5" rows="2" style="resize: none;"></textarea>
+    </div>
+
+  <div class="form-group text-center">
+    <button class="btn btn-success mr-2" [disabled]="!absenceForm.valid" type="submit">valider</button>
+    <button class="btn btn-success mr-2" [disabled]="!absenceForm.valid"
+      type="button" (click)="saveAbsence(true)">valider et nouveau</button>
+    <button class="btn btn-secondary" (click)="cancel()" type="button">annuler</button>
+  </div>
+      
+</form>

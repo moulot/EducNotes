@@ -1,0 +1,63 @@
+<div class="mb-2">
+  <div class="d-flex justify-content-between">
+    <div>
+      <nz-radio-group>
+        <label nz-radio-button nzValue="large">semaine</label>
+        <label nz-radio-button nzValue="large">mois</label>
+      </nz-radio-group>
+    </div>
+    <div>
+      <h6><strong>{{strMonday}} - {{strSunday}}</strong></h6>
+    </div>
+    <div>
+      RIGHT
+    </div>
+  </div>
+  <div class="d-flex mt-2">
+    <div style="width: 50px"></div>
+    <div class="flex-fill bordered">{{weekDays[0]}}</div>
+    <div class="flex-fill bordered">{{weekDays[1]}}</div>
+    <div class="flex-fill bordered">{{weekDays[2]}}</div>
+    <div class="flex-fill bordered">{{weekDays[3]}}</div>
+    <div class="flex-fill bordered">{{weekDays[4]}}</div>
+    <div class="flex-fill bordered">{{weekDays[5]}}</div>
+    <div class="flex-fill bordered">{{weekDays[6]}}</div>
+  </div>
+  <div class="d-flex">
+    <div style="width: 50px">
+      <div class="hour-div">7h</div>
+      <div class="hour-div">8h</div>
+      <div class="hour-div">9h</div>
+      <div class="hour-div">10h</div>
+      <div class="hour-div">11h</div>
+      <div class="hour-div">12h</div>
+      <div class="hour-div">13h</div>
+      <div class="hour-div">14h</div>
+      <div class="hour-div">15h</div>
+      <div class="hour-div">16h</div>
+      <div class="hour-div">17h</div>
+      <div class="hour-div">18h</div>
+    </div>
+    <div class="flex-fill bordered dayCol">
+      <app-schedule-day [items]="monCourses"></app-schedule-day>
+    </div>
+    <div class="flex-fill bordered dayCol">
+      <app-schedule-day [items]="tueCourses"></app-schedule-day>
+    </div>
+    <div class="flex-fill bordered dayCol">
+      <app-schedule-day [items]="wedCourses"></app-schedule-day>
+    </div>
+    <div class="flex-fill bordered dayCol">
+      <app-schedule-day [items]="thuCourses"></app-schedule-day>
+    </div>
+    <div class="flex-fill bordered dayCol">
+      <app-schedule-day [items]="friCourses"></app-schedule-day>
+    </div>
+    <div class="flex-fill bordered dayCol">
+      <app-schedule-day [items]="satCourses"></app-schedule-day>
+    </div>
+    <div class="flex-fill bordered dayCol">
+      <app-schedule-day [items]="sunCourses"></app-schedule-day>
+    </div>
+  </div>
+</div>

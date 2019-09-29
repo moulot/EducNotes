@@ -1,0 +1,87 @@
+<!-- <nav class="navbar navbar-expand-lg navbar-light bg-light"> -->
+    <!-- <a class="navbar-brand" [routerLink]="['/teacher']">Educ'Notes</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button> -->
+
+  <!-- <div class="collapse navbar-collapse" id="navbarColor03">
+    <ul class="navbar-nav mr-auto"> -->
+      <!-- <li class="nav-item active">
+        <a class="nav-link" [routerLink]="['/teacher']">Accueil</a>
+      </li>
+      <li class="nav-item active" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/agenda']">cahier de textes</a>
+      </li>
+      <li class="nav-item active" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/classes']">classes</a>
+      </li>
+      <li class="nav-item active" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/notes']">notes</a>
+      </li>
+      <li class="nav-item active" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/members']">carnet d'abscence</a>
+      </li> -->
+      <!-- <li class="nav-item active" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/members']">emploi du temps</a>
+      </li> -->
+      <!-- <li class="nav-item active" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/members']">Matches</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/lists']">Lists</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/messages']">Messages</a>
+      </li>
+      <li *appHasRole="['Admin', 'Moderator']" class="nav-item" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/admin']">Admin</a>
+      </li> -->
+    <!-- </ul> -->
+
+    <!-- <div *ngIf="loggedIn()" class="dropdown" dropdown>
+          <span class="mr-1">
+            <img src="{{photoUrl || '../../assets/user.png'}}" class="rounded-circle" alt="">
+          </span>
+          <a class="dropdown-toggle " dropdownToggle>
+            {{authService.currentUser.lastName | titlecase}} {{authService.currentUser.firstName | titlecase}}
+          </a>
+        
+          <div class="dropdown-menu mt-2" *dropdownMenu>
+            <a class="dropdown-item" [routerLink]="['/member/edit']">
+              <i class="fa fa-user"></i> Edit Profile</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" (click)="logout()"><i class="fa fa-sign-out"></i> Logout</a>
+          </div>
+      </div> -->
+  <!-- </div>
+</nav> -->
+
+<div class="d-flex">
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/teacher']">accueil</a>
+  </div>
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/agenda']">cahier de textes</a>
+  </div>
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/classes']">classes</a>
+  </div>
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/notes']">notes</a>
+  </div>
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/members']">carnet d'abscence</a>
+  </div>
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/members']">Matches</a>
+  </div>
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/lists']">Lists</a>
+  </div>
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/messages']">Messages</a>
+  </div>
+  <div *appHasRole="['Admin', 'Moderator']" class="" routerLinkActive="active">
+    <a class="text-15 text-muted" [routerLink]="['/admin']">Admin</a>
+  </div>
+</div>

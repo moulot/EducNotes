@@ -1,0 +1,42 @@
+.chk {
+    font-size: 15px;
+}
+
+.error-div {
+    width: 200px
+}
+
+.box-course{
+  width: 35px;
+  height: 35px;
+}
+
+.animate {
+  transition: all 3s ease;
+}
+
+.show {
+  display: block
+}
+
+.hide {
+  display: none
+}
+
+.list-horizontal .list-item .div-thumb img {
+  height: 37px;
+  object-fit: cover;
+}
+.list-grid .list-item .div-thumb img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.display-none {
+  display: none
+}
+
+.display-block {
+  display: block
+}

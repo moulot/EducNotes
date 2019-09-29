@@ -1,0 +1,215 @@
+<div class="row">
+
+  <div class="col-md-12">
+    <div class="lead text-15 m-0 pb-2">tableau de bord des notes</div>
+    <!-- <p class="text-13 text-muted">notes des élèves par classe, par type et par période</p> -->
+  </div>
+
+  <div class="col-md-12">
+    <form [formGroup]="notesForm" (ngSubmit)="showNotes()">  
+      <div class="card p-2 mb-1">
+        
+        <div class="row">
+          <div class="col-md-2">
+            <nz-select #classSelect nzShowSearch nzPlaceHolder="entrez la classe"
+              formControlName="aclass" nzSize="default" nzAllowClear>
+              <nz-option *ngFor="let item of teacherClasses" nzLabel="{{item.className}}" nzValue="{{item.classId}}"></nz-option>
+            </nz-select>
+          </div>
+          <div class="col-md-2">
+            <nz-select #courseSelect nzSize="default" nzShowSearch nzAllowClear
+              formControlName="course" nzPlaceHolder="entrez le cours">
+              <nz-option *ngFor="let item of teacherCourses" nzLabel="{{item.courseName}}" nzValue="{{item.courseId}}"></nz-option>
+            </nz-select>
+          </div>
+          <div class="col-md-2">
+            <nz-select #periodSelect nzShowSearch nzSize="default"
+              nzAllowClear formControlName="period" nzPlaceHolder="entrez la période">
+              <nz-option *ngFor="let item of periods" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
+            </nz-select>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" [disabled]="!notesForm.valid" class="btn btn-primary btn-sm mr-2">valider</button>
+            <button (click)="cancelNotesFrom()" type="button" class="btn btn-default btn-sm">annuler</button>
+          </div>
+          <div class="col-md-4">
+            <button type="button" [routerLink]="['/addEval']" routerLinkActive="router-link-active"  class="btn btn-outline-primary btn-sm float-right">créer une évaluation</button>              
+          </div>
+        </div>
+
+      </div>  
+    </form>
+  </div>
+
+</div>
+
+  <div *ngIf="toggleListAdd">
+
+    <div *ngIf="showTable">
+
+      <div *ngIf="evals.length > 0">
+
+        <div class="row m-2">
+
+          <div class="col-md-4">
+            <input id="search" placeholder="recherche élève" [formControl]="searchControl" class="form-control " type="search">
+          </div>
+
+          <div class="col-md-12 mb-1">
+            <!-- GRID AND LIST BUTTONS -->
+            <!-- <div class="col-md-6">
+              <button class="btn btn-sm btn-rounded btn-outline-light btn-svg mr-2" [ngClass]="{active: viewMode === 'grid'}" (click)="viewMode = 'grid'">
+                <svg version="1.1" width="16px" id="grid" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                  x="0px" y="0px" viewBox="0 0 369.946 369.946" style="enable-background:new 0 0 369.946 369.946;" xml:space="preserve">
+                  <path d="M250.609,0h-11.934H131.271h-11.934H0v119.337v11.934v107.404v11.934v119.337h119.337h11.934
+                      h107.404h11.934h119.337V250.609v-11.934V131.271v-11.934V0H250.609z M238.675,11.934v107.404H131.271V11.934H238.675z
+                        M238.675,131.271v107.404H131.271V131.271H238.675z M11.934,11.934h107.404v107.404H11.934V11.934z M11.934,131.271h107.404
+                      v107.404H11.934V131.271z M11.934,358.012V250.609h107.404v107.404H11.934z M131.271,358.012V250.609h107.404v107.404H131.271z
+                        M358.012,358.012H250.609V250.609h107.404V358.012z M358.012,238.675H250.609V131.271h107.404V238.675z M250.609,119.337V11.934
+                      h107.404v107.404H250.609z" />
+                </svg>
+              </button>
+              <button class="btn btn-sm btn-rounded btn-outline-light btn-svg" [ngClass]="{active: viewMode === 'list'}" (click)="viewMode = 'list'">
+                <svg version="1.1" id="list" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+                  y="0px" width="16px" height="16px" viewBox="0 0 612 612" style="enable-background:new 0 0 612 612;" xml:space="preserve">
+                  <path d="M0,97.92v24.48h612V97.92H0z M0,318.24h612v-24.48H0V318.24z M0,514.08h612V489.6H0V514.08z" />
+                </svg>
+              </button>
+            </div> -->
+          </div>
+
+        </div>
+        
+        <!-- HEADER -->
+        <div class="row ml-2 mr-2" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
+          <div class="list-item" [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-3': viewMode === 'grid'}">
+            <div class="card mb-1 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
+              <div class="div-thumb p-0 d-flex align-self-center">
+                <!-- TUMBNAIL -->
+                <div>&nbsp;</div>
+              </div>
+              <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
+                <div class="card-body o-hidden p-1 d-flex flex-column justify-content-start align-items-lg-center"
+                  [ngClass]="{'flex-lg-row': viewMode === 'list'}">
+                  <!-- OTHER DATA -->
+                  <div class="w-20 w-sm-100">
+                    <div class="item-title">nom & prénoms</div>
+                  </div>                        
+                  <div *ngFor="let eval of evals, index as i" class="w-10 w-sm-25">
+                    <div class="item-title">
+                      <ng-template #popTitle>{{eval.name}}</ng-template>
+                      <ng-template #popContent>
+                        <p class="text-muted text-13 m-0">{{eval.evalType.name}}</p>
+                        <p class="text-muted text-13 m-0" *ngIf="eval.graded">note/{{eval.maxGrade}}. coeff:{{eval.coeff}}</p>
+                        <p class="text-muted text-13 m-0" *ngIf="!eval.graded">non notée</p>
+                      </ng-template>
+                      <div class="d-flex">
+                        <a class="d-flex" [ngbPopover]="popContent" [popoverTitle]="popTitle" style="cursor: pointer"
+                        triggers="mouseenter:mouseleave" (click)="enterGrades(eval, userGrades, i)">
+                        {{eval.name}}
+                      </a>
+                      <!-- <button type="button" class="d-flex" *ngIf="eval.graded" (click)="enterGrades(eval, userGrades, i)"
+                        class="btn btn-outline-primary btn-sm m-1"><i class="i-Edit"></i></button> -->
+                      </div>
+                    </div>
+                  </div>
+                  <div href="" class="w-35 w-sm-80">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DATA LIST -->
+        <div class="row m-2" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
+          <!-- SINGLE LIST ITEM -->
+          <div *ngFor="let student of filteredUserGrades | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index" 
+            class="list-item"
+            [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-3': viewMode === 'grid'}"
+            [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}"
+          >
+            <div class="card o-hidden mb-3 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
+              <div class="div-thumb d-flex">
+                <!-- TUMBNAIL -->
+                <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
+              </div>
+              <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
+                <div class="card-body p-1 align-self-center d-flex flex-column justify-content-start align-items-lg-center"
+                  [ngClass]="{'flex-lg-row': viewMode === 'list'}">
+                  <!-- OTHER DATA -->
+                  <div class="w-20 w-sm-100">
+                    <div class="item-title">{{student.studentName}}</div>
+                  </div>                        
+                  <div *ngFor="let grade of student.grades, index as i" class="d-flex w-10 w-sm-100">
+                    <!-- <div class="d-flex mr-1" [ngClass]="{'display-none': viewMode === 'list', 'display-block': viewMode === 'grid'}">{{evals[i].name}}:</div> -->
+                    <div class="d-flex item-title">{{grade}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- PAGINATION CONTROL -->
+          <div class="col-md-12 mt-3" *ngIf="userGrades?.length">
+            <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
+          </div>
+        </div>
+
+        <!-- <div class="col-md-12">
+          <div class="card o-hidden">
+            <ngx-datatable
+              style="height: 500px; box-shadow: none"
+              class="material fullscreen"
+              [columnMode]="'force'"
+              [headerHeight]="120"
+              [footerHeight]="50"
+              [rowHeight]="60"
+              [scrollbarV]="true"
+              [rows]="filteredUserGrades">
+              <ngx-datatable-column name="photoUrl" [maxWidth]="80">
+                <ng-template ngx-datatable-header-template>
+                  élève
+                </ng-template>
+                <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+                    <img height="60px" width="60px" style="border-radius: 4px" [src]="value" alt="">
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="studentName" [width]="100">
+                <ng-template ngx-datatable-header-template>
+                  nom
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column *ngFor="let eval of evals, index as i">
+                <ng-template let-column="column" ngx-datatable-header-template>
+                  <p class="text-muted text-13 m-0">{{eval.name}}</p>
+                  <p class="text-muted text-13 m-0">{{eval.evalType.name}}</p>
+                  <p class="text-muted text-13 m-0" *ngIf="eval.graded">note/{{eval.maxGrade}}. coeff:{{eval.coeff}}</p>
+                  <p class="text-muted text-13 m-0" *ngIf="!eval.graded">non notée</p>
+                  <button type="button" *ngIf="eval.graded" (click)="enterGrades(eval, userGrades, i)" class="btn btn-primary btn-sm m-1"><i class="i-Edit"></i></button>
+                </ng-template>
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  {{row.grades[i]}}
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </div>
+        </div> -->
+      
+      </div>
+
+      <div *ngIf="evals.length === 0">
+        <!-- <ngb-alert class="alert-card mb-4" [type]="Warning" (close)="closeAlertCard(alert)">
+          <strong class="text-capitalize">attention!</strong>aucune évaluation disponible pour cette sélection. recommencez svp
+        </ngb-alert> -->
+        <nz-alert nzType="warning" nzMessage="Attention"
+          nzDescription="aucune évaluation disponible pour cette sélection. recommencez svp" nzShowIcon>
+        </nz-alert>
+      </div>
+              
+    </div>
+
+  </div>
+      
+  <div *ngIf="!toggleListAdd">
+    <app-grade-addForm (toggleView)="toggleView($event)" (cancelNotesFrom)="cancelNotesFrom()"></app-grade-addForm>
+  </div>  

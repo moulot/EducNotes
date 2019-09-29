@@ -1,0 +1,45 @@
+a {
+    text-decoration: none
+}
+
+.scene {
+    width: 200px;
+    height: 215px;
+    perspective: 600px;
+}
+
+.card-box {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: transform 0.5s;
+    transform-style: preserve-3d;
+}
+.cardFace {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    backface-visibility: hidden;
+}
+  
+.cardFaceBack {
+    transform: rotateY( 180deg );
+}
+  
+.card-box.is-flipped {
+    transform: rotateY(180deg);
+}
+
+.list-grid .list-item .pic-blured img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    opacity: 0.3;
+}
+
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    transform: translate(-50%, -50%);
+}

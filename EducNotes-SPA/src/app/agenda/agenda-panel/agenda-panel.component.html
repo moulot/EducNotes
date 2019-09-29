@@ -1,0 +1,22 @@
+<!--
+<div class="container">
+  <div class="d-flex">
+    <div class="form-inline ml-3">
+      <i class="fa fa-calendar" style="font-size:20px;color:blue"></i>
+      <h4 class="mt-2 ml-1">cahier de textes</h4>
+    </div>
+    <div class="btn-group float-right ml-auto mt-2">
+      <button type="button" class="btn btn-secondary" (click)="activateList()">vue liste</button>
+      <button type="button" class="btn btn-secondary" 
+        (click)="activateSchedule()">vue emploi du temp s</button>
+    </div>
+</div>
+</div>
+-->
+<div *ngIf="this.listActive == true">
+  <app-agenda-list></app-agenda-list>
+</div>
+
+<div *ngIf="this.scheduleActive == true">
+  <app-agenda-schedule></app-agenda-schedule>
+</div>

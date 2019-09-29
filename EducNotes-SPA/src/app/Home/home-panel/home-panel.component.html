@@ -1,0 +1,27 @@
+<div *ngIf="!loggedIn()" class="row m-4">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <app-signin></app-signin>
+  </div>
+  <div class="col-md-2"></div>
+</div>
+
+<div *ngIf="loggedIn()" class="container-fluid">
+
+  <div *ngIf="parentLoggedIn()">
+    <app-parent-dashboard></app-parent-dashboard>      
+  </div>
+
+  <div *ngIf="studentLoggedIn()">
+    <app-student-dashboard></app-student-dashboard>
+  </div>
+
+  <div *ngIf="teacherLoggedIn()">
+    <app-teacher-dashboard></app-teacher-dashboard>     
+  </div>
+
+  <div *ngIf="adminLoggedIn()">
+    <app-home-admin></app-home-admin>
+  </div>
+
+</div>

@@ -1,0 +1,58 @@
+<div class="row justify-content-center align-items-center mt-3"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+ 
+    <div class="col-md-8" >
+        <div class="card pt-2">
+            <form nz-form [formGroup]="registerForm" (ngSubmit)="submit()">
+              
+               
+                 <nz-form-item>
+                    <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="levelId">Type de compte</nz-form-label>
+                    <nz-form-control [nzSm]="14" [nzXs]="24">
+                        <nz-select name="userTypeId" id="userTypeId"  style="width: 100%" nzShowSearch 
+                        nzAllowClear nzPlaceHolder="Choisir le type de compte" formControlName="userTypeId" (ngModelChange)="typeCheicking()">
+                        <nz-option *ngFor="let userType of userTypes" nzValue="{{userType.id}}" nzLabel="{{userType.name}}"></nz-option>
+                        </nz-select>
+                    </nz-form-control>
+                 </nz-form-item>
+
+                 <nz-form-item>
+                    <nz-form-label [nzSm]="6" [nzXs]="24">Email</nz-form-label>
+                    <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="registerForm.controls['email']">
+                      <nz-input-group nzAddOnBefore="@">
+                        <input type="text" nz-input placeholder="email" formControlName="email" id="email">
+                    <nz-form-explain *ngIf="registerForm.get('email').touched && registerForm.get('email').errors">Entrer un email valide!</nz-form-explain>
+                      </nz-input-group>
+                    </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item *ngIf="showCourses">
+                    <nz-form-label [nzSm]="6" [nzXs]="24"  nzFor="suffixe">Choisir ses cours</nz-form-label>
+                   <nz-form-control [nzSm]="14" [nzXs]="24"> 
+                    <nz-select style="width: 100%" formControlName="courseIds"  [nzSize]="'default'" nzMode="tags" nzPlaceHolder="Choisir ses cours">
+                        <nz-option *ngFor="let course of courses" [nzLabel]="course.name" [nzValue]="course.id"></nz-option>
+                    </nz-select>
+                    </nz-form-control>
+                 </nz-form-item>
+      
+                 
+                 <nz-form-item *ngIf="showNumber">
+                    <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="totalChild">Entrer le Nombre d'enfant</nz-form-label>
+                    <nz-form-control [nzSm]="14" [nzXs]="24">
+                        <nz-input-number name="totalChild" id="totalChild" style="width: 200px" [nzPlaceHolder]="'nombre'" formControlName="totalChild" [nzMin]="1" [nzMax]="100" [nzStep]="1"></nz-input-number>
+                    </nz-form-control>
+                 </nz-form-item>
+
+                   <nz-form-item>
+                    <nz-form-control [nzSpan]="14" [nzOffset]="6">
+                        <button type="submit" [disabled]="!registerForm.valid || submitText!='enregistrer'"
+                          class="btn btn-outline-primary"><span>{{submitText}}</span></button>
+                        <button type="button"  class="btn btn-outline-primary ml-2" (click)="cancel()"><span>annuler</span></button>
+                    </nz-form-control>
+                  </nz-form-item>
+         </form>
+          
+            
+        </div>
+      </div>
+</div>
+

@@ -1,0 +1,202 @@
+<div class="row">
+
+  <div class="border-top mb-3"></div>
+
+  <div class="col-lg-5 col-md-12">
+    
+    <div class="row">
+
+      <div class="col-md-12 mb-2">
+        <div class="card o-hidden">
+          <div class="card-body p-2">
+            <div class="d-flex">
+              <i class="d-flex i-Receipt-4 icon mr-3"></i>
+              <div class="content">
+                <p class="lead pt-0 mt-0 mb-1">feuille d'appel</p>
+                <!-- <div class="d-flex">
+                  <div *ngFor="let class of teacherClasses" class="d-flex">
+                    <a [routerLink]="['/callSheet', class.classId]" class="text-15 text-primary mr-3">classe {{class.className}}</a>
+                  </div>
+                </div> -->
+                <div *ngIf="nextCourses?.length > 0">
+                  <div class="d-flex">
+                    <nz-select #classSelect nzShowSearch nzPlaceHolder="choisir le cours" style="width: 300px"
+                      [formControl]="coursesControl" class="mr-1" nzAllowClear>
+                      <nz-option *ngFor="let item of nextCourses" nzValue="{{item.scheduleId}}"
+                        nzLabel="{{item.className}} {{item.courseName}} {{item.startHourMin}} - {{item.endHourMin}}"></nz-option>
+                    </nz-select>
+                    <button type="button" (click)="goToClass()" class="btn btn-sm btn-outline-primary">OK</button> 
+                  </div>
+                </div>
+                <div *ngIf="nextCourses?.length == 0">
+                  <div class="d-flex">
+                    <p class="text-15 text-muted m-0">pas de cours aujourd'hui</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngFor="let class of teacherClasses" class="col-md-12">
+        <div class="card mb-2">
+        <div class="card-body p-2">
+          <!-- <div class="card-title">mes classes</div> -->
+          <div>
+            <h3 class="lead mb-2">classe {{class.className}}</h3>
+            <div class="row">
+              <div class="col-md-3 mb-1">
+                <a [routerLink]="['/studentsClass', class.classId]">
+                  <div class="card card-icon m-0 icon-btn">
+                    <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                      <i class="i-MaleFemale"></i>
+                      <p class="text-muted mt-2 mb-2">{{class.nbStudents}} élèves</p>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-md-3 mb-1">
+                <a [routerLink]="['/agendas', class.classId]">
+                  <div class="card card-icon m-0 icon-btn">
+                    <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                      <i class="i-Receipt"></i>
+                      <p class="text-muted mt-2 mb-2">c. textes</p>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-md-3 mb-1">
+                <div class="card card-icon mb-0 icon-btn">
+                  <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                    <i class="i-Pen-5"></i>
+                    <p class="text-muted mt-2 mb-2">notes</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card card-icon mb-0 icon-btn">
+                  <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                    <i class="i-Conference"></i>
+                    <p class="text-muted mt-2 mb-2">vie classe</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="col-lg-4 col-md-12">
+  
+    <div class="row">
+
+      <div class="col-md-12">
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="lead mb-1">évaluations</div>
+            <div class="row">
+              
+              <div class="col-md-12 mb-2">
+                <button [routerLink]="['/addEval']" routerLinkActive="router-link-active"  type="button" class="btn btn-outline-primary btn-block">ajouter une évaluation</button>
+              </div>
+
+              <div class="col-md-12 mb-2">
+                <div class="p-2 border rounded d-flex align-items-center">
+                  <div>
+                    <h4 class="text-18 mb-1">évaluations à noter</h4>
+                    <p class="text-small text-muted">notes à renseigner pour ces évaluations</p>
+                  </div>
+                </div>
+              </div>
+                  
+              <div class="col-md-12 mb-2">
+                <div class="p-2 border rounded d-flex align-items-center">
+                  <div>
+                    <h4 class="text-18 mb-1">évaluations à venir</h4>
+                    <p class="text-small text-muted">évaluations programmées par le professeur</p>
+                  </div>
+                </div>
+              </div>
+                  
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="col-lg-3 col-md-12">
+    <div class="row">
+
+      <div class="col-md-12 col-sm-12">
+        <div class="card mb-2 p-2">
+          <div class="card-body">
+            <div class="lead m-0">mon agenda</div>
+            <p class="text-small text-muted">programme de la semaine.</p>
+            <nz-timeline>
+              <nz-timeline-item nzColor="green">
+                <div>
+                  <strong class="mr-1"><a href="#">8:30 - math 5e A</a></strong>
+                  <p class="text-muted">devoir surveillé</p>
+                </div>
+              </nz-timeline-item>
+              <nz-timeline-item nzColor="green">
+                <div>
+                  <strong class="mr-1"><a href="#">10:30 - physique 5e A</a></strong>
+                  <p class="text-muted"></p>
+                </div>
+              </nz-timeline-item>
+              <nz-timeline-item [nzDot]="dotTemplate" nzColor="red">
+                <p>Solve initial network problems 3 2015-09-01</p>
+              </nz-timeline-item>
+              <nz-timeline-item>
+                <p>Technical testing 1</p>
+                <p>Technical testing 3 2015-09-01</p>
+              </nz-timeline-item>
+              <nz-timeline-item nzColor="gray">
+                <p>Technical testing 1</p>
+              </nz-timeline-item>
+              <nz-timeline-item nzColor="gray">
+                <p>Technical testing 1</p>
+                <p>Technical testing 2</p>
+              </nz-timeline-item>
+            </nz-timeline>
+            <ng-template #dotTemplate>
+              <i nz-icon nzType="clock-circle-o" style="font-size: 16px;"></i>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="card mb-2">
+          <div class="card-body">
+            <h6 class="mb-2">Last 7 days traffic status</h6>
+            <p class="text-24 font-weight-light mb-1"><i class="i-Up text-success"></i> 15%</p>
+            <div>ECHART</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="card mb-2">
+          <div class="card-body">
+            <h6 class="mb-2">Server failures</h6>
+            <p class="text-24 font-weight-light mb-1"><i class="i-Down text-danger"></i> 5%</p>
+            <div>ECHART</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  
+</div>

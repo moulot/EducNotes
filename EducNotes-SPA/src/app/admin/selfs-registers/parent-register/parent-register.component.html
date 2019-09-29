@@ -1,0 +1,429 @@
+<div class="row m-2" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+    
+  <div class="separator-breadcrumb border-top"></div>
+  <div class="col-md-12" *ngIf="wait"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+      <ngb-alert class="alert-card text-center">
+      <h3>veuillez patienter s'il vous plait...</h3>
+      </ngb-alert>
+  </div>
+  
+  <div class="col-md-12"  *ngIf="!wait">
+    
+    <form-wizard>
+      <wizard-step [title]="'CONFIGURER VOTRE COMPTE UTILISATEUR'" [isValid]="user1Form.valid" (onNext)="onStep1Next($event)">
+          <div class="row m-2">
+              <div class="col-md-12">
+                  <div class="card mb-4">
+                      <div class="card-body">
+                          <div class="card-title mb-3">ENREGISTREMENT VOS INFORMATIONS</div>
+                          <form [formGroup]="user1Form">
+                              <div class="row">
+
+                                <div class="form-group col-md-6 mb-3">
+                                  <label for="lastName">Nom</label>
+                                  <input type="text" class="form-control" id="lastName" name="lastName" placeholder="entrer le nom" formControlName="lastName">
+                                </div>
+
+                                <div class="form-group col-md-6 mb-3">
+                                  <label for="firstName">Prénom(s)</label>
+                                  <input type="text" class="form-control" id="firstName" name="firstName" placeholder="entrer le prénoms" formControlName="firstName">
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputEmail1">Email</label>
+                                    <input  type="email" class="form-control" id="email" name="email"  formControlName="email" readonly
+                                     aria-describedby="emailHelp" placeholder="entrer l'email">
+                                 </div>
+
+                                <div class="form-group col-md-6 mb-3">
+                                    <label for="firstName">Nom d'utilisateur</label>
+                                    <input type="text" class="form-control" id="userName" name="userName" placeholder="entrer votre login ou nom utilisateur" formControlName="userName">
+                                </div>
+
+                                <div class="form-group col-md-6 mb-3">
+                                  <label for="firstName">Sexe</label>
+                                  <select  nzAllowClear placeHolder="Choisir le sexe" formControlName="gender" id="gender" class="form-control">
+                                      <option value="1">Homme</option>
+                                      <option value="0">Femme</option>
+                                    </select>
+                                 </div>
+
+                                 <div class="form-group col-md-6">
+                                    <label for="exampleInputEmail1">Date de naissance</label> <br> 
+                                    <nz-date-picker formControlName="dateOfBirth" id="datenaiss" [nzFormat]="'dd-MMMM-yyyy'" style="width: 500px" nzPlaceHolder="date de naissance"></nz-date-picker>
+                                 </div>
+
+
+                                <div class="form-group col-md-6 mb-3">
+                                  <label for="firstName">Mot de passe </label>
+                                  <input type="password" class="form-control" id="password" (ngModelChange)="updateUser1ConfirmValidator()" minlength="4" name="password" placeholder="entrer votre mot de passe" formControlName="password">
+                                   <nz-form-explain *ngIf="user1Form.get('password').dirty && user1Form.get('password').errors">Entrer votre mot de passe s'il vous plait</nz-form-explain>
+                                </div>
+
+                                <div class="form-group col-md-6 mb-3">
+                                  <label for="firstName">Confirmez votre mot de passe</label>
+                                  <input type="password" class="form-control" minlength="4" id="checkPassword" name="checkPassword" placeholder="confirmer le mot de passe" formControlName="checkPassword">
+                                  <nz-form-explain *ngIf="user1Form.get('checkPassword').dirty && user1Form.get('checkPassword').errors">
+                                    <ng-container *ngIf="user1Form.get('checkPassword').hasError('required')">
+                                      Confirmer le mot de passe!
+                                    </ng-container>
+                                    <ng-container *ngIf="user1Form.get('checkPassword').hasError('confirm')">
+                                        Les deux mots de passe que vous entrez sont differents !
+                                    </ng-container>
+                                  </nz-form-explain>
+                                </div>
+                                
+                                <div class="form-group col-md-6">
+                                  <label for="phone">Contact principal</label>
+                                  <input class="form-control" id="phone"  formControlName="phoneNumber" name="phone" [textMask]="{mask: phoneMask}" 
+                                  placeholder="entrer le contact principal">
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label for="phone">Second contact</label>
+                                    <input class="form-control" id="phone"  formControlName="secondPhoneNumber" name="sphone"  [textMask]="{mask: phoneMask}" placeholder="second contact">
+                                </div>
+
+                                  <div class="form-group col-md-6">
+                                    <label for="phone">Ville</label>
+                                    <select  class="form-control" placeholder="choisissez la ville"  formControlName="cityId" id="cityId" name="cityId" (change)="getUser1Districts()">
+                                        <option *ngFor="let city of cities" value="{{city.id}}" >{{city.name}}</option>
+                                    </select>
+                                  </div>
+
+                                  <div class="form-group col-md-6">
+                                      <label for="phone">Commune ou quartier</label>
+                                      <select class="form-control"  placeholder="Choisir le quartier ou commune" formControlName="districtId" id="districtId" name="districtId">
+                                        <option *ngFor="let district of user1Disctricts" value="{{district.id}}">{{district.name}}</option>
+                                    </select>
+                                  </div>
+                                  
+                              </div>
+                              
+                            
+                            </form>
+                      </div>
+                  </div>
+                  </div>
+         </div>
+      </wizard-step>
+
+      <wizard-step [title]="'DEUXIEME COMPTE PARENT'"   (onNext)="onStep2Next($event)">
+          <div class="row m-2">
+              <div class="col-md-12">
+                  <div class="card mb-4">
+                      <div class="card-body">
+                          <div class="card-title mb-3">AUTRR COMPE COMPTE PARENT </div>
+                          <form [formGroup]="user2Form">
+                              <div class="row">
+
+                                <div class="form-group col-md-6 mb-3">
+                                  <label for="lastName">Nom</label>
+                                  <input type="text" class="form-control" id="lastName" name="lastName" placeholder="entrer nom" formControlName="lastName">
+                                </div>
+
+                                <div class="form-group col-md-6 mb-3">
+                                  <label for="firstName">Prénom(s)</label>
+                                  <input type="text" class="form-control" id="firstName" name="firstName" placeholder="entrer prénoms" formControlName="firstName">
+                                </div>
+
+                                <div class="form-group col-md-6 mb-3">
+                                    <label for="firstName">Sexe</label>
+                                    <select  nzAllowClear placeHolder="Choisir le sexe" formControlName="gender" id="gender" class="form-control">
+                                        <option value="1">Homme</option>
+                                        <option value="0">Femme</option>
+                                      </select>
+                                   </div>
+                                   <div class="form-group col-md-6 mb-3">
+                                    <label for="firstName">Nom d'utilisateur</label>
+                                    <input type="text" class="form-control" id="userName" name="userName" placeholder="entrer votre login ou nom utilisateur" formControlName="userName">
+                                   </div>
+                                   <div class="form-group col-md-6 mb-3">
+                                    <label for="firstName">Mot de passe </label>
+                                    <input type="password" class="form-control" id="password" (ngModelChange)="updateUser2ConfirmValidator()" minlength="4" name="password" placeholder="entrer votre mot de passe" formControlName="password">
+                                     <nz-form-explain *ngIf="user1Form.get('password').dirty && user1Form.get('password').errors">Entrer votre mot de passe s'il vous plait</nz-form-explain>
+                                  </div>
+  
+  
+                                  <div class="form-group col-md-6 mb-3">
+                                    <label for="firstName">Confirmez votre mot de passe</label>
+                                    <input type="password" class="form-control" minlength="4" id="checkPassword" name="checkPassword" placeholder="confirmer le mot de passe" formControlName="checkPassword">
+                                    <nz-form-explain *ngIf="user1Form.get('checkPassword').dirty && user1Form.get('checkPassword').errors">
+                                      <ng-container *ngIf="user1Form.get('checkPassword').hasError('required')">
+                                        Confirmer le mot de passe!
+                                      </ng-container>
+                                      <ng-container *ngIf="user1Form.get('checkPassword').hasError('confirm')">
+                                          Les deux mots de passe que vous entrez sont differents !
+                                      </ng-container>
+                                    </nz-form-explain>
+                                  </div>
+  
+                                   <div class="form-group col-md-6">
+                                      <label for="exampleInputEmail1">Date de naissance</label> <br> 
+                                      <nz-date-picker formControlName="dateOfBirth" id="datenaiss" [nzFormat]="'dd-MMMM-yyyy'" style="width: 500px" nzPlaceHolder="date de naissance"></nz-date-picker>
+                                   </div>
+
+                               
+                                <div class="form-group col-md-6">
+                                  <label for="phone">Contact principal</label>
+                                  <input class="form-control" id="phone"  formControlName="phoneNumber" name="phone"  [textMask]="{mask: phoneMask}"
+                                  placeholder="entrer le contact principal">
+                                </div>
+                              
+                                <div class="form-group col-md-6">
+                                    <label for="phone">Second contact</label>
+                                    <input class="form-control" id="phone"  formControlName="secondPhoneNumber" name="sphone"  [textMask]="{mask: phoneMask}"
+                                    placeholder="second contact">
+                                 </div>
+
+                                <div class="form-group col-md-6">
+                                  <label class="switch switch-secondary">
+                                          <span>Meme adresse </span>
+                                          <input type="checkbox" formControlName="sameLocationWithUser1" (change)="selectSameLacation($event)">
+                                          <span class="slider"></span>
+                                  </label> <br>
+
+                                    <label for="phone">Ville</label>
+                                    
+
+                                    <select  class="form-control" placeholder  formControlName="cityId" id="cityId" name="cityId" (change)="getUser2Districts()">
+                                        <option *ngFor="let city of cities" value="{{city.id}}" >{{city.name}}</option>
+                                    </select>
+                                  </div>
+                                  <div class="form-group col-md-6">
+                                    <br>
+                                      <label for="phone">Commune ou quartier</label>
+                                      <select class="form-control"  placeholder="Choisir la quartier" formControlName="districtId" id="districtId" name="districtId">
+                                        <option *ngFor="let district of user2Districts" value="{{district.id}}">{{district.name}}</option>
+                                    </select>
+                    
+                                  </div>
+                                  <div class="form-group col-md-6">
+                                      <label for="exampleInputEmail1">Email</label>
+                                      <input type="email" class="form-control" id="exampleInputEmail1" name="exampleInputEmail1"  formControlName="email" aria-describedby="emailHelp" placeholder="Entrer l'email"
+                                        >
+                                    </div>
+                              </div>
+                              
+                            
+                            </form>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </wizard-step>
+
+      <wizard-step [title]="'ENREGISTREMENT ENFANT(S)'" [isValid]="children.length>0" (onNext)="onStep3Next($event)">
+        <div class="m-2">
+          <div class="card"  *ngIf="showChildenList"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+              <div class="card-body">
+                  <nz-alert nzType="info" class="mb-1"  *ngIf=" children.length===0" nzMessage="Aucun enfant enregistré sur {{maxChild}}" nzShowIcon></nz-alert>
+                  <nz-alert nzType="info" class="mb-1"  *ngIf=" children.length>0" nzMessage="{{children.length}} enfant(s) enregistré sur {{maxChild}}" nzShowIcon></nz-alert>
+   
+                  <button class = "btn btn-outline-primary mb-1 mr-1" (click)="add()" *ngIf="children.length < maxChild">ajouter un enfant</button>
+                    
+                    <!-- DATA LIST -->
+                    <div class="row m-4" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
+                    <!-- SINGLE LIST ITEM -->
+                    <div *ngFor="let item of children | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index" 
+                      class="list-item"
+                      [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-3': viewMode === 'grid'}"
+                      [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}"
+                    >
+                      <div class="card o-hidden mb-4 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
+                        <div class="list-thumb d-flex">
+                          <!-- TUMBNAIL -->
+                          <!-- <img [src]="item.photo" alt=""> -->
+                         <i class="i-Girl m-2" style="font-size: 4rem" *ngIf="item.gender==0"></i>
+                          <i class="i-Boy m-2" style="font-size: 4rem" *ngIf="item.gender==1"></i>
+
+                          <div class="d-flex align-items-center">
+                         
+                          </div>
+                        </div>
+                        <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
+                          <div class="card-body align-self-center d-flex flex-column justify-content-start align-items-lg-center"
+                            [ngClass]="{'flex-lg-row': viewMode === 'list'}">
+                            <!-- OTHER DATA -->
+                            <div class="w-20 w-sm-50">
+                              <div class="item-title">{{item.lastName}} {{item.firstName}}</div>
+                            </div>
+                            <div class="w-10 w-sm-50">
+                                <div class="item-title">{{item.dateOfBirth|date:'dd-MM-yyyy'}}</div>
+                              </div>
+                            <div class="w-10 w-sm-25">
+                              <div class="item-title">{{item.level}}</div>
+                            </div>
+                            <div class="w-10 w-sm-50">
+                              <div class="item-title">{{item.phoneNumber}} {{item.secondPhoneNumber}}</div>
+                            </div>
+                            <div class="w-10 w-sm-50">
+                                <div class="item-title">{{item.email}}</div>
+                              </div>
+                              <div class="w-10 w-sm-50">
+                              </div>
+                            
+                            <div href="" class="w-35 w-sm-80">
+                              <button title="editer" nz-button [nzSize]="size" nzType="primary" class="mr-1"><i class="i-Edit"></i></button>
+                              <button  title="supprimer" nz-button [nzSize]="size" nzType="danger" 
+                               nz-popconfirm nzTitle="Etes vous sûre de vouloir supprimer cet élement ?" (nzOnConfirm)="confirm(item)" (nzOnCancel)="cancel()"><i class="i-Delete-File"></i></button>
+                           </div>
+                          </div>
+                          <div class="align-self-center pl-3 pb-2 pr-3 item-select">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    </div>
+
+              
+              </div>
+          </div>
+              
+          <div *ngIf="!showChildenList" class="card"   [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+              <div class="card-body mb-2">
+                  <form [formGroup]="childForm">
+                      <div class="row">
+                        <div class="form-group col-md-6 mb-3">
+                          <label for="lastName">Nom*</label>
+                          <input type="text" class="form-control" id="lastName" name="lastName" placeholder="entrer le nom" formControlName="lastName">
+                        
+                        </div>
+                        <div class="form-group col-md-6 mb-3">
+                          <label for="firstName">Prénom(s)*</label>
+                          <input type="text" class="form-control" id="firstName" name="firstName" placeholder="entrer le prénoms" formControlName="firstName">
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                          <label for="phone">Sexe*</label>
+                          <nz-select  nzAllowClear nzShowSearch nzPlaceHolder="Choisir le sexe" formControlName="gender" id="gender">
+                              <nz-option nzValue="1" nzLabel="Homme"></nz-option>
+                              <nz-option nzValue="0" nzLabel="Femme"></nz-option>
+                            </nz-select>
+                        </div>
+
+                        <div class="form-group col-md-6 mb-3">
+                          <label for="firstName">Nom d'utilisateur</label>
+                          <input type="text" class="form-control" id="userName" name="userName" placeholder="entrer votre login ou nom utilisateur" formControlName="userName">
+                        </div>
+                        <div class="form-group col-md-6 mb-3">
+                          <label for="firstName">Mot de passe </label>
+                          <input type="password" class="form-control" id="password" (ngModelChange)="updateChilConfirmValidator()" minlength="4" name="password" placeholder="entrer votre mot de passe" formControlName="password">
+                           <nz-form-explain *ngIf="user1Form.get('password').dirty && user1Form.get('password').errors">Entrer votre mot de passe s'il vous plait</nz-form-explain>
+                        </div>
+
+
+                        <div class="form-group col-md-6 mb-3">
+                          <label for="firstName">Confirmez votre mot de passe</label>
+                          <input type="password" class="form-control" minlength="4" id="checkPassword" name="checkPassword" placeholder="confirmer le mot de passe" formControlName="checkPassword">
+                          <nz-form-explain *ngIf="user1Form.get('checkPassword').dirty && user1Form.get('checkPassword').errors">
+                            <ng-container *ngIf="user1Form.get('checkPassword').hasError('required')">
+                              Confirmer le mot de passe!
+                            </ng-container>
+                            <ng-container *ngIf="user1Form.get('checkPassword').hasError('confirm')">
+                                Les deux mots de passe que vous entrez sont differents !
+                            </ng-container>
+                          </nz-form-explain>
+                         </div>
+
+                        <div class="form-group col-md-6">
+                          <label for="exampleInputEmail1">Email</label> 
+                          <input type="email" class="form-control" id="exampleInputEmail1" name="exampleInputEmail1" 
+                            formControlName="email" aria-describedby="emailHelp" placeholder="Entrer l'email" >
+                        </div>
+                        <div class="form-group col-md-6">
+                          <label for="exampleInputEmail1">Date de naissance</label> <br> 
+                          <nz-date-picker formControlName="dateOfBirth" id="datenaiss" [nzFormat]="'dd-MMMM-yyyy'" style="width: 500px" nzPlaceHolder="date de naissance"></nz-date-picker>
+                         </div>
+                        <div class="form-group col-md-6">
+                          <label for="phone">Contact principal</label>
+                          <input class="form-control" id="phone"  formControlName="phoneNumber" name="phone" [textMask]="{mask: phoneMask}" 
+                          placeholder="entrer le contact principal">
+          
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="phone">Second contact</label>
+                            <input class="form-control" id="sphone"  formControlName="secondPhoneNumber" name="sphone" [textMask]="{mask: phoneMask}" 
+                            placeholder="second contact">
+          
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label for="phone">Niveau*</label>
+                            <nz-select formControlName="levelId" id="cityId" name="cityId"  nzPlaceHolder="Choisir le niveau">
+                                <nz-option *ngFor="let item of levels"  [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+                            </nz-select>
+                          </div>
+                          
+                      </div>
+                          <div class="d-flex flex-row-reverse">
+                            <div class="form-inline">
+                            <button class="btn btn-outline-primary mr-1" [disabled]="!childForm.valid" (click)="submitChild()">{{submitText}}</button> <button class="btn btn-outline-default" (click)="open()">annuler</button>
+      
+                            </div>
+                          </div>
+                              
+                  </form>
+              </div>
+              
+          </div>
+        </div>
+      </wizard-step>
+
+      <wizard-step [title]="'VERIFICATION'" [isValid]="errorMessage.length===0" (onComplete)="onComplete($event)">
+        <div class="row" *ngFor="let error of errorMessage" class="mb-2">
+            <nz-alert nzType="error" nzShowIcon  nzMessage="{{error}}"
+          >
+          </nz-alert>
+        </div>
+      <div class="row">
+          <div class="col-md-6" *ngIf="children.length>0">
+            <div class="card mb-4">
+              <div class="card-body">
+                <div class="card-title">Enfants</div>
+                <div *ngFor="let item of children">
+                  <div class="d-flex align-items-center border-bottom-dotted-dim pb-3 mb-3">
+                    <img class="avatar-md rounded mr-3" src="../../../../assets/user.png" alt="">
+                    <div class="flex-grow-1">
+                      <h6 class="m-0"> {{item.lastName}} {{item.firstName}} </h6>
+                      <p class="m-0 text-small text-muted">Niveau:{{item.level}} &nbsp;&nbsp;  Date de naissance:  {{item.dateOfBirth|date:'dd-MM-yyyy'}}   </p> 
+                      <p class="m-0 text-small text-muted"> Email:  {{item.email}} &nbsp;&nbsp; Contact(s):  {{item.phoneNumber}}  {{item.secondPhoneNumber}} </p> 
+                    </div>
+                    
+                  </div>
+                  </div>
+                
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-md-6" *ngIf="parents.length>0">
+            <div class="card mb-4">
+              <div class="card-body">
+                <div class="card-title">Parents</div>
+                <div *ngFor="let item of parents">
+                  <div class="d-flex align-items-center border-bottom-dotted-dim pb-3 mb-3">
+                    <img class="avatar-md rounded mr-3" src="../../../../assets/user.png" alt="">
+                    <div class="flex-grow-1">
+                      <h6 class="m-0"> {{item.lastName}} {{item.firstName}} </h6>
+                      <!-- <p class="m-0 text-small text-muted">ville: {{item.city}} &nbsp;&nbsp;  Quartier:  {{item.district}}   </p>  -->
+                      <p class="m-0 text-small text-muted"> Email:  {{item.email}} &nbsp;&nbsp; Contact(s):  {{item.phoneNumber}}  {{item.secondPhoneNumber}} </p> 
+                    </div>
+                    
+                  </div>
+                  </div>
+                
+              </div>
+            </div>
+          </div>
+      </div>
+      
+      </wizard-step>
+    </form-wizard>
+      
+  </div>
+  
+  </div>
+
+ 

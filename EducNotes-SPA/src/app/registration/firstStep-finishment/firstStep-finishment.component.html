@@ -1,0 +1,37 @@
+<div *ngIf="!user">
+    <div  *ngIf="user.emailConfirmed">
+        <div class="alert alert-dismissible alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <h4 class="alert-heading">Aucun compte trouvé!</h4>
+            <p class="mb-0">désolé vous devez creer un compte avant d'acceder a cette page.</p>
+          </div>
+          <p class="lead">
+              <a class="btn btn-primary btn-lg" href="/registration" role="button">creer un compte</a>
+            </p>
+      
+    </div>
+ 
+</div>
+<div class="container">
+    <div class="mt-3"  *ngIf="!user.emailConfirmed">
+        <div class="jumbotron">
+          <h1 class="display-5">Merci <b>{{user.lastName}} {{user.firstName}} </b>pour votre inscription !</h1>
+          <p class="lead">un lien d'activation vous a été envoyer dans à votre mail <b>{{user.email}}</b></p>
+          <p>Si vous ne trouvez pas le mail dans la boite de reception veuillez virifier dans vos couriers indesirables.</p>
+          <p class="lead">
+            <a class="btn btn-primary btn-lg" href="/home" role="button">retour</a>
+          </p>
+        </div>
+      </div>
+      <div  *ngIf="user.emailConfirmed">
+          <div class="alert alert-dismissible alert-warning">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              <h4 class="alert-heading">Pas Permis!</h4>
+              <p class="mb-0">désolé votre compte est deja activer.</p>
+            </div>
+            <p class="lead">
+                <a class="btn btn-primary btn-lg" href="/home" role="button">retour</a>
+              </p>
+        
+      </div>
+</div>

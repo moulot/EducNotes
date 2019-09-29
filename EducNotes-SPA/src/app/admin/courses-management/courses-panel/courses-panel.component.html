@@ -1,0 +1,56 @@
+
+
+       <div *ngIf="!addNew" [@animate]="{value:'*',params:{delay: 500+'ms', y:'50px'}}">
+          <button class="btn btn-outline-primary btn-sm" (click)="newCourse()">Ajouter</button>
+          <div class="col-md-12">
+              <div class="card">
+                <ngx-datatable
+                  style="height: 500px; box-shadow: none"
+                  class="material fullscreen"
+                  [columnMode]="'force'"
+                  [headerHeight]="50"
+                  [footerHeight]="50"
+                  [rowHeight]="60"
+                  [scrollbarV]="true"
+    
+                  [rows]="courses">
+                
+                  <ngx-datatable-column name="name" [width]="50">
+                    <ng-template ngx-datatable-header-template>
+                      Nom
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column name="teachersNumber" [width]="50">
+                    <ng-template ngx-datatable-header-template>
+                      Nombre de Prof
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column name="classesNumber" [width]="50">
+                    <ng-template ngx-datatable-header-template>
+                      Nombre de classes
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column name="studentsNumber" [width]="50">
+                    <ng-template ngx-datatable-header-template>
+                      Effectif Eleve
+                    </ng-template>
+                  </ngx-datatable-column>
+                 
+    
+                  <ngx-datatable-column name="id" [width]="50">
+                    <ng-template ngx-datatable-header-template>
+                      Option
+                    </ng-template>
+                    <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+                      <a href="{{value}}" class="btn btn-outline-primary btn-sm">details</a>
+                  </ng-template>
+                  </ngx-datatable-column>
+                 
+                </ngx-datatable>
+              </div>
+            </div>
+       </div>
+       <div [@animate]="{value:'*',params:{delay: 500+'ms', y:'50px'}}" *ngIf="addNew">
+       <app-new-course (addCourseResult)="resultMode($event)"></app-new-course>
+      </div>
+

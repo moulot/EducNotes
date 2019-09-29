@@ -1,0 +1,19 @@
+.bordered {
+    border: 1px solid #cccccc;
+    margin:0;
+    padding: 0px;
+    width: 14.28%;
+}
+
+.dayCol {
+    position: relative;
+    padding: 0px
+ }
+ 
+.hour-div {
+    border-top: #cccccc 1px solid;
+    border-bottom: #cccccc 1px solid;
+    
+    line-height: 100px;
+    text-align: center;
+}

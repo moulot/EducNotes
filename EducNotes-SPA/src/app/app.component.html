@@ -1,0 +1,20 @@
+<div class="app-admin-wrap layout-sidebar-large">
+    <div>
+        <app-navGPanel></app-navGPanel>
+    </div>
+    <!-- <div class="side-content-wrap">
+        <app-sideBar></app-sideBar>
+    </div> -->
+    <div class=" d-flex flex-column" [ngClass]="loggedIn() ? 'main-content-wrap' : ''">
+    <!-- [ngClass]="{'sidenav-open': navService.sidebarState.sidenavOpen}"
+    [perfectScrollbar]="{suppressScrollX: true}"> -->
+        <router-outlet></router-outlet>
+        <!-- <div class="flex-grow-1"></div> -->
+        <!-- <app-footer></app-footer> -->
+        <!-- <div class="module-loader" *ngIf="moduleLoading">
+            <div class="spinner spinner-bubble spinner-bubble-primary mr-3"></div>
+        </div> -->
+    </div>
+</div>
+
+<!-- <app-search *ngIf="searchService.searchOpen"></app-search> -->

@@ -1,0 +1,30 @@
+<div class="card mb-2">
+  <div class="card-body">
+    <div class="card-title d-flex">
+      <div class="flex-grow-1">{{items.dueDate}}</div>
+      <div>
+        <button class="btn btn-outline-primary btn-sm">modifier</button>
+      </div>
+    </div>
+    <div *ngFor="let course of items.courses">
+      <div class="d-flex align-items-center border-bottom-dotted-dim pb-4">
+        <div class="box-course mr-3" [ngStyle]="{'background-color': 'course.courseColor'}"></div>
+        <div class="flex-grow-1">
+          <h6 class="m-0">{{course.courseName}}</h6>
+          <p class="m-0 text-18 text-muted">{{course.taskDesc}}</p>
+          <p class="m-0 text-small text-muted">donné le {{course.dateAdded}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="card m-2">
+  <div class="card-header"><h5><strong>{{items.dueDate}}</strong></h5></div>
+  <div class="card-body">
+      <div *ngFor="let course of items.courses" class="d-flex justify-content-between m-2">
+        <div><h6><strong>{{course.courseName}}</strong> : {{course.taskDesc}}</h6></div>
+        <div><h6>donné {{course.dateAdded}}</h6></div>
+      </div>
+  </div>
+</div> -->

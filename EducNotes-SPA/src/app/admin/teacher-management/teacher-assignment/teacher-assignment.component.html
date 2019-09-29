@@ -1,0 +1,41 @@
+<div  class="row justify-content-center align-items-center mt-3"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+  <div class="col-md-6">
+      <div class="col-md-12"> <p class="card-title">spécification des classes de l'enseignant <b>{{teacher.lastName}} {{teacher.firstName}}</b></p> </div>
+      <div class="card mt-3 p-2">
+          <nz-form-item>
+              <nz-form-label [nzSm]="6" [nzXs]="24">Choisir le cours </nz-form-label>
+              <nz-form-control  [nzSm]="14" [nzXs]="24">
+                  <nz-select style="width: 100%" [(ngModel)]="courseId"  [nzSize]="'default'" nzPlaceHolder="Choisir ses cours" >
+                      <nz-option *ngFor="let course of courses" [nzLabel]="course.name" [nzValue]="course.id"></nz-option>
+                    </nz-select>
+              </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+              <nz-form-label [nzSm]="6" [nzXs]="24">Choisir le niveau </nz-form-label>
+              <nz-form-control  [nzSm]="14" [nzXs]="24">
+                <nz-select [nzDisabled]="!courseId" style="width: 100%" [(ngModel)]="levelId"  [nzSize]="'default'" 
+                (ngModelChange)="getClasses($event)" nzPlaceHolder="Choisir le niveau">
+                  <nz-option *ngFor="let level of levels" [nzLabel]="level.name" [nzValue]="level.id"></nz-option>
+                </nz-select>
+              </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+              <nz-form-label [nzSm]="6" [nzXs]="24">Choisir la classes </nz-form-label>
+              <nz-form-control  [nzSm]="14" [nzXs]="24">
+                <nz-select style="width: 100%" [(ngModel)]="classIds" [nzDisabled]="!levelId"  [nzSize]="'default'" nzMode="tags" nzPlaceHolder="Choisir les classes">
+                  <nz-option *ngFor="let class of classes" [nzLabel]="class.name" [nzValue]="class.id"></nz-option>
+                </nz-select>
+              </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-control  [nzSm]="14" [nzXs]="24">
+                <button type="submit" [disabled]=" submitText!='enregistrer' || !classIds"  (click)="affectation()" class="btn btn-outline-primary ">{{submitText}}</button>
+                <button type="button" (click)="close()" class="ant-btn" class="btn btn-outline-primary ml-2">annuler</button>
+            </nz-form-control>
+          </nz-form-item>
+     </div>
+  
+   </div>
+ </div>

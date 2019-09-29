@@ -1,0 +1,59 @@
+<form [formGroup]="sanctionForm" (ngSubmit)="saveSanction(false)">
+
+    <div class="form-group">
+      <nz-select style="width: 200px;" nzShowSearch nzAllowClear nzPlaceHolder="choisir un élève"
+        id="student" name="student" formControlName="student">
+        <nz-option *ngFor="let user of students" nzLabel="{{user.lastName}} {{user.firstName}}"
+          nzValue="{{user.id}}"></nz-option>
+      </nz-select>
+      <div *ngIf="sanctionForm.get('student').errors && sanctionForm.get('student').touched"
+        class="text-danger">choisir un élève svp</div>
+    </div>
+    
+    <div class="form-group">
+      <nz-select style="width: 200px;" nzShowSearch nzAllowClear nzPlaceHolder="choisir la sanction"
+      id="sanction" name="sanction" formControlName="sanction">
+        <nz-option *ngFor="let sanction of sanctions" nzLabel="{{sanction.name}}"
+          nzValue="{{sanction.id}}"></nz-option>
+      </nz-select>
+      <div *ngIf="sanctionForm.get('sanction').errors && sanctionForm.get('sanction').touched"
+        class="text-danger">choisir une sanction svp</div>
+    </div>
+      
+      <div class="form-group">
+        <nz-date-picker id="date" nzShowTime nzFormat="dd-MMMM-yyyy"
+          name="date" formControlName="date"></nz-date-picker>
+    </div>
+  
+    <div class="form-group">
+      <nz-select style="width: 200px;" nzShowSearch nzAllowClear nzPlaceHolder="choisir le professeur"
+        id="sanctionedBy" name="sanctionedBy" formControlName="sanctionedBy">
+        <nz-option *ngFor="let user of classTeachers" nzLabel="{{user.lastName}} {{user.firstName}}"
+          nzValue="{{user.id}}"></nz-option>
+      </nz-select>
+      <div *ngIf="sanctionForm.get('sanctionedBy').errors && sanctionForm.get('sanctionedBy').touched"
+        class="text-danger">choisir le professeur svp</div>
+    </div>
+      
+    <div class="form-group">
+      <input type="text" id="reason" name="reason"
+        class="form-control mr-3" formControlName="reason" placeholder="motif">
+      <div *ngIf="sanctionForm.get('reason').errors && sanctionForm.get('reason').touched"
+        class="text-danger">saisir le motif svp</div>
+    </div>
+
+    <div class="form-group">
+      <label for="comment" class="text-secondary">commentaire</label><br>
+      <textarea name="comment" class="form-control" formControlName="comment" 
+        id="comment" cols="5" rows="2" style="resize: none;"></textarea>
+    </div>
+
+    <div class="form-group text-center">
+      <button class="btn btn-success mr-2" [disabled]="!sanctionForm.valid" type="submit">valider</button>
+      <button class="btn btn-success mr-2" (click)="saveSanction(true)"
+        [disabled]="!sanctionForm.valid" type="button">valider et nouveau</button>
+      <button class="btn btn-secondary" (click)="cancel()" type="button">annuler</button>
+    </div>
+        
+  </form>
+  

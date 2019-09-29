@@ -1,0 +1,88 @@
+<div *ngIf="showTable">
+  <div *ngIf="userGrades?.length > 0">
+
+    <!-- <div class="row mb-4">
+
+      <div class="col-md-4">
+        <div class="form-group">
+          <input id="search" placeholder="recherche élève" [formControl]="searchControl" class="form-control " type="search">
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="card o-hidden">
+          <ngx-datatable
+            style="height: 500px; box-shadow: none"
+            class="material fullscreen"
+            [columnMode]="'force'"
+            [headerHeight]="100"
+            [footerHeight]="50"
+            [rowHeight]="60"
+            [scrollbarV]="true"
+            [rows]="filteredUserGrades">
+            <ngx-datatable-column name="photoUrl" [maxWidth]="80">
+              <ng-template ngx-datatable-header-template>
+                élève
+              </ng-template>
+              <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+                  <img height="60px" width="60px" style="border-radius: 4px" [src]="value" alt="">
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="studentName" [width]="150">
+              <ng-template ngx-datatable-header-template>
+                nom
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column *ngFor="let eval of evals, index as i">
+                <ng-template let-column="column" ngx-datatable-header-template>
+                  <p>{{eval.name}}</p>
+                  <p>{{eval.evalType.name}}</p>
+                  <p *ngIf="eval.graded">note/{{eval.maxGrade}}. coeff:{{eval.coeff}}</p>
+                  <p *ngIf="!eval.graded">non notée</p>
+                  <button *ngIf="eval.graded" (click)="enterGrades(eval, userGrades, i)"
+                  nzSize="small"><i class="fa fa-edit"></i></button>
+                    </ng-template>
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{row.age}} <br> {{row.studentName}}
+                </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+        </div>
+      </div>
+
+    </div> -->
+    
+    <nz-table #userEvalTable nzSize="middle" [nzShowPagination]="false" [nzPageSize]="50" nzBordered [nzData]="userGrades">
+      <thead>
+        <tr>
+          <th nzWidth="16%">élève</th>
+          <th style="width: 30px" *ngFor="let item of evals, index as i">
+            <label class="eval-title mr-1">{{item.name}}<br>{{item.evalType.name}}</label><br>
+            <label class="mr-1" *ngIf="item.graded">note/{{item.maxGrade}}. coeff:{{item.coeff}}</label>
+            <label class="mr-1" *ngIf="!item.graded">non notée</label>
+            <button *ngIf="item.graded" nz-button nzType="primary" (click)="enterGrades(item, userGrades, i)"
+              nzSize="small"><i class="fa fa-edit"></i></button>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of userEvalTable.data">
+          <td>
+            <span class="mr-1">
+              <img src="{{item.photoUrl || '../../assets/user.png'}}" class="rounded-circle" alt="">
+            </span>
+            {{ item.studentName }}
+          </td>
+          <td *ngFor="let grade of item.grades">{{grade}}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+
+    
+  </div>
+  <div *ngIf="userGrades.length === 0">
+    <nz-alert nzType="warning" nzMessage="Attention"
+      nzDescription="aucune évaluation disponible pour cette sélection. recommencez svp" nzShowIcon>
+    </nz-alert>
+  </div>
+</div>

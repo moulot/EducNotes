@@ -1,0 +1,70 @@
+<div class="row justify-content-center align-items-center mt-3"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+ 
+    <div class="col-md-8" >
+        <div class="card pt-2">
+            <form nz-form [formGroup]="classForm" (ngSubmit)="save()">
+              
+                <nz-form-item>
+                    <nz-form-label [nzSm]="6" [nzXs]="24"  nzFor="name">Nom</nz-form-label>
+                    <nz-form-control [nzSm]="14" [nzXs]="24">
+                      <input nz-input formControlName="name" id="name">
+                    </nz-form-control>
+                 </nz-form-item>
+      
+                 <nz-form-item>
+                    <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="levelId">choisir le Niveau</nz-form-label>
+                    <nz-form-control [nzSm]="14" [nzXs]="24">
+                        <nz-select name="classlevelId" id="classlevelId"  style="width: 100%" nzShowSearch 
+                        nzAllowClear nzPlaceHolder="Choisir le niveau" formControlName="levelId">
+                        <nz-option *ngFor="let level of levels" nzValue="{{level.id}}" nzLabel="{{level.name}}"></nz-option>
+                        </nz-select>
+                      <nz-form-explain *ngIf="classForm.get('levelId').dirty && classForm.get('levelId').errors">Veuillez choisir le niveau</nz-form-explain>
+                    </nz-form-control>
+                 </nz-form-item>
+                 <nz-form-item>
+                    <nz-form-label [nzSm]="6" [nzXs]="24"  nzFor="suffixe">Choisir le type</nz-form-label>
+                    <nz-form-control [nzSm]="14" [nzXs]="24">
+                        <nz-select name="classTypeId" id="classTypeId"  style="width: 100%" nzShowSearch 
+                            nzAllowClear nzPlaceHolder="Choisir le type" formControlName="classTypeId">
+                            <nz-option *ngFor="let item of classTypes" nzValue="{{item.id}}" nzLabel="{{item.name}}"></nz-option>
+                            </nz-select>
+                    </nz-form-control>
+                 </nz-form-item>
+      
+                 <nz-form-item>
+                    <nz-form-label [nzSm]="6" [nzXs]="24"  nzFor="suffixe">choisir le suffixe Suffixe</nz-form-label>
+                    <nz-form-control [nzSm]="14" [nzXs]="24">
+                        <nz-select name="suffixe" id="suffixe"  style="width: 100%" nzShowSearch 
+                            nzAllowClear nzPlaceHolder="Choisir le suffixe" formControlName="suffixe">
+                            <nz-option *ngFor="let item of suffixes" nzValue="{{item.id}}" nzLabel="{{item.name}}"></nz-option>
+                            </nz-select>
+                    </nz-form-control>
+                 </nz-form-item>
+                 
+                 <nz-form-item>
+                    <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="number">Entrer le Nombre</nz-form-label>
+                    <nz-form-control [nzSm]="14" [nzXs]="24">
+                        <nz-input-number name="number" id="number" [nzPlaceHolder]="'nombre'" formControlName="number" [nzMin]="1" [nzMax]="100" [nzStep]="1"></nz-input-number>
+                    </nz-form-control>
+                 </nz-form-item>
+                 <nz-form-item>
+                    <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="number">Entrer la capacité</nz-form-label>
+                    <nz-form-control [nzSm]="14" [nzXs]="24">
+                        <nz-input-number name="maxStudent" id="maxStudent" [nzPlaceHolder]="'capacité'" formControlName="maxStudent" [nzMin]="1" [nzMax]="100" [nzStep]="1"></nz-input-number>
+                    </nz-form-control>
+                 </nz-form-item>
+                 <nz-form-item>
+                    <nz-form-control [nzSpan]="14" [nzOffset]="6">
+                        <button type="submit" [disabled]="!classForm.valid || submitText!='enregistrer'"
+                          class="btn btn-outline-primary btn-sm"><span>{{submitText}}</span></button>
+                        <button type="button"  class="btn btn-outline-primary btn-sm ml-2" (click)="cancel()"><span>annuler</span></button>
+                     
+                      </nz-form-control>
+                  </nz-form-item>
+         </form>
+          
+            
+        </div>
+      </div>
+</div>
+

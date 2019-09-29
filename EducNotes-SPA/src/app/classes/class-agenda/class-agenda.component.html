@@ -1,0 +1,122 @@
+<div class="breadcrumb m-2">
+  <h1>Educ'Notes</h1>
+  <ul>
+      <li><a class="text-15" [routerLink]="['/classes']">classes</a></li>
+      <li class="text-15">classe {{classRoom?.name}} - devoirs à faire à la maison</li>
+  </ul>
+</div>
+
+<div class="row m-2">
+  
+  <div class="col-md-12">
+    <h5 class="lead text-22 text-center m-4">{{strMonday}} - {{strSaturday}}</h5>
+  </div>
+
+  <div class="col-md-12 text-center mb-4">
+    <button type="button" (click)="loadMovedWeek(-7)" class="btn btn-primary mr-2"><</button>
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+      <div class="btn-group btn-group-toggle">
+        <label class="btn-outline-primary mr-1 btn-day" ngbButtonLabel>
+          <span class="mr-2">{{weekDays[0]}}</span>
+          <span *ngIf="nbDayTasks[0] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[0]}}</span>
+          <input type="checkbox" ngbButton>
+        </label>
+        <label class="btn-outline-primary mr-1 btn-day" ngbButtonLabel>
+          <span class="mr-2">{{weekDays[1]}}</span>
+          <span *ngIf="nbDayTasks[1] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[1]}}</span>
+          <input type="checkbox" ngbButton>
+        </label>
+        <label class="btn-outline-primary mr-1 btn-day" ngbButtonLabel>
+          <span class="mr-2">{{weekDays[2]}}</span>
+          <span *ngIf="nbDayTasks[2] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[2]}}</span>
+          <input type="checkbox" ngbButton>
+        </label>
+        <label class="btn-outline-primary mr-1 btn-day" ngbButtonLabel>
+          <span class="mr-2">{{weekDays[3]}}</span>
+          <span *ngIf="nbDayTasks[3] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[3]}}</span>
+          <input type="checkbox" ngbButton>
+        </label>
+        <label class="btn-outline-primary mr-1 btn-day" ngbButtonLabel>
+          <span class="mr-2">{{weekDays[4]}}</span>
+          <span *ngIf="nbDayTasks[4] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[4]}}</span>
+          <input type="checkbox" ngbButton>
+        </label>
+        <label class="btn-outline-primary btn-day" ngbButtonLabel>
+          <span class="mr-2">{{weekDays[5]}}</span>
+          <span *ngIf="nbDayTasks[5] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[5]}}</span>
+          <input type="checkbox" ngbButton>
+        </label>
+      </div>
+    </div>
+    <button type="button" (click)="loadMovedWeek(7)" class="btn btn-primary ml-2">></button>
+  </div>
+
+
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-1"></div>
+      <div class="col-md-10">
+        <div *ngIf="classAgendaDays?.length == 0">
+          <div class="card p-5">
+            <h4>pas de devoirs à faire cette semaine...</h4>
+          </div>
+        </div>
+        <div *ngIf="classAgendaDays?.length != 0">
+          <div *ngFor="let items of classAgendaDays">
+            <app-agenda-item [items]="items"></app-agenda-item>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- <div class="d-flex justify-content-center">
+<nz-button-group>
+  <button nz-button (click)="loadMovedWeek(-7)" class="ml-2" nzType="default"><</button>
+  <button nz-button nzType="default">
+    <span class="mr-2">{{weekDays[0]}}</span>
+    <span *ngIf="nbDayTasks[0] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[0]}}</span>
+  </button>
+  <button nz-button nzType="default">
+    <span class="mr-2">{{weekDays[1]}}</span>
+    <span *ngIf="nbDayTasks[1] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[1]}}</span>  
+  </button>
+  <button nz-button nzType="default">
+    <span class="mr-2">{{weekDays[2]}}</span>
+    <span *ngIf="nbDayTasks[2] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[2]}}</span>  
+  </button>
+  <button nz-button nzType="default">
+    <span class="mr-2">{{weekDays[3]}}</span>
+    <span *ngIf="nbDayTasks[3] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[3]}}</span>    
+  </button>
+  <button nz-button nzType="default">
+    <span class="mr-2">{{weekDays[4]}}</span>
+    <span *ngIf="nbDayTasks[4] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[4]}}</span>  
+  </button>
+  <button nz-button nzType="default">
+    <span class="mr-2">{{weekDays[5]}}</span>
+    <span *ngIf="nbDayTasks[5] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[5]}}</span>  
+  </button>
+    <button nz-button (click)="loadMovedWeek(7)" class="mr-2" nzType="default">></button>
+</nz-button-group>
+</div>
+
+<div class="card m-2">
+  <h4 class="m-2">tous les devoirs à faire</h4>
+
+  <div *ngIf="classAgendaDays?.length == 0">
+    <div class="jumbotron m-2">
+      <h4>pas de devoirs à faire...</h4>
+    </div>
+  </div>
+
+  <div *ngIf="classAgendaDays?.length != 0">
+    <div *ngFor="let items of classAgendaDays">
+      <app-agenda-item [items]="items"></app-agenda-item>
+    </div>
+  </div>          
+</div> -->

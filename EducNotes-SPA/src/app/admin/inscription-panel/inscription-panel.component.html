@@ -1,0 +1,45 @@
+<div class="p-1">
+<div class="row">
+  <div class="col-md-12">
+      <div class="card o-hidden">
+        <ngx-datatable
+        style="height: calc(100vh - 350px); box-shadow: none"
+        class="material fullscreen"
+        [columnMode]="'force'"
+        [headerHeight]="50"
+        [footerHeight]="50"
+        [rowHeight]="60"
+        [scrollbarV]="true"
+        [limit]="10"
+        [rows]="levels">
+         
+          <ngx-datatable-column name="name">
+            <ng-template ngx-datatable-header-template>
+              Niveau
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="totalEnrolled">
+            <ng-template ngx-datatable-header-template>
+              total Inscrit
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="totalValdated">
+            <ng-template ngx-datatable-header-template>
+              total validé
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="availableClasses">
+            <ng-template ngx-datatable-header-template>
+              classes disponibles
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="availablePlaces">
+            <ng-template ngx-datatable-header-template>
+              Places disponibles
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </div>
+  </div>
+</div>
+</div>

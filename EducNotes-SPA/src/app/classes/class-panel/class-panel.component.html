@@ -1,0 +1,249 @@
+<div class="row m-2">
+  <div *ngFor="let class of teacherClasses" class="col-md-2">
+    <!-- <a (click)="loadClass(class)"> -->
+    <div class="card card-icon lead mb-2">
+      <div class="card-body text-center">
+        <p class="lead text-22 m-0">classe de {{class.className}}</p>
+        <p class="text-muted text-17 mt-1 mb-1">{{class.nbStudents}} élèves.</p>
+        <div class="div-overlay animate text-white text-15 p-2 text-left">
+          <p class="m-0 p-1"><a class="text-white" [routerLink]="['/studentsClass', class.classId]">élèves</a></p>
+          <p class="m-0 p-1"><a class="text-white" [routerLink]="['/agendas', class.classId]">cahier de textes</a></p>
+          <p class="m-0 p-1"><a>notes</a></p>
+          <p class="m-0 p-1"><a>vie de la classe</a></p>
+        </div>
+      </div>
+    </div>
+    <!-- </a> -->
+  </div>
+</div>
+
+<!-- <div class="row m-2">
+  <div *ngFor="let class of teacherClasses" class="col-md-2">
+    <div class="card mb-2">
+      <div class="card-body">
+        <h5 class="lead text-22">classe de {{class.className}}</h5>
+        <p class="card-text">{{class.nbStudents}} élèves.</p>
+        <div class="div-links animate lead">
+          <a href="" (click)="loadClass(class)" class="card-link text-14">élèves</a><br>
+          <a href="#" class="card-link text-14">cahier de textes</a><br>
+          <a href="#" class="card-link text-14">notes</a><br>
+          <a href="#" class="card-link text-14">vie de la classe</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+
+<div id="wrapper">
+  <div class="container mt-2">
+    <div class="row mb-2">
+      <div class="col-sm-8">
+        <div *ngFor="let class of teacherClasses">
+          <button (click)="loadClass(class)" class="btn-class" nz-button nzType="default">classe de {{class.className}}</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+
+        <div class="card" *ngIf="!firstClick">
+          <div class="jumbotron m-2" style="height: 150px">
+            <strong><h4>sélectionner une classe...</h4></strong>
+          </div>
+        </div>
+
+        <div class="card" *ngIf="firstClick">
+          
+          <div class="m-2">
+            <h3 class="text-secondary">classe de {{selectedClass.className}} - {{students?.length}} élèves.</h3>
+
+            <nz-tabset>
+              <nz-tab nzTitle="élèves">
+                <div class="row">
+                  <div *ngFor="let student of students" class="col-lg-2 col-md-3 col-sm-6">
+                    <app-student-card [student]="student"></app-student-card>
+                  </div>            
+                </div>
+              </nz-tab>
+              <nz-tab nzTitle="cahier de textes">
+
+                <div class="d-flex justify-content-center mb-3 ml-2 mt-2 mr-2">
+                  <h5><strong>{{strMonday}} - {{strSaturday}}</strong></h5>
+                </div>
+
+                <div class="d-flex justify-content-center">
+                <nz-button-group>
+                  <button nz-button (click)="loadMovedWeek(-7)" class="ml-2" nzType="default"><</button>
+                  <button nz-button nzType="default">
+                    <span class="mr-2">lundi {{weekDays[0]}}</span>
+                    <span *ngIf="nbDayTasks[0] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[0]}}</span>
+                  </button>
+                  <button nz-button nzType="default">
+                    <span class="mr-2">mardi {{weekDays[1]}}</span>
+                    <span *ngIf="nbDayTasks[1] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[1]}}</span>  
+                  </button>
+                  <button nz-button nzType="default">
+                    <span class="mr-2">mercredi {{weekDays[2]}}</span>
+                    <span *ngIf="nbDayTasks[2] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[2]}}</span>  
+                  </button>
+                  <button nz-button nzType="default">
+                    <span class="mr-2">jeudi {{weekDays[3]}}</span>
+                    <span *ngIf="nbDayTasks[3] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[3]}}</span>    
+                  </button>
+                  <button nz-button nzType="default">
+                    <span class="mr-2">vendredi {{weekDays[4]}}</span>
+                    <span *ngIf="nbDayTasks[4] > 0" class="badge badge-primary badge-pill">{{nbDayTasks[4]}}</span>  
+                  </button>
+                  <button nz-button (click)="loadMovedWeek(7)" class="mr-2" nzType="default">></button>
+                </nz-button-group>
+                </div>
+
+                <div class="card m-2">
+                  <h4 class="m-2">tous les devoirs à faire</h4>
+          
+                  <div *ngIf="classAgendaDays?.length == 0">
+                    <div class="jumbotron m-2">
+                      <h4>pas de devoirs à faire...</h4>
+                    </div>
+                  </div>
+          
+                  <div *ngIf="classAgendaDays?.length != 0">
+                    <div *ngFor="let items of classAgendaDays">
+                      <app-agenda-item [items]="items"></app-agenda-item>
+                    </div>
+                  </div>          
+                </div>
+              </nz-tab>
+              <nz-tab nzTitle="notes">
+                NOTES!!!!
+              </nz-tab>
+              <nz-tab nzTitle="vie de la classe">
+
+                <div #classLifeReport class="m-2" *ngIf="!toggleFormAdd">
+
+                  <button nz-button (click)="toggleForm()" nzSize="large" nzType="default" nzBlock>
+                    saisir la vie de la classe
+                  </button>
+
+                  <div>
+                    <div class="d-flex justify-content-around mb-3 ml-2 mt-2 mr-2">
+                      <div>
+                        <button nz-button class="btn-head-life" nzType="default">
+                          <h5>{{nbAbsences + nbSanctions + nbRewards}}</h5>
+                          <h4>tout</h4>
+                        </button>    
+                      </div>
+                      <div>
+                        <button nz-button class="btn-head-life warning">
+                          <h5>{{nbAbsences}}</h5>
+                          <h4>absences</h4>
+                        </button>      
+                      </div>
+                      <div>
+                        <button nz-button class="btn-head-life danger" nzType="default">
+                          <h5>{{nbSanctions}}</h5>
+                          <h4>sanctions</h4>
+                        </button>    
+                      </div>
+                      <div>
+                        <button nz-button class="btn-head-life success" nzType="default">
+                          <h5>{{nbRewards}}</h5>
+                          <h4>encouragements</h4>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <nz-table #absenceTable nzSize="small" [nzPageSize]="5" [nzShowSizeChanger]="false" [nzShowPagination]="true"
+                    [nzFrontPagination]="true" [nzTitle]="title ? 'Absences' : null" nzBordered [nzData]="absencesList">
+                    <thead>
+                      <tr>
+                          <th nzWidth="12%">élève</th>
+                        <th nzWidth="24%">absence / retard</th>
+                        <th nzWidth="6%">durée</th>
+                        <th nzWidth="6%">justifié ?</th>
+                        <th nzWidth="17%">motif</th>
+                        <th nzWidth="35%">commentaire</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let data of absenceTable.data">
+                          <td>{{ data.userName }}</td>
+                        <td *ngIf="data.startDate == data.endDate">
+                          {{ data.startDate }} de {{data.startTime}} à {{data.endTime}}</td>
+                        <td *ngIf="data.startDate != data.endDate">
+                          du {{ data.startDate }} {{data.startTime}} à {{data.endDate}} {{data.endTime}}</td>
+                        <td>{{ data.justified }}</td>
+                        <td>{{ data.justified }}</td>
+                        <td>{{ data.reason }}</td>
+                        <td>{{ data.comment }}</td>
+                      </tr>
+                    </tbody>
+                  </nz-table>
+            
+                  <nz-table #sanctionTable nzSize="small" [nzPageSize]="5" [nzShowSizeChanger]="false" [nzShowPagination]="true"
+                    [nzFrontPagination]="true" [nzTitle]="title ? 'Sanctions' : null" nzBordered [nzData]="sanctionsList">
+                    <thead>
+                      <tr>
+                        <th nzWidth="15%">élève</th>
+                        <th nzWidth="13%">sanction</th>
+                        <th nzWidth="8%">date</th>
+                        <th nzWidth="17%">motif</th>
+                        <th nzWidth="15%">sanctionné par</th>
+                        <th nzWidth="32%">commentaire</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let data of sanctionTable.data">
+                        <td>{{data.userName}}</td>
+                        <td>{{ data.sanctionName }}</td>
+                        <td>{{ data.sanctionDate }}</td>
+                        <td>{{ data.reason }}</td>
+                        <td>{{ data.sanctionedBy }}</td>
+                        <td>{{ data.comment }}</td>
+                      </tr>
+                    </tbody>
+                  </nz-table>
+            
+                </div>
+                            
+                <div #classLifeForm class="m-2" *ngIf="toggleFormAdd">
+          
+                  <button nz-button (click)="toggleForm()" nzSize="large" nzType="default" nzBlock>
+                    afficher la vie de la classe
+                  </button>
+          
+                  <h2 class="text-center text-secondary mt-2">Saisie de la vie scolaire</h2>
+                  <hr>
+                  
+                  <nz-tabset nzTabPosition="left">
+                    <nz-tab nzTitle="absence">
+                      <app-class-absence [students]="students" (loadAbsences)="loadAbsences(selectedClass.id)"
+                        (toggleForm)="toggleForm($event)"></app-class-absence>
+                    </nz-tab>
+                    <nz-tab nzTitle="sanction">
+                      <app-class-sanction [students]="students" (loadSanctions)="loadSanctions(selectedClass.id)"
+                        (toggleForm)="toggleForm($event)" [selectedClass]="selectedClass"></app-class-sanction>
+                    </nz-tab>
+                    <nz-tab nzTitle="encouragement">
+                      Content of Tab Pane 3
+                    </nz-tab>
+                  </nz-tabset>
+          
+                </div>
+              
+              </nz-tab>
+              <nz-tab nzTitle="emploi du temps">
+                <app-schedule-panel [teacher]="teacher" [selectedClass]="selectedClass"></app-schedule-panel>
+              </nz-tab>
+            </nz-tabset>
+        
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

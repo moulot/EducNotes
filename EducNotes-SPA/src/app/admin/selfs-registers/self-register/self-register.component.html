@@ -1,0 +1,4 @@
+<div >
+  <app-parent-register [maxChild]="maxChild" [user1]="user" *ngIf="user.userTypeId === parentTypeId"></app-parent-register>
+  <app-new-user *ngIf="user.userTypeId === teacherTypeId" [user]="user" [selfRegister]="true"></app-new-user>
+</div>

@@ -1,0 +1,18 @@
+.txt {
+    color: #999999
+}
+
+.user {
+    font-size: 20px
+}
+
+img {
+    max-height: 50px;
+    border: 2px solid white;
+    display: inline;
+}
+
+.header {
+    font-size: 20px;
+    color: #222222;
+}

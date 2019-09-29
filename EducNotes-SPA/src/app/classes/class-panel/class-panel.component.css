@@ -1,0 +1,91 @@
+.div-overlay {
+  position: absolute;
+  bottom: -60%;
+  left: 0;
+  right: 0;
+  margin-right: auto;
+  margin-left: auto;
+  opacity: 0;
+}
+
+.card {
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.card:hover .div-overlay {
+  bottom: 0;
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.div-links {
+  position: absolute;
+  z-index: 2;
+  display: none;
+}
+
+.card:hover .div-links {
+  display: block;
+}
+
+.animate {
+  transition: all 0.3s ease-in-out;
+}
+
+
+
+.pointer {
+    cursor: pointer;
+}
+
+.btn-group {
+    width: 100%;
+}
+
+.btn-group .btn {
+    width: 50%;
+    margin: 1px;
+}
+
+.badge-pill {
+    position: relative;
+    top: -22px;
+    left: -15%;
+}
+
+.btn-class {
+    margin-right: 8px;
+    float: left;
+}
+
+.head-btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 4px;
+    background: #eee;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.btn-head-life {
+    height: 100px;
+    width: 250px;
+    vertical-align: middle;
+}
+
+.warning {
+    background-color: yellow;
+    color: black;
+}
+
+.danger {
+    background-color: red;
+    color: white;
+}
+
+.success {
+    background-color: green;
+    color:white;
+}
