@@ -18,7 +18,7 @@ export class HomePanelComponent implements OnInit {
   teacherTypeId: number = environment.teacherTypeId;
  parentTypeId: number = environment.parentTypeId;
   adminTypeId: number = environment.adminTypeId;
-  user?: User;
+  user: User;
   // photoUrl: string;
   // registerMode = false;
 
@@ -29,6 +29,9 @@ export class HomePanelComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.currentUser;
+    // this.route.data.subscribe(data => {
+    //   this.teacher = data['teacher'];
+    // });
   }
 
   loggedIn() {

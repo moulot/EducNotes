@@ -61,7 +61,7 @@ export class AuthService {
     this.currentUser = null;
     this.currentPeriod = null;
     this.alertify.infoBar('logged out');
-    this.router.navigate(['/home']);
+    this.router.navigate(['/']);
   }
 
   register(user: User) {

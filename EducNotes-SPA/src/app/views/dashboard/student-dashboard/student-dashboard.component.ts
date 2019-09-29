@@ -27,12 +27,10 @@ export class StudentDashboardComponent implements OnInit {
     private evalService: EvaluationService) { }
 
   ngOnInit() {
-    this.route.data.subscribe(data => {
-      this.student = data['student'];
-      this.getAgenda(this.student.classId, this.toNbDays);
-      this.getEvalsToCome(this.student.classId);
-    });
-  }
+    this.student = this.authService.currentUser;
+    this.getAgenda(this.student.classId, this.toNbDays);
+    this.getEvalsToCome(this.student.classId);
+}
 
   getAgenda(classId, toNbDays) {
 

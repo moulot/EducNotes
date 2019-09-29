@@ -129,12 +129,6 @@ namespace EducNotes.API.Data
                 };
                 context.AddRange(paymentTypes);
 
-                // var periods = new List<Period>
-                // {
-                //     new Period{Name = "1er trimestre", Active = 1},
-                //     new Period{Name = "2e trimestre", Active = 0},
-                //     new Period{Name = "3e trimestre", Active = 0}
-                // };
                 var pers = new List<Period>
                 {
                     new Period{Name = "1er trimestre", Active = 1},

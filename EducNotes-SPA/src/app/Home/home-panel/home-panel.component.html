@@ -1,12 +1,4 @@
-<div *ngIf="!loggedIn()" class="row m-4">
-  <div class="col-md-2"></div>
-  <div class="col-md-8">
-    <app-signin></app-signin>
-  </div>
-  <div class="col-md-2"></div>
-</div>
-
-<div *ngIf="loggedIn()" class="container-fluid">
+<div class="container-fluid">
 
   <div *ngIf="parentLoggedIn()">
     <app-parent-dashboard></app-parent-dashboard>      
@@ -20,8 +12,8 @@
     <app-teacher-dashboard></app-teacher-dashboard>     
   </div>
 
-  <!-- <div *ngIf="adminLoggedIn()">
+  <div *ngIf="adminLoggedIn()">
     <app-admin-dashboard></app-admin-dashboard>
-  </div> -->
+  </div>
 
 </div>

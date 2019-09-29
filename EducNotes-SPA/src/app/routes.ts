@@ -44,9 +44,10 @@ import { TeacherManagementResolver } from './_resolvers/teacher-management.resol
 import { SelfRegisterComponent } from './admin/selfs-registers/self-register/self-register.component';
 import { CallSheetResolver } from './_resolvers/callSheet-resolver';
 import { GradeStudentComponent } from './grades/grade-student/grade-student.component';
+import { SigninComponent } from './views/sessions/signin/signin.component';
 
 export const appRoutes: Routes = [
-    {path: '', component: HomePanelComponent},
+    {path: '', component: SigninComponent},
     {path: 'forgotPassword', component: ForgotComponent},
     {path: 'confirmEmail/:code', component: ConfirmEmailComponent, resolve : {user: EmailConfirmResolver}},
     {path: 'resetPassword/:code', component: ResetPasswordComponent, resolve : {user: ResetPasswordResolver}},
@@ -57,6 +58,8 @@ export const appRoutes: Routes = [
         runGuardsAndResolvers: 'always',
         canActivate: [AuthGuard],
         children: [
+            {path: 'home', component: HomePanelComponent,
+              resolve: {user: UserHomeResolver}},
             {path: 'members', component: MemberListComponent,
             resolve: {users : MemberListResolver}},
             {path: 'members/:id', component: MemberDetailComponent,

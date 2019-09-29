@@ -7,13 +7,10 @@ using System.Threading.Tasks;
 using EducNotes.API.Dtos;
 using EducNotes.API.Helpers;
 using EducNotes.API.Models;
-using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MimeKit;
-using MimeKit.Text;
 using RestSharp;
 
 namespace EducNotes.API.Data

@@ -29,44 +29,37 @@ export class SigninComponent implements OnInit {
         private alertify: AlertifyService) { }
 
     ngOnInit() {
-        this.router.events.subscribe(event => {
-            if (event instanceof RouteConfigLoadStart || event instanceof ResolveStart) {
-                this.loadingText = 'Loading Dashboard Module...';
 
-                this.loading = true;
-            }
-            if (event instanceof RouteConfigLoadEnd || event instanceof ResolveEnd) {
-                this.loading = false;
-            }
-        });
+        if (this.loggedIn()) {
+            this.router.navigate(['/home']);
+        } else {
+            this.router.events.subscribe(event => {
+                if (event instanceof RouteConfigLoadStart || event instanceof ResolveStart) {
+                    this.loadingText = 'Loading Dashboard Module...';
 
-        this.signinForm = this.fb.group({
-            username: ['', Validators.required],
-            password: ['', Validators.required]
-        });
+                    this.loading = true;
+                }
+                if (event instanceof RouteConfigLoadEnd || event instanceof ResolveEnd) {
+                    this.loading = false;
+                }
+            });
+
+            this.signinForm = this.fb.group({
+                username: ['', Validators.required],
+                password: ['', Validators.required]
+            });
+        }
     }
+
+    loggedIn() {
+        return this.authService.loggedIn();
+      }
 
     signin() {
         this.notConfirmed = false;
         this.authService.login(this.signinForm.value).subscribe((res) => {
           const loggedUser = this.authService.currentUser;
-          switch (loggedUser.userTypeId) {
-              case environment.parentTypeId :
-                  this.router.navigate(['parent']);
-                  break;
-              case environment.studentTypeId:
-                  this.router.navigate(['student']);
-                  break;
-              case environment.teacherTypeId:
-                  this.router.navigate(['teacher']);
-                  break;
-              case environment.adminTypeId:
-                    this.router.navigate(['admins']);
-                    break;
-                default:
-                  break;
-          }
-          // this.router.navigate(['/home']);
+          this.router.navigate(['/home']);
         }, error => {
           this.alertify.error(error);
         });

@@ -4,9 +4,6 @@ using EducNotes.API.Dtos;
 using EducNotes.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MailKit.Security;
-using MimeKit;
-using MimeKit.Text;
 using System.Net;
 
 
@@ -102,46 +99,6 @@ namespace EducNotes.API.Data
     public async Task<bool> SaveAll()
     {
           return await _context.SaveChangesAsync() > 0;
-    }
-    public async Task<bool> SendEmail(EmailFormDto emailFormDto)
-    {
-      var emailMessage = new MimeMessage();
-
-      emailMessage.From.Add(new MailboxAddress("Educ'Notes","no-reply@inscriptions.educNotes.com"));
-      emailMessage.To.Add(new MailboxAddress("", emailFormDto.toEmail));
-      emailMessage.Subject = emailFormDto.subject;
-
-      emailMessage.Body = new TextPart(TextFormat.Html)
-      {
-      Text = emailFormDto.content
-      };
-
-      try
-      {
-           
-          using (var client = new MailKit.Net.Smtp.SmtpClient())
-          {
-
-              var credentials = new NetworkCredential
-              {
-                  UserName = _config.GetValue<String>("Email:Smtp:Username"), // replace with valid value
-                  Password = _config.GetValue<String>("Email:Smtp:Password")// replace with valid value
-              };
-
-              // check your smtp server setting and amend accordingly:
-              await client.ConnectAsync("smtp.gmail.com", 465, SecureSocketOptions.Auto).ConfigureAwait(false);
-              await client.AuthenticateAsync(credentials);
-              await client.SendAsync(emailMessage).ConfigureAwait(false);
-              await client.DisconnectAsync(true).ConfigureAwait(false);
-
-          }
-          return true;            
-        }
-        catch (System.Exception)
-        {
-
-            return false;
-        }
     }
   }
 }

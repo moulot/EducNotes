@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { User } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
@@ -12,11 +12,11 @@ import { NavigationService } from 'src/app/shared/services/navigation.service';
   styleUrls: ['./navGPanel.component.scss']
 })
 export class NavGPanelComponent implements OnInit {
+  user: User;
   studentTypeId = environment.studentTypeId;
   teacherTypeId = environment.teacherTypeId;
   parentTypeId = environment.parentTypeId;
   adminTypeId = environment.adminTypeId;
-  user?: User;
   model: any = {};
   photoUrl: string;
   notifications: any[];
@@ -76,31 +76,21 @@ export class NavGPanelComponent implements OnInit {
     this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
   }
 
-  toggelSidebar() {
-    const state = this.navService.sidebarState;
-    if (state.childnavOpen && state.sidenavOpen) {
-      return state.childnavOpen = false;
-    }
-    if (!state.childnavOpen && state.sidenavOpen) {
-      return state.sidenavOpen = false;
-    }
-    if (!state.sidenavOpen && !state.childnavOpen) {
-        state.sidenavOpen = true;
-        // setTimeout(() => {
-        //     state.childnavOpen = false;
-        // }, 50);
-    }
-  }
-
-  login() {
-    this.authService.login(this.model).subscribe(next => {
-      this.alertify.success('logged in successfully');
-    }, error => {
-      this.alertify.error(error);
-    }, () => {
-      this.router.navigate(['/home']);
-    });
-  }
+  // toggelSidebar() {
+  //   const state = this.navService.sidebarState;
+  //   if (state.childnavOpen && state.sidenavOpen) {
+  //     return state.childnavOpen = false;
+  //   }
+  //   if (!state.childnavOpen && state.sidenavOpen) {
+  //     return state.sidenavOpen = false;
+  //   }
+  //   if (!state.sidenavOpen && !state.childnavOpen) {
+  //       state.sidenavOpen = true;
+  //       // setTimeout(() => {
+  //       //     state.childnavOpen = false;
+  //       // }, 50);
+  //   }
+  // }
 
   logout() {
     this.authService.logout();
