@@ -33,15 +33,15 @@ import { ResetPasswordComponent } from './registration/reset-password/reset-pass
 import { EvalAddFormComponent } from './grades/eval-addForm/eval-addForm.component';
 import { ClassCallSheetComponent } from './classes/class-callSheet/class-callSheet.component';
 import { AdminDashboardComponent } from './views/dashboard/admin-dashboard/admin-dashboard.component';
-import { InscriptionsListComponent } from './Admin/inscriptions-list/inscriptions-list.component';
-import { ClassesPanelComponent } from './Admin/class-managemet/classes-panel/classes-panel.component';
+import { InscriptionsListComponent } from './admin/inscriptions-list/inscriptions-list.component';
+import { ClassesPanelComponent } from './admin/class-managemet/classes-panel/classes-panel.component';
 import { ClassesListResolver } from './_resolvers/classes-list-resolver';
-import { CoursesPanelComponent } from './Admin/courses-management/courses-panel/courses-panel.component';
+import { CoursesPanelComponent } from './admin/courses-management/courses-panel/courses-panel.component';
 import { CoursesListResolver } from './_resolvers/courses-list.resolver';
 import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
-import { PreRegisterComponent } from './Admin/selfs-registers/pre-register/pre-register.component';
+import { PreRegisterComponent } from './admin/selfs-registers/pre-register/pre-register.component';
 import { TeacherManagementResolver } from './_resolvers/teacher-management.resolver';
-import { SelfRegisterComponent } from './Admin/selfs-registers/self-register/self-register.component';
+import { SelfRegisterComponent } from './admin/selfs-registers/self-register/self-register.component';
 import { CallSheetResolver } from './_resolvers/callSheet-resolver';
 import { GradeStudentComponent } from './grades/grade-student/grade-student.component';
 

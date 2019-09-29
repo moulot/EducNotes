@@ -49,9 +49,9 @@ import { LoginComponent } from './login/login.component';
 import { ClassService } from './_services/class.service';
 import { BooknoteComponent } from './admin/booknote/booknote.component';
 import { HomePanelComponent } from './home/home-panel/home-panel.component';
-import { HomeParentComponent } from './home/home-parent/home-parent.component';
-import { HomeStudentComponent } from './home/home-student/home-student.component';
-import { HomeTeacherComponent } from './home/home-teacher/home-teacher.component';
+// import { HomeParentComponent } from './home/home-parent/home-parent.component';
+// import { HomeStudentComponent } from './home/home-student/home-student.component';
+// import { HomeTeacherComponent } from './home/home-teacher/home-teacher.component';
 import { UserCardComponent } from './users/user-card/user-card.component';
 import { AgendaPanelComponent } from './agenda/agenda-panel/agenda-panel.component';
 import { AgendaListComponent } from './agenda/agenda-list/agenda-list.component';
@@ -60,7 +60,7 @@ import { NavStudentComponent } from './nav/nav-student/nav-student.component';
 import { NavParentComponent } from './nav/nav-parent/nav-parent.component';
 import { NavTeacherComponent } from './nav/nav-teacher/nav-teacher.component';
 import { NavAdminComponent } from './nav/nav-admin/nav-admin.component';
-import { HomeAdminComponent } from './home/home-admin/home-admin.component';
+// import { HomeAdminComponent } from './home/home-admin/home-admin.component';
 import { ClassPanelComponent } from './classes/class-panel/class-panel.component';
 import { StudentCardComponent } from './classes/student-card/student-card.component';
 import { ClassNavComponent } from './classes/class-nav/class-nav.component';
@@ -121,16 +121,16 @@ import { ResetPasswordResolver } from './_resolvers/reset-password.resolver';
 import { EvalAddFormComponent } from './grades/eval-addForm/eval-addForm.component';
 import { ClassCallSheetComponent } from './classes/class-callSheet/class-callSheet.component';
 import { FlipModule } from 'ngx-flip';
-import { InscriptionsListComponent } from './Admin/inscriptions-list/inscriptions-list.component';
-import { AccountHistoryComponent } from './Admin/account-history/account-history.component';
-import { InscriptionPanelComponent } from './Admin/inscription-panel/inscription-panel.component';
-import { ClassesPanelComponent } from './Admin/class-managemet/classes-panel/classes-panel.component';
-import { NewClassComponent } from './Admin/class-managemet/new-class/new-class.component';
-import { CoursesPanelComponent } from './Admin/courses-management/courses-panel/courses-panel.component';
-import { NewCourseComponent } from './Admin/courses-management/new-course/new-course.component';
-import { NewTeacherComponent } from './Admin/teacher-management/new-teacher/new-teacher.component';
-import { PreRegisterComponent } from './Admin/selfs-registers/pre-register/pre-register.component';
-import { SelfRegisterComponent } from './Admin/selfs-registers/self-register/self-register.component';
+import { InscriptionsListComponent } from './admin/inscriptions-list/inscriptions-list.component';
+import { AccountHistoryComponent } from './admin/account-history/account-history.component';
+import { InscriptionPanelComponent } from './admin/inscription-panel/inscription-panel.component';
+import { ClassesPanelComponent } from './admin/class-managemet/classes-panel/classes-panel.component';
+import { NewClassComponent } from './admin/class-managemet/new-class/new-class.component';
+import { CoursesPanelComponent } from './admin/courses-management/courses-panel/courses-panel.component';
+import { NewCourseComponent } from './admin/courses-management/new-course/new-course.component';
+import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
+import { PreRegisterComponent } from './admin/selfs-registers/pre-register/pre-register.component';
+import { SelfRegisterComponent } from './admin/selfs-registers/self-register/self-register.component';
 import { ClassesListResolver } from './_resolvers/classes-list-resolver';
 import { CoursesListResolver } from './_resolvers/courses-list.resolver';
 import { TeacherManagementResolver } from './_resolvers/teacher-management.resolver';
@@ -174,7 +174,7 @@ export function tokenGetter() {
       BooknoteComponent,
       // HomeParentComponent,
       // HomeStudentComponent,
-      HomeTeacherComponent,
+      // HomeTeacherComponent,
       UserCardComponent,
       AgendaPanelComponent,
       AgendaListComponent,
@@ -243,10 +243,7 @@ export function tokenGetter() {
       ParentRegisterComponent,
       RegisterComponent,
       TeacherAssignmentComponent,
-
-
-
-      HomeParentComponent,
+      // HomeParentComponent,
       AccountHistoryComponent
 
    ],

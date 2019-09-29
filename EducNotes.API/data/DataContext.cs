@@ -79,11 +79,6 @@ namespace EducNotes.API.Data
                     .IsRequired();
             });
 
-            // builder.Entity<Class>()
-            //     .HasOne(p => p.User)
-            //     .WithOne(i => i.Class)
-            //     .HasForeignKey<User>(b => b.ClassId);
-
             builder.Entity<Like>()
                 .HasKey(k => new {k.LikerId, k.LikeeId});
 
