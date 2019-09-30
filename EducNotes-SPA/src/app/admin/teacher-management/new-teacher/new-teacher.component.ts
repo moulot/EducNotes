@@ -129,7 +129,7 @@ export class NewTeacherComponent implements OnInit {
         this.addUserResult.emit(true);
       }, error => {
         this.alertify.error(error);
-      });
+        this.submitText = 'enregistrer';});
     }
 
   }

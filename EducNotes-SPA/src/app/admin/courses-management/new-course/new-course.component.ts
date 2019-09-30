@@ -42,45 +42,13 @@ export class NewCourseComponent implements OnInit {
 
   save() {
     const course =  Object.assign({}, this.courseForm.value);
-    // this.classServie.courseExist(course.name).subscribe((res) => {
-    //       if (res === true) {
-    //         this.saveCourse(course);
+    this.classService.addNewCourse(course).subscribe(() => {
+      this.alertify.success('cours enregistrée...');
+      this.addCourseResult.emit(true);
+     }, error => {
+       console.log(error);
+     });}
 
-    //       } else {
-    //         this.alertify.error('désoloé ce cours existe déja...');
-    //       }
-    //     }, error => {
-    //       console.log(error);
-    //     });
-    this.saveCourse(course);
-   }
-
-  saveCourse(element) {
-   // this.submitText = 'patientez...';
-    this.classService.addNewCourse(element).subscribe(() => {
-      // response.type = 'new';
-      // this.allCourses = [...this.allCourses, response];
-      // console.log(response);
-       // this.createCourseForm();
-         this.alertify.success('cours enregistrée...');
-        this.addCourseResult.emit(true);
-
-
-   }, error => {
-     console.log(error);
-   });
-
-    //  this.classService.saveNewClasses(element).subscribe(next => {
-    //     this.submitText = 'enregistrer';
-    //     this.alertify.success('enregistrement terminé...');
-    //     this.addClassResult.emit(true);
-
-    //   }, error => {
-    //     console.log(error);
-    //     this.submitText = 'enregistrer';
-    //     this.errorMessage = error;
-    //   });
-  }
 
   cancel() {
     this.addCourseResult.emit(false);

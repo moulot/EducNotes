@@ -8,15 +8,6 @@ namespace EducNotes.API.Data
 {
     public class Seed
     {
-        // private readonly UserManager<User> _userManager;
-        // private readonly RoleManager<Role> _roleManager;
-
-        // public Seed(UserManager<User> userManager, RoleManager<Role> roleManager)
-        // {
-        //     _userManager = userManager;
-        //     _roleManager = roleManager;
-        // }
-
         public static void SeedUsers(DataContext context, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             if(!userManager.Users.Any())
@@ -169,12 +160,12 @@ namespace EducNotes.API.Data
                 context.AddRange(userTypes);
                 context.SaveChanges();
 
-                foreach (var user in users)
-                {
-                    user.Photos.SingleOrDefault().IsApproved = true;
-                    userManager.CreateAsync(user, "password").Wait();
-                    userManager.AddToRoleAsync(user, "Professeur").Wait();
-                }
+                // foreach (var user in users)
+                // {
+                //     user.Photos.SingleOrDefault().IsApproved = true;
+                //     userManager.CreateAsync(user, "password").Wait();
+                //     userManager.AddToRoleAsync(user, "Professeur").Wait();
+                // }
 
                 var adminUser = new User
                 {
@@ -191,27 +182,27 @@ namespace EducNotes.API.Data
                 }
 
                 //add students
-                for(int i = 0; i < 100; i++)
-                {
-                    byte sex = 0;
-                    if(i % 2 == 0)
-                        sex = 1;
-                    var Student = new User
-                    {
-                        UserName = "User" + i,
-                        FirstName = "Fuser" + i,
-                        LastName = "Luser" + i,
-                        Gender = sex,
-                        UserTypeId = 1
-                    };
+                // for(int i = 0; i < 100; i++)
+                // {
+                //     byte sex = 0;
+                //     if(i % 2 == 0)
+                //         sex = 1;
+                //     var Student = new User
+                //     {
+                //         UserName = "User" + i,
+                //         FirstName = "Fuser" + i,
+                //         LastName = "Luser" + i,
+                //         Gender = sex,
+                //         UserTypeId = 1
+                //     };
 
-                    IdentityResult result1 = userManager.CreateAsync(Student, "password").Result;
+                //     IdentityResult result1 = userManager.CreateAsync(Student, "password").Result;
 
-                    if(result1.Succeeded)
-                    {
-                        userManager.AddToRolesAsync(Student, new[] {"élève"}).Wait();
-                    }
-                }
+                //     if(result1.Succeeded)
+                //     {
+                //         userManager.AddToRolesAsync(Student, new[] {"élève"}).Wait();
+                //     }
+                // }
 
             }
         }
