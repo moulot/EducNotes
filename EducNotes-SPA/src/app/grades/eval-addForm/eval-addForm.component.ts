@@ -118,6 +118,10 @@ export class EvalAddFormComponent implements OnInit {
     this.isGradeCounted = !this.isGradeCounted;
   }
 
+  toggleNegative() {
+
+  }
+
   getTeacherClasses(teacherId) {
     this.userService.getTeacherClasses(teacherId).subscribe((courses: CourseUser[]) => {
       this.teacherClasses = courses;

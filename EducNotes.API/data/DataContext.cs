@@ -2,10 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EducNotes.API.Data
 {
@@ -54,6 +50,8 @@ namespace EducNotes.API.Data
         public DbSet<City> Cities { get; set; }
         public DbSet<Inscription> Inscriptions { get; set; }
         public DbSet<Session> Sessions { get; set; }
+        public DbSet<Email> Emails { get; set; }
+        public DbSet<EmailType> EmailTypes { get; set; }
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////

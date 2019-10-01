@@ -58,21 +58,22 @@ namespace EducNotes.API.Data
 
                 var classLevels = new List<ClassLevel>
                 {
-                    new ClassLevel{Name = "TPS"},
-                    new ClassLevel{Name = "PS"},
-                    new ClassLevel{Name = "CP1"},
-                    new ClassLevel{Name = "CP2"},
-                    new ClassLevel{Name = "CE1"},
-                    new ClassLevel{Name = "CE2"},
-                    new ClassLevel{Name = "CM1"},
-                    new ClassLevel{Name = "CM2"},
-                    new ClassLevel{Name = "6e"},
-                    new ClassLevel{Name = "5e"},
-                    new ClassLevel{Name = "4e"},
-                    new ClassLevel{Name = "3e"},
-                    new ClassLevel{Name = "2nd"},
-                    new ClassLevel{Name = "1ere"},
-                    new ClassLevel{Name = "terminale"}
+                    new ClassLevel{Name = "TPS", DsplSeq = 1},
+                    new ClassLevel{Name = "MS", DsplSeq = 2},
+                    new ClassLevel{Name = "PS", DsplSeq = 3},
+                    new ClassLevel{Name = "CP1", DsplSeq = 4},
+                    new ClassLevel{Name = "CP2", DsplSeq = 5},
+                    new ClassLevel{Name = "CE1", DsplSeq = 6},
+                    new ClassLevel{Name = "CE2", DsplSeq = 7},
+                    new ClassLevel{Name = "CM1", DsplSeq = 8},
+                    new ClassLevel{Name = "CM2", DsplSeq = 9},
+                    new ClassLevel{Name = "6e", DsplSeq = 10},
+                    new ClassLevel{Name = "5e", DsplSeq = 11},
+                    new ClassLevel{Name = "4e", DsplSeq = 12},
+                    new ClassLevel{Name = "3e", DsplSeq = 13},
+                    new ClassLevel{Name = "2nde", DsplSeq = 14},
+                    new ClassLevel{Name = "1ere", DsplSeq = 15},
+                    new ClassLevel{Name = "Tle", DsplSeq = 16}
                 };
                 context.AddRange(classLevels);
 
@@ -170,6 +171,11 @@ namespace EducNotes.API.Data
                 var adminUser = new User
                 {
                     UserName = "Admin",
+                    FirstName = "admin",
+                    LastName = "admin",
+                    Email = "adminUser@educnotes.com",
+                    EmailConfirmed = true,
+                    ValidatedCode = true,
                     UserTypeId = 4
                 };
 

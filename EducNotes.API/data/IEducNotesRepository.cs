@@ -31,7 +31,9 @@ namespace EducNotes.API.Data
         List<int> GetWeekDays(DateTime date);
         Task<IEnumerable<Schedule>> GetScheduleDay(int classId, int day);
         Task<Like> GetLike(int userId, int recipientId);
-         Task<bool> EmailExist(string email);    
+        Task<bool> EmailExist(string email);    
+        Task<bool> UserNameExist(string userName);    
+
 
         Task<int> AddUserPreInscription(Guid code,User user,int roleId,bool sendEMail);
         Task<IEnumerable<User>> GetStudentsForClass(int classId);

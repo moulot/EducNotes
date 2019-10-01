@@ -10,8 +10,8 @@
     <ng-content></ng-content>
   </div>
   <div class="card-footer" [hidden]="isCompleted">
-      <button type="button" class="btn btn-rounded btn-secondary float-left" (click)="previous()" [hidden]="!hasPrevStep || !activeStep.showPrev">Previous</button>
-      <button type="button" class="btn btn-rounded btn-secondary float-right" (click)="next()" [disabled]="!activeStep.isValid" [hidden]="!hasNextStep || !activeStep.showNext">Next</button>
-      <button type="button" class="btn btn-rounded btn-secondary float-right" (click)="complete()" [disabled]="!activeStep.isValid" [hidden]="hasNextStep">Done</button>
+      <button type="button" class="btn btn-rounded btn-secondary float-left" (click)="previous()" [hidden]="!hasPrevStep || !activeStep.showPrev">précédent</button>
+      <button type="button" class="btn btn-rounded btn-secondary float-right" (click)="next()" [disabled]="!activeStep.isValid" [hidden]="!hasNextStep || !activeStep.showNext">suivant</button>
+      <button type="button" class="btn btn-rounded btn-secondary float-right" (click)="complete()" [disabled]="!activeStep.isValid" [hidden]="hasNextStep">valider</button>
   </div>
 </div>

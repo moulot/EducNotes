@@ -60,7 +60,7 @@ export class AuthService {
     this.decodedToken = null;
     this.currentUser = null;
     this.currentPeriod = null;
-    this.alertify.infoBar('logged out');
+    this.alertify.infoBar('vous êtes déconnecté');
     this.router.navigate(['/']);
   }
 
@@ -215,6 +215,10 @@ export class AuthService {
 
   emailExist(email: string) {
     return this.http.get(this.baseUrl +  email + '/VerifyEmail');
+  }
+
+  userNameExist(userName: string) {
+    return this.http.get(this.baseUrl +  userName + '/VerifyUserName');
   }
 
 }

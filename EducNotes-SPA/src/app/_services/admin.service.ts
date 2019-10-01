@@ -39,6 +39,10 @@ export class AdminService {
     return this.http.get(this.baseUrl + 'admin/' + email + '/VerifyEmail');
   }
 
+  userNameExist(userName: string) {
+    return this.http.get(this.baseUrl + 'admin/' + userName + '/VerifyUserName');
+  }
+
   // enregistrement d'un nouveau teacher
   saveTeacher(user: User) {
     return this.http.post(this.baseUrl + 'admin/' + 'AddUser', user);

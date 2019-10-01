@@ -248,6 +248,42 @@ namespace EducNotes.API.Controllers
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////
+    [HttpPost("AddUser")]
+    public async Task<IActionResult> AddUser(UserForRegisterDto userForRegisterDto)
+    {
+
+        var userToCreate = _mapper.Map<User>(userForRegisterDto);
+        userToCreate.UserName = userForRegisterDto.Email;
+        try
+        {
+            await _repo.AddUserPreInscription(Guid.NewGuid(),userToCreate,teacherRoleId,false);
+            
+            if(userForRegisterDto.CourseIds!=null)
+            {
+                foreach (var course in userForRegisterDto.CourseIds)
+                {
+                    _context.Add( new ClassCourse {CourseId = course, TeacherId = userToCreate.Id});
+                }
+                await _context.SaveChangesAsync();
+                var teacherToReturn = new TeacherForListDto(){
+                // Teacher =  _mapper.Map<UserForListDto>(await _repo.GetUser(userToCreate.Id,false)),
+                // Courses = await _repo.GetTeacherCoursesAndClasses(userToCreate.Id)
+            };
+            return Ok(teacherToReturn);
+            }
+            else
+            return Ok(_mapper.Map<UserForListDto>(userToCreate));
+            
+        }
+        catch (System.Exception ex)
+        {
+            string mes = ex.Message;
+
+            return BadRequest(ex);
+        }    
+    }
+  
+  
     [HttpGet("ClassLevelDetails")]
     public async Task<IActionResult> ClassLevelDetails()
     {
@@ -421,16 +457,16 @@ namespace EducNotes.API.Controllers
     public async Task<IActionResult> SendRegisterEmail(SelfRegisterDto model)
     {
      
-        if(model.UserTypeId ==teacherTypeId)
+       if(model.UserTypeId ==teacherTypeId)
       {
           var TeacherRole   = await _context.Roles.FirstOrDefaultAsync(a=>a.Id==teacherRoleId);
          
           string code = Guid.NewGuid().ToString();
           var teacher = new User{
-            ValidationCode = code,
-            Email = model.Email,
-            UserName = code,
-            UserTypeId =teacherTypeId
+              ValidationCode = code,
+              Email = model.Email,
+              UserName = code,
+              UserTypeId =teacherTypeId
           };
           // enregistrement du professeur
           int userId= await _repo.AddSelfRegister(teacher,TeacherRole.Name,true);
@@ -439,8 +475,8 @@ namespace EducNotes.API.Controllers
              foreach (var courseId in model.CourseIds)
              {
                  var ClassCourse = new ClassCourse{
-                   TeacherId = userId,
-                   CourseId = courseId
+                    TeacherId = userId,
+                    CourseId = courseId
                  };
 
                  _repo.Add(ClassCourse);

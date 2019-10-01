@@ -54,27 +54,28 @@ teacherTypeId = Number(environment.teacherTypeId);
   createRegisterForm() {
     this.registerForm = this.fb.group({
       userTypeId: [null, Validators.required],
-      courseIds: [null, Validators.nullValidator],
+      courseIds: [null],
       email: ['', [Validators.required, Validators.email]],
-       totalChild: [null, Validators.nullValidator]});
+       totalChild: [null]});
   }
 
   submit() {
     this.submitText = 'patienter...';
     this.user = Object.assign({}, this.registerForm.value);
-    this.adminService.emailExist(this.user.email).subscribe((res: boolean) => {
-      if (res === true) {
-        this.alertify.error('l\'email ' + this.user.email + ' est déja utlilisé ');
-        this.submitText = 'enregistrer';
+    this.save();
+    // this.adminService.emailExist(this.user.email).subscribe((res: boolean) => {
+    //   if (res === true) {
+    //     this.alertify.error('l\'email ' + this.user.email + ' est déja utlilisé ');
+    //     this.submitText = 'enregistrer';
 
-      } else {
-          this.save();
-        }
-    });
+    //   } else {
+    //       this.save();
+    //     }
+    // });
 
   }
   cancel() {
-
+    this.registerForm.reset();
   }
   typeCheicking() {
     this.showCourses = false;

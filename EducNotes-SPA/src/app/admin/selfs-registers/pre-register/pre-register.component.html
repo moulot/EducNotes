@@ -18,7 +18,7 @@
                  <nz-form-item>
                     <nz-form-label [nzSm]="6" [nzXs]="24">Email</nz-form-label>
                     <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="registerForm.controls['email']">
-                      <nz-input-group nzAddOnBefore="@">
+                      <nz-input-group>
                         <input type="text" nz-input placeholder="email" formControlName="email" id="email">
                     <nz-form-explain *ngIf="registerForm.get('email').touched && registerForm.get('email').errors">Entrer un email valide!</nz-form-explain>
                       </nz-input-group>
@@ -44,7 +44,7 @@
 
                    <nz-form-item>
                     <nz-form-control [nzSpan]="14" [nzOffset]="6">
-                        <button type="submit" [disabled]="!registerForm.valid || submitText!='enregistrer'"
+                        <button type="submit" [disabled]="!registerForm.valid && !registerForm.value.totalChild && !registerForm.value.courseIds"
                           class="btn btn-outline-primary"><span>{{submitText}}</span></button>
                         <button type="button"  class="btn btn-outline-primary ml-2" (click)="cancel()"><span>annuler</span></button>
                     </nz-form-control>

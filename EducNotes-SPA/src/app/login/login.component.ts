@@ -58,6 +58,7 @@ export class LoginComponent implements OnInit {
   login() {
     this.notConfirmed = false;
     this.authService.login(this.signinForm.value).subscribe((response) => {
+      this.alertify.success('vous êtes connecté...');
     }, error => {
       this.alertify.error(error);
     }, () => {

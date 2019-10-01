@@ -7,6 +7,7 @@ import { environment } from 'src/environments/environment';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { User } from 'src/app/_models/user';
+import { Utils } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-new-teacher',
@@ -26,6 +27,7 @@ export class NewTeacherComponent implements OnInit {
   editionMode = 'add';
   teachersCourses: any[];
   phoneMask = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
+  birthDateMask = [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/];
 
   @Output() addUserResult = new EventEmitter();
 
@@ -97,6 +99,11 @@ export class NewTeacherComponent implements OnInit {
     this.submitText = 'patienter...';
 
     this.teacher = Object.assign({}, this.teacherForm.value);
+    // const ze = this.teacherForm.value.dateOfBirth.split('-');
+    // const dd = new Date(ze[2], ze[1], ze[0]);
+    this.teacher.dateOfBirth = Utils.inputDateDDMMYY(this.teacherForm.value.dateOfBirth, '/');
+    console.log(this.teacher.dateOfBirth);
+
     this.teacher.userTypeId = this.teacherTypeId;
     if (this.editionMode === 'add') {
     this.adminService.emailExist(this.teacher.email).subscribe((res: boolean) => {
@@ -122,15 +129,15 @@ export class NewTeacherComponent implements OnInit {
           });
     }
 
-    if (this.editionMode === 'edit') {
-      this.classService.updateTeacher(this.userId, this.teacher).subscribe(() => {
-        this.alertify.success('enregistrement terminé');
-        this.submitText = 'enregistrer';
-        this.addUserResult.emit(true);
-      }, error => {
-        this.alertify.error(error);
-        this.submitText = 'enregistrer';});
-    }
+    // if (this.editionMode === 'edit') {
+    //   this.classService.updateTeacher(this.userId, this.teacher).subscribe(() => {
+    //     this.alertify.success('enregistrement terminé');
+    //     this.submitText = 'enregistrer';
+    //     this.addUserResult.emit(true);
+    //   }, error => {
+    //     this.alertify.error(error);
+    //     this.submitText = 'enregistrer';});
+    // }
 
   }
 

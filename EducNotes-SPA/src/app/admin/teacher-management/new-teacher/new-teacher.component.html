@@ -18,7 +18,8 @@
              <nz-form-item>
                 <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="dateOfBirth">Date de naissance</nz-form-label>
                 <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="teacherForm.controls['dateOfBirth']">
-                    <nz-date-picker formControlName="dateOfBirth" id="datenaiss" [nzFormat]="'dd-MMMM-yyyy'"></nz-date-picker>
+                    <!-- <nz-date-picker formControlName="dateOfBirth" id="datenaiss" [nzFormat]="'dd-MMMM-yyyy'"></nz-date-picker> -->
+                    <input class="form-control" id="datenaiss" placeholder="date de naissance"  formControlName="dateOfBirth" name="datenaiss" [textMask]="{mask: birthDateMask}">
                 </nz-form-control>
               </nz-form-item>
               <nz-form-item>

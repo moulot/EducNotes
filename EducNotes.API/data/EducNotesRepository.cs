@@ -531,8 +531,16 @@ namespace EducNotes.API.Data
 
     public async Task<List<ClassLevel>> GetLevels()
     {
-      return await _context.ClassLevels.OrderBy(c => c.Name).ToListAsync();
+      return await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
     }
 
-  }
+    public async Task<bool> UserNameExist(string userName)
+    {
+       var user = await _context.Users.FirstOrDefaultAsync(e => e.UserName == userName.ToLower());
+            if (user != null)
+                return true;
+            return
+            false;
+    }
+    }
 }

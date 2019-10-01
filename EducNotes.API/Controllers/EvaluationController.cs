@@ -103,6 +103,99 @@ namespace EducNotes.API.Controllers
           });
         }
 
+        [HttpGet("Class/{classId}/CoursesWithEvals/{userId}")]
+        public async Task<IActionResult> GetCoursesWithEvals(int userId, int classId)
+        {
+            var courses = await (from course in _context.Courses 
+                                        
+                                    orderby course.Name
+                                    select new
+                                    {
+                                        CourseId = course.Id,
+                                        CourseName = course.Name,
+                                        UserEvals = GetUserEvals(userId, course.Id),
+                                        ClassEvals = 0
+                                    }).ToListAsync();
+
+            return Ok(courses);
+        }
+
+        private async Task<IActionResult> GetUserEvals(int userId, int courseId)
+        {
+            var userEvals = await _context.UserEvaluations
+                            .Include(i => i.Evaluation)
+                            .OrderBy(o => o.Evaluation.EvalDate)
+                            .Where(e => e.UserId == userId &&
+                                e.Evaluation.GradeInLetter == false &&
+                                e.Evaluation.CourseId == courseId &&
+                                e.Evaluation.Graded == true).ToListAsync();
+
+            List<double> grades = new List<double>();
+            double gradesSum = 0;
+            double coeffSum = 0;
+            for (int i = 0; i < userEvals.Count(); i++)
+            {
+                var ue = userEvals[i];
+                if(ue.Grade.IsNumeric())
+                {
+                    double grade = Convert.ToDouble(ue.Grade);
+                    double coeff = ue.Evaluation.Coeff;
+                    gradesSum += grade * coeff;
+                    coeffSum += coeff;
+                    grades.Add(grade);
+                }
+            }
+
+            double gradesAvg = gradesSum / coeffSum;
+            double gradeMin = grades.Min();
+            double gradeMax = grades.Max();
+
+            return Ok(new {
+                UserEvals = grades,
+                GradeAvg = gradesAvg,
+                GradeMin = gradeMin,
+                GradeMax = gradeMax
+            });
+        }
+
+        private async Task<IActionResult> GetClassEvals(int classId, int courseId)
+        {
+            var classEvals = await _context.UserEvaluations
+                            .Include(i => i.Evaluation)
+                            .OrderBy(o => o.Evaluation.EvalDate)
+                            .Where(e => e.Evaluation.ClassId == classId &&
+                                e.Evaluation.GradeInLetter == false &&
+                                e.Evaluation.CourseId == courseId &&
+                                e.Evaluation.Graded == true).ToListAsync();
+
+            List<double> grades = new List<double>();
+            double gradesSum = 0;
+            double coeffSum = 0;
+            for (int i = 0; i < classEvals.Count(); i++)
+            {
+                var ue = classEvals[i];
+                if(ue.Grade.IsNumeric())
+                {
+                    double grade = Convert.ToDouble(ue.Grade);
+                    double coeff = ue.Evaluation.Coeff;
+                    gradesSum += grade * coeff;
+                    coeffSum += coeff;
+                    grades.Add(grade);
+                }
+            }
+
+            double gradesAvg = gradesSum / coeffSum;
+            double gradeMin = grades.Min();
+            double gradeMax = grades.Max();
+
+            return Ok(new {
+                UserEvals = grades,
+                GradeAvg = gradesAvg,
+                GradeMin = gradeMin,
+                GradeMax = gradeMax
+            });
+        }
+
         [HttpGet("CoursesSkills")]
         public async Task<IActionResult> GetCourseSkillsWithProgElts()
         {
