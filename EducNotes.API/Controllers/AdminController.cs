@@ -248,6 +248,32 @@ namespace EducNotes.API.Controllers
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////
+    [HttpPost("{classId}/StudentAffectation")]
+    public async Task<IActionResult> StudentAffectation(int classId,List<StudentPostingDto> model)
+    {
+      if(model.Count() > 0)
+      {
+          foreach (var item in model)
+          {
+              var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == item.UserId);
+              user.ClassId = classId;
+
+              var inscription = await _context.Inscriptions.FirstOrDefaultAsync(i => i.Id == item.Id);
+              inscription.Validated = true;
+              inscription.ValidatedDate = DateTime.Now;
+          }
+          
+          if(await _repo.SaveAll())
+            return Ok();
+
+          return BadRequest("imposible d'effectuer cette opération");
+      }
+
+      return NotFound();
+    }
+
+
+
     [HttpPost("AddUser")]
     public async Task<IActionResult> AddUser(UserForRegisterDto userForRegisterDto)
     {
@@ -346,11 +372,11 @@ namespace EducNotes.API.Controllers
     public  async Task<IActionResult> GetClassLevels()
     {
           var levels =await _context.ClassLevels
-          .Include(i => i.Inscriptions) 
-          .Include(c => c.Classes)
-          .ThenInclude(c => c.Students)
-          .OrderBy(a => a.Name)
-          .ToListAsync();
+                    .Include(i => i.Inscriptions) 
+                    .Include(c => c.Classes).ThenInclude(c => c.Students)
+                    .OrderBy(a => a.DsplSeq)
+                    .ToListAsync();
+
           var dataToReturn = new List<ClassLevelDetailDto>();
           foreach (var item in levels)
           {

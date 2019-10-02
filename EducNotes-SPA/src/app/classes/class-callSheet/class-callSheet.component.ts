@@ -128,7 +128,7 @@ export class ClassCallSheetComponent implements OnInit {
       this.absences = [...this.absences, newAbsence];
     }
 
-    this.classService.saveCallSheet(this.absences).subscribe(() => {
+    this.classService.saveCallSheet(this.session.id, this.absences).subscribe(() => {
       this.alertify.success('classe ' + this.schedule.className + ' - ' + this.schedule.courseName +
         'de ' + this.schedule.strStartHourMin + ' à ' + this.schedule.strEndHourMin + '. appel Validé');
     }, error => {

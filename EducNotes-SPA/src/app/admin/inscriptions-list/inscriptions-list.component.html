@@ -72,7 +72,7 @@
             </button> -->
             <nz-select #classSelect nzShowSearch nzPlaceHolder="choisissez la classe" nzSize="'default'" style="width: 250px"
            id="id" class="" nzAllowClear [(ngModel)]="classId">
-            <nz-option *ngFor="let item of classes" nzLabel="{{item.name}} (dispo : {{item.maxStudent-item.studentsNumber}})"
+            <nz-option *ngFor="let item of classes" nzLabel="{{item.name}} (dispo : {{item.maxStudent-item.totalStudent}})"
               nzValue="{{item.id}}"></nz-option>
           </nz-select>
           <button type="button" (click)=" checkValid(modalConfirm)"  class="btn btn-sm btn-primary btn-outlet mb-1 ml-2" [disabled]="!classId">affecter</button>

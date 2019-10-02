@@ -58,8 +58,8 @@ constructor(private http: HttpClient) { }
     return this.http.get(this.baseUrl + 'classes/Session/' + scheduleId);
   }
 
-  saveCallSheet(absences: Absence[]) {
-    return this.http.put(this.baseUrl + 'classes/saveCallSheet', absences);
+  saveCallSheet(sessionId: number, absences: Absence[]) {
+    return this.http.put(this.baseUrl + 'classes/saveCallSheet/' + sessionId, absences);
   }
 
   getSanctions() {

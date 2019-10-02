@@ -613,7 +613,7 @@ namespace EducNotes.API.Controllers
                                     // .Include(i=>i.Inscriptions) 
                                     .Include(c=>c.Classes)
                                     // .ThenInclude(c=>c.Students)
-                                    .OrderBy(a=>a.Name)
+                                    .OrderBy(a=>a.DsplSeq)
                                     .ToListAsync();
            var dataToReturn = new List<ClassLevelDetailDto>();
           foreach (var item in levels)
@@ -637,13 +637,13 @@ namespace EducNotes.API.Controllers
           return Ok(dataToReturn);
         }
 
-        [HttpGet("{id}/SearchClassesByLevel")]
-        public async Task<IActionResult> SearchClassesByLevel(int id)
+        [HttpGet("{classLevelId}/SearchClassesByLevel")]
+        public async Task<IActionResult> SearchClassesByLevel(int classLevelId)
         {
-            // ici on ramene une liste des classes avec l'effectif et le nom du professeur principal
+            
            var classes = await _context.Classes
                                 .Include(s=>s.Students)
-                                .Where(c=>c.ClassLevelId == id)
+                                .Where(c=>c.ClassLevelId == classLevelId)
                                 .ToListAsync();
 
             var classesToReturn = _mapper.Map<IEnumerable<ClassDetailDto>>(classes);
@@ -693,14 +693,15 @@ namespace EducNotes.API.Controllers
             return Ok(scheduleToReturn);
         }
 
-        [HttpPut("SaveCallSheet")]
-        public async Task<IActionResult> SaveCallSheet([FromBody]Absence[] absences)
+        [HttpPut("SaveCallSheet/{sessionId}")]
+        public async Task<IActionResult> SaveCallSheet(int sessionId, [FromBody]Absence[] absences)
         {
-            //delete old absents (update: delte + add)
-            var sessionId = absences[0].SessionId;
-            List<Absence> oldAbsences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
-            if(oldAbsences.Count() > 0)
-                _repo.DeleteAll(oldAbsences);
+            //delete old absents (update: delete + add)
+            if(sessionId > 0){
+                List<Absence> oldAbsences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
+                if(oldAbsences.Count() > 0)
+                    _repo.DeleteAll(oldAbsences);
+            }
 
             //add new absents
             for (int i = 0; i < absences.Length; i++)

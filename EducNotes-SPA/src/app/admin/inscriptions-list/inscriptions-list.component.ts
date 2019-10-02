@@ -28,7 +28,7 @@ showListDiv = false;
 searchParams: any = {};
 allSelected: boolean;
 students: User[];
-classes: any[];
+classes: Class[];
 classId;
 noResult: string;
 viewMode: 'list' | 'grid' = 'list';
@@ -75,24 +75,29 @@ className = '';
             this.selectedIds = [...this.selectedIds, s];
       }
     }
+
     if (this.selectedIds.length === 0) {
       this.toastr.error('Veuillez sélectionnez au moins un élève...', 'Erreur de saisie', { timeOut: 3000 });
     } else {
+
       // debugger;
       const room = this.classes.find(item => item.id === Number(this.classId));
       this.className = room.name;
-      const diff = (room.maxStudent - room.studentsNumber);
+
+      const diff = (room.maxStudent - room.totalStudent);
+
       if ( diff < this.selectedIds.length) {
         this.toastr.error('il reste seulement ' + diff + 'place(s) disponible(s) pour cette classe');
       } else {
-        this.modalService.open(content, { ariaLabelledBy: 'CONFIRMATION', centered: true })
-        .result.then((result) => {
+        this.modalService.open(content, { ariaLabelledBy: 'confirmation', centered: true })
+          .result.then((result) => {
           this.confirmResut = `Closed with: ${result}`;
-        this.toastr.info('validez', 'Erreur de saisie', { timeOut: 3000 });
-        this.studentAffectation();
+          // this.toastr.info('validez', 'Erreur de saisie', { timeOut: 3000 });
+          this.studentAffectation();
         }, (reason) => {
+
           this.confirmResut = `Dismissed with: ${reason}`;
-        this.toastr.info('annuler', 'Erreur de saisie', { timeOut: 3000 });
+          this.toastr.info('annuler', 'Erreur de saisie', { timeOut: 3000 });
 
         });
       }
@@ -133,14 +138,17 @@ className = '';
     this.submitText = 'patienter...';
     this.noResult = '';
     this.students = [];
+
     this.searchParams = {};
     this.searchParams.levelId = Number(this.searchForm.value.levelId);
     this.searchParams.lastName = this.searchForm.value.lastName;
     this.searchParams.firstName = this.searchForm.value.firstName;
+
     this.adminService.searchIncription(this.searchParams).subscribe((res: any[])  => {
       if (res.length > 0) {
         this.students = res;
         this.filteredStudents = res;
+
         this.classService.getClassesByLevelId(this.searchParams.levelId).subscribe((response: Class[]) => {
           this.classes = response;
         });

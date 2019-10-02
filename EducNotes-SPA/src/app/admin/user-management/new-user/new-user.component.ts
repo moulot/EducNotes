@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/_services/auth.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Router } from '@angular/router';
+import { Utils } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-new-user',
@@ -33,6 +34,9 @@ export class NewUserComponent implements OnInit {
   userTypeId: number;
   userId: number;
   phoneMask = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
+  birthDateMask = [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/];
+
+  userNameExist = false;
 
 
 
@@ -78,6 +82,18 @@ export class NewUserComponent implements OnInit {
 
 
   }
+
+ userNameVerification() {
+   const userName = this.userForm.value.userName;
+   this.userNameExist = false;
+   this.authService.userNameExist(userName).subscribe((res: boolean) => {
+     if (res === true) {
+        this.userNameExist = true;
+        // this.user1Form.valid = false;
+     }
+   });
+ }
+
   getEmails() {
     this.authService.getEmails().subscribe((res) => {
       this.emailsList = res;
@@ -106,7 +122,7 @@ export class NewUserComponent implements OnInit {
     });
   }
 
- 
+
   getDistricts() {
     // // const id = this.motherForm.value.cityId;
     // // this.motherForm.value.cityId = '';
@@ -125,20 +141,22 @@ export class NewUserComponent implements OnInit {
       lastName: ['', Validators.required],
       firstName: ['', Validators.nullValidator],
       userName: ['', Validators.nullValidator],
-      password         : [ null, [ Validators.nullValidator ] ],
+      password         : [ null, [ Validators.required ] ],
       checkPassword    : [ null, [ Validators.nullValidator, this.confirmationValidator ] ],
       gender: [null, Validators.required],
-      levelId: [null, Validators.nullValidator],
-      cityId: [null, Validators.nullValidator],
-      districtId: [null, Validators.nullValidator],
+      // levelId: [null, Validators.nullValidator],
+      // cityId: [null, Validators.nullValidator],
+      // districtId: [null, Validators.nullValidator],
       phoneNumber: [null, Validators.nullValidator],
-      courseIds: [null, Validators.nullValidator],
+      // courseIds: [null, Validators.nullValidator],
       email: [this.email, [Validators.nullValidator, Validators.nullValidator, Validators.email]],
       secondPhoneNumber: ['', Validators.nullValidator]});
   }
 
   saveUser() {
    const teacher = Object.assign({}, this.userForm.value);
+  const dd = teacher.dateOfBirth;
+   teacher.dateOfBirth = Utils.inputDateDDMMYY(dd, '/');
    teacher.userTypeId = this.teacherTypeId;
    this.authService.teacherSelfPreinscription(this.userId, this.userForm.value).subscribe(() => {
       this.alertify.success('enregistrement terminé...');

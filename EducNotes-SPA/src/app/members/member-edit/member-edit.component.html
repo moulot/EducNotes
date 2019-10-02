@@ -16,7 +16,7 @@
           <div class="card-body">
             <div>
               <strong>location:</strong>
-              <p>{{user.city}}, {{user.country}}</p>
+              <p>{{user.cityId}}, {{user.country}}</p>
             </div>
             <div>
               <strong>Age:</strong>
@@ -53,7 +53,7 @@
                   <h4>Location Details</h4>
                   <div class="form-inline">
                     <label for="city">City</label>
-                    <input class="form-control" type="text" name="city" [(ngModel)]="user.city">
+                    <input class="form-control" type="text" name="city" [(ngModel)]="user.cityId">
                     <label for="country">Country</label>
                     <input class="form-control" type="text" name="country" [(ngModel)]="user.country">
                   </div>

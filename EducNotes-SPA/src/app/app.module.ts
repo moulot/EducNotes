@@ -19,7 +19,6 @@ import { InMemoryDataService } from './shared/inmemory-db/inmemory-db.service';
 import { AppComponent } from './app.component';
 import { NavPanelComponent } from './nav/nav-panel/nav-panel.component';
 import { AuthService } from './_services/auth.service';
-import { RegisterComponent } from './register/register.component';
 import { ErrorInterceptorProvider } from './_services/error.interceptor';
 import { AlertifyService } from './_services/alertify.service';
 import { MessagesComponent } from './messages/messages.component';
@@ -154,7 +153,6 @@ export function tokenGetter() {
       AppComponent,
       NavPanelComponent,
       HomePanelComponent,
-      RegisterComponent,
       MemberListComponent,
       ListsComponent,
       MessagesComponent,
@@ -242,8 +240,7 @@ export function tokenGetter() {
       ParentRegisterComponent,
       TeacherAssignmentComponent,
       HomeParentComponent,
-      AccountHistoryComponent,
-      // BadgesComponent
+      AccountHistoryComponent
    ],
    imports: [
      FormWizardModule,

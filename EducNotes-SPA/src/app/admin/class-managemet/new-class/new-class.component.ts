@@ -11,7 +11,7 @@ import { ClassService } from 'src/app/_services/class.service';
   animations: [SharedAnimations]
 })
 export class NewClassComponent implements OnInit {
-  @Input() levels: any;
+  levels: any;
   @Output() addClassResult = new EventEmitter();
 
   classTypes;
@@ -24,9 +24,19 @@ export class NewClassComponent implements OnInit {
   constructor(private fb: FormBuilder, private classService: ClassService, private alertify: AlertifyService) { }
 
   ngOnInit() {
+
+    this.getLevels();
     this.createClassForm();
     this.getClassTypes();
 
+  }
+
+  getLevels() {
+    this.classService.getLevels().subscribe((res) => {
+      this.levels = res;
+    }, error => {
+      this.alertify.error(error);
+    });
   }
   getClassTypes() {
    this.classService.getClassTypes().subscribe((res) => {

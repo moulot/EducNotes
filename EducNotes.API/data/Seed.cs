@@ -12,8 +12,8 @@ namespace EducNotes.API.Data
         {
             if(!userManager.Users.Any())
             {
-                var userData = System.IO.File.ReadAllText("Data/UserSeedData.json");
-                var users = JsonConvert.DeserializeObject<List<User>>(userData);
+                // var userData = System.IO.File.ReadAllText("Data/UserSeedData.json");
+                // var users = JsonConvert.DeserializeObject<List<User>>(userData);
 
                 var roles = new List<Role>
                 {

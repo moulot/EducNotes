@@ -20,7 +20,8 @@
              <nz-form-item>
               <nz-form-label [nzSm]="6" [nzXs]="24">Nom utilisateur</nz-form-label>
               <nz-form-control [nzSm]="14" [nzXs]="24">
-                <input nz-input placeholder="entrer le login ou nom d'utilisateur" formControlName="userName" id="userName">
+                <input nz-input (blur)="userNameVerification()" placeholder="entrer le login ou nom d'utilisateur" formControlName="userName" id="userName">
+                <span class="text-danger" *ngIf="userNameExist"> ce nom d'utilisateur est déjà utilisé</span>
               </nz-form-control>
               </nz-form-item>
 
@@ -50,8 +51,9 @@
              <nz-form-item>
                 <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="dateOfBirth">Date de naissance</nz-form-label>
                 <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="userForm.controls['dateOfBirth']">
-                    <nz-date-picker formControlName="dateOfBirth" id="datenaiss" [nzFormat]="'dd-MMMM-yyyy'"></nz-date-picker>
-                </nz-form-control>
+                    <!-- <nz-date-picker formControlName="dateOfBirth" id="datenaiss" [nzFormat]="'dd-MMMM-yyyy'"></nz-date-picker> -->
+                    <input class="form-control" id="datenaiss" placeholder="date de naissance"  formControlName="dateOfBirth" name="datenaiss" [textMask]="{mask: birthDateMask}">
+                  </nz-form-control>
               </nz-form-item>
 
               <nz-form-item>
@@ -64,14 +66,14 @@
                   </nz-form-control>
               </nz-form-item>
 
-              <nz-form-item *ngIf="teacherMode && !selfRegister">
+              <!-- <nz-form-item *ngIf="teacherMode && !selfRegister">
                   <nz-form-label nzRequired nzFor="levelId"  [nzSm]="6" [nzXs]="24">choisir le nivau</nz-form-label>
                   <nz-form-control  [nzValidateStatus]="userForm.controls['levelId']" [nzSm]="14" [nzXs]="24">
                       <nz-select  nzAllowClear nzShowSearch nzPlaceHolder="Choisir la classe" formControlName="levelId" id="levelId">
                           <nz-option *ngFor="let level of levels" [nzValue]="level.id" [nzLabel]="level.name"></nz-option>
                       </nz-select>
                   </nz-form-control>
-              </nz-form-item>
+              </nz-form-item> -->
 
               <nz-form-item>
                 <nz-form-label  nzRequired nzFor="gender" [nzSm]="6" [nzXs]="24">Sexe</nz-form-label>
@@ -100,18 +102,18 @@
                       <nz-form-explain *ngIf="userForm.get('secondPhoneNumber').touched && userForm.get('secondPhoneNumber').errors">numero nom valide!</nz-form-explain>
                     </nz-form-control>
                </nz-form-item>
-               <nz-form-item *ngIf="!selfRegister">
+               <!-- <nz-form-item *ngIf="!selfRegister">
                   <nz-form-label [nzSm]="6" [nzXs]="24"  nzFor="suffixe">Choisir ses cours</nz-form-label>
                  <nz-form-control [nzSm]="14" [nzXs]="24"> 
                   <nz-select style="width: 100%" formControlName="courseIds"  [nzSize]="'default'" nzMode="tags" nzPlaceHolder="Choisir ses cours">
                       <nz-option *ngFor="let course of courses" [nzLabel]="course.name" [nzValue]="course.id"></nz-option>
                   </nz-select>
                   </nz-form-control>
-               </nz-form-item>
+               </nz-form-item> -->
                <nz-form-item>
                   <nz-form-control [nzSpan]="14" [nzOffset]="6">
-                    <!-- <button class="btn btn-outline-primary " type="submit" [disabled]="!userForm.valid || submitText!='enregistrer'"><span>{{submitText}}</span></button> -->
-                    <button class="btn btn-outline-primary " type="submit"><span>{{submitText}}</span></button>
+                    <button class="btn btn-outline-primary " type="submit" [disabled]="!userForm.valid || userNameExist === true"><span>{{submitText}}</span></button>
+                    <!-- <button class="btn btn-outline-primary " type="submit"><span>{{submitText}}</span></button> -->
                     <button type="button" (click)="close()" class="btn btn-outline-primary ml-2"><span>annuler</span></button>      
                   </nz-form-control>
 

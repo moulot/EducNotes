@@ -10,7 +10,6 @@ export interface User {
     created: Date;
     lastActive: Date;
     photoUrl: string;
-    city: string;
     country: string;
     interests?: string;
     introduction?: string;
@@ -27,7 +26,7 @@ export interface User {
     secondPhoneNumber: string;
     validatedCode: boolean;
     districtId: number;
-    cityId: number;
+    cityId?: number;
 
     photos?: Photo[];
     roles?: string[];

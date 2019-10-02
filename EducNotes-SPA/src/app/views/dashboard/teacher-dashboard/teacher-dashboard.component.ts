@@ -33,11 +33,8 @@ export class TeacherDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.teacher = this.authService.currentUser;
-    // this.route.data.subscribe(data => {
-    //   this.teacher = data['teacher'];
-    //   this.getTeacherClasses(this.teacher.id);
-    //   this.getTeacherNextCourses(this.teacher.id);
-    // });
+    this.getTeacherClasses(this.teacher.id);
+    this.getTeacherNextCourses(this.teacher.id);
   }
 
   getTeacherScheduleToday(teacherId) {

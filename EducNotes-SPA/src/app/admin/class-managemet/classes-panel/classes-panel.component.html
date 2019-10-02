@@ -61,6 +61,6 @@
 </div>
 
 <div [@animate]="{value:'*',params:{delay: 500+'ms', y:'50px'}}" *ngIf="addNew">
-<app-new-class [levels]='lev' (addClassResult)="resultMode($event)"></app-new-class>
+<app-new-class  (addClassResult)="resultMode($event)"></app-new-class>
 </div>
 
