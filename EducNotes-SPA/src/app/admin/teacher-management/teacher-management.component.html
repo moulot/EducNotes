@@ -20,7 +20,7 @@
                   <p class="m-0 text text-muted"><b>Cours : </b> <span *ngIf="teacher.courseClasses.length===0">Aucun</span>
                     <span *ngIf="teacher.courseClasses.length>0">
                         <span *ngFor="let course of teacher.courseClasses" >
-                            {{course.course.name}} <span *ngIf="course.classes.length>0">:<span *ngFor="let class of course.classes"><a href="">{{class.name}}</a></span></span>,
+                            {{course.course.name}} <span *ngIf="course.classes.length>0">:<span *ngFor="let class of course.classes"><a href="">{{class.name}}, </a></span></span>
                           </span>
                     </span>
                       

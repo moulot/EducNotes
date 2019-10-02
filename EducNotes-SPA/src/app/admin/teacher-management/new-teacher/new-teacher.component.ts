@@ -99,14 +99,17 @@ export class NewTeacherComponent implements OnInit {
     this.submitText = 'patienter...';
 
     this.teacher = Object.assign({}, this.teacherForm.value);
-    // const ze = this.teacherForm.value.dateOfBirth.split('-');
-    // const dd = new Date(ze[2], ze[1], ze[0]);
-    this.teacher.dateOfBirth = Utils.inputDateDDMMYY(this.teacherForm.value.dateOfBirth, '/');
+    // console.log(this.teacher);
+    const dtBirth = this.teacherForm.value.dateOfBirth;
+    // console.log(dtBirth);
+    if (dtBirth) {
+      this.teacher.dateOfBirth = Utils.inputDateDDMMYY(this.teacherForm.value.dateOfBirth, '/');
+    }
     console.log(this.teacher.dateOfBirth);
 
     this.teacher.userTypeId = this.teacherTypeId;
     if (this.editionMode === 'add') {
-    this.adminService.emailExist(this.teacher.email).subscribe((res: boolean) => {
+      this.adminService.emailExist(this.teacher.email).subscribe((res: boolean) => {
             if (res === true) {
               this.alertify.infoBar('l\'email ' + this.teacher.email + ' est déja utlilisé ');
               this.submitText = 'enregistrer';
