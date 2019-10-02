@@ -76,7 +76,7 @@ submitText = 'enregistrer';
 
    affectation() {
 
-    this.classService.saveTeacherAffectation(this.teacher.id, this.courseId, this.classIds).subscribe(response => {
+    this.classService.saveTeacherAffectation(this.teacher.id, this.courseId, this.levelId, this.classIds).subscribe(response => {
       this.alertify.success('affectation terminée...');
       this.addUserResult.emit(true);
       this.submitText = 'enregistrer';

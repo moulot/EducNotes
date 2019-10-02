@@ -142,6 +142,12 @@ import { GradeStudentComponent } from './grades/grade-student/grade-student.comp
 import { NewUserComponent } from './admin/user-management/new-user/new-user.component';
 import { ParentRegisterComponent } from './admin/selfs-registers/parent-register/parent-register.component';
 import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-assignment/teacher-assignment.component';
+import localeFr from '@angular/common/locales/fr';
+import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
+import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
+
+// the second parameter 'fr' is optional
+registerLocaleData(localeFr, 'fr');
 
 
 export function tokenGetter() {
@@ -240,7 +246,8 @@ export function tokenGetter() {
       ParentRegisterComponent,
       TeacherAssignmentComponent,
       HomeParentComponent,
-      AccountHistoryComponent
+      AccountHistoryComponent,
+      LevelClassesComponent
    ],
    imports: [
      FormWizardModule,
@@ -304,6 +311,7 @@ export function tokenGetter() {
       ClassesListResolver,
       CoursesListResolver,
       TeacherManagementResolver,
+      LevelClassesResolver,
       CallSheetResolver,
       {provide: NZ_I18N, useValue: fr_FR}
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },

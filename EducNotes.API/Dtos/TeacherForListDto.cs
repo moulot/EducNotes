@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using EducNotes.API.Models;
 
@@ -11,6 +12,7 @@ namespace EducNotes.API.Dtos
         public string Email { get; set; }
         public string PhotoUrl { get; set; }
        public string PhoneNumber { get; set; }
+       public DateTime?  DateOfBirth { get; set; }
        public string SeconPhoneNumber { get; set; }
         public List<TeacherCourseClassesDto> CourseClasses { get; set; }
     }

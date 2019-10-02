@@ -110,6 +110,7 @@ className = '';
     this.adminService.studentAffectation(this.classId, this.selectedIds).subscribe( () => {
       this.searchStudents();
       this.alertify.success('enegistrement terminé...');
+      this.classId = null;
 
     }, error => {
       this.alertify.error(error);
@@ -130,6 +131,10 @@ className = '';
   resetSessions() {
     // this.filteredSessions = this.allSessions;
     this.searchForm.reset();
+    this.showListDiv = false;
+    this.allSelected = false;
+    this.students = [];
+
   }
 
   searchStudents() {

@@ -57,14 +57,6 @@ export class TeacherManagementComponent implements OnInit {
 
 
   add() {
-    // this.editionMode = 'add';
-    // this.teacher = {};
-    // this.affectaionVisible = false;
-    // this.getAllCourses();
-    // this.initializeParams();
-    // this.createTeacherForm();
-    // this.visible = true;
-    // this.drawerTitle = 'NOUVEL ENSEIGNANT';
     this.show = 'add';
 
   }
@@ -104,12 +96,12 @@ export class TeacherManagementComponent implements OnInit {
   courseChange(): void {
    this.classIds = [];
    // matching selecting course from seleceted Teacher to get classes
-    const teachercourses = this.selectedTeacher.courses.find(item => item.course.id === this.courseId);
-         for (let index = 0; index < teachercourses.classes.length; index++) {
-          if ( teachercourses.classes[index].teacherId === this.userId) {
-            this.classIds = [...this.classIds, teachercourses.classes[index].classId];
-          }
-        }
+    // const teachercourses = this.selectedTeacher.courses.find(item => item.course.id === this.courseId);
+    //      for (let index = 0; index < teachercourses.classes.length; index++) {
+    //       if ( teachercourses.classes[index].teacherId === this.userId) {
+    //         this.classIds = [...this.classIds, teachercourses.classes[index].classId];
+    //       }
+    //     }
 
   }
 

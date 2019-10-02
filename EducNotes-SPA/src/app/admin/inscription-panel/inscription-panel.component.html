@@ -38,6 +38,15 @@
               Places disponibles
             </ng-template>
           </ngx-datatable-column>
+
+          <ngx-datatable-column name="id" [width]="50">
+            <ng-template ngx-datatable-header-template>
+              Option
+            </ng-template>
+            <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+              <a [routerLink]="['/levelClasses', value]" routerLinkActive="router-link-active"  class="btn btn-outline-primary btn-sm">details</a>
+          </ng-template>
+          </ngx-datatable-column>
         </ngx-datatable>
       </div>
   </div>

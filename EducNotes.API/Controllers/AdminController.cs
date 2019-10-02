@@ -253,18 +253,25 @@ namespace EducNotes.API.Controllers
     {
       if(model.Count() > 0)
       {
-          foreach (var item in model)
+          foreach (var student in model)
           {
-              var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == item.UserId);
+              var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == student.UserId);
               user.ClassId = classId;
 
-              var inscription = await _context.Inscriptions.FirstOrDefaultAsync(i => i.Id == item.Id);
+              var inscription = await _context.Inscriptions.FirstOrDefaultAsync(i => i.Id == student.Id);
               inscription.Validated = true;
               inscription.ValidatedDate = DateTime.Now;
           }
           
           if(await _repo.SaveAll())
+          {
+            //envoi du mail d'affectation à chaque parent
+           foreach (var student in model)
+           {
+                await _repo.sendOk(studentTypeId, student.UserId);
+           }
             return Ok();
+          }
 
           return BadRequest("imposible d'effectuer cette opération");
       }
@@ -274,31 +281,40 @@ namespace EducNotes.API.Controllers
 
 
 
+
     [HttpPost("AddUser")]
     public async Task<IActionResult> AddUser(UserForRegisterDto userForRegisterDto)
     {
 
         var userToCreate = _mapper.Map<User>(userForRegisterDto);
-        userToCreate.UserName = userForRegisterDto.Email;
+        var code  = Guid.NewGuid();
+        userToCreate.UserName = code.ToString();
         try
         {
-            await _repo.AddUserPreInscription(Guid.NewGuid(),userToCreate,teacherRoleId,false);
+            await _repo.AddUserPreInscription(code,userToCreate,teacherRoleId,true);
             
             if(userForRegisterDto.CourseIds!=null)
             {
-                foreach (var course in userForRegisterDto.CourseIds)
-                {
-                    _context.Add( new ClassCourse {CourseId = course, TeacherId = userToCreate.Id});
-                }
-                await _context.SaveChangesAsync();
-                var teacherToReturn = new TeacherForListDto(){
-                // Teacher =  _mapper.Map<UserForListDto>(await _repo.GetUser(userToCreate.Id,false)),
-                // Courses = await _repo.GetTeacherCoursesAndClasses(userToCreate.Id)
-            };
-            return Ok(teacherToReturn);
+                    foreach (var course in userForRegisterDto.CourseIds)
+                    {
+                        var newCourse =  new TeacherCourse {CourseId = course, TeacherId = userToCreate.Id};
+                        _repo.Add(newCourse);
+                    }
+                //     var teacherToReturn = new TeacherForListDto(){
+                //     // Teacher =  _mapper.Map<UserForListDto>(await _repo.GetUser(userToCreate.Id,false)),
+                //     // Courses = await _repo.GetTeacherCoursesAndClasses(userToCreate.Id)
+                // };
+                
+                // return Ok(teacherToReturn);
+                 if( await _repo.SaveAll())
+                return Ok();
+
+                return BadRequest("impossible de terminer l'enregistrement");
             }
+
             else
-            return Ok(_mapper.Map<UserForListDto>(userToCreate));
+            return Ok();
+            // return Ok(_mapper.Map<UserForListDto>(userToCreate));
             
         }
         catch (System.Exception ex)

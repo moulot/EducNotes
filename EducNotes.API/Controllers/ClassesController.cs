@@ -663,18 +663,18 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPost("AddCourse")]
-        public async Task<IActionResult> AddCourse([FromBody]NewCourseDto courseDto)
+        public async Task<IActionResult> AddCourse([FromBody]NewCourseDto newCourseDto)
         {
-            var course = new Course{Name = courseDto.name, Abbreviation=courseDto.abbreviation};
+            var course = new Course{Name = newCourseDto.name, Abbreviation=newCourseDto.abbreviation};
             _repo.Add(course);
-            foreach (var item in courseDto.classLevelIds)
-            {
-                var classes = await _context.Classes.Where(a=>a.ClassLevelId == Convert.ToInt32(item)).Select(a=>a.Id).ToListAsync();
-                foreach (var classId in classes)
-                {
-                  _repo.Add(new ClassCourse {CourseId = course.Id,ClassId = classId});
-                }
-            }
+            // foreach (var item in courseDto.classLevelIds)
+            // {
+            //     var classes = await _context.Classes.Where(a=>a.ClassLevelId == Convert.ToInt32(item)).Select(a=>a.Id).ToListAsync();
+            //     foreach (var classId in classes)
+            //     {
+            //       _repo.Add(new ClassCourse {CourseId = course.Id,ClassId = classId});
+            //     }
+            // }
             if(await _repo.SaveAll())
               return Ok();
            
@@ -895,12 +895,16 @@ namespace EducNotes.API.Controllers
             //recuperation de tous les professeurs ainsi que les cours affectés
             var teachers = await _context.Users.Include(p => p.Photos).Where(u => u.UserTypeId == teacherTypeId)
             .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
+
+            // var teacherCouses = await _context.TeacherCourse.ToListAsync();
+
+            // var classCourses = await _context.ClassCourses.ToListAsync();
             
-            var classCourses =await  _context.ClassCourses
-                                        .Include(t => t.Teacher)
-                                        .Include(c => c.Class)
-                                        .Include(c => c.Course)
-                                        .ToListAsync();
+            // var classCourses =await  _context.ClassCourses
+            //                             .Include(t => t.Teacher)
+            //                             .Include(c => c.Class)
+            //                             .Include(c => c.Course)
+            //                             .ToListAsync();
             
            var teachersToReturn = new List<TeacherForListDto>();
            foreach (var teacher in teachers)
@@ -912,16 +916,18 @@ namespace EducNotes.API.Controllers
                 tdetails.Id = teacher.Id;
                 tdetails.LastName = teacher.LastName;
                 tdetails.FirstName = teacher.FirstName;  
+                tdetails.DateOfBirth = teacher.DateOfBirth;
                 tdetails.CourseClasses = new List<TeacherCourseClassesDto>();
                // tdetails.PhotoUrl = teacher.Photos.FirstOrDefault(i => i.IsMain == true).Url;
-               var allclassCourses = classCourses.Where(t => t.TeacherId == teacher.Id);
+               var allteacherCourses = await _context.TeacherCourses.Include(c => c.Course).Where(t => t.TeacherId == teacher.Id).ToListAsync();
 
-                foreach (var cours in allclassCourses.Select(c => c.Course).Distinct())
+                foreach (var cours in allteacherCourses)
                 {
                     var cdetails = new TeacherCourseClassesDto();
-                    cdetails.Course = cours;
+                    cdetails.Course = cours.Course;
                     cdetails.Classes = new List<Class>();
-                    var classes = allclassCourses.Where(t => t.TeacherId == teacher.Id && t.CourseId == cours.Id && t.ClassId !=null).ToList();
+                    var classes = _context.ClassCourses.Include(c => c.Class)
+                                  .Where(t => t.TeacherId == teacher.Id && t.CourseId == cours.CourseId && t.ClassId !=null).ToList();
                     if(classes!=null & classes.Count()>0)
                     cdetails.Classes =classes.Select(c => c.Class).ToList();
                   tdetails.CourseClasses.Add(cdetails);
@@ -936,50 +942,63 @@ namespace EducNotes.API.Controllers
         [HttpPost("{id}/UpdateTeacher")]
         public async Task<IActionResult> UpdateTeacher(int id, UserForUpdateDto teacherForUpdate)
         {
-          var courseIds = teacherForUpdate.CourseIds;
-          var classCourses =await _context.ClassCourses.Include(c =>c.Class).Where(t => t.TeacherId == id).ToListAsync();
-          var ccIds = classCourses.Select(c => c.CourseId).Distinct().ToList();
-          foreach (var courId in courseIds.Except(ccIds))
+          
+          if(teacherForUpdate.CourseIds.Count() > 0)
           {
-              //ajout d'une nouvelle ligne dans ClassCourse
-              var cl = new ClassCourse{TeacherId = id, CourseId = courId};
-              _repo.Add(cl);
-          }
-
-          foreach (var courId in ccIds.Except(courseIds))
-          {
-                var currentLines = classCourses.Where(c => c.CourseId == courId && c.TeacherId == id);
-                if (currentLines != null)
+                // les cours sont bien renseignés 
+                var courseIds = new List<int>();
+                foreach (var item in teacherForUpdate.CourseIds)
                 {
-                    foreach (var item in currentLines)
-                    {
-                    _repo.Delete(item);
-                    }
-                    // suppression de la ligne ******a revoir *************
-                }   
+                    courseIds.Add(Convert.ToInt32(item)); 
+                }
+            
+            
+                var teacherCourses =await _context.TeacherCourses.Where(t => t.TeacherId == id).ToListAsync();
+                // recupartion des courseId du profésseur
+                var ccIds = teacherCourses.Select(c => c.CourseId).ToList();
+                
+                foreach (var courId in courseIds.Except(ccIds))
+                {
+                    //ajout d'une nouvelle ligne dans TeacheCourses
+                    var cl = new TeacherCourse{TeacherId = id, CourseId = courId};
+                    _repo.Add(cl);
+                }
+
+                foreach (var courId in ccIds.Except(courseIds))
+                {
+                        var currentLines = _context.ClassCourses.Where(c => c.CourseId == courId && c.TeacherId == id);
+                        if (currentLines.Count()==0)
+                            _repo.Delete(teacherCourses.FirstOrDefault(t => t.TeacherId == id && t.CourseId == courId));
+                        // suppression de la ligne concernée....
+                }
+
+                var userFromRepo = await _repo.GetUser(id, false);
+                // _mapper.Map(model, userFromRepo);
+                userFromRepo.FirstName = teacherForUpdate.FirstName;
+                userFromRepo.LastName = teacherForUpdate.LastName;
+                if(teacherForUpdate.DateOfBirth != null)
+                    userFromRepo.DateOfBirth = Convert.ToDateTime(teacherForUpdate.DateOfBirth);
+                userFromRepo.Email = teacherForUpdate.Email;
+                userFromRepo.PhoneNumber = teacherForUpdate.PhoneNumber;
+                userFromRepo.SecondPhoneNumber = teacherForUpdate.SecondPhoneNumber;
+                _repo.Update(userFromRepo);
+
+                if(await _repo.SaveAll())
+                    return Ok();
+
+                 return BadRequest("impossible de terminer l'action");
+
           }
-
-          var userFromRepo = await _repo.GetUser(id, false);
-          // _mapper.Map(model, userFromRepo);
-          userFromRepo.FirstName = teacherForUpdate.FirstName;
-          userFromRepo.LastName = teacherForUpdate.LastName;
-          if(teacherForUpdate.DateOfBirth != null)
-            userFromRepo.DateOfBirth = Convert.ToDateTime(teacherForUpdate.DateOfBirth);
-          userFromRepo.Email = teacherForUpdate.Email;
-          userFromRepo.PhoneNumber = teacherForUpdate.PhoneNumber;
-          userFromRepo.SecondPhoneNumber = teacherForUpdate.SecondPhoneNumber;
-          _repo.Update(userFromRepo);
-
-            if(await _repo.SaveAll())
-                return Ok();
-
-          return BadRequest("impossible de terminer l'action");
+          
+            return BadRequest("veuillez selectionner au moins un cours");
         }
 
-        [HttpPost("{id}/{courseId}/SaveTeacherAffectation")]
-        public async Task<IActionResult> SaveTeacherAffectation(int id, int courseId, [FromBody]List<int?> classIds)
+        [HttpPost("{id}/{courseId}/{levelId}/SaveTeacherAffectation")]
+        public async Task<IActionResult> SaveTeacherAffectation(int id, int courseId,int levelId, [FromBody]List<int?> classIds)
         {
-               var classcourses = await _context.ClassCourses.Where(c => c.CourseId == courseId).ToListAsync();
+               var classcourses = await _context.ClassCourses.Include(c => c.Class)
+                         .Where(c => c.CourseId == courseId && c.Class.ClassLevelId == levelId)
+                         .ToListAsync();
                 // récupération des classIds
                 var tt = classcourses.Select(c => c.ClassId).Distinct().ToList();
                 foreach (var item in classIds.Except(tt))

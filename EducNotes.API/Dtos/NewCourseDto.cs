@@ -6,6 +6,6 @@ namespace EducNotes.API.Dtos
     {
         public string name { get; set; }
         public string abbreviation { get; set; }
-        public List<string> classLevelIds { get; set; }
+       // public List<string> classLevelIds { get; set; }
     }
 }

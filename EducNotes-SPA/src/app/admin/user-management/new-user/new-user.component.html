@@ -59,7 +59,7 @@
               <nz-form-item>
                   <nz-form-label [nzSm]="6" [nzXs]="24">Email</nz-form-label>
                   <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="userForm.controls['email']" >
-                    <nz-input-group nzAddOnBefore="@">
+                    <nz-input-group>
                       <input type="text" nz-input placeholder="email" formControlName="email" id="cemail" [readonly]="selfRegister">
                   <nz-form-explain *ngIf="userForm.get('email').touched && userForm.get('email').errors">Entrer un email valide!</nz-form-explain>
                     </nz-input-group>

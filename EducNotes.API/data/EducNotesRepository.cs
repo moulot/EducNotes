@@ -22,6 +22,7 @@ namespace EducNotes.API.Data
         private readonly IEmailSender _emailSender;
         private readonly UserManager<User> _userManager;
         string password;
+         int teacherTypeId,parentTypeId,studentTypeId,adminTypeId;
 
 
         public EducNotesRepository(DataContext context, IConfiguration config, IEmailSender emailSender,
@@ -33,6 +34,10 @@ namespace EducNotes.API.Data
             _config = config;
             password = _config.GetValue<String>("AppSettings:defaultPassword");
             _userManager =userManager;
+            teacherTypeId =  _config.GetValue<int>("AppSettings:teacherTypeId");
+            parentTypeId =  _config.GetValue<int>("AppSettings:parentTypeId");
+            adminTypeId =  _config.GetValue<int>("AppSettings:adminTypeId");
+            studentTypeId =  _config.GetValue<int>("AppSettings:studentTypeId");
         }
 
         public void Add<T>(T entity) where T : class
@@ -543,5 +548,39 @@ namespace EducNotes.API.Data
             return
             false;
     }
+
+        public async Task sendOk(int userTypeId, int userId)
+        {
+            if(userTypeId == studentTypeId)
+            {
+                // envoi de mail de l'affectation de l'eleve au professeur
+                
+                // recuperation des emails de ses parents
+        
+                var parents = await _context.UserLinks
+                   .Include(c => c.UserP)
+                   .Where(u => u.UserId == userId).Select(c => c.UserP)
+                   .ToListAsync();
+
+                // récupération de nom de la classe de l'eleve
+                var student = await _context.Users.Include(c => c.Class) 
+                               .FirstOrDefaultAsync( u => u.Id == userId);
+
+                // formatage du mail
+                foreach (var parent in parents)
+                {
+                    var emailform = new EmailFormDto{
+                        toEmail = parent.Email,
+                    subject = "Confirmation mise en salle de votre enfant ",
+                    content = "<b> Bonjour "+ parent.LastName + " " + parent.FirstName +"</b>, <br>" +
+                              "Votre enfant <b>" + student.FirstName + " " + student.FirstName +
+                               " </b> a bien été enregistré(s) dans la classe de <b>" + student.Class.Name
+                };
+                  await SendEmail(emailform);
+                }
+
+
+            }
+        }
     }
 }

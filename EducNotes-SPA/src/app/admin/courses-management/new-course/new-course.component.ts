@@ -12,7 +12,7 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 })
 export class NewCourseComponent implements OnInit {
   @Output() addCourseResult = new EventEmitter();
-  levels;
+  // levels;
   courseForm: FormGroup;
   submitText = 'enregistrer';
 
@@ -21,24 +21,29 @@ export class NewCourseComponent implements OnInit {
 
   ngOnInit() {
     this.createCourseForm();
-    this.getLevels();
+    // this.getLevels();
   }
   createCourseForm() {
     this.courseForm = this.fb.group({
       name: ['', Validators.required],
-      classLevelIds: [null, Validators.required],
-      abbreviation: ['', Validators.nullValidator]});
-  }
-  getLevels() {
-    this.classService.getLevels().subscribe((res) => {
-      this.levels = res;
-    }, error => {
-      console.log(error);
+      // classLevelIds: [null, Validators.required],
+      abbreviation: ['', Validators.nullValidator]
     });
   }
-  isNotSelected(value: any): boolean {
-    return this.levels.indexOf(value) === -1;
-  }
+
+
+  // getLevels() {
+  //   this.classService.getLevels().subscribe((res) => {
+  //     this.levels = res;
+  //   }, error => {
+  //     console.log(error);
+  //   });
+  // }
+
+
+  // isNotSelected(value: any): boolean {
+  //   return this.levels.indexOf(value) === -1;
+  // }
 
   save() {
     const course =  Object.assign({}, this.courseForm.value);
@@ -47,7 +52,8 @@ export class NewCourseComponent implements OnInit {
       this.addCourseResult.emit(true);
      }, error => {
        console.log(error);
-     });}
+     });
+    }
 
 
   cancel() {
