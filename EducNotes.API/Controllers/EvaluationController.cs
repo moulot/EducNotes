@@ -48,12 +48,14 @@ namespace EducNotes.API.Controllers
         [HttpGet("Class/{classId}/Course/{courseId}/Period/{periodId}")]
         public async Task<IActionResult> GetUserEvaluations(int classId, int courseId, int periodId)
         {
-          var evals = await _context.Evaluations
+          var evalsFromRepo = await _context.Evaluations
                           .Include(i => i.EvalType)
                           .Where(e => e.ClassId == classId && e.CourseId == courseId &&
                             e.PeriodId == periodId && e.Graded == true)
                           .OrderBy(o => o.EvalDate)
                           .ToListAsync();
+
+          var evalsForEditDto = _mapper.Map<IEnumerable<EvalsForEditDto>>(evalsFromRepo);
 
           var usersFromRepo = await _repo.GetClassStudents(classId);
           var users = _mapper.Map<IEnumerable<UserForDetailedDto>>(usersFromRepo);
@@ -99,7 +101,7 @@ namespace EducNotes.API.Controllers
 
           return Ok(new {
               userGrades = usersWithGrades,
-              evals = evals
+              evals = evalsForEditDto
           });
         }
 

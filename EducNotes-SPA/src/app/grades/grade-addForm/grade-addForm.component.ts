@@ -5,6 +5,7 @@ import { UserEvaluation } from 'src/app/_models/userEvaluation';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { debounceTime } from 'rxjs/operators';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
+import { Utils } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-grade-addForm',
@@ -27,11 +28,13 @@ export class GradeAddFormComponent implements OnInit {
   viewMode: 'list' | 'grid' = 'list';
   page = 1;
   pageSize = 15;
+  closed = false;
 
   constructor(private evalService: EvaluationService, private fb: FormBuilder, private alertify: AlertifyService) { }
 
   ngOnInit() {
     this.selectedEval = this.evalService.currentEval;
+    this.closed = this.selectedEval.closed;
     this.userGrades = this.evalService.userGrades;
     this.filteredUserGrades = this.userGrades;
     this.newUserGrades = this.userGrades;
@@ -66,6 +69,7 @@ export class GradeAddFormComponent implements OnInit {
   }
 
   saveNotes() {
+    console.log(this.closed);
     for (let i = 0; i < this.userGrades.length; i++) {
       const elt = this.userGrades[i];
       const grade = elt.grades[this.gradeIndex];
@@ -85,24 +89,13 @@ export class GradeAddFormComponent implements OnInit {
     }, () => {
       this.evalService.setCurrentCurrentEval(this.selectedEval, this.newUserGrades);
       this.toggleView.emit();
-      this.scrollToTop();
+      Utils.smoothScrollToTop();
     });
   }
 
   cancelForm() {
     this.toggleView.emit();
-    this.scrollToTop();
-  }
-
-  scrollToTop() {
-    const scrollToTop = window.setInterval(() => {
-      const pos = window.pageYOffset;
-      if (pos > 0) {
-          window.scrollTo(0, pos - 10); // how far to scroll on each step
-      } else {
-          window.clearInterval(scrollToTop);
-      }
-    }, 10);
+    Utils.smoothScrollToTop();
   }
 
 }

@@ -336,21 +336,9 @@ namespace EducNotes.API.Controllers
         [HttpGet("{TeacherId}/period/{periodId}/ClassesWithEvalsByPeriod")]
         public async Task<IActionResult> GetTeacherClassesWithEvalsByPeriod(int teacherId, int periodId)
         {
-            // var teacherClasses1 = await (from course in _context.CourseUsers
-            //                         join classes in _context.ClassCourses
-            //                         on course.CourseId equals classes.CourseId
-            //                         where course.TeacherId == teacherId
-            //                         select new {
-            //                             ClassId = classes.ClassId,
-            //                             ClassName = classes.Class.Name,
-            //                             NbStudents = _context.Users.Where(u => u.ClassId == classes.ClassId).Count()
-            //                         })
-            //                         .OrderBy(o => o.ClassName)
-            //                         .Distinct().ToListAsync();
-
             var Classes = await _context.ClassCourses
-                                                .Include(i => i.Class).ThenInclude(i => i.Students)
-                                                .Where(c => c.TeacherId == teacherId).Distinct().ToListAsync();
+                                    .Include(i => i.Class).ThenInclude(i => i.Students)
+                                    .Where(c => c.TeacherId == teacherId).Distinct().ToListAsync();
 
             List<ClassesWithEvalsDto> classesWithEvals = new List<ClassesWithEvalsDto>();
             foreach (var aclass in Classes)
@@ -359,21 +347,25 @@ namespace EducNotes.API.Controllers
                                 .Include(i => i.Course)
                                 .Include(i => i.EvalType)
                                 .Where(e => e.ClassId == aclass.ClassId && e.PeriodId == periodId).ToListAsync();
-              var OpenedEvals = ClassEvals.FindAll(e => e.Closed == 0);
-              var OpenedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(OpenedEvals);
-              var ToBeGradedEvals = ClassEvals.FindAll(e => e.Closed == 1);
-              var ToBeGradedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(ToBeGradedEvals);
-              var NbEvals = OpenedEvals.Count() + ToBeGradedEvals.Count();
 
-              ClassesWithEvalsDto classDto = new ClassesWithEvalsDto();
-              classDto.ClassId = Convert.ToInt32(aclass.ClassId);
-              classDto.ClassName = aclass.Class.Name;
-              classDto.NbStudents = aclass.Class.Students.Count();
-              classDto.NbEvals = NbEvals;
-              classDto.OpenedEvals = OpenedEvalsDto;
-              classDto.ToBeGradedEvals = ToBeGradedEvalsDto;
+              if (ClassEvals.Count > 0)
+              {
+                    var OpenedEvals = ClassEvals.FindAll(e => e.Closed == 0);
+                    var OpenedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(OpenedEvals);
+                    var ToBeGradedEvals = ClassEvals.FindAll(e => e.Closed == 1);
+                    var ToBeGradedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(ToBeGradedEvals);
+                    var NbEvals = OpenedEvals.Count() + ToBeGradedEvals.Count();
 
-              classesWithEvals.Add(classDto);
+                    ClassesWithEvalsDto classDto = new ClassesWithEvalsDto();
+                    classDto.ClassId = Convert.ToInt32(aclass.ClassId);
+                    classDto.ClassName = aclass.Class.Name;
+                    classDto.NbStudents = aclass.Class.Students.Count();
+                    classDto.NbEvals = NbEvals;
+                    classDto.OpenedEvals = OpenedEvalsDto;
+                    classDto.ToBeGradedEvals = ToBeGradedEvalsDto;
+
+                    classesWithEvals.Add(classDto);
+              }
             }
 
             return Ok(classesWithEvals);

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AutoMapper;
 using EducNotes.API.Data;
@@ -37,6 +38,10 @@ namespace EducNotes.API.Helpers
             .ForMember(dest=> dest.TotalStudent, opt => {
               opt.MapFrom(src=>src.Students.Count());
             });
+            CreateMap<Evaluation, EvalsForEditDto>()
+                .ForMember(dest => dest.EvalDateExpired, opt => {
+                    opt.MapFrom(src => (src.EvalDate.Date <= DateTime.Now.Date));
+                });
             CreateMap<Photo, PhotosForDetailedDto>();
             CreateMap<UserForUpdateDto, User>();
             CreateMap<Photo, PhotoForReturnDto>();

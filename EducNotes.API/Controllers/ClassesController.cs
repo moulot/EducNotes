@@ -963,8 +963,8 @@ namespace EducNotes.API.Controllers
           // _mapper.Map(model, userFromRepo);
           userFromRepo.FirstName = teacherForUpdate.FirstName;
           userFromRepo.LastName = teacherForUpdate.LastName;
-          if(teacherForUpdate.DateOfBirth!=null)
-          userFromRepo.DateOfBirth = teacherForUpdate.DateOfBirth;
+          if(teacherForUpdate.DateOfBirth != null)
+            userFromRepo.DateOfBirth = Convert.ToDateTime(teacherForUpdate.DateOfBirth);
           userFromRepo.Email = teacherForUpdate.Email;
           userFromRepo.PhoneNumber = teacherForUpdate.PhoneNumber;
           userFromRepo.SecondPhoneNumber = teacherForUpdate.SecondPhoneNumber;

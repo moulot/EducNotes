@@ -35,4 +35,16 @@ export class Utils {
         const dt = date.split(char);
         return new Date(Number(dt[2]), Number(dt[1]) - 1, Number(dt[0]));
     }
+
+    static smoothScrollToTop() {
+        const scrollToTop = window.setInterval(() => {
+          const pos = window.pageYOffset;
+          if (pos > 0) {
+              window.scrollTo(0, pos - 10); // how far to scroll on each step
+          } else {
+              window.clearInterval(scrollToTop);
+          }
+        }, 10);
+    }
+
 }

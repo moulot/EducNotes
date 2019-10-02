@@ -20,7 +20,6 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 })
 export class GradePanelComponent implements OnInit {
   @ViewChild('classSelect', {static: false}) classSelect: ElementRef;
-  // @ViewChild(SkillsModalComponent, {static: false}) modalCpnt: SkillsModalComponent;
   teacherClasses: any;
   teacher: User;
   notesForm: FormGroup;

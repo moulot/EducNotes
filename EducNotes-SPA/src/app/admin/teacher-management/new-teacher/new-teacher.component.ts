@@ -132,15 +132,15 @@ export class NewTeacherComponent implements OnInit {
           });
     }
 
-    // if (this.editionMode === 'edit') {
-    //   this.classService.updateTeacher(this.userId, this.teacher).subscribe(() => {
-    //     this.alertify.success('enregistrement terminé');
-    //     this.submitText = 'enregistrer';
-    //     this.addUserResult.emit(true);
-    //   }, error => {
-    //     this.alertify.error(error);
-    //     this.submitText = 'enregistrer';});
-    // }
+    if (this.editionMode === 'edit') {
+      this.classService.updateTeacher(this.userId, this.teacher).subscribe(() => {
+        this.alertify.success('enregistrement terminé');
+        this.submitText = 'enregistrer';
+        this.addUserResult.emit(true);
+      }, error => {
+        this.alertify.error(error);
+        this.submitText = 'enregistrer';});
+    }
 
   }
 
