@@ -45,6 +45,8 @@ import { SelfRegisterComponent } from './admin/selfs-registers/self-register/sel
 import { CallSheetResolver } from './_resolvers/callSheet-resolver';
 import { GradeStudentComponent } from './grades/grade-student/grade-student.component';
 import { SigninComponent } from './views/sessions/signin/signin.component';
+import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
+import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
@@ -92,6 +94,7 @@ export const appRoutes: Routes = [
             {path: 'courses', component: CoursesPanelComponent, resolve: {courses: CoursesListResolver}},
             {path: 'teachers', component: TeacherManagementComponent, resolve: {teachers: TeacherManagementResolver}},
             {path: 'preregister', component: PreRegisterComponent},
+            {path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve : {classes: LevelClassesResolver}},
             {path: 'studentGrades', component: GradeStudentComponent, resolve: {student: UserHomeResolver}}
         ]
     },

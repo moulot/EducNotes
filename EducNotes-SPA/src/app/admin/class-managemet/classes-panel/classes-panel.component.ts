@@ -36,7 +36,7 @@ export class ClassesPanelComponent implements OnInit {
 
     getlevels() {
       this.levels = [];
-      this.adminService.getClassLevelsDetails().subscribe((res : any[]) => {
+      this.adminService.getClassLevelsDetails().subscribe((res: any[]) => {
         this.levels = res ;
         for (let index = 0; index < this.levels.length; index++) {
           const element: any = {

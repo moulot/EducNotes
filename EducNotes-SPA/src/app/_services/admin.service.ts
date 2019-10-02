@@ -52,6 +52,10 @@ export class AdminService {
     return this.http.get(this.baseUrl + 'admin/GetClassLevels');
   }
 
+  // levelDetails(levelId: number) {
+  //   return this.http.get(this.baseUrl + 'admin/LevelDetails/' + levelId)
+  // }
+
   sendRegisterEmail(user: User) {
     return this.http.post(this.baseUrl + 'admin/' + 'SendRegisterEmail', user);
   }

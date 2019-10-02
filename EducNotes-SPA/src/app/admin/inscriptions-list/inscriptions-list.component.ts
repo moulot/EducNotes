@@ -131,6 +131,10 @@ className = '';
   resetSessions() {
     // this.filteredSessions = this.allSessions;
     this.searchForm.reset();
+    this.showListDiv = false;
+    this.allSelected = false;
+    this.students = [];
+
   }
 
   searchStudents() {

@@ -253,24 +253,32 @@ namespace EducNotes.API.Controllers
     {
       if(model.Count() > 0)
       {
-          foreach (var item in model)
+          foreach (var student in model)
           {
-              var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == item.UserId);
+              var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == student.UserId);
               user.ClassId = classId;
 
-              var inscription = await _context.Inscriptions.FirstOrDefaultAsync(i => i.Id == item.Id);
+              var inscription = await _context.Inscriptions.FirstOrDefaultAsync(i => i.Id == student.Id);
               inscription.Validated = true;
               inscription.ValidatedDate = DateTime.Now;
           }
           
           if(await _repo.SaveAll())
+          {
+            //envoi du mail d'affectation à chaque parent
+           foreach (var student in model)
+           {
+                await _repo.sendOk(studentTypeId, student.UserId);
+           }
             return Ok();
+          }
 
           return BadRequest("imposible d'effectuer cette opération");
       }
 
       return NotFound();
     }
+
 
 
 

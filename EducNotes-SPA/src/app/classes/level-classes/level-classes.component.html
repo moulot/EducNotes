@@ -1,0 +1,46 @@
+<div *ngIf="!addNew" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+  <div class="col-md-12">
+      <div class="card">
+        <ngx-datatable
+          style="height: 500px; box-shadow: none"
+          class="material fullscreen"
+          [columnMode]="'force'"
+          [headerHeight]="50"
+          [footerHeight]="50"
+          [rowHeight]="60"
+          [scrollbarV]="true"
+
+          [rows]="classes">
+        
+          <ngx-datatable-column name="name" [width]="50">
+            <ng-template ngx-datatable-header-template>
+              Classe
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="totalStudent" [width]="50">
+            <ng-template ngx-datatable-header-template>
+              effectif Actuelle
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="totalStudent" [width]="50">
+            <ng-template ngx-datatable-header-template>
+              Capacité
+            </ng-template>
+          </ngx-datatable-column>
+          
+
+          <ngx-datatable-column name="id" [width]="50">
+            <ng-template ngx-datatable-header-template>
+              Option
+            </ng-template>
+            <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+              <a href="{{value}}" class="btn btn-outline-primary btn-sm">details</a>
+          </ng-template>
+          </ngx-datatable-column>
+          
+        </ngx-datatable>
+      </div>
+    </div>
+</div>

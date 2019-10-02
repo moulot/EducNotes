@@ -64,6 +64,7 @@ namespace EducNotes.API.Data
         Task<List<string>> GetEmails();
         Task<List<string>> GetUserNames();
         Task<List<ClassLevel>> GetLevels();
+        Task sendOk(int userTypeId, int userId);
 
     }
 }
