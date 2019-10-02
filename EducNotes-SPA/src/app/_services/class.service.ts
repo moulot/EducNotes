@@ -138,8 +138,8 @@ constructor(private http: HttpClient) { }
     return this.http.get<Course[]>(this.baseUrl + 'classes/GetAllCourses');
   }
 
-  saveTeacherAffectation(id: number, courseId: number, classIds: number[]) {
-    return this.http.post(this.baseUrl + 'classes/' + id + '/' + courseId + '/SaveTeacherAffectation', classIds);
+  saveTeacherAffectation(id: number, courseId: number, levelId: number, classIds: number[]) {
+    return this.http.post(this.baseUrl + 'classes/' + id + '/' + courseId + '/' + levelId + ' /SaveTeacherAffectation', classIds);
   }
   updateTeacher(id: number, user: any) {
     return this.http.post(this.baseUrl + 'classes/' + id + '/UpdateTeacher', user);

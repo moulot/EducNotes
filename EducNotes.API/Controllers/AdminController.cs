@@ -279,26 +279,34 @@ namespace EducNotes.API.Controllers
     {
 
         var userToCreate = _mapper.Map<User>(userForRegisterDto);
-        userToCreate.UserName = userForRegisterDto.Email;
+        var code  = Guid.NewGuid();
+        userToCreate.UserName = code.ToString();
         try
         {
-            await _repo.AddUserPreInscription(Guid.NewGuid(),userToCreate,teacherRoleId,false);
+            await _repo.AddUserPreInscription(code,userToCreate,teacherRoleId,true);
             
             if(userForRegisterDto.CourseIds!=null)
             {
-                foreach (var course in userForRegisterDto.CourseIds)
-                {
-                    _context.Add( new ClassCourse {CourseId = course, TeacherId = userToCreate.Id});
-                }
-                await _context.SaveChangesAsync();
-                var teacherToReturn = new TeacherForListDto(){
-                // Teacher =  _mapper.Map<UserForListDto>(await _repo.GetUser(userToCreate.Id,false)),
-                // Courses = await _repo.GetTeacherCoursesAndClasses(userToCreate.Id)
-            };
-            return Ok(teacherToReturn);
+                    foreach (var course in userForRegisterDto.CourseIds)
+                    {
+                        var newCourse =  new TeacherCourse {CourseId = course, TeacherId = userToCreate.Id};
+                        _repo.Add(newCourse);
+                    }
+                //     var teacherToReturn = new TeacherForListDto(){
+                //     // Teacher =  _mapper.Map<UserForListDto>(await _repo.GetUser(userToCreate.Id,false)),
+                //     // Courses = await _repo.GetTeacherCoursesAndClasses(userToCreate.Id)
+                // };
+                
+                // return Ok(teacherToReturn);
+                 if( await _repo.SaveAll())
+                return Ok();
+
+                return BadRequest("impossible de terminer l'enregistrement");
             }
+
             else
-            return Ok(_mapper.Map<UserForListDto>(userToCreate));
+            return Ok();
+            // return Ok(_mapper.Map<UserForListDto>(userToCreate));
             
         }
         catch (System.Exception ex)

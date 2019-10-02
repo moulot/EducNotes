@@ -110,6 +110,7 @@ className = '';
     this.adminService.studentAffectation(this.classId, this.selectedIds).subscribe( () => {
       this.searchStudents();
       this.alertify.success('enegistrement terminé...');
+      this.classId = null;
 
     }, error => {
       this.alertify.error(error);

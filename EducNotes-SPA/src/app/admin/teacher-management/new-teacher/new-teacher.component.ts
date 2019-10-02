@@ -63,9 +63,7 @@ export class NewTeacherComponent implements OnInit {
   }
 
 
-
   createTeacherForm() {
-
     this.teacherForm = this.fb.group({
       lastName: [this.editModel.lastName, Validators.required],
       firstName: [this.editModel.firstName, Validators.nullValidator],
@@ -117,7 +115,7 @@ export class NewTeacherComponent implements OnInit {
             } else {
               this.adminService.saveTeacher(this.teacher).subscribe((response: any) => {
             //   this.visible = false;
-              response.type = 'new';
+            //   response.type = 'new';
               // this.teachersCourses = [...this.teachersCourses, response];
             // this.teachersCourses.unshift(response);
               this.alertify.success('enregistrement terminé...');
@@ -132,15 +130,16 @@ export class NewTeacherComponent implements OnInit {
           });
     }
 
-    // if (this.editionMode === 'edit') {
-    //   this.classService.updateTeacher(this.userId, this.teacher).subscribe(() => {
-    //     this.alertify.success('enregistrement terminé');
-    //     this.submitText = 'enregistrer';
-    //     this.addUserResult.emit(true);
-    //   }, error => {
-    //     this.alertify.error(error);
-    //     this.submitText = 'enregistrer';});
-    // }
+    if (this.editionMode === 'edit') {
+      this.classService.updateTeacher(this.userId, this.teacher).subscribe(() => {
+        this.alertify.success('enregistrement terminé');
+        this.submitText = 'enregistrer';
+        this.addUserResult.emit(true);
+      }, error => {
+        this.alertify.error(error);
+        this.submitText = 'enregistrer';
+      });
+    }
 
   }
 

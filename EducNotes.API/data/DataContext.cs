@@ -55,7 +55,8 @@ namespace EducNotes.API.Data
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////
-        public DbSet<ClassType> ClassTypes { get; set; }
+        public DbSet<TeacherCourse> TeacherCourses { get; set; }
+         public DbSet<ClassType> ClassTypes { get; set; }
         public DbSet<InscriptionType> InscriptionTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

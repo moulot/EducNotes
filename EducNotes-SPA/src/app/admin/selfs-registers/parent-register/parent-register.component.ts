@@ -218,7 +218,7 @@ export class ParentRegisterComponent implements OnInit {
   this.initializeParams(this.user1Form.value.lastName);
   this.createChildForm();
   this.showChildenList = false;
-  this.submitText = 'ajouter l\'enfant';
+  this.submitText = 'enregistrer l\'enfant';
 
 }
 

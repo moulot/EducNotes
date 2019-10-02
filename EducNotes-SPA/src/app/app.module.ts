@@ -142,6 +142,10 @@ import { GradeStudentComponent } from './grades/grade-student/grade-student.comp
 import { NewUserComponent } from './admin/user-management/new-user/new-user.component';
 import { ParentRegisterComponent } from './admin/selfs-registers/parent-register/parent-register.component';
 import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-assignment/teacher-assignment.component';
+import localeFr from '@angular/common/locales/fr';
+
+// the second parameter 'fr' is optional
+registerLocaleData(localeFr, 'fr');
 
 
 export function tokenGetter() {
