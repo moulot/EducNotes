@@ -1,13 +1,62 @@
 <div class="row justify-content-center align-items-center mt-3"  [@animate]="{value:'*',params:{delay: 500+'ms', y:'50px'}}">
     <div  class="col-md-6">
-            <ngb-alert class="alert-card alert-title" >
-            <h5> <p>Presque terminé <b>{{user.firstName}}.</b></p></h5>
-            <p>Veuillez saisir le mot de passe de votre compte</p>
-            </ngb-alert>
+  
+    <div class="card">
+            <ngb-alert class="alert-card alert-title m-1" [dismissible]='false' >
+                    <h5> <p>Presque terminé <b>{{user.firstName}}.</b></p></h5>
+                    <p class="card-title">Veuillez saisir votre login et mot de passe</p>
+                    </ngb-alert>
+                
+                    <div class="card-body">
+                            <p class="card-title mt-1">Entrer votre nom d'utilisateur et de mot de passe</p>
+                              <form nz-form [formGroup]="loginForm" (ngSubmit)="submitForm()" >
+                                  <nz-form-item>
+                                    <nz-form-control>
+                                    <input nz-input type="text" id="username" placeholder="not utilisateur" formControlName="userName" (blur)="userNameVerification()">
+                                    <nz-form-explain class="text-danger" *ngIf="userNameExist">ce nom d'utilisateur existe déjà</nz-form-explain>
+                                    </nz-form-control>
+                                  </nz-form-item>
+                
+                                  <nz-form-item>
+                                   <nz-form-control>
+                                     <input nz-input type="password" id="password" placeholder="mot de passe" formControlName="password" (ngModelChange)="updateConfirmValidator()" minlength="4">
+                                     <nz-form-explain *ngIf="loginForm.get('password').dirty && loginForm.get('password').errors">Entrer votre mot de passe s'il vous plait</nz-form-explain>
+                                   </nz-form-control>
+                                 </nz-form-item>
+                
+                                 <nz-form-item>
+                                   <nz-form-control >
+                                     <input nz-input type="password" placeholder="confirmer le mot de passe" formControlName="checkPassword" id="checkPassword" minlength="4">
+                                     <nz-form-explain *ngIf="loginForm.get('checkPassword').dirty && loginForm.get('checkPassword').errors">
+                                       <ng-container *ngIf="loginForm.get('checkPassword').hasError('required')">
+                                         Please confirm your password!
+                                       </ng-container>
+                                       <ng-container *ngIf="loginForm.get('checkPassword').hasError('confirm')">
+                                           Les deux mots de passe que vous entrez sont differents !
+                                       </ng-container>
+                                     </nz-form-explain>
+                                   </nz-form-control>
+                                 </nz-form-item>
+                
+                                 <nz-form-item nz-row style="margin-bottom:8px;">
+                                     <nz-form-control [nzSpan]="14" [nzOffset]="6">
+                                       <button class="btn btn-primary btn-block" [disabled]="!loginForm.valid || userNameExist">enregistrer</button>
+                                       <!-- <button nz-button nzType="default" style="margin-left: 5px">retour</button> -->
+                                     </nz-form-control>
+                                   </nz-form-item>
+                                
+                              </form>
+                    </div>
+    </div>
+
+
+
        
        
-        <div class="card">
+       
+           <!-- j'ai fais monté la fonction de configurattion du mot de passe -->
+            <!-- <div class="card">
             <app-member-password-setting [user]="user"  (passwordSetingResult)="resultMode($event)"></app-member-password-setting>
-        </div>       
+        </div>        -->
     </div>  
 </div>  

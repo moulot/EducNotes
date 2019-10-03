@@ -2,7 +2,7 @@
     
   <div class="separator-breadcrumb border-top"></div>
   <div class="col-md-12" *ngIf="wait"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
-      <ngb-alert class="alert-card text-center">
+      <ngb-alert class="alert-card text-center" [dismissible]='false'>
       <h3>veuillez patienter s'il vous plait...</h3>
       </ngb-alert>
   </div>
