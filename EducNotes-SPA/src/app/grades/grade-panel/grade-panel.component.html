@@ -138,46 +138,6 @@
           </div>
         </div>
 
-        <!-- <div class="col-md-12">
-          <div class="card o-hidden">
-            <ngx-datatable
-              style="height: 500px; box-shadow: none"
-              class="material fullscreen"
-              [columnMode]="'force'"
-              [headerHeight]="120"
-              [footerHeight]="50"
-              [rowHeight]="60"
-              [scrollbarV]="true"
-              [rows]="filteredUserGrades">
-              <ngx-datatable-column name="photoUrl" [maxWidth]="80">
-                <ng-template ngx-datatable-header-template>
-                  élève
-                </ng-template>
-                <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
-                    <img height="60px" width="60px" style="border-radius: 4px" [src]="value" alt="">
-                </ng-template>
-              </ngx-datatable-column>
-              <ngx-datatable-column name="studentName" [width]="100">
-                <ng-template ngx-datatable-header-template>
-                  nom
-                </ng-template>
-              </ngx-datatable-column>
-              <ngx-datatable-column *ngFor="let eval of evals, index as i">
-                <ng-template let-column="column" ngx-datatable-header-template>
-                  <p class="text-muted text-13 m-0">{{eval.name}}</p>
-                  <p class="text-muted text-13 m-0">{{eval.evalType.name}}</p>
-                  <p class="text-muted text-13 m-0" *ngIf="eval.graded">note/{{eval.maxGrade}}. coeff:{{eval.coeff}}</p>
-                  <p class="text-muted text-13 m-0" *ngIf="!eval.graded">non notée</p>
-                  <button type="button" *ngIf="eval.graded" (click)="enterGrades(eval, userGrades, i)" class="btn btn-primary btn-sm m-1"><i class="i-Edit"></i></button>
-                </ng-template>
-                <ng-template let-row="row" ngx-datatable-cell-template>
-                  {{row.grades[i]}}
-                </ng-template>
-              </ngx-datatable-column>
-            </ngx-datatable>
-          </div>
-        </div> -->
-      
       </div>
 
       <div *ngIf="evals.length === 0">

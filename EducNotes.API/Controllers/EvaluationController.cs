@@ -294,28 +294,45 @@ namespace EducNotes.API.Controllers
 
         }
 
-        [HttpPut("SaveUserGrades")]
-        public async Task<IActionResult> SaveUserGrades([FromBody]List<UserEvaluation> userGrades)
+        [HttpPut("{evalClosed}/SaveUserGrades")]
+        public async Task<IActionResult> SaveUserGrades([FromBody]List<UserEvaluation> userGrades, int evalClosed)
         {
-            //get the current evaluation id
-            int evalId = userGrades[0].EvaluationId;
-            //delete previous evaluation data
-            var previousData = _context.UserEvaluations.Where(e => e.EvaluationId == evalId);
-            foreach (UserEvaluation ue in previousData)
+            if(userGrades.Count() > 0)
             {
-                _repo.Delete(ue);
+                //get the current evaluation id
+                int evalId = userGrades[0].EvaluationId;
+                //delete previous evaluation data
+                var previousData = _context.UserEvaluations.Where(e => e.EvaluationId == evalId);
+                foreach (UserEvaluation ue in previousData)
+                {
+                    _repo.Delete(ue);
+                }
+
+                foreach (UserEvaluation ue in userGrades)
+                {
+                    _repo.Update(ue);
+                }
+
+                //did we close the evaluation grades?
+                var evalToBeClosed = await _context.Evaluations.SingleOrDefaultAsync(e => e.Id == evalId);
+                if(evalToBeClosed != null)
+                {
+                    if(evalClosed == 1)
+                        evalToBeClosed.Closed = 1;
+                    else
+                        evalToBeClosed.Closed = 0;
+                }
+                _repo.Update(evalToBeClosed);
+
+                if(await _repo.SaveAll())
+                    return NoContent();
+
+                throw new Exception($"l'ajout des notes a échoué");
             }
 
-            foreach (UserEvaluation ue in userGrades)
-            {
-                _repo.Update(ue);
-            }
-
-            if(await _repo.SaveAll())
-                return NoContent();
-
-            throw new Exception($"l'ajout des notes a échoué");
+            return NoContent();
         }
+
     }
 
 }

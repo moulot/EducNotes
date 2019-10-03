@@ -145,6 +145,7 @@ import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-a
 import localeFr from '@angular/common/locales/fr';
 import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
 import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
+import { ClassLifeComponent } from './classes/class-life/class-life.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -247,7 +248,8 @@ export function tokenGetter() {
       TeacherAssignmentComponent,
       HomeParentComponent,
       AccountHistoryComponent,
-      LevelClassesComponent
+      LevelClassesComponent,
+      ClassLifeComponent
    ],
    imports: [
      FormWizardModule,

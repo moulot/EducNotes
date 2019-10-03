@@ -1,0 +1,136 @@
+<div #classLifeReport class="m-2" *ngIf="!toggleFormAdd">
+
+    <p class="lead">classe {{selectedClass.name}} - vie scolaire</p>
+
+    <div class="row">
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
+          <div class="card-body text-center">
+            <i class="i-Turn-Up" style="color: rgb(81, 211, 81)"></i>
+            <div class="content">
+              <p class="text-muted mt-2 mb-0">tout</p>
+              <p class="text-primary text-24 line-height-1 mb-2">{{nbAbsences + nbSanctions + nbRewards}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
+          <div class="card-body text-center">
+            <i class="i-Tongue" style="color: green"></i>
+            <div class="content">
+              <p class="text-muted mt-2 mb-0">compliments</p>
+              <p class="text-primary text-24 line-height-1 mb-2">{{nbRewards}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
+          <div class="card-body text-center">
+            <i class="i-Close" style="color: orange"></i>
+            <div class="content">
+              <p class="text-muted mt-2 mb-0">absences</p>
+              <p class="text-primary text-24 line-height-1 mb-2">{{nbAbsences}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
+          <div class="card-body text-center">
+            <i class="i-Angry" style="color:red"></i>
+            <div class="content">
+              <p class="text-muted mt-2 mb-0">sanctions</p>
+              <p class="text-primary text-24 line-height-1 mb-2">{{nbSanctions}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn btn-outline-primary mb-1" (click)="toggleForm()">
+      saisir évènement de la vie de classe
+    </button>
+  
+      <nz-table #absenceTable nzSize="small" [nzPageSize]="5" [nzShowSizeChanger]="false" [nzShowPagination]="true"
+      [nzFrontPagination]="true" [nzTitle]="title ? 'Absences' : null" nzBordered [nzData]="absencesList">
+      <thead>
+        <tr>
+            <th nzWidth="12%">élève</th>
+          <th nzWidth="24%">absence / retard</th>
+          <th nzWidth="6%">durée</th>
+          <th nzWidth="6%">justifié ?</th>
+          <th nzWidth="17%">motif</th>
+          <th nzWidth="35%">commentaire</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of absenceTable.data">
+            <td>{{ data.userName }}</td>
+          <td *ngIf="data.startDate == data.endDate">
+            {{ data.startDate }} de {{data.startTime}} à {{data.endTime}}</td>
+          <td *ngIf="data.startDate != data.endDate">
+            du {{ data.startDate }} {{data.startTime}} à {{data.endDate}} {{data.endTime}}</td>
+          <td>{{ data.justified }}</td>
+          <td>{{ data.justified }}</td>
+          <td>{{ data.reason }}</td>
+          <td>{{ data.comment }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+
+    <nz-table #sanctionTable nzSize="small" [nzPageSize]="5" [nzShowSizeChanger]="false" [nzShowPagination]="true"
+      [nzFrontPagination]="true" [nzTitle]="title ? 'Sanctions' : null" nzBordered [nzData]="sanctionsList">
+      <thead>
+        <tr>
+          <th nzWidth="15%">élève</th>
+          <th nzWidth="13%">sanction</th>
+          <th nzWidth="8%">date</th>
+          <th nzWidth="17%">motif</th>
+          <th nzWidth="15%">sanctionné par</th>
+          <th nzWidth="32%">commentaire</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of sanctionTable.data">
+          <td>{{data.userName}}</td>
+          <td>{{ data.sanctionName }}</td>
+          <td>{{ data.sanctionDate }}</td>
+          <td>{{ data.reason }}</td>
+          <td>{{ data.sanctionedBy }}</td>
+          <td>{{ data.comment }}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+
+  </div>
+              
+  <div #classLifeForm class="m-2" *ngIf="toggleFormAdd">
+
+    <button class="btn btn-outline-primary mb-1" (click)="toggleForm()">
+        afficher la vie de la classe
+      </button>
+  
+    <h2 class="text-center text-secondary mt-2">Saisie de la vie scolaire</h2>
+    <hr>
+    
+    <nz-tabset nzTabPosition="left">
+      <nz-tab nzTitle="absence">
+        <app-class-absence [students]="students" (loadAbsences)="loadAbsences(selectedClass.id)"
+          (toggleForm)="toggleForm($event)"></app-class-absence>
+      </nz-tab>
+      <nz-tab nzTitle="sanction">
+        <app-class-sanction [students]="students" (loadSanctions)="loadSanctions(selectedClass.id)"
+          (toggleForm)="toggleForm($event)" [selectedClass]="selectedClass"></app-class-sanction>
+      </nz-tab>
+      <nz-tab nzTitle="encouragement">
+        Content of Tab Pane 3
+      </nz-tab>
+    </nz-tabset>
+
+  </div>

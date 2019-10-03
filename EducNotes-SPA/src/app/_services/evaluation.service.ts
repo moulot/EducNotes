@@ -38,8 +38,8 @@ export class EvaluationService {
     return this.http.put(this.baseUrl + 'evaluation/saveEvaluation', evaluation, {params});
   }
 
-  saveUserGrades(userGrades: UserEvaluation[]) {
-    return this.http.put(this.baseUrl + 'evaluation/saveUserGrades', userGrades);
+  saveUserGrades(userGrades: UserEvaluation[], evalClosed: number) {
+    return this.http.put(this.baseUrl + 'evaluation/' + evalClosed + '/saveUserGrades', userGrades);
   }
 
   getUserEvals(classId, courseId, periodId) {
@@ -57,6 +57,10 @@ export class EvaluationService {
   setCurrentCurrentEval(evaluation, userGrades) {
     this.currentEval = evaluation;
     this.userGrades = userGrades;
+  }
+
+  setEvalClosed(evalId: number) {
+    return this.http.get(this.baseUrl + 'evaluation/' + evalId + '/closeEval');
   }
 
   setColIndex(index: number) {

@@ -3,7 +3,7 @@ import { User } from 'src/app/_models/user';
 import { UserService } from 'src/app/_services/user.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { CourseUser } from 'src/app/_models/courseUser';
-import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl, NgForm } from '@angular/forms';
 import { AuthService } from 'src/app/_services/auth.service';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
 import { Period } from 'src/app/_models/period';
@@ -20,6 +20,7 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 })
 export class GradePanelComponent implements OnInit {
   @ViewChild('classSelect', {static: false}) classSelect: ElementRef;
+  // @ViewChild('notesForm', {static: false}) form: NgForm;
   teacherClasses: any;
   teacher: User;
   notesForm: FormGroup;
@@ -103,6 +104,9 @@ export class GradePanelComponent implements OnInit {
 
   toggleView() {
     this.toggleListAdd = !this.toggleListAdd;
+    if (this.toggleListAdd === true) {
+      this.showNotes();
+    }
   }
 
   cancelNotesFrom() {

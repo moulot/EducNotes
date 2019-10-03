@@ -47,6 +47,7 @@ import { GradeStudentComponent } from './grades/grade-student/grade-student.comp
 import { SigninComponent } from './views/sessions/signin/signin.component';
 import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
 import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
+import { ClassLifeComponent } from './classes/class-life/class-life.component';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
@@ -74,6 +75,8 @@ export const appRoutes: Routes = [
             {path: 'agenda', component: AgendaPanelComponent},
             {path: 'classes', component: ClassPanelComponent},
             {path: 'notes', component: GradePanelComponent},
+            {path: 'classLife/:classId', component: ClassLifeComponent},
+            {path: 'studentNotes', component: GradeStudentComponent},
             {path: 'studentsClass/:classId', component: ClassStudentsComponent},
             {path: 'agendas/:classId', component: ClassAgendaComponent},
             {path: 'student', component: StudentDashboardComponent,
