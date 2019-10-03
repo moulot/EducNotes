@@ -1030,5 +1030,15 @@ namespace EducNotes.API.Controllers
            
         }
 
+        [HttpGet("TeacherClassCoursByLevel/{teacherId}/{levelId}/{courseId}")]
+        public async Task<IActionResult> TeacherClassCoursByLevel(int teacherid, int levelId,int courseId)
+        {
+            var res = await _context.ClassCourses.Include(c =>c.Class)
+                    .Where(c => c.TeacherId == teacherid && c.CourseId == courseId && c.Class.ClassLevelId == levelId)
+                    .ToListAsync();
+
+            return Ok(res);
+        }
+
     }
 }

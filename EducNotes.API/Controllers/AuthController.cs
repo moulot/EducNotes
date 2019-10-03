@@ -100,6 +100,10 @@ namespace EducNotes.API.Controllers
             return NotFound();
         }
 
+
+      
+
+
         [HttpGet("{email}/ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
@@ -335,17 +339,17 @@ namespace EducNotes.API.Controllers
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////MOHAMED KABORE ///////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        [HttpGet("GetEmails")] 
-        public async Task<IActionResult> GetEmails()
-        {
-            return Ok(await _repo.GetEmails());
-        }
+        // [HttpGet("GetEmails")] 
+        // public async Task<IActionResult> GetEmails()
+        // {
+        //     return Ok(await _repo.GetEmails());
+        // }
 
-        [HttpGet("GetUserNames")] 
-        public async Task<IActionResult> GetUserNames()
-        {
-            return Ok(await _repo.GetUserNames());
-        }
+        // [HttpGet("GetUserNames")] 
+        // public async Task<IActionResult> GetUserNames()
+        // {
+        //     return Ok(await _repo.GetUserNames());
+        // }
 
         [HttpGet("GetAllCities")]
         public async Task<IActionResult>GetAllCities()
@@ -529,6 +533,43 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> VerifyUserName(string userName)
         {
             return Ok(await _repo.UserNameExist(userName));
+        }
+
+
+      [HttpPost("{id}/setLoginPassword")] // edition du mot de passe apres validation du code
+        public async Task<IActionResult> setLoginPassword(int id,LoginFormDto loginForDto)
+        {
+            var user =await  _repo.GetUser(id,false);
+            if(user!=null)
+            {
+                  var newPassword=_userManager.PasswordHasher.HashPassword(user,loginForDto.Password);
+                  user.UserName = loginForDto.UserName.ToLower();
+                  user.NormalizedUserName = loginForDto.UserName.ToUpper();
+                  user.PasswordHash = newPassword;
+                  user.ValidatedCode = true;
+                  user.EmailConfirmed =true;
+                  user.ValidationDate = DateTime.Now;
+                  var res = await _userManager.UpdateAsync(user);
+           
+                 if(res.Succeeded)
+                 {
+                     
+                    var mail = new EmailFormDto();
+                    mail.subject ="Compte confirmé";
+                    mail. content ="<b> "+user.LastName + " "+ user.FirstName + "</b>, votre compte a bien été enregistré";
+                    mail. toEmail = user.Email;
+                    await _repo.SendEmail(mail);
+                    var userToReturn = _mapper.Map<UserForListDto>(user);
+                    return Ok(new
+                    {
+                        token = await GenerateJwtToken(user),
+                        user = userToReturn
+
+                    });
+                 }
+                 return BadRequest("impossible de terminé l'action");
+            }
+            return NotFound();
         }
 
     }

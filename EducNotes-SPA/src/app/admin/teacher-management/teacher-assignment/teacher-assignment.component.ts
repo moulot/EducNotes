@@ -45,27 +45,29 @@ submitText = 'enregistrer';
 
     this.classService.getClassesByLevelId(this.levelId).subscribe((res: any[]) => {
       this.classes = res;
-      for (let i = 0; i < this.selectedClass.length; i++) {
-        const element = this.selectedClass[i];
-        if (element.classLevelId === this.levelId) {
-          if (!this.classIds.find( item => item === element.id)) {
-            this.classIds = [...this.classIds, element.id];
+      // for (let i = 0; i < this.selectedClass.length; i++) {
+      //   const element = this.selectedClass[i];
+      //   if (element.classLevelId === this.levelId) {
+      //     if (!this.classIds.find( item => item === element.id)) {
+      //       this.classIds = [...this.classIds, element.id];
+      //     }
+      //   }
+      // }
+
+      // recupération  des classes en fonction du niveau, de cours et du prof
+      this.classService.teacherClassCoursByLevel(this.teacher.id, this.levelId, this.courseId).subscribe((val: any[]) => {
+          for (let i = 0; i < val.length; i++) {
+            this.classIds = [...this.classIds, val[i].classId];
+
           }
-        }
-      }
+      });
 
     });
   }
 
-  courseChange(): void {
-    // this.classIds = [];
-    // // matching selecting course from seleceted Teacher to get classes
-    //  const teachercourses = this.selectedTeacher.courses.find(item => item.course.id === this.courseId);
-    //       for (let index = 0; index < teachercourses.classes.length; index++) {
-    //        if ( teachercourses.classes[index].teacherId === this.userId) {
-    //          this.classIds = [...this.classIds, teachercourses.classes[index].classId];
-    //        }
-    //      }
+  changeCourseId(): void {
+    this.levelId = null;
+    this.classes = [];
 
    }
 

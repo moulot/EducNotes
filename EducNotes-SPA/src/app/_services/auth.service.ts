@@ -83,6 +83,25 @@ export class AuthService {
       })
     );
   }
+
+
+
+  setUserLoginPassword(id: number, loginModel: any) {
+    return this.http.post(this.baseUrl  + id +  '/setLoginPassword', loginModel)
+   .pipe(
+     map((response: any) => {
+       const user = response;
+       if (user) {
+         localStorage.setItem('token', user.token);
+         localStorage.setItem('user', JSON.stringify(user.user));
+         this.decodedToken = this.jwtHelper.decodeToken(user.token);
+         this.currentUser = user.user;
+         this.changeMemberPhoto(this.currentUser.photoUrl);
+       }
+     })
+   );
+ }
+
   forgotPassord(email: string) {
     return this.http.get(this.baseUrl + email + '/ForgotPassword');
   }

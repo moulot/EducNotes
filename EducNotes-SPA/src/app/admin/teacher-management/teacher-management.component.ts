@@ -78,8 +78,8 @@ export class TeacherManagementComponent implements OnInit {
     let classIds = [];
     for (let i = 0; i < params.courseClasses.length; i++) {
       const cours = params.courseClasses[i].course;
-      const classes =  params.courseClasses[i].classes;
       courses =  [...courses, cours];
+      const classes =  params.courseClasses[i].classes;
       for (let j = 0; j < classes.length; j++) {
         const cl = classes[j];
         classIds = [...classIds, cl];
