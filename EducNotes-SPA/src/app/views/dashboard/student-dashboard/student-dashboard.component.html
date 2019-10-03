@@ -65,15 +65,13 @@
               <div class="card-title d-flex">
                 <div class="lead flex-grow-1">notes</div>
                 <div>
-                  <button class="btn btn-outline-primary btn-sm">détails</button>
+                  <button [routerLink]="['/studentNotes', student.id]"  class="btn btn-outline-primary btn-sm">détails</button>
                 </div>
               </div>
               <!-- <div *ngFor="let course of items.courses"> -->
                 <div class="d-flex align-items-center border-bottom-dotted-dim pb-4">
                   <div class="flex-grow-1">
-                    <h6 class="m-0">course.courseName</h6>
-                    <p class="m-0 text-18 text-muted">course.taskDesc</p>
-                    <p class="m-0 text-small text-muted">donné le course.dateAdded</p>
+                    <h6 class="m-0">ici synthède des notes de l'élève avec graphiques</h6>
                   </div>
                 </div>
               <!-- </div> -->

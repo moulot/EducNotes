@@ -374,7 +374,7 @@ namespace EducNotes.API.Controllers
         [HttpGet("{teacherId}/Courses")]
         public async Task<IActionResult> GetTeacherCourses(int teacherId)
         {
-            var courses = await (from cu in _context.ClassCourses
+            var courses = await (from cu in _context.TeacherCourses
                                     where cu.Teacher.Id == teacherId
                                     select new{
                                         TeacherId = cu.TeacherId,

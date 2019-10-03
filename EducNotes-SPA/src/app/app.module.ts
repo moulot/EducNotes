@@ -9,6 +9,7 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { NgxGalleryModule } from 'ngx-gallery';
 import { FileUploadModule } from 'ng2-file-upload';
 import {TimeAgoPipe} from 'time-ago-pipe';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
@@ -288,7 +289,8 @@ export function tokenGetter() {
       TextMaskModule,
       UiKitsModule,
       SharedPipesModule,
-      PerfectScrollbarModule
+      PerfectScrollbarModule,
+      NgxEchartsModule
    ],
    providers: [
       AuthService,

@@ -115,14 +115,14 @@ namespace EducNotes.API.Controllers
                                     {
                                         CourseId = course.Id,
                                         CourseName = course.Name,
-                                        UserEvals = GetUserEvals(userId, course.Id),
+                                        UserEvals = 0,//GetUserEvals(userId, course.Id),
                                         ClassEvals = 0
                                     }).ToListAsync();
 
             return Ok(courses);
         }
 
-        private async Task<IActionResult> GetUserEvals(int userId, int courseId)
+        private async Task GetUserEvals(int userId, int courseId)
         {
             var userEvals = await _context.UserEvaluations
                             .Include(i => i.Evaluation)
@@ -140,7 +140,10 @@ namespace EducNotes.API.Controllers
                 var ue = userEvals[i];
                 if(ue.Grade.IsNumeric())
                 {
+                    double maxGrade = Convert.ToDouble(ue.Evaluation.MaxGrade);
                     double grade = Convert.ToDouble(ue.Grade);
+                    // grade are ajusted to 20 as MAx. Avg is on 20
+                    double ajustedGrade = 20 * grade / maxGrade;
                     double coeff = ue.Evaluation.Coeff;
                     gradesSum += grade * coeff;
                     coeffSum += coeff;
