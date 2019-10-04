@@ -163,9 +163,9 @@ namespace EducNotes.API.Controllers
                 });
                 }
 
-                return BadRequest("mot de passe incorrecte...");
+                return BadRequest("login ou mot de passe incorrecte...");
            }
-           return BadRequest("nom d'utilistateur introuvable");
+           return BadRequest("login ou mot de passe incorrecte...");
             
          }
 
