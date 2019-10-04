@@ -132,35 +132,41 @@ namespace EducNotes.API.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
-            
-            var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
-            if (!user.ValidatedCode)
+
+         // verification de l'existence du userName 
+          if(await _repo.UserNameExist(userForLoginDto.Username.ToLower()))   
+           {
+               var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
+               if (!user.ValidatedCode)
                 return BadRequest("Compte non validé pour l'instant...");
 
-            var result = await _signInManager
+                var result = await _signInManager
                 .CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
-            if (result.Succeeded)
-            {
-              var appUser = await _userManager.Users.Include(p => p.Photos)
-                  .FirstOrDefaultAsync(u => u.NormalizedUserName ==
-                      userForLoginDto.Username.ToUpper());
+                if (result.Succeeded)
+                {
+                var appUser = await _userManager.Users.Include(p => p.Photos)
+                    .FirstOrDefaultAsync(u => u.NormalizedUserName ==
+                        userForLoginDto.Username.ToUpper());
 
-              var userToReturn = _mapper.Map<UserForListDto>(appUser);
+                var userToReturn = _mapper.Map<UserForListDto>(appUser);
 
-              //get the current period
-              Period CurrentPeriod = await _context.Periods.Where(p => p.Active == 1).FirstOrDefaultAsync();
+                //get the current period
+                Period CurrentPeriod = await _context.Periods.Where(p => p.Active == 1).FirstOrDefaultAsync();
 
 
-              return Ok(new
-              {
-                  token = await GenerateJwtToken(appUser),
-                  user = userToReturn,
-                  currentPeriod = CurrentPeriod
-              });
-            }
+                return Ok(new
+                {
+                    token = await GenerateJwtToken(appUser),
+                    user = userToReturn,
+                    currentPeriod = CurrentPeriod
+                });
+                }
 
-                return BadRequest("Login ou mot de passe incorrecte...");
+                return BadRequest("mot de passe incorrecte...");
+           }
+           return BadRequest("nom d'utilistateur introuvable");
+            
          }
 
         private async Task<string> GenerateJwtToken(User user)

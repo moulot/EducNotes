@@ -230,11 +230,11 @@ export class ParentRegisterComponent implements OnInit {
  close(): void {
    this.showChildenList = true;
  }
- 
+
  cancel(): void {
    this.alertify.info('suppression annulée ');
  }
- 
+
  back() {
   // this.showDetails = false;
  }

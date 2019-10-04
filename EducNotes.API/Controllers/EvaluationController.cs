@@ -122,46 +122,46 @@ namespace EducNotes.API.Controllers
             return Ok(courses);
         }
 
-        private async Task GetUserEvals(int userId, int courseId)
-        {
-            var userEvals = await _context.UserEvaluations
-                            .Include(i => i.Evaluation)
-                            .OrderBy(o => o.Evaluation.EvalDate)
-                            .Where(e => e.UserId == userId &&
-                                e.Evaluation.GradeInLetter == false &&
-                                e.Evaluation.CourseId == courseId &&
-                                e.Evaluation.Graded == true).ToListAsync();
+        // private async Task GetUserEvals(int userId, int courseId)
+        // {
+        //     var userEvals = await _context.UserEvaluations
+        //                     .Include(i => i.Evaluation)
+        //                     .OrderBy(o => o.Evaluation.EvalDate)
+        //                     .Where(e => e.UserId == userId &&
+        //                         e.Evaluation.GradeInLetter == false &&
+        //                         e.Evaluation.CourseId == courseId &&
+        //                         e.Evaluation.Graded == true).ToListAsync();
 
-            List<double> grades = new List<double>();
-            double gradesSum = 0;
-            double coeffSum = 0;
-            for (int i = 0; i < userEvals.Count(); i++)
-            {
-                var ue = userEvals[i];
-                if(ue.Grade.IsNumeric())
-                {
-                    double maxGrade = Convert.ToDouble(ue.Evaluation.MaxGrade);
-                    double grade = Convert.ToDouble(ue.Grade);
-                    // grade are ajusted to 20 as MAx. Avg is on 20
-                    double ajustedGrade = 20 * grade / maxGrade;
-                    double coeff = ue.Evaluation.Coeff;
-                    gradesSum += grade * coeff;
-                    coeffSum += coeff;
-                    grades.Add(grade);
-                }
-            }
+        //     List<double> grades = new List<double>();
+        //     double gradesSum = 0;
+        //     double coeffSum = 0;
+        //     for (int i = 0; i < userEvals.Count(); i++)
+        //     {
+        //         var ue = userEvals[i];
+        //         if(ue.Grade.IsNumeric())
+        //         {
+        //             double maxGrade = Convert.ToDouble(ue.Evaluation.MaxGrade);
+        //             double grade = Convert.ToDouble(ue.Grade);
+        //             // grade are ajusted to 20 as MAx. Avg is on 20
+        //             double ajustedGrade = 20 * grade / maxGrade;
+        //             double coeff = ue.Evaluation.Coeff;
+        //             gradesSum += grade * coeff;
+        //             coeffSum += coeff;
+        //             grades.Add(grade);
+        //         }
+        //     }
 
-            double gradesAvg = gradesSum / coeffSum;
-            double gradeMin = grades.Min();
-            double gradeMax = grades.Max();
+        //     double gradesAvg = gradesSum / coeffSum;
+        //     double gradeMin = grades.Min();
+        //     double gradeMax = grades.Max();
 
-            return Ok(new {
-                UserEvals = grades,
-                GradeAvg = gradesAvg,
-                GradeMin = gradeMin,
-                GradeMax = gradeMax
-            });
-        }
+        //     return Ok(new {
+        //         UserEvals = grades,
+        //         GradeAvg = gradesAvg,
+        //         GradeMin = gradeMin,
+        //         GradeMax = gradeMax
+        //     });
+        // }
 
         private async Task<IActionResult> GetClassEvals(int classId, int courseId)
         {
