@@ -86,7 +86,7 @@ export class InscriptionComponent implements OnInit {
     this.next();
   }
   onStep3Next(e) {
-    this.emailsVerification();
+   // this.emailsVerification();
   this.parents = [];
   this.parents = [...this.parents, this.father];
   this.parents = [...this.parents, this.mother];
@@ -131,6 +131,7 @@ export class InscriptionComponent implements OnInit {
   }
 
   add() {
+   this.editionMode = 'add';
     this.submitText = 'ENREGISTER';
     this.initializeParams(this.fatherForm.value.lastName);
     this.createChildForm();
