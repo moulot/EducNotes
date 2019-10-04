@@ -115,22 +115,28 @@ namespace EducNotes.API.Controllers
                                     {
                                         CourseId = course.Id,
                                         CourseName = course.Name,
-                                        UserEvals = 0,//GetUserEvals(userId, course.Id),
+                                        UserEvals = _context.UserEvaluations
+                                            .Include(i => i.Evaluation)
+                                            .OrderBy(o => o.Evaluation.EvalDate)
+                                            .Where(e => e.UserId == userId &&
+                                                e.Evaluation.GradeInLetter == false &&
+                                                e.Evaluation.CourseId == course.Id &&
+                                                e.Evaluation.Graded == true).ToList(),
                                         ClassEvals = 0
                                     }).ToListAsync();
 
             return Ok(courses);
         }
 
-        private async Task GetUserEvals(int userId, int courseId)
+        private UserEvalsDto GetUserEvals(int userId, int courseId)
         {
-            var userEvals = await _context.UserEvaluations
+            var userEvals = _context.UserEvaluations
                             .Include(i => i.Evaluation)
                             .OrderBy(o => o.Evaluation.EvalDate)
                             .Where(e => e.UserId == userId &&
                                 e.Evaluation.GradeInLetter == false &&
                                 e.Evaluation.CourseId == courseId &&
-                                e.Evaluation.Graded == true).ToListAsync();
+                                e.Evaluation.Graded == true).ToList();
 
             List<double> grades = new List<double>();
             double gradesSum = 0;
@@ -155,12 +161,14 @@ namespace EducNotes.API.Controllers
             double gradeMin = grades.Min();
             double gradeMax = grades.Max();
 
-            return Ok(new {
-                UserEvals = grades,
-                GradeAvg = gradesAvg,
-                GradeMin = gradeMin,
-                GradeMax = gradeMax
-            });
+            UserEvalsDto userEvalsDto = new UserEvalsDto();
+            userEvalsDto.GradedOutOf = 20;
+            userEvalsDto.grades = grades;
+            userEvalsDto.Avg = gradesAvg;
+            userEvalsDto.MinGrade = gradeMin;
+            userEvalsDto.MaxGrade = gradeMax;
+
+            return userEvalsDto;
         }
 
         private async Task<IActionResult> GetClassEvals(int classId, int courseId)
