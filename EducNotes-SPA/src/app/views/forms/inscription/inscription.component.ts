@@ -131,6 +131,7 @@ export class InscriptionComponent implements OnInit {
   }
 
   add() {
+   this.editionMode = 'add';
     this.submitText = 'ENREGISTER';
     this.initializeParams(this.fatherForm.value.lastName);
     this.createChildForm();
