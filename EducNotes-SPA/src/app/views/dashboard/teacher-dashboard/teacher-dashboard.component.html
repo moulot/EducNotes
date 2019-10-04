@@ -67,20 +67,24 @@
                 </a>
               </div>
               <div class="col-md-3 mb-1">
-                <div class="card card-icon mb-0 icon-btn">
-                  <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                    <i class="i-Pen-5"></i>
-                    <p class="text-muted mt-2 mb-2">notes</p>
+                <a [routerLink]="['/notes']">
+                  <div class="card card-icon mb-0 icon-btn">
+                    <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                      <i class="i-Pen-5"></i>
+                      <p class="text-muted mt-2 mb-2">notes</p>
+                    </div>
                   </div>
-                </div>
+                </a>
               </div>
               <div class="col-md-3">
-                <div class="card card-icon mb-0 icon-btn">
-                  <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                    <i class="i-Conference"></i>
+                <a [routerLink]="['/classLife', class.classId]">
+                  <div class="card card-icon mb-0 icon-btn">
+                    <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                      <i class="i-Conference"></i>
                     <p class="text-muted mt-2 mb-2">vie classe</p>
                   </div>
                 </div>
+                </a>
               </div>
             </div>
           </div>

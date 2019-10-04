@@ -1,5 +1,8 @@
-<div class=" row">
+<div class="row m-0">
   
+  <div class="col-md-12 mb-1">
+    <p class="lead m-0">{{student.firstName}} {{student.lastName}} - classe {{classRoom.name}}</p>
+  </div>
   <div class="col-lg-9 col-md-12">
     
     <div class="row">
@@ -51,6 +54,30 @@
             </div>
           </div>
         </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-md-12 mb-2">
+        <div class="card mb-2">
+            <div class="card-body">
+              <div class="card-title d-flex">
+                <div class="lead flex-grow-1">notes</div>
+                <div>
+                  <button [routerLink]="['/studentNotes', student.id]"  class="btn btn-outline-primary btn-sm">détails</button>
+                </div>
+              </div>
+              <!-- <div *ngFor="let course of items.courses"> -->
+                <div class="d-flex align-items-center border-bottom-dotted-dim pb-4">
+                  <div class="flex-grow-1">
+                    <h6 class="m-0">ici synthède des notes de l'élève avec graphiques</h6>
+                  </div>
+                </div>
+              <!-- </div> -->
+            </div>
+          </div>
+      </div>
 
     </div>
 
@@ -127,29 +154,6 @@
     </div>
 
     <div class="row">
-
-      <div class="col-md-12 mb-4">
-        <div class="card mb-2">
-            <div class="card-body">
-              <div class="card-title d-flex">
-                <div class="flex-grow-1">notes</div>
-                <div>
-                  <button class="btn btn-outline-primary btn-sm">détails</button>
-                </div>
-              </div>
-              <!-- <div *ngFor="let course of items.courses"> -->
-                <div class="d-flex align-items-center border-bottom-dotted-dim pb-4">
-                  <div class="box-course mr-3"></div>
-                  <div class="flex-grow-1">
-                    <h6 class="m-0">course.courseName</h6>
-                    <p class="m-0 text-18 text-muted">course.taskDesc</p>
-                    <p class="m-0 text-small text-muted">donné le course.dateAdded</p>
-                  </div>
-                </div>
-              <!-- </div> -->
-            </div>
-          </div>
-      </div>
 
       <div class="col-md-12">
         <div class="card mb-2">

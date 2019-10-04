@@ -115,14 +115,14 @@ namespace EducNotes.API.Controllers
                                     {
                                         CourseId = course.Id,
                                         CourseName = course.Name,
-                                        UserEvals = GetUserEvals(userId, course.Id),
+                                        UserEvals = 0,//GetUserEvals(userId, course.Id),
                                         ClassEvals = 0
                                     }).ToListAsync();
 
             return Ok(courses);
         }
 
-        private async Task<IActionResult> GetUserEvals(int userId, int courseId)
+        private async Task GetUserEvals(int userId, int courseId)
         {
             var userEvals = await _context.UserEvaluations
                             .Include(i => i.Evaluation)
@@ -140,7 +140,10 @@ namespace EducNotes.API.Controllers
                 var ue = userEvals[i];
                 if(ue.Grade.IsNumeric())
                 {
+                    double maxGrade = Convert.ToDouble(ue.Evaluation.MaxGrade);
                     double grade = Convert.ToDouble(ue.Grade);
+                    // grade are ajusted to 20 as MAx. Avg is on 20
+                    double ajustedGrade = 20 * grade / maxGrade;
                     double coeff = ue.Evaluation.Coeff;
                     gradesSum += grade * coeff;
                     coeffSum += coeff;
@@ -294,28 +297,45 @@ namespace EducNotes.API.Controllers
 
         }
 
-        [HttpPut("SaveUserGrades")]
-        public async Task<IActionResult> SaveUserGrades([FromBody]List<UserEvaluation> userGrades)
+        [HttpPut("{evalClosed}/SaveUserGrades")]
+        public async Task<IActionResult> SaveUserGrades([FromBody]List<UserEvaluation> userGrades, int evalClosed)
         {
-            //get the current evaluation id
-            int evalId = userGrades[0].EvaluationId;
-            //delete previous evaluation data
-            var previousData = _context.UserEvaluations.Where(e => e.EvaluationId == evalId);
-            foreach (UserEvaluation ue in previousData)
+            if(userGrades.Count() > 0)
             {
-                _repo.Delete(ue);
+                //get the current evaluation id
+                int evalId = userGrades[0].EvaluationId;
+                //delete previous evaluation data
+                var previousData = _context.UserEvaluations.Where(e => e.EvaluationId == evalId);
+                foreach (UserEvaluation ue in previousData)
+                {
+                    _repo.Delete(ue);
+                }
+
+                foreach (UserEvaluation ue in userGrades)
+                {
+                    _repo.Update(ue);
+                }
+
+                //did we close the evaluation grades?
+                var evalToBeClosed = await _context.Evaluations.SingleOrDefaultAsync(e => e.Id == evalId);
+                if(evalToBeClosed != null)
+                {
+                    if(evalClosed == 1)
+                        evalToBeClosed.Closed = 1;
+                    else
+                        evalToBeClosed.Closed = 0;
+                }
+                _repo.Update(evalToBeClosed);
+
+                if(await _repo.SaveAll())
+                    return NoContent();
+
+                throw new Exception($"l'ajout des notes a échoué");
             }
 
-            foreach (UserEvaluation ue in userGrades)
-            {
-                _repo.Update(ue);
-            }
-
-            if(await _repo.SaveAll())
-                return NoContent();
-
-            throw new Exception($"l'ajout des notes a échoué");
+            return NoContent();
         }
+
     }
 
 }

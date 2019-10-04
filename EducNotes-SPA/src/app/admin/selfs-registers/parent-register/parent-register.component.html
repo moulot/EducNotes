@@ -251,6 +251,9 @@
                               <h6 class="m-0"> {{item.lastName}} {{item.firstName}} </h6>
                               <p class="m-0 text-small text-muted">Niveau:{{item.level}} &nbsp;&nbsp;  Date de naissance:  {{item.dateOfBirth}}   </p> 
                               <p class="m-0 text-small text-muted"> Email:  {{item.email}} &nbsp;&nbsp; Contact(s):  {{item.phoneNumber}}  {{item.secondPhoneNumber}} </p> 
+                              <p>  <button title="editer" nz-button [nzSize]="size" nzType="primary" (click)="edit(item)" class="mr-1"><i class="i-Edit"></i></button>
+                                <button  title="supprimer" nz-button [nzSize]="size" nzType="primary" 
+                                 nz-popconfirm nzTitle="Etes vous sûre de vouloir supprimer cet élement ?" (nzOnConfirm)="confirm(item)" (nzOnCancel)="cancel()"><i class="i-Delete-File"></i></button></p>
                             </div>                            
                         </div>
                         </div>

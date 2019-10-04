@@ -45,7 +45,8 @@
             [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-4': viewMode === 'grid'}"
             [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}"
           >
-            <div class="card o-hidden mb-2 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
+            <a [routerLink]="['/studentFromP', child.id]"> 
+              <div class="card o-hidden mb-2 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
               <div class="img-box d-flex">
                 <!-- TUMBNAIL -->
                 <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="">
@@ -77,7 +78,8 @@
               <!-- <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
                 ddddddddddddddddddddddddd
               </div> -->
-            </div>
+              </div>
+            </a>
           </div>
           <!-- PAGINATION CONTROL -->
           <!-- <div class="col-md-12 mt-3" *ngIf="children?.length">
@@ -143,3 +145,5 @@
     </div>
     
   </div>
+
+  app-

@@ -5,6 +5,7 @@ import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute } from '@angular/router';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
+import { Class } from 'src/app/_models/class';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -13,6 +14,7 @@ import { EvaluationService } from 'src/app/_services/evaluation.service';
 })
 export class StudentDashboardComponent implements OnInit {
   student: User;
+  classRoom: Class;
   strFirstDay: string;
   strLastDay: string;
   agendaItems: any;
@@ -28,6 +30,7 @@ export class StudentDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.student = this.authService.currentUser;
+    this.getClass(this.student.classId);
     this.getAgenda(this.student.classId, this.toNbDays);
     this.getEvalsToCome(this.student.classId);
 }
@@ -51,6 +54,14 @@ export class StudentDashboardComponent implements OnInit {
   getEvalsToCome(classId) {
     this.evalService.getClassEvalsToCome(classId).subscribe(evals => {
       this.evalsToCome = evals;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getClass(classId) {
+    this.classService.getClass(classId).subscribe(data => {
+      this.classRoom = data;
     }, error => {
       this.alertify.error(error);
     });

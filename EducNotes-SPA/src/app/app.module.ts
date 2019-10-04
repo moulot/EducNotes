@@ -9,6 +9,7 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { NgxGalleryModule } from 'ngx-gallery';
 import { FileUploadModule } from 'ng2-file-upload';
 import {TimeAgoPipe} from 'time-ago-pipe';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
@@ -145,6 +146,7 @@ import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-a
 import localeFr from '@angular/common/locales/fr';
 import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
 import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
+import { ClassLifeComponent } from './classes/class-life/class-life.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -247,7 +249,8 @@ export function tokenGetter() {
       TeacherAssignmentComponent,
       HomeParentComponent,
       AccountHistoryComponent,
-      LevelClassesComponent
+      LevelClassesComponent,
+      ClassLifeComponent
    ],
    imports: [
      FormWizardModule,
@@ -286,7 +289,8 @@ export function tokenGetter() {
       TextMaskModule,
       UiKitsModule,
       SharedPipesModule,
-      PerfectScrollbarModule
+      PerfectScrollbarModule,
+      NgxEchartsModule
    ],
    providers: [
       AuthService,

@@ -28,13 +28,14 @@ export class GradeAddFormComponent implements OnInit {
   viewMode: 'list' | 'grid' = 'list';
   page = 1;
   pageSize = 15;
-  closed = false;
+  closed: boolean;
 
   constructor(private evalService: EvaluationService, private fb: FormBuilder, private alertify: AlertifyService) { }
 
   ngOnInit() {
     this.selectedEval = this.evalService.currentEval;
     this.closed = this.selectedEval.closed;
+    console.log(this.closed);
     this.userGrades = this.evalService.userGrades;
     this.filteredUserGrades = this.userGrades;
     this.newUserGrades = this.userGrades;
@@ -69,7 +70,9 @@ export class GradeAddFormComponent implements OnInit {
   }
 
   saveNotes() {
-    console.log(this.closed);
+
+    const evalClosed = Number(this.closed);
+
     for (let i = 0; i < this.userGrades.length; i++) {
       const elt = this.userGrades[i];
       const grade = elt.grades[this.gradeIndex];
@@ -82,7 +85,7 @@ export class GradeAddFormComponent implements OnInit {
       this.userEvals = [...this.userEvals, ue];
     }
 
-    this.evalService.saveUserGrades(this.userEvals).subscribe(() => {
+    this.evalService.saveUserGrades(this.userEvals, evalClosed).subscribe(() => {
       this.alertify.success('ajout des notes OK');
     }, error => {
       this.alertify.error(error);

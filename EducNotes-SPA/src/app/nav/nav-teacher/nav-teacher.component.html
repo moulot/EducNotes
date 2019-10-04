@@ -11,6 +11,9 @@
   <div class="" routerLinkActive="active">
     <a class="text-15 text-muted mr-3" [routerLink]="['/notes']">notes</a>
   </div>
+  <!-- <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted" [routerLink]="['/classLife']">vie de classe</a>
+  </div> -->
   <div *appHasRole="['Admin', 'Moderator']" class="" routerLinkActive="active">
     <a class="text-15 text-muted" [routerLink]="['/admin']">Admin</a>
   </div>

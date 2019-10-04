@@ -1,6 +1,22 @@
-<div class="row m-2">
+<div class="row">
+  <div *ngFor="let class of teacherClasses" class="col-lg-4 col-md-12 col-sm-12">
+    <div class="card card-icon mb-2">
+      <div class="card-body text-center">
+        <i class="i-MaleFemale"></i>
+        <p class="text-muted text-20 mt-2 m-0">classe de {{class.className}}</p>
+        <p class="text-muted text-20 mt-0 mb-2">{{class.nbStudents}} élèves.</p>
+        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/studentsClass', class.classId]">élèves</a></p>
+        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/agendas', class.classId]">cahier de textes</a></p>
+        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/notes']">notes</a></p>
+        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/classLife', class.classId]">vie de la classe</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- <div class="row m-2">
   <div *ngFor="let class of teacherClasses" class="col-md-2">
-    <!-- <a (click)="loadClass(class)"> -->
     <div class="card card-icon lead mb-2">
       <div class="card-body text-center">
         <p class="lead text-22 m-0">classe de {{class.className}}</p>
@@ -13,9 +29,8 @@
         </div>
       </div>
     </div>
-    <!-- </a> -->
   </div>
-</div>
+</div> -->
 
 <!-- <div class="row m-2">
   <div *ngFor="let class of teacherClasses" class="col-md-2">
@@ -36,7 +51,7 @@
 
 
 
-<div id="wrapper">
+<!-- <div id="wrapper">
   <div class="container mt-2">
     <div class="row mb-2">
       <div class="col-sm-8">
@@ -246,4 +261,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
