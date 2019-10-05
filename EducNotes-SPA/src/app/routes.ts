@@ -48,6 +48,8 @@ import { SigninComponent } from './views/sessions/signin/signin.component';
 import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
 import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 import { ClassLifeComponent } from './classes/class-life/class-life.component';
+import { SchoolComponent } from './admin/school/school.component';
+import { SchoolResolver } from './_resolvers/school-resolver';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
@@ -98,7 +100,8 @@ export const appRoutes: Routes = [
             {path: 'teachers', component: TeacherManagementComponent, resolve: {teachers: TeacherManagementResolver}},
             {path: 'preregister', component: PreRegisterComponent},
             {path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve : {classes: LevelClassesResolver}},
-            {path: 'studentGrades', component: GradeStudentComponent, resolve: {student: UserHomeResolver}}
+            {path: 'studentGrades', component: GradeStudentComponent, resolve: {student: UserHomeResolver}},
+            {path: 'school', component: SchoolComponent, resolve : {school: SchoolResolver}}
         ]
     },
     {path: '**', redirectTo: '', pathMatch: 'full'}

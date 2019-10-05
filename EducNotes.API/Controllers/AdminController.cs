@@ -244,6 +244,47 @@ namespace EducNotes.API.Controllers
       return Ok(CurrentPeriod);
     }
 
+    [HttpGet("School")]
+    public async Task<IActionResult> GetSchool()
+    {
+      var school = await _context.Establishments.SingleOrDefaultAsync();
+
+      if(school == null)
+      {
+        var newSchool = new Establishment 
+        {
+            Name = "",
+            Location = "",
+            Phone = "",
+            WebSite = "",
+            StartCoursesHour = DateTime.Now.Date,
+            EndCoursesHour = DateTime.Now.Date
+        };
+        _context.Add(newSchool);
+
+        if(await _repo.SaveAll())
+          return Ok(newSchool);
+        
+        return BadRequest("problème pour créer les infos de l'établissement");
+      }
+
+      return Ok(school);
+    }
+
+    [HttpPut("SaveSchool")]
+    public async Task<IActionResult> SaveEstablishment([FromBody]Establishment school)
+    {
+      if(school.Id == 0)
+        _repo.Add(school);
+      else
+        _repo.Update(school);
+
+        if(await _repo.SaveAll())
+            return NoContent();
+
+        throw new Exception($"l'ajout des infos de l'établissement a échoué");
+    }
+
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////

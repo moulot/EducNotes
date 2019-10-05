@@ -87,7 +87,7 @@ namespace EducNotes.API.Controllers
         [HttpGet("{classId}/schedule")]
         public async Task<IActionResult> GetClassSchedule(int classId)
         {
-            DateTime today = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            DateTime today = DateTime.Now.Date;
             var dayInt = (int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
             var monday = today.AddDays(1 - dayInt);
             var sunday = monday.AddDays(6);

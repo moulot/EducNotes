@@ -147,6 +147,10 @@ import localeFr from '@angular/common/locales/fr';
 import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
 import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 import { ClassLifeComponent } from './classes/class-life/class-life.component';
+import { SchoolComponent } from './admin/school/school.component';
+import { BtnLoadingComponent } from './shared/components/btn-loading/btn-loading.component';
+import { SharedComponentsModule } from './shared/components/shared-components.module';
+import { SchoolResolver } from './_resolvers/school-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -250,7 +254,8 @@ export function tokenGetter() {
       HomeParentComponent,
       AccountHistoryComponent,
       LevelClassesComponent,
-      ClassLifeComponent
+      ClassLifeComponent,
+      SchoolComponent
    ],
    imports: [
      FormWizardModule,
@@ -290,7 +295,8 @@ export function tokenGetter() {
       UiKitsModule,
       SharedPipesModule,
       PerfectScrollbarModule,
-      NgxEchartsModule
+      NgxEchartsModule,
+      SharedComponentsModule
    ],
    providers: [
       AuthService,
@@ -317,6 +323,7 @@ export function tokenGetter() {
       TeacherManagementResolver,
       LevelClassesResolver,
       CallSheetResolver,
+      SchoolResolver,
       {provide: NZ_I18N, useValue: fr_FR}
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

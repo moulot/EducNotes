@@ -13,10 +13,17 @@
 <div class="" routerLinkActive="active">
     <a class="text-15 text-muted mr-3" [routerLink]="['/teachers']">enseignants</a>
   </div>
-  <div class="" routerLinkActive="active">
-    <a class="text-15 text-muted mr-3" [routerLink]="['/classesPanel']">classes</a>
+  <div class="" ngbDropdown role="group" aria-label="Select all" placement="bottom-left">
+    <a class="dropdown-toggle text-15 text-muted mr-3 dd" ngbDropdownToggle>classes</a>
+    <div class="dropdown-menu" ngbDropdownMenu>
+      <button [routerLink]="['/classesPanel']" class="dropdown-item">classes</button>
+      <button [routerLink]="['/preregister']" class="dropdown-item">emploi du temps</button>
+    </div>
   </div>
   <div class="" routerLinkActive="active">
     <a class="text-15 text-muted mr-3" [routerLink]="['/courses']">matières</a>
+  </div>
+  <div class="" routerLinkActive="active">
+    <a class="text-15 text-muted mr-3" [routerLink]="['/school']">info école</a>
   </div>
 </div>

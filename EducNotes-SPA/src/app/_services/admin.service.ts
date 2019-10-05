@@ -5,6 +5,7 @@ import { User } from '../_models/user';
 import { Period } from '../_models/period';
 import { Observable } from 'rxjs';
 import { AlertifyService } from './alertify.service';
+import { Establishment } from '../_models/establishment';
 
 @Injectable({
   providedIn: 'root'
@@ -124,5 +125,13 @@ export class AdminService {
   // le post pour enrgister la preinscription : model {father:any,mother:any; children : any[]}
   savePreinscription(userId: number, data: any) {
     return this.http.post(this.baseUrl + 'admin/' + userId + '/SavePreinscription', data);
+  }
+
+  getSchool() {
+    return this.http.get(this.baseUrl + 'admin/school');
+  }
+
+  saveSchool(school: Establishment) {
+    return this.http.put(this.baseUrl + 'admin/saveSchool', school);
   }
 }
