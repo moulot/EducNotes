@@ -28,7 +28,6 @@ export class AdminDashboardComponent implements OnInit {
      this.parents = res.find(i => i.userTypeId === this.parentTypeId);
      this.teachers = res.find(i => i.userTypeId === this.teacherTypeId);
      this.students = res.find(i => i.userTypeId === this.studentTypeId);
-
     }, error => {
       console.log(error);
     });

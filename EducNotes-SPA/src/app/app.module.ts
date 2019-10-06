@@ -148,6 +148,10 @@ import { LevelClassesComponent } from './classes/level-classes/level-classes.com
 import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 import { ClassLifeComponent } from './classes/class-life/class-life.component';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { SchoolComponent } from './admin/school/school.component';
+import { SchoolResolver } from './_resolvers/school-resolver';
+import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
+import { ClassResolver } from './_resolvers/class-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -251,7 +255,9 @@ export function tokenGetter() {
       HomeParentComponent,
       AccountHistoryComponent,
       LevelClassesComponent,
-      ClassLifeComponent
+      ClassLifeComponent,
+      SchoolComponent,
+      ClassScheduleComponent
    ],
    imports: [
      FormWizardModule,
@@ -320,6 +326,8 @@ export function tokenGetter() {
       TeacherManagementResolver,
       LevelClassesResolver,
       CallSheetResolver,
+      SchoolResolver,
+      ClassResolver,
       {provide: NZ_I18N, useValue: fr_FR}
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

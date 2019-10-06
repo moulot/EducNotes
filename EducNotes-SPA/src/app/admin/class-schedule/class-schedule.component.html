@@ -1,0 +1,30 @@
+<div class="row">
+
+  <div class="col-md-12">
+    <p class="lead">saisie des emplois du temps</p>
+  </div>
+
+  <div class="col-md-12">
+    <label class="mr-2">niveau classe:</label>
+    <nz-select #classLevelSelect class="" nzShowSearch nzPlaceHolder="classLevel"
+      formControlName="classLevel" nzAllowClear>
+      <nz-option *ngFor="let item of classes" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
+    </nz-select>
+  </div>
+
+  <div *ngFor="let i of [0, 1, 2, 3, 4, 5]" class="card p-0 col-md-2">
+    <div class="card-body p-0 m-0 dayCol">
+      <div class="lead text-center">{{weekDays[i]}}</div>
+    </div>
+    <div class="d-flex">
+      <div style="width: 25px">
+        <div style="border-top: 1px solid #cccccc"></div>
+        <div class="hour-div" *ngFor="let i of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; let i = index">{{i + 7}}h</div>
+      </div>
+      <div class="card-body p-0 m-0 dayCol" style="height: 1000px; border-top: 1px solid #cccccc">
+        <app-schedule-day [items]="dayItems[i]"></app-schedule-day>
+      </div>
+    </div>
+  </div>
+  
+</div>

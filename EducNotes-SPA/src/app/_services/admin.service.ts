@@ -5,6 +5,7 @@ import { User } from '../_models/user';
 import { Period } from '../_models/period';
 import { Observable } from 'rxjs';
 import { AlertifyService } from './alertify.service';
+import { Establishment } from '../_models/establishment';
 
 @Injectable({
   providedIn: 'root'
@@ -129,5 +130,13 @@ export class AdminService {
   // enregistrement des professeurs extraits du fichier excel
   importTeachersFile(teachers: User[]) {
     return this.http.post(this.baseUrl + 'admin/ImportTeachers', teachers);
+  }
+
+  getSchool(){
+    return this.http.get(this.baseUrl + 'admin/school');
+  }
+
+  saveSchool(school: Establishment) {
+    return this.http.put(this.baseUrl + 'admin/saveSchool', school);
   }
 }

@@ -7,8 +7,9 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class BtnLoadingComponent implements OnInit {
   @Input('loading') loading: boolean;
+  @Input('formValid') formValid: boolean = true;
   @Input('btnClass') btnClass: string;
-  @Input('loadingText') loadingText = 'Please wait';
+  @Input('loadingText') loadingText = 'Patientez svp';
   @Input('type') type: 'button' | 'submit' = 'submit';
 
   constructor() { }

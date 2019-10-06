@@ -74,8 +74,6 @@ export class NewTeacherComponent implements OnInit {
       secondPhoneNumber: [this.editModel.secondPhoneNumber, Validators.nullValidator]});
   }
 
-
-
   initializeParams() {
     this.editModel = {
       dateOfBirth : null,
@@ -87,10 +85,7 @@ export class NewTeacherComponent implements OnInit {
       secondPhoneNumber : ''
     };
 
-
   }
-
-
 
   submit() {
     this.teachersCourses = [];

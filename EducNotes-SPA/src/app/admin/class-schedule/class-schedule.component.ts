@@ -1,25 +1,21 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { User } from '../../_models/user';
-import { ClassService } from '../../_services/class.service';
-import { AlertifyService } from '../../_services/alertify.service';
-import { Class } from 'src/app/_models/class';
+import { Component, OnInit } from '@angular/core';
+import { ClassService } from 'src/app/_services/class.service';
+import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute } from '@angular/router';
+import { ClassLevel } from 'src/app/_models/classLevel';
+import { Class } from 'src/app/_models/class';
 
 @Component({
-  selector: 'app-schedule-panel',
-  templateUrl: './schedule-panel.component.html',
-  styleUrls: ['./schedule-panel.component.css']
+  selector: 'app-class-schedule',
+  templateUrl: './class-schedule.component.html',
+  styleUrls: ['./classs-schedule.component.scss']
 })
-export class SchedulePanelComponent implements OnInit {
-  @Input() teacher: User;
-  // @Input() selectedClass: any;
-  classRoom: Class;
-  weekDays = ['', '', '', '', '', '', ''];
-  agendaParams: any = {};
-  monday: Date;
-  strMonday: string;
-  strSunday: string;
+export class ClassScheduleComponent implements OnInit {
+  selectedCL: ClassLevel;
+  classes: Class[];
   scheduleItems: any;
+  dayItems = [];
+  weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
   monCourses = [];
   tueCourses = [];
   wedCourses = [];
@@ -27,39 +23,28 @@ export class SchedulePanelComponent implements OnInit {
   friCourses = [];
   satCourses = [];
   sunCourses = [];
-  dayItems = [];
-  btnGroupModel = {
-    left: false,
-    middle: false,
-    right: false
-  };
 
   constructor(private classService: ClassService, public alertify: AlertifyService,
     private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.route.data.subscribe(params => {
-      this.classRoom = params['class'];
-    });
-    this.loadWeekSchedule(this.classRoom.id);
+    this.getClasses();
   }
 
-  // getClass(classId) {
-  //   this.classService.getClass(classId).subscribe((aclass: Class) => {
-  //     this.classRoom = aclass;
-  //     console.log(this.classRoom);
-  //   });
-  // }
+  getClasses() {
+    this.classService.getAllClasses().subscribe((data: Class[]) => {
+      this.classes = data;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
 
   loadWeekSchedule(classId) {
 
     this.resetSchedule();
-    this.classService.getClassSchedule(classId).subscribe((response: any) => {
-      this.scheduleItems = response.scheduleItems;
-      // this.monday = response.firstDayWeek;
-      this.strMonday = response.strMonday;
-      this.strSunday = response.strSunday;
-      this.weekDays = response.weekDays;
+    this.classService.getClassSchedule(classId).subscribe((data: any) => {
+
+      this.scheduleItems = data.scheduleItems;
 
       // add courses on the schedule
       for (let i = 1; i <= 7; i++) {

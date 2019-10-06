@@ -71,6 +71,23 @@ namespace EducNotes.API.Helpers
                     .MapFrom(src => src.Course.Color))
                 .ForMember(s => s.ClassLevel, opt => opt
                     .MapFrom(d => d.Class.ClassLevel.Name));
+            CreateMap<Schedule, ClassScheduleForTimeTableDto>()
+                .ForMember(dest => dest.StartHourMin, opt => {
+                    opt.MapFrom(d => d.StartHourMin.ToShortTimeString());
+                })
+                .ForMember(dest => dest.EndHourMin, opt => {
+                    opt.MapFrom(d => d.EndHourMin.ToShortTimeString());
+                })
+                .ForMember(dest => dest.Top, opt => {
+                    opt.MapFrom(d => d.StartHourMin.CalculateTop());
+                })
+                .ForMember(dest => dest.Height, opt => {
+                    opt.MapFrom(d => d.StartHourMin.CalculateHeight(d.EndHourMin));
+                })
+                .ForMember(dest => dest.Color, opt => opt
+                    .MapFrom(src => src.Course.Color))
+                .ForMember(s => s.ClassLevel, opt => opt
+                    .MapFrom(d => d.Class.ClassLevel.Name));
             CreateMap<Schedule, ScheduleToReturnDto>()
                 .ForMember(dest => dest.strStartHourMin, opt => {
                     opt.MapFrom(d => d.StartHourMin.ToShortTimeString());

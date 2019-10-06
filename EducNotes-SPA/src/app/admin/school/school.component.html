@@ -1,0 +1,51 @@
+<div class="row">
+
+  <div class="col-md-12">
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="lead mb-3">informations de l'établissement</div>
+        <form [formGroup]="schoolForm" (ngSubmit)="saveInfos()">
+          <div class="row">
+              <div class="col-md-6 form-group mb-3">
+                <label for="name">nom de l'établissement</label>
+                <input type="text" class="form-control" id="name" formControlName="name">
+              </div>
+
+              <div class="col-md-6 form-group mb-3">
+                <label for="webSite">site web</label>
+                <input class="form-control" id="webSite" formControlName="webSite">
+              </div>
+
+              <div class="col-md-6 form-group mb-3">
+                <label for="phone">téléphone</label>
+                <input class="form-control" id="phone" formControlName="phone" [textMask]="{mask: phoneMask}">
+              </div>
+
+              <div class="col-md-6 form-group mb-3">
+                <label for="email">adresse email</label>
+                <input type="email" class="form-control" id="email" formControlName="email" aria-describedby="emailHelp">
+                <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+              </div>
+
+              <div class="col-md-6 form-group mb-3">
+                <label for="startCoursesHour">heure début des cours de l'établissement</label>
+                <input type="time-local" class="form-control" id="startCoursesHour"
+                  formControlName="startCoursesHour" placeholder="hh:mm" [textMask]="{mask: timeMask}">
+              </div>
+              
+              <div class="col-md-6 form-group mb-3">
+                <label for="endCoursesHour">heure fin des cours de l'établissement</label>
+                <input class="form-control" id="endCoursesHour"
+                  formControlName="endCoursesHour" placeholder="hh:mm" [textMask]="{mask: timeMask}">
+              </div>
+
+              <div class="col-md-12">
+                <btn-loading btnClass="btn-primary" [loading]="loading">valider</btn-loading>
+              </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
