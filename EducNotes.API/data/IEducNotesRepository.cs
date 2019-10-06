@@ -23,6 +23,7 @@ namespace EducNotes.API.Data
         Task<IEnumerable<Agenda>> GetClassAgenda(int classId, DateTime StartDate, DateTime EndDate);
         Task<IEnumerable<Agenda>> GetClassAgendaTodayToNDays(int classId, int toNbDays);
         Task<IEnumerable<Schedule>> GetClassSchedule(int classId);
+        Task<IEnumerable<ClassLevelSchedule>> GetClassLevelSchedule(int classLevelId);
         Task<IEnumerable<CourseSkill>> GetCourseSkills(int courseId);
         Task<Agenda> GetAgenda(int agendaId);
         Task<Photo> GetPhoto(int id);

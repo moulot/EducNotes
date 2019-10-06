@@ -227,6 +227,15 @@ namespace EducNotes.API.Data
                     .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin).ToListAsync();
         }
 
+        public async Task<IEnumerable<ClassLevelSchedule>> GetClassLevelSchedule(int classLevelId)
+        {
+            return await _context.ClassLevelSchedules
+                    .Include(i => i.ClassLevel)
+                    .Include(i => i.Course)
+                    .Where(s => s.ClassLevelId == classLevelId)
+                    .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin).ToListAsync();
+        }
+
         public async Task<IEnumerable<Agenda>> GetClassAgenda(int classId, DateTime StartDate, DateTime EndDate)
         {
             return await _context.Agendas

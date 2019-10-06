@@ -50,7 +50,7 @@ import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 import { ClassLifeComponent } from './classes/class-life/class-life.component';
 import { SchoolComponent } from './admin/school/school.component';
 import { SchoolResolver } from './_resolvers/school-resolver';
-import { ClasslevelScheduleComponent } from './admin/classlevel-schedule/classlevel-schedule.component';
+import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
 import { ClassResolver } from './_resolvers/class-resolver';
 
@@ -79,7 +79,7 @@ export const appRoutes: Routes = [
             {path: 'notes', component: GradePanelComponent},
             {path: 'classLife/:classId', component: ClassLifeComponent},
             {path: 'studentNotes/:id', component: GradeStudentComponent},
-            {path: 'classLevelSchedule', component: ClasslevelScheduleComponent},
+            {path: 'classScheduleEdit', component: ClassScheduleComponent},
             {path: 'studentsClass/:classId', component: ClassStudentsComponent},
             {path: 'agendas/:classId', component: ClassAgendaComponent},
             {path: 'student', component: StudentDashboardComponent},

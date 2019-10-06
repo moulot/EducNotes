@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { ClasslevelScheduleComponent } from './classlevel-schedule.component';
+import { ClasslevelScheduleComponent } from './class-schedule.component';
 
 describe('ClasslevelScheduleComponent', () => {
   let component: ClasslevelScheduleComponent;

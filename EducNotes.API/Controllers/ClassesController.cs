@@ -478,54 +478,6 @@ namespace EducNotes.API.Controllers
             return Ok(await les_classes.ToListAsync());
         }
 
-        // [HttpGet("{id}/GetAllTeacherCoursesById")]
-        // public async Task<IActionResult> GetAllTeacherCoursesById(int id)
-        // {
-        //     //recuperation de tous les professeurs ainsi que les cours affectés
-        //     var teacher = await _context.Users.Include(p => p.Photos).Include(p => p.UserType).FirstOrDefaultAsync(u => u.Id==id);
-        //      var teacherListToReturn =new TeacherForListDto
-        //         {
-        //             Teacher = _mapper.Map<UserForListDto>(teacher),
-        //             Courses = await _repo.GetTeacherCoursesAndClasses(teacher.Id)
-        //         };
-            
-
-        //     return Ok(teacherListToReturn);
-
-        // }
-
-        // [HttpGet("GetAllCoursesDetails")]
-        // public async Task<IActionResult> GetAllCoursesDetails()
-        // {
-        //     var data = new List<CoursesDetailsDto>();
-        //     var allCourses = await _context.Courses.OrderBy(c => c.Name).ToListAsync();
-        //     foreach (var item in allCourses)
-        //     {
-        //         var cc = new List<Class>();
-        //         cc = await _context.ClassCourses.Include(c => c.Course).Where(c => c.CourseId == item.Id).Select(c => c.Class).ToListAsync();
-        //         var tt = new List<UserForListDto>();
-        //         var teachers = _context.CourseUsers.Include(c => c.Teacher).ThenInclude(t => t.Photos).Where(c => c.CourseId == item.Id);
-
-        //         foreach (var t in teachers)
-        //         {
-        //             tt.Add(_mapper.Map<UserForListDto>(t.Teacher));
-        //         }
-        //         int total = 0;
-        //         foreach (var i in cc)
-        //         {
-        //             total += _context.Users.Where(c => c.ClassId == i.Id).Count();
-        //         }
-
-        //         data.Add(new CoursesDetailsDto
-        //         {
-        //             Course = item,
-        //             Classes = cc,
-        //             StudentsNumber = total,
-        //             Teachers = tt
-        //         });
-        //     }
-        //     return Ok(data);
-        // }
 
         [HttpPost("{courseId}/UpdateCourse/{courseName}")]
         public async Task<IActionResult> UpdateCourse(int courseId, string courseName)
@@ -540,70 +492,6 @@ namespace EducNotes.API.Controllers
 
         }
 
-        // [HttpPost("{id}/{courseId}/SaveTeacherAffectation")]
-        // public async Task<IActionResult> SaveTeacherAffectation(int id, int courseId, [FromBody]List<int> classIds)
-        // {
-        //     try
-        //     {
-        //         var classcourses = await _context.ClassCourses.Where(c => c.CourseId == courseId).ToListAsync();
-        //         var tt = classcourses.Select(c => c.ClassId);
-        //         foreach (var item in classIds.Except(tt))
-        //         {
-        //             //ajout d'une nouvelle ligne
-        //             _context.Add(new ClassCourse { CourseId = courseId, ClassId = item, TeacherId = id });
-        //         }
-        //         foreach (var item in classIds)
-        //         {
-        //             var cc = classcourses.FirstOrDefault(c => c.ClassId == item);
-        //             if (cc != null)
-        //             {
-        //                 cc.TeacherId = id;
-        //             }
-        //         }
-        //         var u = classcourses.Where(teacherTypeId => teacherTypeId.TeacherId == id).Select(c => c.ClassId);
-        //         foreach (var item in u.Except(classIds))
-        //         {
-        //             var cc = classcourses.FirstOrDefault(c => c.ClassId == item);
-        //             cc.TeacherId = null;
-
-        //         }
-
-        //         if (await _repo.SaveAll())
-        //         {
-        //             var teacherToReturn = new TeacherForListDto()
-        //             {
-        //                 Teacher = _mapper.Map<UserForListDto>(await _repo.GetUser(id, false)),
-        //                 Courses = await _repo.GetTeacherCoursesAndClasses(id)
-        //             };
-        //             return Ok(teacherToReturn);
-        //         }
-        //         return BadRequest("impossiblle de terminer l'opération");
-        //     }
-        //     catch (System.Exception)
-        //     {
-
-        //         return BadRequest("impossiblle de terminer l'opération");
-        //     }
-        // }
-       
-
-        // [HttpGet("GetCoursesTeachers")]
-        // public async Task<IActionResult> GetCoursesTeachers()
-        // {
-        //     //CoursesTeacherDto
-        //     var data = new List<CoursesTeacherDto>();
-        //     var courses = await _context.Courses.OrderBy(e => e.Name).ToListAsync();
-        //     foreach (var item in courses)
-        //     {
-        //         data.Add(new CoursesTeacherDto
-        //         {
-        //             Course = item,
-        //             Teachers = _mapper.Map<List<UserForDetailedDto>>
-        //         (_context.CourseUsers.Include(c => c.Teacher).ThenInclude(t => t.Photos).Where(c => c.CourseId == item.Id).Select(c => c.Teacher))
-        //         });
-        //     }
-        //     return Ok(data);
-        // }
 
         [HttpGet("GetLevels")]
         public async Task<IActionResult> GetLevels()

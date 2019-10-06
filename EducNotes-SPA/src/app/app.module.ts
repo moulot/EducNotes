@@ -151,7 +151,7 @@ import { SchoolComponent } from './admin/school/school.component';
 import { BtnLoadingComponent } from './shared/components/btn-loading/btn-loading.component';
 import { SharedComponentsModule } from './shared/components/shared-components.module';
 import { SchoolResolver } from './_resolvers/school-resolver';
-import { ClasslevelScheduleComponent } from './admin/classlevel-schedule/classlevel-schedule.component';
+import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { ClassResolver } from './_resolvers/class-resolver';
 
 // the second parameter 'fr' is optional
@@ -258,7 +258,7 @@ export function tokenGetter() {
       LevelClassesComponent,
       ClassLifeComponent,
       SchoolComponent,
-      ClasslevelScheduleComponent
+      ClassScheduleComponent
    ],
    imports: [
      FormWizardModule,

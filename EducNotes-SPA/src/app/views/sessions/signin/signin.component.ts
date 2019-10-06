@@ -5,7 +5,6 @@ import { Router, RouteConfigLoadStart, ResolveStart, RouteConfigLoadEnd, Resolve
 import { User } from 'src/app/_models/user';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { AuthService } from 'src/app/_services/auth.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-signin',
@@ -59,21 +58,13 @@ export class SigninComponent implements OnInit {
     signin() {
         this.loading = true;
         this.notConfirmed = false;
-        this.authService.login(this.signinForm.value).subscribe((res) => {
-          const loggedUser = this.authService.currentUser;
+        this.authService.login(this.signinForm.value).subscribe(() => {
           this.router.navigate(['/home']);
           this.loading = false;
         }, error => {
           this.alertify.error(error);
           this.loading = false;
         });
-        // this.loading = true;
-        // this.loadingText = 'Sigining in...';
-        // this.auth.signin(this.signinForm.value)
-        //     .subscribe(res => {
-        //         this.router.navigateByUrl('/dashboard/v1');
-        //         this.loading = false;
-        //     });
     }
 
 }
