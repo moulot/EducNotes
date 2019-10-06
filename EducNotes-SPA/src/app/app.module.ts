@@ -151,6 +151,8 @@ import { SchoolComponent } from './admin/school/school.component';
 import { BtnLoadingComponent } from './shared/components/btn-loading/btn-loading.component';
 import { SharedComponentsModule } from './shared/components/shared-components.module';
 import { SchoolResolver } from './_resolvers/school-resolver';
+import { ClasslevelScheduleComponent } from './admin/classlevel-schedule/classlevel-schedule.component';
+import { ClassResolver } from './_resolvers/class-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -255,7 +257,8 @@ export function tokenGetter() {
       AccountHistoryComponent,
       LevelClassesComponent,
       ClassLifeComponent,
-      SchoolComponent
+      SchoolComponent,
+      ClasslevelScheduleComponent
    ],
    imports: [
      FormWizardModule,
@@ -324,6 +327,7 @@ export function tokenGetter() {
       LevelClassesResolver,
       CallSheetResolver,
       SchoolResolver,
+      ClassResolver,
       {provide: NZ_I18N, useValue: fr_FR}
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

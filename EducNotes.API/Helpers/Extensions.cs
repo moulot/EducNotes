@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using EducNotes.API.Data;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -44,8 +41,8 @@ namespace EducNotes.API.Helpers
         public static string CalculateTop(this DateTime startHourMin)
         {
             // to be retrieved from appSettings
-            var scheduleHourSize = 100;
-            var startCourseHour = 7;
+            var scheduleHourSize = Convert.ToDouble(Startup.StaticConfig.GetSection("AppSettings:DimHourSchedule").Value);
+            var startCourseHour = Convert.ToDouble(Startup.StaticConfig.GetSection("AppSettings:CoursesHourStart").Value);
 
             var netHours = startHourMin.Hour - startCourseHour;
             var mins = startHourMin.Minute;
@@ -58,7 +55,7 @@ namespace EducNotes.API.Helpers
         public static string CalculateHeight(this DateTime startHourMin, DateTime endHourMin)
         {
             // to be retrieved from appSettings
-            var scheduleHourSize = 100;
+            var scheduleHourSize =  Convert.ToDouble(Startup.StaticConfig.GetSection("AppSettings:DimHourSchedule").Value);
 
             TimeSpan span = endHourMin.Subtract(startHourMin);
 

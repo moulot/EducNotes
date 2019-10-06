@@ -50,6 +50,9 @@ import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 import { ClassLifeComponent } from './classes/class-life/class-life.component';
 import { SchoolComponent } from './admin/school/school.component';
 import { SchoolResolver } from './_resolvers/school-resolver';
+import { ClasslevelScheduleComponent } from './admin/classlevel-schedule/classlevel-schedule.component';
+import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
+import { ClassResolver } from './_resolvers/class-resolver';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
@@ -63,14 +66,11 @@ export const appRoutes: Routes = [
         runGuardsAndResolvers: 'always',
         canActivate: [AuthGuard],
         children: [
-            {path: 'home', component: HomePanelComponent,
-              resolve: {user: UserHomeResolver}},
-            {path: 'members', component: MemberListComponent,
-            resolve: {users : MemberListResolver}},
-            {path: 'members/:id', component: MemberDetailComponent,
-            resolve: {user : MemberDetailResolver}},
+            {path: 'home', component: HomePanelComponent, resolve: {user: UserHomeResolver}},
+            {path: 'members', component: MemberListComponent, resolve: {users : MemberListResolver}},
+            {path: 'members/:id', component: MemberDetailComponent, resolve: {user : MemberDetailResolver}},
             {path: 'member/edit', component: MemberEditComponent,
-            resolve: {user: MemberEditResolver}, canDeactivate: [PreventUnSavedChanges]},
+              resolve: {user: MemberEditResolver}, canDeactivate: [PreventUnSavedChanges]},
             {path: 'messages', component: MessagesComponent, resolve: {messages: MessagesResolver}},
             {path: 'lists', component: ListsComponent, resolve: {users: ListsResolver}},
             {path: 'admin', component: AdminPanelComponent, data: {roles: ['Admin', 'Moderator']}},
@@ -79,16 +79,14 @@ export const appRoutes: Routes = [
             {path: 'notes', component: GradePanelComponent},
             {path: 'classLife/:classId', component: ClassLifeComponent},
             {path: 'studentNotes/:id', component: GradeStudentComponent},
+            {path: 'classLevelSchedule', component: ClasslevelScheduleComponent},
             {path: 'studentsClass/:classId', component: ClassStudentsComponent},
             {path: 'agendas/:classId', component: ClassAgendaComponent},
             {path: 'student', component: StudentDashboardComponent},
             {path: 'studentFromP/:id', component: StudentDashboardComponent},
-            {path: 'parent', component: ParentDashboardComponent,
-              resolve: {parent: UserHomeResolver}},
-            {path: 'teacher', component: TeacherDashboardComponent,
-              resolve: {teacher: UserHomeResolver}},
-            {path: 'admins', component: AdminDashboardComponent,
-              resolve: {admin: UserHomeResolver}},
+            {path: 'parent', component: ParentDashboardComponent, resolve: {parent: UserHomeResolver}},
+            {path: 'teacher', component: TeacherDashboardComponent, resolve: {teacher: UserHomeResolver}},
+            {path: 'admins', component: AdminDashboardComponent, resolve: {admin: UserHomeResolver}},
             {path: 'inscriptions', component: InscriptionComponent},
             {path: 'agendas/:classId', component: ClassAgendaComponent},
             {path: 'addEval', component: EvalAddFormComponent},
@@ -96,6 +94,7 @@ export const appRoutes: Routes = [
             {path: 'inscriptions', component: InscriptionComponent},
             {path: 'inscriptionsList', component: InscriptionsListComponent},
             {path: 'classesPanel', component: ClassesPanelComponent, resolve: {levels: ClassesListResolver}},
+            {path: 'classSchedule/:classId', component: SchedulePanelComponent, resolve: {class: ClassResolver}},
             {path: 'courses', component: CoursesPanelComponent, resolve: {courses: CoursesListResolver}},
             {path: 'teachers', component: TeacherManagementComponent, resolve: {teachers: TeacherManagementResolver}},
             {path: 'preregister', component: PreRegisterComponent},

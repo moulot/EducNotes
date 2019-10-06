@@ -9,7 +9,7 @@
         <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/agendas', class.classId]">cahier de textes</a></p>
         <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/notes']">notes</a></p>
         <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/classLife', class.classId]">vie de la classe</a></p>
-        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/classLife', class.classId]">emploi du temps</a></p>
+        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/classSchedule', class.classId]">emploi du temps</a></p>
       </div>
     </div>
   </div>
@@ -252,7 +252,7 @@
               
               </nz-tab>
               <nz-tab nzTitle="emploi du temps">
-                <app-schedule-panel [teacher]="teacher" [selectedClass]="selectedClass"></app-schedule-panel>
+                <app-schedule-panel [teacher]="teacher"></app-schedule-panel>
               </nz-tab>
             </nz-tabset>
         

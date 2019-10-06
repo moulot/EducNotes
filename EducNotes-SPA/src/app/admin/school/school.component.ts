@@ -1,6 +1,6 @@
 import { Component, OnInit, HostListener, ɵConsole } from '@angular/core';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Establishment } from 'src/app/_models/establishment';
 import { AdminService } from 'src/app/_services/admin.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,17 +31,28 @@ export class SchoolComponent implements OnInit {
       this.school = data['school'];
     });
     this.createSchoolForm();
-    console.log(this.school.startCoursesHour.getHours + ' - ' + this.school.startCoursesHour.getMinutes);
   }
 
   createSchoolForm() {
+    const startDate = new Date(this.school.startCoursesHour);
+    const startDateH = startDate.getHours().toString();
+    const startH = startDateH.length === 1 ? '0' + startDateH : startDateH;
+    const startDateM = startDate.getMinutes().toString();
+    const startM = startDateM.length === 1 ? '0' + startDateM : startDateM;
+
+    const endDate = new Date(this.school.endCoursesHour);
+    const endDateH = endDate.getHours().toString();
+    const endH = endDateH.length === 1 ? '0' + endDateH : endDateH;
+    const endDateM = endDate.getMinutes().toString();
+    const endM = endDateM.length === 1 ? '0' + endDateM : endDateM;
+
     this.schoolForm = this.fb.group({
       name: [this.school.name],
       phone: [this.school.phone],
       email: [this.school.email],
       webSite: [this.school.webSite],
-      startCoursesHour: [this.school.startCoursesHour.getHours + ':' + this.school.startCoursesHour.getMinutes],
-      endCoursesHour: [this.school.endCoursesHour.getHours + ':' + this.school.endCoursesHour.getMinutes]
+      startCoursesHour: [startH + ':' + startM, [Validators.minLength(4), Validators.maxLength(4)]],
+      endCoursesHour: [endH + ':' + endM, [Validators.minLength(4), Validators.maxLength(4)]]
     });
   }
 

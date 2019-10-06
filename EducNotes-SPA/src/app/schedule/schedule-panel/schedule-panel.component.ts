@@ -2,7 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { User } from '../../_models/user';
 import { ClassService } from '../../_services/class.service';
 import { AlertifyService } from '../../_services/alertify.service';
-import { filter } from 'rxjs/operators';
+import { Class } from 'src/app/_models/class';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-schedule-panel',
@@ -11,7 +12,8 @@ import { filter } from 'rxjs/operators';
 })
 export class SchedulePanelComponent implements OnInit {
   @Input() teacher: User;
-  @Input() selectedClass: any;
+  // @Input() selectedClass: any;
+  classRoom: Class;
   weekDays = ['', '', '', '', '', '', ''];
   agendaParams: any = {};
   monday: Date;
@@ -25,12 +27,29 @@ export class SchedulePanelComponent implements OnInit {
   friCourses = [];
   satCourses = [];
   sunCourses = [];
+  dayItems = [];
+  btnGroupModel = {
+    left: false,
+    middle: false,
+    right: false
+  };
 
-  constructor(private classService: ClassService, public alertify: AlertifyService) { }
+  constructor(private classService: ClassService, public alertify: AlertifyService,
+    private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.loadWeekSchedule(this.selectedClass.id);
+    this.route.data.subscribe(params => {
+      this.classRoom = params['class'];
+    });
+    this.loadWeekSchedule(this.classRoom.id);
   }
+
+  // getClass(classId) {
+  //   this.classService.getClass(classId).subscribe((aclass: Class) => {
+  //     this.classRoom = aclass;
+  //     console.log(this.classRoom);
+  //   });
+  // }
 
   loadWeekSchedule(classId) {
 
@@ -73,6 +92,8 @@ export class SchedulePanelComponent implements OnInit {
           }
         }
       }
+
+      this.dayItems = [this.monCourses, this.tueCourses, this.wedCourses, this.thuCourses, this.friCourses, this.satCourses];
 
     }, error => {
       this.alertify.error(error);
