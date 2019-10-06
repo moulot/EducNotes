@@ -147,6 +147,7 @@ import localeFr from '@angular/common/locales/fr';
 import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
 import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 import { ClassLifeComponent } from './classes/class-life/class-life.component';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -290,7 +291,9 @@ export function tokenGetter() {
       UiKitsModule,
       SharedPipesModule,
       PerfectScrollbarModule,
-      NgxEchartsModule
+      NgxEchartsModule,
+    ColorPickerModule,
+
    ],
    providers: [
       AuthService,

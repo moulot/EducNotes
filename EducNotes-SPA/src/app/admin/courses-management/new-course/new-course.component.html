@@ -16,31 +16,24 @@
                   <input nz-input formControlName="abbreviation" id="abbreviation">
                 </nz-form-control>
              </nz-form-item>
-    
-               <!-- <nz-form-item>
-                  <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="classLevelIds">choisir le Niveau</nz-form-label>
-                  <nz-form-control [nzSm]="14" [nzXs]="24">
-                    
 
-                      <nz-select name="classLevelIds" id="classLevelIds"  style="width: 100%" 
-                      nzMode="multiple" nzPlaceHolder="Choisir le niveau" formControlName="classLevelIds">
-                       <ng-container *ngFor="let level of levels">
-                          <nz-option nzLabel="{{level.name}} ({{level.totalClasses}} classe(s))" nzValue="{{level.id}}" 
-                         ></nz-option>
-                        </ng-container>
-                      </nz-select>
-                    <nz-form-explain *ngIf="courseForm.get('classLevelIds').dirty && courseForm.get('classLevelIds').errors">Veuillez choisir le niveau</nz-form-explain>
-                  </nz-form-control>
-               </nz-form-item> -->
+             <nz-form-item>
+              <nz-form-label [nzSm]="6" [nzXs]="24"  nzFor="abbreviation">Choisir la couleur</nz-form-label>
+              <nz-form-control [nzSm]="14" [nzXs]="24" >
+                <input  nz-input name="color" formControlName="color" [(colorPicker)]="color" [style.background]="color"
+                 (colorPickerChange)="setColor()" >
+              </nz-form-control>
+             
+              </nz-form-item>
               
-                <nz-form-item>
-                  <nz-form-control [nzSpan]="14" [nzOffset]="6">
-                      <button type="submit" [disabled]="!courseForm.valid || submitText!='enregistrer'"
-                        class="btn btn-outline-primary btn-sm"><span>{{submitText}}</span></button>
-                      <button type="button"  class="btn btn-outline-primary btn-sm ml-2" (click)="cancel()"><span>annuler</span></button>
-                   
-                    </nz-form-control>
-                </nz-form-item>
+              <nz-form-item>
+                <nz-form-control [nzSpan]="14" [nzOffset]="6">
+                    <button type="submit" [disabled]="!courseForm.valid || submitText!='enregistrer'"
+                      class="btn btn-outline-primary btn-sm"><span>{{submitText}}</span></button>
+                    <button type="button"  class="btn btn-outline-primary btn-sm ml-2" (click)="cancel()"><span>annuler</span></button>
+                  
+                  </nz-form-control>
+              </nz-form-item>
        </form>
         
           

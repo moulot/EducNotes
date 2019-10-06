@@ -167,9 +167,9 @@ constructor(private http: HttpClient) { }
     return this.http.get(this.baseUrl + 'classes/GetLevels');
   }
 
-  // saveClassModification(courseId: number, courseName: string) {
-  //   return this.http.post(this.baseUrl + 'classes/' + courseId + '/UpdateCourse' + courseName, {}); updateCourse
-  // }
+  updatCourse(courseId: number, course: Course) {
+    return this.http.post(this.baseUrl + 'classes/UpdateCourse/' + courseId, course);
+  }
 
   saveClassModification(classId: number, data: any) {
     return this.http.post(this.baseUrl + 'classes/' + classId + '/UpdateClass', data);
@@ -210,5 +210,6 @@ constructor(private http: HttpClient) { }
    teacherClassCoursByLevel(teacherId: number, levelid: number, courseId: number) {
     return this.http.get(this.baseUrl + 'classes/TeacherClassCoursByLevel/  ' + teacherId + '/' + levelid + '/' + courseId );
   }
+ 
 
 }

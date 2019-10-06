@@ -125,4 +125,9 @@ export class AdminService {
   savePreinscription(userId: number, data: any) {
     return this.http.post(this.baseUrl + 'admin/' + userId + '/SavePreinscription', data);
   }
+
+  // enregistrement des professeurs extraits du fichier excel
+  importTeachersFile(teachers: User[]) {
+    return this.http.post(this.baseUrl + 'admin/ImportTeachers', teachers);
+  }
 }
