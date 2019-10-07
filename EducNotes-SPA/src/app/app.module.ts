@@ -152,6 +152,7 @@ import { SchoolComponent } from './admin/school/school.component';
 import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { ClassResolver } from './_resolvers/class-resolver';
+import { EditionPhotoComponent } from './edition-photo/edition-photo.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -257,13 +258,17 @@ export function tokenGetter() {
       LevelClassesComponent,
       ClassLifeComponent,
       SchoolComponent,
-      ClassScheduleComponent
+      ClassScheduleComponent,
+      EditionPhotoComponent
    ],
    imports: [
-     FormWizardModule,
+      FormWizardModule,
       SharedModule,
       HttpClientModule,
-      InMemoryWebApiModule.forRoot(InMemoryDataService, { passThruUnknownUrl: true }),
+      InMemoryWebApiModule.forRoot(InMemoryDataService,
+      passThruUnknownUrl
+   ]
+}),
       AppRoutingModule,
       BrowserModule,
       BrowserAnimationsModule,

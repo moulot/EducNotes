@@ -8,7 +8,7 @@ import { Class } from 'src/app/_models/class';
 @Component({
   selector: 'app-class-schedule',
   templateUrl: './class-schedule.component.html',
-  styleUrls: ['./classs-schedule.component.scss']
+  styleUrls: ['./class-schedule.component.scss']
 })
 export class ClassScheduleComponent implements OnInit {
   selectedCL: ClassLevel;
