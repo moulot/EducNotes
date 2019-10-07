@@ -35,7 +35,6 @@ export class GradeAddFormComponent implements OnInit {
   ngOnInit() {
     this.selectedEval = this.evalService.currentEval;
     this.closed = this.selectedEval.closed;
-    console.log(this.closed);
     this.userGrades = this.evalService.userGrades;
     this.filteredUserGrades = this.userGrades;
     this.newUserGrades = this.userGrades;
