@@ -153,6 +153,7 @@ import { SharedComponentsModule } from './shared/components/shared-components.mo
 import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { ClassResolver } from './_resolvers/class-resolver';
+import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-schedule.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -258,7 +259,8 @@ export function tokenGetter() {
       LevelClassesComponent,
       ClassLifeComponent,
       SchoolComponent,
-      ClassScheduleComponent
+      ClassScheduleComponent,
+      ClassdayScheduleComponent
    ],
    imports: [
      FormWizardModule,

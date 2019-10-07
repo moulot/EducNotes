@@ -122,6 +122,10 @@ constructor(private http: HttpClient) { }
     return this.http.put(this.baseUrl + 'classes/SaveAgenda', agendaItem);
   }
 
+  getClassCourses(classId) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/ClassCourses');
+  }
+
   getAllClasses() {
     return this.http.get<any[]>(this.baseUrl + 'classes/GetAllClasses');
   }

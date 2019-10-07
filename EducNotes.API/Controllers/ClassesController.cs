@@ -478,6 +478,15 @@ namespace EducNotes.API.Controllers
             return Ok(await les_classes.ToListAsync());
         }
 
+        [HttpGet("{classId}/classCourses")]
+        public async Task<IActionResult> GetClassCourses(int classId)
+        {
+            var courses = await _context.ClassCourses
+                                    .Where(c => c.ClassId == classId)
+                                    .Select(s => s.Course).ToListAsync();
+
+            return Ok(courses);
+        }
 
         [HttpPost("{courseId}/UpdateCourse/{courseName}")]
         public async Task<IActionResult> UpdateCourse(int courseId, string courseName)

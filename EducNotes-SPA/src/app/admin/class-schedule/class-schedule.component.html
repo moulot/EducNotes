@@ -4,12 +4,107 @@
     <p class="lead">saisie des emplois du temps</p>
   </div>
 
-  <div class="col-md-12">
-    <label class="mr-2">niveau classe:</label>
-    <nz-select #classLevelSelect class="" nzShowSearch nzPlaceHolder="classLevel"
-      formControlName="classLevel" nzAllowClear>
-      <nz-option *ngFor="let item of classes" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
-    </nz-select>
+  <div class="col-md-12 mb-2">
+    <form [formGroup]="scheduleForm" (ngSubmit)="saveScheduleItem()">
+      <div class="card">
+        <div class="card-body">
+
+          <nz-select class="mr-2 mb-3" nzAllowClear nzShowSearch nzPlaceHolder="entrer la classe" id="aclass" name="aclass"
+            style="width: 150px" formControlName="aclass" (ngModelChange)="onClassChanged()">
+            <nz-option *ngFor="let item of classes" nzLabel="classe {{item.name}}" nzValue="{{item.id}}"></nz-option>
+          </nz-select>
+
+          <nz-select nzAllowClear nzShowSearch nzPlaceHolder="cours" id="course" name="course"
+            style="width: 175px" formControlName="course">
+            <nz-option *ngFor="let item of classCourses" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
+          </nz-select>
+
+          <div class="mb-3" style="border-top: 1px solid #cccccc"></div>
+
+          <!-- <div formArrayName="itemLines" class="mb-2" *ngFor="let item of scheduleForm.controls['itemLines'].value; let i = index"> -->
+          <!-- <ng-container [formGroupName]="i"> -->
+          <div formGroupName="item1" class="mb-2">
+            <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="jour du cours" id="day1" name="day1"
+              style="width: 200px" formControlName="day1">
+              <nz-option *ngFor="let item of daySelect" nzLabel="{{item.name}}" nzValue="{{item.value}}"></nz-option>
+            </nz-select>
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure debut"
+              formControlName="hourStart1" id="hourStart1" [textMask]="{mask: timeMask}">
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
+              formControlName="hourEnd1" id="hourEnd1" [textMask]="{mask: timeMask}">
+          </div>
+
+          <div formGroupName="item2" class="mb-2">
+            <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="jour du cours" id="day2" name="day2"
+              style="width: 200px" formControlName="day2">
+              <nz-option *ngFor="let item of daySelect" nzLabel="{{item.name}}" nzValue="{{item.value}}"></nz-option>
+            </nz-select>
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure debut"
+              formControlName="hourStart2" id="hourStart2" [textMask]="{mask: timeMask}">
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
+              formControlName="hourEnd2" id="hourEnd2" [textMask]="{mask: timeMask}">
+          </div>
+          
+          <div formGroupName="item3" class="mb-2">
+            <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="jour du cours" id="day3" name="day3"
+              style="width: 200px" formControlName="day3">
+              <nz-option *ngFor="let item of daySelect" nzLabel="{{item.name}}" nzValue="{{item.value}}"></nz-option>
+            </nz-select>
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure debut"
+              formControlName="hourStart3" id="hourStart3" [textMask]="{mask: timeMask}">
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
+              formControlName="hourEnd3" id="hourEnd3" [textMask]="{mask: timeMask}">
+          </div>
+            
+          <div formGroupName="item4" class="mb-2">
+            <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="jour du cours" id="day4" name="day4"
+              style="width: 200px" formControlName="day4">
+              <nz-option *ngFor="let item of daySelect" nzLabel="{{item.name}}" nzValue="{{item.value}}"></nz-option>
+            </nz-select>
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure debut"
+              formControlName="hourStart4" id="hourStart4" [textMask]="{mask: timeMask}">
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
+              formControlName="hourEnd4" id="hourEnd4" [textMask]="{mask: timeMask}">
+          </div>
+              
+          <div formGroupName="item5" class="mb-2">
+            <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="jour du cours" id="day5" name="day5"
+              style="width: 200px" formControlName="day5">
+              <nz-option *ngFor="let item of daySelect" nzLabel="{{item.name}}" nzValue="{{item.value}}"></nz-option>
+            </nz-select>
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure debut"
+              formControlName="hourStart5" id="hourStart5" [textMask]="{mask: timeMask}">
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
+              formControlName="hourEnd5" id="hourEnd5" [textMask]="{mask: timeMask}">
+          </div>
+                
+          <div formGroupName="item6">
+            <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="jour du cours" id="day6" name="day6"
+              style="width: 200px" formControlName="day6">
+              <nz-option *ngFor="let item of daySelect" nzLabel="{{item.name}}" nzValue="{{item.value}}"></nz-option>
+            </nz-select>
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure debut"
+              formControlName="hourStart6" id="hourStart6" [textMask]="{mask: timeMask}">
+
+            <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
+              formControlName="hourEnd6" id="hourEnd6" [textMask]="{mask: timeMask}">
+          </div>
+
+          <btn-loading [formValid]="scheduleForm.valid" btnClass="btn-primary mt-2" [loading]="loading">valider</btn-loading>
+      </div>
+      </div>
+    </form>
   </div>
 
   <div *ngFor="let i of [0, 1, 2, 3, 4, 5]" class="card p-0 col-md-2">
@@ -22,7 +117,7 @@
         <div class="hour-div" *ngFor="let i of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; let i = index">{{i + 7}}h</div>
       </div>
       <div class="card-body p-0 m-0 dayCol" style="height: 1000px; border-top: 1px solid #cccccc">
-        <app-schedule-day [items]="dayItems[i]"></app-schedule-day>
+        <app-classday-schedule [items]="dayItems[i]"></app-classday-schedule>
       </div>
     </div>
   </div>
