@@ -147,9 +147,8 @@ import localeFr from '@angular/common/locales/fr';
 import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
 import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 import { ClassLifeComponent } from './classes/class-life/class-life.component';
+import { ColorPickerModule } from 'ngx-color-picker';
 import { SchoolComponent } from './admin/school/school.component';
-import { BtnLoadingComponent } from './shared/components/btn-loading/btn-loading.component';
-import { SharedComponentsModule } from './shared/components/shared-components.module';
 import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { ClassResolver } from './_resolvers/class-resolver';
@@ -301,7 +300,8 @@ export function tokenGetter() {
       SharedPipesModule,
       PerfectScrollbarModule,
       NgxEchartsModule,
-      SharedComponentsModule
+    ColorPickerModule,
+
    ],
    providers: [
       AuthService,

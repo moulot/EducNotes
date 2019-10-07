@@ -127,7 +127,12 @@ export class AdminService {
     return this.http.post(this.baseUrl + 'admin/' + userId + '/SavePreinscription', data);
   }
 
-  getSchool() {
+  // enregistrement des professeurs extraits du fichier excel
+  importTeachersFile(teachers: User[]) {
+    return this.http.post(this.baseUrl + 'admin/ImportTeachers', teachers);
+  }
+
+  getSchool(){
     return this.http.get(this.baseUrl + 'admin/school');
   }
 

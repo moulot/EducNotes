@@ -693,6 +693,47 @@ namespace EducNotes.API.Controllers
             return Ok(res);    
     }
 
+    [HttpPost("ImportTeachers")]
+    public async Task<IActionResult> ImportTeachers(List<UserFromExelDto> usersFromExcel)
+    {
+       
+        try
+        {
+            foreach (var userForRegister in usersFromExcel)
+            {
+                  var userToCreate = _mapper.Map<User>(userForRegister);
+                  userToCreate.UserTypeId = teacherTypeId;
+                  var code  = Guid.NewGuid();
+                  userToCreate.UserName = code.ToString();
+                  int userId= await _repo.AddUserPreInscription(code,userToCreate,teacherRoleId,true);
+                  
+
+                  foreach (var course in userForRegister.Courses)
+                  {
+                    var cours = await _context.Courses?.FirstOrDefaultAsync(c => c.Name.ToLower() == course.ToLower());
+                    if(cours != null)
+                    _repo.Add( new TeacherCourse{ TeacherId = userId, CourseId = cours.Id });
+                  }
+            }
+
+
+            if( await _repo.SaveAll())
+                return Ok();
+
+            return BadRequest("impossible de terminer l'enregistrement");
+                
+            // return Ok(_mapper.Map<UserForListDto>(userToCreate));
+            
+        }
+        catch (System.Exception ex)
+        {
+            string mes = ex.Message;
+
+            return BadRequest(ex);
+        }  
+
+    }
+
   }
 
 }

@@ -488,11 +488,13 @@ namespace EducNotes.API.Controllers
             return Ok(courses);
         }
 
-        [HttpPost("{courseId}/UpdateCourse/{courseName}")]
-        public async Task<IActionResult> UpdateCourse(int courseId, string courseName)
+        [HttpPost("UpdateCourse/{courseId}")]
+        public async Task<IActionResult> UpdateCourse(int courseId,CourseDto courseDto )
         {
             var courseFromRepo = await _repo.GetCourse(courseId);
-            courseFromRepo.Name = courseName;
+            courseFromRepo.Name = courseDto.Name;
+            courseFromRepo.Abbreviation = courseDto.Abbreviation;
+            courseFromRepo.Color = courseDto.Color;
             _repo.Update(courseFromRepo);
             if(await _repo.SaveAll())
             return NoContent();
@@ -560,9 +562,9 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPost("AddCourse")]
-        public async Task<IActionResult> AddCourse([FromBody]NewCourseDto newCourseDto)
+        public async Task<IActionResult> AddCourse([FromBody]CourseDto newCourseDto)
         {
-            var course = new Course{Name = newCourseDto.name, Abbreviation=newCourseDto.abbreviation};
+            var course = new Course{Name = newCourseDto.Name, Abbreviation=newCourseDto.Abbreviation,Color = newCourseDto.Color};
             _repo.Add(course);
             // foreach (var item in courseDto.classLevelIds)
             // {
@@ -670,39 +672,14 @@ namespace EducNotes.API.Controllers
             var allCourses = await _context.Courses.OrderBy(c => c.Name).ToListAsync();
             foreach (var cours in allCourses)
             {
-                var c = new CoursesDetailsDto{Id=cours.Id,Name= cours.Name};
+                var c = new CoursesDetailsDto{Id=cours.Id,Name= cours.Name, Abbreviation = cours.Abbreviation , Color = cours.Color};
                     c.TeachersNumber = await _context.ClassCourses.Where(a=>a.CourseId == cours.Id && a.TeacherId != null).Distinct().CountAsync();
                     List<int?> classIds= await _context.ClassCourses.Where(a=>a.CourseId == cours.Id).Select(a=>a.ClassId).ToListAsync();
                     c.ClassesNumber = classIds.Count();
                     c.StudentsNumber = await _context.Users.Where(a=> classIds.Contains(Convert.ToInt32(a.ClassId))).CountAsync();
                     data.Add(c);
             }
-            // var allCourses = await _context.Courses.OrderBy(c => c.Name).ToListAsync();
-            // foreach (var item in allCourses)
-            // {
-            //     var cc = new List<Class>();
-            //     cc = await _context.ClassCourses.Include(c => c.Course).Where(c => c.CourseId == item.Id).Select(c => c.Class).ToListAsync();
-            //     var tt = new List<UserForListDto>();
-            //     var teachers = _context.CourseUsers.Include(c => c.Teacher).ThenInclude(t => t.Photos).Where(c => c.CourseId == item.Id);
-
-            //     foreach (var t in teachers)
-            //     {
-            //         tt.Add(_mapper.Map<UserForListDto>(t.Teacher));
-            //     }
-            //     int total = 0;
-            //     foreach (var i in cc)
-            //     {
-            //         total += _context.Users.Where(c => c.ClassId == i.Id).Count();
-            //     }
-
-            //     data.Add(new CoursesDetailsDto
-            //     {
-            //         Course = item,
-            //         Classes = cc,
-            //         StudentsNumber = total,
-            //         Teachers = tt
-            //     });
-            //}
+            
             return Ok(data);
         }
 
@@ -732,14 +709,7 @@ namespace EducNotes.API.Controllers
                                 var newClass = new Class { Name = levelName + " " + i, ClassLevelId = model.LevelId,
                                  Active = 1,ClassTypeId = model.classTypeId,MaxStudent = model.maxStudent };
                                 await _context.Classes.AddAsync(newClass);
-                                // foreach (var item in model.CourseIds)
-                                // {
-                                //     await _context.ClassCourses.AddAsync(new ClassCourse
-                                //     {
-                                //         ClassId = newClass.Id,
-                                //         CourseId = item,
-                                //     });
-                                // }
+                   
                                 compteur++;
                             }
                         }
@@ -752,29 +722,13 @@ namespace EducNotes.API.Controllers
                             var newClass = new Class { Name = levelName + " " + i, ClassLevelId = model.LevelId, Active = 1,
                             ClassTypeId = model.classTypeId,MaxStudent = model.maxStudent };
                             await _context.Classes.AddAsync(newClass);
-                            // foreach (var item in model.CourseIds)
-                            // {
-                            //     await _context.ClassCourses.AddAsync(new ClassCourse
-                            //     {
-                            //         ClassId = newClass.Id,
-                            //         CourseId = item,
-                            //     });
-                            // }
-                        }
+                          }
                     }
                 }
                 else
                 {
                     var newClass = new Class { Name = model.Name, ClassLevelId = model.LevelId,MaxStudent = model.maxStudent, Active = 1,ClassTypeId = model.classTypeId };
                     await _context.Classes.AddAsync(newClass);
-                    // foreach (var item in model.CourseIds)
-                    // {
-                    //     await _context.ClassCourses.AddAsync(new ClassCourse
-                    //     {
-                    //         ClassId = newClass.Id,
-                    //         CourseId = item,
-                    //     });
-                    // }
                 }
                 await _context.SaveChangesAsync();
                 return Ok();
@@ -793,17 +747,7 @@ namespace EducNotes.API.Controllers
             var teachers = await _context.Users.Include(p => p.Photos).Where(u => u.UserTypeId == teacherTypeId)
             .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
 
-            // var teacherCouses = await _context.TeacherCourse.ToListAsync();
-
-            // var classCourses = await _context.ClassCourses.ToListAsync();
-            
-            // var classCourses =await  _context.ClassCourses
-            //                             .Include(t => t.Teacher)
-            //                             .Include(c => c.Class)
-            //                             .Include(c => c.Course)
-            //                             .ToListAsync();
-            
-           var teachersToReturn = new List<TeacherForListDto>();
+            var teachersToReturn = new List<TeacherForListDto>();
            foreach (var teacher in teachers)
            {
                 var tdetails = new TeacherForListDto();
@@ -936,6 +880,8 @@ namespace EducNotes.API.Controllers
 
             return Ok(res);
         }
+
+       
 
     }
 }

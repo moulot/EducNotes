@@ -4,6 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from 'src/app/_services/admin.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { ClassService } from 'src/app/_services/class.service';
+import { Course } from 'src/app/_models/course';
+import * as XLSX from 'xlsx';
+
 
 @Component({
   selector: 'app-courses-panel',
@@ -16,7 +19,10 @@ export class CoursesPanelComponent implements OnInit {
     private router: Router, private alertify: AlertifyService, private classService: ClassService) {}
 
  courses: any[];
- addNew = false;
+ course: Course;
+ show = 'all';
+ willDownload = false;
+
 ngOnInit() {
     this.route.data.subscribe(data => {
        this.courses = data.courses;
@@ -30,14 +36,19 @@ ngOnInit() {
       });
     }
     newCourse() {
-      this.addNew = !this.addNew;
+      this.show = 'add';
+    }
+
+    edit(course: Course) {
+      this.course = course;
+      this.show = 'edit';
     }
 
     resultMode(val: boolean) {
       if (val) {
        this.getCourses();
       }
-      this.addNew = !this.addNew;
+      this.show = 'all';
     }
 
 }
