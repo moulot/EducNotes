@@ -153,6 +153,7 @@ import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { ClassResolver } from './_resolvers/class-resolver';
 import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-schedule.component';
+import { SharedComponentsModule } from './shared/components/shared-components.module';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -300,8 +301,8 @@ export function tokenGetter() {
       SharedPipesModule,
       PerfectScrollbarModule,
       NgxEchartsModule,
-    ColorPickerModule,
-
+      ColorPickerModule,
+      SharedComponentsModule
    ],
    providers: [
       AuthService,

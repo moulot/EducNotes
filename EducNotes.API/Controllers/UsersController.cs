@@ -374,17 +374,27 @@ namespace EducNotes.API.Controllers
         [HttpGet("{teacherId}/Courses")]
         public async Task<IActionResult> GetTeacherCourses(int teacherId)
         {
-            var courses = await (from cu in _context.TeacherCourses
-                                    where cu.Teacher.Id == teacherId
-                                    select new{
-                                        TeacherId = cu.TeacherId,
-                                        TeacherName = cu.Teacher.FirstName + ' ' + cu.Teacher.LastName,
-                                        CourseId = cu.CourseId,
-                                        CourseName = cu.Course.Name
-                                    }).OrderBy(o => o.CourseName).ToListAsync();
+            var courses = await _context.TeacherCourses
+                                    .Where(c => c.TeacherId == teacherId)
+                                    .Select(s => s.Course).ToListAsync();
 
             return Ok(courses);
         }
+
+        // [HttpGet("{teacherId}/Courses")]
+        // public async Task<IActionResult> GetTeacherCourses(int teacherId)
+        // {
+        //     var courses = await (from cu in _context.TeacherCourses
+        //                             where cu.Teacher.Id == teacherId
+        //                             select new{
+        //                                 TeacherId = cu.TeacherId,
+        //                                 TeacherName = cu.Teacher.FirstName + ' ' + cu.Teacher.LastName,
+        //                                 CourseId = cu.CourseId,
+        //                                 CourseName = cu.Course.Name
+        //                             }).OrderBy(o => o.CourseName).ToListAsync();
+
+        //     return Ok(courses);
+        // }
         
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, UserForUpdateDto userForUpdateDto)

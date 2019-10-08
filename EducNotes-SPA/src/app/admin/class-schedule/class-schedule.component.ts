@@ -1,11 +1,13 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { ActivatedRoute } from '@angular/router';
-import { ClassLevel } from 'src/app/_models/classLevel';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Class } from 'src/app/_models/class';
 import { Course } from 'src/app/_models/course';
-import { FormBuilder, Validators, FormGroup, FormArray } from '@angular/forms';
+import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { Schedule } from 'src/app/_models/schedule';
+import { User } from 'src/app/_models/user';
+import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-class-schedule',
@@ -18,7 +20,8 @@ export class ClassScheduleComponent implements OnInit {
   courseId: number;
   day: number;
   classes: Class[];
-  classCourses: Course[];
+  courses: Course[];
+  teachers: User[];
   scheduleItems: any;
   scheduleForm: FormGroup;
   dayItems = [];
@@ -34,72 +37,224 @@ export class ClassScheduleComponent implements OnInit {
   satCourses = [];
   sunCourses = [];
   timeMask = [/\d/, /\d/, ':', /\d/, /\d/];
+  agendaItems: Schedule[] = [];
 
   constructor(private classService: ClassService, public alertify: AlertifyService,
-    private route: ActivatedRoute, private fb: FormBuilder) { }
+    private fb: FormBuilder, private userService: UserService, router: Router) { }
 
   ngOnInit() {
     this.createScheduleForm();
-    // this.setItemLines();
     this.getClasses();
   }
 
   createScheduleForm() {
     this.scheduleForm = this.fb.group({
       aclass: [null, Validators.required],
+      teacher: [null, Validators.required],
       course: [null, Validators.required],
-      // itemLines: this.fb.array([])
+      // itemLines: this.fb.array([]),
       item1: this.fb.group({
-        day1: [null, Validators.required],
-        hourStart1: ['', [Validators.required, Validators.minLength(4)]],
-        hourEnd1: ['', [Validators.required, Validators.minLength(4)]]
-      }),
+        day1: [null],
+        hourStart1: [''],
+        hourEnd1: ['']
+      }, {validator: this.item1Validator}),
       item2: this.fb.group({
-        day2: [null, Validators.required],
-        hourStart2: ['', [Validators.required, Validators.minLength(4)]],
-        hourEnd2: ['', [Validators.required, Validators.minLength(4)]]
-      }),
+        day2: [null],
+        hourStart2: [''],
+        hourEnd2: ['']
+      }, {validator: this.item2Validator}),
       item3: this.fb.group({
-        day3: [null, Validators.required],
-        hourStart3: ['', [Validators.required, Validators.minLength(4)]],
-        hourEnd3: ['', [Validators.required, Validators.minLength(4)]]
-      }),
+        day3: [null],
+        hourStart3: [''],
+        hourEnd3: ['']
+      }, {validator: this.item3Validator}),
       item4: this.fb.group({
-        day4: [null, Validators.required],
-        hourStart4: ['', [Validators.required, Validators.minLength(4)]],
-        hourEnd4: ['', [Validators.required, Validators.minLength(4)]]
-      }),
+        day4: [null],
+        hourStart4: [''],
+        hourEnd4: ['']
+      }, {validator: this.item4Validator}),
       item5: this.fb.group({
-        day5: [null, Validators.required],
-        hourStart5: ['', [Validators.required, Validators.minLength(4)]],
-        hourEnd5: ['', [Validators.required, Validators.minLength(4)]]
-      }),
+        day5: [null],
+        hourStart5: [''],
+        hourEnd5: ['']
+      }, {validator: this.item5Validator}),
       item6: this.fb.group({
-        day6: [null, Validators.required],
-        hourStart6: ['', [Validators.required, Validators.minLength(4)]],
-        hourEnd6: ['', [Validators.required, Validators.minLength(4)]]
-      }),
-    });
+        day6: [null],
+        hourStart6: [''],
+        hourEnd6: ['']
+      }, {validator: this.item6Validator})
+    }, {validator: this.formValidator});
   }
 
-  setItemLines() {
+  formValidator(g: FormGroup) {
+    const form1IsValid = g.controls['item1'].valid;
+    const form2IsValid = g.controls['item2'].valid;
+    const form3IsValid = g.controls['item3'].valid;
+    const form4IsValid = g.controls['item4'].valid;
+    const form5IsValid = g.controls['item5'].valid;
+    const form6IsValid = g.controls['item6'].valid;
 
-    console.log('in setItemLines');
-    const items = this.scheduleForm.controls['itemLines'] as FormArray;
-
-    for (let i = 0; i < this.weekDays.length; i++) {
-      items.push(this.fb.group({
-        day: [null, Validators.required],
-        hourStart: ['', [Validators.required, Validators.minLength(4)]],
-        hourEnd: ['', [Validators.required, Validators.minLength(4)]]
-      }));
+    if (!form1IsValid || !form2IsValid || !form3IsValid || !form4IsValid || !form5IsValid || !form6IsValid) {
+      return {'formNOK': true};
     }
 
-    console.log(items.value);
+    return null;
+  }
+
+  item1Validator(g: FormGroup) {
+    // line 1
+    const day1 = g.get('day1').value;
+    const hourStart1 = g.get('hourStart1').value;
+    const hourEnd1 = g.get('hourEnd1').value;
+    if (day1 !== null || hourStart1.length > 0 || hourEnd1.length > 0) {
+      const typedHS1 = hourStart1.replace('_', '');
+      const typedHE1 = hourEnd1.replace('_', '');
+      if (day1 !== null && typedHS1.length > 1 && typedHE1.length > 1) {
+        if (typedHS1.length !== 5 || typedHE1.length !== 5) {
+          console.log(typedHS1 + '-' + typedHE1);
+          return {'line1DatesNOK': true};
+        } else {
+          return null;
+        }
+      } else {
+        return {'line1NOK': true};
+      }
+    }
+  }
+
+  item2Validator(g: FormGroup) {
+    // line 2
+    const day2 = g.get('day2').value;
+    const hourStart2 = g.get('hourStart2').value;
+    const hourEnd2 = g.get('hourEnd2').value;
+    if (day2 !== null || hourStart2.length > 0 || hourEnd2.length > 0) {
+      const typedHS2 = hourStart2.replace('_', '');
+      const typedHE2 = hourEnd2.replace('_', '');
+      if (day2 !== null && typedHS2.length > 1 && typedHE2.length > 1) {
+        if (typedHS2.length !== 5 || typedHE2.length !== 5) {
+          console.log(typedHS2 + '-' + typedHE2);
+          return {'line2DatesNOK': true};
+        } else {
+          return null;
+        }
+      } else {
+        return {'line2NOK': true};
+      }
+    }
+
+  }
+
+  item3Validator(g: FormGroup) {
+    // line 3
+    const day3 = g.get('day3').value;
+    const hourStart3 = g.get('hourStart3').value;
+    const hourEnd3 = g.get('hourEnd3').value;
+    if (day3 !== null || hourStart3.length > 0 || hourEnd3.length > 0) {
+      if (day3 !== null && hourStart3.length > 0 && hourEnd3.length > 0) {
+        const typedHS3 = hourStart3.replace('_', '');
+        const typedHE3 = hourEnd3.replace('_', '');
+        if (typedHS3.length !== 5 || typedHE3.length !== 5) {
+          console.log(typedHS3 + '-' + typedHE3);
+          return {'line3DatesNOK': true};
+        } else {
+          return null;
+        }
+      } else {
+        return {'line3NOK': true};
+      }
+    }
+  }
+
+  item4Validator(g: FormGroup) {
+    // line 4
+    const day4 = g.get('day4').value;
+    const hourStart4 = g.get('hourStart4').value;
+    const hourEnd4 = g.get('hourEnd4').value;
+    if (day4 !== null || hourStart4.length > 0 || hourEnd4.length > 0) {
+      if (day4 !== null && hourStart4.length > 0 && hourEnd4.length > 0) {
+        const typedHS4 = hourStart4.replace('_', '');
+        const typedHE4 = hourEnd4.replace('_', '');
+        if (typedHS4.length !== 5 || typedHE4.length !== 5) {
+          console.log(typedHS4 + '-' + typedHE4);
+          return {'line4DatesNOK': true};
+        } else {
+          return null;
+        }
+      } else {
+        return {'line4NOK': true};
+      }
+    }
+  }
+
+  item5Validator(g: FormGroup) {
+    // line 5
+    const day5 = g.get('day5').value;
+    const hourStart5 = g.get('hourStart5').value;
+    const hourEnd5 = g.get('hourEnd5').value;
+    if (day5 !== null || hourStart5.length > 0 || hourEnd5.length > 0) {
+      if (day5 !== null && hourStart5.length > 0 && hourEnd5.length > 0) {
+        const typedHS5 = hourStart5.replace('_', '');
+        const typedHE5 = hourEnd5.replace('_', '');
+        if (typedHS5.length !== 5 || typedHE5.length !== 5) {
+          console.log(typedHS5 + '-' + typedHE5);
+          return {'line5DatesNOK': true};
+        } else {
+          return null;
+        }
+      } else {
+        return {'line5NOK': true};
+      }
+    }
+  }
+
+  item6Validator(g: FormGroup) {
+    // line 6
+    const day6 = g.get('day6').value;
+    const hourStart6 = g.get('hourStart6').value;
+    const hourEnd6 = g.get('hourEnd6').value;
+    if (day6 !== null || hourStart6.length > 0 || hourEnd6.length > 0) {
+      if (day6 !== null && hourStart6.length > 0 && hourEnd6.length > 0) {
+        const typedHS6 = hourStart6.replace('_', '');
+        const typedHE6 = hourEnd6.replace('_', '');
+        if (typedHS6.length !== 5 || typedHE6.length !== 5) {
+          console.log(typedHS6 + '-' + typedHE6);
+          return {'line6DatesNOK': true};
+        } else {
+          return null;
+        }
+      } else {
+        return {'line6NOK': true};
+      }
+    }
   }
 
   saveScheduleItem() {
-    console.log(this.scheduleForm.value);
+    for (let i = 1; i <= 6; i++) {
+      // is the schedule item line empty?
+      if (this.scheduleForm.controls['item' + i].get('day' + i).value !== null) {
+        const sch = <Schedule>{};
+        sch.classId = this.scheduleForm.value.aclass;
+        sch.teacherId = this.scheduleForm.value.teacher;
+        sch.courseId = this.scheduleForm.value.course;
+        sch.day = this.scheduleForm.controls['item' + i].get('day' + i).value;
+        const hStart = this.scheduleForm.controls['item' + i].get('hourStart' + i).value.split(':');
+        const hEnd = this.scheduleForm.controls['item' + i].get('hourEnd' + i).value.split(':');
+        const hourStart = new Date(2019, 1, 1, hStart[0], hStart[1]);
+        const hourEnd = new Date(2019, 1, 1, hEnd[0], hEnd[1]);
+        sch.startHourMin = hourStart;
+        sch.endHourMin = hourEnd;
+        // console.log(sch);
+        this.agendaItems = [...this.agendaItems, sch];
+        }
+    }
+    // console.log(this.agendaItems);
+    this.classService.saveSchedules(this.agendaItems).subscribe(() => {
+      this.alertify.successBar('données de l\'emploi du temps enregistrés');
+      route
+    }, error => {
+      this.alertify.errorBar(error);
+    });
+
   }
 
   getClasses() {
@@ -110,15 +265,32 @@ export class ClassScheduleComponent implements OnInit {
     });
   }
 
-  getClassCourses(classId) {
-    this.classService.getClassCourses(classId).subscribe((courses: Course[]) => {
-      this.classCourses = courses;
+  onClassChanged() {
+    const classId = this.scheduleForm.value.aclass;
+    this.getClassTeachers(classId);
+  }
+
+  onTeacherChanged() {
+    const teacherId = this.scheduleForm.value.teacher;
+    this.getTeacherCourses(teacherId);
+  }
+
+  getTeacherCourses(teacherId) {
+    // console.log('tch id: ' + teacherId);
+    this.userService.getTeacherCourses(teacherId).subscribe((courses: Course[]) => {
+      this.courses = courses;
+      console.log(this.courses);
+    }, error => {
+      this.alertify.error(error);
     });
   }
 
-  onClassChanged() {
-    const classId = this.scheduleForm.value.aclass; // this.classId;
-    this.getClassCourses(classId);
+  getClassTeachers(classId) {
+    this.classService.getClassTeachers(classId).subscribe((teachers: User[]) => {
+      this.teachers = teachers;
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
   loadWeekSchedule(classId) {

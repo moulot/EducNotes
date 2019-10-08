@@ -155,11 +155,15 @@ namespace EducNotes.API.Controllers
            return BadRequest("Aucun emploi du temps trouvé");            
         }
 
-        [HttpGet("{classId}/GetClassTeachers")]
+        [HttpGet("{classId}/ClassTeachers")]
         public async Task<IActionResult> GetClassTeachers(int classId)
         {
-            var teachersFromRepo = await _repo.GetClassTeachers(classId);
-            var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(teachersFromRepo);
+            var teachers = await _context.ClassCourses
+                                    .Where(c => c.ClassId == classId)
+                                    .Select(s => s.Teacher).Distinct().ToListAsync();
+
+
+            var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(teachers);
 
             return Ok(usersToReturn);
         }
@@ -435,6 +439,20 @@ namespace EducNotes.API.Controllers
                 return Ok(emptyAgendaItem);
             }
             
+        }
+
+        [HttpPut("saveSchedules")]
+        public async Task<IActionResult> saveSchedules([FromBody]Schedule[] schedules)
+        {
+            foreach (var sch in schedules)
+            {
+                _repo.Add(sch);
+            }
+
+            if(await _repo.SaveAll())
+                return NoContent();
+
+            return BadRequest("problème d'enregistrement des données");
         }
 
         [HttpPut("SaveAgenda")]

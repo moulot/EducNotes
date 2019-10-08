@@ -14,9 +14,14 @@
             <nz-option *ngFor="let item of classes" nzLabel="classe {{item.name}}" nzValue="{{item.id}}"></nz-option>
           </nz-select>
 
+          <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="enseignant" id="teacher" name="teacher"
+            style="width: 175px" formControlName="teacher" (ngModelChange)="onTeacherChanged()">
+            <nz-option *ngFor="let item of teachers" nzLabel="{{item.lastName}} {{item.firstName}}" nzValue="{{item.id}}"></nz-option>
+          </nz-select>
+
           <nz-select nzAllowClear nzShowSearch nzPlaceHolder="cours" id="course" name="course"
             style="width: 175px" formControlName="course">
-            <nz-option *ngFor="let item of classCourses" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
+            <nz-option *ngFor="let item of courses" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
           </nz-select>
 
           <div class="mb-3" style="border-top: 1px solid #cccccc"></div>
@@ -34,6 +39,13 @@
 
             <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
               formControlName="hourEnd1" id="hourEnd1" [textMask]="{mask: timeMask}">
+
+            <div class="text-danger text-12" *ngIf="scheduleForm.controls['item1'].hasError('line1NOK')">
+              ligne 1. tous les champs doivent être renseignés.
+            </div>
+            <div class="text-danger text-12" *ngIf="scheduleForm.controls['item1'].hasError('line1DatesNOK')">
+              ligne 1. les heures de cours sont au format : hh:mm
+            </div>
           </div>
 
           <div formGroupName="item2" class="mb-2">
@@ -47,7 +59,14 @@
 
             <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
               formControlName="hourEnd2" id="hourEnd2" [textMask]="{mask: timeMask}">
-          </div>
+
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item2'].hasError('line2NOK')">
+                ligne 2. tous les champs doivent être renseignés.
+              </div>
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item2'].hasError('line2DatesNOK')">
+                ligne 2. les heures de cours sont au format : hh:mm
+              </div>
+            </div>
           
           <div formGroupName="item3" class="mb-2">
             <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="jour du cours" id="day3" name="day3"
@@ -60,7 +79,14 @@
 
             <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
               formControlName="hourEnd3" id="hourEnd3" [textMask]="{mask: timeMask}">
-          </div>
+
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item3'].hasError('line3NOK')">
+                ligne 3. tous les champs doivent être renseignés.
+              </div>
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item3'].hasError('line3DatesNOK')">
+                ligne 3. les heures de cours sont au format : hh:mm
+              </div>
+            </div>
             
           <div formGroupName="item4" class="mb-2">
             <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="jour du cours" id="day4" name="day4"
@@ -73,7 +99,14 @@
 
             <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
               formControlName="hourEnd4" id="hourEnd4" [textMask]="{mask: timeMask}">
-          </div>
+
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item4'].hasError('line4NOK')">
+                ligne 4. tous les champs doivent être renseignés.
+              </div>
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item4'].hasError('line4DatesNOK')">
+                ligne 4. les heures de cours sont au format : hh:mm
+              </div>
+            </div>
               
           <div formGroupName="item5" class="mb-2">
             <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="jour du cours" id="day5" name="day5"
@@ -86,7 +119,14 @@
 
             <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
               formControlName="hourEnd5" id="hourEnd5" [textMask]="{mask: timeMask}">
-          </div>
+
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item5'].hasError('line5NOK')">
+                ligne 5. tous les champs doivent être renseignés.
+              </div>
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item5'].hasError('line5DatesNOK')">
+                ligne 5. les heures de cours sont au format : hh:mm
+              </div>
+            </div>
                 
           <div formGroupName="item6">
             <nz-select class="mr-2" nzAllowClear nzShowSearch nzPlaceHolder="jour du cours" id="day6" name="day6"
@@ -99,7 +139,14 @@
 
             <input nz-input class="mr-2" style="width: 125px" placeholder="Heure fin"
               formControlName="hourEnd6" id="hourEnd6" [textMask]="{mask: timeMask}">
-          </div>
+
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item6'].hasError('line6NOK')">
+                ligne 6. tous les champs doivent être renseignés.
+              </div>
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item6'].hasError('line6DatesNOK')">
+                ligne 6. les heures de cours sont au format : hh:mm
+              </div>
+            </div>
 
           <btn-loading [formValid]="scheduleForm.valid" btnClass="btn-primary mt-2" [loading]="loading">valider</btn-loading>
       </div>
