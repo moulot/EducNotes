@@ -127,11 +127,10 @@
     
         <div ngbDropdownMenu aria-labelledby="userDropdown" class="header-account-dropdown">
             <div class="dropdown-header">
-                <i class="i-Lock-User mr-1"></i> {{user.firstName}} {{user.lastName}}
+                <i class="i-Lock-User mr-1"></i><label class="text-capitalize">{{user.firstName}} {{user.lastName}}</label>
             </div>
-            <button class="dropdown-item">Account settings</button>
-            <button class="dropdown-item">Billing history</button>
-            <button class="dropdown-item" (click)=" logout()">Sign out</button>
+            <button class="dropdown-item">mon compte</button>
+            <button class="dropdown-item" (click)=" logout()">se déconnecter</button>
         </div>
     </div>
     
