@@ -1,0 +1,254 @@
+<div class="row m-2">
+    <div class="col-md-12">
+      <form [formGroup]="scheduleForm" (ngSubmit)="saveScheduleItem()">
+
+        <div class="d-flex mb-2">
+          <h6 class="lead flex-grow-1" id="modal-title">ajout emploi du temps</h6>
+          <button type="button" class="close" aria-label="Close button"
+            (click)="activeModal.dismiss()" aria-describedby="modal-title">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="row">
+
+          <div class="form-group col-md-3 mb-1">
+            <label for="teacher">enseignant</label>
+            <select class="form-control mr-2 mb-0" id="teacher" name="teacher"
+              formControlName="teacher" (change)="onTeacherChanged()">
+              <option value=""></option>
+              <option *ngFor="let item of teachers" value="{{item.id}}">{{item.lastName}} {{item.firstName}}</option>
+            </select>
+          </div>
+
+          <div class="form-group col-md-3 mb-0">
+            <label for="course">cours</label>
+            <select class="form-control mb-0" id="course" name="course" formControlName="course">
+              <option value=""></option>
+              <option *ngFor="let item of courses" value="{{item.id}}">{{item.name}}</option>
+            </select>
+          </div>
+  
+        </div>
+
+        <div class="m-0" style="border-top: 1px solid #cccccc"></div>
+
+        <div formGroupName="item1" class="mb-0">
+
+          <div class="row">
+
+            <div class="form-group col-md-3 mb-0">
+              <label for="day1">jour du cours</label>
+              <select class="form-control mr-2 mb-0" id="day1" name="day1" formControlName="day1">
+                <!-- <option selected disabled>jour du cours</option> -->
+                <option *ngFor="let item of daySelect" value="{{item.value}}">{{item.name}}</option>
+              </select>
+            </div>
+
+            <div class="form-group col-md-3 mb-0">
+              <label for="hourStart1">heure début</label>
+              <input class="form-control mr-2 mb-0"
+                formControlName="hourStart1" id="hourStart1" [textMask]="{mask: timeMask}">
+              </div>
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="hourEnd1">heure fin</label>
+                <input class="form-control mr-2 mb-0" formControlName="hourEnd1" id="hourEnd1" [textMask]="{mask: timeMask}">
+              </div>
+  
+            <div class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item1'].hasError('line1NOK')">
+              ligne 1. tous les champs doivent être renseignés.
+            </div>
+
+            <div class="text-danger text-12" *ngIf="scheduleForm.controls['item1'].hasError('line1DatesNOK')">
+              ligne 1. les heures de cours sont au format : hh:mm
+            </div>
+
+          </div>
+
+        </div>
+    
+        <div formGroupName="item2" class="mb-0">
+
+            <div class="row">
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="day2">jour du cours</label>
+                <select class="form-control mr-2 mb-0" id="day2" name="day2" formControlName="day2">
+                  <option *ngFor="let item of daySelect" value="{{item.value}}">{{item.name}}</option>
+                </select>
+              </div>
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="hourStart2">heure début</label>
+                <input class="form-control mr-2 mb-0"
+                  formControlName="hourStart2" id="hourStart2" [textMask]="{mask: timeMask}">
+                </div>
+
+                <div class="form-group col-md-3 mb-0">
+                  <label for="hourEnd2">heure fin</label>
+                  <input class="form-control mr-2 mb-0"
+                    formControlName="hourEnd2" id="hourEnd2" [textMask]="{mask: timeMask}">
+                </div>
+    
+              <div class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item2'].hasError('line2NOK')">
+                ligne 2. tous les champs doivent être renseignés.
+              </div>
+
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item2'].hasError('line2DatesNOK')">
+                ligne 2. les heures de cours sont au format : hh:mm
+              </div>
+
+            </div>
+
+        </div>
+      
+        <div formGroupName="item3" class="mb-0">
+
+            <div class="row">
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="day3">jour du cours</label>
+                <select class="form-control mr-2 mb-0" id="day3" name="day3" formControlName="day3">
+                  <option *ngFor="let item of daySelect" value="{{item.value}}">{{item.name}}</option>
+                </select>
+              </div>
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="hourStart3">heure début</label>
+                <input class="form-control mr-2 mb-0"
+                  formControlName="hourStart3" id="hourStart3" [textMask]="{mask: timeMask}">
+                </div>
+
+                <div class="form-group col-md-3 mb-0">
+                  <label for="hourEnd3">heure fin</label>
+                  <input class="form-control mr-2 mb-0"
+                    formControlName="hourEnd3" id="hourEnd3" [textMask]="{mask: timeMask}">
+                </div>
+    
+              <div class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item3'].hasError('line3NOK')">
+                ligne 3. tous les champs doivent être renseignés.
+              </div>
+
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item3'].hasError('line3DatesNOK')">
+                ligne 3. les heures de cours sont au format : hh:mm
+              </div>
+
+            </div>
+
+        </div>
+      
+        <div formGroupName="item4" class="mb-0">
+
+            <div class="row">
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="day4">jour du cours</label>
+                <select class="form-control mr-2 mb-0" id="day4" name="day4" formControlName="day4">
+                  <option *ngFor="let item of daySelect" value="{{item.value}}">{{item.name}}</option>
+                </select>
+              </div>
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="hourStart4">heure début</label>
+                <input class="form-control mr-2 mb-0"
+                  formControlName="hourStart4" id="hourStart4" [textMask]="{mask: timeMask}">
+                </div>
+
+                <div class="form-group col-md-3 mb-0">
+                  <label for="hourEnd4">heure fin</label>
+                  <input class="form-control mr-2 mb-0"
+                    formControlName="hourEnd4" id="hourEnd4" [textMask]="{mask: timeMask}">
+                </div>
+    
+              <div class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item4'].hasError('line4NOK')">
+                ligne 4. tous les champs doivent être renseignés.
+              </div>
+
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item4'].hasError('line4DatesNOK')">
+                ligne 4. les heures de cours sont au format : hh:mm
+              </div>
+
+            </div>
+
+        </div>
+      
+        <div formGroupName="item5" class="mb-0">
+
+            <div class="row">
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="day5">jour du cours</label>
+                <select class="form-control mr-2 mb-0" id="day5" name="day5" formControlName="day5">
+                  <option *ngFor="let item of daySelect" value="{{item.value}}">{{item.name}}</option>
+                </select>
+              </div>
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="hourStart5">heure début</label>
+                <input class="form-control mr-2 mb-0"
+                  formControlName="hourStart5" id="hourStart5" [textMask]="{mask: timeMask}">
+                </div>
+
+                <div class="form-group col-md-3 mb-0">
+                  <label for="hourEnd5">heure fin</label>
+                  <input class="form-control mr-2 mb-0" formControlName="hourEnd5" id="hourEnd5" [textMask]="{mask: timeMask}">
+                </div>
+    
+              <div class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item5'].hasError('line5NOK')">
+                ligne 5. tous les champs doivent être renseignés.
+              </div>
+
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item5'].hasError('line5DatesNOK')">
+                ligne 5. les heures de cours sont au format : hh:mm
+              </div>
+
+            </div>
+
+        </div>
+      
+        <div formGroupName="item6" class="mb-0">
+
+            <div class="row">
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="day6">jour du cours</label>
+                <select class="form-control mr-2 mb-0" id="day6" name="day6" formControlName="day6">
+                  <option *ngFor="let item of daySelect" value="{{item.value}}">{{item.name}}</option>
+                </select>
+              </div>
+
+              <div class="form-group col-md-3 mb-0">
+                <label for="hourStart6">heure début</label>
+                <input class="form-control mr-2 mb-0"
+                  formControlName="hourStart6" id="hourStart6" [textMask]="{mask: timeMask}">
+                </div>
+
+                <div class="form-group col-md-3 mb-0">
+                  <label for="hourEnd6">heure fin</label>
+                  <input class="form-control mr-2 mb-0"
+                    formControlName="hourEnd6" id="hourEnd6" [textMask]="{mask: timeMask}">
+                </div>
+    
+              <div class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item6'].hasError('line6NOK')">
+                ligne 6. tous les champs doivent être renseignés.
+              </div>
+
+              <div class="text-danger text-12" *ngIf="scheduleForm.controls['item6'].hasError('line6DatesNOK')">
+                ligne 6. les heures de cours sont au format : hh:mm
+              </div>
+
+            </div>
+
+        </div>
+      
+        <div class="mt-2 mb-3" style="border-top: 1px solid #cccccc"></div>
+
+        <div class="float-right">
+          <button type="button" class="btn btn-outline-default mr-2" (click)="closeModal()" >Cancel</button>
+          <button type="submit" class="btn btn-outline-primary" >Ok</button>
+        </div>
+
+      </form>
+    </div>
+  </div>

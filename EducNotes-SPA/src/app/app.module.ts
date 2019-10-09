@@ -154,6 +154,7 @@ import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.co
 import { ClassResolver } from './_resolvers/class-resolver';
 import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-schedule.component';
 import { SharedComponentsModule } from './shared/components/shared-components.module';
+import { ModalScheduleComponent } from './admin/modal-schedule/modal-schedule.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -260,7 +261,8 @@ export function tokenGetter() {
       ClassLifeComponent,
       SchoolComponent,
       ClassScheduleComponent,
-      ClassdayScheduleComponent
+      ClassdayScheduleComponent,
+      ModalScheduleComponent
    ],
    imports: [
      FormWizardModule,
@@ -302,7 +304,7 @@ export function tokenGetter() {
       PerfectScrollbarModule,
       NgxEchartsModule,
       ColorPickerModule,
-      SharedComponentsModule
+      SharedComponentsModule,
    ],
    providers: [
       AuthService,
@@ -338,7 +340,8 @@ export function tokenGetter() {
    entryComponents: [
       RolesModalComponent,
       SkillsModalComponent,
-      AgendaModalComponent
+      AgendaModalComponent,
+      ModalScheduleComponent
    ],
    bootstrap: [
       AppComponent

@@ -223,6 +223,7 @@ namespace EducNotes.API.Data
             return await _context.Schedules
                     .Include(i => i.Class)
                     .Include(i => i.Course)
+                    .Include(i => i.Teacher)
                     .Where(s => s.ClassId == classId)
                     .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin).ToListAsync();
         }
