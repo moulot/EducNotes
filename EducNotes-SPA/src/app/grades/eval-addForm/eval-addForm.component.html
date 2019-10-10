@@ -14,7 +14,7 @@
             <div class="col-md-4">
               <nz-select #classSelect class="sel mr-2" nzShowSearch nzPlaceHolder="classe"
                 formControlName="newaclass" nzAllowClear>
-                <nz-option *ngFor="let item of teacherClasses" nzLabel="{{item.className}}" nzValue="{{item.classId}}"></nz-option>
+                <nz-option *ngFor="let item of teacherClasses" nzLabel="classe {{item.className}}" nzValue="{{item.classId}}"></nz-option>
               </nz-select>
               <div *ngIf="newEvalForm.get('newaclass').errors && newEvalForm.get('newaclass').touched"
                 class="text-danger mr-2" style="width: 250px">saisir la classe svp</div>
@@ -22,7 +22,7 @@
             <div class="col-md-4 mt-3 mt-md-0">
               <nz-select #courseSelect class="sel mr-2" nzShowSearch nzAllowClear
                 formControlName="newcourse" nzPlaceHolder="matière">
-                <nz-option *ngFor="let item of teacherCourses" nzLabel="{{item.courseName}}" nzValue="{{item.courseId}}"></nz-option>
+                <nz-option *ngFor="let item of teacherCourses" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
               </nz-select>
               <div *ngIf="newEvalForm.get('newcourse').errors && newEvalForm.get('newcourse').touched"
                 class="text-danger" style="width: 250px">saisir le cours svp</div>

@@ -6,6 +6,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute } from '@angular/router';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
 import { Class } from 'src/app/_models/class';
+import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -23,17 +24,40 @@ export class StudentDashboardComponent implements OnInit {
   weekDays = [];
   firstDay: Date;
   toNbDays = 7;
+  userCourses: any;
+  studentAvg: any;
+  userIdFromRoute: any;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
-    private evalService: EvaluationService) { }
+    private evalService: EvaluationService, private userService: UserService) { }
 
   ngOnInit() {
-    this.student = this.authService.currentUser;
-    this.getClass(this.student.classId);
-    this.getAgenda(this.student.classId, this.toNbDays);
-    this.getEvalsToCome(this.student.classId);
+
+    this.route.params.subscribe(params => {
+      this.userIdFromRoute = params['id'];
+    });
+
+    const loggedUser = this.authService.currentUser;
+
+    if (this.userIdFromRoute !== this.authService.currentUser.id) {
+      this.getUser(this.userIdFromRoute);
+    } else {
+      this.student = this.authService.currentUser;
+    }
 }
+
+  getUser(id) {
+    this.userService.getUser(id).subscribe((user: User) => {
+      this.student = user;
+
+      this.getClass(this.student.classId);
+      this.getAgenda(this.student.classId, this.toNbDays);
+      this.getEvalsToCome(this.student.classId);
+      }, error => {
+      this.alertify.error(error);
+    });
+  }
 
   getAgenda(classId, toNbDays) {
 
@@ -62,6 +86,16 @@ export class StudentDashboardComponent implements OnInit {
   getClass(classId) {
     this.classService.getClass(classId).subscribe(data => {
       this.classRoom = data;
+      this.getCoursesWithEvals(this.student.id, this.classRoom.id);
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getCoursesWithEvals(studentId, classId) {
+    this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
+      this.userCourses = data.coursesWithEvals;
+      this.studentAvg = data.studentAvg;
     }, error => {
       this.alertify.error(error);
     });

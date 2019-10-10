@@ -155,6 +155,7 @@ import { ClassResolver } from './_resolvers/class-resolver';
 import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-schedule.component';
 import { SharedComponentsModule } from './shared/components/shared-components.module';
 import { ModalScheduleComponent } from './admin/modal-schedule/modal-schedule.component';
+import { StudentResolver } from './_resolvers/student-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -333,6 +334,7 @@ export function tokenGetter() {
       CallSheetResolver,
       SchoolResolver,
       ClassResolver,
+      StudentResolver,
       {provide: NZ_I18N, useValue: fr_FR}
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

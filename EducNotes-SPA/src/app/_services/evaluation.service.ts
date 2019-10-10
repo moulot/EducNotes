@@ -46,6 +46,10 @@ export class EvaluationService {
     return this.http.get(this.baseUrl + 'evaluation/class/' + classId + '/course/' + courseId + '/period/' + periodId);
   }
 
+  getUserCoursesWithEvals(classId, userId) {
+    return this.http.get(this.baseUrl + 'evaluation/class/' + classId + '/CoursesWithEvals/' + userId);
+  }
+
   getClassEvalsToCome(classId) {
     return this.http.get(this.baseUrl + 'evaluation/class/' + classId + '/evalsToCome');
   }

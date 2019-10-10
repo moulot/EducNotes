@@ -53,6 +53,7 @@ import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
 import { ClassResolver } from './_resolvers/class-resolver';
+import { StudentResolver } from './_resolvers/student-resolver';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
@@ -99,7 +100,7 @@ export const appRoutes: Routes = [
             {path: 'teachers', component: TeacherManagementComponent, resolve: {teachers: TeacherManagementResolver}},
             {path: 'preregister', component: PreRegisterComponent},
             {path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve : {classes: LevelClassesResolver}},
-            {path: 'studentGrades', component: GradeStudentComponent, resolve: {student: UserHomeResolver}},
+            {path: 'studentGrades/:id', component: GradeStudentComponent, resolve: {student: StudentResolver}},
             {path: 'school', component: SchoolComponent, resolve : {school: SchoolResolver}}
         ]
     },

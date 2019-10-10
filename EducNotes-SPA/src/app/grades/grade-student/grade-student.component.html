@@ -1,46 +1,68 @@
-<div class="row">
-  <div class="col-lg-6 col-md-12">
-    <!-- CARD ICON -->
-  <div class="row">
-      <div class="col-lg-4 col-md-6 col-sm-6">
-        <div class="card card-icon mb-4">
-          <div class="card-body text-center">
-            <!-- <i class="i-Share-on-Cloud"></i> -->
-            <p class="text-muted mt-2 mb-2">Math</p>
-            <p class="text-primary text-24 line-height-1 m-0">12.5</p>
+<div class="row mb-2">
+
+  <div class="col-md-12 mb-1">
+    <p class="lead m-0">{{student?.firstName}} {{student?.lastName}} - classe {{classRoom?.name}}</p>
+  </div>
+
+  <div class="col-lg-8 col-md-12 mb-2">
+
+    <div class="row">
+
+      <div class="col-md-12">
+
+        <div class="card">
+            <div class="card-body">
+          
+              <div class="row">
+  
+                <div *ngFor="let course of userCourses" class="col-lg-2 col-md-6 col-sm-6">
+                  <div class="card mb-1" (click)="loadData(course)" style="cursor: pointer">
+                    <div class="card-body text-nowrap text-center">
+                      <p class="text-muted text-15 mt-2 mb-2">{{course.courseAbbrev}}</p>
+                      <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000" class="text-primary text-danger text-24 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                      <p *ngIf="course.userCourseAvg >= 10" class="text-primary text-success text-24 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                      <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-24 line-height-1 m-0">N/A</p>
+                    </div>
+                  </div>
+                </div>
+                        
+              </div>
+  
+            </div>
+          </div>
+      </div>
+
+
+      <div class="col-lg-12 col-md-12 mb-2">
+        <div class="card">
+          <div class="card-body p-0">
+            <h5 class="lead m-0 p-1">graphes des notes de l'élève - notes sur 20</h5>
+            <div echarts [options]="chartLineOption3" style="height: 150px"></div>
           </div>
         </div>
       </div>
-  
-      <div class="col-lg-4 col-md-6 col-sm-6">
-        <div class="card card-icon mb-4">
-          <div class="card-body text-center">
-            <!-- <i class="i-Add-User"></i> -->
-            <p class="text-muted mt-2 mb-2">Anglais</p>
-            <p class="text-primary text-24 line-height-1 m-0">13</p>
-          </div>
+      
+    </div>
+
+  </div>
+
+  <div class="col-lg-4 col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <p class="lead">détails des notes</p>
+        <div *ngFor="let grade of evalData; let i = index">
+          <p class="text-muted text-14 m-0">
+            {{grade.evalDate}}. {{grade.evalType}} (-){{grade.classGradeMin}} 
+            <label class="text-danger" *ngIf="aboveAvg[i] === false"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
+            <label class="text-success" *ngIf="aboveAvg[i] === true"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
+            (+){{grade.classGradeMax}}
+          </p>
         </div>
       </div>
-  
-      <div class="col-lg-4 col-md-6 col-sm-6">
-        <div class="card card-icon mb-4">
-          <div class="card-body text-center">
-            <!-- <i class="i-Money-2"></i> -->
-            <p class="text-muted mt-2 mb-2">Français</p>
-            <p class="text-primary text-24 line-height-1 m-0 text-danger">8.5</p>
-          </div>
-        </div>
-      </div>
-  
     </div>
   </div>
 
-  <div class="col-lg-6 col-md-12">
-    <div class="card mb-4">
-      <div class="card-body p-0">
-        <h5 class="card-title m-0 p-3">graphes des notes de l'élève</h5>
-        <div echarts [options]="chartLineOption3" style="height: 300px"></div>
-      </div>
-    </div>
-  </div>
+</div>
+
+<div class="row">
 </div>
