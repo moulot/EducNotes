@@ -1,7 +1,5 @@
 <div class="row m-2">
-   
- 
-  
+
   <div class="separator-breadcrumb border-top"></div>
   <div class="col-md-12" *ngIf="wait"  [@animate]="{value:'*',params:{delay: 300+'ms', y:'50px'}}">
       <ngb-alert class="alert-card text-center">
@@ -12,131 +10,126 @@
   <div class="col-md-12"  *ngIf="!wait">
     
     <form-wizard>
-      <wizard-step [title]="'INFO DU PERE'"  (onNext)="onStep1Next($event)">
-        
-          <div class="row m-2">
-              <div class="col-md-12">
-                  <div class="card mb-4">
-                      <div class="card-body">
-                          <div class="card-title mb-3">ENREGISTREMENT DU PERE</div>
-                          <form [formGroup]="fatherForm">
-                              <div class="row">
-                                <div class="form-group col-md-6 mb-3">
-                                  <label for="lastName">Nom</label>
-                                  <input type="text" class="form-control" id="lastName" name="lastName" placeholder="entrer le nom" formControlName="lastName">
-                                
-                                </div>
-                                <div class="form-group col-md-6 mb-3">
-                                  <label for="firstName">Prénom(s)</label>
-                                  <input type="text" class="form-control" id="firstName" name="firstName" placeholder="entrer le prénoms" formControlName="firstName">
-                                </div>
-                               
-                                <div class="form-group col-md-6">
-                                  <label for="phone">Contact principal</label>
-                                  <input class="form-control" id="phone"  formControlName="phoneNumber" name="phone" [textMask]="{mask: phoneMask}" 
-                                  placeholder="entrer le contact principal">
-                
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="phone">Second contact</label>
-                                    <input class="form-control" id="phone"  formControlName="secondPhoneNumber" name="sphone"  [textMask]="{mask: phoneMask}" placeholder="second contact">
-                
-                                  </div>
-                                  <div class="form-group col-md-6">
-                                    <label for="phone">Ville</label>
-                                    <select  class="form-control" placeholder="choisissez la ville"  formControlName="cityId" id="cityId" name="cityId" (change)="getFatherDistricts()">
-                                        <option *ngFor="let city of cities" value="{{city.id}}" >{{city.name}}</option>
-                                    </select>
-                                  </div>
-                                  <div class="form-group col-md-6">
-                                      <label for="phone">Commune ou quartier</label>
-                                      <select class="form-control"  placeholder="Choisir le quartier ou commune" formControlName="districtId" id="districtId" name="districtId">
-                                        <option *ngFor="let district of fatherDistricts" value="{{district.id}}">{{district.name}}</option>
-                                    </select>
-                  
-                                  </div>
-                                  <div class="form-group col-md-6">
-                                      <label for="exampleInputEmail1">Email</label>
-                                      <input  type="email" class="form-control" id="email" name="email"  formControlName="email"
-                                       aria-describedby="emailHelp" placeholder="entrer l'email">
-                                   </div>
+      <wizard-step [title]="'info du père'" (onNext)="onStep1Next($event)">
+
+        <div class="row m-2">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="card-title mb-3">ENREGISTREMENT DU PERE</div>
+                        <form [formGroup]="fatherForm">
+                            <div class="row">
+                              <div class="form-group col-md-6 mb-3">
+                                <label for="lastName">Nom</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="entrer le nom" formControlName="lastName">                                
+                              </div>
+                              <div class="form-group col-md-6 mb-3">
+                                <label for="firstName">Prénom(s)</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="entrer le prénoms" formControlName="firstName">
                               </div>
                               
-                            
-                            </form>
-                      </div>
-                  </div>
-                  </div>
-           </div>
+                              <div class="form-group col-md-6">
+                                <label for="phone">Contact principal</label>
+                                <input class="form-control" id="phone"  formControlName="phoneNumber" name="phone" [textMask]="{mask: phoneMask}" 
+                                placeholder="entrer le contact principal">
+                              </div>
+                              <div class="form-group col-md-6">
+                                <label for="phone">Second contact</label>
+                                <input class="form-control" id="phone"  formControlName="secondPhoneNumber" name="sphone"  [textMask]="{mask: phoneMask}" placeholder="second contact">
+                              </div>
+                                <div class="form-group col-md-6">
+                                  <label for="phone">Ville</label>
+                                  <select  class="form-control" placeholder="choisissez la ville"  formControlName="cityId" id="cityId" name="cityId" (change)="getFatherDistricts()">
+                                      <option *ngFor="let city of cities" value="{{city.id}}" >{{city.name}}</option>
+                                  </select>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="phone">Commune ou quartier</label>
+                                    <select class="form-control"  placeholder="Choisir le quartier ou commune" formControlName="districtId" id="districtId" name="districtId">
+                                      <option *ngFor="let district of fatherDistricts" value="{{district.id}}">{{district.name}}</option>
+                                  </select>
+                
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputEmail1">Email</label>
+                                    <input  type="email" class="form-control" id="email" name="email"  formControlName="email"
+                                      aria-describedby="emailHelp" placeholder="entrer l'email">
+                                  </div>
+                            </div>
+                          
+                          </form>
+                    </div>
+                </div>
+                </div>
+        </div>
            
       </wizard-step>
 
       <wizard-step [title]="'INFO DE LA MERE'" [isValid]="fatherForm.valid || motherForm.valid"  (onNext)="onStep2Next($event)">
-          <div class="row m-2">
-              <div class="col-md-12">
-                  <div class="card mb-4">
-                      <div class="card-body">
-                          <div class="card-title mb-3">ENREGISTREMENT DE LA MERE</div>
-                          <form [formGroup]="motherForm">
-                              <div class="row">
-                                <div class="form-group col-md-6 mb-3">
-                                  <label for="lastName">Nom</label>
-                                  <input type="text" class="form-control" id="lastName" name="lastName" placeholder="entrer nom" formControlName="lastName">
-                                
-                                </div>
-                                <div class="form-group col-md-6 mb-3">
-                                  <label for="firstName">Prénom(s)</label>
-                                  <input type="text" class="form-control" id="firstName" name="firstName" placeholder="entrer prénoms" formControlName="firstName">
-                                </div>
-                               
-                                <div class="form-group col-md-6">
-                                  <label for="phone">Contact principal</label>
-                                  <input class="form-control" id="phone"  formControlName="phoneNumber" name="phone"  [textMask]="{mask: phoneMask}"
-                                  placeholder="entrer le contact principal">
-                    
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="phone">Second contact</label>
-                                    <input class="form-control" id="phone"  formControlName="secondPhoneNumber" name="sphone"  [textMask]="{mask: phoneMask}"
-                                    placeholder="second contact">
-                    
-                                  </div>
-                                  <div class="form-group col-md-6">
-                                  <label class="switch switch-secondary">
-                                          <span>Meme localication que le père </span>
-                                          <input type="checkbox" formControlName="sameLocationWithFather" (change)="selectSameLacation($event)">
-                                          <span class="slider"></span>
-                                  </label> <br>
-
-                                    <label for="phone">Ville</label>
-                                    
-
-                                    <select  class="form-control" placeholder  formControlName="cityId" id="cityId" name="cityId" (change)="getMotherDistricts()">
-                                        <option *ngFor="let city of cities" value="{{city.id}}" >{{city.name}}</option>
-                                    </select>
-                                  </div>
-                                  <div class="form-group col-md-6">
-                                    <br>
-                                      <label for="phone">Commune ou quartier</label>
-                                      <select class="form-control"  placeholder="Choisir la quartier" formControlName="districtId" id="districtId" name="districtId">
-                                        <option *ngFor="let district of motherDistricts" value="{{district.id}}">{{district.name}}</option>
-                                    </select>
-                    
-                                  </div>
-                                  <div class="form-group col-md-6">
-                                      <label for="exampleInputEmail1">Email</label>
-                                      <input type="email" class="form-control" id="exampleInputEmail1" name="exampleInputEmail1"  formControlName="email" aria-describedby="emailHelp" placeholder="Entrer l'email"
-                                        >
-                                    </div>
+        <div class="row m-2">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="card-title mb-3">ENREGISTREMENT DE LA MERE</div>
+                        <form [formGroup]="motherForm">
+                            <div class="row">
+                              <div class="form-group col-md-6 mb-3">
+                                <label for="lastName">Nom</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="entrer nom" formControlName="lastName">
+                              
+                              </div>
+                              <div class="form-group col-md-6 mb-3">
+                                <label for="firstName">Prénom(s)</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="entrer prénoms" formControlName="firstName">
                               </div>
                               
+                              <div class="form-group col-md-6">
+                                <label for="phone">Contact principal</label>
+                                <input class="form-control" id="phone"  formControlName="phoneNumber" name="phone"  [textMask]="{mask: phoneMask}"
+                                placeholder="entrer le contact principal">
+                  
+                              </div>
+                              <div class="form-group col-md-6">
+                                  <label for="phone">Second contact</label>
+                                  <input class="form-control" id="phone"  formControlName="secondPhoneNumber" name="sphone"  [textMask]="{mask: phoneMask}"
+                                  placeholder="second contact">
+                  
+                                </div>
+                                <div class="form-group col-md-6">
+                                <label class="switch switch-secondary">
+                                        <span>Meme localication que le père </span>
+                                        <input type="checkbox" formControlName="sameLocationWithFather" (change)="selectSameLacation($event)">
+                                        <span class="slider"></span>
+                                </label> <br>
+
+                                  <label for="phone">Ville</label>
+                                  
+
+                                  <select  class="form-control" placeholder  formControlName="cityId" id="cityId" name="cityId" (change)="getMotherDistricts()">
+                                      <option *ngFor="let city of cities" value="{{city.id}}" >{{city.name}}</option>
+                                  </select>
+                                </div>
+                                <div class="form-group col-md-6">
+                                  <br>
+                                    <label for="phone">Commune ou quartier</label>
+                                    <select class="form-control"  placeholder="Choisir la quartier" formControlName="districtId" id="districtId" name="districtId">
+                                      <option *ngFor="let district of motherDistricts" value="{{district.id}}">{{district.name}}</option>
+                                  </select>
+                  
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputEmail1">Email</label>
+                                    <input type="email" class="form-control" id="exampleInputEmail1" name="exampleInputEmail1"  formControlName="email" aria-describedby="emailHelp" placeholder="Entrer l'email"
+                                      >
+                                  </div>
+                            </div>
                             
-                            </form>
-                      </div>
-                  </div>
-              </div>
-          </div>
-        
+                          
+                          </form>
+                    </div>
+                </div>
+            </div>
+        </div>
       </wizard-step>
 
       <wizard-step [title]="'ENREGISTREMENT ENFANT(S)'" (onNext)="onStep3Next($event)">
@@ -274,51 +267,48 @@
 
       <wizard-step [title]="'VERIFICATION'" [isValid]="errorMessage.length===0" (onComplete)="onComplete($event)">
         <div class="row" *ngFor="let error of errorMessage" class="mb-2">
-            <nz-alert nzType="error" nzShowIcon  nzMessage="{{error}}"
-          >
-          </nz-alert>
+          <nz-alert nzType="error" nzShowIcon  nzMessage="{{error}}"></nz-alert>
         </div>
       <div class="row">
-          <div class="col-md-6" *ngIf="children.length>0">
-            <div class="card mb-4">
-              <div class="card-body">
-                <div class="card-title">Enfants</div>
-                <div *ngFor="let item of children">
-                  <div class="d-flex align-items-center border-bottom-dotted-dim pb-3 mb-3">
-                    <img class="avatar-md rounded mr-3" src="../../../../assets/user.png" alt="">
-                    <div class="flex-grow-1">
-                      <h6 class="m-0"> {{item.lastName}} {{item.firstName}} </h6>
-                      <p class="m-0 text-small text-muted">Niveau:{{item.level}} &nbsp;&nbsp;  Date de naissance:  {{item.dateOfBirth|date:'dd-MM-yyyy'}}   </p> 
-                      <p class="m-0 text-small text-muted"> Email:  {{item.email}} &nbsp;&nbsp; Contact(s):  {{item.phoneNumber}}  {{item.secondPhoneNumber}} </p> 
-                    </div>
-                    
+        <div class="col-md-6" *ngIf="children.length>0">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="card-title">Enfants</div>
+              <div *ngFor="let item of children">
+                <div class="d-flex align-items-center border-bottom-dotted-dim pb-3 mb-3">
+                  <img class="avatar-md rounded mr-3" src="../../../../assets/user.png" alt="">
+                  <div class="flex-grow-1">
+                    <h6 class="m-0"> {{item.lastName}} {{item.firstName}} </h6>
+                    <p class="m-0 text-small text-muted">Niveau:{{item.level}} &nbsp;&nbsp;  Date de naissance:  {{item.dateOfBirth|date:'dd-MM-yyyy'}}   </p> 
+                    <p class="m-0 text-small text-muted"> Email:  {{item.email}} &nbsp;&nbsp; Contact(s):  {{item.phoneNumber}}  {{item.secondPhoneNumber}} </p> 
                   </div>
-                  </div>
-                
-              </div>
+                  
+                </div>
+                </div>
+              
             </div>
           </div>
+        </div>
 
-
-          <div class="col-md-6" *ngIf="parents.length>0">
-            <div class="card mb-4">
-              <div class="card-body">
-                <div class="card-title">Parents</div>
-                <div *ngFor="let item of parents">
-                  <div class="d-flex align-items-center border-bottom-dotted-dim pb-3 mb-3">
-                    <img class="avatar-md rounded mr-3" src="../../../../assets/user.png" alt="">
-                    <div class="flex-grow-1">
-                      <h6 class="m-0"> {{item.lastName}} {{item.firstName}} </h6>
-                      <!-- <p class="m-0 text-small text-muted">ville: {{item.city}} &nbsp;&nbsp;  Quartier:  {{item.district}}   </p>  -->
-                      <p class="m-0 text-small text-muted"> Email:  {{item.email}} &nbsp;&nbsp; Contact(s):  {{item.phoneNumber}}  {{item.secondPhoneNumber}} </p> 
-                    </div>
-                    
+        <div class="col-md-6" *ngIf="parents.length>0">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="card-title">Parents</div>
+              <div *ngFor="let item of parents">
+                <div class="d-flex align-items-center border-bottom-dotted-dim pb-3 mb-3">
+                  <img class="avatar-md rounded mr-3" src="../../../../assets/user.png" alt="">
+                  <div class="flex-grow-1">
+                    <h6 class="m-0"> {{item.lastName}} {{item.firstName}} </h6>
+                    <!-- <p class="m-0 text-small text-muted">ville: {{item.city}} &nbsp;&nbsp;  Quartier:  {{item.district}}   </p>  -->
+                    <p class="m-0 text-small text-muted"> Email:  {{item.email}} &nbsp;&nbsp; Contact(s):  {{item.phoneNumber}}  {{item.secondPhoneNumber}} </p> 
                   </div>
-                  </div>
-                
-              </div>
+                  
+                </div>
+                </div>
+              
             </div>
           </div>
+        </div>
       </div>
       
       </wizard-step>
@@ -326,6 +316,6 @@
       
   </div>
   
-  </div>
+</div>
 
  

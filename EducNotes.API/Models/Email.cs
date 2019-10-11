@@ -13,6 +13,7 @@ namespace EducNotes.API.Models
         public string FromAddress { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
+        public DateTime DateTimeToSend { get; set; }
         public byte StatusFlag { get; set; }
         public DateTime InsertDate { get; set; }
         public int InsertUserId { get; set; }

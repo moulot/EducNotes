@@ -54,6 +54,7 @@ import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.co
 import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
 import { ClassResolver } from './_resolvers/class-resolver';
 import { StudentResolver } from './_resolvers/student-resolver';
+import { CommComponent } from './admin/comm/comm.component';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
@@ -68,6 +69,7 @@ export const appRoutes: Routes = [
         canActivate: [AuthGuard],
         children: [
             {path: 'home', component: HomePanelComponent, resolve: {user: UserHomeResolver}},
+            {path: 'comm', component: CommComponent},
             {path: 'members', component: MemberListComponent, resolve: {users : MemberListResolver}},
             {path: 'members/:id', component: MemberDetailComponent, resolve: {user : MemberDetailResolver}},
             {path: 'member/edit', component: MemberEditComponent,

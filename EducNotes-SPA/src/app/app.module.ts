@@ -156,6 +156,7 @@ import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-sc
 import { SharedComponentsModule } from './shared/components/shared-components.module';
 import { ModalScheduleComponent } from './admin/modal-schedule/modal-schedule.component';
 import { StudentResolver } from './_resolvers/student-resolver';
+import { CommComponent } from './admin/comm/comm.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -263,7 +264,8 @@ export function tokenGetter() {
       SchoolComponent,
       ClassScheduleComponent,
       ClassdayScheduleComponent,
-      ModalScheduleComponent
+      ModalScheduleComponent,
+      CommComponent
    ],
    imports: [
      FormWizardModule,
