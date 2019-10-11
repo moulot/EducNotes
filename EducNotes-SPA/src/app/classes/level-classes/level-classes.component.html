@@ -36,7 +36,7 @@
               Option
             </ng-template>
             <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
-              <a href="{{value}}" class="btn btn-outline-primary btn-sm">details</a>
+              <a [routerLink]="['/studentsClass', value]" routerLinkActive="router-link-active"  class="btn btn-outline-primary btn-sm">details</a>
           </ng-template>
           </ngx-datatable-column>
           

@@ -37,6 +37,7 @@ export class TeacherManagementComponent implements OnInit {
  visible: boolean;
  affectaionVisible: boolean;
  submitText = 'enregistrer';
+ dateOfBirth: string;
 
   constructor(private adminService: AdminService, private fb: FormBuilder,
      private classService: ClassService, private router: Router, private alertify: AlertifyService,
@@ -70,6 +71,8 @@ export class TeacherManagementComponent implements OnInit {
       courseIds =  [...courseIds, element];
     }
     params.courseIds = courseIds;
+    this.dateOfBirth = params.dateOfBirth.toString();
+   // params.dateOfBirth = this.dateOfBirth
    this.teacher = params;
 
    this.show = 'edit';

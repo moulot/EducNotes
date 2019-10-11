@@ -747,6 +747,9 @@ namespace EducNotes.API.Controllers
             var teachers = await _context.Users.Include(p => p.Photos).Where(u => u.UserTypeId == teacherTypeId)
             .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
 
+
+            CultureInfo frC = new CultureInfo("fr-FR");
+           
             var teachersToReturn = new List<TeacherForListDto>();
            foreach (var teacher in teachers)
            {
@@ -757,7 +760,7 @@ namespace EducNotes.API.Controllers
                 tdetails.Id = teacher.Id;
                 tdetails.LastName = teacher.LastName;
                 tdetails.FirstName = teacher.FirstName;  
-                tdetails.DateOfBirth = teacher.DateOfBirth;
+                tdetails.DateOfBirth = teacher.DateOfBirth?.ToString("dd/MM/yyyy", frC);
                 tdetails.CourseClasses = new List<TeacherCourseClassesDto>();
                // tdetails.PhotoUrl = teacher.Photos.FirstOrDefault(i => i.IsMain == true).Url;
                var allteacherCourses = await _context.TeacherCourses.Include(c => c.Course).Where(t => t.TeacherId == teacher.Id).ToListAsync();

@@ -196,22 +196,22 @@ export class AuthService {
   }
 
    // le post pour enrgister la preinscription : model {father:any,mother:any; children : any[]}
-  parentSelfPreinscription(userId: number, data: any) {
-    return this.http.post(this.baseUrl + userId + '/ParentSelfPreinscription', data)
-    .pipe(
-      map((response: any) => {
-        const user = response;
-        if (user) {
-          localStorage.setItem('token', user.token);
-          localStorage.setItem('user', JSON.stringify(user.user));
-          localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
-          this.decodedToken = this.jwtHelper.decodeToken(user.token);
-          this.currentUser = user.user;
-          this.currentPeriod = user.currentPeriod;
-          this.changeMemberPhoto(this.currentUser.photoUrl);
-        }
-      })
-    );
+  parentSelfInscription(userId: number, data: any) {
+    return this.http.post(this.baseUrl + userId + '/ParentSelfPreinscription', data);
+    // .pipe(
+    //   map((response: any) => {
+    //     const user = response;
+    //     if (user) {
+    //       localStorage.setItem('token', user.token);
+    //       localStorage.setItem('user', JSON.stringify(user.user));
+    //       localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
+    //       this.decodedToken = this.jwtHelper.decodeToken(user.token);
+    //       this.currentUser = user.user;
+    //       this.currentPeriod = user.currentPeriod;
+    //       this.changeMemberPhoto(this.currentUser.photoUrl);
+    //     }
+    //   })
+    // );
   }
 
   teacherSelfPreinscription(userId: number, data: any) {
@@ -238,6 +238,11 @@ export class AuthService {
 
   userNameExist(userName: string) {
     return this.http.get(this.baseUrl +  userName + '/VerifyUserName');
+  }
+
+  addUserPhoto(userId: number, photo: any ) {
+    // return this.http.post(environment.apiUrl + 'users/' + userId + '/photos', photo);
+    return this.http.post(this.baseUrl  + userId + '/AddPhotoForUser', photo);
   }
 
 }

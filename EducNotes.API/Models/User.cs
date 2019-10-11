@@ -19,7 +19,7 @@ namespace EducNotes.API.Models
         public bool ValidatedCode { get; set; }
         public int? ClassId { get; set; }
         public Class Class { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastActive { get; set; }
         public ICollection<UserRole> UserRoles { get; set; }
@@ -33,6 +33,7 @@ namespace EducNotes.API.Models
         public int ResetPasswordCount { get; set; }
         public int? CityId { get; set; }
         public City City { get; set; }
+        public byte TempData { get; set; }
         public DateTime? ResetPasswordDate { get; set; }
         public DateTime? ForgotPasswordDate { get; set; }
         public ICollection<Photo> Photos { get; set; }

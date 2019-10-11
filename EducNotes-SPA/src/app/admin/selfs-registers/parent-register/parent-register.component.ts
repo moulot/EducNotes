@@ -3,13 +3,14 @@ import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from 'src/app/_services/user.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { User } from 'src/app/_models/user';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { City } from 'src/app/_models/city';
 import { District } from 'src/app/_models/district';
 import { AuthService } from 'src/app/_services/auth.service';
 import { environment } from 'src/environments/environment';
 import { Utils } from 'src/app/shared/utils';
+import { UserSpaCode } from 'src/app/_models/userSpaCode';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
@@ -20,7 +21,7 @@ import { Utils } from 'src/app/shared/utils';
 })
 export class ParentRegisterComponent implements OnInit {
 
-  @Input() user1: User;
+  @Input() user1: any;
   @Input() maxChild: number;
   // user2: User;
   userTypes: any;
@@ -40,7 +41,6 @@ export class ParentRegisterComponent implements OnInit {
   user1Form: FormGroup;
   // user2Form: FormGroup;
   childForm: FormGroup;
-  submitText = 'enregistrer';
  errorMessage = [];
  phoneMask = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
  birthDateMask = [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/];
@@ -53,21 +53,34 @@ export class ParentRegisterComponent implements OnInit {
   page = 1;
   pageSize = 15;
   userId: number;
-  parentTypeId: number;
   user1NameExist = false;
   childNameExist = false;
+  parentImg: any;
+  userImgs: any[] = [];
+  studentTypeId = environment.studentTypeId;
+  parentTypeId = environment.parentTypeId;
+  usersSpaCode: UserSpaCode[] = [];
+  // selectedFiles: File[] = [];
+  selectedFiles: any[] = [];
+  url = '';
+
+
 
   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
-     private alertify: AlertifyService,  private router: Router, private userService: UserService) { }
+     private alertify: AlertifyService,  private router: Router, private userService: UserService,
+     private http: HttpClient) { }
 
   ngOnInit() {
     this.userId = this.user1.id;
-    this.parentTypeId = environment.parentTypeId;
       this.createParentsForms();
       this.getCities();
       this.getLevels();
    }
 
+   onFileSelected(event) {
+    //  this.selectedFiles = <File>event.target.files[0];
+    // this.savePhotos();
+   }
    getCities() {
      this.authService.getAllCities().subscribe((res: City[]) => {
        this.cities = res;
@@ -104,22 +117,8 @@ export class ParentRegisterComponent implements OnInit {
         districtId: [null, Validators.nullValidator],
         phoneNumber: ['', Validators.nullValidator],
         email: [this.user1.email, [Validators.nullValidator, Validators.email]],
-        secondPhoneNumber: ['', Validators.nullValidator]});
+        secondPhoneNumber: ['']});
 
-      // this.user2Form = this.fb.group({
-      //   lastName: ['', Validators.nullValidator],
-      //   firstName: ['', Validators.nullValidator],
-      //   userName: ['', Validators.nullValidator],
-      //   password: ['', Validators.required],
-      //   checkPassword    : [ null, [ Validators.required, this.user2confirmationValidator ] ],
-      //   gender: [null, Validators.required],
-      //   dateOfBirth: [null, Validators.nullValidator],
-      //    sameLocationWithUser1: [false, Validators.nullValidator],
-      //   cityId: [null, Validators.nullValidator],
-      //   districtId: [null, Validators.nullValidator],
-      //   email: ['', [Validators.nullValidator, Validators.email]],
-      //   phoneNumber: ['', Validators.nullValidator],
-      //   secondPhoneNumber: ['', Validators.nullValidator]});
     }
 
     createChildForm() {
@@ -146,14 +145,6 @@ export class ParentRegisterComponent implements OnInit {
       }
     }
 
-    // user2confirmationValidator = (control: FormControl): { [ s: string ]: boolean } => {
-    //   if (!control.value) {
-    //     return { required: true };
-    //   } else if (control.value !== this.user2Form.controls.password.value) {
-    //     return { confirm: true, error: true };
-    //   }
-    // }
-
     childrenconfirmationValidator = (control: FormControl): { [ s: string ]: boolean } => {
       if (!control.value) {
         return { required: true };
@@ -178,33 +169,34 @@ export class ParentRegisterComponent implements OnInit {
     }
 
   onStep1Next(e) {
-    this.next();
+    
   }
 
-  // onStep2Next(e) {
-  // //  this.next();
-  // }
   onStep3Next(e) {
   //  this.emailsVerification();
+  this.next();
   this.parents = [];
   this.parents = [...this.parents, this.user1];
   // this.parents = [...this.parents, this.user2];
-  }
+}
 
   onComplete(e) {
     this.save();
    }
 
  submitChild(): void {
-       let enfant: any;
+        let enfant: any;
          enfant = Object.assign({}, this.childForm.value);
          enfant.level = this.levels.find(item => item.id === enfant.levelId).name;
          if (this.editionMode === 'add') {
-           this.i = this.i + 1;
-           enfant.id = this.i;
+           enfant.spaCode = this.i;
+          //  const image_line = this.userImgs.find( i => i.spaCode === this.i);
+          //  if (image_line) {
+          //   enfant.image = image_line.image.image;
+          //  }
            this.children = [...this.children, enfant];
          } else {
-           const itemIndex = this.children.findIndex(item => item.id === this.selectedIndex);
+           const itemIndex = this.children.findIndex(item => item.spaCode === this.selectedIndex);
            Object.assign(this.children[ itemIndex ], enfant);
 
          }
@@ -215,11 +207,10 @@ export class ParentRegisterComponent implements OnInit {
 
  add() {
   this.editionMode = 'add';
-  this.submitText = 'ENREGISTER';
+  this.i = this.i + 1;
   this.initializeParams(this.user1Form.value.lastName);
   this.createChildForm();
   this.showChildenList = false;
-  this.submitText = 'enregistrer l\'enfant';
 
 }
 
@@ -241,14 +232,15 @@ export class ParentRegisterComponent implements OnInit {
 
  next() {
    this.user1 = Object.assign({}, this.user1Form.value);
-   // this.user1.userTypeId = this.parentTypeId;
-   const userBirthOfDate = this.user1Form.value.dateOfBirth;
-   console.log(userBirthOfDate);
-   // this.user2 = Object.assign({}, this.user2Form.value);
-  // this.user2.userTypeId = this.parentTypeId;
-  // this.emailsVerification();
+   this.user1.userTypeId = this.parentTypeId;
+   this.user1.spaCode = 1;
+  //  const img = this.userImgs.find(s => s.spaCode === 1);
+  //  if (img) {
+  //    this.user1.image = img.image.image;
+  //  }
 
- //  this.submitForm();
+  //  const userBirthOfDate = this.user1Form.value.dateOfBirth;
+  //  console.log(userBirthOfDate);
  }
 
  user1NameVerification() {
@@ -279,30 +271,36 @@ export class ParentRegisterComponent implements OnInit {
  }
 
  edit(element: any): void {
-   this.submitText = 'enregistrer modifications';
-   this.selectedIndex = element.id;
+   this.selectedIndex = element.spaCodek;
   this.editModel = Object.assign({}, element);
   this.editionMode = 'edit';
   this.createChildForm();
    this.open();
  }
-//  selectSameLacation(e) {
-//    if (this.user2Form.value.sameLocationWithUser1 === true) {
-//        if (this.user1Form.value.cityId) {
-//          const val =  this.user1Form.value.cityId;
-//          this.user2Form.patchValue({cityId: val});
-//          this.getUser2Districts();
-//        }
-//        if (this.user1Form.value.districtId) {
-//          const val =  this.user1Form.value.districtId;
-//          this.user2Form.patchValue({districtId: val});
-//       }
-//    } else {
-//      this.user2Form.value.cityId = null;
-//      this.user2Form.value.districtId = null;
 
-//    }
-//  }
+ parentImgResult(event) {
+  // const img = {spaCode : 1, image: file};
+  // this.userImgs = [...this.userImgs , img];
+  // console.log(file);
+  let file: File = null;
+  file = <File>event.target.files[0];
+  const img  = {spaCode : 1 , image : file};
+  this.selectedFiles = [...this.selectedFiles, img];
+
+  const reader = new FileReader();
+  reader.readAsDataURL(file); // read file as data url
+
+  reader.onload = (ev) => { // called once readAsDataURL is completed
+    this.url = event.target.result;
+  }
+}
+
+ childImgResult(event) {
+  let file: File = null;
+  file = <File>event.target.files[0];
+  const img  = {spaCode : this.i , image : file};
+  this.selectedFiles = [...this.selectedFiles, img];
+}
 
 save() {
   this.wait = true;
@@ -310,37 +308,61 @@ save() {
   const usersToSave: any = {};
   usersToSave.user1 = this.user1;
   const dt = usersToSave.user1.dateOfBirth;
+  // formatage date de naissance du père
   usersToSave.user1.dateOfBirth = Utils.inputDateDDMMYY(dt, '/');
-  //  data.user2 = this.user2;
 
-  for (let i = 0; i < this.children.length; i++) {
-    const elt = this.children[i];
-    elt.dateOfBirth = Utils.inputDateDDMMYY(elt.dateOfBirth, '/');
-  }
-  usersToSave.children = this.children;
+  // formatage date de naissance des enfants
+    for (let i = 0; i < this.children.length; i++) {
+      const elt = this.children[i];
+      elt.dateOfBirth = Utils.inputDateDDMMYY(elt.dateOfBirth, '/');
+      elt.userTypeId = this.studentTypeId;
+    }
+    usersToSave.children = this.children;
 
-  this.authService.parentSelfPreinscription(this.userId, usersToSave).subscribe(() => {
-      this.submitText = 'enregistrer';
-      this.createParentsForms();
-      this.alertify.success('enregistrement terminé...');
-      this.router.navigate(['/parents']);
-      this.wait = false;
+    // first Step : Enregistrement des Users
+    this.authService.parentSelfInscription(this.userId, usersToSave).subscribe((res: UserSpaCode[]) => {
+      this.usersSpaCode = res;
+      this.savePhotos();
     }, error => {
-      this.wait = false;
-      this.alertify.error(error);
-  });
+        this.wait = false;
+        this.alertify.error(error);
+    });
+
 }
 
-//  getUser2Districts() {
-//    const id = this.user2Form.value.cityId;
-//    this.user2Form.value.cityId = '';
-//    this.user2Districts = [];
-//    this.authService.getDistrictsByCityId(id).subscribe((res: District[]) => {
-//    this.user2Districts = res;
-//    }, error => {
-//      console.log(error);
-//    });
-//  }
+savePhotos() {
+  let errorCount = 0;
+    let allCompleted = false;
+    for (let i = 0; i < this.usersSpaCode.length; i++) {
+    const element = this.usersSpaCode[i];
+      const img = this.selectedFiles.find( c => c.spaCode === element.spaCode);
+      if (img) {
+        console.log('trouvé : ');
+        // mise a jour de la photo
+      //  debugger;
+      const formData = new FormData();
+      formData.append('file', img.image, img.image.name);
+        this.authService.addUserPhoto(element.userId, formData).subscribe(() => {
+          allCompleted = true;
+        }, error => {
+          this.alertify.error(error);
+          errorCount = errorCount + 1;
+          allCompleted = false;
+        });
+      }
+     if (element === this.usersSpaCode[this.usersSpaCode.length - 1]) {
+       this.logUser();
+     }
+      //fin de la boucle
+    }
+
+    if (allCompleted) {
+      console.log('terminé...  : ');
+
+      this.alertify.success('enregistrement terminé...');
+      this.wait = false;
+    }
+}
 
  getUser1Districts() {
    const id = this.user1Form.value.cityId;
@@ -365,15 +387,6 @@ save() {
 
    }
 
-  //  if (this.user2.email) {
-  //    this.authService.emailExist(this.user2.email).subscribe((response: boolean) => {
-  //        if (response === true) {
-  //        this.errorMessage.push('l\'email de la mere est déja utilisé');
-  //        }
-  //    });
-
-  //  }
-
    for (let i = 0; i < this.children.length; i++) {
      if (this.children[i].email) {
        this.authService.emailExist(this.children[i].email).subscribe((response: boolean) => {
@@ -386,6 +399,15 @@ save() {
      }
 
    }
+ }
+
+ logUser() {
+   const user = {userName : this.user1.userName , password : this.user1.password};
+  this.authService.login(user).subscribe(() => {
+    this.router.navigate(['/home']);
+  }, error => {
+    this.alertify.error(error);
+  });
  }
 
 }

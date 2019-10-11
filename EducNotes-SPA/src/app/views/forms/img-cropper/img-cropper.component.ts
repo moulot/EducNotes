@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { ImageCropperComponent, CropperSettings } from 'ngx-img-cropper';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -10,6 +10,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class AppImgCropperComponent implements OnInit {
   data: any;
   cropperSettings: CropperSettings;
+   @Output() imgResult = new EventEmitter();
+
 
   constructor(
     private modalService: NgbModal
@@ -34,6 +36,7 @@ export class AppImgCropperComponent implements OnInit {
     this.modalService.open(modal, { ariaLabelledBy: 'modal-basic-title' })
     .result.then((result) => {
       console.log(result);
+      this.imgResult.emit(this.data);
     }, (reason) => {
       console.log('Err!', reason);
     });

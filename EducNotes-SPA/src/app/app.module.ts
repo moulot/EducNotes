@@ -153,6 +153,9 @@ import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { ClassResolver } from './_resolvers/class-resolver';
 import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-schedule.component';
+import { AppFormsModule } from './views/forms/forms.module';
+import { SharedComponentsModule } from './shared/components/shared-components.module';
+import { AppImgCropperComponent } from './views/forms/img-cropper/img-cropper.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -260,7 +263,7 @@ export function tokenGetter() {
       SchoolComponent,
       ClassScheduleComponent,
       ClassdayScheduleComponent
-   ],
+      ],
    imports: [
      FormWizardModule,
       SharedModule,
@@ -301,6 +304,8 @@ export function tokenGetter() {
       PerfectScrollbarModule,
       NgxEchartsModule,
     ColorPickerModule,
+    SharedComponentsModule
+    , AppFormsModule
 
    ],
    providers: [

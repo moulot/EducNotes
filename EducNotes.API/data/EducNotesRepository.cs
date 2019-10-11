@@ -591,5 +591,112 @@ namespace EducNotes.API.Data
 
             }
         }
+
+        public async Task<List<UserSpaCodeDto>> ParentSelfInscription(int parentId,List<UserForUpdateDto> userToUpdate)
+        {
+           var usersSpaCode = new List<UserSpaCodeDto>();
+           using (var identityContextTransaction = _context.Database.BeginTransaction())
+           {
+               try
+               {
+                   var c = await GetChildren(parentId);
+                   var children = c.ToList();
+                   int cpt =0;
+                   foreach (var user in userToUpdate)
+                   {
+
+                     if(user.UserTypeId == parentTypeId)
+                     {
+                        var parentFromRepo =await GetUser(parentId,true);
+                        parentFromRepo.UserName = user.UserName.ToLower();
+                        parentFromRepo.LastName = user.LastName;
+                        parentFromRepo.FirstName = user.FirstName;
+                        if(user.DateOfBirth!=null)
+                        parentFromRepo.DateOfBirth = user.DateOfBirth;
+                        parentFromRepo.CityId = user.CityId;
+                        parentFromRepo.DistrictId = user.DistrictId;
+                        parentFromRepo.PhoneNumber = user.PhoneNumber;
+                        parentFromRepo.SecondPhoneNumber = user.SecondPhoneNumber;
+                        // configuration du nouveau mot de passe
+                        var newPassword=_userManager.PasswordHasher.HashPassword(parentFromRepo,user.Password);
+                        parentFromRepo.PasswordHash = newPassword;
+                        parentFromRepo.ValidatedCode = true;
+                        parentFromRepo.EmailConfirmed =true;
+                        parentFromRepo.ValidationDate = DateTime.Now;
+                        var res = await _userManager.UpdateAsync(parentFromRepo);
+                        
+                         if(res.Succeeded)
+                         {
+                             // ajout dans la table Email
+                             var email = new Email();
+                             email.InsertDate = DateTime.Now;
+                             email.InsertUserId = parentId;
+                             email.UpdateUserId = parentId;
+                             email.StatusFlag =0;
+                             email.Subject = "Compte confirmé";
+                             email.ToAddress = parentFromRepo.Email;
+                             email.Body = "<b> "+parentFromRepo.LastName + " "+ parentFromRepo.FirstName + "</b>, votre compte a bien été enregistré";
+                             email.FromAddress ="no-reply@educnotes.com";
+                             email.EmailTypeId =  _config.GetValue<int>("AppSettings:confirmedtypeId");
+                             Add(email);
+                             // retour du code du userId et du codeSpa
+                             usersSpaCode.Add(new UserSpaCodeDto {UserId = parentFromRepo.Id,SpaCode= Convert.ToInt32(user.SpaCode)});
+                         }
+                        
+                     } 
+                     if(user.UserTypeId == studentTypeId)
+                     {
+                        var child = children[cpt];
+                        int classLevelId = Convert.ToInt32(user.LevelId);
+                        child.UserName = user.UserName.ToLower();
+                        child.LastName = user.LastName;
+                        child.FirstName = user.FirstName;
+                        if(child.DateOfBirth != null)
+                        child.DateOfBirth = Convert.ToDateTime(user.DateOfBirth);
+                        child.CityId = user.CityId;
+                        child.DistrictId = user.DistrictId;
+                        child.PhoneNumber = user.PhoneNumber;
+                        child.SecondPhoneNumber = user.SecondPhoneNumber;
+                            // configuration du mot de passe
+                        var newPass=_userManager.PasswordHasher.HashPassword(child,user.Password);
+                        child.PasswordHash = newPass;
+                        child.ValidatedCode = true;
+                        child.EmailConfirmed =true;
+                        child.ValidationDate = DateTime.Now;
+                        child.TempData =1;
+                        var res = await _userManager.UpdateAsync(child);
+                       
+                        if(res.Succeeded)
+                        {
+                           //enregistrement de l inscription
+                            var insc = new Inscription {
+                            InsertDate = DateTime.Now,
+                            ClassLevelId = classLevelId,
+                            UserId = child.Id,
+                            InsertUserId = parentId,
+                            InscriptionTypeId =  _config.GetValue<int>("AppSettings:parentInscTypeId"),
+
+                            Validated = false
+                        };
+                            Add(insc);
+                        usersSpaCode.Add( new UserSpaCodeDto{UserId = child.Id, SpaCode = Convert.ToInt32(user.SpaCode)});
+                        cpt=cpt+1;
+                        }
+                        
+                     }   
+                   }
+
+                   if(await SaveAll())
+                     identityContextTransaction.Commit();
+               }
+               catch (System.Exception)
+               {
+                   identityContextTransaction.Rollback();
+                   usersSpaCode=new List<UserSpaCodeDto>();
+               }
+           }
+           return usersSpaCode;
+           
+        }
     }
 }

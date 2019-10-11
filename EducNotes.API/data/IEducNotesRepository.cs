@@ -37,6 +37,7 @@ namespace EducNotes.API.Data
 
 
         Task<int> AddUserPreInscription(Guid code,User user,int roleId,bool sendEMail);
+
         Task<IEnumerable<User>> GetStudentsForClass(int classId);
         Task<IEnumerable<Agenda>> GetClassAgenda(int classId);
         Task<IEnumerable<UserType>> getUserTypes(); 
@@ -66,6 +67,8 @@ namespace EducNotes.API.Data
         Task<List<string>> GetUserNames();
         Task<List<ClassLevel>> GetLevels();
         Task sendOk(int userTypeId, int userId);
+        Task<List<UserSpaCodeDto>> ParentSelfInscription(int parentId,List<UserForUpdateDto> userToUpdate);
+
 
     }
 }

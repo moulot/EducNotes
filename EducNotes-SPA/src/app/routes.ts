@@ -53,10 +53,12 @@ import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
 import { ClassResolver } from './_resolvers/class-resolver';
+import { AppImgCropperComponent } from './views/forms/img-cropper/img-cropper.component';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
     {path: 'forgotPassword', component: ForgotComponent},
+    {path: 'imgCropper', component: AppImgCropperComponent},
     {path: 'confirmEmail/:code', component: ConfirmEmailComponent, resolve : {user: EmailConfirmResolver}},
     {path: 'resetPassword/:code', component: ResetPasswordComponent, resolve : {user: ResetPasswordResolver}},
     {path: 'selfRegister/:code', component: SelfRegisterComponent, resolve : {user: EmailConfirmResolver}},
