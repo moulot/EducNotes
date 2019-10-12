@@ -5,7 +5,6 @@ import { AdminService } from 'src/app/_services/admin.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { ClassService } from 'src/app/_services/class.service';
 import { Course } from 'src/app/_models/course';
-import * as XLSX from 'xlsx';
 
 
 @Component({
