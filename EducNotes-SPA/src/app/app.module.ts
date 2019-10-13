@@ -155,8 +155,8 @@ import { SharedComponentsModule } from './shared/components/shared-components.mo
 import { ModalScheduleComponent } from './admin/modal-schedule/modal-schedule.component';
 import { StudentResolver } from './_resolvers/student-resolver';
 import { CommComponent } from './admin/comm/comm.component';
-// import { MDBBootstrapModulesPro } from 'ng-uikit-pro-standard';
-// import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
+import { MDBBootstrapModulesPro } from 'ng-uikit-pro-standard';
+import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
 
 
 // the second parameter 'fr' is optional
@@ -308,8 +308,8 @@ export function tokenGetter() {
       PerfectScrollbarModule,
       NgxEchartsModule,
       ColorPickerModule,
-      SharedComponentsModule
-      // MDBBootstrapModulesPro.forRoot()
+      SharedComponentsModule,
+      MDBBootstrapModulesPro.forRoot()
    ],
    providers: [
       AuthService,
@@ -339,7 +339,7 @@ export function tokenGetter() {
       SchoolResolver,
       ClassResolver,
       StudentResolver,
-      // MDBSpinningPreloader,
+      MDBSpinningPreloader,
       {provide: NZ_I18N, useValue: fr_FR}
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

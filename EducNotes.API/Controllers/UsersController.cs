@@ -101,18 +101,27 @@ namespace EducNotes.API.Controllers
             return Ok(userToReturn);
         }
 
+        [HttpGet("Types")]
+        public async Task<IActionResult> GetUserTypes()
+        {
+            var userTypes = await _context.UserTypes.OrderBy(o => o.Name).ToListAsync();
+            return Ok(userTypes);
+        }
+
         [HttpGet("GetUserTypesDetails")]
         public  async Task<IActionResult> GetUserTypesDetails()
         {
             var users =await _context.Users.ToListAsync();
              var usertypes = await _context.UserTypes.OrderBy(a=>a.Name).ToListAsync();
+
             var data = new List<UserTypesDto>();
+
             foreach (var item in usertypes)
             {
                 data.Add( new UserTypesDto {
                     UserType = item,
-                    Total = users.Where(a=>a.UserTypeId==item.Id).Count(),
-                    TotalActive = users.Where(a=>a.UserTypeId==item.Id && a.ValidatedCode == true).Count(),
+                    Total = users.Where(a => a.UserTypeId == item.Id).Count(),
+                    TotalActive = users.Where(a => a.UserTypeId == item.Id && a.ValidatedCode == true).Count(),
                     
                 });
             }
@@ -613,7 +622,7 @@ namespace EducNotes.API.Controllers
             [HttpGet("GetAdminUserTypes")]
             public async Task<IActionResult> GetAdminUserTypes()
             {
-                return Ok(await _context.UserTypes.Where(a=>a.Id>=adminTypeId).OrderBy(a=>a.Name).ToListAsync());
+                return Ok(await _context.UserTypes.Where(a=>a.Id >= adminTypeId).OrderBy(a => a.Name).ToListAsync());
             }
 
             [HttpGet("GetUserByTypeId/{id}")]

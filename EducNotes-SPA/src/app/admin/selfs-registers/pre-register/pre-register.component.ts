@@ -32,16 +32,15 @@ teacherTypeId = Number(environment.teacherTypeId);
     this.createRegisterForm();
     this.getCourses();
   }
+
   getUserTypes() {
     this.adminService.getUserTypes().subscribe((res: any[]) => {
-    for (let i = 0; i < res.length; i++) {
-      const id = Number(res[i].id);
-      if (id === this.teacherTypeId  || id === this.parentTypeId) {
-      this.userTypes = [...this.userTypes, res[i]];
+      for (let i = 0; i < res.length; i++) {
+        const id = Number(res[i].id);
+        if (id === this.teacherTypeId  || id === this.parentTypeId) {
+          this.userTypes = [...this.userTypes, res[i]];
+        }
       }
-
-    }
-
     });
   }
 

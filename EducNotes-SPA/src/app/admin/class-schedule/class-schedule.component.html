@@ -10,8 +10,8 @@
         <p class="lead text-12 mr-2">choisir la classe:</p>
       </div>
       <div class="col-md-3 mb-2">
-        <select class="form-control" [formControl]="classControl" (change)="classChanged()">
-          <option value=""></option>
+        <select class="custom-select" [formControl]="classControl" (change)="classChanged()">
+          <option  selected>choisir la classe</option>
           <option *ngFor="let item of classes" value="{{item.id}}">classe {{item.name}}</option>
         </select>
       </div>
