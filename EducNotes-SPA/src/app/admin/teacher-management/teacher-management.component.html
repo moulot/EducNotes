@@ -1,23 +1,34 @@
+<div class="row">
 
-<div  *ngIf="show==='all' && !teachersCourses">
+  <div class="col-md-9">
+    <p class="lead m-0">admin - liste des enseignants</p>
+  </div>
 
-</div>   
-<div class="row justify-content-center align-items-center mt-3"  *ngIf="show==='all'">
-  <div  class="col-md-8">
-      <div class="col-md-12">
-          <button class="btn btn-outline-primary btn-sm" (click)="add()">ajouter</button>
-          <input type="file"  accept=" application/docx" title="importer" (change)="onFileChange($event)" />
-      </div>
+  <div class="col-md-12">
 
-      <div class="card mb-4">
-        <div class="card-body">
-          <div class="card-title">Profésseurs et enseignants</div>
-    
-          <div class="d-flex align-items-center border-bottom-dotted-dim pb-3 mb-3" *ngFor="let teacher of teachersCourses">
+    <div class="row mt-1"  *ngIf="show==='all'">
+
+        <div class="col-md-12 mb-1">
+          <!-- <input type="file"  accept=" application/docx" title="importer" (change)="onFileChange($event)" /> -->
+        </div>
+  
+        <div  class="col-md-9">
+
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="d-flex">
+                <div class="card-title flex-grow-1">liste des enseignants</div>
+                <div>
+                  <button class="btn btn-outline-primary btn-sm" (click)="add()">ajouter un enseignant</button>
+                </div>              
+              </div>
+              <div class="mb-4" style="border-top: 1px solid #cccccc"></div>
+  
+              <div class="d-flex border-bottom-dotted-dim pb-3 mb-3" *ngFor="let teacher of teachersCourses">
                 <img class="avatar-md rounded mr-3"  src="{{teacher.photoUrl || '../../assets/user.png'}}" alt="">
                 <div class="flex-grow-1">
-                  <h6 class="m-0">{{teacher.lastName}} {{teacher.firstName}} </h6> 
-                  <span> {{teacher.email}}.&nbsp; &nbsp; Contact: {{teacher.phoneNumber}} {{teacher.secondPhoneNumber}}  </span>
+                  <p class="text-15 m-0"><b>{{teacher.lastName}} {{teacher.firstName}}</b></p> 
+                  <span class="mr-2">{{teacher.email}}.</span><span>tél: {{teacher.phoneNumber}} {{teacher.secondPhoneNumber}}</span>
                   <p class="m-0 text text-muted"><b>Cours : </b> <span *ngIf="teacher.courseClasses.length===0">Aucun</span>
                     <span *ngIf="teacher.courseClasses.length>0">
                         <span *ngFor="let course of teacher.courseClasses" >
@@ -31,47 +42,53 @@
                   <button class="btn btn-outline-primary btn-sm" (click)="edit(teacher)">Editer</button>
                   <button class="btn btn-outline-primary btn-sm ml-2" [disabled]="teacher.courseClasses.length===0" (click)="assignment(teacher)">Affecter</button>
                 </div>
-          </div>
-          
-        </div>
-      </div>
-  </div>  
-</div>
-    
-
-<div *ngIf="show==='add'">
-    <app-new-teacher (addUserResult)="resultMode($event)"></app-new-teacher>
-</div>
-<div *ngIf="show==='edit'">
-  <app-new-teacher (addUserResult)="resultMode($event)" [teacherDetail]="teacher"></app-new-teacher>
-</div>
- <div *ngIf="show==='affect'">
-   <app-teacher-assignment [teacher]="teacher"  (addUserResult)="resultMode($event)"></app-teacher-assignment>
-</div>
-<div *ngIf="show==='export'" class="row justify-content-center align-items-center mt-3">
-        <div  class="col-md-8">
-            <p class="lead">{{exportedTeachers.length | json}} lignes trouvée(s)</p> 
-            <div class="col-md-12 mt-1">
-                <button class="btn btn-outline-primary btn-sm" (click)="saveImport()">Enregistrer</button>
-                <button class="btn btn-outline-primary btn-sm" (click)="cancel()">annuler</button>
-            </div>
+              </div>
             
-            <div class="d-flex align-items-center border-bottom-dotted-dim mb-1" *ngFor="let teacher of exportedTeachers">
-                  <img class="avatar-md rounded mr-3"  src="{{'../../assets/user.png'}}" alt="">
-                  <div class="flex-grow-1">
-                      <h6 class="m-0">{{teacher.lastName}} {{teacher.firstName}} </h6> 
-                      <span> {{teacher.email}}.&nbsp; &nbsp; Contact: {{teacher.phoneNumber}} {{teacher.secondPhoneNumber}}  </span>
-                      <p class="m-0 text text-muted"><b>Cours ({{teacher.courses.length}}) : </b> <span *ngIf="!teacher.courses">Aucun</span>
-                        <span *ngIf="teacher.courses"> <span *ngFor="let course of teacher.courses" >    {{course}} -  </span>
-                        </span>
-                      </p>
-                  </div>
-
-                  <div>
-                    <!-- <button class="btn btn-outline-primary btn-sm" (click)="edit(teacher)">Editer</button> -->
-                  </div>
             </div>
+          </div>
+        
         </div>
+      
+    </div>
+
+  </div>
+
+  <div *ngIf="show === 'add'">
+    <app-new-teacher (addUserResult)="resultMode($event)"></app-new-teacher>
+  </div>
+
+  <div *ngIf="show === 'edit'">
+    <app-new-teacher (addUserResult)="resultMode($event)" [teacherDetail]="teacher"></app-new-teacher>
+  </div>
+
+  <div *ngIf="show === 'affect'">
+    <app-teacher-assignment [teacher]="teacher"  (addUserResult)="resultMode($event)"></app-teacher-assignment>
+  </div>
+
+  <div *ngIf="show === 'export'" class="row justify-content-center align-items-center mt-3">
+          <div  class="col-md-8">
+              <p class="lead">{{exportedTeachers.length | json}} lignes trouvée(s)</p> 
+              <div class="col-md-12 mt-1">
+                  <button class="btn btn-outline-primary btn-sm" (click)="saveImport()">Enregistrer</button>
+                  <button class="btn btn-outline-primary btn-sm" (click)="cancel()">annuler</button>
+              </div>
+              
+              <div class="d-flex align-items-center border-bottom-dotted-dim mb-1" *ngFor="let teacher of exportedTeachers">
+                    <img class="avatar-md rounded mr-3"  src="{{'../../assets/user.png'}}" alt="">
+                    <div class="flex-grow-1">
+                        <h6 class="m-0">{{teacher.lastName}} {{teacher.firstName}} </h6> 
+                        <span> {{teacher.email}}.&nbsp; &nbsp; Contact: {{teacher.phoneNumber}} {{teacher.secondPhoneNumber}}  </span>
+                        <p class="m-0 text text-muted"><b>Cours ({{teacher.courses.length}}) : </b> <span *ngIf="!teacher.courses">Aucun</span>
+                          <span *ngIf="teacher.courses"> <span *ngFor="let course of teacher.courses" >    {{course}} -  </span>
+                          </span>
+                        </p>
+                    </div>
+
+                    <div>
+                      <!-- <button class="btn btn-outline-primary btn-sm" (click)="edit(teacher)">Editer</button> -->
+                    </div>
+              </div>
+          </div>
+  </div>
+
 </div>
-
-

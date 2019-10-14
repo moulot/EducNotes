@@ -19,7 +19,7 @@
           <div class="col-md-2">
             <nz-select #courseSelect nzSize="default" nzShowSearch nzAllowClear
               formControlName="course" nzPlaceHolder="entrez le cours">
-              <nz-option *ngFor="let item of teacherCourses" nzLabel="{{item.courseName}}" nzValue="{{item.courseId}}"></nz-option>
+              <nz-option *ngFor="let item of teacherCourses" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
             </nz-select>
           </div>
           <div class="col-md-2">

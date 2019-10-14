@@ -36,7 +36,7 @@ export class GradePanelComponent implements OnInit {
   showSearch = true;
   viewMode: 'list' | 'grid' = 'list';
   page = 1;
-  pageSize = 8;
+  pageSize = 20;
 
   searchControl: FormControl = new FormControl();
   filteredUserGrades: any = [];

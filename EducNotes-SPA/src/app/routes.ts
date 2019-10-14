@@ -53,7 +53,12 @@ import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
 import { ClassResolver } from './_resolvers/class-resolver';
+<<<<<<< HEAD
 import { AppImgCropperComponent } from './views/forms/img-cropper/img-cropper.component';
+=======
+import { StudentResolver } from './_resolvers/student-resolver';
+import { CommComponent } from './admin/comm/comm.component';
+>>>>>>> 01a8960dcaa9996bce337e176e21359b69928783
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
@@ -69,6 +74,7 @@ export const appRoutes: Routes = [
         canActivate: [AuthGuard],
         children: [
             {path: 'home', component: HomePanelComponent, resolve: {user: UserHomeResolver}},
+            {path: 'comm', component: CommComponent},
             {path: 'members', component: MemberListComponent, resolve: {users : MemberListResolver}},
             {path: 'members/:id', component: MemberDetailComponent, resolve: {user : MemberDetailResolver}},
             {path: 'member/edit', component: MemberEditComponent,
@@ -101,7 +107,7 @@ export const appRoutes: Routes = [
             {path: 'teachers', component: TeacherManagementComponent, resolve: {teachers: TeacherManagementResolver}},
             {path: 'preregister', component: PreRegisterComponent},
             {path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve : {classes: LevelClassesResolver}},
-            {path: 'studentGrades', component: GradeStudentComponent, resolve: {student: UserHomeResolver}},
+            {path: 'studentGrades/:id', component: GradeStudentComponent, resolve: {student: StudentResolver}},
             {path: 'school', component: SchoolComponent, resolve : {school: SchoolResolver}}
         ]
     },

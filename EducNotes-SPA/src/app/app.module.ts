@@ -154,8 +154,11 @@ import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.co
 import { ClassResolver } from './_resolvers/class-resolver';
 import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-schedule.component';
 import { AppFormsModule } from './views/forms/forms.module';
-import { SharedComponentsModule } from './shared/components/shared-components.module';
 import { AppImgCropperComponent } from './views/forms/img-cropper/img-cropper.component';
+import { ModalScheduleComponent } from './admin/modal-schedule/modal-schedule.component';
+import { SharedComponentsModule } from './shared/components/shared-components.module';
+import { StudentResolver } from './_resolvers/student-resolver';
+import { CommComponent } from './admin/comm/comm.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -262,8 +265,10 @@ export function tokenGetter() {
       ClassLifeComponent,
       SchoolComponent,
       ClassScheduleComponent,
-      ClassdayScheduleComponent
-      ],
+      ClassdayScheduleComponent,
+      ModalScheduleComponent,
+      CommComponent
+   ],
    imports: [
      FormWizardModule,
       SharedModule,
@@ -306,7 +311,6 @@ export function tokenGetter() {
     ColorPickerModule,
     SharedComponentsModule
     , AppFormsModule
-
    ],
    providers: [
       AuthService,
@@ -335,6 +339,7 @@ export function tokenGetter() {
       CallSheetResolver,
       SchoolResolver,
       ClassResolver,
+      StudentResolver,
       {provide: NZ_I18N, useValue: fr_FR}
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }
@@ -342,7 +347,8 @@ export function tokenGetter() {
    entryComponents: [
       RolesModalComponent,
       SkillsModalComponent,
-      AgendaModalComponent
+      AgendaModalComponent,
+      ModalScheduleComponent
    ],
    bootstrap: [
       AppComponent

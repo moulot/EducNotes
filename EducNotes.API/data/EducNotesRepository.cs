@@ -223,6 +223,7 @@ namespace EducNotes.API.Data
             return await _context.Schedules
                     .Include(i => i.Class)
                     .Include(i => i.Course)
+                    .Include(i => i.Teacher)
                     .Where(s => s.ClassId == classId)
                     .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin).ToListAsync();
         }
@@ -254,21 +255,6 @@ namespace EducNotes.API.Data
                   .Include(i => i.Course)
                   .Where(a => a.ClassId == classId && a.DueDate.Date >= today && a.DueDate.Date <= EndDate)
                   .OrderBy(o => o.DueDate).ToListAsync();
-        }
-
-       public async Task<IEnumerable<User>> GetClassTeachers(int classId)
-        {
-            var TeacherTypeId = Convert.ToInt32(_config.GetSection("AppSettings:TeacherTypeId").Value);
-            return await (from cusers in _context.ClassCourses
-                            join ccourses in _context.ClassCourses
-                            on cusers.CourseId equals ccourses.CourseId
-                            join users in _context.Users
-                            on cusers.TeacherId equals users.Id
-                            where ccourses.ClassId == classId
-                            select users)
-                .Where(u => u.UserTypeId == TeacherTypeId)
-                .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
-                .Distinct().ToListAsync();
         }
 
        public async Task<IEnumerable<User>> GetClassStudents(int classId)

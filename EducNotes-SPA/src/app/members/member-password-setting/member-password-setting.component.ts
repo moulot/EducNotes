@@ -21,8 +21,9 @@ export class MemberPasswordSettingComponent implements OnInit {
     this.passwordForm = this.fb.group({
       password         : [ null, [ Validators.required ] ],
       checkPassword    : [ null, [ Validators.required, this.confirmationValidator ] ],
-  });
+    });
   }
+
   submitForm(): void {
     // post de mot de passse;
 
@@ -41,6 +42,7 @@ export class MemberPasswordSettingComponent implements OnInit {
       return { confirm: true, error: true };
     }
   }
+
   updateConfirmValidator(): void {
     /** wait for refresh value */
     Promise.resolve().then(() => this.passwordForm.controls.checkPassword.updateValueAndValidity());

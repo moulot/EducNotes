@@ -121,20 +121,18 @@ export class TeacherManagementComponent implements OnInit {
 
   }
 
+  cancel(): void {
+    this.show = 'all';
+  }
 
-    cancel(): void {
-      this.show = 'all';
+  resultMode(val: boolean) {
+    if (val) {
+      // reload data;
+      this.getTeachers();
+
     }
-
-    resultMode(val: boolean) {
-      if (val) {
-       // reload data;
-       this.getTeachers();
-
-      }
-      this.show = 'all';
-    }
-
+    this.show = 'all';
+  }
 
     onFileChange(ev) {
       let workBook = null;

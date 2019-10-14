@@ -1,10 +1,11 @@
 <div class="card" style="position:absolute; width: 100%" *ngFor="let item of items"
 [ngStyle]="{'top': item.top, 'height': item.height}">
-<div class="card-header p-1"><b>{{item.startHourMin}} - {{item.endHourMin}}</b></div>
+<!-- <div class="card-header p-1"><b>{{item.startHourMin}} - {{item.endHourMin}}</b></div> -->
 <div class="card-body p-1" [ngStyle]="{'background-color': item.color}">
   <div>
-    <b>{{item.courseName | uppercase}}</b><br>
-    {{item.className}}
+    <p class="text-12 m-0">{{item.startHourMin}} - {{item.endHourMin}}</p>
+    <p class="text-12 m-0"><b>{{item.courseName | uppercase}}</b></p>
+    <p class="text-12 text-capitalize m-0">{{item.teacherName}}</p>
   </div>
 </div>
 </div>

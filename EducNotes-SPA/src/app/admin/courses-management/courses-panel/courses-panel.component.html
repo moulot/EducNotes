@@ -1,4 +1,47 @@
+<div class="row">
 
+    <div class="col-md-9">
+      <p class="lead ">admin - liste des classes</p>
+    </div>
+      
+    <div *ngIf="!addNew" [@animate]="{value:'*',params:{delay: 300+'ms', y:'80px'}}" class="col-lg-10 col-md-12">
+      
+        <div class="card mb-4">
+              <div class="card-body p-0">
+  
+                <div class="card-title border-bottom d-flex align-items-center m-0 p-3">
+                  <button class="btn btn-outline-primary btn-sm" (click)='newCourse()'>ajouter une matière</button>
+                  <span class="flex-grow-1"></span>
+                </div>
+  
+                <div *ngFor="let level of levels" class="d-flex border-bottom justify-content-between p-3">
+                  <div class="flex-grow-1">
+                    <span class="text-small text-muted">niveau</span>
+                    <h5 class="m-0">{{level.name}}</h5>
+                  </div>
+                  <div class="flex-grow-1">
+                    <span class="text-small text-muted">effectif</span>
+                    <h5 class="m-0">{{level.totalStudents}}</h5>
+                  </div>
+                  <div class="flex-grow-1">
+                    <span class="text-small text-muted">classes</span>
+                    <h5 class="m-0">{{level.classes.length}}</h5>
+                  </div>
+                  <div class="flex-grow-1">
+                    <!-- <span class="text-small text-muted">autre info</span> -->
+                    <h5 class="m-0 mt-1">
+                      <button class="btn btn-outline-primary p-1 btn-sm">détails</button>
+                    </h5>
+                  </div>
+                </div>
+    
+              </div>
+        </div>
+      
+    </div>
+  
+  </div>
+  
 
       
 <div *ngIf="show==='all' && !this.courses">

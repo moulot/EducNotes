@@ -55,6 +55,9 @@ namespace EducNotes.API.Helpers
                 .ForMember(m => m.RecipientPhotoUrl, opt => opt
                     .MapFrom(u => u.Recipient.Photos.FirstOrDefault(p => p.IsMain).Url));
             CreateMap<Schedule, ScheduleForTimeTableDto>()
+                .ForMember(dest => dest.TeacherName, opt => {
+                    opt.MapFrom(src => src.Teacher.LastName + ' ' + src.Teacher.FirstName);
+                })
                 .ForMember(dest => dest.StartHourMin, opt => {
                     opt.MapFrom(d => d.StartHourMin.ToShortTimeString());
                 })

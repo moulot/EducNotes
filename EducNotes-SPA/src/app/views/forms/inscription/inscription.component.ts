@@ -31,8 +31,8 @@ export class InscriptionComponent implements OnInit {
   cityId: number;
   motherDistricts: District[];
   fatherDistricts: District[];
- editionMode = 'add';
-   i = 1;
+  editionMode = 'add';
+  i = 1;
   selectedIndex = 0;
   position = 'left';
   size = 'default';
@@ -40,22 +40,16 @@ export class InscriptionComponent implements OnInit {
   motherForm: FormGroup;
   childForm: FormGroup;
   submitText = 'enregistrer';
- errorMessage = [];
- phoneMask = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
- products$;
- showChildenList = true;
- alerts;
- viewMode: 'list' | 'grid' = 'list';
- sameLocation: false;
+  errorMessage = [];
+  phoneMask = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
+  products$;
+  showChildenList = true;
+  alerts;
+  viewMode: 'list' | 'grid' = 'list';
+  sameLocation: false;
   wait = false;
   page = 1;
   pageSize = 15;
-
-
-
-
-
-
   isCompleted: boolean;
   data: any = {
     email: ''
@@ -82,20 +76,22 @@ export class InscriptionComponent implements OnInit {
   }
 
   onStep1Next(e) {}
+
   onStep2Next(e) {
     this.next();
   }
+
   onStep3Next(e) {
    // this.emailsVerification();
-  this.parents = [];
-  this.parents = [...this.parents, this.father];
-  this.parents = [...this.parents, this.mother];
-
-
+    this.parents = [];
+    this.parents = [...this.parents, this.father];
+    this.parents = [...this.parents, this.mother];
   }
+
   onComplete(e) {this.save(); }
 
   createParentsForms() {
+
     this.fatherForm = this.fb.group({
       lastName: ['', Validators.nullValidator],
       firstName: ['', Validators.nullValidator],
@@ -105,17 +101,16 @@ export class InscriptionComponent implements OnInit {
       email: ['', [Validators.nullValidator, Validators.email]],
       secondPhoneNumber: ['', Validators.nullValidator]});
 
-      this.motherForm = this.fb.group({
-        lastName: ['', Validators.nullValidator],
-        firstName: ['', Validators.nullValidator],
-        sameLocationWithFather: [false, Validators.nullValidator],
-        cityId: [null, Validators.nullValidator],
-        districtId: [null, Validators.nullValidator],
-       phoneNumber: ['', Validators.nullValidator],
-        email: ['', [Validators.nullValidator, Validators.email]],
-        secondPhoneNumber: ['', Validators.nullValidator]});
+    this.motherForm = this.fb.group({
+      lastName: ['', Validators.nullValidator],
+      firstName: ['', Validators.nullValidator],
+      sameLocationWithFather: [false, Validators.nullValidator],
+      cityId: [null, Validators.nullValidator],
+      districtId: [null, Validators.nullValidator],
+      phoneNumber: ['', Validators.nullValidator],
+      email: ['', [Validators.nullValidator, Validators.email]],
+      secondPhoneNumber: ['', Validators.nullValidator]});
   }
-
 
   createChildForm() {
 
@@ -131,14 +126,14 @@ export class InscriptionComponent implements OnInit {
   }
 
   add() {
-   this.editionMode = 'add';
+    this.editionMode = 'add';
     this.submitText = 'ENREGISTER';
     this.initializeParams(this.fatherForm.value.lastName);
     this.createChildForm();
     this.showChildenList = false;
     this.submitText = 'ajouter l\'enfant';
-
   }
+
   initializeParams(val: string) {
      this.editModel = {};
     this.editModel.lastName = val;
@@ -150,23 +145,25 @@ export class InscriptionComponent implements OnInit {
     this.editModel.email = '';
     this.editModel.secondPhoneNumber = '';
   }
+
   submitChild(): void {
-        let enfant: any;
-          enfant = Object.assign({}, this.childForm.value);
-          enfant.level = this.levels.find(item => item.id === enfant.levelId).name;
-          if (this.editionMode === 'add') {
-            this.i = this.i + 1;
-            enfant.id = this.i;
-            this.children = [...this.children, enfant];
-          } else {
-            const itemIndex = this.children.findIndex(item => item.id === this.selectedIndex);
-            Object.assign(this.children[ itemIndex ], enfant);
+    let enfant: any;
+    enfant = Object.assign({}, this.childForm.value);
+    enfant.level = this.levels.find(item => item.id === enfant.levelId).name;
+    if (this.editionMode === 'add') {
+      this.i = this.i + 1;
+      enfant.id = this.i;
+      this.children = [...this.children, enfant];
+    } else {
+      const itemIndex = this.children.findIndex(item => item.id === this.selectedIndex);
+      Object.assign(this.children[ itemIndex ], enfant);
 
-          }
+    }
 
-          this.close();
+    this.close();
 
   }
+
   open() {
     this.showChildenList = !this.showChildenList;
   }
@@ -174,12 +171,15 @@ export class InscriptionComponent implements OnInit {
   close(): void {
     this.showChildenList = true;
   }
+
   cancel(): void {
     this.nzMessageService.info('suppression annulée');
   }
+
   back() {
    // this.showDetails = false;
   }
+
   next() {
     this.father = Object.assign({}, this.fatherForm.value);
     this.mother = Object.assign({}, this.motherForm.value);
@@ -190,7 +190,6 @@ export class InscriptionComponent implements OnInit {
   //  this.submitForm();
   }
 
-
   confirm(element: any): void {
     this.children.splice(this.children.findIndex(p => p.id === element.id), 1);
     this.nzMessageService.info('suppression éffectuée');
@@ -199,30 +198,32 @@ export class InscriptionComponent implements OnInit {
   edit(element: any): void {
     this.submitText = 'enregistrer modifications';
     this.selectedIndex = element.id;
-   this.editModel = Object.assign({}, element);
-   this.editionMode = 'edit';
-   this.createChildForm();
+    this.editModel = Object.assign({}, element);
+    this.editionMode = 'edit';
+    this.createChildForm();
     this.open();
   }
+
   selectSameLacation(e) {
     if (this.motherForm.value.sameLocationWithFather === true) {
-        if (this.fatherForm.value.cityId) {
+      if (this.fatherForm.value.cityId) {
 
-          const val =  this.fatherForm.value.cityId;
-          this.motherForm.patchValue({cityId: val});
+        const val =  this.fatherForm.value.cityId;
+        this.motherForm.patchValue({cityId: val});
 
-          this.getMotherDistricts();
-        }
-        if (this.fatherForm.value.districtId) {
-          const val =  this.fatherForm.value.districtId;
-          this.motherForm.patchValue({districtId: val});
-       }
+        this.getMotherDistricts();
+      }
+
+      if (this.fatherForm.value.districtId) {
+        const val =  this.fatherForm.value.districtId;
+        this.motherForm.patchValue({districtId: val});
+      }
     } else {
       this.motherForm.value.cityId = null;
       this.motherForm.value.districtId = null;
-
     }
   }
+
   save() {
     this.wait = true;
     const data: any = {};
@@ -230,17 +231,16 @@ export class InscriptionComponent implements OnInit {
     data.mother = this.mother;
     data.children = this.children;
     this.userService.savePreinscription(data).subscribe(() => {
-        this.submitText = 'enregistrer';
-        this.createParentsForms();
-        this.alertify.success('enregistrement terminé...');
-        this.router.navigateByUrl('/InscriptionComponent', {skipLocationChange: true}).then(() =>
-         this.router.navigate(['/inscriptions']));
-          this.wait = false;
-          }, error => {
-            this.wait = false;
-            this.alertify.error(error);
-
-    });
+      this.submitText = 'enregistrer';
+      this.createParentsForms();
+      this.alertify.success('enregistrement terminé...');
+      this.router.navigateByUrl('/InscriptionComponent', {skipLocationChange: true}).then(() =>
+      this.router.navigate(['/inscriptions']));
+      this.wait = false;
+    }, error => {
+        this.wait = false;
+        this.alertify.error(error);
+      });
   }
 
   getMotherDistricts() {

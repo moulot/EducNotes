@@ -21,24 +21,25 @@ export class InscriptionsListComponent implements OnInit {
   constructor(private adminService: AdminService, private alertify: AlertifyService,
     private modalService: NgbModal, private fb: FormBuilder, private classService: ClassService,
      private toastr: ToastrService) { }
-levels: any;
-searchForm: FormGroup;
-searchControl: FormControl = new FormControl();
-showListDiv = false;
-searchParams: any = {};
-allSelected: boolean;
-students: User[];
-classes: Class[];
-classId;
-noResult: string;
-viewMode: 'list' | 'grid' = 'list';
-confirmResut;
-submitText = 'valider';
-filteredStudents: any[] = [];
-selectedIds: any[] = [];
-page = 1;
-pageSize = 8;
-className = '';
+
+  levels: any;
+  searchForm: FormGroup;
+  searchControl: FormControl = new FormControl();
+  showListDiv = false;
+  searchParams: any = {};
+  allSelected: boolean;
+  students: User[];
+  classes: Class[];
+  classId;
+  noResult: string;
+  viewMode: 'list' | 'grid' = 'list';
+  confirmResut;
+  submitText = 'valider';
+  filteredStudents: any[] = [];
+  selectedIds: any[] = [];
+  page = 1;
+  pageSize = 8;
+  className = '';
 
 
 

@@ -1,8 +1,7 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserService } from 'src/app/_services/user.service';
 import { User } from 'src/app/_models/user';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { DataLayerService } from 'src/app/shared/services/data-layer.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AuthService } from 'src/app/_services/auth.service';
 

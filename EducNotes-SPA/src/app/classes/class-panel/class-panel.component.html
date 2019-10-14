@@ -1,22 +1,84 @@
 <div class="row">
-  <div *ngFor="let class of teacherClasses" class="col-lg-4 col-md-12 col-sm-12">
-    <div class="card card-icon mb-2">
-      <div class="card-body text-center">
-        <i class="i-MaleFemale"></i>
-        <p class="text-muted text-20 mt-2 m-0">classe de {{class.className}}</p>
-        <p class="text-muted text-20 mt-0 mb-2">{{class.nbStudents}} élèves.</p>
-        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/studentsClass', class.classId]">élèves</a></p>
-        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/agendas', class.classId]">cahier de textes</a></p>
-        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/notes']">notes</a></p>
-        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/classLife', class.classId]">vie de la classe</a></p>
-        <p><a class="text-primary text-15 line-height-1 m-0" [routerLink]="['/classSchedule', class.classId]">emploi du temps</a></p>
+  <div *ngFor="let class of teacherClasses" class="col-lg-12 col-md-12 col-sm-12">
+    <div class="card mb-3">
+      <div class="card-body m-0">
+        <div class="row m-0">
+
+          <div class="col-md-12 pb-1">
+            <p class="lead text-nowrap m-0 p-0">classe {{class.className}} - {{class.nbStudents}} élèves.</p>
+            <!-- <p class="lead m-0 p-0">{{class.nbStudents}} élèves.</p>  -->
+          </div>
+
+          <div class="col-md-5 mt-1">
+              
+            <div class="row">
+              <div class="col-md-4 mb-1">
+                <a [routerLink]="['/studentsClass', class.classId]">
+                  <div class="card card-icon m-0 icon-btn">
+                    <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                      <i class="i-MaleFemale"></i>
+                      <p class="text-muted mt-2 mb-2">{{class.nbStudents}} élèves</p>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-md-4 mb-1">
+                <a [routerLink]="['/agendas', class.classId]">
+                  <div class="card card-icon m-0 icon-btn">
+                    <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                      <i class="i-Receipt"></i>
+                      <p class="text-muted mt-2 mb-2">c. textes</p>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-md-4 mb-1">
+                <a [routerLink]="['/notes']">
+                  <div class="card card-icon mb-0 icon-btn">
+                    <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                      <i class="i-Pen-5"></i>
+                      <p class="text-muted mt-2 mb-2">notes</p>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="col-md-4 mb-1">
+                <a [routerLink]="['/classLife', class.classId]">
+                  <div class="card card-icon mb-0 icon-btn">
+                    <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                      <i class="i-Conference"></i>
+                    <p class="text-muted mt-2 mb-2">vie classe</p>
+                  </div>
+                </div>
+                </a>
+              </div>
+              <div class="col-md-4">
+                <a [routerLink]="['/classSchedule', class.classId]">
+                  <div class="card card-icon mb-0 icon-btn">
+                    <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                      <i class="i-Conference"></i>
+                    <p class="text-muted mt-2 mb-2">emploi du tps</p>
+                  </div>
+                </div>
+                </a>
+              </div>
+            </div>
+              
+          </div>
+
+          <div class="col-md-7">
+            <div class="col-md-8 my-auto" style="border-left: 1px solid #cccccc; width: 100%">
+              <p class="lead">INFORMATIONS  DE LA CLASSE</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 
-<div class="row m-2">
+<!-- <div class="row m-2">
   <div *ngFor="let class of teacherClasses" class="col-md-2">
     <div class="card card-icon lead mb-2">
       <div class="card-body text-center">
@@ -48,11 +110,11 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 
 
-<div id="wrapper">
+<!-- <div id="wrapper">
   <div class="container mt-2">
     <div class="row mb-2">
       <div class="col-sm-8">
@@ -262,4 +324,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->

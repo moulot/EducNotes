@@ -311,8 +311,8 @@ namespace EducNotes.API.Controllers
         [HttpGet("{teacherId}/Classes")]
         public async Task<IActionResult> GetTeacherClasses(int teacherId)
         {
-            if(teacherId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-                return Unauthorized();
+            // if(teacherId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            //     return Unauthorized();
 
             var teacherClasses = await (from courses in _context.ClassCourses
                                     join classes in _context.Classes
@@ -325,6 +325,12 @@ namespace EducNotes.API.Controllers
                                     })
                                     .OrderBy(o => o.ClassName)
                                     .Distinct().ToListAsync();
+            
+            // var tclasses = await _context.ClassCourses
+            //             //.Include(i =>  i.Class)
+            //             .Where(c => c.TeacherId == teacherId)
+            //             .Select(s => s.Class).Distinct().ToListAsync();
+
 
             // var teacherClasses = await _context.ClassCourses
             //                                 .Include(i => i.Class).ThenInclude(i => i.Students).Distinct()
@@ -374,17 +380,27 @@ namespace EducNotes.API.Controllers
         [HttpGet("{teacherId}/Courses")]
         public async Task<IActionResult> GetTeacherCourses(int teacherId)
         {
-            var courses = await (from cu in _context.TeacherCourses
-                                    where cu.Teacher.Id == teacherId
-                                    select new{
-                                        TeacherId = cu.TeacherId,
-                                        TeacherName = cu.Teacher.FirstName + ' ' + cu.Teacher.LastName,
-                                        CourseId = cu.CourseId,
-                                        CourseName = cu.Course.Name
-                                    }).OrderBy(o => o.CourseName).ToListAsync();
+            var courses = await _context.TeacherCourses
+                                    .Where(c => c.TeacherId == teacherId)
+                                    .Select(s => s.Course).ToListAsync();
 
             return Ok(courses);
         }
+
+        // [HttpGet("{teacherId}/Courses")]
+        // public async Task<IActionResult> GetTeacherCourses(int teacherId)
+        // {
+        //     var courses = await (from cu in _context.TeacherCourses
+        //                             where cu.Teacher.Id == teacherId
+        //                             select new{
+        //                                 TeacherId = cu.TeacherId,
+        //                                 TeacherName = cu.Teacher.FirstName + ' ' + cu.Teacher.LastName,
+        //                                 CourseId = cu.CourseId,
+        //                                 CourseName = cu.Course.Name
+        //                             }).OrderBy(o => o.CourseName).ToListAsync();
+
+        //     return Ok(courses);
+        // }
         
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, UserForUpdateDto userForUpdateDto)

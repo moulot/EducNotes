@@ -7,6 +7,7 @@ import { Agenda } from '../_models/agenda';
 import { Course } from '../_models/course';
 import { Class } from '../_models/class';
 import { Absence } from '../_models/absence';
+import { Schedule } from '../_models/schedule';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,7 @@ constructor(private http: HttpClient) { }
 
   // pour recuperer les eleves d'une classe a partir de classId
   getClassTeachers(classId): Observable<User[]> {
-    return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/GetClassTeachers');
+    return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/ClassTeachers');
   }
 
   getTodayToNDaysAgenda(classId, toNbDays) {
@@ -133,6 +134,7 @@ constructor(private http: HttpClient) { }
    getAllTeachersCourses() {
     return this.http.get(this.baseUrl + 'classes/GetAllTeachersCourses');
    }
+
    getAllTeacherCoursesById(id: number) {
     return this.http.get(this.baseUrl + 'classes/' + id + '/GetAllTeacherCoursesById');
    }
@@ -140,6 +142,10 @@ constructor(private http: HttpClient) { }
     // recuperation de tous les cours
   getAllCourses(): Observable<Course[]> {
     return this.http.get<Course[]>(this.baseUrl + 'classes/GetAllCourses');
+  }
+
+  saveSchedules(schedules: Schedule[]) {
+    return this.http.put(this.baseUrl + 'classes/saveSchedules', schedules);
   }
 
   saveTeacherAffectation(id: number, courseId: number, levelId: number, classIds: number[]) {
