@@ -181,7 +181,6 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'users/GetUserTypes');
   }
 
-
   getAllClassesCourses(): Observable<any[]> {
     return this.http.get<any[]>(this.baseUrl + 'users/GetAllClassesCourses');
   }

@@ -521,7 +521,6 @@ namespace EducNotes.API.Controllers
 
         }
 
-
         [HttpGet("GetLevels")]
         public async Task<IActionResult> GetLevels()
         {
@@ -533,24 +532,26 @@ namespace EducNotes.API.Controllers
                                     .OrderBy(a=>a.DsplSeq)
                                     .ToListAsync();
            var dataToReturn = new List<ClassLevelDetailDto>();
+
           foreach (var item in levels)
           {
-          var res = new ClassLevelDetailDto();
-          res.Id = item.Id;
-          res.Name = item.Name;
-          res.TotalClasses = item.Classes.Count();
-          
-          // res.TotalEnrolled = item.Inscriptions.Count();
-          // res.TotalStudents = 0;
-          // foreach (var c in item.Classes)
-          // {
-          //     res.TotalStudents+=c.Students.Count();
-          // }
-          
-          res.Classes = item.Classes.ToList();
+            var res = new ClassLevelDetailDto();
+            res.Id = item.Id;
+            res.Name = item.Name;
+            res.TotalClasses = item.Classes.Count();
+            
+            // res.TotalEnrolled = item.Inscriptions.Count();
+            // res.TotalStudents = 0;
+            // foreach (var c in item.Classes)
+            // {
+            //     res.TotalStudents+=c.Students.Count();
+            // }
+            
+            res.Classes = item.Classes.ToList();
+                
             dataToReturn.Add(res);
-
           }
+
           return Ok(dataToReturn);
         }
 

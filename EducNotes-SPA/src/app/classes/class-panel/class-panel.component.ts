@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/_models/user';
 import { ClassService } from 'src/app/_services/class.service';
 import { AuthService } from 'src/app/_services/auth.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { UserService } from 'src/app/_services/user.service';
 import { CourseUser } from 'src/app/_models/courseUser';
-import { SchedulePanelComponent } from 'src/app/schedule/schedule-panel/schedule-panel.component';
 
 
 @Component({

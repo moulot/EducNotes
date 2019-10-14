@@ -66,7 +66,6 @@ import { StudentCardComponent } from './classes/student-card/student-card.compon
 import { ClassNavComponent } from './classes/class-nav/class-nav.component';
 import { AgendaItemComponent } from './classes/agenda-item/agenda-item.component';
 import { ClassLifeFormComponent } from './classes/class-lifeForm/class-lifeForm.component';
-import { IconDefinition } from '@ant-design/icons-angular';
 import { NgZorroAntdModule, NZ_I18N, fr_FR } from 'ng-zorro-antd';
 import { registerLocaleData, CommonModule} from '@angular/common';
 import fr from '@angular/common/locales/fr';
@@ -74,7 +73,6 @@ import { ClassAbsenceComponent } from './classes/class-absence/class-absence.com
 import { ClassSanctionComponent } from './classes/class-sanction/class-sanction.component';
 import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
 registerLocaleData(fr);
-import { AccountBookFill, AlertFill, AlertOutline } from '@ant-design/icons-angular/icons';
 import { ScheduleDayComponent } from './schedule/schedule-day/schedule-day.component';
 import { GradePanelComponent } from './grades/grade-panel/grade-panel.component';
 import { SkillsModalComponent } from './grades/skills-modal/skills-modal.component';
@@ -159,6 +157,9 @@ import { ModalScheduleComponent } from './admin/modal-schedule/modal-schedule.co
 import { SharedComponentsModule } from './shared/components/shared-components.module';
 import { StudentResolver } from './_resolvers/student-resolver';
 import { CommComponent } from './admin/comm/comm.component';
+import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
+import { MDBBootstrapModulesPro } from 'ng-uikit-pro-standard';
+
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -308,9 +309,10 @@ export function tokenGetter() {
       SharedPipesModule,
       PerfectScrollbarModule,
       NgxEchartsModule,
-    ColorPickerModule,
-    SharedComponentsModule
-    , AppFormsModule
+      ColorPickerModule,
+      SharedComponentsModule,
+      AppFormsModule,
+      MDBBootstrapModulesPro.forRoot()
    ],
    providers: [
       AuthService,
@@ -340,6 +342,7 @@ export function tokenGetter() {
       SchoolResolver,
       ClassResolver,
       StudentResolver,
+      MDBSpinningPreloader,
       {provide: NZ_I18N, useValue: fr_FR}
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

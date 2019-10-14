@@ -220,6 +220,6 @@ constructor(private http: HttpClient) { }
    teacherClassCoursByLevel(teacherId: number, levelid: number, courseId: number) {
     return this.http.get(this.baseUrl + 'classes/TeacherClassCoursByLevel/  ' + teacherId + '/' + levelid + '/' + courseId );
   }
- 
+
 
 }
