@@ -555,13 +555,29 @@ namespace EducNotes.API.Controllers
           return Ok(dataToReturn);
         }
 
+        [HttpPost("ClassLevelsWithClasses")]
+        public async Task<IActionResult> GetClassLevelWithClasses(List<int> CLIds)
+        {
+            var classLevels = await _context.ClassLevels
+                                        .Where(c => CLIds.Contains(c.Id)).ToListAsync();
+
+            foreach (var cl in classLevels)
+            {
+                cl.Classes = await _context.Classes
+                                    .OrderBy(c => c.Name)
+                                    .Where(c => c.ClassLevelId == cl.Id).ToListAsync();
+            }
+
+            return Ok(classLevels);
+        }
+
         [HttpGet("{classLevelId}/SearchClassesByLevel")]
         public async Task<IActionResult> SearchClassesByLevel(int classLevelId)
         {
             
            var classes = await _context.Classes
-                                .Include(s=>s.Students)
-                                .Where(c=>c.ClassLevelId == classLevelId)
+                                .Include(s => s.Students)
+                                .Where(c => c.ClassLevelId == classLevelId)
                                 .ToListAsync();
 
             var classesToReturn = _mapper.Map<IEnumerable<ClassDetailDto>>(classes);
@@ -577,7 +593,6 @@ namespace EducNotes.API.Controllers
             if (await _repo.SaveAll())
                 return Ok(classId);
             return BadRequest("impossible de supprimer cette classe");
-
         }
 
         [HttpPost("AddCourse")]

@@ -201,6 +201,10 @@ constructor(private http: HttpClient) { }
     return this.http.get(this.baseUrl + 'classes/' + id + '/SearchClassesByLevel');
   }
 
+  getClassLevelsWithClasses(ids: number[]) {
+    return this.http.post(this.baseUrl + 'classes/ClassLevelsWithClasses', ids);
+  }
+
   saveNewClasses(classes: any) {
     return this.http.post(this.baseUrl + 'classes/SaveNewClasses', classes);
   }

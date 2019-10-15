@@ -626,6 +626,63 @@ namespace EducNotes.API.Controllers
         return BadRequest("impossible d'envoyer le mail");
     }
 
+    [HttpPost("SendEmails")]
+    public async Task<IActionResult> SendEmails(DataForEmailDto dataForEmailDto)
+    {
+      var userTypeIds = dataForEmailDto.UserTypeIds;
+      var classLevelIds = dataForEmailDto.ClassLevelIds;
+      List<int?> classIds = dataForEmailDto.ClassIds;
+
+      List<string> recipientEmails = new List<string>();
+
+      foreach (var ut in userTypeIds)
+      {
+        if(ut == studentTypeId)
+        {
+          var studentEmails = await _context.Users
+                          .Where(u => u.UserTypeId ==studentTypeId &&
+                            u.EmailConfirmed == true && u.Active == 1)
+                          .Select(u => u.Email)
+                          .ToListAsync();
+
+          foreach (var email in studentEmails)
+          {
+            recipientEmails.Add(email);
+          }
+        }
+
+        if(ut == parentTypeId)
+        {
+          var parentEmails = await _context.Users
+                          .Where(u => u.UserTypeId == parentTypeId &&
+                            u.EmailConfirmed == true && u.Active == 1)
+                          .Select(u => u.Email)
+                          .ToListAsync();
+
+          foreach (var email in parentEmails)
+          {
+            recipientEmails.Add(email);
+          }
+        }
+
+        if(ut == teacherTypeId)
+        {
+          var parentEmails = await _context.Users
+                          .Where(u => u.UserTypeId == teacherTypeId &&
+                            u.EmailConfirmed == true && u.Active == 1)
+                          .Select(u => u.Email)
+                          .ToListAsync();
+
+          foreach (var email in parentEmails)
+          {
+            recipientEmails.Add(email);
+          }
+        }      
+      }
+
+      return NoContent();
+    }
+
     [HttpGet("UsersRecap")]
     public async Task<IActionResult> UsersRecap()
     {
@@ -716,14 +773,12 @@ namespace EducNotes.API.Controllers
                   }
             }
 
-
             if( await _repo.SaveAll())
                 return Ok();
 
             return BadRequest("impossible de terminer l'enregistrement");
                 
             // return Ok(_mapper.Map<UserForListDto>(userToCreate));
-            
         }
         catch (System.Exception ex)
         {

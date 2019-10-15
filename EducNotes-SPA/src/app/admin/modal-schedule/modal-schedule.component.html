@@ -246,7 +246,7 @@
 
         <div class="float-right">
           <button type="button" class="btn btn-outline-default mr-2" (click)="closeModal()" >Cancel</button>
-          <button type="submit" class="btn btn-outline-primary" >Ok</button>
+          <button type="submit" [disabled]="scheduleForm.hasError('formNOK')" class="btn btn-outline-primary" >Ok</button>
         </div>
 
       </form>

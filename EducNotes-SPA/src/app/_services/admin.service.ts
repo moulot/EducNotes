@@ -6,6 +6,7 @@ import { Period } from '../_models/period';
 import { Observable } from 'rxjs';
 import { AlertifyService } from './alertify.service';
 import { Establishment } from '../_models/establishment';
+import { DataForEmail } from '../_models/dataForEmail';
 
 @Injectable({
   providedIn: 'root'
@@ -138,5 +139,9 @@ export class AdminService {
 
   saveSchool(school: Establishment) {
     return this.http.put(this.baseUrl + 'admin/saveSchool', school);
+  }
+
+  sendEmails(dataForEmail: DataForEmail) {
+    return this.http.post(this.baseUrl + 'admin/SendEmails', dataForEmail);
   }
 }

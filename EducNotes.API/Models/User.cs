@@ -6,6 +6,10 @@ namespace EducNotes.API.Models
 {
   public class User : IdentityUser<int>
     {
+        public User()
+        {
+            Active = 1;
+        }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int UserTypeId { get; set; }
@@ -33,6 +37,7 @@ namespace EducNotes.API.Models
         public int ResetPasswordCount { get; set; }
         public int? CityId { get; set; }
         public City City { get; set; }
+        public byte Active { get; set; }
         public DateTime? ResetPasswordDate { get; set; }
         public DateTime? ForgotPasswordDate { get; set; }
         public ICollection<Photo> Photos { get; set; }
@@ -40,7 +45,5 @@ namespace EducNotes.API.Models
         public ICollection<Like> Likees { get; set; }
         public ICollection<Message> MessagesSent { get; set; }
         public ICollection<Message> MessagesRecceived { get; set; }
-      
-      
     }
 }

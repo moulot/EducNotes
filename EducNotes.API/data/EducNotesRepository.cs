@@ -400,7 +400,7 @@ namespace EducNotes.API.Data
         {
               try
               {
-                  await _emailSender.SendEmailAsync(emailFormDto.toEmail, emailFormDto.subject,emailFormDto.content);
+                  await _emailSender.SendEmailAsync(emailFormDto.toEmail, emailFormDto.subject, emailFormDto.content);
                   return true;
               }
               catch (System.Exception)
