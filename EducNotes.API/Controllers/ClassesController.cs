@@ -566,6 +566,11 @@ namespace EducNotes.API.Controllers
                 cl.Classes = await _context.Classes
                                     .OrderBy(c => c.Name)
                                     .Where(c => c.ClassLevelId == cl.Id).ToListAsync();
+
+                foreach (var aclass in cl.Classes)
+                {
+                    aclass.Students = await _context.Users.Where(u => u.ClassId == aclass.Id).ToListAsync();
+                }
             }
 
             return Ok(classLevels);

@@ -629,58 +629,93 @@ namespace EducNotes.API.Controllers
     [HttpPost("SendEmails")]
     public async Task<IActionResult> SendEmails(DataForEmailDto dataForEmailDto)
     {
-      var userTypeIds = dataForEmailDto.UserTypeIds;
-      var classLevelIds = dataForEmailDto.ClassLevelIds;
-      List<int?> classIds = dataForEmailDto.ClassIds;
+      List<int> userTypeIds = dataForEmailDto.UserTypeIds;
+      List<int> classLevelIds = dataForEmailDto.ClassLevelIds;
+      List<int> classIds = dataForEmailDto.ClassIds;
+      string body = dataForEmailDto.Body;
+      string subject = dataForEmailDto.Subject;
+      var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
       List<string> recipientEmails = new List<string>();
 
+      var users = new List<User>();
       foreach (var ut in userTypeIds)
       {
-        if(ut == studentTypeId)
+        if(ut == studentTypeId || ut == parentTypeId)
         {
-          var studentEmails = await _context.Users
-                          .Where(u => u.UserTypeId ==studentTypeId &&
-                            u.EmailConfirmed == true && u.Active == 1)
-                          .Select(u => u.Email)
-                          .ToListAsync();
-
-          foreach (var email in studentEmails)
+          if(users.Count() == 0)
           {
-            recipientEmails.Add(email);
+            users = await _context.Users
+                            .Where(u => classIds.Contains(Convert.ToInt32(u.ClassId)) && u.Active == 1 &&
+                              u.UserTypeId == studentTypeId && u.EmailConfirmed == true)
+                            .ToListAsync();
           }
-        }
 
-        if(ut == parentTypeId)
-        {
-          var parentEmails = await _context.Users
-                          .Where(u => u.UserTypeId == parentTypeId &&
-                            u.EmailConfirmed == true && u.Active == 1)
-                          .Select(u => u.Email)
-                          .ToListAsync();
-
-          foreach (var email in parentEmails)
+          if(ut == studentTypeId)
           {
-            recipientEmails.Add(email);
+            foreach (var user in users)
+            {
+              if(!string.IsNullOrEmpty(user.Email))
+                recipientEmails.Add(user.Email);
+            }
+          }
+
+          if(ut == parentTypeId)
+          {
+            var ids = users.Select(u => u.Id);
+            var parents = _context.UserLinks
+                          .Where(u => ids.Contains(u.UserId)).Select(u => u.UserP).Distinct();
+
+            foreach (var user in parents)
+            {
+              if(!string.IsNullOrEmpty(user.Email))
+                recipientEmails.Add(user.Email);
+            }
           }
         }
 
         if(ut == teacherTypeId)
         {
-          var parentEmails = await _context.Users
-                          .Where(u => u.UserTypeId == teacherTypeId &&
-                            u.EmailConfirmed == true && u.Active == 1)
-                          .Select(u => u.Email)
+          var teachers = await _context.ClassCourses
+                          .Where(t => classLevelIds.Contains(t.Class.ClassLevelId))
+                          .Select(t => t.Teacher)
+                          .Distinct()
                           .ToListAsync();
 
-          foreach (var email in parentEmails)
+          foreach (var user in teachers)
           {
-            recipientEmails.Add(email);
+            if(!string.IsNullOrEmpty(user.Email))
+              recipientEmails.Add(user.Email);
           }
-        }      
+        }
       }
 
-      return NoContent();
+      List<Email> emailsToBeSent = new List<Email>();
+      //save emails to Emails table
+      foreach (var email in recipientEmails)
+      {
+          Email newEmail = new Email();
+          newEmail.EmailTypeId = 1;
+          newEmail.Subject = subject;
+          newEmail.Body = body;
+          newEmail.ToAddress = email;
+          newEmail.TimeToSend = DateTime.Now;
+          newEmail.InsertUserId = currentUserId;
+          newEmail.InsertDate = DateTime.Now;
+          newEmail.UpdateUserId = currentUserId;
+          newEmail.UpdateDate = DateTime.Now;
+          emailsToBeSent.Add(newEmail);
+      }
+      _context.AddRange(emailsToBeSent);
+
+      if(await _repo.SaveAll())
+      {
+        return NoContent();
+      }
+      else
+      {
+        return BadRequest("problème pour envoyer les emails");
+      }
     }
 
     [HttpGet("UsersRecap")]

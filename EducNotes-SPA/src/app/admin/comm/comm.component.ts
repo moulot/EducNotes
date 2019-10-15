@@ -62,47 +62,28 @@ export class CommComponent implements OnInit {
     const classIds = this.emailForm.value.class;
     const subject = this.emailForm.value.subject;
     const body = this.emailForm.value.body;
+    console.log(userTypeIds + ' - ' + classLevelIds + ' - ' + classIds);
 
     const dataForEmail = <DataForEmail>{};
     dataForEmail.subject = subject;
     dataForEmail.body = body;
 
-    if (userTypeIds) {
-      userTypeIds.split(',');
-      for (let i = 0; i < userTypeIds.length; i++) {
-        const elt = userTypeIds[i];
-        dataForEmail.userTypeIds = [...dataForEmail.userTypeIds, elt];
-      }
-    }
+    dataForEmail.userTypeIds = userTypeIds;
+    dataForEmail.classLevelIds = classLevelIds;
+    dataForEmail.classIds = classIds;
 
-    if (classLevelIds) {
-      classLevelIds.split(',');
-      for (let i = 0; i < classLevelIds.length; i++) {
-        const elt = classLevelIds[i];
-        dataForEmail.classLevelIds = [...dataForEmail.classLevelIds, elt];
-      }
-    }
+    console.log(dataForEmail);
 
-    if (classIds) {
-      classIds.split(',');
-      for (let i = 0; i < classIds.length; i++) {
-        const elt = classIds[i];
-        dataForEmail.classIds = [...dataForEmail.classIds, elt];
-      }
-    }
-
-    // console.log(usertypeId + ' - ' + classLevelId + ' - ' + classIds);
-
-    // this.adminService.sendEmails(dataForEmail).subscribe(() => {
-    //   this.alertify.successBar('messages envoyés.');
-    // }, error => {
-    //   this.alertify.errorBar('problème avec l\'envoi des emails');
-    // });
+    this.adminService.sendEmails(dataForEmail).subscribe(() => {
+      this.alertify.successBar('messages envoyés.');
+    }, error => {
+      this.alertify.errorBar('problème avec l\'envoi des emails');
+    });
   }
 
   getClassLevels() {
     this.classService.getLevels().subscribe((data: any) => {
-      this.classLevelOptions = [...this.classLevelOptions, {value: 'all', label: 'tous...'}];
+      // this.classLevelOptions = [...this.classLevelOptions, {value: 'all', label: 'tous...'}];
       for (let i = 0; i < data.length; i++) {
         const elt = data[i];
         const option = {value: elt.id, label: elt.name};
@@ -142,11 +123,12 @@ export class CommComponent implements OnInit {
             this.classOptions = [...this.classOptions, optionGroup];
             for (let j = 0; j < classes.length; j++) {
               const aclass = classes[j];
-              if (aclass.totalStudent > 0) {
-                const option = {value: aclass.id, label: 'classe ' + aclass.name + '(' + aclass.totalStudent + ')'};
+              const nbStudents = aclass.students.length;
+              if (nbStudents > 0) {
+                const option = {value: aclass.id, label: 'classe ' + aclass.name + '(' + nbStudents + ')'};
                 this.classOptions = [...this.classOptions, option];
               } else {
-                const option = {value: aclass.id, label: 'classe ' + aclass.name + '(' + aclass.totalStudent + ')', disabled: true};
+                const option = {value: aclass.id, label: 'classe ' + aclass.name + '(' + nbStudents + ')', disabled: true};
                 this.classOptions = [...this.classOptions, option];
               }
             }
