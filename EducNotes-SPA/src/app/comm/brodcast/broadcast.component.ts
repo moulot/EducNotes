@@ -7,14 +7,15 @@ import { AdminService } from 'src/app/_services/admin.service';
 import { Email } from 'src/app/_models/email';
 import { DataForEmail } from 'src/app/_models/dataForEmail';
 import { ClassLevel } from 'src/app/_models/classLevel';
+import { UserService } from 'src/app/_services/user.service';
 
 @Component({
-  selector: 'app-comm',
-  templateUrl: './comm.component.html',
-  styleUrls: ['./comm.component.scss'],
+  selector: 'app-broadcast',
+  templateUrl: './broadcast.component.html',
+  styleUrls: ['./broadcast.component.scss'],
   animations :  [SharedAnimations]
 })
-export class CommComponent implements OnInit {
+export class BroadcastComponent implements OnInit {
   showClass = false;
   userTypeOptions = [];
   classLevelOptions = [];
@@ -22,32 +23,25 @@ export class CommComponent implements OnInit {
   emailForm: FormGroup;
   showWarning = false;
   email: Email;
-  autocompletes$;
-  hideElement = true;
-  addtags: string[] = [];
+  autocompletes$: any[] = [];
 
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
-    private adminService: AdminService, private fb: FormBuilder) { }
+    private adminService: AdminService, private fb: FormBuilder, private userService: UserService) { }
 
 
   ngOnInit() {
     this.createEmailForm();
     this.getUserTypes();
     this.getClassLevels();
+    this.getAutoComplteList();
   }
 
   createEmailForm() {
     this.emailForm = this.fb.group({
-      tagsCtrlTos: [''],
-      tagsCtrlCcs: [''],
-      tagsCtrlBccs: [''],
       userType: [null, Validators.required],
       classLevel: [null, Validators.required],
-      class: [null],
-      userTypeCC: [null, Validators.required],
-      classLevelCC: [null, Validators.required],
-      classCC: [null],
+      class: [null, Validators.required],
       subject: [''],
       body: ['']
     }, {validator: this.senderValidator});
@@ -72,7 +66,7 @@ export class CommComponent implements OnInit {
     const classIds = this.emailForm.value.class;
     const subject = this.emailForm.value.subject;
     const body = this.emailForm.value.body;
-
+console.log(this.emailForm.value.tagsCtrlCcs);
     const dataForEmail = <DataForEmail>{};
     dataForEmail.subject = subject;
     dataForEmail.body = body;
@@ -90,7 +84,6 @@ export class CommComponent implements OnInit {
 
   getClassLevels() {
     this.classService.getLevels().subscribe((data: any) => {
-      // this.classLevelOptions = [...this.classLevelOptions, {value: 'all', label: 'tous...'}];
       for (let i = 0; i < data.length; i++) {
         const elt = data[i];
         const option = {value: elt.id, label: elt.name};
@@ -111,7 +104,7 @@ export class CommComponent implements OnInit {
     });
   }
 
-  getClasses() {
+  getClasses(event) {
 
     const clevelIds = this.emailForm.value.classLevel;
     this.classOptions = [];
@@ -152,6 +145,21 @@ export class CommComponent implements OnInit {
       this.emailForm.value.class.reset();
 
     }
+  }
+
+  getAutoComplteList() {
+    this.userService.getUsers().subscribe((data: any) => {
+      console.log(data);
+      for (let i = 0; i < data.length; i++) {
+        const elt = data[i];
+        const label = elt.lastName + ' ' + elt.firstName;
+        const val = elt.email;
+        const listElt = {display: label, value: val};
+        console.log(listElt);
+        this.autocompletes$ = [...this.autocompletes$, listElt];
+      }
+    });
+    console.log(this.autocompletes$);
   }
 
 }

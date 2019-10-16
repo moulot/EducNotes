@@ -19,7 +19,7 @@ export class UserService {
 
 constructor(private http: HttpClient) {}
 
-  getUsers(page?, itemsPerPage?, userParams?, likesParam?): Observable<PaginatedResult<User[]>> {
+  getUsers1(page?, itemsPerPage?, userParams?, likesParam?): Observable<PaginatedResult<User[]>> {
 
     const paginatedResult: PaginatedResult<User[]> = new PaginatedResult<User[]>();
 
@@ -55,6 +55,10 @@ constructor(private http: HttpClient) {}
           return paginatedResult;
         })
       );
+  }
+
+  getUsers() {
+    return this.http.get(this.baseUrl + 'users');
   }
 
   getUsersWithRoles() {

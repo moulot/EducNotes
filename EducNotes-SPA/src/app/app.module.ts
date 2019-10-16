@@ -154,11 +154,12 @@ import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-sc
 import { SharedComponentsModule } from './shared/components/shared-components.module';
 import { ModalScheduleComponent } from './admin/modal-schedule/modal-schedule.component';
 import { StudentResolver } from './_resolvers/student-resolver';
-import { CommComponent } from './admin/comm/comm.component';
+import { BroadcastComponent } from './comm/brodcast/broadcast.component';
 import { MDBBootstrapModulesPro } from 'ng-uikit-pro-standard';
 import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
 import { TagInputsComponent } from './views/forms/tag-inputs/tag-inputs.component';
 import { TagInputModule } from 'ngx-chips';
+import { EmailComponent } from './comm/email/email.component';
 
 
 // the second parameter 'fr' is optional
@@ -268,8 +269,9 @@ export function tokenGetter() {
       ClassScheduleComponent,
       ClassdayScheduleComponent,
       ModalScheduleComponent,
-      CommComponent,
-      TagInputsComponent
+      BroadcastComponent,
+      TagInputsComponent,
+      EmailComponent
    ],
    imports: [
      FormWizardModule,

@@ -13,19 +13,19 @@
             <div class="card-body">
               <div class="mb-2">
                 <tag-input class="m-0 p-0" formControlName="tagsCtrlTos" theme='default' placeholder="A...">
-                  <tag-input-dropdown [autocompleteItems]="autocompletes$ | async">
+                  <tag-input-dropdown [autocompleteItems]="autocompletes$">
                   </tag-input-dropdown>
                 </tag-input>
               </div>
               <div class="mb-2">
-                <tag-input formControlName="tagsCtrlCcs" theme='default' placeholder="CC...">
-                  <tag-input-dropdown [autocompleteItems]="autocompletes$ | async">
+                <tag-input formControlName="tagsCtrlCcs1" theme='default' placeholder="CC...">
+                  <tag-input-dropdown [autocompleteItems]="autocompletes$">
                   </tag-input-dropdown>
                 </tag-input>
               </div>
               <div class="mb-2">
                 <tag-input formControlName="tagsCtrlBccs" theme='default' placeholder="BCC...">
-                  <tag-input-dropdown [autocompleteItems]="autocompletes$ | async">
+                  <tag-input-dropdown [autocompleteItems]="autocompletes$">
                   </tag-input-dropdown>
                 </tag-input>
               </div>
@@ -75,26 +75,11 @@
                 <div class="col-md-1 text-17 text-center my-auto">
                   CC...
                 </div>
-                <div class="col-md-11">
-                  <div class="row">
-
-                      <div class="col-md-4 mb-2">
-                        <mdb-select [options]="userTypeOptions" [multiple]="true" formControlName="userTypeCC" placeholder="destinataire..."></mdb-select>
-                        <div class="text-danger text-12" *ngIf="emailForm.controls['userTypeCC'].invalid &&
-                          (emailForm.controls['userTypeCC'].touched || emailForm.controls['userTypeCC'].dirty)">les destinataires sont obligatoires</div>
-                      </div>
-                      <div class="col-md-4 mb-2">
-                        <mdb-select [options]="classLevelOptions" [multiple]="true" formControlName="classLevelCC" (ngModelChange)="getClasses($event)"
-                          placeholder="niveau classe..."></mdb-select>
-                        <div class="text-danger text-12" *ngIf="emailForm.controls['classLevelCC'].invalid &&
-                          (emailForm.controls['classLevelCC'].touched || emailForm.controls['classLevelCC'].dirty)">le niveau de la classe est obligatoire</div>
-                      </div>
-                      <div class="col-md-4 mb-2">
-                        <mdb-select [options]="classOptions" formControlName="classCC" [multiple]="true" placeholder="classes..."></mdb-select>
-                      </div>
-      
-                  </div>
-      
+                <div class="col-md-11 mb-2">
+                  <tag-input formControlName="tagsCtrlCcs" theme='default' placeholder="CC...">
+                    <tag-input-dropdown [autocompleteItems]="autocompletes$">
+                    </tag-input-dropdown>
+                  </tag-input>            
                 </div>
               </div>
             </div>

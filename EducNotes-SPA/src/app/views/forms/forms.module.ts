@@ -38,7 +38,7 @@ import { AddChildrenComponent } from './add-children/add-children.component';
     FormsRoutingModule
   ],
 
-  declarations: [BasicFormComponent, AddChildrenComponent, TagInputsComponent,
+  declarations: [BasicFormComponent, AddChildrenComponent, // TagInputsComponent,
      AppImgCropperComponent, InputMaskComponent, InputGroupsComponent, FormLayoutsComponent]
      // AppFormsModule removed to put it in app.module
 })

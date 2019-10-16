@@ -696,6 +696,7 @@ namespace EducNotes.API.Controllers
       {
           Email newEmail = new Email();
           newEmail.EmailTypeId = 1;
+          newEmail.FromAddress = "no-reply@educnotes.com";
           newEmail.Subject = subject;
           newEmail.Body = body;
           newEmail.ToAddress = email;
