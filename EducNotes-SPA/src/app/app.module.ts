@@ -157,6 +157,8 @@ import { StudentResolver } from './_resolvers/student-resolver';
 import { CommComponent } from './admin/comm/comm.component';
 import { MDBBootstrapModulesPro } from 'ng-uikit-pro-standard';
 import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
+import { TagInputsComponent } from './views/forms/tag-inputs/tag-inputs.component';
+import { TagInputModule } from 'ngx-chips';
 
 
 // the second parameter 'fr' is optional
@@ -266,7 +268,8 @@ export function tokenGetter() {
       ClassScheduleComponent,
       ClassdayScheduleComponent,
       ModalScheduleComponent,
-      CommComponent
+      CommComponent,
+      TagInputsComponent
    ],
    imports: [
      FormWizardModule,
@@ -309,7 +312,8 @@ export function tokenGetter() {
       NgxEchartsModule,
       ColorPickerModule,
       SharedComponentsModule,
-      MDBBootstrapModulesPro.forRoot()
+      MDBBootstrapModulesPro.forRoot(),
+      TagInputModule
    ],
    providers: [
       AuthService,

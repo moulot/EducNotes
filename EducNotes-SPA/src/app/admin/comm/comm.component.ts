@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { AdminService } from 'src/app/_services/admin.service';
 import { Email } from 'src/app/_models/email';
 import { DataForEmail } from 'src/app/_models/dataForEmail';
@@ -22,6 +22,10 @@ export class CommComponent implements OnInit {
   emailForm: FormGroup;
   showWarning = false;
   email: Email;
+  autocompletes$;
+  hideElement = true;
+  addtags: string[] = [];
+
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
     private adminService: AdminService, private fb: FormBuilder) { }
@@ -35,9 +39,15 @@ export class CommComponent implements OnInit {
 
   createEmailForm() {
     this.emailForm = this.fb.group({
+      tagsCtrlTos: [''],
+      tagsCtrlCcs: [''],
+      tagsCtrlBccs: [''],
       userType: [null, Validators.required],
       classLevel: [null, Validators.required],
       class: [null],
+      userTypeCC: [null, Validators.required],
+      classLevelCC: [null, Validators.required],
+      classCC: [null],
       subject: [''],
       body: ['']
     }, {validator: this.senderValidator});
@@ -62,7 +72,6 @@ export class CommComponent implements OnInit {
     const classIds = this.emailForm.value.class;
     const subject = this.emailForm.value.subject;
     const body = this.emailForm.value.body;
-    console.log(userTypeIds + ' - ' + classLevelIds + ' - ' + classIds);
 
     const dataForEmail = <DataForEmail>{};
     dataForEmail.subject = subject;
@@ -71,8 +80,6 @@ export class CommComponent implements OnInit {
     dataForEmail.userTypeIds = userTypeIds;
     dataForEmail.classLevelIds = classLevelIds;
     dataForEmail.classIds = classIds;
-
-    console.log(dataForEmail);
 
     this.adminService.sendEmails(dataForEmail).subscribe(() => {
       this.alertify.successBar('messages envoyés.');
@@ -115,7 +122,6 @@ export class CommComponent implements OnInit {
 
         this.showClass = true;
         this.classService.getClassLevelsWithClasses(clevelIds).subscribe((data: ClassLevel[]) => {
-          console.log(data);
           for (let i = 0; i < data.length; i++) {
             const elt = data[i];
             const classes = data[i].classes;

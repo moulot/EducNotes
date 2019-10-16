@@ -55,6 +55,7 @@ import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel
 import { ClassResolver } from './_resolvers/class-resolver';
 import { StudentResolver } from './_resolvers/student-resolver';
 import { CommComponent } from './admin/comm/comm.component';
+import { TagInputsComponent } from './views/forms/tag-inputs/tag-inputs.component';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},

@@ -1,55 +1,127 @@
 <div class="row">
 
   <div class="col-md-9">
-    <p class="lead ">admin - communication. envoi de e-mails</p>
+    <p class="lead mb-1">admin - communication. envoi de e-mails</p>
   </div>
-    
+
   <div [@animate]="{value:'*', params:{delay: 300+'ms', y:'80px'}}" class="col-lg-12 col-md-12">
     <form [formGroup]="emailForm" (ngSubmit)="sendEmail()">
       <div class="row">
-        <div class="col-md-4">
+
+        <div class="col-md-3">
           <div class="card">
             <div class="card-body">
-              <div class="alert alert-warning" *ngIf="showWarning" role="alert">
-                pas de destinataires disponibles.
+              <div class="mb-2">
+                <tag-input class="m-0 p-0" formControlName="tagsCtrlTos" theme='default' placeholder="A...">
+                  <tag-input-dropdown [autocompleteItems]="autocompletes$ | async">
+                  </tag-input-dropdown>
+                </tag-input>
               </div>
               <div class="mb-2">
-                <mdb-select [options]="userTypeOptions" [multiple]="true" formControlName="userType" placeholder="destinataire..."></mdb-select>
+                <tag-input formControlName="tagsCtrlCcs" theme='default' placeholder="CC...">
+                  <tag-input-dropdown [autocompleteItems]="autocompletes$ | async">
+                  </tag-input-dropdown>
+                </tag-input>
               </div>
-              <div class="text-danger text-12" *ngIf="emailForm.controls['userType'].invalid &&
-                (emailForm.controls['userType'].touched || emailForm.controls['userType'].dirty)">les destinataires sont obligatoires</div>
               <div class="mb-2">
-                <mdb-select [options]="classLevelOptions" [multiple]="true" formControlName="classLevel" (ngModelChange)="getClasses($event)"
-                  placeholder="niveau classe..."></mdb-select>
-              </div>
-              <div class="text-danger text-12" *ngIf="emailForm.controls['classLevel'].invalid &&
-                (emailForm.controls['classLevel'].touched || emailForm.controls['classLevel'].dirty)">le niveau de la classe est obligatoire</div>
-              <div class="mb-2">
-                <mdb-select [options]="classOptions" formControlName="class" [multiple]="true" placeholder="classes..."></mdb-select>
+                <tag-input formControlName="tagsCtrlBccs" theme='default' placeholder="BCC...">
+                  <tag-input-dropdown [autocompleteItems]="autocompletes$ | async">
+                  </tag-input-dropdown>
+                </tag-input>
               </div>
             </div>
           </div>        
         </div>
-        <div class="col-md-8">
-          <div class="card">
-            <div class="card-body">
-                <div class="mb-2">
-                  <button type="submit" [disabled]="!emailForm.valid || showWarning"
-                    class="btn btn-outline-primary btn-block btn-sm">envoyer email</button>
+        
+        <div class="col-md-9">
+          <div class="row">
+
+            <div class="col-md-12 mb-2">
+              <button type="submit" [disabled]="!emailForm.valid || showWarning"
+                class="btn btn-outline-primary btn-block btn-sm">envoyer email</button>
+            </div>
+            
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-1 text-17 text-center my-auto">
+                  A...
                 </div>
-                <div class="mb-2">
-                <div class="form-group shadow-textarea">
-                  <textarea class="form-control z-depth-1" id="subject" formControlName="subject" rows="1" placeholder="objet..."></textarea>
-                </div>
-              </div>
-              <div>
-                <div class="form-group shadow-textarea">
-                  <textarea class="form-control z-depth-1" id="body" formControlName="body" rows="10" placeholder="message..."></textarea>
+                <div class="col-md-11">
+                  <div class="row">
+
+                      <div class="col-md-4 mb-2">
+                        <mdb-select [options]="userTypeOptions" [multiple]="true" formControlName="userType" placeholder="destinataire..."></mdb-select>
+                        <div class="text-danger text-12" *ngIf="emailForm.controls['userType'].invalid &&
+                          (emailForm.controls['userType'].touched || emailForm.controls['userType'].dirty)">les destinataires sont obligatoires</div>
+                      </div>
+                      <div class="col-md-4 mb-2">
+                        <mdb-select [options]="classLevelOptions" [multiple]="true" formControlName="classLevel" (ngModelChange)="getClasses($event)"
+                          placeholder="niveau classe..."></mdb-select>
+                        <div class="text-danger text-12" *ngIf="emailForm.controls['classLevel'].invalid &&
+                          (emailForm.controls['classLevel'].touched || emailForm.controls['classLevel'].dirty)">le niveau de la classe est obligatoire</div>
+                      </div>
+                      <div class="col-md-4 mb-2">
+                        <mdb-select [options]="classOptions" formControlName="class" [multiple]="true" placeholder="classes..."></mdb-select>
+                      </div>
+      
+                  </div>
+      
                 </div>
               </div>
             </div>
+
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-1 text-17 text-center my-auto">
+                  CC...
+                </div>
+                <div class="col-md-11">
+                  <div class="row">
+
+                      <div class="col-md-4 mb-2">
+                        <mdb-select [options]="userTypeOptions" [multiple]="true" formControlName="userTypeCC" placeholder="destinataire..."></mdb-select>
+                        <div class="text-danger text-12" *ngIf="emailForm.controls['userTypeCC'].invalid &&
+                          (emailForm.controls['userTypeCC'].touched || emailForm.controls['userTypeCC'].dirty)">les destinataires sont obligatoires</div>
+                      </div>
+                      <div class="col-md-4 mb-2">
+                        <mdb-select [options]="classLevelOptions" [multiple]="true" formControlName="classLevelCC" (ngModelChange)="getClasses($event)"
+                          placeholder="niveau classe..."></mdb-select>
+                        <div class="text-danger text-12" *ngIf="emailForm.controls['classLevelCC'].invalid &&
+                          (emailForm.controls['classLevelCC'].touched || emailForm.controls['classLevelCC'].dirty)">le niveau de la classe est obligatoire</div>
+                      </div>
+                      <div class="col-md-4 mb-2">
+                        <mdb-select [options]="classOptions" formControlName="classCC" [multiple]="true" placeholder="classes..."></mdb-select>
+                      </div>
+      
+                  </div>
+      
+                </div>
+              </div>
+            </div>
+  
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  
+                  <div class="mb-2">
+                    <div class="form-group shadow-textarea">
+                      <textarea class="form-control z-depth-1" id="subject" formControlName="subject" rows="1" placeholder="objet..."></textarea>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div class="form-group shadow-textarea">
+                      <textarea class="form-control z-depth-1" id="body" formControlName="body" rows="10" placeholder="message..."></textarea>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
+        
       </div>
     </form>
   </div>

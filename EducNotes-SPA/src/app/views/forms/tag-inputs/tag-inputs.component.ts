@@ -13,6 +13,8 @@ export class TagInputsComponent implements OnInit {
   autocompletes$;
   tagsCtrl1 = new FormControl(this.items);
   tagsCtrl2 = new FormControl([{display: 'Bangladesh', value: 'BD'}]);
+  hideElement = true;
+  addtags: string[] = [];
 
 
   constructor(
@@ -25,6 +27,7 @@ export class TagInputsComponent implements OnInit {
 
   public onSelect(item) {
     console.log('tag selected: value is ' + item);
+    console.log(this.tagsCtrl2.value);
   }
 
 }
