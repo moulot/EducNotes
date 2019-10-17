@@ -8,6 +8,7 @@ import { Email } from 'src/app/_models/email';
 import { DataForEmail } from 'src/app/_models/dataForEmail';
 import { ClassLevel } from 'src/app/_models/classLevel';
 import { UserService } from 'src/app/_services/user.service';
+import { DataForBroadcast } from 'src/app/_models/dataForBroadcast';
 
 @Component({
   selector: 'app-broadcast',
@@ -66,16 +67,16 @@ export class BroadcastComponent implements OnInit {
     const classIds = this.emailForm.value.class;
     const subject = this.emailForm.value.subject;
     const body = this.emailForm.value.body;
-console.log(this.emailForm.value.tagsCtrlCcs);
-    const dataForEmail = <DataForEmail>{};
-    dataForEmail.subject = subject;
-    dataForEmail.body = body;
 
-    dataForEmail.userTypeIds = userTypeIds;
-    dataForEmail.classLevelIds = classLevelIds;
-    dataForEmail.classIds = classIds;
+    const dataForEmails = <DataForBroadcast>{};
+    dataForEmails.subject = subject;
+    dataForEmails.body = body;
 
-    this.adminService.sendEmails(dataForEmail).subscribe(() => {
+    dataForEmails.userTypeIds = userTypeIds;
+    dataForEmails.classLevelIds = classLevelIds;
+    dataForEmails.classIds = classIds;
+
+    this.adminService.sendBradcast(dataForEmails).subscribe(() => {
       this.alertify.successBar('messages envoyés.');
     }, error => {
       this.alertify.errorBar('problème avec l\'envoi des emails');
@@ -149,17 +150,14 @@ console.log(this.emailForm.value.tagsCtrlCcs);
 
   getAutoComplteList() {
     this.userService.getUsers().subscribe((data: any) => {
-      console.log(data);
       for (let i = 0; i < data.length; i++) {
         const elt = data[i];
         const label = elt.lastName + ' ' + elt.firstName;
         const val = elt.email;
         const listElt = {display: label, value: val};
-        console.log(listElt);
         this.autocompletes$ = [...this.autocompletes$, listElt];
       }
     });
-    console.log(this.autocompletes$);
   }
 
 }

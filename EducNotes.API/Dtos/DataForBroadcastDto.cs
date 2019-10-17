@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace EducNotes.API.Dtos
 {
-    public class DataForEmailDto
+    public class DataForBroadcastDto
     {
         public List<int> UserTypeIds { get; set; }
         public List<int> ClassLevelIds { get; set; }

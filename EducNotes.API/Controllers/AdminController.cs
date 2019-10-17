@@ -626,8 +626,38 @@ namespace EducNotes.API.Controllers
         return BadRequest("impossible d'envoyer le mail");
     }
 
-    [HttpPost("SendEmails")]
-    public async Task<IActionResult> SendEmails(DataForEmailDto dataForEmailDto)
+    [HttpPost("SendBatchEmail")]
+    public async Task<IActionResult> SendBatchEmail(DataForEmail dataForEmail)
+    {
+        var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+        Email newEmail = new Email();
+        newEmail.EmailTypeId = 1;
+        newEmail.FromAddress = "no-reply@educnotes.com";
+        newEmail.Subject = dataForEmail.Subject;
+        newEmail.Body = dataForEmail.Body;
+        newEmail.ToAddress = dataForEmail.Tos;
+        newEmail.CCAddress = dataForEmail.Ccs;
+        newEmail.TimeToSend = DateTime.Now;
+        newEmail.InsertUserId = currentUserId;
+        newEmail.InsertDate = DateTime.Now;
+        newEmail.UpdateUserId = currentUserId;
+        newEmail.UpdateDate = DateTime.Now;
+
+        _context.Add(newEmail);
+
+        if(await _repo.SaveAll())
+        {
+          return NoContent();
+        }
+        else
+        {
+          return BadRequest("problème pour envoyer l\' email");
+        }
+    }
+
+    [HttpPost("Broadcast")]
+    public async Task<IActionResult> Broadcast(DataForBroadcastDto dataForEmailDto)
     {
       List<int> userTypeIds = dataForEmailDto.UserTypeIds;
       List<int> classLevelIds = dataForEmailDto.ClassLevelIds;
@@ -677,7 +707,8 @@ namespace EducNotes.API.Controllers
         if(ut == teacherTypeId)
         {
           var teachers = await _context.ClassCourses
-                          .Where(t => classLevelIds.Contains(t.Class.ClassLevelId))
+                          .Where(t => classLevelIds.Contains(t.Class.ClassLevelId) && t.Teacher.Active == 1 &&
+                              t.Teacher.UserTypeId == teacherTypeId && t.Teacher.EmailConfirmed == true)
                           .Select(t => t.Teacher)
                           .Distinct()
                           .ToListAsync();

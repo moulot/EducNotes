@@ -77,7 +77,7 @@ namespace EducNotes.API.Controllers
 
             usergrades.UserId = userid;                
             usergrades.StudentName = userName;
-            usergrades.Age = userdata.DateOfBirth.CalculateAge();
+            // usergrades.Age = userdata.DateOfBirth.CalculateAge();
             IEnumerable<Photo> photoUrls = _context.Photos.Where(p => p.UserId == userid);
             string photoUrl = "";
             if(photoUrls.Count() > 0)

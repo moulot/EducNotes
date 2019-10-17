@@ -56,6 +56,8 @@ import { ClassResolver } from './_resolvers/class-resolver';
 import { StudentResolver } from './_resolvers/student-resolver';
 import { BroadcastComponent } from './comm/brodcast/broadcast.component';
 import { EmailComponent } from './comm/email/email.component';
+import { Component } from '@angular/core';
+import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
@@ -102,6 +104,7 @@ export const appRoutes: Routes = [
             {path: 'classSchedule/:classId', component: SchedulePanelComponent, resolve: {class: ClassResolver}},
             {path: 'courses', component: CoursesPanelComponent, resolve: {courses: CoursesListResolver}},
             {path: 'teachers', component: TeacherManagementComponent, resolve: {teachers: TeacherManagementResolver}},
+            {path: 'editTeacher/:id', component: NewTeacherComponent, resolve: {teacher: TeacherManagementResolver}},
             {path: 'preregister', component: PreRegisterComponent},
             {path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve : {classes: LevelClassesResolver}},
             {path: 'studentGrades/:id', component: GradeStudentComponent, resolve: {student: StudentResolver}},

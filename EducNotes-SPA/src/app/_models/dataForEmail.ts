@@ -1,7 +1,7 @@
 export interface DataForEmail {
-    userTypeIds: number[];
-    classLevelIds: number[];
-    classIds: number[];
+    tos: string;
+    ccs: string;
+    bccs: string;
     subject: string;
     body: string;
 }

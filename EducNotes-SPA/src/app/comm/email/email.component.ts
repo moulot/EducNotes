@@ -39,50 +39,58 @@ export class EmailComponent implements OnInit {
 
   createEmailForm() {
     this.emailForm = this.fb.group({
-      tagsCtrlTos: [''],
+      tagsCtrlTos: ['', Validators.required],
       tagsCtrlCcs: [''],
-      tagsCtrlCcs1: [''],
-      tagsCtrlBccs: [''],
-      userType: [null, Validators.required],
-      classLevel: [null, Validators.required],
-      class: [null],
+      // tagsCtrlBccs: [''],
       subject: [''],
       body: ['']
     }, {validator: this.senderValidator});
   }
 
   senderValidator(g: FormGroup) {
-    const sender = g.get('userType');
-    const clevel = g.get('classLevel').value;
     const subject = g.get('subject').value;
     const body = g.get('body').value;
 
-    if (sender.invalid && sender.dirty) {
-      return {'senderNOK': true};
-    } else {
-
-    }
   }
 
   sendEmail() {
-    const userTypeIds = this.emailForm.value.userType;
-    const classLevelIds = this.emailForm.value.classLevel;
-    const classIds = this.emailForm.value.class;
+    const Tos = this.emailForm.value.tagsCtrlTos;
+    const Ccs = this.emailForm.value.tagsCtrlCcs;
     const subject = this.emailForm.value.subject;
     const body = this.emailForm.value.body;
-console.log(this.emailForm.value.tagsCtrlCcs);
+
+    let toEmails = '';
+    for (let i = 0; i < Tos.length; i++) {
+      const to = Tos[i];
+      const email = to.value;
+      if (toEmails === '') {
+        toEmails = email;
+      } else {
+        toEmails += ';' + email;
+      }
+    }
+
+    let ccEmails = '';
+    for (let i = 0; i < Ccs.length; i++) {
+      const cc = Ccs[i];
+      const email = cc.value;
+      if (ccEmails === '') {
+        ccEmails = email;
+      } else {
+        ccEmails += ';' + email;
+      }
+    }
+
     const dataForEmail = <DataForEmail>{};
     dataForEmail.subject = subject;
     dataForEmail.body = body;
+    dataForEmail.tos = toEmails;
+    dataForEmail.ccs = ccEmails;
 
-    dataForEmail.userTypeIds = userTypeIds;
-    dataForEmail.classLevelIds = classLevelIds;
-    dataForEmail.classIds = classIds;
-
-    this.adminService.sendEmails(dataForEmail).subscribe(() => {
-      this.alertify.successBar('messages envoyés.');
+    this.adminService.sendEmail(dataForEmail).subscribe(() => {
+      this.alertify.successBar('message envoyé.');
     }, error => {
-      this.alertify.errorBar('problème avec l\'envoi des emails');
+      this.alertify.errorBar('problème avec l\'envoi du email');
     });
   }
 
@@ -153,17 +161,14 @@ console.log(this.emailForm.value.tagsCtrlCcs);
 
   getAutoComplteList() {
     this.userService.getUsers().subscribe((data: any) => {
-      console.log(data);
       for (let i = 0; i < data.length; i++) {
         const elt = data[i];
         const label = elt.lastName + ' ' + elt.firstName;
         const val = elt.email;
         const listElt = {display: label, value: val};
-        console.log(listElt);
         this.autocompletes$ = [...this.autocompletes$, listElt];
       }
     });
-    console.log(this.autocompletes$);
   }
 
 }
