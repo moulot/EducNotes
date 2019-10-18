@@ -1,0 +1,42 @@
+<div class="row mb-2">
+  
+  <div class="col-md-3">
+
+    <div class="card">
+      <div class="card-body">
+        <div class="mb-2">
+          <!-- <div class="p-0 m-0">tous les cours</div> -->
+          <label class="switch switch-primary mr-3">
+              <span>afficher tous les cours</span>
+              <input type="checkbox" checked>
+              <span class="slider"></span>
+          </label>
+        </div>
+        <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
+        <div class="card mb-2" *ngFor="let course of courses">
+          <div class="card-body p-2">
+            <div class="row">
+              <div class="col-md-12 d-flex">
+                <div class=" mr-2" [ngStyle]="{'background-color': course.color}" style="width: 25px;height: 100%;"></div>
+                <div class="flex-grow-1">{{course.name}}</div>
+                <div>{{course.nbItems}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-md-9">
+
+    <div class="card">
+      <div class="card-body">        
+    </div>
+
+  </div>
+    
+
+  </div>
+</div>

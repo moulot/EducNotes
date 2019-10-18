@@ -1,21 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/_models/user';
-import { AuthService } from 'src/app/_services/auth.service';
-import { ClassService } from 'src/app/_services/class.service';
-import { AlertifyService } from 'src/app/_services/alertify.service';
-import { ActivatedRoute } from '@angular/router';
-import { EvaluationService } from 'src/app/_services/evaluation.service';
 import { Class } from 'src/app/_models/class';
+import { ClassService } from 'src/app/_services/class.service';
+import { ActivatedRoute } from '@angular/router';
 import { UserService } from 'src/app/_services/user.service';
+import { AlertifyService } from 'src/app/_services/alertify.service';
+import { AuthService } from 'src/app/_services/auth.service';
+import { Course } from 'src/app/_models/course';
 
 @Component({
-  selector: 'app-student-dashboard',
-  templateUrl: './student-dashboard.component.html',
-  styleUrls: ['./student-dashboard.component.scss']
+  selector: 'app-student-agenda',
+  templateUrl: './student-agenda.component.html',
+  styleUrls: ['./student-agenda.component.scss']
 })
-export class StudentDashboardComponent implements OnInit {
+export class StudentAgendaComponent implements OnInit {
   student: User;
   classRoom: Class;
+  courses: any;
+  userIdFromRoute: any;
   strFirstDay: string;
   strLastDay: string;
   agendaItems: any;
@@ -23,14 +25,12 @@ export class StudentDashboardComponent implements OnInit {
   nbDayTasks = [];
   weekDays = [];
   firstDay: Date;
-  toNbDays = 7;
-  userCourses: any;
-  studentAvg: any;
-  userIdFromRoute: any;
+  daysToNow = 7;
+  daysFromNow = 7;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
-    private evalService: EvaluationService, private userService: UserService) { }
+    private userService: UserService) { }
 
   ngOnInit() {
 
@@ -51,10 +51,8 @@ export class StudentDashboardComponent implements OnInit {
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
-      this.getClass(this.student.classId);
-      this.getAgenda(this.student.classId, this.toNbDays);
-      this.getEvalsToCome(this.student.classId);
-      }, error => {
+      this.getClassCoursesWithAgenda(this.student.classId, this.daysToNow, this.daysFromNow);
+    }, error => {
       this.alertify.error(error);
     });
   }
@@ -75,9 +73,9 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  getEvalsToCome(classId) {
-    this.evalService.getClassEvalsToCome(classId).subscribe(evals => {
-      this.evalsToCome = evals;
+  getClassCoursesWithAgenda(classId, daysToNow, daysFromNow) {
+    this.classService.getClassCoursesWithAgenda(classId, daysToNow, daysFromNow).subscribe((courses: any) => {
+      this.courses = courses;
     }, error => {
       this.alertify.error(error);
     });
@@ -86,16 +84,6 @@ export class StudentDashboardComponent implements OnInit {
   getClass(classId) {
     this.classService.getClass(classId).subscribe(data => {
       this.classRoom = data;
-      this.getCoursesWithEvals(this.student.id, this.classRoom.id);
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
-  getCoursesWithEvals(studentId, classId) {
-    this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
-      this.userCourses = data.coursesWithEvals;
-      this.studentAvg = data.studentAvg;
     }, error => {
       this.alertify.error(error);
     });

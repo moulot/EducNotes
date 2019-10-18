@@ -58,6 +58,7 @@ import { BroadcastComponent } from './comm/brodcast/broadcast.component';
 import { EmailComponent } from './comm/email/email.component';
 import { Component } from '@angular/core';
 import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
+import { StudentAgendaComponent } from './agenda/student-agenda/student-agenda.component';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
@@ -108,7 +109,8 @@ export const appRoutes: Routes = [
             {path: 'preregister', component: PreRegisterComponent},
             {path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve : {classes: LevelClassesResolver}},
             {path: 'studentGrades/:id', component: GradeStudentComponent, resolve: {student: StudentResolver}},
-            {path: 'school', component: SchoolComponent, resolve : {school: SchoolResolver}}
+            {path: 'school', component: SchoolComponent, resolve : {school: SchoolResolver}},
+            {path: 'studentAgenda/:id', component: StudentAgendaComponent, resolve: {student: StudentResolver}}
         ]
     },
     {path: '**', redirectTo: '', pathMatch: 'full'}

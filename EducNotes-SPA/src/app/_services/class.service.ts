@@ -127,6 +127,10 @@ constructor(private http: HttpClient) { }
     return this.http.get(this.baseUrl + 'classes/' + classId + '/ClassCourses');
   }
 
+  getClassCoursesWithAgenda(classId, daysToNow, daysFromNow) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/CoursesWithAgenda/f/' + daysToNow + '/t/' + daysFromNow);
+  }
+
   getAllClasses() {
     return this.http.get<any[]>(this.baseUrl + 'classes/GetAllClasses');
   }

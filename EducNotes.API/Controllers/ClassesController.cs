@@ -506,6 +506,101 @@ namespace EducNotes.API.Controllers
             return Ok(courses);
         }
 
+        [HttpGet("{classId}/CoursesWithAgenda/f/{daysToNow}/t/{daysFromNow}")]
+        public async Task<IActionResult> GetClassCoursesWithAgenda(int classId, int daysToNow, int daysFromNow)
+        {
+            var today = DateTime.Now.Date;
+            var startDate = today.AddDays(-daysFromNow);
+            var EndDate = today.AddDays(daysFromNow);
+
+            var courses = await _context.ClassCourses
+                                    .Where(c => c.ClassId == classId)
+                                    .Select(s => s.Course).ToListAsync();
+
+            var classAgenda = await _context.Agendas
+                                    .OrderBy(o => o.DueDate)
+                                    .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= EndDate)
+                                    .ToListAsync();
+
+            List<CourseWithAgendaDto> coursesWithAgenda = new List<CourseWithAgendaDto>();
+            foreach (var course in courses)
+            {
+                CourseWithAgendaDto cwa = new CourseWithAgendaDto();
+                cwa.Id = course.Id;
+                cwa.Name = course.Name;
+                cwa.Abbrev = course.Abbreviation;
+                cwa.Color = course.Color;
+
+                var items = classAgenda.Where(a => a.CourseId == course.Id).ToList();
+                List<AgendaItemDto> agendaItems = new List<AgendaItemDto>();
+                foreach (var item in items)
+                {
+                    AgendaItemDto aid = new AgendaItemDto();
+
+                    CultureInfo frC = new CultureInfo("fr-FR");
+                    var strDateAdded = item.DateAdded.ToString("ddd dd MMM", frC);
+                    var strDueDate = item.DueDate.ToString("ddd dd MMM", frC);
+
+                    aid.strDateAdded = strDateAdded;
+                    aid.strDueDate = strDueDate;
+                    aid.TaskDesc = item.TaskDesc;
+                    aid.Done = item.Done;
+                    agendaItems.Add(aid);
+                }
+                cwa.AgendaItems = agendaItems;
+                cwa.NbItems = cwa.AgendaItems.Count();
+
+                coursesWithAgenda.Add(cwa);
+            }
+
+            return Ok(coursesWithAgenda);
+        }
+
+        [HttpGet("{classId}/AgendaByDates/f/{daysToNow}/t/{daysFromNow}")]
+        public async Task<IActionResult> GetAgendaByDate(int classId, int daysToNow, int daysFromNow)
+        {
+            var today = DateTime.Now.Date;
+            var startDate = today.AddDays(-daysFromNow);
+            var EndDate = today.AddDays(daysFromNow);
+
+            var classAgenda = await _context.Agendas
+                                    .Include(i => i.Course)
+                                    .OrderBy(o => o.DueDate)
+                                    .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= EndDate)
+                                    .ToListAsync();
+
+            var agendaDates = classAgenda.OrderBy(o => o.DueDate)
+                                .Select(a => a.DueDate).Distinct().ToList();
+
+            List<AgendaForListDto> AgendaList = new List<AgendaForListDto>();
+            foreach (var date in agendaDates)
+            {
+                AgendaForListDto afld = new AgendaForListDto();
+                afld.DueDate = date;
+
+                CultureInfo frC = new CultureInfo("fr-FR");
+                var shortDueDate = date.ToString("ddd dd MMM", frC);
+                var longDueDate = date.ToString("dd MMMM yyyy", frC);
+
+                afld.ShortDueDate = shortDueDate;
+                afld.LongDueDate = longDueDate;
+
+                afld.AgendaItems = new List<AgendaItemDto>();
+                var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();                
+                foreach (var item in agendaItems)
+                {
+                    AgendaItemDto aid = new AgendaItemDto();
+                    aid.TaskDesc = item.TaskDesc;
+                    aid.Done = item.Done;
+                    afld.AgendaItems.Add(aid);
+                }
+
+                AgendaList.Add(afld);
+            }
+
+            return Ok(AgendaList);
+        }
+
         [HttpPost("UpdateCourse/{courseId}")]
         public async Task<IActionResult> UpdateCourse(int courseId,CourseDto courseDto )
         {

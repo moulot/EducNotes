@@ -160,6 +160,7 @@ import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
 import { TagInputsComponent } from './views/forms/tag-inputs/tag-inputs.component';
 import { TagInputModule } from 'ngx-chips';
 import { EmailComponent } from './comm/email/email.component';
+import { StudentAgendaComponent } from './agenda/student-agenda/student-agenda.component';
 
 
 // the second parameter 'fr' is optional
@@ -271,7 +272,8 @@ export function tokenGetter() {
       ModalScheduleComponent,
       BroadcastComponent,
       TagInputsComponent,
-      EmailComponent
+      EmailComponent,
+      StudentAgendaComponent
    ],
    imports: [
      FormWizardModule,
