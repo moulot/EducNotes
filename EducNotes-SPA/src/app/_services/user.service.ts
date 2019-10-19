@@ -73,6 +73,10 @@ constructor(private http: HttpClient) {}
     return this.http.put(this.baseUrl + 'users/saveAbsence', absence);
   }
 
+  getStudentLifeData(userId) {
+    return this.http.get(this.baseUrl + 'users/' + userId + '/LifeData/');
+  }
+
   saveSanction(userSanction: UserSanction) {
     return this.http.put(this.baseUrl + 'users/saveSanction', userSanction);
   }

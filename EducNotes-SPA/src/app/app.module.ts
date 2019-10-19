@@ -161,6 +161,7 @@ import { TagInputsComponent } from './views/forms/tag-inputs/tag-inputs.componen
 import { TagInputModule } from 'ngx-chips';
 import { EmailComponent } from './comm/email/email.component';
 import { StudentAgendaComponent } from './agenda/student-agenda/student-agenda.component';
+import { StudentLifeComponent } from './classes/class-life/student-life/student-life.component';
 
 
 // the second parameter 'fr' is optional
@@ -273,7 +274,8 @@ export function tokenGetter() {
       BroadcastComponent,
       TagInputsComponent,
       EmailComponent,
-      StudentAgendaComponent
+      StudentAgendaComponent,
+      StudentLifeComponent
    ],
    imports: [
      FormWizardModule,

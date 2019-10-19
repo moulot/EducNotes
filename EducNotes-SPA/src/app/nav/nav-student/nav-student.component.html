@@ -6,9 +6,15 @@
     <a class="text-15 text-muted mr-3" [routerLink]="['/studentAgenda', user.id]">cahier de textes</a>
   </div>
   <div class="" routerLinkActive="active">
-    <a class="text-15 text-muted mr-3" [routerLink]="['/studentGrades']">notes</a>
+    <a class="text-15 text-muted mr-3" [routerLink]="['/studentGrades', user.id]">notes</a>
   </div>
-  <div class="" routerLinkActive="active">
-    <a class="text-15 text-muted mr-3" [routerLink]="['/student']">vie scolaire</a>
-  </div>
+  <div class="" ngbDropdown role="group" aria-label="Select all" placement="bottom-left">
+    <a class="dropdown-toggle text-15 text-muted mr-3 dd" ngbDropdownToggle>vie scolaire</a>
+    <div class="dropdown-menu" ngbDropdownMenu>
+      <button [routerLink]="['/studentSchedule', user.id]"  class="dropdown-item">emploi du temps</button>
+      <button [routerLink]="['/studentLife', user.id]"  class="dropdown-item">absences/sanctions</button>
+      <button [routerLink]="['/classStaff', user.classId]" class="dropdown-item">équipe pédagogique</button>
+      <!-- <button [routerLink]="['/templates']" class="dropdown-item">modèles de emails</button> -->
+    </div>
+  </div>  
 </div>

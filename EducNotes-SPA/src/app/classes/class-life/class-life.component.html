@@ -3,6 +3,7 @@
     <p class="lead">classe {{selectedClass.name}} - vie scolaire</p>
 
     <div class="row">
+
       <div class="col-lg-3 col-md-6 col-sm-6">
         <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
           <div class="card-body text-center">
@@ -61,7 +62,7 @@
       [nzFrontPagination]="true" [nzTitle]="title ? 'Absences' : null" nzBordered [nzData]="absencesList">
       <thead>
         <tr>
-            <th nzWidth="12%">élève</th>
+          <th nzWidth="12%">élève</th>
           <th nzWidth="24%">absence / retard</th>
           <th nzWidth="6%">durée</th>
           <th nzWidth="6%">justifié ?</th>

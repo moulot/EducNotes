@@ -1,7 +1,3 @@
-.box-course{
-  width: 20px;
-  height: 20px;
-}
 .course-color {
   width: 100%;
   height: 20px
@@ -9,14 +5,11 @@
 
 .scrollbar {
   float: left;
-  height: 300px;
-  // width: 100%;
-  background: #fff;
+  height: 400px;
   overflow-y: scroll;
-  margin-bottom: 25px;
   }
   .force-overflow {
-  min-height: 500px;
+  min-height: 350px;
   }
   
   .scrollbar-primary::-webkit-scrollbar {

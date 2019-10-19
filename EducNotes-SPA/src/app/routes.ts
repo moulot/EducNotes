@@ -59,6 +59,7 @@ import { EmailComponent } from './comm/email/email.component';
 import { Component } from '@angular/core';
 import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
 import { StudentAgendaComponent } from './agenda/student-agenda/student-agenda.component';
+import { StudentLifeComponent } from './classes/class-life/student-life/student-life.component';
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
@@ -86,6 +87,7 @@ export const appRoutes: Routes = [
             {path: 'classes', component: ClassPanelComponent},
             {path: 'notes', component: GradePanelComponent},
             {path: 'classLife/:classId', component: ClassLifeComponent},
+            {path: 'studentLife/:id', component: StudentLifeComponent, resolve: {student: StudentResolver}},
             {path: 'studentNotes/:id', component: GradeStudentComponent},
             {path: 'classScheduleEdit', component: ClassScheduleComponent},
             {path: 'studentsClass/:classId', component: ClassStudentsComponent},

@@ -481,6 +481,53 @@ namespace EducNotes.API.Controllers
             throw new Exception($"l'ajout de l'absence a échoué");
         }
 
+        [HttpGet("{userId}/LifeData")]
+        public async Task<IActionResult> GetStudentLifeData(int userId)
+        {
+            var absences = await _context.Absences
+                                .Include(i => i.User)
+                                .Where(a => a.UserId == userId)
+                                .OrderByDescending(o => o.StartDate).ToListAsync();
+
+            //var nbAbscences = absences.Count();
+            var absencesToReturn = _mapper.Map<IEnumerable<AbsencesToReturnDto>>(absences);
+
+            var sanctions = await _context.UserSanctions
+                .Include(i => i.Sanction)
+                .Include(i => i.User)
+                .Include(i => i.SanctionedBy)
+                .Where(a => a.User.Id == userId)
+                .OrderByDescending(a => a.SanctionDate).ToListAsync();
+
+            //var nbSanctions = sanctions.Count();
+            var sanctionsToReturn = _mapper.Map<IEnumerable<UserSanctionsToReturnDto>>(sanctions);
+
+            return Ok(new {
+                absences = absencesToReturn,
+                //nbAbsences = nbAbscences,
+                sanctions = sanctionsToReturn,
+                //nbSanctions = nbSanctions
+            });
+        }
+
+        [HttpGet("{userId}/Absences")]
+        public async Task<IActionResult> GetAbsences(int userId)
+        {
+            var absences = await _context.Absences
+                                .Include(i => i.User)
+                                .Where(a => a.UserId == userId)
+                                .OrderByDescending(o => o.StartDate).ToListAsync();
+
+            var nbClassAbscences = absences.Count();
+
+            var absencesToReturn = _mapper.Map<IEnumerable<AbsencesToReturnDto>>(absences);
+
+            return Ok(new {
+                absences = absencesToReturn,
+                nbAbsences = nbClassAbscences
+            });
+        }
+
         [HttpPut("SaveSanction")]
         public async Task<IActionResult> SaveSanction([FromBody]UserSanction userSanction)
         {

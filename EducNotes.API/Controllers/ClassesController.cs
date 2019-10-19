@@ -556,7 +556,7 @@ namespace EducNotes.API.Controllers
             return Ok(coursesWithAgenda);
         }
 
-        [HttpGet("{classId}/AgendaByDates/f/{daysToNow}/t/{daysFromNow}")]
+        [HttpGet("{classId}/AgendaByDate/f/{daysToNow}/t/{daysFromNow}")]
         public async Task<IActionResult> GetAgendaByDate(int classId, int daysToNow, int daysFromNow)
         {
             var today = DateTime.Now.Date;
@@ -586,14 +586,20 @@ namespace EducNotes.API.Controllers
                 afld.LongDueDate = longDueDate;
 
                 afld.AgendaItems = new List<AgendaItemDto>();
-                var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();                
+                var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();           
                 foreach (var item in agendaItems)
                 {
                     AgendaItemDto aid = new AgendaItemDto();
+                    aid.CourseId = item.CourseId;
+                    aid.CourseName = item.Course.Name;
+                    aid.CourseAbbrev = item.Course.Abbreviation;
+                    aid.CourseColor = item.Course.Color;
+                    aid.strDateAdded = item.DateAdded.ToShortDateString();
                     aid.TaskDesc = item.TaskDesc;
                     aid.Done = item.Done;
                     afld.AgendaItems.Add(aid);
                 }
+                afld.NbItems = agendaItems.Count();
 
                 AgendaList.Add(afld);
             }

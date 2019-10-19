@@ -105,7 +105,7 @@
 
       <div class="col-md-6">
         <div class="card mb-4 scrollbar scrollbar-primary">
-            <div class="card-body force-overflow">
+            <div class="card-body ">
               <div class="card-title d-flex">
                 <div class="flex-grow-1 lead">devoirs à faire</div>
                 <div>
@@ -190,17 +190,17 @@
                         <div class="card mb-1">
                           <div class="card-body p-2">
                             <div class="row">
-                              <div class="col-md-1">
-                                <div class="box-course mr-1" [ngStyle]="{'background-color': course.courseColor}" style="height: 100%;"></div>
-                              </div>
-                              <div class="col-md-11">
-                                <div class="d-flex">
-                                  <div class="flex-grow-1 m-0">
-                                    <p class="m-0"><b>{{course.courseName}}</b></p>
+                              <div class="col-md-12 d-flex">
+                                <div class="mr-2" [ngStyle]="{'background-color': course.courseColor}" style="width: 25px; height: 100%;"></div>
+                                <div class="flex-grow-1">
+                                  <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                      <p class="m-0"><b>{{course.courseName}}</b></p>
+                                    </div>
+                                    <div class="m-0 text-small text-muted">donné le {{course.shortDateAdded}}</div>
                                   </div>
-                                  <div class="m-0 text-small text-muted">donné le {{course.shortDateAdded}}</div>
+                                  <div class="m-0 text-14 pt-1">{{course.taskDesc}}</div>    
                                 </div>
-                                <div class="m-0 text-14 pt-1">{{course.taskDesc}}</div>
                               </div>
                             </div>
                           </div>
@@ -234,17 +234,17 @@
               <div class="card mb-2">
                 <div class="card-body p-2">
                   <div class="row">
-                    <div class="col-md-1">
-                      <div class="box-course mr-1" [ngStyle]="{'background-color': eval.courseColor}" style="height: 100%;"></div>
-                    </div>
-                    <div class="col-md-11">
-                      <div class="d-flex">
-                        <div class="flex-grow-1 m-0">
-                          <p class="m-0"><b>{{eval.courseName}}</b></p>
+                    <div class="col-md-12 d-flex">
+                      <div class="box-course mr-2" [ngStyle]="{'background-color': eval.courseColor}" style="width: 20px;height: 100%;"></div>
+                      <div class="flex-grow-1">
+                        <div class="d-flex">
+                          <div class="flex-grow-1">
+                            <p class="m-0"><b>{{eval.courseName}}</b></p>
+                          </div>
+                          <div class="m-0 text-12 text-muted">prévue le {{eval.evalDate}}</div>    
                         </div>
-                        <div class="m-0 text-12 text-muted">prévue le {{eval.evalDate}}</div>      
+                        <div class="m-0 text-14 p-0">{{eval.evalTypeName}}</div>
                       </div>
-                      <div class="m-0 text-14 p-0">{{eval.evalTypeName}}</div>
                     </div>
                   </div>
                 </div>

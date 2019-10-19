@@ -16,7 +16,8 @@ import { Course } from 'src/app/_models/course';
 export class StudentAgendaComponent implements OnInit {
   student: User;
   classRoom: Class;
-  courses: any;
+  coursesWithAgenda: any;
+  classAgendaByDate: any;
   userIdFromRoute: any;
   strFirstDay: string;
   strLastDay: string;
@@ -52,6 +53,7 @@ export class StudentAgendaComponent implements OnInit {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
       this.getClassCoursesWithAgenda(this.student.classId, this.daysToNow, this.daysFromNow);
+      this.getClassAgendaByDate(this.student.classId, this.daysToNow, this.daysFromNow);
     }, error => {
       this.alertify.error(error);
     });
@@ -75,10 +77,22 @@ export class StudentAgendaComponent implements OnInit {
 
   getClassCoursesWithAgenda(classId, daysToNow, daysFromNow) {
     this.classService.getClassCoursesWithAgenda(classId, daysToNow, daysFromNow).subscribe((courses: any) => {
-      this.courses = courses;
+      this.coursesWithAgenda = courses;
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  getClassAgendaByDate(classId, daysToNow, daysFromNow) {
+    this.classService.getClassAgendaByDate(classId, daysToNow, daysFromNow).subscribe((agenda: any) => {
+      this.classAgendaByDate = agenda;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  showCourseItems(courseId) {
+
   }
 
   getClass(classId) {

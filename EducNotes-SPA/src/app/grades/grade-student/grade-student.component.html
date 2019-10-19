@@ -4,11 +4,11 @@
     <p class="lead m-0">{{student?.firstName}} {{student?.lastName}} - classe {{classRoom?.name}}</p>
   </div>
 
-  <div class="col-lg-8 col-md-12 mb-2">
+  <div class="col-md-12 mb-2">
 
     <div class="row">
 
-      <div class="col-md-12">
+      <div class="col-md-12 mb-1">
 
         <div class="card">
             <div class="card-body">
@@ -32,37 +32,45 @@
           </div>
       </div>
 
+    </div>
 
-      <div class="col-lg-12 col-md-12 mb-2">
+  </div>
+
+  <div class="col-md-12">
+
+    <div class="row">
+
+      <div class="col-md-8 mb-2">
+
         <div class="card">
           <div class="card-body p-0">
-            <h5 class="lead m-0 p-1">graphes des notes de l'élève - notes sur 20</h5>
+            <p class="text-15 m-0 p-1">graphes des notes de l'élève - notes sur 20</p>
             <div echarts [options]="chartLineOption3" style="height: 150px"></div>
           </div>
         </div>
+
       </div>
-      
-    </div>
-
-  </div>
-
-  <div class="col-lg-4 col-md-12">
-    <div class="card">
-      <div class="card-body">
-        <p class="lead">détails des notes</p>
-        <div *ngFor="let grade of evalData; let i = index">
-          <p class="text-muted text-14 m-0">
-            {{grade.evalDate}}. {{grade.evalType}} (-){{grade.classGradeMin}} 
-            <label class="text-danger" *ngIf="aboveAvg[i] === false"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
-            <label class="text-success" *ngIf="aboveAvg[i] === true"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
-            (+){{grade.classGradeMax}}
-          </p>
+            
+      <div class="col-md-4">
+  
+        <div class="card">
+          <div class="card-body">
+            <p class="lead">détails des notes</p>
+            <div *ngFor="let grade of evalData; let i = index">
+              <p class="text-muted text-14 m-0">
+                {{grade.evalDate}}. {{grade.evalType}} (-){{grade.classGradeMin}} 
+                <label class="text-danger" *ngIf="aboveAvg[i] === false"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
+                <label class="text-success" *ngIf="aboveAvg[i] === true"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
+                (+){{grade.classGradeMax}}
+              </p>
+            </div>
+          </div>
         </div>
+  
       </div>
+            
     </div>
+      
   </div>
 
-</div>
-
-<div class="row">
 </div>
