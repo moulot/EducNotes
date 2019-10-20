@@ -34,6 +34,8 @@ export class ClassScheduleComponent implements OnInit {
   agendaItems: Schedule[] = [];
   showTimeline = false;
   classControl = new FormControl();
+  hourCols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  weekdays = [0, 1, 2, 3, 4, 5];
 
   constructor(private classService: ClassService, public alertify: AlertifyService,
     private modalService: NgbModal, private router: Router) { }

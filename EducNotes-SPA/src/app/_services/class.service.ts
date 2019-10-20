@@ -21,9 +21,8 @@ constructor(private http: HttpClient) { }
     return this.http.get<Class>(this.baseUrl + 'classes/' + classId);
   }
 
-  // pour recuperer les eleves d'une classe a partir de classId
   getClassTeachers(classId): Observable<User[]> {
-    return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/ClassTeachers');
+    return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/CourseWithTeacher');
   }
 
   getTodayToNDaysAgenda(classId, toNbDays) {

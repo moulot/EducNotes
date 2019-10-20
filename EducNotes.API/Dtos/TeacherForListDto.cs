@@ -14,6 +14,7 @@ namespace EducNotes.API.Dtos
        public string PhoneNumber { get; set; }
        public string DateOfBirth { get; set; }
        public string SeconPhoneNumber { get; set; }
+       public Course Course { get; set; }
         public List<TeacherCourseClassesDto> CourseClasses { get; set; }
     }
 

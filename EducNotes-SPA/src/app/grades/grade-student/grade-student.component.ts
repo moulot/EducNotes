@@ -26,7 +26,6 @@ export class GradeStudentComponent implements OnInit {
     private alertify: AlertifyService, private classService: ClassService) { }
 
   ngOnInit() {
-
     this.route.data.subscribe(data => {
       this.student = data['student'];
       this.getCoursesWithEvals(this.student.id, this.student.classId);

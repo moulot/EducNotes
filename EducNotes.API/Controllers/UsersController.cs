@@ -486,6 +486,7 @@ namespace EducNotes.API.Controllers
         {
             var absences = await _context.Absences
                                 .Include(i => i.User)
+                                .Include(i => i.AbsenceType)
                                 .Where(a => a.UserId == userId)
                                 .OrderByDescending(o => o.StartDate).ToListAsync();
 

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using EducNotes.API.Data;
@@ -155,17 +154,32 @@ namespace EducNotes.API.Controllers
            return BadRequest("Aucun emploi du temps trouvé");            
         }
 
-        [HttpGet("{classId}/ClassTeachers")]
-        public async Task<IActionResult> GetClassTeachers(int classId)
+        [HttpGet("{classId}/CourseWithTeacher")]
+        public async Task<IActionResult> GetCourseWithTeacher(int classId)
         {
-            var teachers = await _context.ClassCourses
-                                    .Where(c => c.ClassId == classId)
-                                    .Select(s => s.Teacher).Distinct().ToListAsync();
+            var teachersData = await _context.ClassCourses
+                                    .Include(i => i.Teacher).ThenInclude(i => i.Photos)
+                                    .Include(i => i.Course)
+                                    .Where(u => u.ClassId == classId)
+                                    .Distinct().ToListAsync();
 
+            List<TeacherForListDto> coursesWithTeacher = new List<TeacherForListDto>();
+            foreach (var data in teachersData)
+            {
+                TeacherForListDto teacherCourse = new TeacherForListDto();
+                teacherCourse.Id = data.Id;
+                teacherCourse.LastName = data.Teacher.LastName;
+                teacherCourse.FirstName = data.Teacher.FirstName;
+                teacherCourse.Email = data.Teacher.Email;
+                teacherCourse.PhotoUrl = data.Teacher.Photos.FirstOrDefault(p => p.IsMain).Url;
+                teacherCourse.PhoneNumber = data.Teacher.PhoneNumber;
+                teacherCourse.DateOfBirth = data.Teacher.DateOfBirth.ToShortDateString();
+                teacherCourse.SeconPhoneNumber = data.Teacher.SecondPhoneNumber;
+                teacherCourse.Course = data.Course;
+                coursesWithTeacher.Add(teacherCourse);
+            }
 
-            var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(teachers);
-
-            return Ok(usersToReturn);
+            return Ok(coursesWithTeacher);
         }
 
         [HttpGet("{classId}/Students")]

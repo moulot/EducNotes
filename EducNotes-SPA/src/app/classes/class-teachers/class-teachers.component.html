@@ -1,0 +1,48 @@
+<div class="row">
+
+  <div class="col-md-12 mb-2">
+    <p class="text-17 m-0">vie de la classe - équipe pédagogique</p>
+  </div>
+
+  <div class="col-md-10 card mb-1 p-0">
+    <div class="card-body p-1">
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-2"><b>nom & prénom</b></div>
+        <div class="col-md-4"><b>email</b></div>
+        <div class="col-md-2"><b>téléphone</b></div>
+        <div class="col-md-3"><b>cours</b></div>
+      </div>
+    </div>      
+  </div>
+      
+  <div class="card col-md-10 mb-1 p-0" *ngFor="let user of teachers">
+
+    <div class="card-body p-0">
+
+      <div class="row">
+        <div class="col-md-1">
+          <div>
+            <img class="img-box" src="{{user.photoUrl || '../../../../../assets/user.png'}}" alt="">
+          </div>
+        </div>
+        <div class="col-md-2 mt-3">
+          <p class="text-15 m-0">{{user.lastName}} {{user.firstName}}</p>
+        </div>
+        <div class="col-md-2 mt-3">
+          <div class="d-flex">
+            <div class="mr-2" [ngStyle]="{'background-color': user.course.color}" style="width: 20px;height: 20px;"></div>
+            <p class="text-15">{{user.course.name}}</p>
+          </div>
+        </div>
+        <div class="col-md-4 mt-3">
+          <p class="text-15">{{user.email}}</p>
+        </div>
+        <div class="col-md-2 mt-3">
+          <p class="text-15">{{user.phoneNumber}}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -87,8 +87,7 @@ namespace EducNotes.API.Data
         public async Task<User> GetUser(int id, bool isCurrentUser)
         {
             var query = _context.Users
-                        //.Include(i => i.Father)
-                        .Include(p => p.Photos).AsQueryable();
+                            .Include(p => p.Photos).AsQueryable();
 
             if (isCurrentUser)
                 query = query.IgnoreQueryFilters();
