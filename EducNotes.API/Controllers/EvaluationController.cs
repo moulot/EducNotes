@@ -113,12 +113,7 @@ namespace EducNotes.API.Controllers
                                         on course.ClassId equals user.ClassId
                                         where user.ClassId == classId
                                         orderby course.Course.Name
-                                        select new
-                                        {
-                                            CourseId = course.Course.Id,
-                                            CourseName = course.Course.Name,
-                                            CourseAbbrev = course.Course.Abbreviation
-                                        }).Distinct().ToListAsync();
+                                        select course.Course).Distinct().ToListAsync();
 
             List<UserEvalsDto> coursesWithEvals = new List<UserEvalsDto>();
 
@@ -134,15 +129,14 @@ namespace EducNotes.API.Controllers
                 var UserEvals = await _context.UserEvaluations
                     .Include(e => e.Evaluation).ThenInclude(e => e.EvalType)
                     .OrderBy(o => o.Evaluation.EvalDate)
-                    .Where(e => e.UserId == userId &&
-                        e.Evaluation.GradeInLetter == false &&
-                        e.Evaluation.CourseId == acourse.CourseId &&
-                        e.Evaluation.Graded == true).Distinct().ToListAsync();
+                    .Where(e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
+                        e.Evaluation.CourseId == acourse.Id && e.Evaluation.Graded == true)
+                    .Distinct().ToListAsync();
 
                 UserEvalsDto userEvalsDto = new UserEvalsDto();
-                userEvalsDto.CourseId = acourse.CourseId;
-                userEvalsDto.CourseName = acourse.CourseName;
-                userEvalsDto.CourseAbbrev = acourse.CourseAbbrev;
+                userEvalsDto.CourseId = acourse.Id;
+                userEvalsDto.CourseName = acourse.Name;
+                userEvalsDto.CourseAbbrev = acourse.Abbreviation;
                 userEvalsDto.GradedOutOf = 20;
 
                 if (UserEvals.Count() > 0)
@@ -160,7 +154,7 @@ namespace EducNotes.API.Controllers
                             double gradeMax = Convert.ToDouble(elt.Evaluation.MaxGrade);
                             double gradeValue = Convert.ToDouble(elt.Grade);
                             // grade are ajusted to 20 as MAx. Avg is on 20
-                            double ajustedGrade = 20 * gradeValue / gradeMax;
+                            double ajustedGrade = Math.Round(20 * gradeValue / gradeMax, 2);
                             double coeff = elt.Evaluation.Coeff;
                             gradesSum += ajustedGrade * coeff;
                             coeffSum += coeff;
@@ -168,6 +162,7 @@ namespace EducNotes.API.Controllers
                             var EvalClassGrades = await _context.UserEvaluations
                                                         .Where(e => e.EvaluationId == elt.EvaluationId)
                                                         .Select(e => Convert.ToDouble(e.Grade)).ToListAsync();
+        
                             double EvalGradeMin = EvalClassGrades.Min();
                             double EvalGradeMax = EvalClassGrades.Max();
                             
@@ -189,31 +184,60 @@ namespace EducNotes.API.Controllers
                     courseAvgSum += gradesAvg;
                     courseCoeffSum += 1; // default course coeff to 1
 
-                    double ClassGradeMin = 0;
-                    double ClassGradeMax = 0;
+                    double ClassCourseAvg = GetClassCourseEvalData(acourse.Id, classId);
 
-                    userEvalsDto.grades = grades;
                     userEvalsDto.UserCourseAvg = gradesAvg;
-                    userEvalsDto.ClassMinGrade = ClassGradeMin;
-                    userEvalsDto.ClassMaxGrade = ClassGradeMax;
+                    userEvalsDto.ClassCourseAvg = ClassCourseAvg;
+                    userEvalsDto.grades = grades;
                     coursesWithEvals.Add(userEvalsDto);
                 }
                 else
                 {
-                    //userEvalsDto.grades = grades;
                     userEvalsDto.UserCourseAvg = -1000;
-                    userEvalsDto.ClassMinGrade = -1000;
-                    userEvalsDto.ClassMaxGrade = -1000;
                     coursesWithEvals.Add(userEvalsDto);
                 }
             }
 
             var GeneralAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
 
-            return Ok(new {
-                StudentAvg = GeneralAvg,
-                coursesWithEvals
-            });
+            if(coursesWithEvals.Count() > 0)
+            {
+                return Ok(new {
+                    StudentAvg = GeneralAvg,
+                    coursesWithEvals
+                });
+            }
+            else
+            {
+                return NoContent();
+            }
+        }
+
+        public double GetClassCourseEvalData(int courseId, int classId)
+        {
+            var ClassEvals = _context.UserEvaluations
+                .Include(e => e.Evaluation)
+                .OrderBy(o => o.Evaluation.EvalDate)
+                .Where(e => e.Evaluation.ClassId == classId && e.Evaluation.GradeInLetter == false &&
+                    e.Evaluation.CourseId == courseId && e.Evaluation.Graded == true &&
+                    e.Grade.IsNumeric())
+                .Distinct().ToList();
+
+            double gradesSum = 0;
+            double coeffSum = 0;
+            for(int i = 0; i < ClassEvals.Count(); i++)
+            {
+                var elt = ClassEvals[i];
+                double gradeMax = Convert.ToDouble(elt.Evaluation.MaxGrade);
+                double gradeValue = Convert.ToDouble(elt.Grade);
+                // grade are ajusted to 20 as MAx. Avg is on 20
+                double ajustedGrade = Math.Round(20 * gradeValue / gradeMax, 2);
+                double coeff = elt.Evaluation.Coeff;
+                gradesSum += ajustedGrade * coeff;
+                coeffSum += coeff;
+            }
+
+            return Math.Round(gradesSum / coeffSum, 2);
         }
 
         [HttpGet("CoursesSkills")]

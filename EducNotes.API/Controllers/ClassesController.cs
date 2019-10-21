@@ -171,7 +171,7 @@ namespace EducNotes.API.Controllers
                 teacherCourse.LastName = data.Teacher.LastName;
                 teacherCourse.FirstName = data.Teacher.FirstName;
                 teacherCourse.Email = data.Teacher.Email;
-                teacherCourse.PhotoUrl = data.Teacher.Photos.FirstOrDefault(p => p.IsMain).Url;
+                teacherCourse.PhotoUrl = "";//data.Teacher.Photos.FirstOrDefault(p => p.IsMain).Url;
                 teacherCourse.PhoneNumber = data.Teacher.PhoneNumber;
                 teacherCourse.DateOfBirth = data.Teacher.DateOfBirth.ToShortDateString();
                 teacherCourse.SeconPhoneNumber = data.Teacher.SecondPhoneNumber;

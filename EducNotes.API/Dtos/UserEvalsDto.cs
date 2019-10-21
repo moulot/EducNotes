@@ -12,10 +12,9 @@ namespace EducNotes.API.Dtos
         public string CourseName { get; set; }
         public string CourseAbbrev { get; set; }
         public int GradedOutOf { get; set; }
-        public List<GradeDto> grades { get; set; }
         public double UserCourseAvg { get; set; }
-        public double ClassMinGrade { get; set; }
-        public double ClassMaxGrade { get; set; }
+        public double ClassCourseAvg { get; set; }
+        public List<GradeDto> grades { get; set; }
     }
 
     public class GradeDto
@@ -26,7 +25,6 @@ namespace EducNotes.API.Dtos
         public double Grade { get; set; }
         public double GradeMax { get; set; }
         public double Coeff { get; set; }
-
         public double ClassGradeMin { get; set; }
         public double ClassGradeMax { get; set; }
     }
