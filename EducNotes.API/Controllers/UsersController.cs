@@ -50,22 +50,37 @@ namespace EducNotes.API.Controllers
             professorRoleName = _config.GetValue<String>("AppSettings:professorRoleName");
             
         }
-        [HttpGet]
-        public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
-        {
-            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            var userFromRepo = await _repo.GetUser(currentUserId, true);
+        // [HttpGet]
+        // public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
+        // {
+        //     var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            userParams.userId = currentUserId;
+        //     var userFromRepo = await _repo.GetUser(currentUserId, true);
+
+        //     userParams.userId = currentUserId;
 
            
-            var users = await _repo.GetUsers(userParams);
+        //     var users = await _repo.GetUsers(userParams);
 
-            var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
+        //     var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
 
-            Response.AddPagination(users.CurrentPage, users.PageSize,
-            users.TotalCount, users.TotalPages);
+        //     Response.AddPagination(users.CurrentPage, users.PageSize,
+        //     users.TotalCount, users.TotalPages);
+
+        //     return Ok(usersToReturn);
+        // }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = await _context.Users
+                                .Include(i => i.Class)
+                                .Include(i => i.UserType)
+                                .Where(u => u.Active == 1 && u.EmailConfirmed == true)
+                                .OrderBy(u => u.LastName).ToListAsync();
+
+            var usersToReturn = _mapper.Map<IEnumerable<UserForAutoCompleteDto>>(users);
 
             return Ok(usersToReturn);
         }
@@ -464,6 +479,54 @@ namespace EducNotes.API.Controllers
                 return NoContent();
 
             throw new Exception($"l'ajout de l'absence a échoué");
+        }
+
+        [HttpGet("{userId}/LifeData")]
+        public async Task<IActionResult> GetStudentLifeData(int userId)
+        {
+            var absences = await _context.Absences
+                                .Include(i => i.User)
+                                .Include(i => i.AbsenceType)
+                                .Where(a => a.UserId == userId)
+                                .OrderByDescending(o => o.StartDate).ToListAsync();
+
+            //var nbAbscences = absences.Count();
+            var absencesToReturn = _mapper.Map<IEnumerable<AbsencesToReturnDto>>(absences);
+
+            var sanctions = await _context.UserSanctions
+                .Include(i => i.Sanction)
+                .Include(i => i.User)
+                .Include(i => i.SanctionedBy)
+                .Where(a => a.User.Id == userId)
+                .OrderByDescending(a => a.SanctionDate).ToListAsync();
+
+            //var nbSanctions = sanctions.Count();
+            var sanctionsToReturn = _mapper.Map<IEnumerable<UserSanctionsToReturnDto>>(sanctions);
+
+            return Ok(new {
+                absences = absencesToReturn,
+                //nbAbsences = nbAbscences,
+                sanctions = sanctionsToReturn,
+                //nbSanctions = nbSanctions
+            });
+        }
+
+        [HttpGet("{userId}/Absences")]
+        public async Task<IActionResult> GetAbsences(int userId)
+        {
+            var absences = await _context.Absences
+                                .Include(i => i.User)
+                                .Where(a => a.UserId == userId)
+                                .OrderByDescending(o => o.StartDate).ToListAsync();
+
+            var nbClassAbscences = absences.Count();
+
+            var absencesToReturn = _mapper.Map<IEnumerable<AbsencesToReturnDto>>(absences);
+
+            return Ok(new {
+                absences = absencesToReturn,
+                nbAbsences = nbClassAbscences
+            });
         }
 
         [HttpPut("SaveSanction")]

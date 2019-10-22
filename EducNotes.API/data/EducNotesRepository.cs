@@ -97,8 +97,8 @@ namespace EducNotes.API.Data
         public async Task<User> GetUser(int id, bool isCurrentUser)
         {
             var query = _context.Users
-                        //.Include(i => i.Father)
-                        .Include(p => p.Photos).AsQueryable();
+                            .Include(c => c.Class)
+                            .Include(p => p.Photos).AsQueryable();
 
             if (isCurrentUser)
                 query = query.IgnoreQueryFilters();
@@ -458,7 +458,7 @@ namespace EducNotes.API.Data
         {
               try
               {
-                  await _emailSender.SendEmailAsync(emailFormDto.toEmail, emailFormDto.subject,emailFormDto.content);
+                  await _emailSender.SendEmailAsync(emailFormDto.toEmail, emailFormDto.subject, emailFormDto.content);
                   return true;
               }
               catch (System.Exception)
@@ -678,7 +678,7 @@ namespace EducNotes.API.Data
                         parentFromRepo.LastName = user.LastName;
                         parentFromRepo.FirstName = user.FirstName;
                         if(user.DateOfBirth!=null)
-                        parentFromRepo.DateOfBirth = user.DateOfBirth;
+                        parentFromRepo.DateOfBirth = Convert.ToDateTime(user.DateOfBirth);
                         parentFromRepo.CityId = user.CityId;
                         parentFromRepo.DistrictId = user.DistrictId;
                         parentFromRepo.PhoneNumber = user.PhoneNumber;

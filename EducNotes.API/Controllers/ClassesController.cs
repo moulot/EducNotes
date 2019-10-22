@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using EducNotes.API.Data;
@@ -155,17 +154,32 @@ namespace EducNotes.API.Controllers
            return BadRequest("Aucun emploi du temps trouvé");            
         }
 
-        [HttpGet("{classId}/ClassTeachers")]
-        public async Task<IActionResult> GetClassTeachers(int classId)
+        [HttpGet("{classId}/CourseWithTeacher")]
+        public async Task<IActionResult> GetCourseWithTeacher(int classId)
         {
-            var teachers = await _context.ClassCourses
-                                    .Where(c => c.ClassId == classId)
-                                    .Select(s => s.Teacher).Distinct().ToListAsync();
+            var teachersData = await _context.ClassCourses
+                                    .Include(i => i.Teacher).ThenInclude(i => i.Photos)
+                                    .Include(i => i.Course)
+                                    .Where(u => u.ClassId == classId)
+                                    .Distinct().ToListAsync();
 
+            List<TeacherForListDto> coursesWithTeacher = new List<TeacherForListDto>();
+            foreach (var data in teachersData)
+            {
+                TeacherForListDto teacherCourse = new TeacherForListDto();
+                teacherCourse.Id = Convert.ToInt32(data.TeacherId);
+                teacherCourse.LastName = data.Teacher.LastName;
+                teacherCourse.FirstName = data.Teacher.FirstName;
+                teacherCourse.Email = data.Teacher.Email;
+                teacherCourse.PhotoUrl = "";//data.Teacher.Photos.FirstOrDefault(p => p.IsMain).Url;
+                teacherCourse.PhoneNumber = data.Teacher.PhoneNumber;
+                teacherCourse.DateOfBirth = data.Teacher.DateOfBirth.ToShortDateString();
+                teacherCourse.SeconPhoneNumber = data.Teacher.SecondPhoneNumber;
+                teacherCourse.Course = data.Course;
+                coursesWithTeacher.Add(teacherCourse);
+            }
 
-            var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(teachers);
-
-            return Ok(usersToReturn);
+            return Ok(coursesWithTeacher);
         }
 
         [HttpGet("{classId}/Students")]
@@ -506,6 +520,107 @@ namespace EducNotes.API.Controllers
             return Ok(courses);
         }
 
+        [HttpGet("{classId}/CoursesWithAgenda/f/{daysToNow}/t/{daysFromNow}")]
+        public async Task<IActionResult> GetClassCoursesWithAgenda(int classId, int daysToNow, int daysFromNow)
+        {
+            var today = DateTime.Now.Date;
+            var startDate = today.AddDays(-daysToNow);
+            var EndDate = today.AddDays(daysFromNow);
+
+            var courses = await _context.ClassCourses
+                                    .Where(c => c.ClassId == classId)
+                                    .Select(s => s.Course).ToListAsync();
+
+            var classAgenda = await _context.Agendas
+                                    .OrderBy(o => o.DueDate)
+                                    .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= EndDate)
+                                    .ToListAsync();
+
+            List<CourseWithAgendaDto> coursesWithAgenda = new List<CourseWithAgendaDto>();
+            foreach (var course in courses)
+            {
+                CourseWithAgendaDto cwa = new CourseWithAgendaDto();
+                cwa.Id = course.Id;
+                cwa.Name = course.Name;
+                cwa.Abbrev = course.Abbreviation;
+                cwa.Color = course.Color;
+
+                var items = classAgenda.Where(a => a.CourseId == course.Id).ToList();
+                List<AgendaItemDto> agendaItems = new List<AgendaItemDto>();
+                foreach (var item in items)
+                {
+                    AgendaItemDto aid = new AgendaItemDto();
+
+                    CultureInfo frC = new CultureInfo("fr-FR");
+                    var strDateAdded = item.DateAdded.ToString("ddd dd MMM", frC);
+                    var strDueDate = item.DueDate.ToString("ddd dd MMM", frC);
+
+                    aid.strDateAdded = strDateAdded;
+                    aid.strDueDate = strDueDate;
+                    aid.TaskDesc = item.TaskDesc;
+                    aid.Done = item.Done;
+                    agendaItems.Add(aid);
+                }
+                cwa.AgendaItems = agendaItems;
+                cwa.NbItems = cwa.AgendaItems.Count();
+
+                coursesWithAgenda.Add(cwa);
+            }
+
+            return Ok(coursesWithAgenda.OrderBy(c => c.Name));
+        }
+
+        [HttpGet("{classId}/AgendaByDate/f/{daysToNow}/t/{daysFromNow}")]
+        public async Task<IActionResult> GetAgendaByDate(int classId, int daysToNow, int daysFromNow)
+        {
+            var today = DateTime.Now.Date;
+            var startDate = today.AddDays(-daysToNow);
+            var EndDate = today.AddDays(daysFromNow);
+
+            var classAgenda = await _context.Agendas
+                                    .Include(i => i.Course)
+                                    .OrderBy(o => o.DueDate)
+                                    .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= EndDate)
+                                    .ToListAsync();
+
+            var agendaDates = classAgenda.OrderBy(o => o.DueDate)
+                                .Select(a => a.DueDate).Distinct().ToList();
+
+            List<AgendaForListDto> AgendaList = new List<AgendaForListDto>();
+            foreach (var date in agendaDates)
+            {
+                AgendaForListDto afld = new AgendaForListDto();
+                afld.DueDate = date;
+
+                CultureInfo frC = new CultureInfo("fr-FR");
+                var shortDueDate = date.ToString("ddd dd MMM", frC);
+                var longDueDate = date.ToString("dd MMMM yyyy", frC);
+
+                afld.ShortDueDate = shortDueDate;
+                afld.LongDueDate = longDueDate;
+
+                afld.AgendaItems = new List<AgendaItemDto>();
+                var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();           
+                foreach (var item in agendaItems)
+                {
+                    AgendaItemDto aid = new AgendaItemDto();
+                    aid.CourseId = item.CourseId;
+                    aid.CourseName = item.Course.Name;
+                    aid.CourseAbbrev = item.Course.Abbreviation;
+                    aid.CourseColor = item.Course.Color;
+                    aid.strDateAdded = item.DateAdded.ToShortDateString();
+                    aid.TaskDesc = item.TaskDesc;
+                    aid.Done = item.Done;
+                    afld.AgendaItems.Add(aid);
+                }
+                afld.NbItems = agendaItems.Count();
+
+                AgendaList.Add(afld);
+            }
+
+            return Ok(AgendaList);
+        }
+
         [HttpPost("UpdateCourse/{courseId}")]
         public async Task<IActionResult> UpdateCourse(int courseId,CourseDto courseDto )
         {
@@ -555,13 +670,34 @@ namespace EducNotes.API.Controllers
           return Ok(dataToReturn);
         }
 
+        [HttpPost("ClassLevelsWithClasses")]
+        public async Task<IActionResult> GetClassLevelWithClasses(List<int> CLIds)
+        {
+            var classLevels = await _context.ClassLevels
+                                        .Where(c => CLIds.Contains(c.Id)).ToListAsync();
+
+            foreach (var cl in classLevels)
+            {
+                cl.Classes = await _context.Classes
+                                    .OrderBy(c => c.Name)
+                                    .Where(c => c.ClassLevelId == cl.Id).ToListAsync();
+
+                foreach (var aclass in cl.Classes)
+                {
+                    aclass.Students = await _context.Users.Where(u => u.ClassId == aclass.Id).ToListAsync();
+                }
+            }
+
+            return Ok(classLevels);
+        }
+
         [HttpGet("{classLevelId}/SearchClassesByLevel")]
         public async Task<IActionResult> SearchClassesByLevel(int classLevelId)
         {
             
            var classes = await _context.Classes
-                                .Include(s=>s.Students)
-                                .Where(c=>c.ClassLevelId == classLevelId)
+                                .Include(s => s.Students)
+                                .Where(c => c.ClassLevelId == classLevelId)
                                 .ToListAsync();
 
             var classesToReturn = _mapper.Map<IEnumerable<ClassDetailDto>>(classes);
@@ -577,7 +713,6 @@ namespace EducNotes.API.Controllers
             if (await _repo.SaveAll())
                 return Ok(classId);
             return BadRequest("impossible de supprimer cette classe");
-
         }
 
         [HttpPost("AddCourse")]
@@ -763,12 +898,15 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetAllTeachersCourses()
         {
             //recuperation de tous les professeurs ainsi que les cours affectés
-            var teachers = await _context.Users.Include(p => p.Photos).Where(u => u.UserTypeId == teacherTypeId)
+            var teachers = await _context.Users
+                            .Include(p => p.Photos)
+                            .Where(u => u.UserTypeId == teacherTypeId && u.ValidatedCode == true)
             .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
 
 
             CultureInfo frC = new CultureInfo("fr-FR");
            
+
             var teachersToReturn = new List<TeacherForListDto>();
            foreach (var teacher in teachers)
            {
@@ -779,7 +917,7 @@ namespace EducNotes.API.Controllers
                 tdetails.Id = teacher.Id;
                 tdetails.LastName = teacher.LastName;
                 tdetails.FirstName = teacher.FirstName;  
-                tdetails.DateOfBirth = teacher.DateOfBirth?.ToString("dd/MM/yyyy", frC);
+                tdetails.DateOfBirth = teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
                 tdetails.CourseClasses = new List<TeacherCourseClassesDto>();
                // tdetails.PhotoUrl = teacher.Photos.FirstOrDefault(i => i.IsMain == true).Url;
                var allteacherCourses = await _context.TeacherCourses.Include(c => c.Course).Where(t => t.TeacherId == teacher.Id).ToListAsync();
@@ -911,6 +1049,7 @@ namespace EducNotes.API.Controllers
         }
 
        
+        //[HttpGet("")]
 
     }
 }

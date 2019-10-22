@@ -40,17 +40,17 @@ export class StudentDashboardComponent implements OnInit {
 
     const loggedUser = this.authService.currentUser;
 
-    if (this.userIdFromRoute !== this.authService.currentUser.id) {
+    if (this.userIdFromRoute) {
       this.getUser(this.userIdFromRoute);
     } else {
-      this.student = this.authService.currentUser;
+      this.student = loggedUser;
+      this.getUser(this.student.id);
     }
 }
 
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
-
       this.getClass(this.student.classId);
       this.getAgenda(this.student.classId, this.toNbDays);
       this.getEvalsToCome(this.student.classId);

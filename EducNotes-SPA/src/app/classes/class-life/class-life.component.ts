@@ -53,8 +53,7 @@ export class ClassLifeComponent implements OnInit {
   this.classService.getClass(classId).subscribe((aclass: Class) => {
     this.selectedClass = aclass;
   });
-}
-
+ }
 
  loadAbsences(classId) {
     this.classService.getClassAbsences(classId).subscribe((data: any) => {

@@ -21,13 +21,22 @@
     </div>
   </div>
 
-  <div class="col-md-12">
+  <div>
+    <mdb-material-chips [(ngModel)]="addtags"></mdb-material-chips>
+
+    <div class="chip" *ngIf="hideElement">
+      <img src="https://mdbootstrap.com/img/Photos/Avatars/avatar-6.jpg" alt="Contact Person"> Jane Doe
+      <mdb-icon fas icon="times" class="close" (click)="hideElement=!hideElement"></mdb-icon>
+    </div>              
+  </div>
+
+  <div class="col-md-6">
     <div class="card mb-4">
       <div class="card-body">
         <div class="card-title">Autocomplete</div>
         <tag-input [formControl]="tagsCtrl2"
           (onSelect)="onSelect($event)"
-          theme='primary' placeholder="Type Country name">
+          theme='default' placeholder="Type Country name">
           <tag-input-dropdown [focusFirstElement]="true" [autocompleteItems]="autocompletes$ | async">
           </tag-input-dropdown>
         </tag-input>

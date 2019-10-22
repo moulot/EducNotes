@@ -593,6 +593,130 @@ namespace EducNotes.API.Controllers
         return BadRequest("impossible d'envoyer le mail");
     }
 
+    [HttpPost("SendBatchEmail")]
+    public async Task<IActionResult> SendBatchEmail(DataForEmail dataForEmail)
+    {
+        var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+        Email newEmail = new Email();
+        newEmail.EmailTypeId = 1;
+        newEmail.FromAddress = "no-reply@educnotes.com";
+        newEmail.Subject = dataForEmail.Subject;
+        newEmail.Body = dataForEmail.Body;
+        newEmail.ToAddress = dataForEmail.Tos;
+        newEmail.CCAddress = dataForEmail.Ccs;
+        newEmail.TimeToSend = DateTime.Now;
+        newEmail.InsertUserId = currentUserId;
+        newEmail.InsertDate = DateTime.Now;
+        newEmail.UpdateUserId = currentUserId;
+        newEmail.UpdateDate = DateTime.Now;
+
+        _context.Add(newEmail);
+
+        if(await _repo.SaveAll())
+        {
+          return NoContent();
+        }
+        else
+        {
+          return BadRequest("problème pour envoyer l\' email");
+        }
+    }
+
+    [HttpPost("Broadcast")]
+    public async Task<IActionResult> Broadcast(DataForBroadcastDto dataForEmailDto)
+    {
+      List<int> userTypeIds = dataForEmailDto.UserTypeIds;
+      List<int> classLevelIds = dataForEmailDto.ClassLevelIds;
+      List<int> classIds = dataForEmailDto.ClassIds;
+      string body = dataForEmailDto.Body;
+      string subject = dataForEmailDto.Subject;
+      var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+      List<string> recipientEmails = new List<string>();
+
+      var users = new List<User>();
+      foreach (var ut in userTypeIds)
+      {
+        if(ut == studentTypeId || ut == parentTypeId)
+        {
+          if(users.Count() == 0)
+          {
+            users = await _context.Users
+                            .Where(u => classIds.Contains(Convert.ToInt32(u.ClassId)) && u.Active == 1 &&
+                              u.UserTypeId == studentTypeId && u.EmailConfirmed == true)
+                            .ToListAsync();
+          }
+
+          if(ut == studentTypeId)
+          {
+            foreach (var user in users)
+            {
+              if(!string.IsNullOrEmpty(user.Email))
+                recipientEmails.Add(user.Email);
+            }
+          }
+
+          if(ut == parentTypeId)
+          {
+            var ids = users.Select(u => u.Id);
+            var parents = _context.UserLinks
+                          .Where(u => ids.Contains(u.UserId)).Select(u => u.UserP).Distinct();
+
+            foreach (var user in parents)
+            {
+              if(!string.IsNullOrEmpty(user.Email))
+                recipientEmails.Add(user.Email);
+            }
+          }
+        }
+
+        if(ut == teacherTypeId)
+        {
+          var teachers = await _context.ClassCourses
+                          .Where(t => classLevelIds.Contains(t.Class.ClassLevelId) && t.Teacher.Active == 1 &&
+                              t.Teacher.UserTypeId == teacherTypeId && t.Teacher.EmailConfirmed == true)
+                          .Select(t => t.Teacher)
+                          .Distinct()
+                          .ToListAsync();
+
+          foreach (var user in teachers)
+          {
+            if(!string.IsNullOrEmpty(user.Email))
+              recipientEmails.Add(user.Email);
+          }
+        }
+      }
+
+      List<Email> emailsToBeSent = new List<Email>();
+      //save emails to Emails table
+      foreach (var email in recipientEmails)
+      {
+          Email newEmail = new Email();
+          newEmail.EmailTypeId = 1;
+          newEmail.FromAddress = "no-reply@educnotes.com";
+          newEmail.Subject = subject;
+          newEmail.Body = body;
+          newEmail.ToAddress = email;
+          newEmail.TimeToSend = DateTime.Now;
+          newEmail.InsertUserId = currentUserId;
+          newEmail.InsertDate = DateTime.Now;
+          newEmail.UpdateUserId = currentUserId;
+          newEmail.UpdateDate = DateTime.Now;
+          emailsToBeSent.Add(newEmail);
+      }
+      _context.AddRange(emailsToBeSent);
+
+      if(await _repo.SaveAll())
+      {
+        return NoContent();
+      }
+      else
+      {
+        return BadRequest("problème pour envoyer les emails");
+      }
+    }
+
     [HttpGet("UsersRecap")]
     public async Task<IActionResult> UsersRecap()
     {
@@ -683,14 +807,12 @@ namespace EducNotes.API.Controllers
             //       }
                }
 
-
             if( await _repo.SaveAll())
                 return Ok();
 
             return BadRequest("impossible de terminer l'enregistrement");
                 
             // return Ok(_mapper.Map<UserForListDto>(userToCreate));
-            
         }
         catch (System.Exception ex)
         {
@@ -717,7 +839,7 @@ namespace EducNotes.API.Controllers
             tdetails.Id = teacher.Id;
             tdetails.LastName = teacher.LastName;
             tdetails.FirstName = teacher.FirstName;  
-            tdetails.DateOfBirth =  teacher.DateOfBirth?.ToString("dd/MM/yyyy", frC);
+            tdetails.DateOfBirth =  teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
             tdetails.Courses =await _context.TeacherCourses.
                       Where(t=> t.TeacherId == teacherId)
                       .Select(c =>c.Course)

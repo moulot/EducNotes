@@ -154,13 +154,9 @@ import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.co
 import { ClassResolver } from './_resolvers/class-resolver';
 import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-schedule.component';
 import { AppFormsModule } from './views/forms/forms.module';
-import { AppImgCropperComponent } from './views/forms/img-cropper/img-cropper.component';
 import { ModalScheduleComponent } from './admin/modal-schedule/modal-schedule.component';
 import { SharedComponentsModule } from './shared/components/shared-components.module';
 import { StudentResolver } from './_resolvers/student-resolver';
-import { CommComponent } from './admin/comm/comm.component';
-import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
-import { MDBBootstrapModulesPro } from 'ng-uikit-pro-standard';
 import { ProductsListComponent } from './admin/product/products-list/products-list.component';
 import { ProductFormComponent } from './admin/product/product-form/product-form.component';
 import { ClassLevelProductsComponent } from './admin/treso/class-level-products/class-level-products.component';
@@ -174,10 +170,22 @@ import { ProductFormResolver } from './_resolvers/product-form-resolver';
 import { CourseFormResolver } from './_resolvers/course-form-resolver';
 import { TeacherFormResolver } from './_resolvers/teacher-form-resolver';
 
+import { BroadcastComponent } from './comm/brodcast/broadcast.component';
+import { MDBBootstrapModulesPro } from 'ng-uikit-pro-standard';
+import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
+import { TagInputsComponent } from './views/forms/tag-inputs/tag-inputs.component';
+import { TagInputModule } from 'ngx-chips';
+import { EmailComponent } from './comm/email/email.component';
+import { StudentAgendaComponent } from './agenda/student-agenda/student-agenda.component';
+import { StudentLifeComponent } from './classes/student-life/student-life.component';
+import { ClassTeachersComponent } from './classes/class-teachers/class-teachers.component';
+import * as Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
 
+Chart.plugins.unregister(ChartDataLabels);
 
 export function tokenGetter() {
    return localStorage.getItem('token');
@@ -282,13 +290,18 @@ export function tokenGetter() {
       ClassScheduleComponent,
       ClassdayScheduleComponent,
       ModalScheduleComponent,
-      CommComponent,
       ProductsListComponent,
       ProductFormComponent,
       ClassLevelProductsComponent,
       ClassLevelProdFormComponent,
       DeadLineListComponent,
-      DeadLineFormComponent
+      DeadLineFormComponent,
+      BroadcastComponent,
+      TagInputsComponent,
+      EmailComponent,
+      StudentAgendaComponent,
+      StudentLifeComponent,
+      ClassTeachersComponent
    ],
    imports: [
      FormWizardModule,
@@ -334,7 +347,8 @@ export function tokenGetter() {
       ColorPickerModule,
       SharedComponentsModule,
       AppFormsModule,
-      MDBBootstrapModulesPro.forRoot()
+      MDBBootstrapModulesPro.forRoot(),
+      TagInputModule
    ],
    providers: [
       AuthService,

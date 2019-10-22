@@ -1,18 +1,11 @@
 <div class="row justify-content-center align-items-center"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
 
-  <div class="col-md-9">
-    <p class="lead m-0">admin - liste des enseignants</p>
-  </div>
+<div  *ngIf="show==='all' && !teachersCourses">
 
-  <div class="col-md-12">
-
-    <div class="row mt-1"  *ngIf="show==='all'">
-
-        <div class="col-md-12 mb-1">
-          <!-- <input type="file"  accept=" application/docx" title="importer" (change)="onFileChange($event)" /> -->
-        </div>
-  
-        <div  class="col-md-9">
+</div>   
+<div class="row justify-content-center align-items-center mt-3"  *ngIf="show==='all'">
+  <div  class="col-md-10">
+     
 
           <div class="card mb-4">
             <div class="card-body">
@@ -27,8 +20,8 @@
               <div class="d-flex border-bottom-dotted-dim pb-3 mb-3" *ngFor="let teacher of teachersCourses">
                 <img class="avatar-md rounded mr-3"  src="{{teacher.photoUrl || '../../assets/user.png'}}" alt="">
                 <div class="flex-grow-1">
-                  <p class="text-15 m-0"><b>{{teacher.lastName}} {{teacher.firstName}}</b></p> 
-                  <span class="mr-2">{{teacher.email}}.</span><span>tél: {{teacher.phoneNumber}} {{teacher.secondPhoneNumber}}</span>
+                  <h6 class="m-0">{{teacher.lastName}} {{teacher.firstName}} </h6> 
+                  <span> {{teacher.email}}.&nbsp; &nbsp; Contact: {{teacher.phoneNumber}} {{teacher.secondPhoneNumber}}  </span>
                   <p class="m-0 text text-muted"><b>Cours : </b> <span *ngIf="teacher.courseClasses.length===0">Aucun</span>
                     <span *ngIf="teacher.courseClasses.length>0">
                         <span *ngFor="let course of teacher.courseClasses" >
@@ -43,11 +36,8 @@
                   <button mdbBtn color="light" size="sm" mdbWavesEffect  class="ml-2" [routerLink]="['/teacherAssignment',teacher.id]" 
                    [disabled]="teacher.courseClasses.length===0" (click)="assignment(teacher)">Affecter</button>
                 </div>
-              </div>
-            
-            </div>
           </div>
-        
+          
         </div>
       
     </div>
@@ -75,12 +65,6 @@
                         </p>
                     </div>
 
-                    <div>
-                      <!-- <button class="btn btn-outline-primary btn-sm" (click)="edit(teacher)">Editer</button> -->
-                    </div>
-              </div>
-          </div>
-  </div>
 
 
 </div>

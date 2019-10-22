@@ -1,68 +1,111 @@
 <div class="row mb-2">
 
   <div class="col-md-12 mb-1">
-    <p class="lead m-0">{{student?.firstName}} {{student?.lastName}} - classe {{classRoom?.name}}</p>
+    <p class="lead m-0">{{student?.firstName}} {{student?.lastName}} ({{student?.className}})</p>
   </div>
 
-  <div class="col-lg-8 col-md-12 mb-2">
+  <div class="col-md-6 mb-2">
 
     <div class="row">
 
-      <div class="col-md-12">
-
-        <div class="card">
-            <div class="card-body">
-          
-              <div class="row">
-  
-                <div *ngFor="let course of userCourses" class="col-lg-2 col-md-6 col-sm-6">
-                  <div class="card mb-1" (click)="loadData(course)" style="cursor: pointer">
-                    <div class="card-body text-nowrap text-center">
-                      <p class="text-muted text-15 mt-2 mb-2">{{course.courseAbbrev}}</p>
-                      <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000" class="text-primary text-danger text-24 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                      <p *ngIf="course.userCourseAvg >= 10" class="text-primary text-success text-24 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                      <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-24 line-height-1 m-0">N/A</p>
-                    </div>
-                  </div>
-                </div>
-                        
-              </div>
-  
-            </div>
-          </div>
-      </div>
-
-
-      <div class="col-lg-12 col-md-12 mb-2">
-        <div class="card">
-          <div class="card-body p-0">
-            <h5 class="lead m-0 p-1">graphes des notes de l'élève - notes sur 20</h5>
-            <div echarts [options]="chartLineOption3" style="height: 150px"></div>
-          </div>
-        </div>
-      </div>
-      
-    </div>
-
-  </div>
-
-  <div class="col-lg-4 col-md-12">
-    <div class="card">
-      <div class="card-body">
-        <p class="lead">détails des notes</p>
-        <div *ngFor="let grade of evalData; let i = index">
-          <p class="text-muted text-14 m-0">
-            {{grade.evalDate}}. {{grade.evalType}} (-){{grade.classGradeMin}} 
-            <label class="text-danger" *ngIf="aboveAvg[i] === false"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
-            <label class="text-success" *ngIf="aboveAvg[i] === true"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
-            (+){{grade.classGradeMax}}
+      <div class="card col-md-12">
+        <div class="card-body p-2 d-flex">
+            <button type="button" (click)="loadDefaultChart()" mdbBtn size="sm" color="light" mdbWavesEffect>graphe moy. gle</button>
+            <p *ngIf="studentAvg < 10" class="text-18 m-0">
+            moyenne générale de {{student.firstName}} : <label class="text-danger">{{studentAvg}} / 20</label>
+          </p>
+          <p *ngIf="studentAvg >= 10" class="text-18 m-0">
+            moyenne générale de {{student.firstName}} : <label class="text-success">{{studentAvg}} / 20</label>
           </p>
         </div>
       </div>
+
+      <div class="card col-md-12">
+        <div class="card-body p-0">
+
+          <div class="row">
+            <div class="card col-md-2 m-0" (click)="loadData(course)" *ngFor="let course of userCourses" style="cursor: pointer">
+              <div class="card-body p-2 text-center">
+                <p class="text-muted text-16 mb-0">{{course.courseAbbrev}}</p>
+                <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000" class="text-primary text-danger text-18 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                <p *ngIf="course.userCourseAvg >= 10" class="text-primary text-success text-18 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-18 line-height-1 m-0">N/A</p>
+              </div>
+            </div>
+          </div>
+      
+        </div>
+      
+      </div>
+              
+      <div class="card col-md-12">
+  
+        <!-- <div class="card"> -->
+          <div class="card-body">
+            <p class="lead">détails des notes</p>
+            <div *ngFor="let grade of evalData; let i = index">
+              <p class="text-muted text-14 m-0">
+                {{grade.evalDate}}. {{grade.evalType}} (-){{grade.classGradeMin}} 
+                <label class="text-danger" *ngIf="aboveAvg[i] === false"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
+                <label class="text-success" *ngIf="aboveAvg[i] === true"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
+                (+){{grade.classGradeMax}}
+              </p>
+            </div>
+          </div>
+        <!-- </div> -->
+  
+      </div>
+  
     </div>
+
   </div>
 
-</div>
+  <div class="col-md-6">
 
-<div class="row">
+    <div class="row">
+
+      <div class="card col-md-12 mb-2">
+
+        <div class="card-body p-0">
+          <div class="row">
+            <div class="col-md-12">
+              <!-- <p class="text-15 m-0 p-1">graphes des notes de l'élève - notes sur 20</p>
+              <div echarts [options]="chartLineOption3" style="height: 150px"></div> -->
+
+              <div *ngIf="!showDefaultChart" style="display: block;">
+                <canvas mdbChart height="175"
+                  [chartType]="chartType"
+                  [datasets]="chartDatasets"
+                  [labels]="chartLabels"
+                  [colors]="chartColors"
+                  [options]="chartOptions"
+                  [legend]="true"
+                  (chartHover)="chartHovered($event)"
+                  (chartClick)="chartClicked($event)">
+                </canvas>
+              </div>
+
+              <div *ngIf="showDefaultChart" style="display: block">
+                <canvas mdbChart height="175"
+                  [chartType]="radarchartType"
+                  [datasets]="radarchartDatasets"
+                  [labels]="radarchartLabels"
+                  [colors]="radarchartColors"
+                  [options]="radarchartOptions"
+                  [legend]="true"
+                  (chartHover)="radarchartHovered($event)"
+                  (chartClick)="radarchartClicked($event)">
+                </canvas>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+            
+    </div>
+      
+  </div>
+
 </div>

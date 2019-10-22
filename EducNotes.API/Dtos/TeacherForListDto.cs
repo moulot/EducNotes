@@ -18,6 +18,7 @@ namespace EducNotes.API.Dtos
        public List<Course> Courses { get; set; }
        public List<int?> classIds { get; set; }
 
+       public Course Course { get; set; }
     }
 
 }

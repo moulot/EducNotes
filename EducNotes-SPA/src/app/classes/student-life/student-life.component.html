@@ -1,0 +1,96 @@
+<div class="row">
+  <div class="col-md-12 mb-2">
+    <p class="text-15 m-0">vide de classe - évènements</p>
+  </div>
+  <div class="col-md-12 smooth-scroll mb-2">
+    <a mdbPageScroll href="#abs"><button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>absences ({{nbAbsences}})</button></a>
+    <a mdbPageScroll href="#san"><button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>sanctions ({{nbSanctions}})</button></a>
+    <button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>encouragements</button>
+  </div>
+
+  <!-- <div class="col-md-4">
+    <div class="md-form">
+      <input type="text" [(ngModel)]="searchText" class="form-control" id="search" mdbInput>
+      <label for="search">recherche</label>
+    </div>
+  </div> -->
+
+  <div id="abs"></div>
+  <div></div>
+  <div class="col-md-12">
+    <p class="text-20 m-1">absences</p>
+    <table mdbTable #tableEl="mdbTable" class=" z-depth-1 mx-auto">
+      <thead>
+        <tr>
+          <th *ngFor="let head of absenceHeadElts; let i = index" scope="col">{{head}}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let el of absences; let i = index">
+          <!-- <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex" scope="row">{{el.absenceType}}</td>
+          <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex &&
+            i < mdbTablePagination.lastItemIndex && el.startDate == el.endDate">{{ el.startDate }} de {{el.startTime}} à {{el.endTime}}</td>
+          <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex &&
+            i < mdbTablePagination.lastItemIndex && el.startDate != el.endDate">du {{ el.startDate }} {{el.startTime}} à {{el.endDate}} {{el.endTime}}</td>
+          <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.justified}}</td>
+          <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.reason}}</td>
+          <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.comment}}</td> -->
+          <td  scope="row">{{el.absenceType}}</td>
+          <td *ngIf="el.startDate == el.endDate">{{ el.startDate }} de {{el.startTime}} à {{el.endTime}}</td>
+          <td *ngIf="el.startDate != el.endDate">du {{ el.startDate }} {{el.startTime}} à {{el.endDate}} {{el.endTime}}</td>
+          <td >{{el.justified}}</td>
+          <td >{{el.reason}}</td>
+          <td >{{el.comment}}</td>
+        </tr>
+      </tbody>
+      <!-- <tfoot class="grey lighten-5 w-100">
+        <tr>
+          <td colspan="5">
+            <mdb-table-pagination [tableEl]="tableEl" [searchDataSource]="absences"></mdb-table-pagination>
+          </td>
+        </tr>
+      </tfoot> -->
+    </table>      
+  </div>
+
+  <!-- <div class="col-md-4">
+    <div class="md-form">
+      <input type="text" [(ngModel)]="searchText1" class="form-control" id="search1" mdbInput>
+      <label for="search1">recherche</label>
+    </div>
+  </div> -->
+
+  <div class="col-md-12">
+    <p id="san" class="text-20 m-1">sanctions</p>
+    <table mdbTable #tableEl1="mdbTable" class=" z-depth-1 mx-auto">
+      <thead>
+        <tr>
+          <th *ngFor="let head of sanctionHeadElts; let i = index" scope="col">{{head}}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="p-0 m-0" *ngFor="let el of sanctions; let i = index">
+          <!-- <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex" scope="row">{{el.sanctionDate}}</td>
+          <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.sanctionName}}</td>
+          <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.reason}}</td>
+          <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.sanctionedBy}}</td>
+          <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.comment}}</td> -->
+          <td scope="row">{{el.sanctionDate}}</td>
+          <td >{{el.sanctionName}}</td>
+          <td >{{el.reason}}</td>
+          <td >{{el.sanctionedBy}}</td>
+          <td >{{el.comment}}</td>
+        </tr>
+      </tbody>
+      <!-- <tfoot class="grey lighten-5 w-100">
+        <tr>
+          <td colspan="5">
+            <mdb-table-pagination [tableEl]="tableEl1" [searchDataSource]="sanctions"></mdb-table-pagination>
+          </td>
+        </tr>
+      </tfoot> -->
+    </table>    
+  </div>
+</div>

@@ -62,39 +62,41 @@
     <div class="row">
 
       <div class="col-md-12 mb-2">
-        <div class="card mb-2">
-            <div class="card-body">
-              <div class="card-title d-flex">
-                <div class="lead flex-grow-1">notes</div>
-                <div>
-                  <button [routerLink]="['/studentGrades', student?.id]"  class="btn btn-outline-primary btn-sm">détails</button>
-                </div>
+        <div class="card">
+          <div class="card-body">
+
+            <div class="d-flex">
+              <div class="lead flex-grow-1">notes</div>
+              <div>
+                <button [routerLink]="['/studentGrades', student?.id]"  class="btn btn-outline-primary btn-sm">détails</button>
               </div>
+            </div>
 
-              <div class="row">
+            <div class="row">
 
-                <div *ngFor="let course of userCourses" class="col-lg-2 col-md-6 col-sm-6">
-                  <!-- <div class="card card-icon mb-1">
-                    <div class="card-body text-center">
-                      <i class="i-Turn-Up"></i>
-                      <p class="text-muted mt-2 mb-2">{{course.courseAbbrev}}</p>
-                      <p class="text-primary text-24 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                    </div>
-                  </div> -->
-                  <div class="card mb-1">
-                    <div class="card-body text-center">
-                      <p class="text-muted text-15 mt-2 mb-2">{{course.courseAbbrev}}</p>
-                      <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000" class="text-primary text-danger text-24 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                      <p *ngIf="course.userCourseAvg >= 10" class="text-primary text-success text-24 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                      <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-24 line-height-1 m-0">N/A</p>
-                    </div>
+              <div *ngFor="let course of userCourses" class="col-lg-2 col-md-6 col-sm-6">
+                <!-- <div class="card card-icon mb-1">
+                  <div class="card-body text-center">
+                    <i class="i-Turn-Up"></i>
+                    <p class="text-muted mt-2 mb-2">{{course.courseAbbrev}}</p>
+                    <p class="text-primary text-24 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                  </div>
+                </div> -->
+                <div class="card mb-1">
+                  <div class="card-body text-center">
+                    <p class="text-muted text-15 mt-2 mb-2">{{course.courseAbbrev}}</p>
+                    <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000" class="text-primary text-danger text-24 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                    <p *ngIf="course.userCourseAvg >= 10" class="text-primary text-success text-24 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                    <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-24 line-height-1 m-0">N/A</p>
                   </div>
                 </div>
-                        
+
               </div>
-                        
+                      
             </div>
+                      
           </div>
+        </div>
       </div>
 
     </div>
@@ -102,41 +104,119 @@
     <div class="row">
 
       <div class="col-md-6">
-        <div class="card mb-4">
-            <div class="card-body">
+        <div class="card mb-4 scrollbar scrollbar-primary">
+            <div class="card-body ">
               <div class="card-title d-flex">
                 <div class="flex-grow-1 lead">devoirs à faire</div>
                 <div>
                   <button class="btn btn-outline-primary btn-sm">détails</button>
                 </div>
               </div>
+
+              <!-- <mdb-accordion [multiple]="true">
+                <mdb-accordion-item [collapsed]="false">
+                  <mdb-accordion-item-head><p class="text-15 text-muted">Collapsible Group Item #1</p></mdb-accordion-item-head>
+                  <mdb-accordion-item-body>
+                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry labore sustainable
+                    VHS.
+                  </mdb-accordion-item-body>
+                </mdb-accordion-item>
+              
+                <mdb-accordion-item>
+                  <mdb-accordion-item-head>Collapsible Group Item #2</mdb-accordion-item-head>
+                  <mdb-accordion-item-body>
+                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richore sustainable
+                    VHS.
+                  </mdb-accordion-item-body>
+                </mdb-accordion-item>
+              
+                <mdb-accordion-item>
+                  <mdb-accordion-item-head>Collapsible Group Item #3</mdb-accordion-item-head>
+                  <mdb-accordion-item-body>
+                    Anim pariatur cliche reprehenderit, enim eiusmod high life them accusamus labore sustainable
+                    VHS.
+                  </mdb-accordion-item-body>
+                </mdb-accordion-item>
+              </mdb-accordion> -->
+
               <div *ngIf="agendaItems?.length == 0">
                 <div class="card pt-5 pb-5 pl-2 pr-2">
                   <h6 class="text-muted">pas de devoirs à faire cette semaine...</h6>
                 </div>
               </div>
+
               <div *ngIf="agendaItems?.length != 0">
+
+                <!-- <mdb-accordion [multiple]="true"> -->
+
                 <div *ngFor="let items of agendaItems">
 
-                  <p class="lead"><b>{{items.dueDate}}</b></p>
-                  <div *ngFor="let course of items.courses">
-                    <div class="card mb-1">
-                        <!-- <div class="card-header course-color" [ngStyle]="{'background-color': course.courseColor}"></div> -->
-                        <div class="card-body">
-                        <div class="card-title m-0 d-flex">
-                          <div class="box-course float-left mr-1" [ngStyle]="{'background-color': course.courseColor}"></div>
-                          <div class="flex-grow-1 m-0">
-                            <h6 class="m-0">{{course.courseName}}</h6>
+                  <!-- <mdb-accordion-item [collapsed]="false">
+                    <mdb-accordion-item-head><p class="text-15 text-muted m-0">{{items.dueDate}}</p></mdb-accordion-item-head>
+                    <mdb-accordion-item-body>
+
+                      <div *ngFor="let course of items.courses">
+    
+                        <div class="card mb-1">
+                          <div class="card-body p-1">
+                            <div class="row">
+                              <div class="col-md-1">
+                                <div class="box-course mr-1" [ngStyle]="{'background-color': course.courseColor}" style="height: 100%;"></div>
+                              </div>
+                              <div class="col-md-11">
+                                <div class="d-flex">
+                                  <div class="flex-grow-1 m-0">
+                                    <p class="m-0"><b>{{course.courseName}}</b></p>
+                                  </div>
+                                  <div class="m-0 text-small text-muted">donné le {{course.shortDateAdded}}</div>
+                                </div>
+                                <div class="m-0 text-14 pt-1">{{course.taskDesc}}</div>
+                              </div>
+                            </div>
                           </div>
-                          <div class="m-0 text-small text-muted">donné le {{course.shortDateAdded}}</div>
                         </div>
-                        <div class="m-0 text-14 pt-1">{{course.taskDesc}}</div>
+    
                       </div>
+          
+                    </mdb-accordion-item-body>
+                  </mdb-accordion-item> -->
+      
+                  <div class="card mb-1">
+                    <div class="card-body p-2">
+
+                      <p class="text-15">{{items.dueDate}}</p>
+                      <div *ngFor="let course of items.courses">
+    
+                        <div class="card mb-1">
+                          <div class="card-body p-2">
+                            <div class="row">
+                              <div class="col-md-12 d-flex">
+                                <div class="mr-2" [ngStyle]="{'background-color': course.courseColor}" style="width: 25px; height: 100%;"></div>
+                                <div class="flex-grow-1">
+                                  <div class="d-flex">
+                                    <div class="flex-grow-1">
+                                      <p class="m-0"><b>{{course.courseName}}</b></p>
+                                    </div>
+                                    <div class="m-0 text-small text-muted">donné le {{course.shortDateAdded}}</div>
+                                  </div>
+                                  <div class="m-0 text-14 pt-1">{{course.taskDesc}}</div>    
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+    
+                      </div>
+      
                     </div>
                   </div>
                   
                 </div>
+
+                <!-- </mdb-accordion> -->
+
               </div>
+
             </div>
         </div>
       </div>
@@ -152,19 +232,24 @@
             </div>
             <div *ngFor="let eval of evalsToCome">
               <div class="card mb-2">
-                <!-- <div class="card-header course-color" [ngStyle]="{'background-color': eval.courseColor}"></div> -->
-                <div class="card-body">
-                  <div class="card-title m-0 d-flex">
-                      <div class="box-course float-left mr-1" [ngStyle]="{'background-color': eval.courseColor}"></div>
-                      <div class="flex-grow-1 m-0">
-                        <h6 class="m-0">{{eval.courseName}}</h6>
+                <div class="card-body p-2">
+                  <div class="row">
+                    <div class="col-md-12 d-flex">
+                      <div class="box-course mr-2" [ngStyle]="{'background-color': eval.courseColor}" style="width: 20px;height: 100%;"></div>
+                      <div class="flex-grow-1">
+                        <div class="d-flex">
+                          <div class="flex-grow-1">
+                            <p class="m-0"><b>{{eval.courseName}}</b></p>
+                          </div>
+                          <div class="m-0 text-12 text-muted">prévue le {{eval.evalDate}}</div>    
+                        </div>
+                        <div class="m-0 text-14 p-0">{{eval.evalTypeName}}</div>
+                      </div>
                     </div>
-                    <div class="m-0 text-12 text-muted">prévu le {{eval.evalDate}}</div>
                   </div>
-                  <div class="m-0 text-14 pt-1">{{eval.evalTypeName}}</div>
                 </div>
+              </div>
             </div>
-        </div>
           </div>
       </div>
       </div>
@@ -247,3 +332,4 @@
   </div>
 
 </div>
+

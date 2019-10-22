@@ -41,9 +41,6 @@ export class InscriptionsListComponent implements OnInit {
   pageSize = 8;
   className = '';
 
-
-
-
   ngOnInit() {
    this.getLevels();
    this.createSearchForm();
@@ -61,7 +58,7 @@ export class InscriptionsListComponent implements OnInit {
   }
   createSearchForm() {
     this.searchForm = this.fb.group({
-      levelId: ['', Validators.required],
+      levelId: [null, Validators.required],
       lastName: [''],
       firstName: ['']
     });
@@ -163,7 +160,6 @@ export class InscriptionsListComponent implements OnInit {
       }
     this.submitText = 'valider';
     this.showListDiv = true;
-
 
     }, error => {
       this.alertify.error(error);

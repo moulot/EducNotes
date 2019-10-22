@@ -27,6 +27,7 @@ export interface User {
     validatedCode: boolean;
     districtId: number;
     cityId?: number;
+    active: number;
 
     photos?: Photo[];
     roles?: string[];

@@ -55,7 +55,6 @@ import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel
 import { ClassResolver } from './_resolvers/class-resolver';
 import { AppImgCropperComponent } from './views/forms/img-cropper/img-cropper.component';
 import { StudentResolver } from './_resolvers/student-resolver';
-import { CommComponent } from './admin/comm/comm.component';
 import { ProductsListComponent } from './admin/product/products-list/products-list.component';
 import { ProductFormComponent } from './admin/product/product-form/product-form.component';
 import { ClassLevelProductsComponent } from './admin/treso/class-level-products/class-level-products.component';
@@ -73,6 +72,12 @@ import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-
 import { TeacherFormResolver } from './_resolvers/teacher-form-resolver';
 import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-assignment/teacher-assignment.component';
 import { NewClassComponent } from './admin/class-managemet/new-class/new-class.component';
+import { BroadcastComponent } from './comm/brodcast/broadcast.component';
+import { EmailComponent } from './comm/email/email.component';
+import { Component } from '@angular/core';
+import { StudentAgendaComponent } from './agenda/student-agenda/student-agenda.component';
+import { StudentLifeComponent } from './classes/student-life/student-life.component';
+import { ClassTeachersComponent } from './classes/class-teachers/class-teachers.component';
 
 export const appRoutes: Routes = [
     {path: 'forgotPassword', component: ForgotComponent},
@@ -89,7 +94,8 @@ export const appRoutes: Routes = [
         children: [
             {path: '', component: HomePanelComponent},
             {path: 'home', component: HomePanelComponent, resolve: {user: UserHomeResolver}},
-            {path: 'comm', component: CommComponent},
+            {path: 'broadcast', component: BroadcastComponent},
+            {path: 'sendEmail', component: EmailComponent},
             {path: 'members', component: MemberListComponent, resolve: {users : MemberListResolver}},
             {path: 'members/:id', component: MemberDetailComponent, resolve: {user : MemberDetailResolver}},
             {path: 'member/edit', component: MemberEditComponent,
@@ -101,6 +107,7 @@ export const appRoutes: Routes = [
             {path: 'classes', component: ClassPanelComponent},
             {path: 'notes', component: GradePanelComponent},
             {path: 'classLife/:classId', component: ClassLifeComponent},
+            {path: 'studentLife/:id', component: StudentLifeComponent, resolve: {student: StudentResolver}},
             {path: 'studentNotes/:id', component: GradeStudentComponent},
             {path: 'classScheduleEdit', component: ClassScheduleComponent},
             {path: 'studentsClass/:classId', component: ClassStudentsComponent},
@@ -112,6 +119,7 @@ export const appRoutes: Routes = [
             {path: 'admins', component: AdminDashboardComponent, resolve: {admin: UserHomeResolver}},
             {path: 'inscriptions', component: InscriptionComponent},
             {path: 'agendas/:classId', component: ClassAgendaComponent},
+            {path: 'classStaff/:classId', component: ClassTeachersComponent, resolve: {classId: ClassResolver}},
             {path: 'addEval', component: EvalAddFormComponent},
             {path: 'callSheet/:id', component: ClassCallSheetComponent, resolve: {schedule: CallSheetResolver}},
             {path: 'inscriptions', component: InscriptionComponent},
@@ -121,11 +129,11 @@ export const appRoutes: Routes = [
             {path: 'classSchedule/:classId', component: SchedulePanelComponent, resolve: {class: ClassResolver}},
             {path: 'teachers', component: TeacherManagementComponent, resolve: {teachers: TeacherManagementResolver}},
             {path: 'addTeacher', component: NewTeacherComponent},
-            {path: 'editTeacher/:id', component: NewTeacherComponent, resolve: {teacher: TeacherFormResolver }},
             {path: 'teacherAssignment/:id', component: TeacherAssignmentComponent, resolve: {teacher: TeacherFormResolver }},
             {path: 'courses', component: CoursesPanelComponent, resolve: {courses: CoursesListResolver}},
             {path: 'addCourse', component: NewCourseComponent},
             {path: 'editCourse/:id', component: NewCourseComponent, resolve: {course: CourseFormResolver}},
+            {path: 'editTeacher/:id', component: NewTeacherComponent, resolve: {teacher: TeacherManagementResolver}},
             {path: 'preregister', component: PreRegisterComponent},
             {path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve : {classes: LevelClassesResolver}},
             {path: 'studentGrades/:id', component: GradeStudentComponent, resolve: {student: StudentResolver}},
@@ -137,9 +145,8 @@ export const appRoutes: Routes = [
             {path: 'createlvlProduct', component: ClassLevelProdFormComponent},
             {path: 'deadLines', component: DeadLineListComponent, resolve : {deadlines: DeadLineListResolver}},
             {path: 'createDeadLine', component: DeadLineFormComponent},
-            {path: 'editDeadLine/:id', component: DeadLineFormComponent, resolve : {deadline: DeadLineFormResolver}}
-
-
+            {path: 'editDeadLine/:id', component: DeadLineFormComponent, resolve : {deadline: DeadLineFormResolver}},
+            {path: 'studentAgenda/:id', component: StudentAgendaComponent, resolve: {student: StudentResolver}}
         ]
     },
     {path: '**', redirectTo: '', pathMatch: 'full'}

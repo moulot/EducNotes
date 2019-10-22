@@ -1,0 +1,95 @@
+<div class="row mb-2">
+
+  <div class="col-md-12 mb-1">
+    <p class="text-17 m-0">cahier de textes - travail à faire à la maison</p>
+  </div>
+
+    <div class="col-md-3">
+
+    <div class="card mb-1">
+      <div class="card-body">
+        <div class="mb-2">
+          <!-- <div class="p-0 m-0">tous les cours</div> -->
+          <label class="switch switch-primary mr-3">
+              <span>afficher tous les cours</span>
+              <input type="checkbox" checked>
+              <span class="slider"></span>
+          </label>
+        </div>
+        <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
+        <p class="text-danger text-15 mt-2 mb-2">clicker sur le cours pour filtrer</p>
+        <div class="card mb-2" *ngFor="let course of coursesWithAgenda">
+          <div *ngIf="course.nbItems > 0">
+            <a (click)="showCourseItems(course.id)" style="cursor: pointer;">
+              <div class="card-body p-2">
+                <div class="row">
+                  <div class="col-md-12 d-flex">
+                    <div class=" mr-2" [ngStyle]="{'background-color': course.color}" style="width: 25px;height: 100%;"></div>
+                    <div class="flex-grow-1 text-17">{{course.name}}</div>
+                    <div class="text-17">{{course.nbItems}}</div>
+                  </div>
+                </div>
+              </div>      
+            </a>      
+          </div>
+          <div *ngIf="course.nbItems <= 0">
+            <div class="card-body p-2">
+              <div class="row">
+                <div class="col-md-12 d-flex">
+                  <div class=" mr-2" [ngStyle]="{'background-color': course.color}" style="width: 25px;height: 100%;"></div>
+                  <div class="flex-grow-1 text-17">{{course.name}}</div>
+                  <div class="text-17">{{course.nbItems}}</div>
+                </div>
+              </div>
+            </div>      
+          </div>
+      </div>
+      </div>
+    </div>
+
+    </div>
+
+    <div class="col-md-9">
+
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div *ngFor="let item of filteredAgenda">
+              <div class="lead">à remettre le {{item.longDueDate}} ({{item.nbItems}})</div>
+              <div class="card mb-2" *ngFor="let ai of item.agendaItems">
+                <div class="card-body p-2">
+                  <div class="row">
+                    <div class="col-md-12 d-flex">
+                      <div class="mr-2" [ngStyle]="{'background-color': ai.courseColor}" style="width: 25px;height: 100%;"></div>
+                      <div class="flex-grow-1">
+                        <div class="d-flex">
+                          <div class="flex-grow-1 text-17">{{ai.courseName}}</div>
+                          <div class="switch">
+                            <label>
+                              <input type="checkbox">
+                              <span class="lever"></span> fait
+                            </label>
+                          </div>    
+                        </div>
+                        <div><p class="text-15 text-muted m-0 mt-1">{{ai.taskDesc}}</p></div>
+                      </div>    
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="flex-grow-1"></div>
+                    <div><p class="text-12 mt-2 m-0">donné le {{ai.strDateAdded}}</p></div>
+                  </div>
+                </div>
+              </div>
+            </div>     
+          </div>
+        </div>
+    </div>
+
+  </div>
+    
+
+    </div>
+
+</div>

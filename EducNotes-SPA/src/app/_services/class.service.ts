@@ -21,9 +21,8 @@ constructor(private http: HttpClient) { }
     return this.http.get<Class>(this.baseUrl + 'classes/' + classId);
   }
 
-  // pour recuperer les eleves d'une classe a partir de classId
   getClassTeachers(classId): Observable<User[]> {
-    return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/ClassTeachers');
+    return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/CourseWithTeacher');
   }
 
   getTodayToNDaysAgenda(classId, toNbDays) {
@@ -127,6 +126,14 @@ constructor(private http: HttpClient) { }
     return this.http.get(this.baseUrl + 'classes/' + classId + '/ClassCourses');
   }
 
+  getClassCoursesWithAgenda(classId, daysToNow, daysFromNow) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/CoursesWithAgenda/f/' + daysToNow + '/t/' + daysFromNow);
+  }
+
+  getClassAgendaByDate(classId, daysToNow, daysFromNow) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/AgendaByDate/f/' + daysToNow + '/t/' + daysFromNow);
+  }
+
   getAllClasses() {
     return this.http.get<any[]>(this.baseUrl + 'classes/GetAllClasses');
   }
@@ -206,6 +213,10 @@ constructor(private http: HttpClient) { }
     return this.http.get(this.baseUrl + 'classes/' + id + '/SearchClassesByLevel');
   }
 
+  getClassLevelsWithClasses(ids: number[]) {
+    return this.http.post(this.baseUrl + 'classes/ClassLevelsWithClasses', ids);
+  }
+
   saveNewClasses(classes: any) {
     return this.http.post(this.baseUrl + 'classes/SaveNewClasses', classes);
   }
@@ -224,6 +235,10 @@ constructor(private http: HttpClient) { }
 
    teacherClassCoursByLevel(teacherId: number, levelid: number, courseId: number) {
     return this.http.get(this.baseUrl + 'classes/TeacherClassCoursByLevel/  ' + teacherId + '/' + levelid + '/' + courseId );
+  }
+
+  getTeacher(id) {
+    return this.http.get(id);
   }
 
 

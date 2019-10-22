@@ -45,8 +45,8 @@
                    <nz-form-item>
                     <nz-form-control [nzSpan]="14" [nzOffset]="6">
                         <button type="submit" [disabled]="!registerForm.valid && !registerForm.value.totalChild && !registerForm.value.courseIds"
-                          class="btn btn-outline-primary"><span>{{submitText}}</span></button>
-                        <button type="button"  class="btn btn-outline-primary ml-2" [routerLink]="['/Home']" routerLinkActive="router-link-active" ><span>annuler</span></button>
+                          size="sm" mdbBtn color="light-blue" mdbWavesEffect><span>valider</span></button>
+                        <button type="button" size="sm" mdbBtn color="light" mdbWavesEffect class="ml-2" (click)="cancel()" ><span>annuler</span></button>
                     </nz-form-control>
                   </nz-form-item>
          </form>

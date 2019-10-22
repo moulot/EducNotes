@@ -6,6 +6,8 @@ import { Period } from '../_models/period';
 import { Observable } from 'rxjs';
 import { AlertifyService } from './alertify.service';
 import { Establishment } from '../_models/establishment';
+import { DataForBroadcast } from '../_models/dataForBroadcast';
+import { DataForEmail } from '../_models/dataForEmail';
 
 @Injectable({
   providedIn: 'root'
@@ -136,11 +138,19 @@ export class AdminService {
     return this.http.post(this.baseUrl + 'admin/ImportTeachers', teachers);
   }
 
-  getSchool(){
+  getSchool() {
     return this.http.get(this.baseUrl + 'admin/school');
   }
 
   saveSchool(school: Establishment) {
     return this.http.put(this.baseUrl + 'admin/saveSchool', school);
+  }
+
+  sendBradcast(dataForBroadcast: DataForBroadcast) {
+    return this.http.post(this.baseUrl + 'admin/Broadcast', dataForBroadcast);
+  }
+
+  sendEmail(dataForEmail: DataForEmail) {
+    return this.http.post(this.baseUrl + 'admin/SendBatchEmail', dataForEmail);
   }
 }

@@ -1,14 +1,13 @@
   <form [formGroup]="searchForm" (ngSubmit)="searchStudents()">
-    <div class="row ml-4 mr-4 mt-2 mb-1">
-      <div class="col-lg-12 col-md-12">
-        <div class="card mb-2">
+    <div class="row mb-2">
+      <div class="col-md-12">
+        <div class="card">
           <div class="card-body">
-            <div class="row row-xs">
+            <div class="row">
               <div class="col-md-3">
                 <nz-select #classSelect nzShowSearch nzPlaceHolder="choisissez le niveau" nzSize="large"
                   formControlName="levelId" nzAllowClear>
-                  <nz-option *ngFor="let item of levels" nzLabel="{{item.name}}"
-                    nzValue="{{item.id}}"></nz-option>
+                  <nz-option *ngFor="let item of levels" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
                 </nz-select>
               </div>
               <div class="col-md-3">
@@ -16,16 +15,18 @@
               </div>
               
               <div class="col-md-3">
-                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="entrer le prénoms" formControlName="firstName">
+                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="entrer le prénom" formControlName="firstName">
               </div>
              
-              <div class="col-md-3 mt-3 mt-md-0">
-                <div class="d-flex  col-md-12">
+              <div class="col-md-3">
+                <div class="row">
                   <div class="col-md-6">
-                    <button type="submit" [disabled]="!searchForm.valid || submitText!='valider'"  class="btn btn-primary btn-block">{{submitText}}</button>
+                    <button type="submit" [disabled]="!searchForm.valid" size="sm" mdbBtn color="light-blue" mdbWavesEffect
+                      class="btn btn-block">valider</button>
                   </div>
                   <div class="col-md-6">
-                    <button type="button" (click)="resetSessions()" class="btn btn-default btn-block">reset</button>
+                    <button type="button" (click)="resetSessions()" size="sm" mdbBtn color="light" mdbWavesEffect
+                      class="btn btn-block">reset</button>
                   </div>
                 </div>
               </div>
@@ -40,8 +41,8 @@
         <p class="card-title">{{noResult}}</p>
     </div>
 
-  <div *ngIf="students.length>0">
-      <div class="row ml-4 mr-4 mt-2 mb-1">
+  <div *ngIf="students.length > 0">
+      <div class="row mt-2 mb-2">
           <div class="col-md-4">
             <div class="form-group">
               <input id="email" placeholder="rechercher élèves" [formControl]="searchControl" class="form-control">
@@ -50,7 +51,7 @@
         </div>
         
         
-        <div class="row ml-4 mr-4 mt-2 mb-1">
+        <div class="row mt-2 mb-2">
           <!-- GRID AND LIST BUTTONS -->
           <div class="col-6">
             <!-- <button class="btn btn-sm btn-outline-light btn-svg mr-2" [ngClass]="{active: viewMode === 'grid'}" (click)="viewMode = 'grid'">
