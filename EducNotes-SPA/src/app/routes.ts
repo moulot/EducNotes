@@ -53,12 +53,9 @@ import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
 import { ClassResolver } from './_resolvers/class-resolver';
-<<<<<<< HEAD
 import { AppImgCropperComponent } from './views/forms/img-cropper/img-cropper.component';
-=======
 import { StudentResolver } from './_resolvers/student-resolver';
 import { CommComponent } from './admin/comm/comm.component';
->>>>>>> 01a8960dcaa9996bce337e176e21359b69928783
 
 export const appRoutes: Routes = [
     {path: '', component: SigninComponent},
