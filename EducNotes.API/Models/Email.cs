@@ -4,6 +4,10 @@ namespace EducNotes.API.Models
 {
     public class Email
     {
+        public Email()
+        {
+            InsertDate =DateTime.Now;
+        }
         public int Id { get; set; }
         public int EmailTypeId { get; set; }
         public EmailType EmailType { get; set; }

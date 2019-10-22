@@ -27,8 +27,8 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    this.alertify.error('vous avez été déconnecté...');
-    this.router.navigate(['/home']);
+    // this.alertify.error('veuillez vous connecter...');
+    this.router.navigate(['/signIn']);
     return false;
   }
 }

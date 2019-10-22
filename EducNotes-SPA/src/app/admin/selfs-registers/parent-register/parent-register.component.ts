@@ -28,10 +28,10 @@ export class ParentRegisterComponent implements OnInit {
   editModel: any;
   children: any = [];
   parents: any = [];
-  levels: any;
-  cities: City[];
+  levels: any[] = [];
+  cities: any[] = [];
   cityId: number;
-  user1Disctricts: District[];
+  user1Disctricts: any[] = [];
   user2Districts: District[];
  editionMode = 'add';
    i = 1;
@@ -62,7 +62,14 @@ export class ParentRegisterComponent implements OnInit {
   usersSpaCode: UserSpaCode[] = [];
   // selectedFiles: File[] = [];
   selectedFiles: any[] = [];
-  url = '';
+  childPhotoUrl = '';
+  parentPhotoUrl = '';
+  sexe = [
+          {value : 1 , label : 'Homme'  },
+          {value : 0 , label : 'Femme'  },
+        ]
+
+  secondFormGroup: FormGroup;
 
 
 
@@ -75,6 +82,11 @@ export class ParentRegisterComponent implements OnInit {
       this.createParentsForms();
       this.getCities();
       this.getLevels();
+
+
+      this.secondFormGroup = new FormGroup({
+        active: new FormControl(null, Validators.required)
+      });
    }
 
    onFileSelected(event) {
@@ -83,12 +95,19 @@ export class ParentRegisterComponent implements OnInit {
    }
    getCities() {
      this.authService.getAllCities().subscribe((res: City[]) => {
-       this.cities = res;
+      for (let i = 0; i < res.length; i++) {
+        const element = {value : res[i].id, label: res[i].name};
+        this.cities = [...this.cities, element];
+      }
+
      });
    }
    getLevels() {
-     this.authService.getLevels().subscribe((res) => {
-       this.levels = res;
+     this.authService.getLevels().subscribe((res: any[]) => {
+       for (let i = 0; i < res.length; i++) {
+         const element = {value: res[i].id , label: res[i].name};
+         this.levels = [...this.levels, element];
+       }
      });
    }
 
@@ -97,6 +116,8 @@ export class ParentRegisterComponent implements OnInit {
    this.editModel.lastName = val;
    this.editModel.dateOfBirth = null;
    this.editModel.firstName = '';
+   this.editModel.password = '';
+   this.editModel.checkPassword = '';
    this.editModel.gender = null;
    this.editModel.levelId = null;
    this.editModel.phoneNumber = '';
@@ -106,17 +127,17 @@ export class ParentRegisterComponent implements OnInit {
 
     createParentsForms() {
       this.user1Form = this.fb.group({
-        lastName: ['', Validators.nullValidator],
-        firstName: ['', Validators.nullValidator],
-        userName: ['', Validators.nullValidator],
+        lastName: ['', Validators.required],
+        firstName: ['', Validators.required],
+        userName: [''],
         password: ['', Validators.required],
         checkPassword    : [ null, [ Validators.required, this.user1confirmationValidator ] ],
         gender: [null, Validators.required],
-        dateOfBirth: [null, Validators.nullValidator],
-        cityId: [null, Validators.nullValidator],
-        districtId: [null, Validators.nullValidator],
-        phoneNumber: ['', Validators.nullValidator],
-        email: [this.user1.email, [Validators.nullValidator, Validators.email]],
+        dateOfBirth: [null],
+        cityId: [null, Validators.required],
+        districtId: [null, Validators.required],
+        phoneNumber: ['', Validators.required],
+        email: [this.user1.email, [Validators.email]],
         secondPhoneNumber: ['']});
 
     }
@@ -127,8 +148,8 @@ export class ParentRegisterComponent implements OnInit {
         dateOfBirth: [this.editModel.dateOfBirth, Validators.required],
         lastName: [this.editModel.lastName, Validators.required],
         userName: [this.editModel.userName, Validators.required],
-        password: ['', Validators.required],
-        checkPassword    : [ null, [ Validators.required, this.childrenconfirmationValidator ] ],
+        password: [this.editModel.password, Validators.required],
+        checkPassword    : [ this.editModel.checkPassword, [ Validators.required, this.childrenconfirmationValidator ] ],
         firstName: [this.editModel.firstName, Validators.nullValidator],
         gender: [this.editModel.gender, Validators.required],
         levelId: [this.editModel.levelId, Validators.required],
@@ -169,7 +190,7 @@ export class ParentRegisterComponent implements OnInit {
     }
 
   onStep1Next(e) {
-    
+
   }
 
   onStep3Next(e) {
@@ -185,17 +206,15 @@ export class ParentRegisterComponent implements OnInit {
    }
 
  submitChild(): void {
-        let enfant: any;
-         enfant = Object.assign({}, this.childForm.value);
-         enfant.level = this.levels.find(item => item.id === enfant.levelId).name;
+        let enfant: any = {};
+        enfant = Object.assign({}, this.childForm.value);
+        enfant.photoUrl = this.childPhotoUrl;
+         enfant.level = this.levels.find(item => item.value === enfant.levelId).label;
          if (this.editionMode === 'add') {
            enfant.spaCode = this.i;
-          //  const image_line = this.userImgs.find( i => i.spaCode === this.i);
-          //  if (image_line) {
-          //   enfant.image = image_line.image.image;
-          //  }
            this.children = [...this.children, enfant];
-         } else {
+            this.secondFormGroup.patchValue({active: 1});
+          } else {
            const itemIndex = this.children.findIndex(item => item.spaCode === this.selectedIndex);
            Object.assign(this.children[ itemIndex ], enfant);
 
@@ -206,6 +225,7 @@ export class ParentRegisterComponent implements OnInit {
  }
 
  add() {
+   this.childPhotoUrl = '';
   this.editionMode = 'add';
   this.i = this.i + 1;
   this.initializeParams(this.user1Form.value.lastName);
@@ -223,7 +243,7 @@ export class ParentRegisterComponent implements OnInit {
  }
 
  cancel(): void {
-   this.alertify.info('suppression annulée ');
+   // this.alertify.info('suppression annulée ');
  }
 
  back() {
@@ -234,6 +254,7 @@ export class ParentRegisterComponent implements OnInit {
    this.user1 = Object.assign({}, this.user1Form.value);
    this.user1.userTypeId = this.parentTypeId;
    this.user1.spaCode = 1;
+   this.user1.photoUrl = this.parentPhotoUrl;
   //  const img = this.userImgs.find(s => s.spaCode === 1);
   //  if (img) {
   //    this.user1.image = img.image.image;
@@ -267,39 +288,69 @@ export class ParentRegisterComponent implements OnInit {
 
  confirm(element: any): void {
    this.children.splice(this.children.findIndex(p => p.id === element.id), 1);
-   this.alertify.info('suppression éffectuée');
+            this.secondFormGroup.patchValue({active: null});
+  // this.alertify.info('suppression éffectuée');
  }
 
  edit(element: any): void {
-   this.selectedIndex = element.spaCodek;
+   this.selectedIndex = element.spaCode;
   this.editModel = Object.assign({}, element);
+  this.childNameExist = false;
+  this.childPhotoUrl = element.photoUrl;
   this.editionMode = 'edit';
   this.createChildForm();
    this.open();
  }
 
  parentImgResult(event) {
-  // const img = {spaCode : 1, image: file};
-  // this.userImgs = [...this.userImgs , img];
-  // console.log(file);
-  let file: File = null;
-  file = <File>event.target.files[0];
-  const img  = {spaCode : 1 , image : file};
-  this.selectedFiles = [...this.selectedFiles, img];
+    let file: File = null;
+    file = <File>event.target.files[0];
 
-  const reader = new FileReader();
-  reader.readAsDataURL(file); // read file as data url
+    // recuperation de l'url de la photo
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.parentPhotoUrl = e.target.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+    // fin recupération
 
-  reader.onload = (ev) => { // called once readAsDataURL is completed
-    this.url = event.target.result;
-  }
+
+    const imageExist = this.selectedFiles.find( t => t.spaCode === 1);
+    if (imageExist) {
+      // une image existe deja dans le tableau
+      imageExist.image = file;
+    } else {
+      // aucune image dans le tableau => insertion
+    const img  = {spaCode : 1 , image : file};
+    this.selectedFiles = [...this.selectedFiles, img];
+    }
+
+
 }
 
  childImgResult(event) {
   let file: File = null;
   file = <File>event.target.files[0];
-  const img  = {spaCode : this.i , image : file};
-  this.selectedFiles = [...this.selectedFiles, img];
+
+   // recuperation de l'url de la photo
+   const reader = new FileReader();
+   reader.onload = (e: any) => {
+     this.childPhotoUrl = e.target.result;
+   };
+   reader.readAsDataURL(event.target.files[0]);
+   // fin recupération
+
+
+   const imageExist = this.selectedFiles.find( t => t.spaCode === this.i);
+   if (imageExist) {
+     // une image existe deja dans le tableau
+     imageExist.image = file;
+   } else {
+     // aucune image dans le tableau => insertion
+     const img  = {spaCode : this.i , image : file};
+     this.selectedFiles = [...this.selectedFiles, img];
+   }
+
 }
 
 save() {
@@ -332,47 +383,43 @@ save() {
 
 savePhotos() {
   let errorCount = 0;
-    let allCompleted = false;
     for (let i = 0; i < this.usersSpaCode.length; i++) {
     const element = this.usersSpaCode[i];
       const img = this.selectedFiles.find( c => c.spaCode === element.spaCode);
       if (img) {
-        console.log('trouvé : ');
+       // console.log('trouvé : ');
         // mise a jour de la photo
       //  debugger;
       const formData = new FormData();
       formData.append('file', img.image, img.image.name);
         this.authService.addUserPhoto(element.userId, formData).subscribe(() => {
-          allCompleted = true;
         }, error => {
           this.alertify.error(error);
           errorCount = errorCount + 1;
-          allCompleted = false;
         });
       }
-     if (element === this.usersSpaCode[this.usersSpaCode.length - 1]) {
-       this.logUser();
-     }
-      //fin de la boucle
+      if (element === this.usersSpaCode[this.usersSpaCode.length - 1]) {
+           this.logUser();
+      }
+      // fin de la boucle
     }
 
-    if (allCompleted) {
-      console.log('terminé...  : ');
-
-      this.alertify.success('enregistrement terminé...');
-      this.wait = false;
-    }
 }
 
  getUser1Districts() {
    const id = this.user1Form.value.cityId;
-   this.user1Form.value.cityId = '';
-   this.user1Disctricts = [];
-   this.authService.getDistrictsByCityId(id).subscribe((res: District[]) => {
-   this.user1Disctricts = res;
-   }, error => {
-     console.log(error);
-   });
+   if (id) {
+      this.user1Form.value.cityId = '';
+      this.user1Disctricts = [];
+      this.authService.getDistrictsByCityId(id).subscribe((res: any[]) => {
+        for (let i = 0; i < res.length; i++) {
+        const element = {value : res[i].id, label: res[i].name};
+        this.user1Disctricts = [...this.user1Disctricts, element];
+        }
+      }, error => {
+        console.log(error);
+      });
+   }
  }
 
 

@@ -57,8 +57,8 @@
                </nz-form-item>
                <nz-form-item>
                   <nz-form-control [nzSpan]="14" [nzOffset]="6">
-                      <button class="btn btn-outline-primary " type="submit" [disabled]="!teacherForm.valid || submitText!='enregistrer'"><span>{{submitText}}</span></button>
-                      <button type="button" (click)="close()" class="btn btn-outline-primary ml-2"><span>annuler</span></button>      
+                      <button mdbBtn color="info" size="sm" mdbWavesEffect  type="submit" [disabled]="!teacherForm.valid || submitText!='enregistrer'"><span>{{submitText}}</span></button>
+                      <button type="button" [routerLink]="['/teachers']" routerLinkActive="router-link-active" mdbBtn color="light" size="sm" mdbWavesEffect   class="ml-2"><span>annuler</span></button>      
                   </nz-form-control>
 
               </nz-form-item>

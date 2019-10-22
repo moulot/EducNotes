@@ -56,8 +56,8 @@
                  <nz-form-item>
                     <nz-form-control [nzSpan]="14" [nzOffset]="6">
                         <button type="submit" [disabled]="!classForm.valid || submitText!='enregistrer'"
-                          class="btn btn-outline-primary btn-sm"><span>{{submitText}}</span></button>
-                        <button type="button"  class="btn btn-outline-primary btn-sm ml-2" (click)="cancel()"><span>annuler</span></button>
+                        mdbBtn color="info" size="sm" mdbWavesEffect ><span>{{submitText}}</span></button>
+                        <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect  [routerLink]="['/classesPanel']" routerLinkActive="router-link-active" >annuler</button>
                      
                       </nz-form-control>
                   </nz-form-item>

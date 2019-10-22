@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -323,47 +324,13 @@ namespace EducNotes.API.Controllers
 
 
 
-    [HttpPost("AddUser")]
-    public async Task<IActionResult> AddUser(UserForRegisterDto userForRegisterDto)
+    [HttpPost("{insertUserId}/AddUser")]
+    public async Task<IActionResult> AddUser(int insertUserId,UserForRegisterDto userForRegisterDto)
     {
+      if(await _repo.AddUserPreInscription(userForRegisterDto,insertUserId))
+      return Ok();
 
-        var userToCreate = _mapper.Map<User>(userForRegisterDto);
-        var code  = Guid.NewGuid();
-        userToCreate.UserName = code.ToString();
-        try
-        {
-            await _repo.AddUserPreInscription(code,userToCreate,teacherRoleId,true);
-            
-            if(userForRegisterDto.CourseIds!=null)
-            {
-                    foreach (var course in userForRegisterDto.CourseIds)
-                    {
-                        var newCourse =  new TeacherCourse {CourseId = course, TeacherId = userToCreate.Id};
-                        _repo.Add(newCourse);
-                    }
-                //     var teacherToReturn = new TeacherForListDto(){
-                //     // Teacher =  _mapper.Map<UserForListDto>(await _repo.GetUser(userToCreate.Id,false)),
-                //     // Courses = await _repo.GetTeacherCoursesAndClasses(userToCreate.Id)
-                // };
-                
-                // return Ok(teacherToReturn);
-                 if( await _repo.SaveAll())
-                return Ok();
-
-                return BadRequest("impossible de terminer l'enregistrement");
-            }
-
-            else
-            return Ok();
-            // return Ok(_mapper.Map<UserForListDto>(userToCreate));
-            
-        }
-        catch (System.Exception ex)
-        {
-            string mes = ex.Message;
-
-            return BadRequest(ex);
-        }    
+      return BadRequest("impossible de termier l'enregistrement");
     }
   
   
@@ -471,7 +438,7 @@ namespace EducNotes.API.Controllers
                     var father = _mapper.Map<User>(model.father);
                     father.UserTypeId =  parentTypeId;
                     var guid =Guid.NewGuid();
-                    fatherId = await _repo.AddUserPreInscription(guid,father,parentRoleId,true);
+                 //   fatherId = await _repo.AddUserPreInscription(guid,father,parentRoleId,true);
                         
                 }
             
@@ -480,7 +447,7 @@ namespace EducNotes.API.Controllers
                 {
                     var mother = _mapper.Map<User>(model.mother);
                     mother.UserTypeId =  parentTypeId;
-                    motherId = await _repo.AddUserPreInscription(Guid.NewGuid(),mother,parentRoleId,true);
+                 //   motherId = await _repo.AddUserPreInscription(Guid.NewGuid(),mother,parentRoleId,true);
                 }
 
                 
@@ -491,7 +458,7 @@ namespace EducNotes.API.Controllers
                         child = _mapper.Map<User>(model.children[i]);
                         child.UserTypeId =  studentTypeId;
                         int userId = 0;
-                        userId=await _repo.AddUserPreInscription(Guid.NewGuid(),child,memberRoleId,false);
+                      //  userId=await _repo.AddUserPreInscription(Guid.NewGuid(),child,memberRoleId,false);
 
                         //enregistrement de l inscription
                         var insc = new Inscription {
@@ -536,8 +503,8 @@ namespace EducNotes.API.Controllers
         return Ok(await _repo.EmailExist(email));
     }
 
-    [HttpPost("SendRegisterEmail")]
-    public async Task<IActionResult> SendRegisterEmail(SelfRegisterDto model)
+    [HttpPost("{currentUserId}/SendRegisterEmail")]
+    public async Task<IActionResult> SendRegisterEmail(int currentUserId,SelfRegisterDto model)
     {
      
        if(model.UserTypeId ==teacherTypeId)
@@ -552,7 +519,7 @@ namespace EducNotes.API.Controllers
               UserTypeId =teacherTypeId
           };
           // enregistrement du professeur
-          int userId= await _repo.AddSelfRegister(teacher,TeacherRole.Name,true);
+          int userId= await _repo.AddSelfRegister(teacher,TeacherRole.Name,true,currentUserId);
           if(userId>0)
           {
              foreach (var courseId in model.CourseIds)
@@ -574,6 +541,7 @@ namespace EducNotes.API.Controllers
       {
           var ParentRole   = await _context.Roles.FirstOrDefaultAsync(a=>a.Id==parentTypeId);
          string code = Guid.NewGuid().ToString();
+         
           var parent = new User{
             ValidationCode = code,
             Email = model.Email,
@@ -581,7 +549,7 @@ namespace EducNotes.API.Controllers
             UserTypeId = parentTypeId
           };
 
-        int parentId= await _repo.AddSelfRegister(parent,ParentRole.Name,true);
+        int parentId= await _repo.AddSelfRegister(parent,ParentRole.Name,true, currentUserId);
 
         if(parentId>0)
         {
@@ -594,7 +562,7 @@ namespace EducNotes.API.Controllers
                   UserName = code,
                   UserTypeId = studentTypeId
                 };
-              int childId =await _repo.AddSelfRegister(child,MemberRole.Name,false);
+              int childId =await _repo.AddSelfRegister(child,MemberRole.Name,false, currentUserId);
               if(childId>0)
               {
                 var userLink = new UserLink{
@@ -604,10 +572,9 @@ namespace EducNotes.API.Controllers
                 _repo.Add(userLink);
               }
           }
-        
         }
 
-        else
+        else // le parent n a pas pu etre inséré
         return BadRequest("impossible d'ajouter ce compte");
       }
 
@@ -705,16 +672,16 @@ namespace EducNotes.API.Controllers
                   userToCreate.UserTypeId = teacherTypeId;
                   var code  = Guid.NewGuid();
                   userToCreate.UserName = code.ToString();
-                  int userId= await _repo.AddUserPreInscription(code,userToCreate,teacherRoleId,true);
+               //   int userId= await _repo.AddUserPreInscription(code,userToCreate,teacherRoleId,true);
                   
 
-                  foreach (var course in userForRegister.Courses)
-                  {
-                    var cours = await _context.Courses?.FirstOrDefaultAsync(c => c.Name.ToLower() == course.ToLower());
-                    if(cours != null)
-                    _repo.Add( new TeacherCourse{ TeacherId = userId, CourseId = cours.Id });
-                  }
-            }
+            //       foreach (var course in userForRegister.Courses)
+            //       {
+            //         var cours = await _context.Courses?.FirstOrDefaultAsync(c => c.Name.ToLower() == course.ToLower());
+            //         if(cours != null)
+            //         _repo.Add( new TeacherCourse{ TeacherId = userId, CourseId = cours.Id });
+            //       }
+               }
 
 
             if( await _repo.SaveAll())
@@ -731,6 +698,38 @@ namespace EducNotes.API.Controllers
 
             return BadRequest(ex);
         }  
+
+    }
+
+    [HttpGet("GetTeacher/{teacherId}")]
+    public async Task<IActionResult> GetTeacher(int teacherId)
+    {
+         //recuperation du professeur professeurs ainsi que tous ses cours
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Id == teacherId);
+            if(teacher != null)
+            {
+            CultureInfo frC = new CultureInfo("fr-FR");
+           
+            var tdetails = new TeacherForListDto();
+            tdetails.PhoneNumber = teacher.PhoneNumber ;
+            tdetails.SeconPhoneNumber =teacher.SecondPhoneNumber;
+            tdetails.Email = teacher.Email;
+            tdetails.Id = teacher.Id;
+            tdetails.LastName = teacher.LastName;
+            tdetails.FirstName = teacher.FirstName;  
+            tdetails.DateOfBirth =  teacher.DateOfBirth?.ToString("dd/MM/yyyy", frC);
+            tdetails.Courses =await _context.TeacherCourses.
+                      Where(t=> t.TeacherId == teacherId)
+                      .Select(c =>c.Course)
+                      .ToListAsync();
+            tdetails.classIds =await _context.ClassCourses.Where(t => t.TeacherId == teacherId)
+                                                          .Select(t => t.ClassId)
+                                                          .Distinct()
+                                                          .ToListAsync()
+                                                          ;
+          return Ok(tdetails);
+         }
+    return BadRequest("impossible de trouver l'utilisateur");
 
     }
 

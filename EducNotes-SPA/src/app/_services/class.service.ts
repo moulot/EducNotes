@@ -181,6 +181,11 @@ constructor(private http: HttpClient) { }
     return this.http.post(this.baseUrl + 'classes/UpdateCourse/' + courseId, course);
   }
 
+  getCourse(courseId: number): Observable<Course> {
+    return this.http.get<Course>(this.baseUrl + 'classes/course/' + courseId);
+
+  }
+
   saveClassModification(classId: number, data: any) {
     return this.http.post(this.baseUrl + 'classes/' + classId + '/UpdateClass', data);
   }

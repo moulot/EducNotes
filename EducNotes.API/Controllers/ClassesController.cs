@@ -903,6 +903,13 @@ namespace EducNotes.API.Controllers
             return Ok(res);
         }
 
+        [HttpGet("Course/{courseId}")]
+        public async Task<IActionResult> Course(int courseId)
+        {
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+            return Ok(course);
+        }
+
        
 
     }

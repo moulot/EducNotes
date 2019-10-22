@@ -8,6 +8,8 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { User } from 'src/app/_models/user';
 import { Utils } from 'src/app/shared/utils';
+import { Router, ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
   selector: 'app-new-teacher',
@@ -16,7 +18,6 @@ import { Utils } from 'src/app/shared/utils';
   animations :  [SharedAnimations]
 })
 export class NewTeacherComponent implements OnInit {
-  @Input()  teacherDetail: any;
   courses: Course[] = [];
   teacherForm: FormGroup;
   submitText = 'enregistrer';
@@ -28,23 +29,31 @@ export class NewTeacherComponent implements OnInit {
   teachersCourses: any[];
   phoneMask = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
   birthDateMask = [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/];
-
-  @Output() addUserResult = new EventEmitter();
-
+  currentUserId: number;
 
 
-  constructor(private classService: ClassService, private fb: FormBuilder,
-    private adminService: AdminService, private alertify: AlertifyService) { }
+  constructor(private classService: ClassService, private fb: FormBuilder, private authService: AuthService,
+     private router: Router, private adminService: AdminService,
+    private alertify: AlertifyService, private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.currentUserId = this.authService.decodedToken.nameid;
 
-    if (this.teacherDetail != null) {
-      this.editionMode = 'edit';
-      this.editModel = this.teacherDetail;
-      this.userId = this.teacherDetail.id;
+    this.route.data.subscribe(data => {
+      if (data.teacher) {
+         this.editModel = data.teacher;
+         this.editionMode = 'edit';
+         this.userId = data.teacher.id;
+         this.editModel.courseIds = [];
+         for (let i = 0; i < data.teacher.courses.length; i++) {
+           this.editModel.courseIds = [...this.editModel.courseIds, data.teacher.courses[i].id];
+         }
+
      } else {
        this.initializeParams();
      }
+   });
+
 
     this.getAllCourses();
     this.createTeacherForm();
@@ -102,34 +111,23 @@ export class NewTeacherComponent implements OnInit {
 
     this.teacher.userTypeId = this.teacherTypeId;
     if (this.editionMode === 'add') {
-      this.adminService.emailExist(this.teacher.email).subscribe((res: boolean) => {
-            if (res === true) {
-              this.alertify.infoBar('l\'email ' + this.teacher.email + ' est déja utlilisé ');
-              this.submitText = 'enregistrer';
+      // nouvelle enregistrement
+      this.adminService.saveTeacher(this.currentUserId, this.teacher).subscribe((response: any) => {
+        this.alertify.success('enregistrement terminé...');
+         this.submitText = 'enregistrer';
+         this.router.navigate(['/teachers']);
+       }, error => {
+           this.submitText = 'enregistrer';
+           this.alertify.error(error);
+         });
 
-            } else {
-              this.adminService.saveTeacher(this.teacher).subscribe((response: any) => {
-            //   this.visible = false;
-            //   response.type = 'new';
-              // this.teachersCourses = [...this.teachersCourses, response];
-            // this.teachersCourses.unshift(response);
-              this.alertify.success('enregistrement terminé...');
-              this.submitText = 'enregistrer';
-              this.addUserResult.emit(true);
-            }, error => {
-                this.submitText = 'enregistrer';
-                this.alertify.error(error);
-              });
-
-            }
-          });
     }
 
     if (this.editionMode === 'edit') {
       this.classService.updateTeacher(this.userId, this.teacher).subscribe(() => {
         this.alertify.success('enregistrement terminé');
         this.submitText = 'enregistrer';
-        this.addUserResult.emit(true);
+        this.router.navigate(['/teachers']);
       }, error => {
         this.alertify.error(error);
         this.submitText = 'enregistrer';
@@ -138,9 +136,5 @@ export class NewTeacherComponent implements OnInit {
 
   }
 
-
-  close() {
-    this.addUserResult.emit(false);
-  }
 
 }

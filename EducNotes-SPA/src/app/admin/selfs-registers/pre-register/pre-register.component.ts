@@ -6,6 +6,7 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { environment } from 'src/environments/environment';
 import { ClassService } from 'src/app/_services/class.service';
 import { User } from 'src/app/_models/user';
+import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
   selector: 'app-pre-register',
@@ -25,7 +26,7 @@ parentTypeId = Number(environment.parentTypeId);
 teacherTypeId = Number(environment.teacherTypeId);
 
   constructor(private adminService: AdminService, private alertify: AlertifyService,
-    private classService: ClassService, private fb: FormBuilder) { }
+    private authService: AuthService, private classService: ClassService, private fb: FormBuilder) { }
 
   ngOnInit() {
     this.getUserTypes();
@@ -88,7 +89,7 @@ teacherTypeId = Number(environment.teacherTypeId);
     }
   }
   save() {
-    this.adminService.sendRegisterEmail(this.user).subscribe(() => {
+    this.adminService.sendRegisterEmail(this.authService.decodedToken.nameid, this.user).subscribe(() => {
       this.alertify.success('enregistrement terminé');
       this.registerForm.reset();
       this.submitText = 'enregistrer';

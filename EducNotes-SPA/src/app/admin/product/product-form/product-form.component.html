@@ -1,0 +1,20 @@
+<div class="row justify-content-center align-items-center mt-3"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+ 
+    <div class="col-md-8" >
+        <div class="card p-3">
+                <form nz-form [formGroup]="productForm" (ngSubmit)="save()">
+                        <div class="md-form">
+                            <input mdbInput type="text" id="name" class="form-control" formControlName="name">
+                            <label for="name" class="">Nom du Service</label>
+                        </div>
+                        <div class="md-form">
+                            <textarea type="text" formControlName="comment" id="comment" class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
+                            <label for="form7">Commentaire</label>
+                          </div>
+                        <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!productForm.valid" mdbWavesEffect>enregistrer</button>
+                        <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect [routerLink]="['/productsList']">annuler</button>
+                    </form>
+        </div>
+    </div>
+</div>
+

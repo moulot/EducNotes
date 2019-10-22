@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using AutoMapper;
 using EducNotes.API.Dtos;
 using EducNotes.API.Helpers;
 using EducNotes.API.Models;
@@ -20,17 +21,21 @@ namespace EducNotes.API.Data
         private readonly DataContext _context;
         private readonly IConfiguration _config;
         private readonly IEmailSender _emailSender;
+         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         string password;
-         int teacherTypeId,parentTypeId,studentTypeId,adminTypeId;
+        int teacherTypeId,parentTypeId,studentTypeId,adminTypeId;
+        int parentRoleId,memberRoleId,moderatorRoleId,adminRoleId,teacherRoleId,schoolInscTypeId;
+
 
 
         public EducNotesRepository(DataContext context, IConfiguration config, IEmailSender emailSender,
-        UserManager<User> userManager)
+        UserManager<User> userManager, IMapper mapper)
         {
             _context = context;
             _config = config;
             _emailSender = emailSender;
+            _mapper = mapper;
             _config = config;
             password = _config.GetValue<String>("AppSettings:defaultPassword");
             _userManager =userManager;
@@ -38,6 +43,11 @@ namespace EducNotes.API.Data
             parentTypeId =  _config.GetValue<int>("AppSettings:parentTypeId");
             adminTypeId =  _config.GetValue<int>("AppSettings:adminTypeId");
             studentTypeId =  _config.GetValue<int>("AppSettings:studentTypeId");
+            parentRoleId = _config.GetValue<int>("AppSettings:parentRoleId");
+            memberRoleId = _config.GetValue<int>("AppSettings:memberRoleId");
+            moderatorRoleId = _config.GetValue<int>("AppSettings:moderatorRoleId");
+            adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
+            teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
         }
 
         public void Add<T>(T entity) where T : class
@@ -340,35 +350,83 @@ namespace EducNotes.API.Data
         //     return classcourses;
         // }
 
-        public async Task<int> AddUserPreInscription(Guid validationCode, User user, int roleId,bool sendEMail)
+        public async Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister,int insertUserId)
         {
-            user.ValidationCode = validationCode.ToString();
-            user.ValidatedCode = false;
-            user.EmailConfirmed = false;
-            if (user.Email != null)
-                user.UserName = validationCode.ToString();
-            else
-                user.UserName = user.LastName;
-            var result = await _userManager.CreateAsync(user, password);
-            if (result.Succeeded)
-            {
-                        var role = await _context.Roles.FirstOrDefaultAsync(a=>a.Id==roleId);
-                var appUser = await _userManager.Users
-                 .FirstOrDefaultAsync(u => u.NormalizedUserName == user.UserName);
 
-                _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+            var userToCreate = _mapper.Map<User>(userForRegister);
+            var code  = Guid.NewGuid();
+            userToCreate.UserName = code.ToString();
+            userToCreate.ValidationCode = code.ToString();
+            userToCreate.ValidatedCode = false;
+            userToCreate.EmailConfirmed = false;
+            userToCreate.UserName =code.ToString();
+            bool resultStatus = false;
 
-                if(sendEMail && user.Email!=null)
-                {
-                   var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink")+user.ValidationCode;
-                      await _emailSender.SendEmailAsync(user.Email, "Confirmation de compte",
-                      $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.");
-                }
+            using (var identityContextTransaction = _context.Database.BeginTransaction())
+           {
+             try
+             {
+                 if(userToCreate.UserTypeId == teacherTypeId)
+                 {
+                     //enregistrement du teacher
+                    var result = await _userManager.CreateAsync(userToCreate, password);
+                    if (result.Succeeded)
+                    {
+                        // enregistrement du RoleTeacher
+                        var role = await _context.Roles.FirstOrDefaultAsync(a=>a.Id==teacherRoleId);
+                        var appUser = await _userManager.Users
+                        .FirstOrDefaultAsync(u => u.NormalizedUserName == userToCreate.UserName);
+                        _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+
+                        //enregistrement de des cours du professeur
+                         if(userForRegister.CourseIds!=null)
+                        {
+                                foreach (var course in userForRegister.CourseIds)
+                                {
+                                    Add( new TeacherCourse {CourseId = course, TeacherId = userToCreate.Id});
+                                }
+                        }
+
+                       
+                         // Enregistrement dans la table Email
+                        if(userToCreate.Email!=null)
+                        {
+                            var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink")+userToCreate.ValidationCode;
+
+                            var emailToSend =  new Email{
+                                InsertUserId = insertUserId,
+                                UpdateUserId = userToCreate.Id,
+                                StatusFlag =0,
+                                Subject = "Confirmation de compte",
+                                ToAddress = userToCreate.Email,
+                                Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                                FromAddress ="no-reply@educnotes.com",
+                                EmailTypeId =  _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
+                            };
+                            Add(emailToSend);
+                        }
+                    if(await SaveAll())
+                    {
+                        // fin de la transaction
+                        identityContextTransaction.Commit();
+                    resultStatus=true;
+
+                    }
+                    else
+                    resultStatus=true;
+                 }
+                    else
+                    resultStatus= false;
+                 }
                 
-                return appUser.Id;
-            }
-            return 0;
-
+             }
+             catch (System.Exception)
+             {
+                 
+                 return resultStatus = false;
+             }  
+           }
+            return resultStatus;
         }
         public async Task<Course> GetCourse(int Id)
         {
@@ -493,31 +551,53 @@ namespace EducNotes.API.Data
       return await _context.ClassTypes.OrderBy(a=>a.Name).ToListAsync();
     }
 
-    public async Task<int> AddSelfRegister(User user,string roleName,bool sendLink)
+    public async Task<int> AddSelfRegister(User user,string roleName,bool sendLink,int currentUserId)
     {
-      
+        var userIdToReturn =0;
        user.Created = DateTime.Now;
-
-      var result = await _userManager.CreateAsync(user, password);
-
-      if(result.Succeeded)
+      using (var identityContextTransaction = _context.Database.BeginTransaction())
       {
-        var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedUserName == user.UserName);
+            try
+            {
+                 var result = await _userManager.CreateAsync(user, password);
 
-        _userManager.AddToRoleAsync(appUser, roleName).Wait();
-        if(sendLink)
-        {
-          // envoi du lien
-           var callbackUrl = _config.GetValue<String>("AppSettings:DefaultSelRegisterLink")+user.ValidationCode;
-           // envoi du mail
-           await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                if(result.Succeeded)
+                {
+                    var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedUserName == user.UserName);
+                    userIdToReturn = appUser.Id;
+                    
+                    _userManager.AddToRoleAsync(appUser, roleName).Wait();
+                    if(sendLink)
+                    {
+                    // envoi du lien
+                    var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink")+appUser.ValidationCode;
+                    var email = new Email{
 
+                                 InsertUserId = currentUserId,
+                                UpdateUserId = appUser.Id,
+                                StatusFlag =0,
+                                Subject = "Confirmation de compte",
+                                ToAddress = appUser.Email,
+                                Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                                FromAddress ="no-reply@educnotes.com",
+                                EmailTypeId =  _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
+                            };
+                      Add(email);  
+                      await SaveAll();            
+                    }
+                }
+
+          identityContextTransaction.Commit();
         }
-        return appUser.Id;
+        catch (System.Exception)
+        {
+            identityContextTransaction.Rollback();
+            userIdToReturn =0;
+        }
       }
 
-      return 0;
+     
+      return userIdToReturn;
     }
     
     public async Task<List<string>> GetEmails()
@@ -623,7 +703,7 @@ namespace EducNotes.API.Data
                              email.ToAddress = parentFromRepo.Email;
                              email.Body = "<b> "+parentFromRepo.LastName + " "+ parentFromRepo.FirstName + "</b>, votre compte a bien été enregistré";
                              email.FromAddress ="no-reply@educnotes.com";
-                             email.EmailTypeId =  _config.GetValue<int>("AppSettings:confirmedtypeId");
+                             email.EmailTypeId =  _config.GetValue<int>("AppSettings:confirmedEmailtypeId");
                              Add(email);
                              // retour du code du userId et du codeSpa
                              usersSpaCode.Add(new UserSpaCodeDto {UserId = parentFromRepo.Id,SpaCode= Convert.ToInt32(user.SpaCode)});
@@ -647,6 +727,8 @@ namespace EducNotes.API.Data
                         var newPass=_userManager.PasswordHasher.HashPassword(child,user.Password);
                         child.PasswordHash = newPass;
                         child.ValidatedCode = true;
+                        child.EmailConfirmed =false;
+                        if(!string.IsNullOrEmpty(child.Email))
                         child.EmailConfirmed =true;
                         child.ValidationDate = DateTime.Now;
                         child.TempData =1;

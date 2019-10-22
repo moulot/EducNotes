@@ -139,6 +139,9 @@ namespace EducNotes.API.Helpers
                 .ForMember(dest => dest.EvalDate, opt => {
                     opt.MapFrom(src => src.EvalDate.ToShortDateString());
                 });
+            CreateMap<ProductDto, Product>();
+            CreateMap<DeadLineDto, DeadLine>();
+            
         }
     }
 }

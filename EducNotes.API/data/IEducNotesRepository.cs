@@ -35,7 +35,7 @@ namespace EducNotes.API.Data
         Task<bool> UserNameExist(string userName);    
 
 
-        Task<int> AddUserPreInscription(Guid code,User user,int roleId,bool sendEMail);
+        Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister,int insertUserId);
 
         Task<IEnumerable<User>> GetStudentsForClass(int classId);
         Task<IEnumerable<Agenda>> GetClassAgenda(int classId);
@@ -61,7 +61,7 @@ namespace EducNotes.API.Data
   /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////
         Task<IEnumerable<ClassType>> GetClassTypes();
-        Task<int> AddSelfRegister(User user,string roleName,bool sendLink);
+        Task<int> AddSelfRegister(User user,string roleName,bool sendLink, int currentUserId);
         Task<List<string>> GetEmails();
         Task<List<string>> GetUserNames();
         Task<List<ClassLevel>> GetLevels();

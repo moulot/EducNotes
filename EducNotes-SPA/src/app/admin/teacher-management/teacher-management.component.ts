@@ -59,24 +59,6 @@ export class TeacherManagementComponent implements OnInit {
   }
 
 
-  add() {
-    this.show = 'add';
-
-  }
-
-  edit( params: any): void {
-    let courseIds = [];
-    for (let i = 0; i < params.courseClasses.length; i++) {
-      const element = params.courseClasses[i].course.id;
-      courseIds =  [...courseIds, element];
-    }
-    params.courseIds = courseIds;
-    this.dateOfBirth = params.dateOfBirth.toString();
-   // params.dateOfBirth = this.dateOfBirth
-   this.teacher = params;
-
-   this.show = 'edit';
-   }
 
   assignment(params: any) {
     let courses = [];
@@ -98,17 +80,6 @@ export class TeacherManagementComponent implements OnInit {
    this.show = 'affect';
   }
 
-  courseChange(): void {
-   this.classIds = [];
-   // matching selecting course from seleceted Teacher to get classes
-    // const teachercourses = this.selectedTeacher.courses.find(item => item.course.id === this.courseId);
-    //      for (let index = 0; index < teachercourses.classes.length; index++) {
-    //       if ( teachercourses.classes[index].teacherId === this.userId) {
-    //         this.classIds = [...this.classIds, teachercourses.classes[index].classId];
-    //       }
-    //     }
-
-  }
 
   saveImport() {
     this.adminService.importTeachersFile(this.exportedTeachers).subscribe(() => {
@@ -121,18 +92,6 @@ export class TeacherManagementComponent implements OnInit {
 
   }
 
-  cancel(): void {
-    this.show = 'all';
-  }
-
-  resultMode(val: boolean) {
-    if (val) {
-      // reload data;
-      this.getTeachers();
-
-    }
-    this.show = 'all';
-  }
 
     onFileChange(ev) {
       let workBook = null;
@@ -148,10 +107,7 @@ export class TeacherManagementComponent implements OnInit {
           return initial;
         }, {});
 
-        // const dataString = JSON.stringify(jsonData);
-        // document.getElementById('output').innerHTML = dataString.slice(0, 300).concat('...');
-        // console.log(d.exel);
-        this.exportedTeachers = [];
+       this.exportedTeachers = [];
         const d = jsonData;
         for (let i = 0; i < d.exel.length; i++) {
             const la_ligne = d.exel[i];

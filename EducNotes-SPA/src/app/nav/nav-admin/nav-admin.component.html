@@ -28,5 +28,14 @@
   </div>
   <div class="" routerLinkActive="active">
       <a class="text-15 text-muted mr-3" [routerLink]="['/comm']">communication</a>
+  </div>
+
+  <div class="" ngbDropdown role="group" aria-label="Select all" placement="bottom-left">
+    <a class="dropdown-toggle text-15 text-muted mr-3 dd" ngbDropdownToggle>Tréso</a>
+    <div class="dropdown-menu" ngbDropdownMenu>
+      <button [routerLink]="['/productsList']" class="dropdown-item">Service</button>
+      <button [routerLink]="['/lvlprods']" class="dropdown-item">Service par niveau</button>
+      <button [routerLink]="['/deadLines']" class="dropdown-item">Echéances</button>
     </div>
+  </div>
   </div>

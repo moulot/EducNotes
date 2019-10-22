@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ClassService } from 'src/app/_services/class.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-class',
@@ -12,7 +13,6 @@ import { ClassService } from 'src/app/_services/class.service';
 })
 export class NewClassComponent implements OnInit {
   levels: any;
-  @Output() addClassResult = new EventEmitter();
 
   classTypes;
   classForm: FormGroup;
@@ -21,7 +21,8 @@ export class NewClassComponent implements OnInit {
  suffixes = [{id: 1, name: 'A,B,C,...'}, {id: 2, name: '1,2,3,.....' }];
 
 
-  constructor(private fb: FormBuilder, private classService: ClassService, private alertify: AlertifyService) { }
+  constructor(private fb: FormBuilder,private router: Router,
+     private classService: ClassService, private alertify: AlertifyService) { }
 
   ngOnInit() {
 
@@ -83,18 +84,12 @@ export class NewClassComponent implements OnInit {
      this.classService.saveNewClasses(element).subscribe(next => {
         this.submitText = 'enregistrer';
         this.alertify.success('enregistrement terminé...');
-        this.addClassResult.emit(true);
-
+        this.router.navigate(['classesPanel']);
       }, error => {
         console.log(error);
         this.submitText = 'enregistrer';
         this.errorMessage = error;
       });
   }
-
-  cancel() {
-    this.addClassResult.emit(false);
-  }
-
 
 }
