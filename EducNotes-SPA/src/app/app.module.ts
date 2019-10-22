@@ -114,6 +114,8 @@ import { TextMaskModule } from 'angular2-text-mask';
 import { EmailConfirmResolver } from './_resolvers/email-confirm.resolver';
 import { ForgotComponent } from './views/sessions/forgot/forgot.component';
 import { UiKitsModule } from './views/ui-kits/ui-kits.module';
+// MDB Angular Pro
+import { StepperModule, WavesModule } from 'ng-uikit-pro-standard';
 import { ResetPasswordComponent } from './registration/reset-password/reset-password.component';
 import { ResetPasswordResolver } from './_resolvers/reset-password.resolver';
 import { EvalAddFormComponent } from './grades/eval-addForm/eval-addForm.component';
@@ -151,9 +153,23 @@ import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { ClassResolver } from './_resolvers/class-resolver';
 import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-schedule.component';
-import { SharedComponentsModule } from './shared/components/shared-components.module';
+import { AppFormsModule } from './views/forms/forms.module';
 import { ModalScheduleComponent } from './admin/modal-schedule/modal-schedule.component';
+import { SharedComponentsModule } from './shared/components/shared-components.module';
 import { StudentResolver } from './_resolvers/student-resolver';
+import { ProductsListComponent } from './admin/product/products-list/products-list.component';
+import { ProductFormComponent } from './admin/product/product-form/product-form.component';
+import { ClassLevelProductsComponent } from './admin/treso/class-level-products/class-level-products.component';
+import { ClassLevelProdFormComponent } from './admin/treso/class-level-prod-form/class-level-prod-form.component';
+import { DeadLineListComponent } from './admin/treso/dead-line-list/dead-line-list.component';
+import { DeadLineFormComponent } from './admin/treso/dead-line-form/dead-line-form.component';
+import { DeadLineListResolver } from './_resolvers/dead-line-list-resolver';
+import { DeadLineFormResolver } from './_resolvers/dead-line-form-resolver';
+import { ProductsListResolver } from './_resolvers/products-list-resolver';
+import { ProductFormResolver } from './_resolvers/product-form-resolver';
+import { CourseFormResolver } from './_resolvers/course-form-resolver';
+import { TeacherFormResolver } from './_resolvers/teacher-form-resolver';
+
 import { BroadcastComponent } from './comm/brodcast/broadcast.component';
 import { MDBBootstrapModulesPro } from 'ng-uikit-pro-standard';
 import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
@@ -274,6 +290,12 @@ export function tokenGetter() {
       ClassScheduleComponent,
       ClassdayScheduleComponent,
       ModalScheduleComponent,
+      ProductsListComponent,
+      ProductFormComponent,
+      ClassLevelProductsComponent,
+      ClassLevelProdFormComponent,
+      DeadLineListComponent,
+      DeadLineFormComponent,
       BroadcastComponent,
       TagInputsComponent,
       EmailComponent,
@@ -317,11 +339,14 @@ export function tokenGetter() {
       DataTablesRoutingModule,
       TextMaskModule,
       UiKitsModule,
+      StepperModule,
+      WavesModule,
       SharedPipesModule,
       PerfectScrollbarModule,
       NgxEchartsModule,
       ColorPickerModule,
       SharedComponentsModule,
+      AppFormsModule,
       MDBBootstrapModulesPro.forRoot(),
       TagInputModule
    ],
@@ -354,6 +379,12 @@ export function tokenGetter() {
       ClassResolver,
       StudentResolver,
       MDBSpinningPreloader,
+      DeadLineListResolver,
+      DeadLineFormResolver,
+      ProductsListResolver,
+      ProductFormResolver,
+      CourseFormResolver,
+      TeacherFormResolver,
       {provide: NZ_I18N, useValue: fr_FR}
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

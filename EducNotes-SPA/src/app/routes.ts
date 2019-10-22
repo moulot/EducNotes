@@ -53,18 +53,36 @@ import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
 import { ClassResolver } from './_resolvers/class-resolver';
+import { AppImgCropperComponent } from './views/forms/img-cropper/img-cropper.component';
 import { StudentResolver } from './_resolvers/student-resolver';
+import { ProductsListComponent } from './admin/product/products-list/products-list.component';
+import { ProductFormComponent } from './admin/product/product-form/product-form.component';
+import { ClassLevelProductsComponent } from './admin/treso/class-level-products/class-level-products.component';
+import { ClassLevelProdFormComponent } from './admin/treso/class-level-prod-form/class-level-prod-form.component';
+import { DeadLineListComponent } from './admin/treso/dead-line-list/dead-line-list.component';
+import { DeadLineFormComponent } from './admin/treso/dead-line-form/dead-line-form.component';
+import { DeadLineListResolver } from './_resolvers/dead-line-list-resolver';
+import { resolve } from 'q';
+import { DeadLineFormResolver } from './_resolvers/dead-line-form-resolver';
+import { ProductsListResolver } from './_resolvers/products-list-resolver';
+import { ProductFormResolver } from './_resolvers/product-form-resolver';
+import { NewCourseComponent } from './admin/courses-management/new-course/new-course.component';
+import { CourseFormResolver } from './_resolvers/course-form-resolver';
+import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
+import { TeacherFormResolver } from './_resolvers/teacher-form-resolver';
+import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-assignment/teacher-assignment.component';
+import { NewClassComponent } from './admin/class-managemet/new-class/new-class.component';
 import { BroadcastComponent } from './comm/brodcast/broadcast.component';
 import { EmailComponent } from './comm/email/email.component';
 import { Component } from '@angular/core';
-import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
 import { StudentAgendaComponent } from './agenda/student-agenda/student-agenda.component';
 import { StudentLifeComponent } from './classes/student-life/student-life.component';
 import { ClassTeachersComponent } from './classes/class-teachers/class-teachers.component';
 
 export const appRoutes: Routes = [
-    {path: '', component: SigninComponent},
     {path: 'forgotPassword', component: ForgotComponent},
+    {path: 'imgCropper', component: AppImgCropperComponent},
+    {path: 'signIn', component: SigninComponent},
     {path: 'confirmEmail/:code', component: ConfirmEmailComponent, resolve : {user: EmailConfirmResolver}},
     {path: 'resetPassword/:code', component: ResetPasswordComponent, resolve : {user: ResetPasswordResolver}},
     {path: 'selfRegister/:code', component: SelfRegisterComponent, resolve : {user: EmailConfirmResolver}},
@@ -74,6 +92,7 @@ export const appRoutes: Routes = [
         runGuardsAndResolvers: 'always',
         canActivate: [AuthGuard],
         children: [
+            {path: '', component: HomePanelComponent},
             {path: 'home', component: HomePanelComponent, resolve: {user: UserHomeResolver}},
             {path: 'broadcast', component: BroadcastComponent},
             {path: 'sendEmail', component: EmailComponent},
@@ -106,14 +125,27 @@ export const appRoutes: Routes = [
             {path: 'inscriptions', component: InscriptionComponent},
             {path: 'inscriptionsList', component: InscriptionsListComponent},
             {path: 'classesPanel', component: ClassesPanelComponent, resolve: {levels: ClassesListResolver}},
+            {path: 'addClass', component: NewClassComponent},
             {path: 'classSchedule/:classId', component: SchedulePanelComponent, resolve: {class: ClassResolver}},
-            {path: 'courses', component: CoursesPanelComponent, resolve: {courses: CoursesListResolver}},
             {path: 'teachers', component: TeacherManagementComponent, resolve: {teachers: TeacherManagementResolver}},
+            {path: 'addTeacher', component: NewTeacherComponent},
+            {path: 'teacherAssignment/:id', component: TeacherAssignmentComponent, resolve: {teacher: TeacherFormResolver }},
+            {path: 'courses', component: CoursesPanelComponent, resolve: {courses: CoursesListResolver}},
+            {path: 'addCourse', component: NewCourseComponent},
+            {path: 'editCourse/:id', component: NewCourseComponent, resolve: {course: CourseFormResolver}},
             {path: 'editTeacher/:id', component: NewTeacherComponent, resolve: {teacher: TeacherManagementResolver}},
             {path: 'preregister', component: PreRegisterComponent},
             {path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve : {classes: LevelClassesResolver}},
             {path: 'studentGrades/:id', component: GradeStudentComponent, resolve: {student: StudentResolver}},
             {path: 'school', component: SchoolComponent, resolve : {school: SchoolResolver}},
+            {path: 'productsList', component: ProductsListComponent, resolve : {products: ProductsListResolver}},
+            {path: 'createProduct', component: ProductFormComponent},
+            {path: 'editProduct/:id', component: ProductFormComponent, resolve : {product : ProductFormResolver}},
+            {path: 'lvlprods', component: ClassLevelProductsComponent},
+            {path: 'createlvlProduct', component: ClassLevelProdFormComponent},
+            {path: 'deadLines', component: DeadLineListComponent, resolve : {deadlines: DeadLineListResolver}},
+            {path: 'createDeadLine', component: DeadLineFormComponent},
+            {path: 'editDeadLine/:id', component: DeadLineFormComponent, resolve : {deadline: DeadLineFormResolver}},
             {path: 'studentAgenda/:id', component: StudentAgendaComponent, resolve: {student: StudentResolver}}
         ]
     },

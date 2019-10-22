@@ -10,7 +10,7 @@
               <div class="card-body p-0">
   
                 <div class="card-title border-bottom d-flex align-items-center m-0 p-3">
-                  <button class="btn btn-outline-primary btn-sm" (click)='newCourse()'>ajouter un cours</button>
+                  <button class="btn btn-outline-primary btn-sm" [routerLink]="['/addCourse']" routerLinkActive="router-link-active" >ajouter un cours</button>
                   <span class="flex-grow-1"></span>
                 </div>
   
@@ -43,7 +43,7 @@
                   </div>
                   <div class="flex-grow-1">
                     <h6 class="m-0 mt-1">
-                      <button (click)="edit(course)" class="btn btn-outline-primary btn-sm">modifier</button>
+                      <button [routerLink]="['/editCourse', course.id]" routerLinkActive="router-link-active"  class="btn btn-outline-primary btn-sm">modifier</button>
                     </h6>
                   </div>
                 </div>
@@ -57,12 +57,11 @@
   
 
       
-<div *ngIf="show==='all' && !this.courses">
+<!-- <div *ngIf="show==='all' && !this.courses">
  <p class="card-title">patienter s'il vous plait....</p>
 </div>
 
 <div *ngIf="show==='all'" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
-    <button class="btn btn-outline-primary btn-sm" (click)="newCourse()">Ajouter</button>
     <div class="col-md-12">
         <div class="card">
           <ngx-datatable
@@ -121,15 +120,7 @@
           </ngx-datatable>
         </div>
       </div>
-</div>
+</div> -->
 
- <!-- appel du childfrom pour nouvel ajout -->
-<div [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}" *ngIf="show === 'add'">
-  <app-new-course (addCourseResult)="resultMode($event)"></app-new-course>
-</div>
-
- <!-- appel du childfrom pour une modification -->
- <div [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}" *ngIf="show === 'edit'">
-  <app-new-course (addCourseResult)="resultMode($event)" [courseModel]="course"></app-new-course>
-</div>
+>
 

@@ -47,8 +47,8 @@ export class AdminService {
   }
 
   // enregistrement d'un nouveau teacher
-  saveTeacher(user: User) {
-    return this.http.post(this.baseUrl + 'admin/' + 'AddUser', user);
+  saveTeacher(currentUserId: number, user: User) {
+    return this.http.post(this.baseUrl + 'admin/' + currentUserId + '/AddUser', user);
   }
 
   getClassLevelsDetails() {
@@ -59,17 +59,12 @@ export class AdminService {
   //   return this.http.get(this.baseUrl + 'admin/LevelDetails/' + levelId)
   // }
 
-  sendRegisterEmail(user: User) {
-    return this.http.post(this.baseUrl + 'admin/' + 'SendRegisterEmail', user);
+  sendRegisterEmail(currentUserId: number, user: User) {
+    return this.http.post(this.baseUrl + 'admin/' + currentUserId + '/SendRegisterEmail', user);
   }
 
   updatePerson(id: number, user: any) {
     return this.http.post(this.baseUrl + 'admin/' + id + '/UpdatePerson', user);
-  }
-
-   // supprimer un professeur
-   deleteTeacher(id: number) {
-    return this.http.post(this.baseUrl + 'admin/' + id + '/DeleteTeacher', {});
   }
 
   searchUsers(data: any) {
@@ -122,6 +117,15 @@ export class AdminService {
   // enregistrement d'un nouveau teacher
   addUser(user: User) {
     return this.http.post(this.baseUrl + 'admin/' + 'AddUser', user);
+  }
+
+   // supprimer un professeur
+   deleteTeacher(id: number) {
+    return this.http.post(this.baseUrl + 'admin/' + id + '/DeleteTeacher', {});
+  }
+
+  getTeacher(teacherid: number) {
+    return this.http.get(this.baseUrl + 'admin/GetTeacher/' + teacherid);
   }
 
   // le post pour enrgister la preinscription : model {father:any,mother:any; children : any[]}

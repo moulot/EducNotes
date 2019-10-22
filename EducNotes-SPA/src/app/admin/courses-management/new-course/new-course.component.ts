@@ -1,9 +1,10 @@
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { Course } from 'src/app/_models/course';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-course',
@@ -14,9 +15,8 @@ import { Course } from 'src/app/_models/course';
 
 
 export class NewCourseComponent implements OnInit {
-  @Input() courseModel: Course;
-  @Output() addCourseResult = new EventEmitter();
   // levels;
+  courseModel: Course;
   courseForm: FormGroup;
   submitText = 'enregistrer';
   color = '';
@@ -26,19 +26,19 @@ export class NewCourseComponent implements OnInit {
 
 
   constructor(private fb: FormBuilder, private classService: ClassService,
-    private alertify: AlertifyService) { }
+     private router: Router, private alertify: AlertifyService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    if (this.courseModel) {
-      if (!this.courseModel.color) {
-        this.courseModel.color = '';
-        }
-      this.model = this.courseModel;
-      this.courseId = this.courseModel.id;
-      this.formMode = 'edit';
-    } else {
-      this.initParams();
-    }
+    this.route.data.subscribe(data => {
+      if (data.course) {
+         this.model = data.course;
+             this.courseId = data.course.id;
+          this.formMode = 'edit';
+     } else {
+       this.initParams();
+     }
+   });
+
     this.createCourseForm();
     this.color = this.model.color;
    // this.createCourseForm();
@@ -62,24 +62,22 @@ export class NewCourseComponent implements OnInit {
 
   setColor() {
     this.courseForm.patchValue({color: this.color});
-  //  alert(this.courseForm.value.color);
   }
 
   save() {
 
       if (this.formMode === 'add') {
-        // new insert
         this.classService.addNewCourse(this.courseForm.value).subscribe(() => {
           this.alertify.success('cours enregistrée...');
-          this.addCourseResult.emit(true);
+          this.router.navigate(['/courses']);
         }, error => {
           console.log(error);
         });
       } else {
-        // updating Course
         this.classService.updatCourse(this.courseId, this.courseForm.value).subscribe(() => {
           this.alertify.success('cours enregistrée...');
-          this.addCourseResult.emit(true);
+          this.router.navigate(['/courses']);
+
         }, error => {
           console.log(error);
         });
@@ -87,9 +85,5 @@ export class NewCourseComponent implements OnInit {
 
     }
 
-
-  cancel() {
-    this.addCourseResult.emit(false);
-  }
 
 }

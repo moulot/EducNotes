@@ -37,6 +37,7 @@ namespace EducNotes.API.Models
         public int ResetPasswordCount { get; set; }
         public int? CityId { get; set; }
         public City City { get; set; }
+        public byte TempData { get; set; }
         public byte Active { get; set; }
         public DateTime? ResetPasswordDate { get; set; }
         public DateTime? ForgotPasswordDate { get; set; }

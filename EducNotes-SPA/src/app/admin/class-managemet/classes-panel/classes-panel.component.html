@@ -4,13 +4,13 @@
     <p class="lead ">admin - liste des classes</p>
   </div>
     
-  <div *ngIf="!addNew" [@animate]="{value:'*',params:{delay: 300+'ms', y:'80px'}}" class="col-lg-12 col-md-12">
+  <div *ngIf="!addNew" [@animate]="{value:'*',params:{delay: 100+'ms', y:'80px'}}" class="col-lg-12 col-md-12">
     
       <div class="card mb-4">
             <div class="card-body p-0">
 
               <div class="card-title border-bottom d-flex align-items-center m-0 p-3">
-                <button class="btn btn-outline-primary btn-sm" (click)='newClass()'>ajouter une classe</button>
+                <button mdbBtn color="info" size="sm" mdbWavesEffect [routerLink]="['/addClass']" routerLinkActive="router-link-active" >ajouter une classe</button>
                 <span class="flex-grow-1"></span>
               </div>
 
@@ -30,7 +30,7 @@
                 <div class="flex-grow-1">
                   <!-- <span class="text-small text-muted">autre info</span> -->
                   <h6 class="m-0 mt-1">
-                    <button class="btn btn-outline-primary p-1 btn-sm">détails</button>
+                    <button class="p-1 btn-sm" mdbBtn color="info" mdbWavesEffect [routerLink]="['/levelClasses',level.id]" routerLinkActive="router-link-active" >détails</button>
                   </h6>
                 </div>
               </div>
@@ -43,66 +43,4 @@
 </div>
 
 
-<div *ngIf="!addNew && !levels" >
-  <p class="card-title">veuillez patienter...</p>
-</div>
-
-<!-- <div *ngIf="!addNew" [@animate]="{value:'*',params:{delay: 300+'ms', y:'80px'}}">
-  <button class="btn btn-outline-primary btn-sm ml-2" (click)='newClass()'>Ajouter</button>
-  <div class="col-md-12">
-      <div class="card">
-        <ngx-datatable
-          style="height: 500px; box-shadow: none"
-          class="material fullscreen"
-          [columnMode]="'force'"
-          [headerHeight]="50"
-          [footerHeight]="50"
-          [rowHeight]="60"
-          [scrollbarV]="true"
-          [rows]="levels">
-        
-          <ngx-datatable-column name="name" [width]="50">
-            <ng-template ngx-datatable-header-template>
-              Niveau
-            </ng-template>
-          </ngx-datatable-column>
-          <ngx-datatable-column name="totalStudents" [width]="50">
-            <ng-template ngx-datatable-header-template>
-              effectif
-            </ng-template>
-          </ngx-datatable-column>
-          <ngx-datatable-column name="classes" [width]="50">
-            <ng-template ngx-datatable-header-template>
-              Classes
-            </ng-template>
-            <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
-              <div class="form-inline">
-                <div *ngFor="let class of value" >
-                        <a  ngbPopover="effectif :{{class.students.length}}/{{class.maxStudent}}"
-                        triggers="mouseenter:mouseleave" popoverTitle="Details">
-                      {{class.name}}
-                      </a>,
-                  </div>
-              </div>
-              
-          </ng-template>
-          </ngx-datatable-column>
-
-          <ngx-datatable-column name="id" [width]="50">
-            <ng-template ngx-datatable-header-template>
-              Option
-            </ng-template>
-            <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
-              <a [routerLink]="['/levelClasses', value]" routerLinkActive="router-link-active"  class="btn btn-outline-primary btn-sm">details</a>
-          </ng-template>
-          </ngx-datatable-column>
-          
-        </ngx-datatable>
-      </div>
-    </div>
-</div> -->
-
-<div [@animate]="{value:'*',params:{delay: 500+'ms', y:'80px'}}" *ngIf="addNew">
-<app-new-class  (addClassResult)="resultMode($event)"></app-new-class>
-</div>
 

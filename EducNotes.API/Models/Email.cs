@@ -7,6 +7,7 @@ namespace EducNotes.API.Models
         public Email()
         {
             TimeToSend = DateTime.Now;    
+            InsertDate =DateTime.Now;
         }
 
         public int Id { get; set; }

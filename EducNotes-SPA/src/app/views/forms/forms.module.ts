@@ -37,9 +37,10 @@ import { AddChildrenComponent } from './add-children/add-children.component';
     FormWizardModule,
     FormsRoutingModule
   ],
+  exports: [AppImgCropperComponent],
 
   declarations: [BasicFormComponent, AddChildrenComponent, // TagInputsComponent,
      AppImgCropperComponent, InputMaskComponent, InputGroupsComponent, FormLayoutsComponent]
      // AppFormsModule removed to put it in app.module
 })
-export class AppFormsModule { }
+export class  AppFormsModule { }

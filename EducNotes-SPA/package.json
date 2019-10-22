@@ -55,6 +55,7 @@
     "ngx-chips": "1.9.8",
     "ngx-color-picker": "7.0.1",
     "ngx-echarts": "4.0.0",
+    "ngx-editor": "^4.1.0",
     "ngx-flip": "^7.1.0",
     "ngx-gallery": "^5.10.0",
     "ngx-img-cropper": "0.10.4",

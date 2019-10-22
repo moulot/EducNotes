@@ -905,6 +905,7 @@ namespace EducNotes.API.Controllers
 
 
             CultureInfo frC = new CultureInfo("fr-FR");
+           
 
             var teachersToReturn = new List<TeacherForListDto>();
            foreach (var teacher in teachers)
@@ -1040,6 +1041,14 @@ namespace EducNotes.API.Controllers
             return Ok(res);
         }
 
+        [HttpGet("Course/{courseId}")]
+        public async Task<IActionResult> Course(int courseId)
+        {
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+            return Ok(course);
+        }
+
+       
         //[HttpGet("")]
 
     }

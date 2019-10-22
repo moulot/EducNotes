@@ -141,14 +141,14 @@ namespace EducNotes.API.Data
                 };
                 context.AddRange(pers);
 
-                var feeTypes = new List<FeeType>
-                {
-                    new FeeType{Name = "cantine"},
-                    new FeeType{Name = "scolarité"},
-                    new FeeType{Name = "bibliothèque"},
-                    new FeeType{Name = "transport"}
-                };
-                context.AddRange(feeTypes);
+                // var feeTypes = new List<FeeType>
+                // {
+                //     new FeeType{Name = "cantine"},
+                //     new FeeType{Name = "scolarité"},
+                //     new FeeType{Name = "bibliothèque"},
+                //     new FeeType{Name = "transport"}
+                // };
+                // context.AddRange(feeTypes);
 
                 var evalTypes = new List<EvalType>
                 {

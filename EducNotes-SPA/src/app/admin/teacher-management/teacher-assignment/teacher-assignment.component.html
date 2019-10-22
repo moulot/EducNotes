@@ -31,8 +31,8 @@
           </nz-form-item>
           <nz-form-item>
             <nz-form-control  [nzSm]="14" [nzXs]="24">
-                <button type="submit" [disabled]=" submitText!='enregistrer' || !classIds"  (click)="affectation()" class="btn btn-outline-primary ">{{submitText}}</button>
-                <button type="button" (click)="close()" class="ant-btn" class="btn btn-outline-primary ml-2">annuler</button>
+                <button type="submit" [disabled]=" submitText!='enregistrer' || !classIds" mdbBtn color="info" size="sm" mdbWavesEffect >{{submitText}}</button>
+                <button type="button" [routerLink]="['/teachers']" mdbBtn color="info" size="sm" mdbWavesEffect >annuler</button>
             </nz-form-control>
           </nz-form-item>
      </div>
