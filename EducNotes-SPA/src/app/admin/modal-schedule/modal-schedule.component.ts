@@ -23,6 +23,8 @@ export class ModalScheduleComponent implements OnInit {
   timeMask = [/\d/, /\d/, ':', /\d/, /\d/];
   agendaItems: Schedule[] = [];
   scheduleForm: FormGroup;
+  teacherOptions: any = [];
+  courseOptions: any = [];
   weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
   daySelect = [{'value': 1, 'name': 'lundi'}, {'value': 2, 'name': 'mardi'}, {'value': 3, 'name': 'mercredi'},
     {'value': 4, 'name': 'jeudi'}, {'value': 5, 'name': 'vendredi'}, {'value': 6, 'name': 'samedi'}];
@@ -258,6 +260,7 @@ export class ModalScheduleComponent implements OnInit {
   getTeacherCourses(teacherId) {
     this.userService.getTeacherCourses(teacherId).subscribe((courses: Course[]) => {
       this.courses = courses;
+      this.loadCourseSelect();
     }, error => {
       this.alertify.error(error);
     });
@@ -266,9 +269,27 @@ export class ModalScheduleComponent implements OnInit {
   getClassTeachers(classId) {
     this.classService.getClassTeachers(classId).subscribe((teachers: User[]) => {
       this.teachers = teachers;
+      this.loadTeacherSelect();
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  loadTeacherSelect() {
+    console.log(this.teachers);
+    for (let i = 0; i < this.teachers.length; i++) {
+      console.log('i: ' + i);
+      const elt = this.teachers[i];
+      this.teacherOptions = [...this.teacherOptions, {value: elt.id, label: elt.firstName + ' ' + elt.lastName}];
+    }
+  }
+
+  loadCourseSelect() {
+    console.log(this.courses);
+    for (let i = 0; i < this.courses.length; i++) {
+      const elt = this.courses[i];
+      this.courseOptions = [...this.courseOptions, {value: elt.id, label: elt.name}];
+    }
   }
 
 }

@@ -17,6 +17,7 @@ export class StudentAgendaComponent implements OnInit {
   student: User;
   classRoom: Class;
   coursesWithAgenda: any;
+  filteredAgenda: any;
   classAgendaByDate: any;
   userIdFromRoute: any;
   strFirstDay: string;
@@ -26,7 +27,7 @@ export class StudentAgendaComponent implements OnInit {
   nbDayTasks = [];
   weekDays = [];
   firstDay: Date;
-  daysToNow = 7;
+  daysToNow = 0;
   daysFromNow = 7;
 
   constructor(private authService: AuthService, private classService: ClassService,
@@ -86,13 +87,26 @@ export class StudentAgendaComponent implements OnInit {
   getClassAgendaByDate(classId, daysToNow, daysFromNow) {
     this.classService.getClassAgendaByDate(classId, daysToNow, daysFromNow).subscribe((agenda: any) => {
       this.classAgendaByDate = agenda;
+      this.filteredAgenda = agenda;
     }, error => {
       this.alertify.error(error);
     });
   }
 
   showCourseItems(courseId) {
+    const courseAgenda = this.classAgendaByDate;
+    console.log(courseAgenda);
+    this.filteredAgenda = [];
 
+    for (let i = 0; i < courseAgenda.length; i++) {
+      const elt = courseAgenda[i];
+      const result = elt.agendaItems.filter(a => a.courseId === courseId );
+      // console.log(result);
+      elt.agendaItems = result;
+      // console.log(elt.agendaItems);
+    }
+    console.log(courseAgenda);
+    this.filteredAgenda = courseAgenda;
   }
 
   getClass(classId) {

@@ -152,7 +152,8 @@ namespace EducNotes.API.Controllers
                             var evalType = elt.Evaluation.EvalType.Name;
                             var evalName = elt.Evaluation.Name;
                             double gradeMax = Convert.ToDouble(elt.Evaluation.MaxGrade);
-                            double gradeValue = Convert.ToDouble(elt.Grade);
+                            var dd = elt.Grade.Replace(",", ".");
+                            double gradeValue = Convert.ToDouble(elt.Grade.Replace(".", ","));
                             // grade are ajusted to 20 as MAx. Avg is on 20
                             double ajustedGrade = Math.Round(20 * gradeValue / gradeMax, 2);
                             double coeff = elt.Evaluation.Coeff;
@@ -160,12 +161,22 @@ namespace EducNotes.API.Controllers
                             coeffSum += coeff;
 
                             var EvalClassGrades = await _context.UserEvaluations
-                                                        .Where(e => e.EvaluationId == elt.EvaluationId)
-                                                        .Select(e => Convert.ToDouble(e.Grade)).ToListAsync();
-        
-                            double EvalGradeMin = EvalClassGrades.Min();
-                            double EvalGradeMax = EvalClassGrades.Max();
+                                                    .Where(e => e.EvaluationId == elt.EvaluationId &&
+                                                    e.Evaluation.GradeInLetter == false && e.Evaluation.Graded == true &&
+                                                    e.Grade.IsNumeric())
+                                                    .Select(e => e.Grade).ToListAsync();
                             
+                            double classMin = 1000;
+                            double classMax = -1000;
+                            foreach (var item in EvalClassGrades)
+                            {
+                                var ddd = item;
+                                var grade = Convert.ToDouble(item.Replace(".", ","));
+                                classMin = grade < classMin? grade : classMin;
+                                classMax = grade > classMax? grade : classMax;
+                            }
+                            double EvalGradeMin = classMin;
+                            double EvalGradeMax = classMax;
 
                             GradeDto gradeDto = new GradeDto();
                             gradeDto.EvalType = evalType;

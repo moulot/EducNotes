@@ -163,11 +163,13 @@ import { EmailComponent } from './comm/email/email.component';
 import { StudentAgendaComponent } from './agenda/student-agenda/student-agenda.component';
 import { StudentLifeComponent } from './classes/student-life/student-life.component';
 import { ClassTeachersComponent } from './classes/class-teachers/class-teachers.component';
-
+import * as Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
 
+Chart.plugins.unregister(ChartDataLabels);
 
 export function tokenGetter() {
    return localStorage.getItem('token');

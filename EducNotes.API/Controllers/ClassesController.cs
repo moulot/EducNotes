@@ -167,7 +167,7 @@ namespace EducNotes.API.Controllers
             foreach (var data in teachersData)
             {
                 TeacherForListDto teacherCourse = new TeacherForListDto();
-                teacherCourse.Id = data.Id;
+                teacherCourse.Id = Convert.ToInt32(data.TeacherId);
                 teacherCourse.LastName = data.Teacher.LastName;
                 teacherCourse.FirstName = data.Teacher.FirstName;
                 teacherCourse.Email = data.Teacher.Email;
@@ -524,7 +524,7 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetClassCoursesWithAgenda(int classId, int daysToNow, int daysFromNow)
         {
             var today = DateTime.Now.Date;
-            var startDate = today.AddDays(-daysFromNow);
+            var startDate = today.AddDays(-daysToNow);
             var EndDate = today.AddDays(daysFromNow);
 
             var courses = await _context.ClassCourses
@@ -567,14 +567,14 @@ namespace EducNotes.API.Controllers
                 coursesWithAgenda.Add(cwa);
             }
 
-            return Ok(coursesWithAgenda);
+            return Ok(coursesWithAgenda.OrderBy(c => c.Name));
         }
 
         [HttpGet("{classId}/AgendaByDate/f/{daysToNow}/t/{daysFromNow}")]
         public async Task<IActionResult> GetAgendaByDate(int classId, int daysToNow, int daysFromNow)
         {
             var today = DateTime.Now.Date;
-            var startDate = today.AddDays(-daysFromNow);
+            var startDate = today.AddDays(-daysToNow);
             var EndDate = today.AddDays(daysFromNow);
 
             var classAgenda = await _context.Agendas

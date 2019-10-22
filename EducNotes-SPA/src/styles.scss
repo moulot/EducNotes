@@ -6,6 +6,13 @@
 @import '../node_modules/ngx-bootstrap/datepicker/bs-datepicker.css';
 @import '../node_modules/ng-zorro-antd/ng-zorro-antd.css';
 
+@import "~ng-uikit-pro-standard/assets/scss/core/colors";
+@import "~ng-uikit-pro-standard/assets/scss/core/variables";
+@import "~ng-uikit-pro-standard/assets/scss/core/variables-pro";
+
+@import "~ng-uikit-pro-standard/assets/scss/addons-pro/_timelines-pro.scss";
+@import "~ng-uikit-pro-standard/assets/scss/addons-pro/_timeline-pro.scss";
+
 #wrapper {
   width: 95%;
   margin: auto;

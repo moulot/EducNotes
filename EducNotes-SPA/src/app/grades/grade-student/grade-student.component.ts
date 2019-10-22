@@ -6,6 +6,7 @@ import { EvaluationService } from 'src/app/_services/evaluation.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Class } from 'src/app/_models/class';
 import { ClassService } from 'src/app/_services/class.service';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 @Component({
   selector: 'app-grade-student',
@@ -49,7 +50,8 @@ export class GradeStudentComponent implements OnInit {
   ];
   chartOptions: any = {
     responsive: true,
-    plugins: {
+    plugins: [ChartDataLabels],
+    options: {
       datalabels: {
         anchor: 'start',
         align: 'right',
@@ -189,11 +191,12 @@ export class GradeStudentComponent implements OnInit {
         const elt = data[i];
         const userCourseGrade = elt.userCourseAvg;
         const classCourseGrade = elt.classCourseAvg;
+        if (Number(userCourseGrade) !== -1000) { // -1000 (in the API) for a course that doesn't have grades
+          this.radarchartLabels = [...this.radarchartLabels, elt.courseName];
 
-        this.radarchartLabels = [...this.radarchartLabels, elt.courseName];
-
-        this.radarchartDatasets[0].data = [...this.radarchartDatasets[0].data, Number(classCourseGrade)];
-        this.radarchartDatasets[1].data = [...this.radarchartDatasets[1].data, Number(userCourseGrade)];
+          this.radarchartDatasets[0].data = [...this.radarchartDatasets[0].data, Number(classCourseGrade)];
+          this.radarchartDatasets[1].data = [...this.radarchartDatasets[1].data, Number(userCourseGrade)];
+        }
       }
 
     }
