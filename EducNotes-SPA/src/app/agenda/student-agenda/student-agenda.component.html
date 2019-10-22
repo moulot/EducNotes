@@ -12,7 +12,7 @@
           <!-- <div class="p-0 m-0">tous les cours</div> -->
           <label class="switch switch-primary mr-3">
               <span>afficher tous les cours</span>
-              <input type="checkbox" checked>
+              <input type="checkbox" (change)="showAllCourses()" [(ngModel)]="allCourses">
               <span class="slider"></span>
           </label>
         </div>

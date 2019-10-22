@@ -6,7 +6,6 @@ import { ActivatedRoute } from '@angular/router';
 import { UserService } from 'src/app/_services/user.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { AuthService } from 'src/app/_services/auth.service';
-import { Course } from 'src/app/_models/course';
 
 @Component({
   selector: 'app-student-agenda',
@@ -16,9 +15,10 @@ import { Course } from 'src/app/_models/course';
 export class StudentAgendaComponent implements OnInit {
   student: User;
   classRoom: Class;
-  coursesWithAgenda: any;
-  filteredAgenda: any;
-  classAgendaByDate: any;
+  coursesWithAgenda: any = [];
+  filteredAgenda: any = [];
+  initialData: any = [];
+  classAgendaByDate: any = [];
   userIdFromRoute: any;
   strFirstDay: string;
   strLastDay: string;
@@ -29,6 +29,7 @@ export class StudentAgendaComponent implements OnInit {
   firstDay: Date;
   daysToNow = 0;
   daysFromNow = 7;
+  allCourses = true;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -94,19 +95,37 @@ export class StudentAgendaComponent implements OnInit {
   }
 
   showCourseItems(courseId) {
-    const courseAgenda = this.classAgendaByDate;
-    console.log(courseAgenda);
+    this.allCourses = false;
+    console.log(this.classAgendaByDate);
+    // const courseAgenda = this.classAgendaByDate;
+    // console.log(courseAgenda);
     this.filteredAgenda = [];
 
-    for (let i = 0; i < courseAgenda.length; i++) {
-      const elt = courseAgenda[i];
-      const result = elt.agendaItems.filter(a => a.courseId === courseId );
-      // console.log(result);
-      elt.agendaItems = result;
-      // console.log(elt.agendaItems);
+    for (let i = 0; i < this.classAgendaByDate.length; i++) {
+      const elt = this.classAgendaByDate[i];
+      const result = elt.agendaItems.map(item => {
+        if (item.courseId === courseId) {
+          return item;
+        }
+      }).filter(item => !!item);
+      if (result.length > 0) {
+        const filteredElt = {
+          'dueDate': elt.dueDate,
+          'shortDueDate': elt.shortDueDate,
+          'longDueDate': elt.longDueDate,
+          'nbItems': result.length,
+          'agendaItems': result
+        };
+        this.filteredAgenda = [...this.filteredAgenda, filteredElt];
+      }
     }
-    console.log(courseAgenda);
-    this.filteredAgenda = courseAgenda;
+    console.log(this.filteredAgenda);
+  }
+
+  showAllCourses() {
+    if (this.allCourses === true) {
+      this.filteredAgenda = this.classAgendaByDate;
+    }
   }
 
   getClass(classId) {
