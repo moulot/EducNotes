@@ -64,6 +64,7 @@ namespace EducNotes.API.Data
         public DbSet<ClassLevelProduct> ClassLevelProducts { get; set; }
         public DbSet<DeadLine> DeadLines { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<CourseCoefficient> CourseCoefficients { get; set; }
 
         
 

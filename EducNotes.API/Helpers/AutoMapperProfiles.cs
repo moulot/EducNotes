@@ -149,6 +149,7 @@ namespace EducNotes.API.Helpers
                 });
             CreateMap<ProductDto, Product>();
             CreateMap<DeadLineDto, DeadLine>();
+            CreateMap<CoefficientDto, CourseCoefficient>();
             
         }
     }

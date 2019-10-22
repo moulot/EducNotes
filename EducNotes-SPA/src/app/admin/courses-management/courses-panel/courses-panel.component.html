@@ -1,4 +1,4 @@
-<!-- <div class="row">
+ <div class="row">
 
     <div class="col-md-12">
       <p class="lead ">admin - liste des cours</p>
@@ -53,74 +53,4 @@
       
     </div>
   
-</div> -->
-  
-
-      
-<!-- <div *ngIf="show==='all' && !this.courses">
- <p class="card-title">patienter s'il vous plait....</p>
 </div>
-
-<div *ngIf="show==='all'" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
-    <div class="col-md-12">
-        <div class="card">
-          <ngx-datatable
-            style="height: 500px; box-shadow: none"
-            class="material fullscreen"
-            [columnMode]="'force'"
-            [headerHeight]="50"
-            [footerHeight]="50"
-            [rowHeight]="60"
-            [scrollbarV]="true"
-
-            [rows]="courses">
-            <ngx-datatable-column name="color" [width]="1">
-              <ng-template ngx-datatable-header-template></ng-template>
-              <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
-              <div [ngStyle]="{'background-color': value}" class="m-0"><span>&nbsp;</span></div>            
-            </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="name" [width]="80">
-              <ng-template ngx-datatable-header-template>
-                Nom
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="abbreviation" [width]="10">
-              <ng-template ngx-datatable-header-template></ng-template>
-              <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
-               <span *ngIf="value"> ({{value}})</span>                
-            </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="teachersNumber" [width]="10">
-              <ng-template ngx-datatable-header-template>
-                Nombre de Prof
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="classesNumber" [width]="10">
-              <ng-template ngx-datatable-header-template>
-                Nombre de classes
-              </ng-template>
-            </ngx-datatable-column>
-            <ngx-datatable-column name="studentsNumber" [width]="10">
-              <ng-template ngx-datatable-header-template>
-                Effectif Eleve
-              </ng-template>
-            </ngx-datatable-column>
-            
-
-            <ngx-datatable-column name="id" [width]="50">
-              <ng-template ngx-datatable-header-template>
-                Option
-              </ng-template>
-              <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
-                <button (click)="edit(row)" class="btn btn-outline-primary btn-sm">modifier</button>
-            </ng-template>
-            </ngx-datatable-column>
-            
-          </ngx-datatable>
-        </div>
-      </div>
-</div> -->
-
->
-

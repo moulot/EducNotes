@@ -1048,6 +1048,34 @@ namespace EducNotes.API.Controllers
             return Ok(course);
         }
 
+        [HttpGet("ClassTypes")]
+        public async Task<IActionResult> ClassTypes()
+        {
+            var classTypes = await _context.ClassTypes.OrderBy(a => a.Name).ToListAsync();
+            return Ok(classTypes);
+        }
+
+        [HttpPost("CreateCourseCoefficient")]
+        public async Task<IActionResult> CreateCourseCoefficient(CoefficientDto coefficientToCreate)
+        {
+            var coefficient = _mapper.Map<CourseCoefficient>(coefficientToCreate);
+            _repo.Add(coefficient);
+            if(await _repo.SaveAll())
+            return Ok();
+
+            return BadRequest("impossible de faire l'ajout");
+        }
+
+        [HttpGet("ClassLevelCoefficients/{classLevelId}")]
+        public async Task<IActionResult> ClassLevelCoefficients(int classLevelId)
+        {
+          var coefficients = await _context.CourseCoefficients
+          .Include(c => c.ClassType)
+          .Include(c => c.Course)
+          .Where(c => c.ClassLevelid == classLevelId).ToListAsync();
+          return Ok(coefficients);
+        }
+
        
         //[HttpGet("")]
 

@@ -74,10 +74,11 @@ import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-a
 import { NewClassComponent } from './admin/class-managemet/new-class/new-class.component';
 import { BroadcastComponent } from './comm/brodcast/broadcast.component';
 import { EmailComponent } from './comm/email/email.component';
-import { Component } from '@angular/core';
 import { StudentAgendaComponent } from './agenda/student-agenda/student-agenda.component';
 import { StudentLifeComponent } from './classes/student-life/student-life.component';
 import { ClassTeachersComponent } from './classes/class-teachers/class-teachers.component';
+import { CourseCoefficientsComponent } from './admin/courses-management/course-coefficients/course-coefficients.component';
+import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
 
 export const appRoutes: Routes = [
     {path: 'forgotPassword', component: ForgotComponent},
@@ -146,7 +147,9 @@ export const appRoutes: Routes = [
             {path: 'deadLines', component: DeadLineListComponent, resolve : {deadlines: DeadLineListResolver}},
             {path: 'createDeadLine', component: DeadLineFormComponent},
             {path: 'editDeadLine/:id', component: DeadLineFormComponent, resolve : {deadline: DeadLineFormResolver}},
-            {path: 'studentAgenda/:id', component: StudentAgendaComponent, resolve: {student: StudentResolver}}
+            {path: 'studentAgenda/:id', component: StudentAgendaComponent, resolve: {student: StudentResolver}},
+            {path: 'coefficients', component : CourseCoefficientsComponent},
+            {path: 'addCoefficient', component : CoefficientFormComponent}
         ]
     },
     {path: '**', redirectTo: '', pathMatch: 'full'}
