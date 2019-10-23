@@ -115,7 +115,7 @@ import { EmailConfirmResolver } from './_resolvers/email-confirm.resolver';
 import { ForgotComponent } from './views/sessions/forgot/forgot.component';
 import { UiKitsModule } from './views/ui-kits/ui-kits.module';
 // MDB Angular Pro
-import { StepperModule, WavesModule } from 'ng-uikit-pro-standard';
+import { StepperModule, ToastModule, WavesModule } from 'ng-uikit-pro-standard';
 import { ResetPasswordComponent } from './registration/reset-password/reset-password.component';
 import { ResetPasswordResolver } from './_resolvers/reset-password.resolver';
 import { EvalAddFormComponent } from './grades/eval-addForm/eval-addForm.component';
@@ -345,6 +345,7 @@ export function tokenGetter() {
       UiKitsModule,
       StepperModule,
       WavesModule,
+      ToastModule.forRoot(),
       SharedPipesModule,
       PerfectScrollbarModule,
       NgxEchartsModule,

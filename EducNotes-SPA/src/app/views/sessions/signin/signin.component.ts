@@ -54,17 +54,17 @@ export class SigninComponent implements OnInit {
 
     loggedIn() {
         return this.authService.loggedIn();
-      }
+    }
 
     signin() {
         this.loading = true;
         this.notConfirmed = false;
         this.authService.login(this.signinForm.value).subscribe(() => {
-          this.router.navigate(['/home']);
-          this.loading = false;
+            this.router.navigate(['/home']);
+            this.loading = false;
         }, error => {
-          this.alertify.error(error);
-          this.loading = false;
+            this.alertify.error(error);
+            this.loading = false;
         });
     }
 

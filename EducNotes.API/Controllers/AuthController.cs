@@ -34,11 +34,11 @@ namespace EducNotes.API.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IEducNotesRepository _repo;
         private readonly DataContext _context;
-         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
+        private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private Cloudinary _cloudinary;
-       int parentRoleId,memberRoleId,moderatorRoleId,adminRoleId,teacherRoleId;
-       int teacherTypeId,parentTypeId,studentTypeId,adminTypeId;
-       int parentIsncrTypeId,schoolInscrTypeId;
+        int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId;
+        int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
+        int parentIsncrTypeId, schoolInscrTypeId;
 
         public AuthController(IConfiguration config, IMapper mapper, IEducNotesRepository repo,
             UserManager<User> userManager, SignInManager<User> signInManager, DataContext context,
@@ -50,25 +50,25 @@ namespace EducNotes.API.Controllers
             _mapper = mapper;
             _userManager = userManager;
             _signInManager = signInManager;
-             teacherTypeId =  _config.GetValue<int>("AppSettings:teacherTypeId");
-            parentTypeId =  _config.GetValue<int>("AppSettings:parentTypeId");
-            adminTypeId =  _config.GetValue<int>("AppSettings:adminTypeId");
-            studentTypeId =  _config.GetValue<int>("AppSettings:studentTypeId");
+            teacherTypeId = _config.GetValue<int>("AppSettings:teacherTypeId");
+            parentTypeId = _config.GetValue<int>("AppSettings:parentTypeId");
+            adminTypeId = _config.GetValue<int>("AppSettings:adminTypeId");
+            studentTypeId = _config.GetValue<int>("AppSettings:studentTypeId");
             parentRoleId = _config.GetValue<int>("AppSettings:parentRoleId");
             memberRoleId = _config.GetValue<int>("AppSettings:memberRoleId");
             moderatorRoleId = _config.GetValue<int>("AppSettings:moderatorRoleId");
             adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
             teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
-             parentIsncrTypeId = _config.GetValue<int>("AppSettings:parentInscTypeId");
+            parentIsncrTypeId = _config.GetValue<int>("AppSettings:parentInscTypeId");
             schoolInscrTypeId = _config.GetValue<int>("AppSettings:schoolInscTypeId");
-             
-             
+
+
             _cloudinaryConfig = cloudinaryConfig;
-             Account acc = new Account(
-                _cloudinaryConfig.Value.CloudName,
-                _cloudinaryConfig.Value.ApiKey,
-                _cloudinaryConfig.Value.ApiSecret
-            );
+            Account acc = new Account(
+               _cloudinaryConfig.Value.CloudName,
+               _cloudinaryConfig.Value.ApiKey,
+               _cloudinaryConfig.Value.ApiSecret
+           );
 
             _cloudinary = new Cloudinary(acc);
         }
@@ -76,34 +76,35 @@ namespace EducNotes.API.Controllers
         [HttpPost("{id}/setPassword/{password}")] // edition du mot de passe apres validation du code
         public async Task<IActionResult> setPassword(int id, string password)
         {
-            var user =await  _repo.GetUser(id,false);
-            if(user!=null)
+            var user = await _repo.GetUser(id, false);
+            if (user != null)
             {
-                 bool emailCOnfirmed = user.EmailConfirmed;
-                  var newPassword=_userManager.PasswordHasher.HashPassword(user,password);
-                  user.PasswordHash = newPassword;
-                  user.ValidatedCode = true;
-                  user.EmailConfirmed =true;
-                  if(!emailCOnfirmed)
-                  user.ValidationDate = DateTime.Now;
-                  var res = await _userManager.UpdateAsync(user);
-           
-                 if(res.Succeeded)
-                 {
-                   var mail = new EmailFormDto();
-                   if(emailCOnfirmed)
-                   {
-                     // Envoi de mail pour la confirmation de la mise a jour du mot de passe
-                      mail.subject ="mot de passe modifié";
-                      mail.content ="bonjour <b> "+user.LastName + " "+ user.FirstName + "</b>, votre nouveau mot de passe a bien eté enregistré...";
-                      mail.toEmail = user.Email;
-                   }
-                   else {
-                      mail.subject ="Compte confirmé";
-                      mail. content ="<b> "+user.LastName + " "+ user.FirstName + "</b>, votre compte a bien été enregistré";
-                      mail. toEmail = user.Email;
-                   }
-                     await _repo.SendEmail(mail);
+                bool emailCOnfirmed = user.EmailConfirmed;
+                var newPassword = _userManager.PasswordHasher.HashPassword(user, password);
+                user.PasswordHash = newPassword;
+                user.ValidatedCode = true;
+                user.EmailConfirmed = true;
+                if (!emailCOnfirmed)
+                    user.ValidationDate = DateTime.Now;
+                var res = await _userManager.UpdateAsync(user);
+
+                if (res.Succeeded)
+                {
+                    var mail = new EmailFormDto();
+                    if (emailCOnfirmed)
+                    {
+                        // Envoi de mail pour la confirmation de la mise a jour du mot de passe
+                        mail.subject = "mot de passe modifié";
+                        mail.content = "bonjour <b> " + user.LastName + " " + user.FirstName + "</b>, votre nouveau mot de passe a bien eté enregistré...";
+                        mail.toEmail = user.Email;
+                    }
+                    else
+                    {
+                        mail.subject = "Compte confirmé";
+                        mail.content = "<b> " + user.LastName + " " + user.FirstName + "</b>, votre compte a bien été enregistré";
+                        mail.toEmail = user.Email;
+                    }
+                    await _repo.SendEmail(mail);
                     var userToReturn = _mapper.Map<UserForListDto>(user);
                     return Ok(new
                     {
@@ -111,80 +112,80 @@ namespace EducNotes.API.Controllers
                         user = userToReturn
 
                     });
-                 }
-                 return BadRequest("impossible de terminé l'action");
+                }
+                return BadRequest("impossible de terminé l'action");
             }
             return NotFound();
         }
 
 
-      
+
 
 
         [HttpGet("{email}/ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
-         // recherche du compte de l 'email
-         var user =await _repo.GetUserByEmail(email);
-         if(user != null)
-         {
-           if(!user.EmailConfirmed)
-           return BadRequest("compte pas encore activé....");
-           // envoi du mail pour le reset du password
-           user.ValidationCode = Guid.NewGuid().ToString();
-           if(await _repo.SendResetPasswordLink(user.Email,user.ValidationCode))
-           {
-             // envoi effectuer
-             user.ForgotPasswordCount+=1;
-             user.ForgotPasswordDate = DateTime.Now;
-             await _repo.SaveAll();
-             return Ok();
+            // recherche du compte de l 'email
+            var user = await _repo.GetUserByEmail(email);
+            if (user != null)
+            {
+                if (!user.EmailConfirmed)
+                    return BadRequest("compte pas encore activé....");
+                // envoi du mail pour le reset du password
+                user.ValidationCode = Guid.NewGuid().ToString();
+                if (await _repo.SendResetPasswordLink(user.Email, user.ValidationCode))
+                {
+                    // envoi effectuer
+                    user.ForgotPasswordCount += 1;
+                    user.ForgotPasswordDate = DateTime.Now;
+                    await _repo.SaveAll();
+                    return Ok();
 
-           }
-           return BadRequest("echec d'envoi du mail");
-         }
-         return BadRequest("email non trouvé. Veuillez réessayer");
-          
+                }
+                return BadRequest("echec d'envoi du mail");
+            }
+            return BadRequest("email non trouvé. Veuillez réessayer");
+
         }
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
 
-         // verification de l'existence du userName 
-          if(await _repo.UserNameExist(userForLoginDto.Username.ToLower()))   
-           {
-               var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
-               if (!user.ValidatedCode)
-                return BadRequest("Compte non validé pour l'instant...");
+            // verification de l'existence du userName 
+            if (await _repo.UserNameExist(userForLoginDto.Username.ToLower()))
+            {
+                var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
+                if (!user.ValidatedCode)
+                    return BadRequest("Compte non validé pour l'instant...");
 
                 var result = await _signInManager
                 .CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
                 if (result.Succeeded)
                 {
-                var appUser = await _userManager.Users.Include(p => p.Photos)
-                    .FirstOrDefaultAsync(u => u.NormalizedUserName ==
-                        userForLoginDto.Username.ToUpper());
+                    var appUser = await _userManager.Users.Include(p => p.Photos)
+                        .FirstOrDefaultAsync(u => u.NormalizedUserName ==
+                            userForLoginDto.Username.ToUpper());
 
-                var userToReturn = _mapper.Map<UserForListDto>(appUser);
+                    var userToReturn = _mapper.Map<UserForListDto>(appUser);
 
-                //get the current period
-                Period CurrentPeriod = await _context.Periods.Where(p => p.Active == 1).FirstOrDefaultAsync();
+                    //get the current period
+                    Period CurrentPeriod = await _context.Periods.Where(p => p.Active == 1).FirstOrDefaultAsync();
 
 
-                return Ok(new
-                {
-                    token = await GenerateJwtToken(appUser),
-                    user = userToReturn,
-                    currentPeriod = CurrentPeriod
-                });
+                    return Ok(new
+                    {
+                        token = await GenerateJwtToken(appUser),
+                        user = userToReturn,
+                        currentPeriod = CurrentPeriod
+                    });
                 }
 
                 return BadRequest("login ou mot de passe incorrecte...");
-           }
-           return BadRequest("login ou mot de passe incorrecte...");
-            
-         }
+            }
+            return BadRequest("login ou mot de passe incorrecte...");
+
+        }
 
         private async Task<string> GenerateJwtToken(User user)
         {
@@ -248,11 +249,11 @@ namespace EducNotes.API.Controllers
             return tokenHandler.WriteToken(token);
         }
 
-        
-          [HttpPost("codeValidation")] // validation du code utilisateur emit a son inscription
-         public async Task<IActionResult> codeValidation([FromBody]UserForCodeValidationDto userForCodeValidation)
+
+        [HttpPost("codeValidation")] // validation du code utilisateur emit a son inscription
+        public async Task<IActionResult> codeValidation([FromBody]UserForCodeValidationDto userForCodeValidation)
         {
-         var user =await _repo.GetSingleUser(userForCodeValidation.UserName);
+            var user = await _repo.GetSingleUser(userForCodeValidation.UserName);
             if (user != null)
             {
                 if (user.ValidatedCode == true)
@@ -263,7 +264,7 @@ namespace EducNotes.API.Controllers
                 {
                     // user.ValidatedCode = true;
                     // await _userManager.UpdateAsync(user);
-                     var userToReturn = _mapper.Map<UserForDetailedDto>(user);
+                    var userToReturn = _mapper.Map<UserForDetailedDto>(user);
 
                     // _userManager.AddToRoleAsync(user, "Member").Wait();
                     // user.EmailConfirmed = true;
@@ -288,35 +289,36 @@ namespace EducNotes.API.Controllers
 
         }
 
-         [HttpGet("emailValidation/{code}")]
+        [HttpGet("emailValidation/{code}")]
         public async Task<IActionResult> emailValidation(string code)
         {
 
             // int id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var user = await _repo.GetUserByCode(code);
-            
+
             if (user != null)
             {
-               if (user.EmailConfirmed == true)
-               return BadRequest("cet compte a déja été confirmé...");
-               int maxChild = 0;   
-               if(user.UserTypeId ==_config.GetValue<int>("AppSettings:parentTypeId") && user.UserName == user.ValidationCode ) 
-               {
-                  var children = await _repo.GetChildren(user.Id);
-                  maxChild = children.Count();
-                
-                   return Ok(new {
-                            user = _mapper.Map<UserForDetailedDto>(user) ,
-                            maxChild = maxChild
-                            });
-               }  
-               else
-               return BadRequest("ce lien ,'existe pas");
-            
-             
-                  
+                if (user.EmailConfirmed == true)
+                    return BadRequest("cet compte a déja été confirmé...");
+                int maxChild = 0;
+                if (user.UserTypeId == _config.GetValue<int>("AppSettings:parentTypeId") && user.UserName == user.ValidationCode)
+                {
+                    var children = await _repo.GetChildren(user.Id);
+                    maxChild = children.Count();
+
+                    return Ok(new
+                    {
+                        user = _mapper.Map<UserForDetailedDto>(user),
+                        maxChild = maxChild
+                    });
+                }
+                else
+                    return BadRequest("ce lien ,'existe pas");
+
+
+
             }
-            
+
             return BadRequest("ce lien ,'existe pas");
 
         }
@@ -327,10 +329,10 @@ namespace EducNotes.API.Controllers
             var user = await _repo.GetUserByCode(code);
             if (user != null)
             {
-               if(DateTime.Now.AddHours(-3)>=user.ForgotPasswordDate.Value) // le delai des 3 Heures a expiré
-               return BadRequest("Désolé ce lien a expiré....");
-               else
-              return Ok(new
+                if (DateTime.Now.AddHours(-3) >= user.ForgotPasswordDate.Value) // le delai des 3 Heures a expiré
+                    return BadRequest("Désolé ce lien a expiré....");
+                else
+                    return Ok(new
                     {
                         user = _mapper.Map<UserForDetailedDto>(user)
                     });
@@ -348,24 +350,24 @@ namespace EducNotes.API.Controllers
                 userToUpdate.EmailConfirmed = true;
                 _repo.Update(userToUpdate);
 
-                if(await _repo.SaveAll())
-                   return base.Ok(new
-                         {
-                            token = GenerateJwtToken(userToUpdate).Result,
-                            user = _mapper.Map<UserForDetailedDto>(userToUpdate)
-                        });
-                
+                if (await _repo.SaveAll())
+                    return base.Ok(new
+                    {
+                        token = GenerateJwtToken(userToUpdate).Result,
+                        user = _mapper.Map<UserForDetailedDto>(userToUpdate)
+                    });
+
                 return BadRequest("impossible de mettre a jour ce compte");
 
             }
-             return BadRequest("Compte introuvable");
+            return BadRequest("Compte introuvable");
 
 
         }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////MOHAMED KABORE ///////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////MOHAMED KABORE ///////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // [HttpGet("GetEmails")] 
         // public async Task<IActionResult> GetEmails()
         // {
@@ -379,22 +381,22 @@ namespace EducNotes.API.Controllers
         // }
 
         [HttpGet("GetAllCities")]
-        public async Task<IActionResult>GetAllCities()
+        public async Task<IActionResult> GetAllCities()
         {
-          return Ok (await _repo.GetAllCities());
+            return Ok(await _repo.GetAllCities());
         }
 
 
         [HttpGet("GetLevels")]
-        public async Task<IActionResult>GetLevels()
+        public async Task<IActionResult> GetLevels()
         {
-          return Ok (await _repo.GetLevels());
+            return Ok(await _repo.GetLevels());
         }
 
         [HttpGet("GetDistrictsByCityId/{id}")]
-        public async Task<IActionResult>GetAllGetDistrictsByCityIdCities(int id)
+        public async Task<IActionResult> GetAllGetDistrictsByCityIdCities(int id)
         {
-        return Ok (await _repo.GetAllGetDistrictsByCityIdCities(id));
+            return Ok(await _repo.GetAllGetDistrictsByCityIdCities(id));
         }
 
         // [HttpPost("{id}/ParentSelfPreinscription")] // enregistrement de préinscription : perer , mere et enfants
@@ -406,7 +408,7 @@ namespace EducNotes.API.Controllers
         //         {
         //           // mise a jour du user1
         //           var parentFromRepo =await _repo.GetUser(id,true);
-                  
+
         //           parentFromRepo.UserName = parentForRegister.UserName.ToLower();
         //           parentFromRepo.LastName = parentForRegister.LastName;
         //           parentFromRepo.FirstName = parentForRegister.FirstName;
@@ -423,8 +425,8 @@ namespace EducNotes.API.Controllers
         //           parentFromRepo.EmailConfirmed =true;
         //           parentFromRepo.ValidationDate = DateTime.Now;
         //           var res = await _userManager.UpdateAsync(parentFromRepo);
-                                
-                
+
+
         //             //ajout du user 2
         //             // if(!string.IsNullOrEmpty(model.user2.LastName) &&  !string.IsNullOrEmpty(model.user2.FirstName))
         //             // {
@@ -483,8 +485,8 @@ namespace EducNotes.API.Controllers
         //                     //       };
         //                     //       _repo.Add(userlink);
         //                     //   }
-                            
-                                                    
+
+
         //                 } 
 
         //                 if(!await _repo.SaveAll())
@@ -504,17 +506,17 @@ namespace EducNotes.API.Controllers
         //                     user = _mapper.Map<UserForListDto>(parentFromRepo),
         //                     currentPeriod = CurrentPeriod
         //                 });
-                        
+
         //     }
         //     catch (System.Exception ex)
         //     {
-                
+
         //         return BadRequest(ex);
         //     }
         // }
 
-         [HttpPost("{parentId}/ParentSelfPreinscription")] // enregistrement de préinscription : perer , mere et enfants
-        public async Task<IActionResult> ParentSelfPreinscription( int parentId,[FromBody]ParentSefRegisterDto model)
+        [HttpPost("{parentId}/ParentSelfPreinscription")] // enregistrement de préinscription : perer , mere et enfants
+        public async Task<IActionResult> ParentSelfPreinscription(int parentId, [FromBody]ParentSefRegisterDto model)
         {
             // récuperation de tous les users
             var usersToUpdate = new List<UserForUpdateDto>();
@@ -523,43 +525,44 @@ namespace EducNotes.API.Controllers
             {
                 usersToUpdate.Add(children);
             }
-            var userscode = await _repo.ParentSelfInscription(parentId,usersToUpdate);
+            var userscode = await _repo.ParentSelfInscription(parentId, usersToUpdate);
             return Ok(userscode);
         }
-     
-     
-     
+
+
+
         [HttpPost("{id}/TeacherSelfPreinscription")] // enregistrement de préinscription : perer , mere et enfants
-        public async Task<IActionResult> TeacherSelfPreinscription( int id,[FromBody]UserForRegisterDto userToUpdate)
+        public async Task<IActionResult> TeacherSelfPreinscription(int id, [FromBody]UserForRegisterDto userToUpdate)
         {
-            var userFromRepo =await _repo.GetUser(id,true);
+            var userFromRepo = await _repo.GetUser(id, true);
             userToUpdate.UserName = userToUpdate.UserName.ToLower();
-            var user= _mapper.Map(userToUpdate, userFromRepo);
+            var user = _mapper.Map(userToUpdate, userFromRepo);
             user.Id = id;
             user.UserTypeId = teacherTypeId;
-            var newPassword=_userManager.PasswordHasher.HashPassword(user,userToUpdate.Password);
+            var newPassword = _userManager.PasswordHasher.HashPassword(user, userToUpdate.Password);
             user.PasswordHash = newPassword;
             user.ValidatedCode = true;
-            user.EmailConfirmed =true;
+            user.EmailConfirmed = true;
             user.ValidationDate = DateTime.Now;
             var result = await _userManager.UpdateAsync(user);
-            if(result.Succeeded)
+            if (result.Succeeded)
             {
 
-              // envoi de l'email pour confirmation de l'activation du compte
-              var mail = new EmailFormDto{
-                subject ="Compte confirmé",
-                content ="<b> "+user.LastName + " "+ user.FirstName + "</b>, votre compte a bien été enregistré",
-                toEmail = user.Email
-              };
-              await _repo.SendEmail(mail);
-                 Period CurrentPeriod = await _context.Periods.Where(p => p.Active == 1).FirstOrDefaultAsync();
-                  return Ok(new
-                  {
-                      token = await GenerateJwtToken(user),
-                      user = _mapper.Map<UserForListDto>(user),
-                      currentPeriod = CurrentPeriod
-                  });
+                // envoi de l'email pour confirmation de l'activation du compte
+                var mail = new EmailFormDto
+                {
+                    subject = "Compte confirmé",
+                    content = "<b> " + user.LastName + " " + user.FirstName + "</b>, votre compte a bien été enregistré",
+                    toEmail = user.Email
+                };
+                await _repo.SendEmail(mail);
+                Period CurrentPeriod = await _context.Periods.Where(p => p.Active == 1).FirstOrDefaultAsync();
+                return Ok(new
+                {
+                    token = await GenerateJwtToken(user),
+                    user = _mapper.Map<UserForListDto>(user),
+                    currentPeriod = CurrentPeriod
+                });
             }
             return BadRequest("impossible de terminer l'opération");
         }
@@ -577,28 +580,28 @@ namespace EducNotes.API.Controllers
         }
 
 
-      [HttpPost("{id}/setLoginPassword")] // edition du mot de passe apres validation du code
-        public async Task<IActionResult> setLoginPassword(int id,LoginFormDto loginForDto)
+        [HttpPost("{id}/setLoginPassword")] // edition du mot de passe apres validation du code
+        public async Task<IActionResult> setLoginPassword(int id, LoginFormDto loginForDto)
         {
-            var user =await  _repo.GetUser(id,false);
-            if(user!=null)
+            var user = await _repo.GetUser(id, false);
+            if (user != null)
             {
-                  var newPassword=_userManager.PasswordHasher.HashPassword(user,loginForDto.Password);
-                  user.UserName = loginForDto.UserName.ToLower();
-                  user.NormalizedUserName = loginForDto.UserName.ToUpper();
-                  user.PasswordHash = newPassword;
-                  user.ValidatedCode = true;
-                  user.EmailConfirmed =true;
-                  user.ValidationDate = DateTime.Now;
-                  var res = await _userManager.UpdateAsync(user);
-           
-                 if(res.Succeeded)
-                 {
-                     
+                var newPassword = _userManager.PasswordHasher.HashPassword(user, loginForDto.Password);
+                user.UserName = loginForDto.UserName.ToLower();
+                user.NormalizedUserName = loginForDto.UserName.ToUpper();
+                user.PasswordHash = newPassword;
+                user.ValidatedCode = true;
+                user.EmailConfirmed = true;
+                user.ValidationDate = DateTime.Now;
+                var res = await _userManager.UpdateAsync(user);
+
+                if (res.Succeeded)
+                {
+
                     var mail = new EmailFormDto();
-                    mail.subject ="Compte confirmé";
-                    mail. content ="<b> "+user.LastName + " "+ user.FirstName + "</b>, votre compte a bien été enregistré";
-                    mail. toEmail = user.Email;
+                    mail.subject = "Compte confirmé";
+                    mail.content = "<b> " + user.LastName + " " + user.FirstName + "</b>, votre compte a bien été enregistré";
+                    mail.toEmail = user.Email;
                     await _repo.SendEmail(mail);
                     var userToReturn = _mapper.Map<UserForListDto>(user);
                     return Ok(new
@@ -607,20 +610,20 @@ namespace EducNotes.API.Controllers
                         user = userToReturn
 
                     });
-                 }
-                 return BadRequest("impossible de terminé l'action");
+                }
+                return BadRequest("impossible de terminé l'action");
             }
             return NotFound();
         }
 
 
-         [HttpPost("{userId}/AddPhotoForUser")]
+        [HttpPost("{userId}/AddPhotoForUser")]
         public async Task<IActionResult> AddPhotoForUser(int userId,
-            [FromForm]PhotoForCreationDto photoForCreationDto)
+           [FromForm]PhotoForCreationDto photoForCreationDto)
         {
-      
-            var user = await _context.Users.Include(p =>p.Photos).FirstOrDefaultAsync( a => a.Id == userId);;
-            user.TempData =2;
+
+            var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId); ;
+            user.TempData = 2;
 
             var file = photoForCreationDto.File;
 
@@ -628,7 +631,7 @@ namespace EducNotes.API.Controllers
 
             if (file.Length > 0)
             {
-                using(var stream = file.OpenReadStream())
+                using (var stream = file.OpenReadStream())
                 {
                     var uploadParams = new ImageUploadParams()
                     {
@@ -643,7 +646,7 @@ namespace EducNotes.API.Controllers
 
             photoForCreationDto.Url = uploadResult.Uri.ToString();
             photoForCreationDto.PublicId = uploadResult.PublicId;
-            
+
 
             var photo = _mapper.Map<Photo>(photoForCreationDto);
 
@@ -662,7 +665,7 @@ namespace EducNotes.API.Controllers
             return BadRequest("Could not add the photo");
         }
 
-      
+
 
     }
 }
