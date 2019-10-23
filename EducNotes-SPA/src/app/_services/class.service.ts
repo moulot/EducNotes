@@ -234,10 +234,6 @@ constructor(private http: HttpClient) { }
   //   return this.http.post(this.baseUrl + 'classes/' + courseId + '/UpdateCourse' + courseName, {}); updateCourse
   // }
 
-  getClassTypes() {
-    return this.http.get(this.baseUrl + 'classes/GetClassTypes');
-   }
-
    teacherClassCoursByLevel(teacherId: number, levelid: number, courseId: number) {
     return this.http.get(this.baseUrl + 'classes/TeacherClassCoursByLevel/  ' + teacherId + '/' + levelid + '/' + courseId );
   }
@@ -246,5 +242,16 @@ constructor(private http: HttpClient) { }
     return this.http.get(id);
   }
 
+  getClassTypes() {
+    return this.http.get(this.baseUrl + 'classes/ClassTypes');
+  }
+
+  createCourseCoefficient(courseCoefficient) {
+    return this.http.post(this.baseUrl + 'classes/CreateCourseCoefficient', courseCoefficient);
+  }
+  getClasslevelsCoefficients(levelId: number) {
+    return this.http.get(this.baseUrl + 'classes/ClassLevelCoefficients/' + levelId);
+
+  }
 
 }

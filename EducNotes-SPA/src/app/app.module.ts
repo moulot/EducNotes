@@ -181,6 +181,8 @@ import { StudentLifeComponent } from './classes/student-life/student-life.compon
 import { ClassTeachersComponent } from './classes/class-teachers/class-teachers.component';
 import * as Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { CourseCoefficientsComponent } from './admin/courses-management/course-coefficients/course-coefficients.component';
+import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -301,7 +303,9 @@ export function tokenGetter() {
       EmailComponent,
       StudentAgendaComponent,
       StudentLifeComponent,
-      ClassTeachersComponent
+      ClassTeachersComponent,
+      CourseCoefficientsComponent,
+      CoefficientFormComponent
    ],
    imports: [
      FormWizardModule,
