@@ -17,6 +17,14 @@
           </label>
         </div>
         <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
+        <div class="d-flex align-items-center">
+          <button type="button" mdbBtn size="sm" class="p-2" (click)="movePeriod(-7)"
+            color="primary" mdbWavesEffect><i class="i-Arrow-Left"></i></button>
+          <p class="flex-grow-1 text-center text-13 m-0">{{strStartDate}} - {{strEndDate}}</p>
+          <button type="button" mdbBtn size="sm" class="p-2" (click)="movePeriod(7)"
+            color="primary" mdbWavesEffect><i class="i-Arrow-Right"></i></button>  
+        </div>
+        <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
         <p class="text-danger text-15 mt-2 mb-2">clicker sur le cours pour filtrer</p>
         <div class="card mb-2" *ngFor="let course of coursesWithAgenda">
           <div *ngIf="course.nbItems > 0">
@@ -67,7 +75,7 @@
                           <div class="flex-grow-1 text-17">{{ai.courseName}}</div>
                           <div class="switch">
                             <label>
-                              <input type="checkbox">
+                              <input (change)="setCourseTask(ai.agendaId)" type="checkbox">
                               <span class="lever"></span> fait
                             </label>
                           </div>    

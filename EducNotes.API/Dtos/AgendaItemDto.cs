@@ -9,6 +9,7 @@ namespace EducNotes.API.Dtos
         public string strDateAdded { get; set; }
         public string strDueDate { get; set; }
         public string TaskDesc { get; set; }
+        public int AgendaId { get; set; }
         public bool Done { get; set; }
     }
 }

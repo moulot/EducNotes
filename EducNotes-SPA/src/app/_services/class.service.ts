@@ -130,8 +130,13 @@ constructor(private http: HttpClient) { }
     return this.http.get(this.baseUrl + 'classes/' + classId + '/CoursesWithAgenda/f/' + daysToNow + '/t/' + daysFromNow);
   }
 
-  getClassAgendaByDate(classId, daysToNow, daysFromNow) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/AgendaByDate/f/' + daysToNow + '/t/' + daysFromNow);
+  getClassAgendaByDate(classId, agendaParams) {
+
+    let params = new HttpParams();
+    params = params.append('currentDate', agendaParams.currentDate);
+    params = params.append('nbDays', agendaParams.nbDays);
+
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/AgendaByDate', {params});
   }
 
   getAllClasses() {

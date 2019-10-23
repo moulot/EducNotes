@@ -9,5 +9,7 @@ namespace EducNotes.API.Helpers
         public int MoveWeek { get; set; }
         public DateTime DateAdded { get; set; }
         public DateTime DueDate { get; set; }
+        public DateTime CurrentDate { get; set; }
+        public int nbDays { get; set; }
     }
 }
