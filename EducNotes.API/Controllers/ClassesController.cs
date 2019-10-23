@@ -570,18 +570,39 @@ namespace EducNotes.API.Controllers
             return Ok(coursesWithAgenda.OrderBy(c => c.Name));
         }
 
-        [HttpGet("{classId}/AgendaByDate/f/{daysToNow}/t/{daysFromNow}")]
-        public async Task<IActionResult> GetAgendaByDate(int classId, int daysToNow, int daysFromNow)
+        [HttpGet("{classId}/AgendaByDate")]
+        public async Task<IActionResult> GetAgendaByDate(int classId,  [FromQuery]AgendaParams agendaParams)
         {
-            var today = DateTime.Now.Date;
-            var startDate = today.AddDays(-daysToNow);
-            var EndDate = today.AddDays(daysFromNow);
+            var nbDays = agendaParams.nbDays;
+            var startDate = agendaParams.CurrentDate.Date;
+            var endDate = startDate.AddDays(nbDays).Date;
 
-            var classAgenda = await _context.Agendas
-                                    .Include(i => i.Course)
-                                    .OrderBy(o => o.DueDate)
-                                    .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= EndDate)
-                                    .ToListAsync();
+            CultureInfo frC = new CultureInfo("fr-FR");
+
+            var classAgenda = new List<Agenda>();
+            if(startDate < endDate) {
+                
+                classAgenda = await _context.Agendas
+                        .Include(i => i.Course)
+                        .OrderBy(o => o.DueDate)
+                        .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= endDate)
+                        .ToListAsync();
+            }
+            else
+            {
+                classAgenda = await _context.Agendas
+                        .Include(i => i.Course)
+                        .OrderBy(o => o.DueDate)
+                        .Where(a => a.ClassId == classId && a.DueDate.Date >= endDate && a.DueDate <= startDate)
+                        .ToListAsync();
+
+                var temp = startDate;
+                startDate = endDate;
+                endDate = temp;
+            }
+
+            var strStartDate = startDate.ToString("ddd dd MMM", frC);
+            var strEndDate = endDate.ToString("ddd dd MMM", frC);
 
             var agendaDates = classAgenda.OrderBy(o => o.DueDate)
                                 .Select(a => a.DueDate).Distinct().ToList();
@@ -592,7 +613,6 @@ namespace EducNotes.API.Controllers
                 AgendaForListDto afld = new AgendaForListDto();
                 afld.DueDate = date;
 
-                CultureInfo frC = new CultureInfo("fr-FR");
                 var shortDueDate = date.ToString("ddd dd MMM", frC);
                 var longDueDate = date.ToString("dd MMMM yyyy", frC);
 
@@ -610,6 +630,7 @@ namespace EducNotes.API.Controllers
                     aid.CourseColor = item.Course.Color;
                     aid.strDateAdded = item.DateAdded.ToShortDateString();
                     aid.TaskDesc = item.TaskDesc;
+                    aid.AgendaId = item.Id;
                     aid.Done = item.Done;
                     afld.AgendaItems.Add(aid);
                 }
@@ -618,7 +639,13 @@ namespace EducNotes.API.Controllers
                 AgendaList.Add(afld);
             }
 
-            return Ok(AgendaList);
+            return Ok(new {
+                agendaList = AgendaList,
+                startDate = startDate,
+                endDate= endDate,
+                strStartDate = strStartDate,
+                strEndDate = strEndDate
+            });
         }
 
         [HttpPost("UpdateCourse/{courseId}")]

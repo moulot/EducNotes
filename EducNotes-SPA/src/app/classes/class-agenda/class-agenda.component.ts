@@ -117,6 +117,7 @@ export class ClassAgendaComponent implements OnInit {
 
       this.classAgendaDays = res.agendaItems;
       this.monday = res.firstDayWeek;
+      console.log(this.monday);
       this.strMonday = res.strMonday;
       this.strSaturday = res.strSaturday;
       this.weekDays = res.weekDays;

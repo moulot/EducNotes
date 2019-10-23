@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" class="col-lg-12 col-md-12">
 
   <div class="col-md-12 mb-2">
     <p class="text-17 m-0">vie de la classe - équipe pédagogique</p>
@@ -9,14 +9,15 @@
       <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-2"><b>nom & prénom</b></div>
+        <div class="col-md-3"><b>cours</b></div>
         <div class="col-md-4"><b>email</b></div>
         <div class="col-md-2"><b>téléphone</b></div>
-        <div class="col-md-3"><b>cours</b></div>
       </div>
     </div>      
   </div>
       
-  <div class="card col-md-10 mb-1 p-0" *ngFor="let user of teachers">
+  <div class="card col-md-10 mb-1 p-0" *ngFor="let user of teachers, let i = index"
+    [@animate]="{value:'*',params:{delay: (i*100)+'ms', x:'120px'}}">
 
     <div class="card-body p-0">
 
@@ -29,7 +30,7 @@
         <div class="col-md-2 mt-3">
           <p class="text-15 m-0">{{user.lastName}} {{user.firstName}}</p>
         </div>
-        <div class="col-md-2 mt-3">
+        <div class="col-md-3 mt-3">
           <div class="d-flex">
             <div class="mr-2" [ngStyle]="{'background-color': user.course.color}" style="width: 20px;height: 20px;"></div>
             <p class="text-15">{{user.course.name}}</p>

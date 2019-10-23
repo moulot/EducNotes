@@ -5,17 +5,17 @@ export class Utils {
     static myDatePickerOptions: IMyOptions = {
         // Strings and translations
         dayLabels: {su: 'Dim', mo: 'Lun', tu: 'Mar', we: 'Mer', th: 'Jeu', fr: 'Ven', sa: 'Sam'},
-        dayLabelsFull: {su: "Dimanche", mo: "Lundi", tu: "Mardi", we: "Mercredi", th: "Jeudi", fr: "Vendredi", sa:
-        "Samedi"},
+        dayLabelsFull: {su: 'Dimanche', mo: 'Lundi', tu: 'Mardi', we: 'Mercredi', th: 'Jeudi', fr: 'Vendredi', sa:
+        'Samedi'},
         monthLabels: { 1: 'Jan', 2: 'Fev', 3: 'Mar', 4: 'Avr', 5: 'Mai', 6: 'Juin', 7: 'Juil', 8: 'Août', 9: 'Sept', 10:
         'Oct', 11: 'Nov', 12: 'Dec' },
-        monthLabelsFull: { 1: "Janvier", 2: "Fevrier", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin", 7: "Juillet", 8:
-        "Août", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Decembre" },
+        monthLabelsFull: { 1: 'Janvier', 2: 'Fevrier', 3: 'Mars', 4: 'Avril', 5: 'Mai', 6: 'Juin', 7: 'Juillet', 8:
+        'Août', 9: 'Septembre', 10: 'Octobre', 11: 'Novembre', 12: 'Decembre' },
 
         // Buttons
-        todayBtnTxt: "Auj",
-        clearBtnTxt: "effacer",
-        closeBtnTxt: "fermer",
+        todayBtnTxt: 'Auj',
+        clearBtnTxt: 'effacer',
+        closeBtnTxt: 'fermer',
         dateFormat: 'dd/mm/yyyy'
       };
 
