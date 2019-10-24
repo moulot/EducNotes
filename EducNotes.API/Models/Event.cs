@@ -5,6 +5,8 @@ namespace EducNotes.API.Models
     public class Event
     {
         public int Id { get; set; }
+        public int UserId { get; set; }
+        public User User { get; set; }
         public int EventTypeId { get; set; }
         public EventType EventType { get; set; }
         public DateTime EventDate { get; set; }

@@ -504,12 +504,12 @@ namespace EducNotes.API.Controllers
     }
 
     [HttpPost("{currentUserId}/SendRegisterEmail")]
-    public async Task<IActionResult> SendRegisterEmail(int currentUserId,SelfRegisterDto model)
+    public async Task<IActionResult> SendRegisterEmail(int currentUserId, SelfRegisterDto model)
     {
      
-       if(model.UserTypeId ==teacherTypeId)
+       if(model.UserTypeId == teacherTypeId)
       {
-          var TeacherRole   = await _context.Roles.FirstOrDefaultAsync(a=>a.Id==teacherRoleId);
+          var TeacherRole   = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
          
           string code = Guid.NewGuid().ToString();
           var teacher = new User{
@@ -519,8 +519,8 @@ namespace EducNotes.API.Controllers
               UserTypeId =teacherTypeId
           };
           // enregistrement du professeur
-          int userId= await _repo.AddSelfRegister(teacher,TeacherRole.Name,true,currentUserId);
-          if(userId>0)
+          int userId = await _repo.AddSelfRegister(teacher, TeacherRole.Name, true, currentUserId);
+          if(userId > 0)
           {
              foreach (var courseId in model.CourseIds)
              {
@@ -533,7 +533,7 @@ namespace EducNotes.API.Controllers
              }
           }
           else
-          return BadRequest("impossible d'ajouter cet utlisateur");
+            return BadRequest("impossible d'ajouter cet utlisateur");
           
       }
 

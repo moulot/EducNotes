@@ -135,8 +135,13 @@ constructor(private http: HttpClient) { }
     let params = new HttpParams();
     params = params.append('currentDate', agendaParams.currentDate);
     params = params.append('nbDays', agendaParams.nbDays);
+    params = params.append('isMovingPeriod', agendaParams.isMovingPeriod);
 
     return this.http.get(this.baseUrl + 'classes/' + classId + '/AgendaByDate', {params});
+  }
+
+  classAgendaSetDone(agendaId, isDone) {
+    return this.http.get(this.baseUrl + 'classes/Agenda/' + agendaId + '/SetTask/' + isDone);
   }
 
   getAllClasses() {

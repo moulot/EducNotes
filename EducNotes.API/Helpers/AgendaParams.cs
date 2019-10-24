@@ -11,5 +11,6 @@ namespace EducNotes.API.Helpers
         public DateTime DueDate { get; set; }
         public DateTime CurrentDate { get; set; }
         public int nbDays { get; set; }
+        public bool IsMovingPeriod { get; set; }
     }
 }

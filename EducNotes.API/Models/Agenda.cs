@@ -16,6 +16,8 @@ namespace EducNotes.API.Models
         public DateTime DateAdded { get; set; }
         public DateTime DueDate { get; set; }
         public string TaskDesc { get; set; }        
-        public bool Done { get; set; }    
+        public bool Done { get; set; }
+        public int DoneSetById { get; set; }
+        public User DoneSetBy { get; set; }
     }
 }

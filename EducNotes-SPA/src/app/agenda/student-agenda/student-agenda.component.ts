@@ -15,7 +15,7 @@ import { AuthService } from 'src/app/_services/auth.service';
 export class StudentAgendaComponent implements OnInit {
   student: User;
   classRoom: Class;
-  coursesWithAgenda: any = [];
+  coursesWithTasks: any = [];
   filteredAgenda: any = [];
   initialData: any = [];
   classAgendaByDate: any = [];
@@ -36,6 +36,7 @@ export class StudentAgendaComponent implements OnInit {
   strStartDate: string;
   strEndDate: string;
   agendaParams: any = {};
+  model: any = [];
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -60,7 +61,6 @@ export class StudentAgendaComponent implements OnInit {
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
-      this.getClassCoursesWithAgenda(this.student.classId, this.daysToNow, this.daysFromNow);
 
       const year = this.startDate.getFullYear();
       const month = this.startDate.getMonth() + 1;
@@ -68,6 +68,7 @@ export class StudentAgendaComponent implements OnInit {
 
       this.agendaParams.currentDate = year + '-' + month + '-' + date + 'T00:00:00';
       this.agendaParams.nbDays = this.nbDays;
+      this.agendaParams.isMovingPeriod = false;
       this.getClassAgendaByDate(this.student.classId, this.agendaParams);
     }, error => {
       this.alertify.error(error);
@@ -90,19 +91,12 @@ export class StudentAgendaComponent implements OnInit {
     });
   }
 
-  getClassCoursesWithAgenda(classId, daysToNow, daysFromNow) {
-    this.classService.getClassCoursesWithAgenda(classId, daysToNow, daysFromNow).subscribe((courses: any) => {
-      this.coursesWithAgenda = courses;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
   getClassAgendaByDate(classId, agendaParams) {
     this.classService.getClassAgendaByDate(classId, agendaParams).subscribe((agenda: any) => {
       this.classAgendaByDate = agenda.agendaList;
       this.filteredAgenda = agenda.agendaList;
-      console.log(agenda.agendaList);
+      this.coursesWithTasks = agenda.coursesWithTasks;
+      this.model = agenda.dones;
       this.startDate = agenda.startDate;
       this.strStartDate = agenda.strStartDate;
       this.endDate = agenda.endDate;
@@ -138,16 +132,16 @@ export class StudentAgendaComponent implements OnInit {
 
   movePeriod(moveDays) {
     this.allCourses = true;
-    if (moveDays > 0) {
+    this.agendaParams.isMovingPeriod = true;
+    if (moveDays > 0) { // move forward
       this.agendaParams.currentDate = this.endDate;
       this.agendaParams.nbDays = moveDays;
-    } else {
+    } else { // move backward of 'moveDays' days
       this.agendaParams.currentDate = this.startDate;
       this.agendaParams.nbDays = moveDays;
     }
 
     this.getClassAgendaByDate(this.student.classId, this.agendaParams);
-    this.getClassCoursesWithAgenda(this.student.classId, this.daysToNow, this.daysFromNow);
   }
 
   showAllCourses() {
@@ -156,16 +150,10 @@ export class StudentAgendaComponent implements OnInit {
     }
   }
 
-  setCourseTask(agendaId) {
-
+  setCourseTask(index, agendaId) {
+    this.classService.classAgendaSetDone(agendaId, this.model[index]).subscribe(() => {
+      this.alertify.successBar('le devoir a bien été mis à jour');
+    });
   }
-
-  // getClass(classId) {
-  //   this.classService.getClass(classId).subscribe(data => {
-  //     this.classRoom = data;
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
 
 }

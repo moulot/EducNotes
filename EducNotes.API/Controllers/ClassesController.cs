@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using EducNotes.API.Data;
@@ -189,6 +190,28 @@ namespace EducNotes.API.Controllers
             var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(studentsFromRepo);
 
             return Ok(usersToReturn);
+        }
+
+        [HttpGet("Agenda/{agendaId}/SetTask/{value}")]
+        public async Task<IActionResult> AgendaSetTask(int agendaId, bool value)
+        {
+            Agenda agenda = await _context.Agendas.FirstOrDefaultAsync(a => a.Id == agendaId);
+
+            if(agenda != null)
+            {
+                agenda.Done = value;
+                //set the current user as the modifier of done status
+                agenda.DoneSetById = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                _repo.Update(agenda);
+                if(await _repo.SaveAll())
+                    return NoContent();
+                else
+                    return BadRequest("problème de saisie de données");
+            }
+            else
+            {
+                return BadRequest("problème de données. voir l'administration si le problème persiste");
+            }
         }
 
         [HttpGet("{classId}/MovedWeekAgenda")]
@@ -574,14 +597,27 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetAgendaByDate(int classId,  [FromQuery]AgendaParams agendaParams)
         {
             var nbDays = agendaParams.nbDays;
+            var IsMovingPeriod = agendaParams.IsMovingPeriod;
             var startDate = agendaParams.CurrentDate.Date;
             var endDate = startDate.AddDays(nbDays).Date;
+            if(IsMovingPeriod)
+            {
+                if(nbDays > 0)
+                {
+                    startDate = agendaParams.CurrentDate.AddDays(1).Date;
+                    endDate = startDate.AddDays(nbDays).Date;
+                }
+                else
+                {
+                    startDate = agendaParams.CurrentDate.AddDays(-1).Date;
+                    endDate = startDate.AddDays(nbDays).Date;
+                }
+            }
 
             CultureInfo frC = new CultureInfo("fr-FR");
 
             var classAgenda = new List<Agenda>();
             if(startDate < endDate) {
-                
                 classAgenda = await _context.Agendas
                         .Include(i => i.Course)
                         .OrderBy(o => o.DueDate)
@@ -607,6 +643,7 @@ namespace EducNotes.API.Controllers
             var agendaDates = classAgenda.OrderBy(o => o.DueDate)
                                 .Select(a => a.DueDate).Distinct().ToList();
 
+            List<bool> dones = new List<bool>();
             List<AgendaForListDto> AgendaList = new List<AgendaForListDto>();
             foreach (var date in agendaDates)
             {
@@ -619,7 +656,9 @@ namespace EducNotes.API.Controllers
                 afld.ShortDueDate = shortDueDate;
                 afld.LongDueDate = longDueDate;
 
+                //get agenda tasks Done Status
                 afld.AgendaItems = new List<AgendaItemDto>();
+
                 var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();           
                 foreach (var item in agendaItems)
                 {
@@ -633,10 +672,28 @@ namespace EducNotes.API.Controllers
                     aid.AgendaId = item.Id;
                     aid.Done = item.Done;
                     afld.AgendaItems.Add(aid);
+                    dones.Add(aid.Done);
                 }
                 afld.NbItems = agendaItems.Count();
 
                 AgendaList.Add(afld);
+            }
+
+            var courses = await _context.ClassCourses
+                            .Where(c => c.ClassId == classId)
+                            .Select(s => s.Course).ToListAsync();
+
+            List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto>();
+            foreach (var course in courses)
+            {
+                CourseTasksDto ctd = new CourseTasksDto();
+                var nbItems = classAgenda.Where(a => a.CourseId == course.Id).ToList().Count();
+                ctd.CourseId = course.Id;
+                ctd.CourseName = course.Name;
+                ctd.CourseAbbrev = course.Abbreviation;
+                ctd.CourseColor = course.Color;
+                ctd.NbTasks = nbItems;
+                coursesWithTasks.Add(ctd);
             }
 
             return Ok(new {
@@ -644,7 +701,9 @@ namespace EducNotes.API.Controllers
                 startDate = startDate,
                 endDate= endDate,
                 strStartDate = strStartDate,
-                strEndDate = strEndDate
+                strEndDate = strEndDate,
+                coursesWithTasks = coursesWithTasks.OrderBy(c => c.CourseName),
+                dones = dones
             });
         }
 
