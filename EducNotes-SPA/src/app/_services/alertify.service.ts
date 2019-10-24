@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
+// import { ToastrService } from 'ngx-toastr';
+import { ToastService } from 'ng-uikit-pro-standard';
+
 declare let alertify: any;
 
 @Injectable({
@@ -7,7 +9,8 @@ declare let alertify: any;
 })
 export class AlertifyService {
 
-  constructor(private toastrService: ToastrService) { }
+  // constructor(private toastrService: ToastrService) { }
+  constructor(private toastrService: ToastService) { }
 
   confirm(message: string, okCallback: () => any) {
     alertify.confirm(message, function(e) {
@@ -16,7 +19,6 @@ export class AlertifyService {
       } else {}
     });
   }
-
   // success(message: string) {
   //   alertify.success(message);
   // }
@@ -55,4 +57,5 @@ export class AlertifyService {
   errorBar(message: string) {
     this.toastrService.error(message, 'Toastr title', { timeOut: 3000, closeButton: true, progressBar: true });
   }
+
 }

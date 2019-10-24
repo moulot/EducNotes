@@ -37,10 +37,10 @@ namespace EducNotes.API
             services.AddDbContext<DataContext>(Options => Options.UseSqlServer(Configuration
                 .GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<IdentityUser>(config =>
-            {
-                config.SignIn.RequireConfirmedEmail = true;
-            });
+            // services.AddDefaultIdentity<IdentityUser>(config =>
+            // {
+            //     config.SignIn.RequireConfirmedEmail = true;
+            // });
             
             IdentityBuilder builder = services.AddIdentityCore<User>(opt =>
             {
