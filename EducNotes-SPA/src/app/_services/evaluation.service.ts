@@ -38,7 +38,7 @@ export class EvaluationService {
     return this.http.put(this.baseUrl + 'evaluation/saveEvaluation', evaluation, {params});
   }
 
-  saveUserGrades(userGrades: UserEvaluation[], evalClosed: number) {
+  saveUserGrades(userGrades: UserEvaluation[], evalClosed: boolean) {
     return this.http.put(this.baseUrl + 'evaluation/' + evalClosed + '/saveUserGrades', userGrades);
   }
 
@@ -48,6 +48,10 @@ export class EvaluationService {
 
   getUserCoursesWithEvals(classId, userId) {
     return this.http.get(this.baseUrl + 'evaluation/class/' + classId + '/CoursesWithEvals/' + userId);
+  }
+
+  getTeacherEvalsToCome(teacherId) {
+    return this.http.get(this.baseUrl + 'evaluation/teacher/' + teacherId + '/evalsToCome');
   }
 
   getClassEvalsToCome(classId) {

@@ -4,11 +4,11 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { User } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
 import { CourseUser } from 'src/app/_models/courseUser';
-import { ClassService } from 'src/app/_services/class.service';
 import { Period } from 'src/app/_models/period';
 import { AdminService } from 'src/app/_services/admin.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
+import { EvaluationService } from 'src/app/_services/evaluation.service';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -26,15 +26,18 @@ export class TeacherDashboardComponent implements OnInit {
   currentPeriod: Period;
   coursesControl: FormControl = new FormControl();
   nextCourses: any;
+  evalsToCome: any;
+  evalsToBeGraded: any;
 
   constructor(private userService: UserService, private authService: AuthService,
     private adminService: AdminService, public alertify: AlertifyService, private router: Router,
-    private classService: ClassService, private route: ActivatedRoute) { }
+    private evalService: EvaluationService, private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.teacher = this.authService.currentUser;
     this.getTeacherClasses(this.teacher.id);
     this.getTeacherNextCourses(this.teacher.id);
+    this.getEvals(this.teacher.id);
   }
 
   getTeacherScheduleToday(teacherId) {
@@ -48,6 +51,15 @@ export class TeacherDashboardComponent implements OnInit {
   getTeacherClasses(teacherId) {
     this.userService.getTeacherClasses(teacherId).subscribe((courses: CourseUser[]) => {
       this.teacherClasses = courses;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getEvals(teacherId) {
+    this.evalService.getTeacherEvalsToCome(teacherId).subscribe((evals: any) => {
+      this.evalsToCome = evals.evalsToCome;
+      this.evalsToBeGraded = evals.evalsToBeGraded;
     }, error => {
       this.alertify.error(error);
     });

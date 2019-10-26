@@ -501,6 +501,7 @@ namespace EducNotes.API.Controllers
                 Agenda newAgendaItem = new Agenda();
                 _mapper.Map(agendaForSaveDto, newAgendaItem);
                 newAgendaItem.DateAdded = DateTime.Now;
+                newAgendaItem.DoneSetById = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 _repo.Add(newAgendaItem);
             }
             else

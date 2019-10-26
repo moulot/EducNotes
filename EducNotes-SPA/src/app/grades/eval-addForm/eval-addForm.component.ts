@@ -10,8 +10,8 @@ import { SkillsModalComponent } from '../skills-modal/skills-modal.component';
 import { EvalType } from 'src/app/_models/evalType';
 import { Evaluation } from 'src/app/_models/evaluation';
 import { User } from 'src/app/_models/user';
-import { CourseUser } from 'src/app/_models/courseUser';
 import { Router } from '@angular/router';
+import { Utils } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-eval-addForm',
@@ -19,6 +19,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./eval-addForm.component.scss']
 })
 export class EvalAddFormComponent implements OnInit {
+  myDatePickerOptions = Utils.myDatePickerOptions;
   teacher: User;
   currentPeriod: Period;
   newEvalForm: FormGroup;
@@ -33,6 +34,10 @@ export class EvalAddFormComponent implements OnInit {
   progEltIds: string;
   isGradedOn = false;
   isGradeCounted = true;
+  optionsClass: any[] = [];
+  optionsCourse: any[] = [];
+  optionsPeriod: any[] = [];
+  optionsEvalType: any[] = [];
 
   constructor(private userService: UserService, private evalService: EvaluationService,
     private fb: FormBuilder, private authService: AuthService, private router: Router,
@@ -73,7 +78,10 @@ export class EvalAddFormComponent implements OnInit {
     this.newEvaluation.name = this.newEvalForm.value.evalName;
     this.newEvaluation.courseId = this.newEvalForm.value.newcourse;
     this.newEvaluation.evalTypeId = this.newEvalForm.value.evalType;
-    this.newEvaluation.evalDate = this.newEvalForm.value.evalDate;
+    // this.evalDate = this.newEvalForm.value.evalDate;
+    const dateData = this.newEvalForm.value.evalDate.split('/');
+    this.newEvaluation.evalDate = new Date(dateData[2], dateData[1] - 1, dateData[0]);
+    console.log(this.newEvalForm.value.evalDate + ' - ' + this.newEvaluation.evalDate);
     this.newEvaluation.graded = this.newEvalForm.controls['grades'].value.isGraded;
     this.newEvaluation.periodId = this.newEvalForm.value.newperiod;
     this.newEvaluation.canBeNagative = this.newEvalForm.controls['grades'].value.isNegative;
@@ -123,16 +131,27 @@ export class EvalAddFormComponent implements OnInit {
   }
 
   getTeacherClasses(teacherId) {
-    this.userService.getTeacherClasses(teacherId).subscribe((courses: CourseUser[]) => {
+    this.userService.getTeacherClasses(teacherId).subscribe((courses: any) => {
       this.teacherClasses = courses;
+      for (let i = 0; i < courses.length; i++) {
+        const elt = courses[i];
+        const element = {value: elt.classId, label: 'classe ' + elt.className};
+        this.optionsClass = [...this.optionsClass, element];
+      }
+
     }, error => {
       this.alertify.error(error);
     });
   }
 
   getTeacherCourses(teacherId) {
-    this.userService.getTeacherCourses(teacherId).subscribe(courses => {
+    this.userService.getTeacherCourses(teacherId).subscribe((courses: any) => {
       this.teacherCourses = courses;
+      for (let i = 0; i < courses.length; i++) {
+        const elt = courses[i];
+        const element = {value: elt.id, label: elt.name};
+        this.optionsCourse = [...this.optionsCourse, element];
+      }
     }, error => {
       this.alertify.error(error);
     });
@@ -141,6 +160,11 @@ export class EvalAddFormComponent implements OnInit {
   getPeriods() {
     this.evalService.getPeriods().subscribe((periods: Period[]) => {
       this.periods = periods;
+      for (let i = 0; i < periods.length; i++) {
+        const elt = periods[i];
+        const element = {value: elt.id, label: elt.name};
+        this.optionsPeriod = [...this.optionsPeriod, element];
+      }
     }, error => {
       this.alertify.error(error);
     });
@@ -149,6 +173,11 @@ export class EvalAddFormComponent implements OnInit {
   getEvalTypes() {
     this.evalService.getEvalTypes().subscribe((types: EvalType[]) => {
       this.evalTypes = types;
+      for (let i = 0; i < types.length; i++) {
+        const elt = types[i];
+        const element = {value: elt.id, label: elt.name};
+        this.optionsEvalType = [...this.optionsEvalType, element];
+      }
     }, error => {
       this.alertify.error(error);
     });

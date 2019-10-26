@@ -3,120 +3,122 @@
   <div class="row">
 
     <div class="col-md-12">
-      <div class="lead m-0 pb-2">ajout d'une évaluation</div>
-      <!-- <p class="text-13 text-muted">notes des élèves par classe, par type et par période</p> -->
+        <div class="lead m-0 pb-2">ajout d'une évaluation</div>
+        <!-- <p class="text-13 text-muted">notes des élèves par classe, par type et par période</p> -->
     </div>
-  
-    <div class="col-lg-6 col-md-12 mb-2">
+        
+    <div class="col-md-12">
+
       <div class="card">
-        <div class="card-body p-2">
-          <div class="row row-xs">
-            <div class="col-md-4">
-              <nz-select #classSelect class="sel mr-2" nzShowSearch nzPlaceHolder="classe"
-                formControlName="newaclass" nzAllowClear>
-                <nz-option *ngFor="let item of teacherClasses" nzLabel="classe {{item.className}}" nzValue="{{item.classId}}"></nz-option>
-              </nz-select>
-              <div *ngIf="newEvalForm.get('newaclass').errors && newEvalForm.get('newaclass').touched"
-                class="text-danger mr-2" style="width: 250px">saisir la classe svp</div>
-            </div>
-            <div class="col-md-4 mt-3 mt-md-0">
-              <nz-select #courseSelect class="sel mr-2" nzShowSearch nzAllowClear
-                formControlName="newcourse" nzPlaceHolder="matière">
-                <nz-option *ngFor="let item of teacherCourses" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
-              </nz-select>
-              <div *ngIf="newEvalForm.get('newcourse').errors && newEvalForm.get('newcourse').touched"
-                class="text-danger" style="width: 250px">saisir le cours svp</div>
-            </div>
-            <div class="col-md-4 mt-3 mt-md-0">
-              <nz-select #periodSelect class="sel" nzShowSearch nzAllowClear
-                formControlName="newperiod" nzPlaceHolder="période">
-                <nz-option *ngFor="let item of periods" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
-              </nz-select>
-              <div *ngIf="newEvalForm.get('newperiod').errors && newEvalForm.get('newperiod').touched"
-                class="text-danger">saisir la période svp</div>
+        <div class="card-body">      
+    
+          <div class="col-md-12 mb-2">
+            <div class="p-3 border rounded">
+              <div class="row">
+                <div class="col-md-4">
+                  <mdb-select [options]="optionsClass" formControlName="newaclass" placeholder="choisir la classe"></mdb-select>
+                  <div *ngIf="newEvalForm.get('newaclass').errors && newEvalForm.get('newaclass').touched"
+                    class="text-danger mr-2" style="width: 250px">saisir la classe svp</div>
+                </div>
+                <div class="col-md-4 mt-3 mt-md-0">
+                  <mdb-select [options]="optionsCourse" formControlName="newcourse" placeholder="choisir le cours"></mdb-select>
+                  <div *ngIf="newEvalForm.get('newcourse').errors && newEvalForm.get('newcourse').touched"
+                    class="text-danger" style="width: 250px">saisir le cours svp</div>
+                </div>
+                <div class="col-md-4 mt-3 mt-md-0">
+                  <mdb-select [options]="optionsPeriod" formControlName="newperiod" placeholder="choisir la période"></mdb-select>
+                  <div *ngIf="newEvalForm.get('newperiod').errors && newEvalForm.get('newperiod').touched"
+                    class="text-danger">saisir la période svp</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-12 mb-2">
-      <div class="card p-2">
-        <h6 class="lead">évaluation...</h6>
-        <div class="form-inline">
-          <input nz-input placeholder="Libellé" formControlName="evalName" class="mr-2" style="width: 250px" />
-          <nz-select style="width: 250px;" class="mr-2" formControlName="evalType"
-            nzShowSearch nzAllowClear nzPlaceHolder="type évaluation">
-            <nz-option *ngFor="let item of evalTypes" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
-          </nz-select>
-          <nz-date-picker formControlName="evalDate" nzFormat="dd-MM-yyyy"
-            name="evalDate" formControlName="evalDate"></nz-date-picker>
-        </div>
-        <div class="form-inline">
-          <div *ngIf="newEvalForm.get('evalName').errors && newEvalForm.get('evalName').touched"
-            class="text-danger mr-2" style="width: 250px">saisir le libellé svp</div>
-          <div *ngIf="!newEvalForm.get('evalName').errors || !newEvalForm.get('evalName').touched"
-            class="text-danger mr-2" style="width: 250px"></div>
-            <div *ngIf="newEvalForm.get('evalType').errors && newEvalForm.get('evalType').touched"
-              class="text-danger" style="width: 250px">saisir le type svp</div>
-            <div *ngIf="!newEvalForm.get('evalType').errors || !newEvalForm.get('evalType').touched"
-              class="text-danger" style="width: 250px"></div>
-            <div *ngIf="newEvalForm.get('evalDate').errors && newEvalForm.get('evalDate').touched"
-            class="text-danger">saisir la date svp</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-12 mb-2">
-      <div class="card p-2 mt-1">
-      <h6 class="lead">caractéristiques...</h6>
-      <div formGroupName="grades">
-        <div class="row">
-          <div class="col-sm-2">
-            <label class="chk" (nzCheckedChange)="toggleGrade()" name="isGraded"
-              formControlName="isGraded" nz-checkbox>évaluation notée</label>
-          </div>
-          <div *ngIf="isGradedOn" class="col-sm-10">
-            <div>
-              <label class="chk" formControlName="gradeInLetter" name="gradeInLetter" nz-checkbox>notation en lettre</label>&nbsp;&nbsp;&nbsp;
-              <label class="mr-2">notée sur</label>
-              <input nz-input formControlName="evalMaxGrade" name="evalMaxGrade" nzSize='small' class="mr-2" style="width: 50px" />&nbsp;&nbsp;&nbsp;
-              <label class="mr-2">coefficient</label>
-              <input nz-input formControlName="evalCoeff" name="evalCoeff" nzSize='small' class="mr-2" style="width: 50px" />&nbsp;&nbsp;&nbsp;
-                  
-            </div>
-            <div class="form-group mt-2">
-                <label class="chk" name="notCounted" (nzCheckedChange)="toggleCounted()"
-                  formControlName="notCounted" nz-checkbox>note non significative</label>&nbsp;&nbsp;&nbsp;
-                <label class="chk" name="isNegative" (nzCheckedChange)="toggleNegative()"
-                  formControlName="isNegative" nz-checkbox>note négative</label>
+      
+          <div class="col-md-12 mb-2">
+            <div class="p-3 border rounded">
+              <div class="row">
+      
+                <div class="col-md-4">
+                  <div class="md-form mt-0">
+                    <input mdbInput type="text" formControlName="evalName" id="evalName" class="form-control">
+                    <label for="evalName" class="">libellé</label>
+                    <div *ngIf="newEvalForm.get('evalName').errors && newEvalForm.get('evalName').touched"
+                      class="text-danger mr-2" style="width: 250px">saisir le libellé svp</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="md-form mt-0">
+                    <mdb-select [options]="optionsEvalType" formControlName="evalType" placeholder="type évaluation"></mdb-select>
+                    <div *ngIf="newEvalForm.get('evalType').errors && newEvalForm.get('evalType').touched"
+                      class="text-danger" style="width: 250px">saisir le type svp</div>    
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="md-form mt-0">
+                    <mdb-date-picker name="evalDate" [options]="myDatePickerOptions" [placeholder]="'date évaluation'"
+                      formControlName="evalDate"></mdb-date-picker>
+                    <div *ngIf="newEvalForm.get('evalDate').errors && newEvalForm.get('evalDate').touched"
+                      class="text-danger">saisir la date svp</div>
+                  </div>
+                </div>
+                
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      </div>
-    </div>
-
-    <div class="col-md-12 mb-2">
-      <div class="card p-2 mt-1">
-        <h6 class="lead">compétences...</h6>
-        <app-skills [skillsSelected]="skillsSelected"></app-skills>
-        <div class="row">
-          <div class="col-md-2">
-            <button type="button" class="btn btn-outline-primary btn-sm mt-1" (click)="addSkills()">ajouter compétences</button>
+      
+          <div class="col-md-12 mb-2">
+            <div class="card p-2 mt-1">
+              <div formGroupName="grades">
+                <div class="row">
+                  <div class="col-sm-2">
+                    <label class="chk" (nzCheckedChange)="toggleGrade()" name="isGraded"
+                      formControlName="isGraded" nz-checkbox>évaluation notée</label>
+                  </div>
+                  <div *ngIf="isGradedOn" class="col-sm-10">
+                    <div>
+                      <label class="chk" formControlName="gradeInLetter" name="gradeInLetter" nz-checkbox>notation en lettre</label>&nbsp;&nbsp;&nbsp;
+                      <label class="mr-2">notée sur</label>
+                      <input nz-input formControlName="evalMaxGrade" name="evalMaxGrade" nzSize='small' class="mr-2" style="width: 50px" />&nbsp;&nbsp;&nbsp;
+                      <label class="mr-2">coefficient</label>
+                      <input nz-input formControlName="evalCoeff" name="evalCoeff" nzSize='small' class="mr-2" style="width: 50px" />&nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="form-group mt-2">
+                        <label class="chk" name="notCounted" (nzCheckedChange)="toggleCounted()"
+                          formControlName="notCounted" nz-checkbox>note non significative</label>&nbsp;&nbsp;&nbsp;
+                        <label class="chk" name="isNegative" (nzCheckedChange)="toggleNegative()"
+                          formControlName="isNegative" nz-checkbox>note négative</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+      
+          <div class="col-md-12 mb-2">
+            <div class="card p-2 mt-1">
+              <h6 class="lead">compétences...</h6>
+              <app-skills [skillsSelected]="skillsSelected"></app-skills>
+              <div class="row">
+                <div class="col-md-2">
+                  <button type="button" class="btn btn-outline-primary btn-sm mt-1" (click)="addSkills()">ajouter compétences</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+          <div class="col-md-12 mb-1">
+            <div class="form-inline mt-2">
+              <button type="submit" class="btn btn-outline-primary btn-sm mr-2" [disabled]="!newEvalForm.valid">valider</button>
+              <button type="button" class="btn btn-outline-primary btn-sm mr-2" [disabled]="!newEvalForm.valid"
+                (click)="createEvaluation(true)">valider et nouveau</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" (click)="newCancel()">annuler</button>
+            </div>
+          </div>  
+
         </div>
       </div>
-    </div>
 
-    <div class="col-md-12 mb-1">
-      <div class="form-inline mt-2">
-        <button type="submit" class="btn btn-outline-primary btn-sm mr-2" [disabled]="!newEvalForm.valid">valider</button>
-        <button type="button" class="btn btn-outline-primary btn-sm mr-2" [disabled]="!newEvalForm.valid"
-          (click)="createEvaluation(true)">valider et nouveau</button>
-        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="newCancel()">annuler</button>
-      </div>
-    </div>  
+    </div>
 
   </div>
 

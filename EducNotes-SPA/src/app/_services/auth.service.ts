@@ -60,7 +60,7 @@ export class AuthService {
     this.decodedToken = null;
     this.currentUser = null;
     this.currentPeriod = null;
-    this.alertify.infoBar('vous êtes déconnecté');
+    this.alertify.info('vous êtes déconnecté');
     this.router.navigate(['/']);
   }
 

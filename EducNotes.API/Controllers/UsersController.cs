@@ -380,9 +380,9 @@ namespace EducNotes.API.Controllers
 
               if (ClassEvals.Count > 0)
               {
-                    var OpenedEvals = ClassEvals.FindAll(e => e.Closed == 0);
+                    var OpenedEvals = ClassEvals.FindAll(e => e.Closed == false);
                     var OpenedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(OpenedEvals);
-                    var ToBeGradedEvals = ClassEvals.FindAll(e => e.Closed == 1);
+                    var ToBeGradedEvals = ClassEvals.FindAll(e => e.Closed == true);
                     var ToBeGradedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(ToBeGradedEvals);
                     var NbEvals = OpenedEvals.Count() + ToBeGradedEvals.Count();
 

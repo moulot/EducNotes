@@ -280,6 +280,53 @@ namespace EducNotes.API.Controllers
             return Ok(skills);
         }
 
+        [HttpGet("Teacher/{teacherId}/EvalsToCome")]
+        public async Task<IActionResult> GetTeacherEvalsToCome(int teacherId)
+        {
+            var classIds = await _context.ClassCourses
+                            .Where(c => c.TeacherId == teacherId)
+                            .Select(c => c.ClassId).Distinct().ToListAsync();
+
+            var today = DateTime.Now.Date;
+            List<Evaluation> nextEvals = new List<Evaluation>();
+            foreach (var classId in classIds)
+            {
+                var classEvals = await _context.Evaluations
+                                .Include(i => i.Course)
+                                .Include(i => i.EvalType)
+                                .Where(e => e.ClassId == classId && e.EvalDate.Date >= today).ToListAsync();
+                
+                foreach (var eval in classEvals)
+                {
+                    nextEvals.Add(eval);
+                }
+            }
+
+            var evalsToCome = _mapper.Map<List<EvaluationForListDto>>(nextEvals).OrderBy(e => e.EvalDate);
+
+            List<Evaluation> prevEvals = new List<Evaluation>();
+            foreach (var classId in classIds)
+            {
+                var classEvals = await _context.Evaluations
+                                .Include(i => i.Course)
+                                .Include(i => i.EvalType)
+                                .Where(e => e.ClassId == classId && e.EvalDate.Date <= today &&
+                                    e.Closed == false).ToListAsync();
+                
+                foreach (var eval in classEvals)
+                {
+                    prevEvals.Add(eval);
+                }
+            }
+
+            var evalsToBeGraded = _mapper.Map<List<EvaluationForListDto>>(prevEvals).OrderBy(e => e.EvalDate);
+
+            return Ok(new {
+                evalsToCome = evalsToCome,
+                evalsToBeGraded = evalsToBeGraded
+            });
+        }
+
         [HttpGet("Class/{classId}/EvalsToCome")]
         public async Task<IActionResult> GetEvalsToCome(int classId)
         {
@@ -301,8 +348,8 @@ namespace EducNotes.API.Controllers
                                     .Where(e => e.ClassId == classId)
                                     .OrderBy(o => o.EvalDate).ToListAsync();
 
-            var OpenEvals = ClassEvals.FindAll(e => e.Closed == 0);
-            var ClosedEvals = ClassEvals.FindAll(e => e.Closed == 1);
+            var OpenEvals = ClassEvals.FindAll(e => e.Closed == false);
+            var ClosedEvals = ClassEvals.FindAll(e => e.Closed == true);
 
             return Ok(new {
                 AllEvals = ClassEvals,
@@ -340,6 +387,17 @@ namespace EducNotes.API.Controllers
                 _repo.Add(new UserEvaluation {UserId = item.Id, EvaluationId = evalId});
             }
 
+            //add the event for the user timeline
+            Event newEvent = new Event();
+            newEvent.ClassId = eval.ClassId;
+            newEvent.EventTypeId = 1; // evaluation - to be set in the appsettings or in azure ENV.
+            newEvent.EventDate = eval.EvalDate;
+            newEvent.EvaluationId = evalId;
+            newEvent.Title = "évaluation";
+            newEvent.Desc = eval.Name != "" ? eval.Name : "";
+            newEvent.Desc += eval.EvalType.Name;
+            _repo.Add(newEvent);
+
             if(await _repo.SaveAll())
                 return NoContent();
 
@@ -348,7 +406,7 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPut("{evalClosed}/SaveUserGrades")]
-        public async Task<IActionResult> SaveUserGrades([FromBody]List<UserEvaluation> userGrades, int evalClosed)
+        public async Task<IActionResult> SaveUserGrades([FromBody]List<UserEvaluation> userGrades, bool evalClosed)
         {
             if(userGrades.Count() > 0)
             {
@@ -370,10 +428,7 @@ namespace EducNotes.API.Controllers
                 var evalToBeClosed = await _context.Evaluations.SingleOrDefaultAsync(e => e.Id == evalId);
                 if(evalToBeClosed != null)
                 {
-                    if(evalClosed == 1)
-                        evalToBeClosed.Closed = 1;
-                    else
-                        evalToBeClosed.Closed = 0;
+                    evalToBeClosed.Closed = evalClosed;
                 }
                 _repo.Update(evalToBeClosed);
 

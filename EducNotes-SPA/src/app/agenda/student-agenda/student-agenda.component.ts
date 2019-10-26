@@ -56,7 +56,7 @@ export class StudentAgendaComponent implements OnInit {
       this.student = loggedUser;
       this.getUser(this.student.id);
     }
-}
+  }
 
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
@@ -152,7 +152,7 @@ export class StudentAgendaComponent implements OnInit {
 
   setCourseTask(index, agendaId) {
     this.classService.classAgendaSetDone(agendaId, this.model[index]).subscribe(() => {
-      this.alertify.successBar('le devoir a bien été mis à jour');
+      this.alertify.success('le devoir a bien été mis à jour');
     });
   }
 

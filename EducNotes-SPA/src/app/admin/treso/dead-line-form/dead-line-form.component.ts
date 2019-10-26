@@ -15,8 +15,6 @@ import { Utils } from 'src/app/shared/utils';
   animations :  [SharedAnimations]
 })
 export class DeadLineFormComponent implements OnInit {
-
-
   deadLineForm: FormGroup;
   formModel: any;
   editMode = 'add';

@@ -5,6 +5,11 @@ namespace EducNotes.API.Models
 {
   public class Evaluation
   {
+    public Evaluation()
+    {
+      Closed = false;
+    }
+
     public int Id { get; set; }
     public string Name { get; set; }
     public int UserId { get; set; }
@@ -25,7 +30,7 @@ namespace EducNotes.API.Models
     public Boolean Significant { get; set; }
     public Boolean CanBeNegative { get; set; }
     public Boolean GradeInLetter { get; set; }
-    public byte Closed { get; set; }
+    public bool Closed { get; set; }
     public ICollection<EvalProgElt> EvalProgElts { get; set; }
   }
 }

@@ -113,32 +113,6 @@
                 </div>
               </div>
 
-              <!-- <mdb-accordion [multiple]="true">
-                <mdb-accordion-item [collapsed]="false">
-                  <mdb-accordion-item-head><p class="text-15 text-muted">Collapsible Group Item #1</p></mdb-accordion-item-head>
-                  <mdb-accordion-item-body>
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry labore sustainable
-                    VHS.
-                  </mdb-accordion-item-body>
-                </mdb-accordion-item>
-              
-                <mdb-accordion-item>
-                  <mdb-accordion-item-head>Collapsible Group Item #2</mdb-accordion-item-head>
-                  <mdb-accordion-item-body>
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richore sustainable
-                    VHS.
-                  </mdb-accordion-item-body>
-                </mdb-accordion-item>
-              
-                <mdb-accordion-item>
-                  <mdb-accordion-item-head>Collapsible Group Item #3</mdb-accordion-item-head>
-                  <mdb-accordion-item-body>
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life them accusamus labore sustainable
-                    VHS.
-                  </mdb-accordion-item-body>
-                </mdb-accordion-item>
-              </mdb-accordion> -->
-
               <div *ngIf="agendaItems?.length == 0">
                 <div class="card pt-5 pb-5 pl-2 pr-2">
                   <h6 class="text-muted">pas de devoirs à faire cette semaine...</h6>
@@ -150,36 +124,6 @@
                 <!-- <mdb-accordion [multiple]="true"> -->
 
                 <div *ngFor="let items of agendaItems">
-
-                  <!-- <mdb-accordion-item [collapsed]="false">
-                    <mdb-accordion-item-head><p class="text-15 text-muted m-0">{{items.dueDate}}</p></mdb-accordion-item-head>
-                    <mdb-accordion-item-body>
-
-                      <div *ngFor="let course of items.courses">
-    
-                        <div class="card mb-1">
-                          <div class="card-body p-1">
-                            <div class="row">
-                              <div class="col-md-1">
-                                <div class="box-course mr-1" [ngStyle]="{'background-color': course.courseColor}" style="height: 100%;"></div>
-                              </div>
-                              <div class="col-md-11">
-                                <div class="d-flex">
-                                  <div class="flex-grow-1 m-0">
-                                    <p class="m-0"><b>{{course.courseName}}</b></p>
-                                  </div>
-                                  <div class="m-0 text-small text-muted">donné le {{course.shortDateAdded}}</div>
-                                </div>
-                                <div class="m-0 text-14 pt-1">{{course.taskDesc}}</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-    
-                      </div>
-          
-                    </mdb-accordion-item-body>
-                  </mdb-accordion-item> -->
       
                   <div class="card mb-1">
                     <div class="card-body p-2">
@@ -227,7 +171,7 @@
             <div class="card-title d-flex">
               <div class="flex-grow-1 lead">évaluations à venir</div>
               <div>
-                <button class="btn btn-outline-primary btn-sm">détails</button>
+                <button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>détails</button>
               </div>
             </div>
             <div *ngFor="let eval of evalsToCome">
@@ -251,7 +195,7 @@
               </div>
             </div>
           </div>
-      </div>
+        </div>
       </div>
     
     </div>

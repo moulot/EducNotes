@@ -131,7 +131,7 @@ export class AgendaListComponent implements OnInit {
     this.agendaForSave.taskDesc = session.tasks;
 
     return this.classService.saveAgendaItem(this.agendaForSave).subscribe(() => {
-      this.alertify.successBar(session.courseName + '. devoirs du ' + session.strDayDate + ' validés!');
+      this.alertify.success(session.courseName + '. devoirs du ' + session.strDayDate + ' validés!');
     }, error => {
       this.alertify.error(error);
     });
