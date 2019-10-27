@@ -183,6 +183,7 @@ import * as Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { CourseCoefficientsComponent } from './admin/courses-management/course-coefficients/course-coefficients.component';
 import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
+import { TimelineComponent } from './views/dashboard/timeline/timeline.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -305,7 +306,8 @@ export function tokenGetter() {
       StudentLifeComponent,
       ClassTeachersComponent,
       CourseCoefficientsComponent,
-      CoefficientFormComponent
+      CoefficientFormComponent,
+      TimelineComponent
    ],
    imports: [
      FormWizardModule,

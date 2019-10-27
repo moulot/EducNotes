@@ -106,7 +106,7 @@ export const appRoutes: Routes = [
             {path: 'admin', component: AdminPanelComponent, data: {roles: ['Admin', 'Moderator']}},
             {path: 'agenda', component: AgendaPanelComponent},
             {path: 'classes', component: ClassPanelComponent},
-            {path: 'notes', component: GradePanelComponent},
+            {path: 'grades', component: GradePanelComponent},
             {path: 'classLife/:classId', component: ClassLifeComponent},
             {path: 'studentLife/:id', component: StudentLifeComponent, resolve: {student: StudentResolver}},
             {path: 'studentNotes/:id', component: GradeStudentComponent},

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using AutoMapper;
 using EducNotes.API.Data;
@@ -141,11 +142,14 @@ namespace EducNotes.API.Helpers
                 .ForMember(dest => dest.SanctionedBy, opt => opt
                     .MapFrom(src => src.SanctionedBy.LastName + ' ' + src.SanctionedBy.FirstName));
             CreateMap<Evaluation, EvaluationForListDto>()
+                .ForMember(dest => dest.CourseAbbrev, opt => {
+                    opt.MapFrom(src => src.Course.Abbreviation);
+                })
                 .ForMember(dest => dest.CourseColor, opt => {
                     opt.MapFrom(src => src.Course.Color);
                 })
                 .ForMember(dest => dest.EvalDate, opt => {
-                    opt.MapFrom(src => src.EvalDate.ToShortDateString());
+                    opt.MapFrom(src => src.EvalDate.ToString("dd/MM/yy"));
                 });
             CreateMap<ProductDto, Product>();
             CreateMap<DeadLineDto, DeadLine>();

@@ -293,8 +293,10 @@ namespace EducNotes.API.Controllers
             {
                 var classEvals = await _context.Evaluations
                                 .Include(i => i.Course)
+                                .Include(i => i.Class)
                                 .Include(i => i.EvalType)
-                                .Where(e => e.ClassId == classId && e.EvalDate.Date >= today).ToListAsync();
+                                .Where(e => e.UserId == teacherId && e.ClassId == classId && e.EvalDate.Date >= today)
+                                .ToListAsync();
                 
                 foreach (var eval in classEvals)
                 {
@@ -309,8 +311,9 @@ namespace EducNotes.API.Controllers
             {
                 var classEvals = await _context.Evaluations
                                 .Include(i => i.Course)
+                                .Include(i => i.Class)
                                 .Include(i => i.EvalType)
-                                .Where(e => e.ClassId == classId && e.EvalDate.Date <= today &&
+                                .Where(e => e.UserId == teacherId && e.ClassId == classId && e.EvalDate.Date <= today &&
                                     e.Closed == false).ToListAsync();
                 
                 foreach (var eval in classEvals)
@@ -387,6 +390,8 @@ namespace EducNotes.API.Controllers
                 _repo.Add(new UserEvaluation {UserId = item.Id, EvaluationId = evalId});
             }
 
+            var evalType = await _context.EvalTypes.FirstOrDefaultAsync(e => e.Id == eval.EvalTypeId);
+
             //add the event for the user timeline
             Event newEvent = new Event();
             newEvent.ClassId = eval.ClassId;
@@ -394,8 +399,7 @@ namespace EducNotes.API.Controllers
             newEvent.EventDate = eval.EvalDate;
             newEvent.EvaluationId = evalId;
             newEvent.Title = "évaluation";
-            newEvent.Desc = eval.Name != "" ? eval.Name : "";
-            newEvent.Desc += eval.EvalType.Name;
+            newEvent.Desc = eval.Name != "" ? eval.Name + " - " + evalType.Name: "";
             _repo.Add(newEvent);
 
             if(await _repo.SaveAll())
