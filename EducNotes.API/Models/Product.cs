@@ -6,6 +6,8 @@ namespace EducNotes.API.Models
         public string Name { get; set; }
         public string  Comment { get; set; }
         public int ProductTypeId { get; set; }
+        public decimal? Price { get; set; }
+        public bool IsByLevel { get; set; }
         public ProductType ProductType { get; set; }
     }
 }

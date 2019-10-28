@@ -89,7 +89,7 @@ namespace EducNotes.API.Controllers {
       foreach (var levelid in lvlprodToCreate.ClassLevelIds) {
         var lvlprod = await _context.ClassLevelProducts.FirstOrDefaultAsync (a => a.ClasssLevelId == levelid && a.ProductId == productId);
         if (lvlprod == null) {
-          var lp = new ClassLevelProduct { ProductId = productId, ClasssLevelId = levelid, Amount = amount };
+          var lp = new ClassLevelProduct { ProductId = productId, ClasssLevelId = levelid, Price = amount };
           _repo.Add (lp);
         }
       }
@@ -119,7 +119,7 @@ namespace EducNotes.API.Controllers {
         dl.Name = dtToCreate.Name;
         dl.Comment = dtToCreate.Comment;
         dl.DueDate = dtToCreate.DueDate;
-        dl.Percentage = dtToCreate.Percentage;
+        dl.Amount = dtToCreate.Percentage;
         _repo.Update (dl);
         if (await _repo.SaveAll ())
           return Ok ();
