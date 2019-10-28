@@ -79,6 +79,7 @@ import { StudentLifeComponent } from './classes/student-life/student-life.compon
 import { ClassTeachersComponent } from './classes/class-teachers/class-teachers.component';
 import { CourseCoefficientsComponent } from './admin/courses-management/course-coefficients/course-coefficients.component';
 import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
+import { CoefficientFormResolver } from './_resolvers/coeffiient-form-form-resolver';
 
 export const appRoutes: Routes = [
     {path: 'forgotPassword', component: ForgotComponent},
@@ -149,7 +150,9 @@ export const appRoutes: Routes = [
             {path: 'editDeadLine/:id', component: DeadLineFormComponent, resolve : {deadline: DeadLineFormResolver}},
             {path: 'studentAgenda/:id', component: StudentAgendaComponent, resolve: {student: StudentResolver}},
             {path: 'coefficients', component : CourseCoefficientsComponent},
-            {path: 'addCoefficient', component : CoefficientFormComponent}
+            {path: 'addCoefficient', component : CoefficientFormComponent},
+            {path: 'editCoeffcicient/:id', component : CoefficientFormComponent, resolve: {coef: CoefficientFormResolver}}
+
         ]
     },
     {path: '**', redirectTo: '', pathMatch: 'full'}

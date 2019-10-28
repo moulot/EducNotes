@@ -12,7 +12,7 @@ import { Utils } from 'src/app/shared/utils';
   selector: 'app-dead-line-form',
   templateUrl: './dead-line-form.component.html',
   styleUrls: ['./dead-line-form.component.scss'],
-  animations :  [SharedAnimations]
+  animations: [SharedAnimations]
 })
 export class DeadLineFormComponent implements OnInit {
   deadLineForm: FormGroup;
@@ -25,7 +25,7 @@ export class DeadLineFormComponent implements OnInit {
 
   ngOnInit() {
     this.route.data.subscribe(data => {
-       if (data.deadline) {
+      if (data.deadline) {
         this.formModel = data.deadline;
         this.editMode = 'edit';
       } else {
@@ -47,32 +47,36 @@ export class DeadLineFormComponent implements OnInit {
 
   createDeadLineForm() {
     this.deadLineForm = this.fb.group({
-       name: [this.formModel.name, Validators.required],
-       percentage: [this.formModel.percentage, Validators.required],
-       comment: [this.formModel.comment],
-       dueDate: [this.formModel.dueDate, Validators.required]
-      });
+      name: [this.formModel.name, Validators.required],
+      percentage: [this.formModel.percentage, Validators.required],
+      comment: [this.formModel.comment],
+      dueDate: [this.formModel.dueDate, Validators.required]
+    });
   }
   save() {
     if (this.editMode === 'add') {
       this.createDealine();
     }
     if (this.editMode === 'edit') {
-     this.editDeadline();
+      this.editDeadline();
     }
   }
 
   createDealine() {
-    this.tresoService.createDeadLine(this.deadLineForm.value).subscribe(() => {
-      this.alertify.success('enregistrement terminé..');
-      this.router.navigate(['/deadLines']);
-    }, error => {
-      this.alertify.error(error);
-    });
+    const dataToSave =  Object.assign({}, this.deadLineForm.value);
+    dataToSave.duedate = Utils.inputDateDDMMYY(dataToSave.dueDate, '/');
+      this.tresoService.createDeadLine(dataToSave).subscribe(() => {
+        this.alertify.success('enregistrement terminé..');
+        this.router.navigate(['/deadLines']);
+      }, error => {
+        this.alertify.error(error);
+      });
   }
 
   editDeadline() {
-    this.tresoService.editDeadLine(this.formModel.id , this.deadLineForm.value).subscribe(() => {
+    const dataToSave =  Object.assign({}, this.deadLineForm.value);
+    dataToSave.duedate = Utils.inputDateDDMMYY(dataToSave.dueDate, '/');
+    this.tresoService.editDeadLine(this.formModel.id, dataToSave).subscribe(() => {
       this.alertify.success('modification  éffectuée..');
       this.router.navigate(['/deadLines']);
     }, error => {

@@ -183,6 +183,7 @@ import * as Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { CourseCoefficientsComponent } from './admin/courses-management/course-coefficients/course-coefficients.component';
 import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
+import { CoefficientFormResolver } from './_resolvers/coeffiient-form-form-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -390,6 +391,7 @@ export function tokenGetter() {
       ProductFormResolver,
       CourseFormResolver,
       TeacherFormResolver,
+      CoefficientFormResolver,
       {provide: NZ_I18N, useValue: fr_FR}
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }
