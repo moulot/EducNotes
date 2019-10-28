@@ -27,3 +27,7 @@
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
+
+.notValidated{
+  background-color: rgba($color: #ff0000, $alpha: 0.5);
+}

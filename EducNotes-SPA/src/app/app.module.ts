@@ -2,13 +2,13 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BsDropdownModule, TabsModule, BsDatepickerModule, PaginationModule, ButtonsModule, ModalModule } from 'ngx-bootstrap';
 import { RouterModule } from '@angular/router';
 import { JwtModule } from '@auth0/angular-jwt';
 import { NgxGalleryModule } from 'ngx-gallery';
 import { FileUploadModule } from 'ng2-file-upload';
-import {TimeAgoPipe} from 'time-ago-pipe';
+import { TimeAgoPipe } from 'time-ago-pipe';
 import { NgxEchartsModule } from 'ngx-echarts';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -67,7 +67,7 @@ import { ClassNavComponent } from './classes/class-nav/class-nav.component';
 import { AgendaItemComponent } from './classes/agenda-item/agenda-item.component';
 import { ClassLifeFormComponent } from './classes/class-lifeForm/class-lifeForm.component';
 import { NgZorroAntdModule, NZ_I18N, fr_FR } from 'ng-zorro-antd';
-import { registerLocaleData, CommonModule} from '@angular/common';
+import { registerLocaleData, CommonModule } from '@angular/common';
 import fr from '@angular/common/locales/fr';
 import { ClassAbsenceComponent } from './classes/class-absence/class-absence.component';
 import { ClassSanctionComponent } from './classes/class-sanction/class-sanction.component';
@@ -184,6 +184,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { CourseCoefficientsComponent } from './admin/courses-management/course-coefficients/course-coefficients.component';
 import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
 import { CoefficientFormResolver } from './_resolvers/coeffiient-form-form-resolver';
+import { TimelineComponent } from './views/dashboard/timeline/timeline.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -306,10 +307,11 @@ export function tokenGetter() {
       StudentLifeComponent,
       ClassTeachersComponent,
       CourseCoefficientsComponent,
-      CoefficientFormComponent
+      CoefficientFormComponent,
+      TimelineComponent
    ],
    imports: [
-     FormWizardModule,
+      FormWizardModule,
       SharedModule,
       HttpClientModule,
       InMemoryWebApiModule.forRoot(InMemoryDataService, { passThruUnknownUrl: true }),
@@ -392,7 +394,7 @@ export function tokenGetter() {
       CourseFormResolver,
       TeacherFormResolver,
       CoefficientFormResolver,
-      {provide: NZ_I18N, useValue: fr_FR}
+      { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }
    ],

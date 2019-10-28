@@ -12,8 +12,45 @@
             [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-4': viewMode === 'grid'}"
             [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}"
           >
-            <a [routerLink]="['/studentFromP', child.id]"> 
-              <div class="card o-hidden mb-2 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
+            <div *ngIf="child.validatedCode">
+              <a [routerLink]="['/studentFromP', child.id]"> 
+                <div class="card o-hidden mb-2 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
+                <div class="img-box d-flex">
+                  <!-- TUMBNAIL -->
+                  <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="">
+                </div>
+                <div class="d-flex" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
+                  <div class="child-data pl-2">
+                    <!-- OTHER DATA -->
+                    <p href="" class="m-0 lead text-15 text-muted text-capitalize w-100 w-sm-100"><b>{{child.lastName}} {{child.firstName}}</b></p>
+                    <div><a href="" class="text-15">classe {{child.className}}</a></div>
+                    <div class="data-line w-100 w-sm-100">
+                      <a href="" class=" text-15">moyenne : 12/20. (-):7.5 (+):17</a>
+                    </div>
+                    <div class="data-line w-100 w-sm-100">
+                      <label class="text-muted text-15 mb-0 mr-1">devoirs maison : </label>
+                      <a class=" text-15 mr-1" href="">mer</a>
+                      <a class=" text-15 mr-1" href="">jeu</a>
+                      <a class=" text-15 mr-1" href="">ven</a>
+                      <a class=" text-15 mr-1" href="">lun</a>
+                      <a class=" text-15 mr-1" href="">mar</a>
+                    </div>
+                    <div class="w-100 w-sm-100 mb-0">
+                      <label class=" text-muted text-15 mr-1">absences : </label>
+                      <a class=" text-15 mr-1" href="">1</a>
+                      <label class=" text-muted text-15 mr-1">retards : </label>
+                      <a class=" text-15 mr-1" href="">3</a>
+                    </div>
+                  </div>
+                </div>
+                <!-- <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
+                  ddddddddddddddddddddddddd
+                </div> -->
+                </div>
+              </a>  
+            </div>
+            <div *ngIf="!child.validatedCode">
+              <div class="card o-hidden mb-2 d-flex notValidated" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
               <div class="img-box d-flex">
                 <!-- TUMBNAIL -->
                 <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="">
@@ -21,24 +58,24 @@
               <div class="d-flex" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
                 <div class="child-data pl-2">
                   <!-- OTHER DATA -->
-                  <p href="" class="m-0 lead text-15 text-muted text-capitalize w-100 w-sm-100"><b>{{child.lastName}} {{child.firstName}}</b></p>
-                  <div><a href="" class="text-15">classe {{child.className}}</a></div>
+                  <p href="" class="m-0 lead w-100 w-sm-100"><b>enfant non validé</b></p>
+                  <!-- <div><a href="" class="text-15">classe {{child.className}}</a></div> -->
                   <div class="data-line w-100 w-sm-100">
-                    <a href="" class=" text-15">moyenne : 12/20. (-):7.5 (+):17</a>
+                    <!-- <a href="" class=" text-15">moyenne : 12/20. (-):7.5 (+):17</a> -->
                   </div>
                   <div class="data-line w-100 w-sm-100">
-                    <label class="text-muted text-15 mb-0 mr-1">devoirs maison : </label>
+                    <!-- <label class="text-muted text-15 mb-0 mr-1">devoirs maison : </label>
                     <a class=" text-15 mr-1" href="">mer</a>
                     <a class=" text-15 mr-1" href="">jeu</a>
                     <a class=" text-15 mr-1" href="">ven</a>
                     <a class=" text-15 mr-1" href="">lun</a>
-                    <a class=" text-15 mr-1" href="">mar</a>
+                    <a class=" text-15 mr-1" href="">mar</a> -->
                   </div>
                   <div class="w-100 w-sm-100 mb-0">
-                    <label class=" text-muted text-15 mr-1">absences : </label>
+                    <!-- <label class=" text-muted text-15 mr-1">absences : </label>
                     <a class=" text-15 mr-1" href="">1</a>
                     <label class=" text-muted text-15 mr-1">retards : </label>
-                    <a class=" text-15 mr-1" href="">3</a>
+                    <a class=" text-15 mr-1" href="">3</a> -->
                   </div>
                 </div>
               </div>
@@ -46,7 +83,7 @@
                 ddddddddddddddddddddddddd
               </div> -->
               </div>
-            </a>
+            </div>
           </div>
           <!-- PAGINATION CONTROL -->
           <!-- <div class="col-md-12 mt-3" *ngIf="children?.length">
@@ -98,19 +135,7 @@
           </div>
         </div>
   
-        <div class="col-md-12">
-          <div class="card mb-4">
-            <div class="card-body">
-              <h6 class="mb-2">Server failures</h6>
-              <p class="text-24 font-weight-light mb-1"><i class="i-Down text-danger"></i> 5%</p>
-              <div>ECHART</div>
-            </div>
-          </div>
-        </div>
-  
       </div>
     </div>
     
   </div>
-
-  app-

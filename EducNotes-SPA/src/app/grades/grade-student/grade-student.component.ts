@@ -97,7 +97,7 @@ export class GradeStudentComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe(data => {
       this.student = data['student'];
-      this.getCoursesWithEvals(this.student.id, this.student.classId);
+      this.getUserGrades(this.student.id, this.student.classId);
     });
 
   }
@@ -205,7 +205,7 @@ export class GradeStudentComponent implements OnInit {
 
   }
 
-  getCoursesWithEvals(studentId, classId) {
+  getUserGrades(studentId, classId) {
     this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
       this.userCourses = data.coursesWithEvals;
       this.studentAvg = data.studentAvg;
