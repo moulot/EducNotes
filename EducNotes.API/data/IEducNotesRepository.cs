@@ -39,6 +39,7 @@ namespace EducNotes.API.Data
 
         Task<IEnumerable<User>> GetStudentsForClass(int classId);
         Task<IEnumerable<Agenda>> GetClassAgenda(int classId);
+        Task<List<AgendaForListDto>> GetUserClassAgenda(int classId, DateTime startDate, DateTime endDate);
         Task<IEnumerable<UserType>> getUserTypes(); 
 
         //Task<List<coursClass>> GetTeacherCoursesAndClasses(int teacherId);
@@ -56,6 +57,7 @@ namespace EducNotes.API.Data
         Task<bool> SendResetPasswordLink(string email,string code);
         Task<User> GetUserByCode(string code);
         Task<User> GetSingleUser(string userName);
+        Task<List<UserEvalsDto>> GetUserGrades(int userId, int classId);
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////

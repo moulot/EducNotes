@@ -11,6 +11,7 @@ namespace EducNotes.API.Dtos
         public int CourseId { get; set; }
         public string CourseName { get; set; }
         public string CourseAbbrev { get; set; }
+        public double CourseCoeff { get; set; }
         public int GradedOutOf { get; set; }
         public double UserCourseAvg { get; set; }
         public double ClassCourseAvg { get; set; }

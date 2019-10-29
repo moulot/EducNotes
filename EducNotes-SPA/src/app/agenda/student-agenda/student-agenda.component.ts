@@ -75,21 +75,21 @@ export class StudentAgendaComponent implements OnInit {
     });
   }
 
-  getAgenda(classId, toNbDays) {
+  // getAgenda(classId, toNbDays) {
 
-    this.classService.getTodayToNDaysAgenda(classId, toNbDays).subscribe((res: any) => {
+  //   this.classService.getTodayToNDaysAgenda(classId, toNbDays).subscribe((res: any) => {
 
-      this.agendaItems = res.agendaItems;
-      this.firstDay = res.firstDay;
-      this.strFirstDay = res.strFirstDayy;
-      this.strLastDay = res.strLastDay;
-      this.weekDays = res.weekDays;
-      this.nbDayTasks = res.nbDayTasks;
+  //     this.agendaItems = res.agendaItems;
+  //     this.firstDay = res.firstDay;
+  //     this.strFirstDay = res.strFirstDayy;
+  //     this.strLastDay = res.strLastDay;
+  //     this.weekDays = res.weekDays;
+  //     this.nbDayTasks = res.nbDayTasks;
 
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
 
   getClassAgendaByDate(classId, agendaParams) {
     this.classService.getClassAgendaByDate(classId, agendaParams).subscribe((agenda: any) => {
