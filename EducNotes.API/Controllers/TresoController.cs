@@ -1,3 +1,5 @@
+using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -43,6 +45,7 @@ namespace EducNotes.API.Controllers {
     [HttpGet ("GetDeadLine/{deadLineId}")]
     public async Task<IActionResult> GetDeadLine (int deadLineId) {
       var deadLine = await _context.DeadLines.FirstOrDefaultAsync (p => p.Id == deadLineId);
+      deadLine.DueDate = deadLine.DueDate.Date;
       return Ok (deadLine);
     }
 
@@ -115,10 +118,13 @@ namespace EducNotes.API.Controllers {
     [HttpPost ("EditDeadLine/{deadLineId}")]
     public async Task<IActionResult> EditDeadLine (int deadLineId, DeadLineDto dtToCreate) {
       var dl = await _context.DeadLines.FirstOrDefaultAsync (d => d.Id == deadLineId);
+
+      CultureInfo frC = new CultureInfo ("fr-FR");
+
       if (dtToCreate != null) {
         dl.Name = dtToCreate.Name;
         dl.Comment = dtToCreate.Comment;
-        dl.DueDate = dtToCreate.DueDate;
+        dl.DueDate = DateTime.ParseExact(dtToCreate.DueDate, "dd/MM/yyyy",frC);
         dl.Amount = dtToCreate.Percentage;
         _repo.Update (dl);
         if (await _repo.SaveAll ())

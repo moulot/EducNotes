@@ -5,7 +5,7 @@ namespace EducNotes.API.Models
         public int id { get; set; }
         public int ProductId { get; set; }
         public Product Product { get; set; }
-        public int DeadLineid { get; set; }
+        public int DeadLineId { get; set; }
         public DeadLine DeadLine { get; set; }
     }
 }

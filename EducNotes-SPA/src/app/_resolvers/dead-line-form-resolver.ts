@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Resolve, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { AlertifyService } from '../_services/alertify.service';
 import { Observable, of } from 'rxjs';
@@ -10,7 +10,7 @@ import { TresoService } from '../_services/treso.service';
 export class DeadLineFormResolver implements Resolve<DeadLine> {
 
     constructor(private tresoService: TresoService, private router: Router,
-         private alertify: AlertifyService) {}
+        private alertify: AlertifyService) { }
 
     resolve(route: ActivatedRouteSnapshot): Observable<DeadLine> {
         return this.tresoService.getDeadline(route.params['id']).pipe(
