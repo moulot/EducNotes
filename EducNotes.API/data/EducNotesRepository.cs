@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text.Encodings.Web;
@@ -772,5 +773,204 @@ namespace EducNotes.API.Data
             return usersSpaCode;
 
         }
+
+        public async Task<List<UserEvalsDto>> GetUserGrades(int userId, int classId)
+        {
+            //get user courses
+            var userCourses = await (from course in _context.ClassCourses
+                                        join user in _context.Users
+                                        on course.ClassId equals user.ClassId
+                                        where user.ClassId == classId
+                                        orderby course.Course.Name
+                                        select course.Course).Distinct().ToListAsync();
+
+            var aclass = await _context.Classes.FirstOrDefaultAsync(c => c.Id == classId);
+
+            List<UserEvalsDto> coursesWithEvals = new List<UserEvalsDto>();
+
+            double gradesSum = 0;
+            double coeffSum = 0;
+            //loop on user courses - get data for each course 
+            for (int i = 0; i < userCourses.Count(); i++)
+            {
+                var acourse = userCourses[i];
+
+                //get all evaluations of the selected course and current userId
+                var UserEvals = await _context.UserEvaluations
+                    .Include(e => e.Evaluation).ThenInclude(e => e.EvalType)
+                    .OrderBy(o => o.Evaluation.EvalDate)
+                    .Where(e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
+                        e.Evaluation.CourseId == acourse.Id && e.Evaluation.Graded == true)
+                    .Distinct().ToListAsync();
+
+                UserEvalsDto userEvalsDto = new UserEvalsDto();
+                userEvalsDto.CourseId = acourse.Id;
+                userEvalsDto.CourseName = acourse.Name;
+                userEvalsDto.CourseAbbrev = acourse.Abbreviation;
+                userEvalsDto.GradedOutOf = 20;
+
+                // evals for this are evailable?
+                if (UserEvals.Count() > 0)
+                {
+                    List<GradeDto> grades = new List<GradeDto>();
+
+                    for(int j = 0; j < UserEvals.Count(); j++)
+                    {
+                        // calculate each grade of the selected course
+                        var elt = UserEvals[j];
+                        if(elt.Grade.IsNumeric())
+                        {
+                            var evalDate = elt.Evaluation.EvalDate.ToShortDateString();
+                            var evalType = elt.Evaluation.EvalType.Name;
+                            var evalName = elt.Evaluation.Name;
+                            double gradeMax = Convert.ToDouble(elt.Evaluation.MaxGrade);
+                            double gradeValue = Convert.ToDouble(elt.Grade.Replace(".", ","));
+                            // grade are ajusted to 20 as MAx. Avg is on 20
+                            double ajustedGrade = Math.Round(20 * gradeValue / gradeMax, 2);
+                            double coeff = elt.Evaluation.Coeff;
+                            //data for course average
+                            gradesSum += ajustedGrade * coeff;
+                            coeffSum += coeff;
+
+                            // get class grades for the current user grade (evaluation)
+                            var EvalClassGrades = await _context.UserEvaluations
+                                                    .Where(e => e.EvaluationId == elt.EvaluationId &&
+                                                    e.Evaluation.GradeInLetter == false && e.Evaluation.Graded == true &&
+                                                    e.Grade.IsNumeric())
+                                                    .Select(e => e.Grade).ToListAsync();
+                            
+                            double classMin = 1000;
+                            double classMax = -1000;
+                            //get class min and max of evaluation
+                            foreach (var item in EvalClassGrades)
+                            {
+                                var ddd = item;
+                                var grade = Convert.ToDouble(item.Replace(".", ","));
+                                classMin = grade < classMin? grade : classMin;
+                                classMax = grade > classMax? grade : classMax;
+                            }
+                            double EvalGradeMin = classMin;
+                            double EvalGradeMax = classMax;
+
+                            //enter grade data "as it is" in the user grades data list
+                            GradeDto gradeDto = new GradeDto();
+                            gradeDto.EvalType = evalType;
+                            gradeDto.EvalDate = evalDate;
+                            gradeDto.EvalName = evalName;
+                            gradeDto.Grade = Math.Round(gradeValue, 2);
+                            gradeDto.GradeMax = gradeMax;
+                            gradeDto.Coeff = coeff;
+                            gradeDto.ClassGradeMin = EvalGradeMin;
+                            gradeDto.ClassGradeMax = EvalGradeMax;
+                            grades.Add(gradeDto);
+                        }
+                    }
+
+                    //calculate user grade avg for the selected course
+                    double gradesAvg = Math.Round(gradesSum / coeffSum, 2);
+                    //data for general user average
+
+                    //get course coeff
+                    var courseCoeffData = await _context.CourseCoefficients
+                                            .FirstOrDefaultAsync(c => c.ClassLevelid == aclass.ClassLevelId &&
+                                                c.CourseId == acourse.Id && c.ClassTypeId == aclass.ClassTypeId);
+                    double courseCoeff = courseCoeffData.Coefficient;
+
+                    //get the class course average - to be compared with the user average
+                    double ClassCourseAvg = GetClassCourseEvalData(acourse.Id, classId);
+
+                    userEvalsDto.UserCourseAvg = gradesAvg;
+                    userEvalsDto.ClassCourseAvg = ClassCourseAvg;
+                    userEvalsDto.CourseCoeff = courseCoeff;
+                    userEvalsDto.grades = grades;
+                    coursesWithEvals.Add(userEvalsDto);
+                }
+                else
+                {
+                    // there is no grade for the course - User course AVG set to -1000.
+                    userEvalsDto.UserCourseAvg = -1000;
+                    coursesWithEvals.Add(userEvalsDto);
+                }
+            }
+
+            return coursesWithEvals;
+        }
+
+        public double GetClassCourseEvalData(int courseId, int classId)
+        {
+            var ClassEvals = _context.UserEvaluations
+                .Include(e => e.Evaluation)
+                .OrderBy(o => o.Evaluation.EvalDate)
+                .Where(e => e.Evaluation.ClassId == classId && e.Evaluation.GradeInLetter == false &&
+                    e.Evaluation.CourseId == courseId && e.Evaluation.Graded == true &&
+                    e.Grade.IsNumeric())
+                .Distinct().ToList();
+
+            double gradesSum = 0;
+            double coeffSum = 0;
+            for(int i = 0; i < ClassEvals.Count(); i++)
+            {
+                var elt = ClassEvals[i];
+                double gradeMax = Convert.ToDouble(elt.Evaluation.MaxGrade);
+                double gradeValue = Convert.ToDouble(elt.Grade);
+                // grade are ajusted to 20 as MAx. Avg is on 20
+                double ajustedGrade = Math.Round(20 * gradeValue / gradeMax, 2);
+                double coeff = elt.Evaluation.Coeff;
+                gradesSum += ajustedGrade * coeff;
+                coeffSum += coeff;
+            }
+
+            return Math.Round(gradesSum / coeffSum, 2);
+        }
+
+        public async Task<List<AgendaForListDto>> GetUserClassAgenda(int classId, DateTime startDate, DateTime endDate)
+        {
+            List<Agenda> classAgenda = await _context.Agendas
+                    .Include(i => i.Course)
+                    .OrderBy(o => o.DueDate)
+                    .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= endDate)
+                    .ToListAsync();
+
+            var agendaDates = classAgenda.OrderBy(o => o.DueDate)
+                                .Select(a => a.DueDate).Distinct().ToList();
+
+            List<AgendaForListDto> AgendaList = new List<AgendaForListDto>();
+            foreach (var date in agendaDates)
+            {
+                AgendaForListDto afld = new AgendaForListDto();
+                afld.DueDate = date;
+
+                //CultureInfo frC = new CultureInfo("fr-FR");
+                var shortDueDate = date.ToString("ddd dd MMM");//, frC);
+                var longDueDate = date.ToString("dd MMMM yyyy");//, frC);
+
+                afld.ShortDueDate = shortDueDate;
+                afld.LongDueDate = longDueDate;
+
+                //get agenda tasks Done Status
+                afld.AgendaItems = new List<AgendaItemDto>();
+
+                var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();           
+                foreach (var item in agendaItems)
+                {
+                    AgendaItemDto aid = new AgendaItemDto();
+                    aid.CourseId = item.CourseId;
+                    aid.CourseName = item.Course.Name;
+                    aid.CourseAbbrev = item.Course.Abbreviation;
+                    aid.CourseColor = item.Course.Color;
+                    aid.strDateAdded = item.DateAdded.ToShortDateString();
+                    aid.TaskDesc = item.TaskDesc;
+                    aid.AgendaId = item.Id;
+                    aid.Done = item.Done;
+                    afld.AgendaItems.Add(aid);
+                }
+                afld.NbItems = agendaItems.Count();
+
+                AgendaList.Add(afld);
+            }
+
+            return AgendaList;
+        }
+
     }
 }

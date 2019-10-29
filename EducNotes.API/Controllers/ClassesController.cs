@@ -623,8 +623,6 @@ namespace EducNotes.API.Controllers
                 }
             }
 
-            CultureInfo frC = new CultureInfo("fr-FR");
-
             var classAgenda = new List<Agenda>();
             if (startDate < endDate)
             {
@@ -647,47 +645,56 @@ namespace EducNotes.API.Controllers
                 endDate = temp;
             }
 
-            var strStartDate = startDate.ToString("ddd dd MMM", frC);
-            var strEndDate = endDate.ToString("ddd dd MMM", frC);
+            //CultureInfo frC = new CultureInfo("fr-FR");
+            var strStartDate = startDate.ToString("ddd dd MMM");//, frC);
+            var strEndDate = endDate.ToString("ddd dd MMM");//, frC);
 
-            var agendaDates = classAgenda.OrderBy(o => o.DueDate)
-                                .Select(a => a.DueDate).Distinct().ToList();
+            List<AgendaForListDto> AgendaList = await _repo.GetUserClassAgenda(classId, startDate, endDate);
 
             List<bool> dones = new List<bool>();
-            List<AgendaForListDto> AgendaList = new List<AgendaForListDto>();
-            foreach (var date in agendaDates)
+            foreach (var al in AgendaList)
             {
-                AgendaForListDto afld = new AgendaForListDto();
-                afld.DueDate = date;
-
-                var shortDueDate = date.ToString("ddd dd MMM", frC);
-                var longDueDate = date.ToString("dd MMMM yyyy", frC);
-
-                afld.ShortDueDate = shortDueDate;
-                afld.LongDueDate = longDueDate;
-
-                //get agenda tasks Done Status
-                afld.AgendaItems = new List<AgendaItemDto>();
-
-                var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();
-                foreach (var item in agendaItems)
+                foreach (var item in al.AgendaItems)
                 {
-                    AgendaItemDto aid = new AgendaItemDto();
-                    aid.CourseId = item.CourseId;
-                    aid.CourseName = item.Course.Name;
-                    aid.CourseAbbrev = item.Course.Abbreviation;
-                    aid.CourseColor = item.Course.Color;
-                    aid.strDateAdded = item.DateAdded.ToShortDateString();
-                    aid.TaskDesc = item.TaskDesc;
-                    aid.AgendaId = item.Id;
-                    aid.Done = item.Done;
-                    afld.AgendaItems.Add(aid);
-                    dones.Add(aid.Done);
+                    dones.Add(item.Done);
                 }
-                afld.NbItems = agendaItems.Count();
-
-                AgendaList.Add(afld);
             }
+            // var agendaDates = classAgenda.OrderBy(o => o.DueDate)
+            //                     .Select(a => a.DueDate).Distinct().ToList();
+
+            // foreach (var date in agendaDates)
+            // {
+            //     AgendaForListDto afld = new AgendaForListDto();
+            //     afld.DueDate = date;
+
+            //     var shortDueDate = date.ToString("ddd dd MMM");//, frC);
+            //     var longDueDate = date.ToString("dd MMMM yyyy");//, frC);
+
+            //     afld.ShortDueDate = shortDueDate;
+            //     afld.LongDueDate = longDueDate;
+
+            //     //get agenda tasks Done Status
+            //     afld.AgendaItems = new List<AgendaItemDto>();
+
+            //     var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();           
+            //     foreach (var item in agendaItems)
+            //     {
+            //         AgendaItemDto aid = new AgendaItemDto();
+            //         aid.CourseId = item.CourseId;
+            //         aid.CourseName = item.Course.Name;
+            //         aid.CourseAbbrev = item.Course.Abbreviation;
+            //         aid.CourseColor = item.Course.Color;
+            //         aid.strDateAdded = item.DateAdded.ToShortDateString();
+            //         aid.TaskDesc = item.TaskDesc;
+            //         aid.AgendaId = item.Id;
+            //         aid.Done = item.Done;
+            //         afld.AgendaItems.Add(aid);
+            //         dones.Add(aid.Done);
+            //     }
+            //     afld.NbItems = agendaItems.Count();
+
+            //     AgendaList.Add(afld);
+            // }
 
             var courses = await _context.ClassCourses
                             .Where(c => c.ClassId == classId)

@@ -9,6 +9,6 @@ namespace EducNotes.API.Models
         public Course Course { get; set; }
         public int? ClassTypeId { get; set; }
         public ClassType ClassType { get; set; }
-        public int Coefficient { get; set; }
+        public double Coefficient { get; set; }
     }
 }
