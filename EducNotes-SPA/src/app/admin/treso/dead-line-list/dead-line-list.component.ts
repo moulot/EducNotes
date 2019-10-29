@@ -7,7 +7,7 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
   selector: 'app-dead-line-list',
   templateUrl: './dead-line-list.component.html',
   styleUrls: ['./dead-line-list.component.scss'],
-  animations :  [SharedAnimations]
+  animations: [SharedAnimations]
 })
 export class DeadLineListComponent implements OnInit {
   deadLines: DeadLine[];
@@ -15,9 +15,9 @@ export class DeadLineListComponent implements OnInit {
   constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
-      this.route.data.subscribe(data => {
-        this.deadLines = data.deadlines;
-       });
+    this.route.data.subscribe(data => {
+      this.deadLines = data.deadlines;
+    });
   }
 
 }

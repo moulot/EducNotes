@@ -15,7 +15,7 @@ import { Schedule } from '../_models/schedule';
 export class ClassService {
   baseUrl = environment.apiUrl;
 
-constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
   getClass(classId): Observable<Class> {
     return this.http.get<Class>(this.baseUrl + 'classes/' + classId);
@@ -39,7 +39,7 @@ constructor(private http: HttpClient) { }
     params = params.append('dueDate', agendaParams.dueDate);
     params = params.append('moveWeek', agendaParams.moveWeek);
 
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/MovedWeekAgenda', {params});
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/MovedWeekAgenda', { params });
   }
 
   getWeekDaysByDate(agendaParams): Observable<number[]> {
@@ -47,7 +47,7 @@ constructor(private http: HttpClient) { }
     let params = new HttpParams();
     params = params.append('dueDate', agendaParams.dueDate);
 
-    return this.http.get<number[]>(this.baseUrl + 'classes/GetWeekDays', {params});
+    return this.http.get<number[]>(this.baseUrl + 'classes/GetWeekDays', { params });
   }
 
   getSchedule(id) {
@@ -107,7 +107,7 @@ constructor(private http: HttpClient) { }
     params = params.append('courseId', agendaParams.courseId);
     params = params.append('dueDate', agendaParams.dueDate);
 
-    return this.http.get<Agenda>(this.baseUrl + 'classes/GetAgendaItem', {params});
+    return this.http.get<Agenda>(this.baseUrl + 'classes/GetAgendaItem', { params });
   }
 
   getClassAgenda(classId): Observable<Agenda[]> {
@@ -137,7 +137,7 @@ constructor(private http: HttpClient) { }
     params = params.append('nbDays', agendaParams.nbDays);
     params = params.append('isMovingPeriod', agendaParams.isMovingPeriod);
 
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/AgendaByDate', {params});
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/AgendaByDate', { params });
   }
 
   classAgendaSetDone(agendaId, isDone) {
@@ -147,16 +147,16 @@ constructor(private http: HttpClient) { }
   getAllClasses() {
     return this.http.get<any[]>(this.baseUrl + 'classes/GetAllClasses');
   }
-   // recuperer tous les professeurs ainsi que les cours qui leurs sont deja assignés
-   getAllTeachersCourses() {
+  // recuperer tous les professeurs ainsi que les cours qui leurs sont deja assignés
+  getAllTeachersCourses() {
     return this.http.get(this.baseUrl + 'classes/GetAllTeachersCourses');
-   }
+  }
 
-   getAllTeacherCoursesById(id: number) {
+  getAllTeacherCoursesById(id: number) {
     return this.http.get(this.baseUrl + 'classes/' + id + '/GetAllTeacherCoursesById');
-   }
+  }
 
-    // recuperation de tous les cours
+  // recuperation de tous les cours
   getAllCourses(): Observable<Course[]> {
     return this.http.get<Course[]>(this.baseUrl + 'classes/GetAllCourses');
   }
@@ -172,7 +172,7 @@ constructor(private http: HttpClient) { }
     return this.http.post(this.baseUrl + 'classes/' + id + '/UpdateTeacher', user);
   }
 
- ////////////////////////////////////////
+  ////////////////////////////////////////
   // tous les cours et leurs differents professeurs
   getCoursesTeachers() {
     return this.http.get(this.baseUrl + 'classes/GetCoursesTeachers');
@@ -208,11 +208,11 @@ constructor(private http: HttpClient) { }
   }
 
   updateCourse(courseId: number, courseName: string) {
-    return this.http.post(this.baseUrl + 'classes/' + courseId + '/UpdateCourse/' + courseName , {});
+    return this.http.post(this.baseUrl + 'classes/' + courseId + '/UpdateCourse/' + courseName, {});
   }
 
   addNewCourse(course: any) {
-    return this.http.post(this.baseUrl + 'classes/AddCourse' , course);
+    return this.http.post(this.baseUrl + 'classes/AddCourse', course);
   }
 
   courseExist(courseName) {
@@ -239,8 +239,8 @@ constructor(private http: HttpClient) { }
   //   return this.http.post(this.baseUrl + 'classes/' + courseId + '/UpdateCourse' + courseName, {}); updateCourse
   // }
 
-   teacherClassCoursByLevel(teacherId: number, levelid: number, courseId: number) {
-    return this.http.get(this.baseUrl + 'classes/TeacherClassCoursByLevel/  ' + teacherId + '/' + levelid + '/' + courseId );
+  teacherClassCoursByLevel(teacherId: number, levelid: number, courseId: number) {
+    return this.http.get(this.baseUrl + 'classes/TeacherClassCoursByLevel/  ' + teacherId + '/' + levelid + '/' + courseId);
   }
 
   getTeacher(id) {
@@ -256,6 +256,10 @@ constructor(private http: HttpClient) { }
   }
   getClasslevelsCoefficients(levelId: number) {
     return this.http.get(this.baseUrl + 'classes/ClassLevelCoefficients/' + levelId);
+  }
+
+  getCourseCoefficient(id: number) {
+    return this.http.get(this.baseUrl + 'classes/CourseCoefficient/' + id);
 
   }
 

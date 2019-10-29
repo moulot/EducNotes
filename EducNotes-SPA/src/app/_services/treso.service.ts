@@ -12,7 +12,7 @@ import { DeadLine } from '../_models/deadline';
 export class TresoService {
   baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getProductTypes() {
     return this.http.get(this.baseUrl + 'treso/GetProductTypes');
@@ -55,16 +55,16 @@ export class TresoService {
   }
 
   editDeadLine(deadLineId: number, deadLine) {
-   return  this.http.post(this.baseUrl + 'treso/EditDeadLine/' + deadLineId, deadLine);
+    return this.http.post(this.baseUrl + 'treso/EditDeadLine/' + deadLineId, deadLine);
   }
 
   editProduct(productId: number, product) {
-    return  this.http.post(this.baseUrl + 'treso/EditProduct/' + productId, product);
-   }
+    return this.http.post(this.baseUrl + 'treso/EditProduct/' + productId, product);
+  }
 
-   getClassLevelServices(levelId: number) {
+  getClassLevelServices(levelId: number) {
     return this.http.get(this.baseUrl + 'treso/GetLvlServices/' + levelId);
-   }
+  }
 
 
 }

@@ -3,17 +3,16 @@ import { Resolve, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { AlertifyService } from '../_services/alertify.service';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { DeadLine } from '../_models/deadline';
-import { TresoService } from '../_services/treso.service';
+import { ClassService } from '../_services/class.service';
 
 @Injectable()
-export class DeadLineFormResolver implements Resolve<DeadLine> {
+export class CoefficientFormResolver implements Resolve<any> {
 
-    constructor(private tresoService: TresoService, private router: Router,
+    constructor(private classServie: ClassService, private router: Router,
         private alertify: AlertifyService) { }
 
-    resolve(route: ActivatedRouteSnapshot): Observable<DeadLine> {
-        return this.tresoService.getDeadline(route.params['id']).pipe(
+    resolve(route: ActivatedRouteSnapshot): Observable<any> {
+        return this.classServie.getCourseCoefficient(route.params['id']).pipe(
             catchError(() => {
                 this.alertify.error('problème de récupération de données');
                 this.router.navigate(['/home']);
