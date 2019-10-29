@@ -1,6 +1,6 @@
 namespace EducNotes.API.Dtos
 {
-    public class CoefficientDto
+    public class CreateCoefficientDto
     {
         public int ClassLevelId { get; set; }
         public int COurseId { get; set; }

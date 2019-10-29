@@ -1167,7 +1167,7 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPost("CreateCourseCoefficient")]
-        public async Task<IActionResult> CreateCourseCoefficient(CoefficientDto coefficientToCreate)
+        public async Task<IActionResult> CreateCourseCoefficient(CreateCoefficientDto coefficientToCreate)
         {
             var coefficient = _mapper.Map<CourseCoefficient>(coefficientToCreate);
             _repo.Add(coefficient);
