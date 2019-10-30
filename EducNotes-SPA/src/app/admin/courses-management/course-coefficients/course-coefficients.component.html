@@ -33,6 +33,7 @@
 
 
               <div class="card col-md-9 mt-2 p-1 " *ngIf="coefficients.length>0">
+                <span><small>pour une modificiation cliquez directement sur la case du coéfficient</small> </span>
                 <table class="table table-condensed table-bordered table-responsive-md table-striped text-center">
                   <thead>
                     <tr>
@@ -50,7 +51,7 @@
                       <td><span *ngIf="!coef.classTypeId">N/A</span><span *ngIf="coef.classTypeId">{{coef.classType.name}}</span></td>
                       <td><span contenteditable="true" (keyup)="changeValue(i, 'coefficient', $event)" (blur)="updateList(i, 'coefficient', $event)">{{coef.coefficient}}</span></td>
                       <td>{{coef.course.name}}</td>
-                      <a type="button" [routerLink]="['/editCoeffcicient', coef.id]"  mdbBtn color="light" size="sm" mdbWavesEffect>modifier</a>
+                      <!-- <a type="button" [routerLink]="['/editCoeffcicient', coef.id]"  mdbBtn color="light" size="sm" mdbWavesEffect>modifier</a> -->
                     </tr>
                   </tbody>
                 </table>
