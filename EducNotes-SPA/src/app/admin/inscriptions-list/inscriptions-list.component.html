@@ -1,60 +1,62 @@
-  <form [formGroup]="searchForm" (ngSubmit)="searchStudents()">
-    <div class="row mb-2">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-3">
-                <nz-select #classSelect nzShowSearch nzPlaceHolder="choisissez le niveau" nzSize="large"
-                  formControlName="levelId" nzAllowClear>
-                  <nz-option *ngFor="let item of levels" nzLabel="{{item.name}}" nzValue="{{item.id}}"></nz-option>
-                </nz-select>
-              </div>
-              <div class="col-md-3">
-                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="entrer le nom" formControlName="lastName">
-              </div>
-              
-              <div class="col-md-3">
-                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="entrer le prénom" formControlName="firstName">
-              </div>
-             
-              <div class="col-md-3">
-                <div class="row">
-                  <div class="col-md-6">
-                    <button type="submit" [disabled]="!searchForm.valid" size="sm" mdbBtn color="light-blue" mdbWavesEffect
-                      class="btn btn-block">valider</button>
-                  </div>
-                  <div class="col-md-6">
-                    <button type="button" (click)="resetSessions()" size="sm" mdbBtn color="light" mdbWavesEffect
-                      class="btn btn-block">reset</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+<div class="card">
+  <div class="card-body m-0">
+    <form [formGroup]="searchForm" (ngSubmit)="searchStudents()" class="text-center" style="color: #757575;">
+      <div class="form-row m-0">
+        <div class="col">
+          <div class="md-form">
+            <mdb-select [options]="levels" style="width:100%" formControlName="levelId" placeholder="Choisir le niveau">
+            </mdb-select>
+          </div>
+        </div>
+        <div class="col">
+          <div class="md-form">
+            <input mdbInput type="text" id="lastName" class="form-control" formControlName="lastName" mdbValidate>
+            <label for="lastName" class="">Nom</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="md-form">
+            <input mdbInput type="text" id="firstName" class="form-control" formControlName="firstName" mdbValidate>
+            <label for="firstName" class="">Prénom(s)</label>
+          </div>
+        </div>
+        <div class="col">
+          <div class="md-form">
+            <button type="submit" [disabled]="!searchForm.valid" size="sm" mdbBtn color="light-blue" mdbWavesEffect
+              class="btn btn-block">valider</button>
+          </div>
+        </div>
+        <div>
+          <div class="md-form">
+            <button type="button" (click)="resetSessions()" size="sm" mdbBtn color="light" mdbWavesEffect
+              class="btn btn-block">annuler</button>
           </div>
         </div>
       </div>
-    </div>
- </form>
- <div *ngIf="showListDiv">
-    <div *ngIf="noResult">
-        <p class="card-title">{{noResult}}</p>
-    </div>
+    </form>
+
+  </div>
+</div>
+
+<div *ngIf="showListDiv">
+  <div *ngIf="noResult">
+    <p class="card-title">{{noResult}}</p>
+  </div>
 
   <div *ngIf="students.length > 0">
-      <div class="row mt-2 mb-2">
-          <div class="col-md-4">
-            <div class="form-group">
-              <input id="email" placeholder="rechercher élèves" [formControl]="searchControl" class="form-control">
-            </div>
-          </div>
+    <div class="row mt-2 mb-2">
+      <div class="col-md-4">
+        <div class="form-group">
+          <input id="email" placeholder="rechercher élèves" [formControl]="searchControl" class="form-control">
         </div>
-        
-        
-        <div class="row mt-2 mb-2">
-          <!-- GRID AND LIST BUTTONS -->
-          <div class="col-6">
-            <!-- <button class="btn btn-sm btn-outline-light btn-svg mr-2" [ngClass]="{active: viewMode === 'grid'}" (click)="viewMode = 'grid'">
+      </div>
+    </div>
+
+
+    <div class="row mt-2 mb-2">
+      <!-- GRID AND LIST BUTTONS -->
+      <div class="col-6">
+        <!-- <button class="btn btn-sm btn-outline-light btn-svg mr-2" [ngClass]="{active: viewMode === 'grid'}" (click)="viewMode = 'grid'">
               <svg version="1.1" width="16px" id="grid" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                 x="0px" y="0px" viewBox="0 0 369.946 369.946" style="enable-background:new 0 0 369.946 369.946;" xml:space="preserve">
                 <path d="M250.609,0h-11.934H131.271h-11.934H0v119.337v11.934v107.404v11.934v119.337h119.337h11.934
@@ -71,96 +73,99 @@
                 <path d="M0,97.92v24.48h612V97.92H0z M0,318.24h612v-24.48H0V318.24z M0,514.08h612V489.6H0V514.08z" />
               </svg>
             </button> -->
-            <nz-select #classSelect nzShowSearch nzPlaceHolder="choisissez la classe" nzSize="'default'" style="width: 250px"
-           id="id" class="" nzAllowClear [(ngModel)]="classId">
-            <nz-option *ngFor="let item of classes" nzLabel="{{item.name}} (dispo : {{item.maxStudent-item.totalStudent}})"
-              nzValue="{{item.id}}"></nz-option>
-          </nz-select>
-          <button type="button" (click)=" checkValid(modalConfirm)"  class="btn btn-sm btn-primary btn-outlet mb-1 ml-2" [disabled]="!classId">affecter</button>
+        <nz-select #classSelect nzShowSearch nzPlaceHolder="choisissez la classe" nzSize="'default'"
+          style="width: 250px" id="id" class="" nzAllowClear [(ngModel)]="classId">
+          <nz-option *ngFor="let item of classes"
+            nzLabel="{{item.name}} (dispo : {{item.maxStudent-item.totalStudent}})" nzValue="{{item.id}}"></nz-option>
+        </nz-select>
+        <button type="button" (click)=" checkValid(modalConfirm)" class="btn btn-sm btn-primary btn-outlet mb-1 ml-2"
+          [disabled]="!classId">affecter</button>
 
+
+      </div>
+      <div class="col-6">
+        <div class="btn-group float-right">
+          <button type="button" class="btn btn-outline-light btn-rounded btn-checkbox">
+            <label class="checkbox checkbox-outline-light">
+              <input type="checkbox" [(ngModel)]="allSelected" (change)="selectAll($event)">
+              <span></span>
+              <span class="checkmark"></span>
+            </label>
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA LIST -->
+    <div class="row m-4" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
+      <!-- SINGLE LIST ITEM -->
+      <div
+        *ngFor="let student of filteredStudents | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index"
+        class="list-item" [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-3': viewMode === 'grid'}"
+        [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+        <div class="card o-hidden mb-4 d-flex"
+          [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
+          <div class="list-thumb d-flex">
+            <img src="{{student.user.photoUrl || '../../assets/user.png'}}" class="p-0 m-0" alt="">
+
+            <!-- TUMBNAIL -->
 
           </div>
-          <div class="col-6">
-              <div class="btn-group float-right">
-                <button type="button" class="btn btn-outline-light btn-rounded btn-checkbox">
-                  <label class="checkbox checkbox-outline-light">
-                    <input type="checkbox" [(ngModel)]="allSelected" (change)="selectAll($event)">
-                    <span></span>
-                    <span class="checkmark"></span>
-                  </label>
-                </button>
-             
+          <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
+            <div class="card-body align-self-center d-flex flex-column justify-content-start align-items-lg-center"
+              [ngClass]="{'flex-lg-row': viewMode === 'list'}">
+              <!-- OTHER DATA -->
+              <div class="w-30 w-sm-75">
+                <div class="item-title">{{student.user.lastName}} {{student.user.firstName}}</div>
               </div>
-            </div>
-        </div>
-        
-        <!-- DATA LIST -->
-        <div class="row m-4" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
-        <!-- SINGLE LIST ITEM -->
-        <div *ngFor="let student of filteredStudents | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index" 
-          class="list-item"
-          [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-3': viewMode === 'grid'}"
-          [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}"
-        >
-          <div class="card o-hidden mb-4 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
-            <div class="list-thumb d-flex">
-                <img src="{{student.user.photoUrl || '../../assets/user.png'}}" class="p-0 m-0" alt="">
-          
-              <!-- TUMBNAIL -->
-             
-            </div>
-            <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
-              <div class="card-body align-self-center d-flex flex-column justify-content-start align-items-lg-center"
-                [ngClass]="{'flex-lg-row': viewMode === 'list'}">
-                <!-- OTHER DATA -->
-                <div class="w-30 w-sm-75">
-                  <div class="item-title">{{student.user.lastName}} {{student.user.firstName}}</div>
-                </div>
-                <div class="w-20 w-sm-50">
-                    <div class="item-title">email: {{student.user.email}}</div>
-                </div>
-                <div class="w-15 w-sm-75">
-                  <div class="item-title">tél 1: {{student.user.phoneNumber}}</div>
-                  <div class="item-title">tél 2: {{student.user.secondPhoneNumber}}</div>
-                </div>
-                <div class="w-20 pl-3 w-sm-75">
-                    <div class="item-title">{{student.user.dateOfBirth|date:'dd-MMMM-yyyy'}}</div>
+              <div class="w-20 w-sm-50">
+                <div class="item-title">email: {{student.user.email}}</div>
+              </div>
+              <div class="w-15 w-sm-75">
+                <div class="item-title">tél 1: {{student.user.phoneNumber}}</div>
+                <div class="item-title">tél 2: {{student.user.secondPhoneNumber}}</div>
+              </div>
+              <div class="w-20 pl-3 w-sm-75">
+                <div class="item-title">{{student.user.dateOfBirth|date:'dd-MMMM-yyyy'}}</div>
 
-                </div>
-                <div class="align-self-center pl-3 pb-2 pr-3 item-select">
-                    <label class="checkbox checkbox-outline-light">
-                      <input type="checkbox" [(ngModel)]="student.isSelected">
-                      <span></span>
-                      <span class="checkmark"></span>
-                    </label>
-                </div>
               </div>
-              
+              <div class="align-self-center pl-3 pb-2 pr-3 item-select">
+                <label class="checkbox checkbox-outline-light">
+                  <input type="checkbox" [(ngModel)]="student.isSelected">
+                  <span></span>
+                  <span class="checkmark"></span>
+                </label>
+              </div>
             </div>
+
           </div>
         </div>
-        <!-- PAGINATION CONTROL -->
-        <div class="col-md-12 mt-3" *ngIf="students?.length">
-          <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
-        </div>
-     </div>
+      </div>
+      <!-- PAGINATION CONTROL -->
+      <div class="col-md-12 mt-3" *ngIf="students?.length">
+        <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
+      </div>
+    </div>
   </div>
 
- </div>
+</div>
 
- <ng-template #modalConfirm let-modal>
+<ng-template #modalConfirm let-modal>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-title">Confirmation affectation</h4>
-    <button type="button" class="close" aria-label="Close button" aria-describedby="modal-title" (click)="modal.dismiss('Cross click')">
+    <button type="button" class="close" aria-label="Close button" aria-describedby="modal-title"
+      (click)="modal.dismiss('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body">
-    <p>Voulez-vous vraiment affecter {{selectedIds.length}}  élève(s) en <strong>{{this.className}}?</strong></p>
-    
+    <p>Voulez-vous vraiment affecter {{selectedIds.length}} élève(s) en <strong>{{this.className}}?</strong></p>
+
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-secondary btn-rounded" (click)="modal.dismiss('cancel')">annuler</button>
+    <button type="button" class="btn btn-outline-secondary btn-rounded"
+      (click)="modal.dismiss('cancel')">annuler</button>
     <button type="button" ngbAutofocus class="btn btn-danger btn-rounded" (click)="modal.close('Ok')">valider</button>
   </div>
 </ng-template>

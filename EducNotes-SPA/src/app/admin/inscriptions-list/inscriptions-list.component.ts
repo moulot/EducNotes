@@ -20,9 +20,9 @@ export class InscriptionsListComponent implements OnInit {
 
   constructor(private adminService: AdminService, private alertify: AlertifyService,
     private modalService: NgbModal, private fb: FormBuilder, private classService: ClassService,
-     private toastr: ToastrService) { }
+    private toastr: ToastrService) { }
 
-  levels: any;
+  levels: any[] = [];
   searchForm: FormGroup;
   searchControl: FormControl = new FormControl();
   showListDiv = false;
@@ -42,16 +42,19 @@ export class InscriptionsListComponent implements OnInit {
   className = '';
 
   ngOnInit() {
-   this.getLevels();
-   this.createSearchForm();
-   this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
-    this.filerData(value);
-  });
+    this.getLevels();
+    this.createSearchForm();
+    this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
+      this.filerData(value);
+    });
   }
 
   getLevels() {
-    this.classService.getLevels().subscribe(res => {
-      this.levels = res;
+    this.classService.getLevels().subscribe((res: any[]) => {
+      for (let i = 0; i < res.length; i++) {
+        const element = {value: res[i].id, label:  res[i].name};
+        this.levels = [...this.levels, element];
+      }
     }, error => {
       console.log(error);
     });
@@ -67,10 +70,10 @@ export class InscriptionsListComponent implements OnInit {
   checkValid(content) {
     this.selectedIds = [];
     for (let index = 0; index < this.filteredStudents.length; index++) {
-      if ( this.filteredStudents[index].isSelected) {
-           // this.classIds = [...this.classIds, teachercourses.classes[index].classId];
-           const  s = { id : Number(this.filteredStudents[index].id), userId :  Number(this.filteredStudents[index].userId)};
-            this.selectedIds = [...this.selectedIds, s];
+      if (this.filteredStudents[index].isSelected) {
+        // this.classIds = [...this.classIds, teachercourses.classes[index].classId];
+        const s = { id: Number(this.filteredStudents[index].id), userId: Number(this.filteredStudents[index].userId) };
+        this.selectedIds = [...this.selectedIds, s];
       }
     }
 
@@ -84,20 +87,20 @@ export class InscriptionsListComponent implements OnInit {
 
       const diff = (room.maxStudent - room.totalStudent);
 
-      if ( diff < this.selectedIds.length) {
+      if (diff < this.selectedIds.length) {
         this.toastr.error('il reste seulement ' + diff + 'place(s) disponible(s) pour cette classe');
       } else {
         this.modalService.open(content, { ariaLabelledBy: 'confirmation', centered: true })
           .result.then((result) => {
-          this.confirmResut = `Closed with: ${result}`;
-          // this.toastr.info('validez', 'Erreur de saisie', { timeOut: 3000 });
-          this.studentAffectation();
-        }, (reason) => {
+            this.confirmResut = `Closed with: ${result}`;
+            // this.toastr.info('validez', 'Erreur de saisie', { timeOut: 3000 });
+            this.studentAffectation();
+          }, (reason) => {
 
-          this.confirmResut = `Dismissed with: ${reason}`;
-          this.toastr.info('annuler', 'Erreur de saisie', { timeOut: 3000 });
+            this.confirmResut = `Dismissed with: ${reason}`;
+            this.toastr.info('annuler', 'Erreur de saisie', { timeOut: 3000 });
 
-        });
+          });
       }
 
     }
@@ -105,7 +108,7 @@ export class InscriptionsListComponent implements OnInit {
   }
 
   studentAffectation() {
-    this.adminService.studentAffectation(this.classId, this.selectedIds).subscribe( () => {
+    this.adminService.studentAffectation(this.classId, this.selectedIds).subscribe(() => {
       this.searchStudents();
       this.alertify.success('enegistrement terminé...');
       this.classId = null;
@@ -147,7 +150,7 @@ export class InscriptionsListComponent implements OnInit {
     this.searchParams.lastName = this.searchForm.value.lastName;
     this.searchParams.firstName = this.searchForm.value.firstName;
 
-    this.adminService.searchIncription(this.searchParams).subscribe((res: any[])  => {
+    this.adminService.searchIncription(this.searchParams).subscribe((res: any[]) => {
       if (res.length > 0) {
         this.students = res;
         this.filteredStudents = res;
@@ -158,8 +161,8 @@ export class InscriptionsListComponent implements OnInit {
       } else {
         this.noResult = 'Aucun élève trouvé...';
       }
-    this.submitText = 'valider';
-    this.showListDiv = true;
+      this.submitText = 'valider';
+      this.showListDiv = true;
 
     }, error => {
       this.alertify.error(error);
@@ -180,7 +183,7 @@ export class InscriptionsListComponent implements OnInit {
       return;
     }
 
-    const rows = this.students.filter(function(d) {
+    const rows = this.students.filter(function (d) {
       for (let i = 0; i <= columns.length; i++) {
         const column = columns[i];
         if (d[column] && d[column].toString().toLowerCase().indexOf(val) > -1) {
