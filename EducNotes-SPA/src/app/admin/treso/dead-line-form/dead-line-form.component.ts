@@ -77,7 +77,7 @@ export class DeadLineFormComponent implements OnInit {
   editDeadline() {
     const dataToSave =  Object.assign({}, this.deadLineForm.value);
     // const val = this.datePipe.transform(dataToSave, 'dd/MM/yyyy');
-    dataToSave.duedate = Utils.inputDateDDMMYY(dataToSave.dueDate, '/');
+   // dataToSave.duedate = Utils.inputDateDDMMYY(dataToSave.dueDate, '/');
     this.tresoService.editDeadLine(this.formModel.id, dataToSave).subscribe(() => {
       this.alertify.success('modification  éffectuée..');
       this.router.navigate(['/deadLines']);

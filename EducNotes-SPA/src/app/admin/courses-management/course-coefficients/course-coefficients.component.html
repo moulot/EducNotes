@@ -29,10 +29,10 @@
 
             <!-- affichage des resultas -->
             <div *ngIf="show">
-              <div *ngIf="!coefficients">aucun service trouvé...</div>
+              <div *ngIf="coefficients.length===0">aucune information trouvée pour ce niveau...</div>
 
 
-              <div class="card col-md-9 mt-2 p-1">
+              <div class="card col-md-9 mt-2 p-1 " *ngIf="coefficients.length>0">
                 <table class="table table-condensed table-bordered table-responsive-md table-striped text-center">
                   <thead>
                     <tr>

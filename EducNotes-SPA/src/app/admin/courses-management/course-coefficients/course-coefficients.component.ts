@@ -32,6 +32,7 @@ editField: string;
 
   getLevelCoefficients() {
     this.show = false;
+    this.coefficients = [];
     this.classService.getClasslevelsCoefficients(this.levelId).subscribe((res) => {
       this.coefficients = res;
       this.show = true;
