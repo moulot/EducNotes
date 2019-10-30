@@ -15,6 +15,7 @@ levels: any = [];
 coefficients;
 levelId: number;
 show = false;
+editField: string;
   constructor(private classService: ClassService, private alertify: AlertifyService) { }
 
   ngOnInit() {
@@ -37,6 +38,39 @@ show = false;
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  updateList(id: number, property: string, event: any) {
+    const editField = event.target.textContent;
+    this.coefficients[id][property] = editField;
+  }
+
+  remove(id: any) {
+    // this.awaitingPersonList.push(this.personList[id]);
+    // this.personList.splice(id, 1);
+  }
+
+  add() {
+    // if (this.awaitingPersonList.length > 0) {
+    //   const person = this.awaitingPersonList[0];
+    //   this.personList.push(person);
+    //   this.awaitingPersonList.splice(0, 1);
+    // }
+  }
+
+  changeValue(id: number, property: string, event: any) {
+    // console.log('id du coefficient: ' + id);
+    // debugger;
+    const elementId = this.coefficients[id].id;
+    this.editField = event.target.textContent;
+    // mise a jour de la ligne
+    if (this.editField && elementId) {
+      this.classService.updateCourseCoefficient(elementId, Number(this.editField)).subscribe(() => {
+        this.alertify.success('modificiation terminéé');
+      }, error => {
+        this.alertify.error(error);
+      });
+    }
   }
 
 }

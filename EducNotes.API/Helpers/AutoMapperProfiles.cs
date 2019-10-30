@@ -160,6 +160,11 @@ namespace EducNotes.API.Helpers {
                 .ForMember (dest => dest.ClassTypeName, opt => {
                     opt.MapFrom (src => src.ClassType.Name);
                 });
+
+                CreateMap<DeadLine, DealLineDetailsDto> ()
+                .ForMember (dest => dest.DueDate, opt => {
+                    opt.MapFrom (src => src.DueDate.ToShortDateString());
+                });
         
         }
     }

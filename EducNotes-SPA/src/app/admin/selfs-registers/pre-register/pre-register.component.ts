@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from 'src/app/_services/admin.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { environment } from 'src/environments/environment';
 import { ClassService } from 'src/app/_services/class.service';
-import { User } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
@@ -15,64 +14,82 @@ import { AuthService } from 'src/app/_services/auth.service';
   animations: [SharedAnimations]
 })
 export class PreRegisterComponent implements OnInit {
-user: any;
-userTypes: any[] = [];
-courses;
-registerForm: FormGroup;
-showNumber = false;
-showCourses = false;
-submitText = 'enregistrer';
-parentTypeId = Number(environment.parentTypeId);
-teacherTypeId = Number(environment.teacherTypeId);
+  user: any;
+  userTypes: any[] = [];
+  totalChild: any[] = [];
+  courses: any[] = [];
+  registerForm: FormGroup;
+  showNumber = false;
+  showCourses = false;
+  submitText = 'enregistrer';
+  parentTypeId: number;
+  teacherTypeId: number;
 
   constructor(private adminService: AdminService, private alertify: AlertifyService,
     private authService: AuthService, private classService: ClassService, private fb: FormBuilder) { }
 
   ngOnInit() {
+    this.parentTypeId = environment.parentTypeId;
+    this.teacherTypeId = environment.teacherTypeId;
+
+    for (let i = 1; i <= 6; i++) {
+      const element = { value: i, label: i };
+      this.totalChild = [...this.totalChild, element];
+    }
     this.getUserTypes();
-    this.createRegisterForm();
     this.getCourses();
+    this.createRegisterForm();
   }
 
   getUserTypes() {
     this.adminService.getUserTypes().subscribe((res: any[]) => {
       for (let i = 0; i < res.length; i++) {
-        const id = Number(res[i].id);
-        if (id === this.teacherTypeId  || id === this.parentTypeId) {
-          this.userTypes = [...this.userTypes, res[i]];
+        const element = { value: res[i].id, label: res[i].name };
+        if (Number(element.value) === this.teacherTypeId || Number(element.value) === this.parentTypeId) {
+          this.userTypes = [...this.userTypes, element];
         }
       }
     });
   }
 
   getCourses() {
-   this.classService.getAllCourses().subscribe((res) => {
-        this.courses = res;
-      });
-    }
+    this.classService.getAllCourses().subscribe((res: any[]) => {
+      for (let i = 0; i < res.length; i++) {
+        const element = { value: res[i].id, label: res[i].name };
+        this.courses = [...this.courses, element];
+      }
+    });
+  }
 
   createRegisterForm() {
     this.registerForm = this.fb.group({
       userTypeId: [null, Validators.required],
       courseIds: [null],
       email: ['', [Validators.required, Validators.email]],
-       totalChild: [null]});
+      totalChild: [null]
+    }, { validator: this.formValidator });
   }
+
+  formValidator(g: FormGroup) {
+    const ctrl = g.controls['userTypeId'];
+    if (ctrl.valid) {
+      if (Number(ctrl.value) === environment.teacherTypeId && !g.get('courseIds').value) {
+        return { 'formNOK': true };
+      } else if (Number(ctrl.value) === environment.parentTypeId && !g.get('totalChild').value) {
+        return { 'formNOK': true };
+      } else {
+        return false;
+
+      }
+    }
+    return { 'formNOK': true };
+  }
+
 
   submit() {
     this.submitText = 'patienter...';
     this.user = Object.assign({}, this.registerForm.value);
     this.save();
-    // this.adminService.emailExist(this.user.email).subscribe((res: boolean) => {
-    //   if (res === true) {
-    //     this.alertify.error('l\'email ' + this.user.email + ' est déja utlilisé ');
-    //     this.submitText = 'enregistrer';
-
-    //   } else {
-    //       this.save();
-    //     }
-    // });
-
   }
   cancel() {
     this.registerForm.reset();
