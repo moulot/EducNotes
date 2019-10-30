@@ -67,7 +67,7 @@ editField: string;
     // mise a jour de la ligne
     if (this.editField && elementId) {
       this.classService.updateCourseCoefficient(elementId, Number(this.editField)).subscribe(() => {
-        this.alertify.success('modificiation terminéé');
+        this.alertify.success('modificiation terminée');
       }, error => {
         console.log(error);
       });
