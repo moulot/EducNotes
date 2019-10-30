@@ -116,7 +116,7 @@ namespace EducNotes.API.Data
             return await _context.Users
                             .Include(i => i.Photos)
                             .Include(i => i.Class)
-                            .Where(u => userIds.Contains(u.Id)).ToListAsync();
+                            .Where(u => userIds.Contains(u.Id) && u.ValidatedCode == true).ToListAsync();
         }
 
         public async Task<PagedList<User>> GetUsers(UserParams userParams)
@@ -943,9 +943,11 @@ namespace EducNotes.API.Data
                 //CultureInfo frC = new CultureInfo("fr-FR");
                 var shortDueDate = date.ToString("ddd dd MMM");//, frC);
                 var longDueDate = date.ToString("dd MMMM yyyy");//, frC);
+                var dueDateAbbrev = date.ToString("ddd dd").Replace(".", "");
 
                 afld.ShortDueDate = shortDueDate;
                 afld.LongDueDate = longDueDate;
+                afld.DueDateAbbrev = dueDateAbbrev;
 
                 //get agenda tasks Done Status
                 afld.AgendaItems = new List<AgendaItemDto>();

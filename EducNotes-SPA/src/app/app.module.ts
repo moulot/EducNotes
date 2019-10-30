@@ -185,6 +185,7 @@ import { CourseCoefficientsComponent } from './admin/courses-management/course-c
 import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
 import { CoefficientFormResolver } from './_resolvers/coeffiient-form-form-resolver';
 import { TimelineComponent } from './views/dashboard/timeline/timeline.component';
+import { StudentDashboard1Component } from './views/dashboard/student-dashboard1/student-dashboard1.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -308,7 +309,8 @@ export function tokenGetter() {
       ClassTeachersComponent,
       CourseCoefficientsComponent,
       CoefficientFormComponent,
-      TimelineComponent
+      TimelineComponent,
+      StudentDashboard1Component
    ],
    imports: [
       FormWizardModule,

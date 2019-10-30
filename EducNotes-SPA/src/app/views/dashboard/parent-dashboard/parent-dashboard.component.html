@@ -14,7 +14,7 @@
           >
             <div *ngIf="child.validatedCode">
               <a [routerLink]="['/studentFromP', child.id]"> 
-                <div class="card o-hidden mb-2 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
+                <div class="card mb-2 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
                 <div class="img-box d-flex">
                   <!-- TUMBNAIL -->
                   <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="">
@@ -25,11 +25,17 @@
                     <p href="" class="m-0 lead text-capitalize w-100 w-sm-100"><b>{{child.lastName}} {{child.firstName}} - {{child.className}}</b></p>
                     <!-- <div><a href="" class="text-15">classe </a></div> -->
                     <div class="data-line w-100 w-sm-100">
-                      <a href="" class=" text-15">moyenne : {{child.avg}}/20</a>
+                      <a class=" text-15">moyenne : {{child.avg}}/20</a>
                     </div>
                     <div class="data-line w-100 w-sm-100">
                       <label class="text-muted text-15 mb-0 mr-1">devoirs maison : </label>
-                      <a class=" text-15 mr-2" href="">mer</a>
+                      <span *ngFor="let item of child.agendaItems">
+                        <ng-template #hoverItems>
+                          <p *ngFor="let ai of item.agendaItems; let i = index" class="text-13 m-0"><b>{{i+1}}. {{ai.courseName}}</b>. {{ai.taskDesc}}</p>
+                        </ng-template>
+                        <a [mdbPopover]="hoverItems" placement="top" triggers="hover"
+                          class=" text-15 mr-3">{{item.dueDateAbbrev}}</a>
+                      </span>
                     </div>
                     <div class="w-100 w-sm-100 mb-0">
                       <label class=" text-muted text-15 mr-1">absences : </label>
@@ -43,7 +49,7 @@
                   ddddddddddddddddddddddddd
                 </div> -->
                 </div>
-              </a>  
+              </a>
             </div>
           </div>
           <!-- PAGINATION CONTROL -->
