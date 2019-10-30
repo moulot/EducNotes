@@ -1,14 +1,12 @@
-<form nz-form [formGroup]="lvlProdForm" (ngSubmit)="save()">
+<form  [formGroup]="lvlProdForm" (ngSubmit)="save()">
     <div  class="row">
         <mdb-select [options]="levels" formControlName="classLevelIds" [multiple]="true" [highlightFirst]="true" placeholder="Choisir les niveaux"></mdb-select>
-        <label>Niveau</label>
     </div>
     <div  class="row mt-3">
         <mdb-select [options]="services"  formControlName="productId" placeholder="Choisir le serice"></mdb-select>
     </div>
     <div class="md-form mt-3">
         <input mdbInput type="number" id="name" class="form-control" formControlName="amount">
-        <label for="name" class="">Montant</label>
     </div>
     
     <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!lvlProdForm.valid" mdbWavesEffect>enregistrer</button>

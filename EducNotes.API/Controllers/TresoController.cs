@@ -46,7 +46,8 @@ namespace EducNotes.API.Controllers {
     public async Task<IActionResult> GetDeadLine (int deadLineId) {
       var deadLine = await _context.DeadLines.FirstOrDefaultAsync (p => p.Id == deadLineId);
       deadLine.DueDate = deadLine.DueDate.Date;
-      return Ok (deadLine);
+            var res = _mapper.Map<DealLineDetailsDto>(deadLine);
+      return Ok (res);
     }
 
     [HttpGet ("GetProduct/{productId}")]
@@ -125,7 +126,7 @@ namespace EducNotes.API.Controllers {
         dl.Name = dtToCreate.Name;
         dl.Comment = dtToCreate.Comment;
         dl.DueDate = DateTime.ParseExact(dtToCreate.DueDate, "dd/MM/yyyy",frC);
-        dl.Amount = dtToCreate.Percentage;
+        dl.Amount = dtToCreate.Amount;
         _repo.Update (dl);
         if (await _repo.SaveAll ())
           return Ok ();
@@ -149,6 +150,8 @@ namespace EducNotes.API.Controllers {
       }
       return NotFound ();
     }
+
+  
 
   }
 }

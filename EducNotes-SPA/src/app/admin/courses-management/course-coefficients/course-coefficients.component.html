@@ -29,11 +29,12 @@
 
             <!-- affichage des resultas -->
             <div *ngIf="show">
-              <div *ngIf="!coefficients">aucun service trouvé...</div>
+              <div *ngIf="coefficients.length===0">aucune information trouvée pour ce niveau...</div>
 
 
-              <div class="card col-md-9 mt-2 p-1">
-                <table class="table table-striped table-condensed">
+              <div class="col-md-9 mt-2 p-1 " *ngIf="coefficients.length>0">
+                <span><small>pour une modificiation cliquez directement sur la case du coéfficient</small> </span>
+                <table mdbTable class="z-depth-1">
                   <thead>
                     <tr>
                       <th scope="col">#</th>
@@ -48,9 +49,9 @@
                       <th scope="row">{{i+1}}</th>
                       <td>{{coef.course.name}}</td>
                       <td><span *ngIf="!coef.classTypeId">N/A</span><span *ngIf="coef.classTypeId">{{coef.classType.name}}</span></td>
-                      <td>{{coef.coefficient}}</td>
+                      <td><span contenteditable="true" (keyup)="changeValue(i, 'coefficient', $event)" (blur)="updateList(i, 'coefficient', $event)">{{coef.coefficient}}</span></td>
                       <td>{{coef.course.name}}</td>
-                      <a type="button" [routerLink]="['/editCoeffcicient', coef.id]" routerLinkActive="router-link-active"  mdbBtn color="light" size="sm" mdbWavesEffect>modifier</a>
+                      <!-- <a type="button" [routerLink]="['/editCoeffcicient', coef.id]"  mdbBtn color="light" size="sm" mdbWavesEffect>modifier</a> -->
                     </tr>
                   </tbody>
                 </table>

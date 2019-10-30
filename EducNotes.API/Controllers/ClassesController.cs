@@ -1007,7 +1007,7 @@ namespace EducNotes.API.Controllers {
         }
 
         [HttpPost ("CreateCourseCoefficient")]
-        public async Task<IActionResult> CreateCourseCoefficient (CoefficientDto coefficientToCreate) {
+        public async Task<IActionResult> CreateCourseCoefficient (CreateCoefficientDto coefficientToCreate) {
             var coefficient = _mapper.Map<CourseCoefficient> (coefficientToCreate);
             _repo.Add (coefficient);
             if (await _repo.SaveAll ())
@@ -1029,6 +1029,19 @@ namespace EducNotes.API.Controllers {
         public async Task<IActionResult> CourseCoefficient (int id) {
             var courseCoef = await _context.CourseCoefficients.FirstOrDefaultAsync (a => a.Id == id);
             return Ok (courseCoef);
+        }
+
+        [HttpPost ("EditCoefficient/{id}/{coeffificient}")]
+        public async Task<IActionResult> EditCoefficient (int id, int coeffificient) {
+            var coef = await _context.CourseCoefficients.FirstOrDefaultAsync (i => i.Id == id);
+            if (coef != null) {
+                coef.Coefficient = coeffificient;
+                if (await _repo.SaveAll ())
+                    return Ok ();
+
+                return BadRequest ("impossible de faire la mise à jour");
+            }
+            return NotFound ();
         }
 
         //[HttpGet("")]

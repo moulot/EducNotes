@@ -1,6 +1,6 @@
 <div class="d-flex">
     <div class="" routerLinkActive="active">
-      <a class="text-15 text-muted mr-3" [routerLink]="['/home']">accueil</a>
+      <a class="text-15 text-muted mr-3" [routerLink]="['/home']" routerLinkActive="active">accueil</a>
     </div>
     <div class="" ngbDropdown role="group" aria-label="Select all" placement="bottom-left">
       <a class="dropdown-toggle text-15 text-muted mr-3 dd" ngbDropdownToggle>inscriptions</a>
@@ -23,8 +23,8 @@
     <div class="" ngbDropdown role="group" aria-label="Select all" placement="bottom-left">
       <a class="dropdown-toggle text-15 text-muted mr-3 dd" ngbDropdownToggle>cours</a>
       <div class="dropdown-menu" ngbDropdownMenu>
-        <button [routerLink]="['/courses']" class="dropdown-item">liste des coures</button>
-        <button [routerLink]="['/coefficients']" class="dropdown-item">Coéfficients cours</button>
+        <a [routerLink]="['/courses']" class="dropdown-item link" routerLinkActive="active">liste des coures</a>
+        <a [routerLink]="['/coefficients']" class="dropdown-item" routerLinkActive="active">Coéfficients cours</a>
       </div>
     </div>
 

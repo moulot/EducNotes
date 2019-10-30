@@ -260,7 +260,10 @@ export class ClassService {
 
   getCourseCoefficient(id: number) {
     return this.http.get(this.baseUrl + 'classes/CourseCoefficient/' + id);
+  }
 
+  updateCourseCoefficient(id: number, coeffficient: number) {
+    return this.http.post(this.baseUrl + 'classes/EditCoefficient/' + id + '/' + coeffficient, {});
   }
 
 }

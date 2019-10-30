@@ -5,6 +5,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { Utils } from 'src/app/shared/utils';
+import { DatePipe } from '@angular/common';
 
 
 
@@ -41,14 +42,14 @@ export class DeadLineFormComponent implements OnInit {
       name: '',
       comment: '',
       dueDate: null,
-      percentage: null,
+      amount: null,
     };
   }
 
   createDeadLineForm() {
     this.deadLineForm = this.fb.group({
       name: [this.formModel.name, Validators.required],
-      percentage: [this.formModel.percentage, Validators.required],
+      amount: [this.formModel.amount, Validators.required],
       comment: [this.formModel.comment],
       dueDate: [this.formModel.dueDate, Validators.required]
     });
@@ -75,7 +76,8 @@ export class DeadLineFormComponent implements OnInit {
 
   editDeadline() {
     const dataToSave =  Object.assign({}, this.deadLineForm.value);
-    dataToSave.duedate = Utils.inputDateDDMMYY(dataToSave.dueDate, '/');
+    // const val = this.datePipe.transform(dataToSave, 'dd/MM/yyyy');
+   // dataToSave.duedate = Utils.inputDateDDMMYY(dataToSave.dueDate, '/');
     this.tresoService.editDeadLine(this.formModel.id, dataToSave).subscribe(() => {
       this.alertify.success('modification  éffectuée..');
       this.router.navigate(['/deadLines']);

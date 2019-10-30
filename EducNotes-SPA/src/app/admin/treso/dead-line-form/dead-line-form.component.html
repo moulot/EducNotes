@@ -1,30 +1,34 @@
-<div class="row justify-content-center align-items-center mt-3"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
- 
-    <div class="col-md-8" >
+<div class="row justify-content-center align-items-center mt-3"
+    [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+
+    <div class="col-md-8">
         <div class="card p-3">
-                <form nz-form [formGroup]="deadLineForm" (ngSubmit)="save()">
-                        <div class="md-form">
-                            <input mdbInput type="text" id="name" class="form-control" formControlName="name">
-                            <label for="name" class="">Nom</label>
-                        </div>
-                        <div class="md-form">
-                            <textarea type="text" formControlName="comment" id="comment" class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
-                            <label for="comment">Commentaire</label>
-                        </div>
-                    
-                        <div class="md-form">
-                            <input mdbInput type="number"  id="percentage" class="form-control" formControlName="percentage">
-                            <label for="percentage" class="">Pourcenatage a versé </label>
-                        </div>
-                    
-                        <div class="md-form">
-                            <mdb-date-picker name="mydate"  [options]="myDatePickerOptions" [placeholder]="'Date limite'"  formControlName="dueDate"></mdb-date-picker>  
-                        </div>
-                        
-                        <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!deadLineForm.valid" mdbWavesEffect>enregistrer</button>
-                        <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect [routerLink]="['/deadLines']" >annuler</button>
-                    </form>
+            <form nz-form [formGroup]="deadLineForm" (ngSubmit)="save()">
+                <div class="md-form">
+                    <input mdbInput type="text" id="name" class="form-control" formControlName="name">
+                    <label for="name" class="">Nom</label>
+                </div>
+                <div class="md-form">
+                    <textarea type="text" formControlName="comment" id="comment"
+                        class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
+                    <label for="comment">Commentaire</label>
+                </div>
+
+                <div class="md-form">
+                    <input mdbInput type="number" id="percentage" class="form-control" formControlName="amount">
+                    <label for="percentage" class="">Montant à verser</label>
+                </div>
+
+                <div class="md-form">
+                    <mdb-date-picker name="mydate" [options]="myDatePickerOptions" [placeholder]="'Date limite'"
+                        formControlName="dueDate"></mdb-date-picker>
+                </div>
+
+                <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!deadLineForm.valid"
+                    mdbWavesEffect>enregistrer</button>
+                <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
+                    [routerLink]="['/deadLines']">annuler</button>
+            </form>
         </div>
     </div>
 </div>
-
