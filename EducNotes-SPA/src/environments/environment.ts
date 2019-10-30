@@ -10,7 +10,8 @@ export const environment = {
   parentTypeId: 3,
   adminTypeId: 4,
   callSheetAbsence: 3,
-  schoolServiceId: 1
+  schoolServiceId: 1,
+  maxChildNumber: 6
 };
 
 /*

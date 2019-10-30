@@ -32,7 +32,7 @@ export class PreRegisterComponent implements OnInit {
     this.parentTypeId = environment.parentTypeId;
     this.teacherTypeId = environment.teacherTypeId;
 
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= environment.maxChildNumber; i++) {
       const element = { value: i, label: i };
       this.totalChild = [...this.totalChild, element];
     }
