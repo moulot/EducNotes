@@ -1,22 +1,25 @@
 <div class="row m-0">
 
   <div *ngIf="isParentConnected" class="col-md-12 mb-2">
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-md-3">
         <div class="" style="border-right: 1px solid #cccccc;">
           <div class="chip m-0">
-            <img src="{{student.photoUrl || '../../../../../../assets/user.png" alt="Contact Person">
+            <img src="{{student?.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
             <span class="text-15">{{student?.firstName}} {{student?.lastName}} ({{student?.className}})</span>
           </div>
         </div>
       </div>
       <div class="col-md-9">
-        <div *ngFor="let item of unSelectedUsers" class="chip m-0 mr-2">
-          <img src="{{student.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">{{item?.firstName}}
-          {{item?.lastName}} ({{item.className}})
-        </div>
+        <a *ngFor="let item of unSelectedUsers" (click)="selectChild(item.id)">
+          <div class="chip m-0 mr-2">
+            <img src="{{item.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">{{item?.firstName}}
+            {{item?.lastName}} ({{item.className}})
+          </div>
+        </a>
       </div>
-    </div>
+    </div> -->
+    <app-users-header [student]="student" (getUser)="getUser(student.id)"></app-users-header>
   </div>
 
   <div class="col-lg-9 col-md-12">

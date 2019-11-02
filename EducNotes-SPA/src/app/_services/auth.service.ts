@@ -22,17 +22,24 @@ export class AuthService {
   jwtHelper = new JwtHelperService();
   decodedToken: any;
   currentUser: User;
-  newUser: User;
+  newUser = <User>{};
   currentPeriod: Period;
 
   photoUrl = new BehaviorSubject<string>('../../assets/user.png');
   currentPhotoUrl = this.photoUrl.asObservable();
+
+  child = new BehaviorSubject<User>(this.newUser);
+  currentChild = this.child.asObservable();
 
   constructor(private http: HttpClient, private alertify: AlertifyService,
     private router: Router) { }
 
   changeMemberPhoto(photoUrl: string) {
     this.photoUrl.next(photoUrl);
+  }
+
+  changeCurrentChild(child: User) {
+    this.child.next(child);
   }
 
   login(model: any) {
@@ -44,9 +51,11 @@ export class AuthService {
             localStorage.setItem('token', user.token);
             localStorage.setItem('user', JSON.stringify(user.user));
             localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
+            localStorage.setItem('currentChild', JSON.stringify(this.newUser));
             this.decodedToken = this.jwtHelper.decodeToken(user.token);
             this.currentUser = user.user;
             this.currentPeriod = user.currentPeriod;
+            this.changeCurrentChild(this.newUser);
             this.changeMemberPhoto(this.currentUser.photoUrl);
           }
         })
@@ -57,11 +66,13 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('currentPeriod');
+    localStorage.removeItem('currentChild');
     this.decodedToken = null;
     this.currentUser = null;
     this.currentPeriod = null;
+    this.currentChild = null;
     this.alertify.info('vous êtes déconnecté');
-    this.router.navigate(['/']);
+    this.router.navigate(['/signin']);
   }
 
   register(user: User) {

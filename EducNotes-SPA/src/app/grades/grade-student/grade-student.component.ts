@@ -200,8 +200,6 @@ export class GradeStudentComponent implements OnInit {
       }
 
     }
-    console.log(this.radarchartDatasets);
-    console.log(this.radarchartLabels);
 
   }
 

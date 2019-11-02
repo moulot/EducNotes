@@ -151,14 +151,14 @@ namespace EducNotes.API.Controllers
 
             var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(users);
 
-            double courseAvgSum = 0;
-            double courseCoeffSum = 0;
-
             var startDate = DateTime.Now.Date;
             var endDate = startDate.AddDays(7).Date;
             
             foreach (var user in usersToReturn)
             {
+                double courseAvgSum = 0;
+                double courseCoeffSum = 0;
+
                 List<UserEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, user.ClassId);
 
                 foreach (var course in coursesWithEvals)

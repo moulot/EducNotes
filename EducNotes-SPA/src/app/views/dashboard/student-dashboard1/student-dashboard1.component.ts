@@ -29,8 +29,8 @@ export class StudentDashboard1Component implements OnInit {
   studentAvg: any;
   userIdFromRoute: any;
   isParentConnected = false;
-  children: User[];
-  unSelectedUsers: User[];
+  // children: User[];
+  // unSelectedUsers: User[] = [];
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -47,7 +47,7 @@ export class StudentDashboard1Component implements OnInit {
     if (this.userIdFromRoute) {
       this.getUser(this.userIdFromRoute);
       this.isParentConnected = true;
-      this.getChildren(loggedUser.id);
+      // this.getChildren(loggedUser.id);
     } else {
       this.student = loggedUser;
       this.getUser(this.student.id);
@@ -89,31 +89,6 @@ export class StudentDashboard1Component implements OnInit {
     });
   }
 
-  getChildren(parentId) {
-    this.userService.getChildren(parentId).subscribe((users: User[]) => {
-      this.children = users;
-      this.unSelectedUsers = [];
-      for (let i = 0; i < users.length; i++) {
-        const elt = users[i];
-        if (elt.id !== this.student.id) {
-          this.unSelectedUsers = [...this.unSelectedUsers, elt];
-        }
-      }
-      // this.unSelectedUsers.splice(this.children.findIndex(c => c.id === this.userIdFromRoute), 1);
-    });
-  }
-
-  selectChild(childId) {
-    this.student = this.children.find(c => c.id === childId);
-    this.unSelectedUsers = [];
-    for (let i = 0; i < this.children.length; i++) {
-      const elt = this.children[i];
-      if (elt.id !== this.student.id) {
-        this.unSelectedUsers = [...this.unSelectedUsers, elt];
-      }
-    }
-  }
-
   getCoursesWithEvals(studentId, classId) {
     this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
       this.userCourses = data.coursesWithEvals;
@@ -122,5 +97,22 @@ export class StudentDashboard1Component implements OnInit {
       this.alertify.error(error);
     });
   }
+
+  // getChildren(parentId) {
+  //   this.userService.getChildren(parentId).subscribe((users: User[]) => {
+  //     this.children = users;
+  //     // console.log(this.children);
+  //     this.unSelectedUsers = [];
+  //     for (let i = 0; i < users.length; i++) {
+  //       const elt = users[i];
+  //       if (elt.id !== this.student.id) {
+  //         // console.log(elt);
+  //         this.unSelectedUsers = [...this.unSelectedUsers, elt];
+  //         console.log(this.unSelectedUsers);
+  //       }
+  //     }
+  //     console.log('dd:' + this.unSelectedUsers);
+  //   });
+  // }
 
 }

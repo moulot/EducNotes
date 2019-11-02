@@ -186,6 +186,8 @@ import { CoefficientFormComponent } from './admin/courses-management/coefficient
 import { CoefficientFormResolver } from './_resolvers/coeffiient-form-form-resolver';
 import { TimelineComponent } from './views/dashboard/timeline/timeline.component';
 import { StudentDashboard1Component } from './views/dashboard/student-dashboard1/student-dashboard1.component';
+import { ChildrenListComponent } from './children-list/children-list.component';
+import { UsersHeaderComponent } from './users-header/users-header.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -310,13 +312,15 @@ export function tokenGetter() {
       CourseCoefficientsComponent,
       CoefficientFormComponent,
       TimelineComponent,
-      StudentDashboard1Component
+      StudentDashboard1Component,
+      ChildrenListComponent,
+      UsersHeaderComponent
    ],
    imports: [
       FormWizardModule,
       SharedModule,
       HttpClientModule,
-      InMemoryWebApiModule.forRoot(InMemoryDataService, { passThruUnknownUrl: true }),
+      InMemoryWebApiModule.forRoot(InMemoryDataService, {passThruUnknownUrl: true}),
       AppRoutingModule,
       BrowserModule,
       BrowserAnimationsModule,

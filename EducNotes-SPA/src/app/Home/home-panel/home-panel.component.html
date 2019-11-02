@@ -4,7 +4,11 @@
     <app-parent-dashboard></app-parent-dashboard>      
   </div>
 
-  <div *ngIf="studentLoggedIn()">
+  <!-- <div *ngIf="parentLoggedIn() && isChildSelected?.valueOf()">
+      <app-student-dashboard1></app-student-dashboard1>
+    </div> -->
+  
+    <div *ngIf="studentLoggedIn()">
     <app-student-dashboard1></app-student-dashboard1>
   </div>
 

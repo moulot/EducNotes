@@ -63,18 +63,14 @@ export class ClassStudentsComponent implements OnInit {
     } else {
       return this.students = [...this.students];
     }
-    console.log('sess:' + this.students);
     const columns = Object.keys(this.students[0]);
-    console.log('col:' + columns + ' - session0:' + this.students[0]);
     if (!columns.length) {
       return;
     }
 
     const rows = this.students.filter(function(d) {
-      console.log('nb cols:' + columns.length);
       for (let i = 0; i <= columns.length; i++) {
         const column = columns[i];
-        console.log('coli:' + column + ' - d[col]:' + d[column]);
         if (d[column] && d[column].toString().toLowerCase().indexOf(val) > -1) {
           return true;
         }

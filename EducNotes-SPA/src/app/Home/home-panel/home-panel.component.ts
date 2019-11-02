@@ -19,8 +19,8 @@ export class HomePanelComponent implements OnInit {
  parentTypeId: number = environment.parentTypeId;
   adminTypeId: number = environment.adminTypeId;
   user: User;
-  // photoUrl: string;
-  // registerMode = false;
+  // currentChild: User;
+  // isChildSelected = false;
 
   constructor(private http: HttpClient, public authService: AuthService,
       private alertify: AlertifyService, private router: Router,
@@ -29,9 +29,10 @@ export class HomePanelComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.currentUser;
-    // this.route.data.subscribe(data => {
-    //   this.teacher = data['teacher'];
-    // });
+    // this.authService.currentChild.subscribe(child => this.currentChild = child);
+    // if (this.currentChild.id !== 0) {
+    //   this.isChildSelected = true;
+    // }
   }
 
   loggedIn() {
@@ -53,14 +54,14 @@ export class HomePanelComponent implements OnInit {
     return this.authService.teacherLoggedIn();
   }
 
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.authService.decodedToken = null;
-    this.authService.currentUser = null;
-    this.alertify.infoBar('logged out');
-    this.router.navigate(['/members']);
-  }
+  // logout() {
+  //   localStorage.removeItem('token');
+  //   localStorage.removeItem('user');
+  //   this.authService.decodedToken = null;
+  //   this.authService.currentUser = null;
+  //   this.alertify.infoBar('logged out');
+  //   this.router.navigate(['/members']);
+  // }
 
   // registerToggle() {
   //   this.registerMode = !this.registerMode;

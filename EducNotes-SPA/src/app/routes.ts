@@ -152,6 +152,7 @@ export const appRoutes: Routes = [
             { path: 'createDeadLine', component: DeadLineFormComponent },
             { path: 'editDeadLine/:id', component: DeadLineFormComponent, resolve: { deadline: DeadLineFormResolver } },
             { path: 'studentAgenda/:id', component: StudentAgendaComponent, resolve: { student: StudentResolver } },
+            { path: 'studentAgendaP/:id', component: StudentAgendaComponent },
             { path: 'coefficients', component: CourseCoefficientsComponent },
             { path: 'addCoefficient', component: CoefficientFormComponent },
             { path: 'editCoeffcicient/:id', component: CoefficientFormComponent, resolve: { coef: CoefficientFormResolver } }
