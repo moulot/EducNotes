@@ -61,19 +61,19 @@
         <i class="search-icon text-muted i-Magnifi-Glass1"></i>
     </div> -->
     <div class="d-none d-md-block">
-        <div *ngIf="parentLoggedIn()" id="navbarSupportedContent">
+        <div *ngIf="parentLoggedIn()">
             <app-nav-parent></app-nav-parent>
         </div>        
         
-        <div *ngIf="studentLoggedIn()" id="navbarSupportedContent">
+        <div *ngIf="studentLoggedIn()">
             <app-nav-student></app-nav-student>
         </div>        
         
-        <div *ngIf="teacherLoggedIn()" id="navbarSupportedContent">
+        <div *ngIf="teacherLoggedIn()">
             <app-nav-teacher></app-nav-teacher>
         </div>        
             
-        <div *ngIf="adminLoggedIn()" id="navbarSupportedContent">
+        <div *ngIf="adminLoggedIn()">
             <app-nav-admin></app-nav-admin>
         </div>
     </div>

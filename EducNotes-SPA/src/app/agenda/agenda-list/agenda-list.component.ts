@@ -91,7 +91,6 @@ export class AgendaListComponent implements OnInit {
     const classid = Number(this.selectForm.value.aclass);
     const courseid = Number(this.selectForm.value.course);
     this.selectedSessions = [];
-    console.log('sess len:' + this.allSessions.length + ' - ' + classid + ' - ' + courseid);
     for (let i = 0; i < this.allSessions.length; i++) {
       const elt = this.allSessions[i];
       if (Number(elt.classId) === classid && Number(elt.courseId) === courseid) {

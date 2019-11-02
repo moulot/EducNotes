@@ -78,10 +78,8 @@ export class EvalAddFormComponent implements OnInit {
     this.newEvaluation.name = this.newEvalForm.value.evalName;
     this.newEvaluation.courseId = this.newEvalForm.value.newcourse;
     this.newEvaluation.evalTypeId = this.newEvalForm.value.evalType;
-    // this.evalDate = this.newEvalForm.value.evalDate;
     const dateData = this.newEvalForm.value.evalDate.split('/');
     this.newEvaluation.evalDate = new Date(dateData[2], dateData[1] - 1, dateData[0]);
-    console.log(this.newEvalForm.value.evalDate + ' - ' + this.newEvaluation.evalDate);
     this.newEvaluation.graded = this.newEvalForm.controls['grades'].value.isGraded;
     this.newEvaluation.periodId = this.newEvalForm.value.newperiod;
     this.newEvaluation.canBeNagative = this.newEvalForm.controls['grades'].value.isNegative;

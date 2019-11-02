@@ -5,6 +5,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AuthService } from 'src/app/_services/auth.service';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-parent-dashboard',
@@ -16,7 +17,6 @@ export class ParentDashboardComponent implements OnInit {
   parent: User;
   courses: any;
   children: User[];
-  currentChild: User;
   userCourses: any;
   studentAvg: any;
 
@@ -24,10 +24,10 @@ export class ParentDashboardComponent implements OnInit {
   allSelected: boolean;
   page = 1;
   pageSize = 8;
-  products: any[] = [];
 
   constructor(private userService: UserService, private alertify: AlertifyService,
-    private authService: AuthService, private evalService: EvaluationService) { }
+    private authService: AuthService, private evalService: EvaluationService,
+    private router: Router) { }
 
   ngOnInit() {
     this.parent = this.authService.currentUser;
@@ -40,6 +40,13 @@ export class ParentDashboardComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  goToPage(child) {
+    // set globally the selected child
+    this.authService.changeCurrentChild(child);
+    // go to page with child data
+    this.router.navigate(['/studentFromP', child.id]);
   }
 
 }

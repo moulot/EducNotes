@@ -80,6 +80,7 @@ import { ClassTeachersComponent } from './classes/class-teachers/class-teachers.
 import { CourseCoefficientsComponent } from './admin/courses-management/course-coefficients/course-coefficients.component';
 import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
 import { CoefficientFormResolver } from './_resolvers/coeffiient-form-form-resolver';
+import { StudentDashboard1Component } from './views/dashboard/student-dashboard1/student-dashboard1.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -116,8 +117,8 @@ export const appRoutes: Routes = [
             { path: 'classScheduleEdit', component: ClassScheduleComponent },
             { path: 'studentsClass/:classId', component: ClassStudentsComponent },
             { path: 'agendas/:classId', component: ClassAgendaComponent },
-            { path: 'student', component: StudentDashboardComponent },
-            { path: 'studentFromP/:id', component: StudentDashboardComponent },
+            { path: 'student', component: StudentDashboard1Component },
+            { path: 'studentFromP/:id', component: StudentDashboard1Component },
             { path: 'parent', component: ParentDashboardComponent, resolve: { parent: UserHomeResolver } },
             { path: 'teacher', component: TeacherDashboardComponent, resolve: { teacher: UserHomeResolver } },
             { path: 'admins', component: AdminDashboardComponent, resolve: { admin: UserHomeResolver } },
@@ -151,6 +152,7 @@ export const appRoutes: Routes = [
             { path: 'createDeadLine', component: DeadLineFormComponent },
             { path: 'editDeadLine/:id', component: DeadLineFormComponent, resolve: { deadline: DeadLineFormResolver } },
             { path: 'studentAgenda/:id', component: StudentAgendaComponent, resolve: { student: StudentResolver } },
+            { path: 'studentAgendaP/:id', component: StudentAgendaComponent },
             { path: 'coefficients', component: CourseCoefficientsComponent },
             { path: 'addCoefficient', component: CoefficientFormComponent },
             { path: 'editCoeffcicient/:id', component: CoefficientFormComponent, resolve: { coef: CoefficientFormResolver } }

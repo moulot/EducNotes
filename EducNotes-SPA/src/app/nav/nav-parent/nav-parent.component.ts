@@ -13,12 +13,17 @@ import { Router } from '@angular/router';
 export class NavParentComponent implements OnInit {
   user: User;
   photoUrl: string;
+  currentChild: User;
 
   constructor(public authService: AuthService, private alertify: AlertifyService,
     private router: Router) { }
 
   ngOnInit() {
     this.user = this.authService.currentUser;
+    this.authService.currentChild.subscribe(child => this.currentChild = child);
+    if (!this.currentChild.id) {
+      this.currentChild.id = 0;
+    }
     this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
   }
 
@@ -26,12 +31,4 @@ export class NavParentComponent implements OnInit {
     return this.authService.loggedIn();
   }
 
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.authService.decodedToken = null;
-    this.authService.currentUser = null;
-    this.alertify.infoBar('logged out');
-    this.router.navigate(['/login']);
-  }
 }

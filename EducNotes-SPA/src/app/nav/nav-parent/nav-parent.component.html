@@ -1,14 +1,19 @@
 <div class="d-flex">
-  <div class="" routerLinkActive="active">
+  <div>
     <a class="text-15 text-muted mr-3" [routerLink]="['/home']">accueil</a>
   </div>
-  <div class="" routerLinkActive="active">
-    <a class="text-15 text-muted mr-3" [routerLink]="['/home']">cahier de textes</a>
+  <div>
+    <a class="text-15 text-muted mr-3" [routerLink]="['/studentAgenda', currentChild?.id]">cahier de textes</a>
   </div>
-  <div class="" routerLinkActive="active">
-    <a class="text-15 text-muted mr-3" [routerLink]="['/home']">notes</a>
+  <div>
+    <a class="text-15 text-muted mr-3" [routerLink]="['/studentGrades', currentChild?.id]">notes</a>
   </div>
-  <div class="" routerLinkActive="active">
-    <a class="text-15 text-muted mr-3" [routerLink]="['/home']">vie scolaire</a>
-  </div>
+  <div class="" ngbDropdown role="group" aria-label="Select all" placement="bottom-left">
+    <a class="dropdown-toggle text-15 text-muted mr-3 dd" ngbDropdownToggle>vie scolaire</a>
+    <div class="dropdown-menu" ngbDropdownMenu>
+      <button [routerLink]="['/studentSchedule', currentChild?.id]"  class="dropdown-item">emploi du temps</button>
+      <button [routerLink]="['/studentLife', currentChild?.id]"  class="dropdown-item">absences/sanctions</button>
+      <button [routerLink]="['/classStaff', currentChild?.classId]" class="dropdown-item">équipe pédagogique</button>
+    </div>
+  </div>  
 </div>

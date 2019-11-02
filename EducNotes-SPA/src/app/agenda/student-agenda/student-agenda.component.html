@@ -1,115 +1,191 @@
-<div class="row mb-2">
+<div class="row">
 
   <div class="col-md-12 mb-1">
-    <p class="text-17 m-0">cahier de textes - travail à faire à la maison</p>
+    <p class="lead m-0">cahier de textes - travail à faire à la maison</p>
   </div>
 
-  <div class="col-md-3">
+  <div class="col-md-12" *ngIf="showChildrenList">
 
-    <div class="card mb-1">
-      <div class="card-body">
-        <div class="mb-2">
-          <!-- <div class="p-0 m-0">tous les cours</div> -->
-          <label class="switch switch-primary mr-3">
-              <span>afficher tous les cours</span>
-              <input type="checkbox" (change)="showAllCourses()" [(ngModel)]="allCourses">
-              <span class="slider"></span>
-          </label>
-        </div>
-        <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
-        <div class="d-flex align-items-center">
-          <button type="button" mdbBtn size="sm" class="p-2" (click)="movePeriod(-7)"
-            color="primary" mdbWavesEffect><i class="i-Arrow-Left"></i></button>
-          <p class="flex-grow-1 text-center text-13 m-0">{{strStartDate}} - {{strEndDate}}</p>
-          <button type="button" mdbBtn size="sm" class="p-2" (click)="movePeriod(7)"
-            color="primary" mdbWavesEffect><i class="i-Arrow-Right"></i></button>  
-        </div>
-        <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
-        <p class="text-danger text-15 mt-2 mb-2">clicker sur le cours pour filtrer</p>
-        <div class="card mb-2" *ngFor="let course of coursesWithTasks">
-          <div *ngIf="course.nbTasks > 0">
-            <a (click)="showCourseItems(course.courseId)" style="cursor: pointer;">
-              <div class="card-body p-2">
-                <div class="row">
-                  <div class="col-md-12 d-flex">
-                    <div class=" mr-2" [ngStyle]="{'background-color': course.courseColor}" style="width: 10px;height: 100%;"></div>
-                    <div class="flex-grow-1 text-17">{{course.courseName}}</div>
-                    <div class="text-17">{{course.nbTasks}}</div>
-                    <!-- <div><mdb-badge pill="true" class="badge-pill" primary="true">{{course.nbTasks}}</mdb-badge></div> -->
-                  </div>
-                </div>
-              </div>      
-            </a>
-          </div>
-          <div *ngIf="course.nbTasks <= 0">
-            <div class="card-body p-2">
-              <div class="row">
-                <div class="col-md-12 d-flex">
-                  <div class=" mr-2" [ngStyle]="{'background-color': course.courseColor}" style="width: 10px;height: 100%;"></div>
-                  <div class="flex-grow-1 text-17">{{course.courseName}}</div>
-                  <div class="text-17">{{course.nbTasks}}</div>
-                  <!-- <div><mdb-badge pill="true" class="badge-pill" primary="true">{{course.nbTasks}}</mdb-badge></div> -->
-                </div>
+    <p class="text-15 text-muted m-1"> sélectionner un enfant pour voir son cahier de texte</p>
+
+    <div class="row">
+
+      <div class="col-md-9 col-sm-12">
+        <app-children-list [children]="children"></app-children-list>
+      </div>
+
+      <div class="col-md-3 col-sm-12">
+        <div class="row">
+
+          <div class="col-md-12 col-sm-12">
+            <div class="card mb-4 p-2">
+              <div class="card-body">
+                <div class="card-title m-0">mon agenda</div>
+                <p class="text-small text-muted">programme de la semaine.</p>
+                <nz-timeline>
+                  <nz-timeline-item nzColor="green">
+                    <div>
+                      <strong class="mr-1"><a href="#">8:30 - évènement à venir</a></strong>
+                      <p class="text-muted">desc de l'info à venir</p>
+                    </div>
+                  </nz-timeline-item>
+                  <nz-timeline-item nzColor="green">
+                    <div>
+                      <strong class="mr-1"><a href="#">10:30 - info suivante</a></strong>
+                      <p class="text-muted">desc infos en temps réel ici</p>
+                    </div>
+                  </nz-timeline-item>
+                  <nz-timeline-item [nzDot]="dotTemplate" nzColor="red">
+                    <p>un évènement parent, élève ici</p>
+                  </nz-timeline-item>
+                  <nz-timeline-item>
+                    <p>réunion profs / parents</p>
+                    <p>détails de l'évènement</p>
+                  </nz-timeline-item>
+                  <nz-timeline-item nzColor="gray">
+                    <p>infos supplémentaires</p>
+                  </nz-timeline-item>
+                  <nz-timeline-item nzColor="gray">
+                    <p>infos 4</p>
+                    <p>détails de l'information</p>
+                  </nz-timeline-item>
+                </nz-timeline>
+                <ng-template #dotTemplate>
+                  <i nz-icon nzType="clock-circle-o" style="font-size: 16px;"></i>
+                </ng-template>
               </div>
-            </div>      
+            </div>
           </div>
+
+        </div>
       </div>
-      </div>
+
     </div>
 
   </div>
 
-  <div class="col-md-9">
+  <div class="col-md-12" *ngIf="!showChildrenList">
 
-    <div class="card">
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-12">
-            <div *ngIf="filteredAgenda.length > 0">
-              <div *ngFor="let item of filteredAgenda; let i = index">
-              <div class="lead m-0 p-0 d-flex">
-                <div>à remettre le {{item.longDueDate}}</div>
-                <div class="ml-2">
-                  <mdb-badge pill="true" class="badge-pill p-1" primary="true">{{item.nbItems}}</mdb-badge>
-                </div>
+    <div class="row">
+      
+      <div class="col-md-3">
+
+        <div class="card">
+          <div class="card-body">
+            <div class="mb-2">
+              <!-- <div class="p-0 m-0">tous les cours</div> -->
+              <label class="switch switch-primary mr-3">
+                <span>afficher tous les cours</span>
+                <input type="checkbox" (change)="showAllCourses()" [(ngModel)]="allCourses">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
+            <div class="d-flex align-items-center">
+              <button type="button" mdbBtn size="sm" class="p-2" (click)="movePeriod(-7)" color="primary"
+                mdbWavesEffect><i class="i-Arrow-Left"></i></button>
+              <p class="flex-grow-1 text-center text-13 m-0">{{strStartDate}} - {{strEndDate}}</p>
+              <button type="button" mdbBtn size="sm" class="p-2" (click)="movePeriod(7)" color="primary"
+                mdbWavesEffect><i class="i-Arrow-Right"></i></button>
+            </div>
+            <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
+            <p class="text-danger text-15 mt-2 mb-2">clicker sur le cours pour filtrer</p>
+            <div class="card mb-2" *ngFor="let course of coursesWithTasks">
+              <div *ngIf="course.nbTasks > 0">
+                <a (click)="showCourseItems(course.courseId)" style="cursor: pointer;">
+                  <div class="card-body p-2">
+                    <div class="row">
+                      <div class="col-md-12 d-flex">
+                        <div class=" mr-2" [ngStyle]="{'background-color': course.courseColor}"
+                          style="width: 10px;height: 100%;"></div>
+                        <div class="flex-grow-1 text-17">{{course.courseName}}</div>
+                        <div class="text-17">{{course.nbTasks}}</div>
+                        <!-- <div><mdb-badge pill="true" class="badge-pill" primary="true">{{course.nbTasks}}</mdb-badge></div> -->
+                      </div>
+                    </div>
+                  </div>
+                </a>
               </div>
-              <div class="card mb-2" *ngFor="let ai of item.agendaItems; let j = index">
+              <div *ngIf="course.nbTasks <= 0">
                 <div class="card-body p-2">
                   <div class="row">
                     <div class="col-md-12 d-flex">
-                      <div class="mr-2" [ngStyle]="{'background-color': ai.courseColor}" style="width: 10px;height: 100%;"></div>
-                      <div class="flex-grow-1">
-                          <div class="d-flex">
-                            <div class="flex-grow-1 text-17">{{ai.courseName}}</div>
-                            <div class="switch">
-                              <label>
-                              <input (change)="setCourseTask(i, ai.agendaId)" [(ngModel)]="model[(i * item.agendaItems.length) + j]" type="checkbox">
-                              <span class="lever"></span>fait
-                            </label>
-                          </div>    
-                        </div>
-                        <div><p class="text-15 text-muted m-0 mt-1">{{ai.taskDesc}}</p></div>
-                      </div>    
+                      <div class=" mr-2" [ngStyle]="{'background-color': course.courseColor}"
+                        style="width: 10px;height: 100%;"></div>
+                      <div class="flex-grow-1 text-17">{{course.courseName}}</div>
+                      <div class="text-17">{{course.nbTasks}}</div>
+                      <!-- <div><mdb-badge pill="true" class="badge-pill" primary="true">{{course.nbTasks}}</mdb-badge></div> -->
                     </div>
-                    </div>
-                  <div class="d-flex">
-                    <div class="flex-grow-1"></div>
-                    <div><p class="text-12 mt-2 m-0">donné le {{ai.strDateAdded}}</p></div>
                   </div>
                 </div>
               </div>
-              </div>
-            </div>
-            <div *ngIf="filteredAgenda.length <= 0">
-                <p class="lead m-0"><b>{{strStartDate}} - {{strEndDate}}</b></p>
-                <p class="lead m-0">pas de devoir à faire pour cette période...</p>
             </div>
           </div>
         </div>
-    </div>
+
+      </div>
+
+      <div class="col-md-9">
+
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div *ngIf="filteredAgenda.length > 0">
+                  <div *ngFor="let item of filteredAgenda; let i = index">
+                    <div class="lead m-0 p-0 d-flex">
+                      <div>à remettre le {{item.longDueDate}}</div>
+                      <div class="ml-2">
+                        <mdb-badge pill="true" class="badge-pill p-1" primary="true">{{item.nbItems}}</mdb-badge>
+                      </div>
+                    </div>
+                    <div class="card mb-2" *ngFor="let ai of item.agendaItems; let j = index">
+                      <div class="card-body p-2">
+                        <div class="row">
+                          <div class="col-md-12 d-flex">
+                            <div class="mr-2" [ngStyle]="{'background-color': ai.courseColor}"
+                              style="width: 10px;height: 100%;"></div>
+                            <div class="flex-grow-1">
+                              <div class="d-flex">
+                                <div class="flex-grow-1 text-17">{{ai.courseName}}</div>
+                                <div class="switch">
+                                  <label>
+                                    <input (change)="setCourseTask(i, ai.agendaId)"
+                                      [(ngModel)]="model[(i * item.agendaItems.length) + j]" type="checkbox">
+                                    <span class="lever"></span>fait
+                                  </label>
+                                </div>
+                              </div>
+                              <div>
+                                <p class="text-15 text-muted m-0 mt-1">{{ai.taskDesc}}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="d-flex">
+                          <div class="flex-grow-1"></div>
+                          <div>
+                            <p class="text-12 mt-2 m-0">donné le {{ai.strDateAdded}}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="filteredAgenda.length <= 0">
+                  <p class="lead m-0"><b>{{strStartDate}} - {{strEndDate}}</b></p>
+                  <p class="lead m-0">pas de devoir à faire pour cette période...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
 
     </div>
-
+      
   </div>
 
 </div>

@@ -587,42 +587,6 @@ namespace EducNotes.API.Controllers {
                     dones.Add (item.Done);
                 }
             }
-            // var agendaDates = classAgenda.OrderBy(o => o.DueDate)
-            //                     .Select(a => a.DueDate).Distinct().ToList();
-
-            // foreach (var date in agendaDates)
-            // {
-            //     AgendaForListDto afld = new AgendaForListDto();
-            //     afld.DueDate = date;
-
-            //     var shortDueDate = date.ToString("ddd dd MMM");//, frC);
-            //     var longDueDate = date.ToString("dd MMMM yyyy");//, frC);
-
-            //     afld.ShortDueDate = shortDueDate;
-            //     afld.LongDueDate = longDueDate;
-
-            //     //get agenda tasks Done Status
-            //     afld.AgendaItems = new List<AgendaItemDto>();
-
-            //     var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();           
-            //     foreach (var item in agendaItems)
-            //     {
-            //         AgendaItemDto aid = new AgendaItemDto();
-            //         aid.CourseId = item.CourseId;
-            //         aid.CourseName = item.Course.Name;
-            //         aid.CourseAbbrev = item.Course.Abbreviation;
-            //         aid.CourseColor = item.Course.Color;
-            //         aid.strDateAdded = item.DateAdded.ToShortDateString();
-            //         aid.TaskDesc = item.TaskDesc;
-            //         aid.AgendaId = item.Id;
-            //         aid.Done = item.Done;
-            //         afld.AgendaItems.Add(aid);
-            //         dones.Add(aid.Done);
-            //     }
-            //     afld.NbItems = agendaItems.Count();
-
-            //     AgendaList.Add(afld);
-            // }
 
             var courses = await _context.ClassCourses
                 .Where (c => c.ClassId == classId)

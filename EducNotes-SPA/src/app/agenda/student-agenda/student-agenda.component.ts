@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { UserService } from 'src/app/_services/user.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { AuthService } from 'src/app/_services/auth.service';
+import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 
 @Component({
   selector: 'app-student-agenda',
@@ -37,6 +38,10 @@ export class StudentAgendaComponent implements OnInit {
   strEndDate: string;
   agendaParams: any = {};
   model: any = [];
+  isChildSelected = false;
+  showChildrenList = false;
+  parent: User;
+  children: User[];
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -48,14 +53,24 @@ export class StudentAgendaComponent implements OnInit {
       this.userIdFromRoute = params['id'];
     });
 
-    const loggedUser = this.authService.currentUser;
-
-    if (this.userIdFromRoute) {
-      this.getUser(this.userIdFromRoute);
+    // is it the parent connected?
+    if (Number(this.userIdFromRoute) === 0) {
+      this.showChildrenList = true;
+      this.parent = this.authService.currentUser;
+      this.getChildren(this.parent.id);
     } else {
-      this.student = loggedUser;
-      this.getUser(this.student.id);
+      this.showChildrenList = false;
+      this.getUser(this.userIdFromRoute);
     }
+
+  }
+
+  getChildren(parentId: number) {
+    this.userService.getChildren(parentId).subscribe((users: User[]) => {
+      this.children = users;
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
   getUser(id) {
