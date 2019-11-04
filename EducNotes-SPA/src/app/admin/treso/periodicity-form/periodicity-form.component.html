@@ -1,0 +1,18 @@
+<div class="row justify-content-center align-items-center mt-3"
+    [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+
+    <div class="col-md-8">
+        <div class="card p-3">
+            <form nz-form [formGroup]="periodicityForm" (ngSubmit)="save()">
+                <div class="md-form">
+                    <input mdbInput type="text" id="name" class="form-control" formControlName="name">
+                    <label for="name" class="">Nom </label>
+                </div>
+                <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!periodicityForm.valid"
+                    mdbWavesEffect>enregistrer</button>
+                <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
+                    [routerLink]="['/periodicities']">annuler</button>
+            </form>
+        </div>
+    </div>
+</div>

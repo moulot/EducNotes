@@ -1,7 +1,7 @@
 <div class="row">
 
   <div class="col-md-12">
-    <p class="lead ">admin - liste des services</p>
+    <p class="lead ">admin - liste périodes</p>
   </div>
 
   <div [@animate]="{value:'*',params:{delay: 300+'ms', y:'80px'}}" class="col-lg-12 col-md-12">
@@ -10,24 +10,21 @@
       <div class="card-body p-0">
 
         <div class="card-title border-bottom d-flex align-items-center m-0 p-3">
-          <button class="btn btn-outline-primary btn-sm" [routerLink]="['/createProduct']">ajouter un service</button>
+          <button size="sm" mdbBtn color="primary" mdbWavesEffect type="button" [routerLink]="['/createPeriod']">ajouter une periode</button>
           <span class="flex-grow-1"></span>
         </div>
 
-        <div *ngFor="let prod of products" class="d-flex border-bottom justify-content-between p-3">
+        <div *ngFor="let period of periodicities" class="d-flex border-bottom justify-content-between p-3">
           <div class="flex-grow-1">
             <span class="text-small text-muted">nom</span>
-            <h6 class="m-0">{{prod.name}}</h6>
+            <h6 class="m-0">{{period.name}}</h6>
           </div>
-          <div class="flex-grow-1">
-            <span class="text-small text-muted">Comment.</span>
-            <h6 class="m-0">{{prod.comment}}</h6>
-          </div>
+          
 
           <div class="flex-grow-1">
             <span class="text-small text-muted"></span>
             <h6 class="m-0 mt-1">
-              <button class="btn btn-outline-primary btn-sm" [routerLink]="['/editProduct', prod.id]">modifier</button>
+              <button class="btn btn-outline-primary btn-sm" [routerLink]="['/editPeriod', period.id]">modifier</button>
             </h6>
           </div>
         </div>

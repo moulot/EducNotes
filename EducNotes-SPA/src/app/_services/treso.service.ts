@@ -5,6 +5,8 @@ import { Product } from '../_models/product';
 import { ClassLevelProduct } from '../_models/classlevelproduct';
 import { Observable } from 'rxjs';
 import { DeadLine } from '../_models/deadline';
+import { Periodicity } from '../_models/periodicity';
+import { PayableAt } from '../_models/payable-at';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +34,22 @@ export class TresoService {
 
   getProduct(productId: number): Observable<Product> {
     return this.http.get<Product>(this.baseUrl + 'treso/GetProduct/' + productId);
+  }
+
+  getPeriodicities(): Observable<Periodicity[]> {
+    return this.http.get<Periodicity[]>(this.baseUrl + 'treso/GetPeriodicities');
+  }
+
+  getPayableAts(): Observable<PayableAt[]> {
+    return this.http.get<PayableAt[]>(this.baseUrl + 'treso/GetPayableAts');
+  }
+
+  getPeriodicity(periodicityId: number): Observable<Periodicity> {
+    return this.http.get<Periodicity>(this.baseUrl + 'treso/GetPeriodicity/' + periodicityId);
+  }
+
+  getPayable(payableId: number): Observable<PayableAt> {
+    return this.http.get<PayableAt>(this.baseUrl + 'treso/GetPayableAt/' + payableId);
   }
 
   createProduct(product: Product) {
@@ -64,6 +82,22 @@ export class TresoService {
 
   getClassLevelServices(levelId: number) {
     return this.http.get(this.baseUrl + 'treso/GetLvlServices/' + levelId);
+  }
+
+  createPeriodicity(periodicityName: string) {
+    return this.http.post(this.baseUrl + 'treso/CreatePeriodicity/' + periodicityName , {});
+  }
+
+  createPayableAt(payableAt: PayableAt) {
+    return this.http.post(this.baseUrl + 'treso/CreatePayableAt' , payableAt);
+  }
+
+  EditPeriodicity(id: number, periodicityName: string) {
+    return this.http.post(this.baseUrl + 'treso/EditPeriodicity/' + id + '/' + periodicityName , {});
+  }
+
+  EditPayableAt(id: number, payableAt: PayableAt) {
+    return this.http.post(this.baseUrl + 'treso/EditPayableAt'  , payableAt);
   }
 
 
