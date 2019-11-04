@@ -12,8 +12,9 @@ import { AuthService } from '../_services/auth.service';
 })
 export class UsersHeaderComponent implements OnInit {
   @Input() student: User;
-  @Output() getUser = new EventEmitter<number>();
+  @Output() getUser = new EventEmitter<any>();
   unSelectedUsers: User[];
+  selectedUser: User;
   children: User[];
   parent: User;
 
@@ -22,20 +23,19 @@ export class UsersHeaderComponent implements OnInit {
 
   ngOnInit() {
     this.parent = this.authService.currentUser;
+    // console.log('parent: ' + this.parent.id);
     this.getChildren(this.parent.id);
   }
 
   selectChild(child) {
-    this.student = this.children.find(c => c.id === child.id);
-    console.log(this.children);
+    this.selectedUser = this.children.find(c => c.id === child.id);
     this.unSelectedUsers = [];
     for (let i = 0; i < this.children.length; i++) {
       const elt = this.children[i];
-      if (elt.id !== this.student.id) {
+      if (elt.id !== this.selectedUser.id) {
         this.unSelectedUsers = [...this.unSelectedUsers, elt];
       }
     }
-    console.log(this.unSelectedUsers);
     this.authService.changeCurrentChild(child);
     this.getUser.emit(child.id);
   }
@@ -43,6 +43,7 @@ export class UsersHeaderComponent implements OnInit {
   getChildren(parentId) {
     this.userService.getChildren(parentId).subscribe((users: User[]) => {
       this.children = users;
+      // console.log(users);
       this.unSelectedUsers = [];
       for (let i = 0; i < users.length; i++) {
         const elt = users[i];
@@ -50,6 +51,8 @@ export class UsersHeaderComponent implements OnInit {
           this.unSelectedUsers = [...this.unSelectedUsers, elt];
         }
       }
+      this.selectedUser = this.student;
+      // console.log(this.unSelectedUsers);
     });
   }
 

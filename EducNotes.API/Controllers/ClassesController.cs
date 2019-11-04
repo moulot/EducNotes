@@ -575,9 +575,9 @@ namespace EducNotes.API.Controllers {
                 endDate = temp;
             }
 
-            //CultureInfo frC = new CultureInfo("fr-FR");
-            var strStartDate = startDate.ToString ("ddd dd MMM"); //, frC);
-            var strEndDate = endDate.ToString ("ddd dd MMM"); //, frC);
+            CultureInfo frC = new CultureInfo("fr-FR");
+            var strStartDate = startDate.ToString ("dd MMM", frC);
+            var strEndDate = endDate.ToString ("dd MMM", frC);
 
             List<AgendaForListDto> AgendaList = await _repo.GetUserClassAgenda (classId, startDate, endDate);
 

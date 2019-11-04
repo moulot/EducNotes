@@ -16,5 +16,6 @@ namespace EducNotes.API.Dtos
         public double UserCourseAvg { get; set; }
         public double ClassCourseAvg { get; set; }
         public List<GradeDto> grades { get; set; }
+        public List<PeriodEvalsDto> PeriodEvals { get; set; }
     }
 }

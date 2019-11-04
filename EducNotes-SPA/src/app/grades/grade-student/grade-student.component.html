@@ -3,19 +3,22 @@
   <div class="col-md-12 mb-1">
     <div class="row">
       <div class="col-md-6 d-flex">
-        <p class="lead m-0">{{student?.firstName}} {{student?.lastName}} ({{student?.className}})</p>
+        <p class="text-20 font-weight-300 m-0">{{student?.firstName}} {{student?.lastName}} ({{student?.className}})</p>
         <div class="ml-2">
-          <p *ngIf="studentAvg < 10" class="lead m-0">
-            - note globale : <label class="text-danger"><b>{{studentAvg}} / 20</b></label>
+          <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-20 font-weight-300 m-0">
+            - moyenne : <label class="text-danger"><b>{{studentAvg}} / 20</b></label>
           </p>
-          <p *ngIf="studentAvg >= 10" class="lead m-0">
-            - note globale : <label class="text-success"><b>{{studentAvg}} / 20</b></label>
+          <p *ngIf="studentAvg >= 10" class="text-20 font-weight-300 m-0">
+            - moyenne : <label class="text-success"><b>{{studentAvg}} / 20</b></label>
+          </p>
+          <p *ngIf="studentAvg === -1000" class="text-20 font-weight-300 m-0">
+            - moyenne : <label class="text-primary"><b>N/A</b></label>
           </p>
         </div>
       </div>
-      <div class="col-md-6">
-        <button type="button" (click)="loadDefaultChart()" mdbBtn size="sm" color="light" mdbWavesEffect>graphe général</button>        
-      </div>
+      <!-- <div class="col-md-6">
+        <button type="button" (click)="loadDefaultChart()" mdbBtn size="sm" color="light" mdbWavesEffect>graphe général</button>
+      </div> -->
     </div>
   </div>
 
@@ -23,18 +26,12 @@
 
     <div class="row">
 
-      <!-- <div class="col-md-12 mb-2">
-        <div class="card">
-          <div class="card-body text-center p-2">
-            <p *ngIf="studentAvg < 10" class="text-18 m-0">
-              moyenne générale : <label class="text-danger">{{studentAvg}} / 20</label>
-            </p>
-            <p *ngIf="studentAvg >= 10" class="text-18 m-0">
-              moyenne générale : <label class="text-success">{{studentAvg}} / 20</label>
-            </p>
-          </div>    
-        </div>
-      </div> -->
+      <div class="col-md-12">
+          <button type="button" (click)="loadDefaultChart()" mdbBtn size="sm" color="light" mdbWavesEffect>graphe général</button>
+        <button type="button" (click)="loadDefaultChart()" class="mr-2" mdbBtn size="sm" color="primary" mdbWavesEffect>1er trim</button>
+        <button type="button" (click)="loadDefaultChart()" class="mr-2" mdbBtn size="sm" color="light" mdbWavesEffect>2e trim</button>
+        <button type="button" (click)="loadDefaultChart()" mdbBtn size="sm" color="light" mdbWavesEffect>3e trim</button>
+      </div>
 
       <div class="col-md-12 mb-2">
         <div class="card">
