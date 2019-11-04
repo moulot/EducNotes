@@ -68,6 +68,8 @@ namespace EducNotes.API.Data {
             public DbSet<Order> Orders { get; set; }
             public DbSet<OrderLine> OrderLines { get; set; }
             public DbSet<ProductDeadLine> ProductDeadLine { get; set; }
+            public DbSet<PayableAt> PayableAt { get; set; }
+            public DbSet<Periodicity> Periodicity { get; set; }
 
             protected override void OnModelCreating (ModelBuilder builder) {
                 base.OnModelCreating (builder);
