@@ -149,6 +149,7 @@ namespace EducNotes.API.Helpers {
                 });
             CreateMap<ProductDto, Product> ();
             CreateMap<DeadLineDto, DeadLine> ();
+            CreateMap<PayableDto, PayableAt> ();
             CreateMap<CreateCoefficientDto, CourseCoefficient> ();
             CreateMap<CourseCoefficient, CoefficientDetailsDto> ()
                 .ForMember (dest => dest.ClassLevelName, opt => {

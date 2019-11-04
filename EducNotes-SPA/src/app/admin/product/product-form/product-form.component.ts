@@ -11,7 +11,7 @@ import { Router, ActivatedRoute } from '@angular/router';
   selector: 'app-product-form',
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.scss'],
-  animations :  [SharedAnimations]
+  animations: [SharedAnimations]
 })
 export class ProductFormComponent implements OnInit {
 
@@ -47,33 +47,34 @@ export class ProductFormComponent implements OnInit {
 
   createProductForm() {
     this.productForm = this.fb.group({
-       name: [this.formModel.name, Validators.required],
-       comment: [this.formModel.comment]});
+      name: [this.formModel.name, Validators.required],
+      comment: [this.formModel.comment]
+    });
   }
 
   save() {
-   if (this.editMode === 'add') {
-     this.createProduct();
-   }
+    if (this.editMode === 'add') {
+      this.createProduct();
+    }
 
-   if (this.editMode === 'edit') {
-    this.editProduct();
-  }
+    if (this.editMode === 'edit') {
+      this.editProduct();
+    }
   }
 
   createProduct() {
-    const dataTosave =  Object.assign({}, this.productForm.value);
+    const dataTosave = Object.assign({}, this.productForm.value);
     dataTosave.productTypeId = this.schoolServicetypeId;
     this.tresoService.createProduct(dataTosave).subscribe(() => {
-     this.alertify.success('enregistrement terminé...');
-     this.router.navigate(['/productsList']);
+      this.alertify.success('enregistrement terminé...');
+      this.router.navigate(['/productsList']);
     }, error => {
       this.alertify.error(error);
     });
   }
 
   editProduct() {
-    this.tresoService.editProduct(this.formModel.id , this.productForm.value).subscribe(() => {
+    this.tresoService.editProduct(this.formModel.id, this.productForm.value).subscribe(() => {
       this.alertify.success('modification  éffectuée..');
       this.router.navigate(['/productsList']);
     }, error => {

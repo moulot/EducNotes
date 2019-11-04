@@ -188,6 +188,14 @@ import { TimelineComponent } from './views/dashboard/timeline/timeline.component
 import { StudentDashboard1Component } from './views/dashboard/student-dashboard1/student-dashboard1.component';
 import { ChildrenListComponent } from './children-list/children-list.component';
 import { UsersHeaderComponent } from './users-header/users-header.component';
+import { PeriodicitiesComponent } from './admin/treso/periodicities/periodicities.component';
+import { PeriodicityFormComponent } from './admin/treso/periodicity-form/periodicity-form.component';
+import { PeriodicityFormResolver } from './_resolvers/periodicity-form-resolver';
+import { PeriodicitiesListResolver } from './_resolvers/periodicities-list-resolver';
+import { PayableAtsComponent } from './admin/treso/payableAts/payableAts.component';
+import { PayableAtListResolver } from './_resolvers/payableAt-list-resolver';
+import { PayableFormComponent } from './admin/treso/payable-form/payable-form.component';
+import { PayableFormResolver } from './_resolvers/payable-form-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -314,7 +322,11 @@ export function tokenGetter() {
       TimelineComponent,
       StudentDashboard1Component,
       ChildrenListComponent,
-      UsersHeaderComponent
+      UsersHeaderComponent,
+      PeriodicitiesComponent,
+      PeriodicityFormComponent,
+      PayableAtsComponent,
+      PayableFormComponent
    ],
    imports: [
       FormWizardModule,
@@ -400,6 +412,10 @@ export function tokenGetter() {
       CourseFormResolver,
       TeacherFormResolver,
       CoefficientFormResolver,
+      PeriodicitiesListResolver,
+      PeriodicityFormResolver,
+      PayableAtListResolver,
+      PayableFormResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

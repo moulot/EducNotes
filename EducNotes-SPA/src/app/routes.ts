@@ -19,7 +19,6 @@ import { ClassPanelComponent } from './classes/class-panel/class-panel.component
 import { GradePanelComponent } from './grades/grade-panel/grade-panel.component';
 import { ClassStudentsComponent } from './classes/class-students/class-students.component';
 import { ClassAgendaComponent } from './classes/class-agenda/class-agenda.component';
-import { StudentDashboardComponent } from './views/dashboard/student-dashboard/student-dashboard.component';
 import { UserHomeResolver } from './_resolvers/user-home-resolver';
 import { ParentDashboardComponent } from './views/dashboard/parent-dashboard/parent-dashboard.component';
 import { TeacherDashboardComponent } from './views/dashboard/teacher-dashboard/teacher-dashboard.component';
@@ -62,7 +61,6 @@ import { ClassLevelProdFormComponent } from './admin/treso/class-level-prod-form
 import { DeadLineListComponent } from './admin/treso/dead-line-list/dead-line-list.component';
 import { DeadLineFormComponent } from './admin/treso/dead-line-form/dead-line-form.component';
 import { DeadLineListResolver } from './_resolvers/dead-line-list-resolver';
-import { resolve } from 'q';
 import { DeadLineFormResolver } from './_resolvers/dead-line-form-resolver';
 import { ProductsListResolver } from './_resolvers/products-list-resolver';
 import { ProductFormResolver } from './_resolvers/product-form-resolver';
@@ -81,6 +79,14 @@ import { CourseCoefficientsComponent } from './admin/courses-management/course-c
 import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
 import { CoefficientFormResolver } from './_resolvers/coeffiient-form-form-resolver';
 import { StudentDashboard1Component } from './views/dashboard/student-dashboard1/student-dashboard1.component';
+import { PeriodicitiesComponent } from './admin/treso/periodicities/periodicities.component';
+import { PeriodicityFormComponent } from './admin/treso/periodicity-form/periodicity-form.component';
+import { PeriodicityFormResolver } from './_resolvers/periodicity-form-resolver';
+import { PeriodicitiesListResolver } from './_resolvers/periodicities-list-resolver';
+import { PayableAtListResolver } from './_resolvers/payableAt-list-resolver';
+import { PayableAtsComponent } from './admin/treso/payableAts/payableAts.component';
+import { PayableFormComponent } from './admin/treso/payable-form/payable-form.component';
+import { PayableFormResolver } from './_resolvers/payable-form-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -155,7 +161,15 @@ export const appRoutes: Routes = [
             { path: 'studentAgendaP/:id', component: StudentAgendaComponent },
             { path: 'coefficients', component: CourseCoefficientsComponent },
             { path: 'addCoefficient', component: CoefficientFormComponent },
-            { path: 'editCoeffcicient/:id', component: CoefficientFormComponent, resolve: { coef: CoefficientFormResolver } }
+            { path: 'editCoeffcicient/:id', component: CoefficientFormComponent, resolve: { coef: CoefficientFormResolver } },
+            { path: 'periodicities', component: PeriodicitiesComponent , resolve: { periodicities: PeriodicitiesListResolver }},
+            { path: 'createPeriod', component: PeriodicityFormComponent },
+            { path: 'editPeriod/:id', component: PeriodicityFormComponent , resolve: { periodicity: PeriodicityFormResolver }},
+            { path: 'payableAts', component: PayableAtsComponent , resolve: { payableAts: PayableAtListResolver }},
+            { path: 'createPayable', component: PayableFormComponent },
+            { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }}
+
+
 
         ]
     },

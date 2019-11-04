@@ -4,16 +4,16 @@ import { AlertifyService } from '../_services/alertify.service';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { TresoService } from '../_services/treso.service';
-import { Product } from '../_models/product';
+import { Periodicity } from '../_models/periodicity';
 
 @Injectable()
-export class ProductsListResolver implements Resolve<Product[]> {
+export class PeriodicityFormResolver implements Resolve<Periodicity> {
 
     constructor(private tresoService: TresoService, private router: Router,
         private alertify: AlertifyService) { }
 
-    resolve(route: ActivatedRouteSnapshot): Observable<Product[]> {
-        return this.tresoService.getProducts().pipe(
+    resolve(route: ActivatedRouteSnapshot): Observable<Periodicity> {
+        return this.tresoService.getPeriodicity(route.params['id']).pipe(
             catchError(() => {
                 this.alertify.error('problème de récupération de données');
                 this.router.navigate(['/home']);
