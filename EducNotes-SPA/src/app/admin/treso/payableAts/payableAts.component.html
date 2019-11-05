@@ -14,7 +14,7 @@
           <span class="flex-grow-1"></span>
         </div>
 
-        <div *ngFor="let payable of payableAts" class="d-flex border-bottom justify-content-between p-3">
+        <!-- <div *ngFor="let payable of payableAts" class="d-flex border-bottom justify-content-between p-3">
           <div class="flex-grow-1">
             <span class="text-small text-muted">nom</span>
             <h6 class="m-0">{{payable.name}}</h6>
@@ -31,11 +31,39 @@
               <button type="button" size="sm" mdbBtn color="light" [routerLink]="['/editPayable', payable.id]" mdbWavesEffect>Editer</button>
             </h6>
           </div>
-        </div>
+        </div> -->
 
+
+        <div class="col-md-9 mt-2 p-1 " *ngIf="payableAts.length>0">
+          <span><small>pour une modificiation cliquez directement sur la case du nom</small> </span>
+          <table mdbTable class="z-depth-1">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nom</th>
+                <th scope="col">Nombre de Jour</th>
+                <th scope="col">option</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of payableAts,index as i">
+                <th scope="row">{{i+1}}</th>
+                <td><span contenteditable="true" (keyup)="changeValue(i, 'name', $event)"
+                    (blur)="updateList(i, 'name', $event)">{{p.name}}</span>
+                </td>
+                <td><span contenteditable="true" (keyup)="changeValue(i, 'dayCount', $event)"
+                  (blur)="updateList(i, 'dayCount', $event)">{{p.dayCount}}</span>
+              </td>
+                <td><button class="btn btn-outline-primary btn-sm"
+                    [routerLink]="['/editPayable', p.id]">modifier</button></td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-
+    
   </div>
 
 </div>

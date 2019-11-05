@@ -42,8 +42,16 @@ editField: string;
   }
 
   updateList(id: number, property: string, event: any) {
+    const elementId = this.coefficients[id].id;
     const editField = event.target.textContent;
     this.coefficients[id][property] = editField;
+    if (this.editField && elementId) {
+      this.classService.updateCourseCoefficient(elementId, Number(this.editField)).subscribe(() => {
+        this.alertify.success('modificiation terminée');
+      }, error => {
+        console.log(error);
+      });
+    }
   }
 
   remove(id: any) {
@@ -65,13 +73,13 @@ editField: string;
     const elementId = this.coefficients[id].id;
     this.editField = event.target.textContent;
     // mise a jour de la ligne
-    if (this.editField && elementId) {
-      this.classService.updateCourseCoefficient(elementId, Number(this.editField)).subscribe(() => {
-        this.alertify.success('modificiation terminée');
-      }, error => {
-        console.log(error);
-      });
-    }
+    // if (this.editField && elementId) {
+    //   this.classService.updateCourseCoefficient(elementId, Number(this.editField)).subscribe(() => {
+    //     this.alertify.success('modificiation terminée');
+    //   }, error => {
+    //     console.log(error);
+    //   });
+    // }
   }
 
 }

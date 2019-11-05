@@ -53,11 +53,10 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("GetPayableAts")]
-    public async Task<IActionResult> GetPayableAts ()
-  {
-    var ats = await _context.PayableAts.OrderBy (p => p.Name).ToListAsync ();
-    return Ok (ats);
-  }
+    public async Task<IActionResult> GetPayableAts () {
+      var ats = await _context.PayableAts.OrderBy (p => p.Name).ToListAsync ();
+      return Ok (ats);
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////ZONE DES GET BY ID/////////////////////////////////////////////////////////////////////////
@@ -226,10 +225,11 @@ namespace EducNotes.API.Controllers {
     [HttpPost ("EditPayableAt/{payableAtId}")]
     public async Task<IActionResult> EditPeriodicity (int payableAtId, PayableDto payableToUpdate) {
       var p = await _context.PayableAts.FirstOrDefaultAsync (a => a.Id == payableAtId);
-      if (p != null) {
-        var c = _mapper.Map<DeadLine> (payableToUpdate);
-        c.Id = p.Id;
-        _repo.Update (c);
+      if (p != null) 
+      {
+        p.Name = payableToUpdate.Name;
+        p.DayCount = payableToUpdate.DayCount;
+        _repo.Update (p);
         if (await _repo.SaveAll ())
           return Ok ();
 
