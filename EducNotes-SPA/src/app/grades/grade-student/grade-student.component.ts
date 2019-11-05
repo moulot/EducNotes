@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { echartStyles } from 'src/app/shared/echart-styles';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { Class } from 'src/app/_models/class';
 import { ClassService } from 'src/app/_services/class.service';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -18,11 +17,11 @@ export class GradeStudentComponent implements OnInit {
   chartLineOption3: any;
   userCourses: any;
   studentAvg: any;
-  classRoom: Class;
   chartData: number[] = [];
   evalData: any[] = [];
   aboveAvg: boolean[] = [];
   showDefaultChart = true;
+  isParentConnected = false;
 
   // LINE CHART
   chartType = 'line';

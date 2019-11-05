@@ -32,16 +32,16 @@ export class StudentAgendaComponent implements OnInit {
   daysFromNow = 7;
   nbDays = 7;
   allCourses = true;
-  startDate = new Date();
+  startDate: Date;
   endDate: Date;
   strStartDate: string;
   strEndDate: string;
   agendaParams: any = {};
   model: any = [];
-  isChildSelected = false;
   showChildrenList = false;
   parent: User;
   children: User[];
+  isParentConnected = false;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -53,7 +53,7 @@ export class StudentAgendaComponent implements OnInit {
       this.userIdFromRoute = params['id'];
     });
 
-    // is it the parent connected?
+    // is the parent connected?
     if (Number(this.userIdFromRoute) === 0) {
       this.showChildrenList = true;
       this.parent = this.authService.currentUser;
@@ -77,9 +77,17 @@ export class StudentAgendaComponent implements OnInit {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
 
+      const loggedUser = this.authService.currentUser;
+      if (loggedUser.id !== this.student.id) {
+        this.isParentConnected = true;
+      }
+
+      this.startDate = new Date();
       const year = this.startDate.getFullYear();
-      const month = this.startDate.getMonth() + 1;
-      const date = this.startDate.getDate();
+      let month = (this.startDate.getMonth() + 1).toString();
+      month = month.length === 2 ? month : '0' + month;
+      let date = this.startDate.getDate().toString();
+      date = date.length === 2 ? date : '0' + date;
 
       this.agendaParams.currentDate = year + '-' + month + '-' + date + 'T00:00:00';
       this.agendaParams.nbDays = this.nbDays;
@@ -89,22 +97,6 @@ export class StudentAgendaComponent implements OnInit {
       this.alertify.error(error);
     });
   }
-
-  // getAgenda(classId, toNbDays) {
-
-  //   this.classService.getTodayToNDaysAgenda(classId, toNbDays).subscribe((res: any) => {
-
-  //     this.agendaItems = res.agendaItems;
-  //     this.firstDay = res.firstDay;
-  //     this.strFirstDay = res.strFirstDayy;
-  //     this.strLastDay = res.strLastDay;
-  //     this.weekDays = res.weekDays;
-  //     this.nbDayTasks = res.nbDayTasks;
-
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
 
   getClassAgendaByDate(classId, agendaParams) {
     this.classService.getClassAgendaByDate(classId, agendaParams).subscribe((agenda: any) => {

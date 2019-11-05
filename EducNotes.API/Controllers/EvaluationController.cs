@@ -110,28 +110,26 @@ namespace EducNotes.API.Controllers
         {
             double courseAvgSum = 0;
             double courseCoeffSum = 0;
+            double GeneralAvg = -1000;
 
             List<UserEvalsDto> coursesWithEvals = await _repo.GetUserGrades(userId, classId);
 
-            foreach (var course in coursesWithEvals)
-            {
-                courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
-                courseCoeffSum += course.CourseCoeff;
-            }
-
-            var GeneralAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
-
             if(coursesWithEvals.Count() > 0)
             {
-                return Ok(new {
-                    StudentAvg = GeneralAvg,
-                    coursesWithEvals
-                });
+                foreach (var course in coursesWithEvals)
+                {
+                    courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
+                    courseCoeffSum += course.CourseCoeff;
+                }
+
+                if(courseCoeffSum > 0)
+                    GeneralAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
             }
-            else
-            {
-                return NoContent();
-            }
+
+            return Ok(new {
+                StudentAvg = GeneralAvg,
+                coursesWithEvals = coursesWithEvals
+            });
         }
 
         [HttpGet("CoursesSkills")]

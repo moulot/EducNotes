@@ -215,7 +215,7 @@ namespace EducNotes.API.Controllers {
       var today = DateTime.Now;
 
       // OTHER SOLUTION : SET THE CURRENT DATE WITH THE ACTIVE FLAG
-      Period CurrentPeriod = await _context.Periods.Where (p => p.Active == 1).FirstOrDefaultAsync ();
+      Period CurrentPeriod = await _context.Periods.Where (p => p.Active == true).FirstOrDefaultAsync ();
 
       if (CurrentPeriod == null)
         return BadRequest ("la période courante n'a pas été paramétrée");

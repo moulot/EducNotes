@@ -170,7 +170,7 @@ namespace EducNotes.API.Controllers
                     var userToReturn = _mapper.Map<UserForListDto>(appUser);
 
                     //get the current period
-                    Period CurrentPeriod = await _context.Periods.Where(p => p.Active == 1).FirstOrDefaultAsync();
+                    Period CurrentPeriod = await _context.Periods.Where(p => p.Active == true).FirstOrDefaultAsync();
 
 
                     return Ok(new
@@ -556,7 +556,7 @@ namespace EducNotes.API.Controllers
                     toEmail = user.Email
                 };
                 await _repo.SendEmail(mail);
-                Period CurrentPeriod = await _context.Periods.Where(p => p.Active == 1).FirstOrDefaultAsync();
+                Period CurrentPeriod = await _context.Periods.Where(p => p.Active == true).FirstOrDefaultAsync();
                 return Ok(new
                 {
                     token = await GenerateJwtToken(user),

@@ -19,7 +19,7 @@
         </a>
       </div>
     </div> -->
-    <app-users-header [student]="student" (getUser)="getUser(student.id)"></app-users-header>
+    <app-users-header [student]="student" (getUser)="getUser($event)"></app-users-header>
   </div>
 
   <div class="col-lg-9 col-md-12">
@@ -30,8 +30,8 @@
         <div class="row">
           <div class="col-md-12">
 
-            <div class="card mb-4 ">
-              <div class="card-body ">
+            <div class="card mb-4">
+              <div class="card-body p-2">
                 <div class="card-title d-flex">
                   <div class="flex-grow-1 lead">devoirs à faire</div>
                   <div>
@@ -109,14 +109,15 @@
                     <i class="i-Turn-Up" style="color: rgb(81, 211, 81); font-size: 30px;"></i>
                     <div class="content">
                       <p class="text-muted mt-2 mb-0">moyenne</p>
-                      <p *ngIf="studentAvg < 10" class="text-danger text-20 line-height-1 mb-2">{{studentAvg}}</p>
-                      <p *ngIf="studentAvg >= 10" class="text-success text-20 line-height-1 mb-2">{{studentAvg}}</p>
+                      <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-danger text-20 line-height-1 mb-2">{{studentAvg}}</p>
+                      <p *ngIf="studentAvg >= 10 && studentAvg > -1000" class="text-success text-20 line-height-1 mb-2">{{studentAvg}}</p>
+                      <p *ngIf="studentAvg === -1000" class="text-primary text-20 line-height-1 m-0">N/A</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6 mb-1">
                 <div class="card card-icon-bg o-hidden">
                   <div class="card-body align-items-center text-center">
                     <i class="i-Tongue" style="color: green; font-size: 30px;"></i>
@@ -183,8 +184,7 @@
                               class="text-primary text-danger text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
                             <p *ngIf="course.userCourseAvg >= 10"
                               class="text-primary text-success text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                            <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-16 line-height-1 m-0">N/A
-                            </p>
+                            <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</p>
                           </div>
                         </div>
                       </div>
@@ -201,7 +201,7 @@
 
           <div class="col-md-12">
             <div class="card mb-4">
-              <div class="card-body">
+              <div class="card-body p-2">
                 <div class="card-title d-flex">
                   <div class="flex-grow-1 lead">évaluations à venir</div>
                   <div>

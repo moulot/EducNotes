@@ -674,108 +674,229 @@ namespace EducNotes.API.Data {
 
             var aclass = await _context.Classes.FirstOrDefaultAsync (c => c.Id == classId);
 
-            List<UserEvalsDto> coursesWithEvals = new List<UserEvalsDto> ();
+            List<UserEvalsDto> coursesWithEvals = new List<UserEvalsDto>();
+            
+            var periods = await _context.Periods.OrderBy(p => p.StartDate).ToListAsync();
 
-            double gradesSum = 0;
-            double coeffSum = 0;
             //loop on user courses - get data for each course 
             for (int i = 0; i < userCourses.Count (); i++) {
+
+                // double gradesSum = 0;
+                // double coeffSum = 0;
+
                 var acourse = userCourses[i];
 
                 //get all evaluations of the selected course and current userId
-                var UserEvals = await _context.UserEvaluations
-                    .Include (e => e.Evaluation).ThenInclude (e => e.EvalType)
-                    .OrderBy (o => o.Evaluation.EvalDate)
-                    .Where (e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
-                        e.Evaluation.CourseId == acourse.Id && e.Evaluation.Graded == true)
-                    .Distinct ().ToListAsync ();
+                var userEvals = await _context.UserEvaluations
+                                    .Include (e => e.Evaluation).ThenInclude (e => e.EvalType)
+                                    .OrderBy (o => o.Evaluation.EvalDate)
+                                    .Where (e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
+                                        e.Evaluation.CourseId == acourse.Id && e.Evaluation.Graded == true)
+                                    .Distinct ().ToListAsync ();
 
-                UserEvalsDto userEvalsDto = new UserEvalsDto ();
-                userEvalsDto.CourseId = acourse.Id;
-                userEvalsDto.CourseName = acourse.Name;
-                userEvalsDto.CourseAbbrev = acourse.Abbreviation;
-                userEvalsDto.GradedOutOf = 20;
+                // get general Evals data for the current user course
+                UserEvalsDto userEvalsDto = GetUserCourseEvals(userEvals, acourse, aclass);
 
-                // evals for this are evailable?
-                if (UserEvals.Count () > 0) {
+                // get evals by period for the current user course
+                userEvalsDto.PeriodEvals = new List<PeriodEvalsDto>();
+                foreach (var period in periods)
+                {
+                    PeriodEvalsDto ped = new PeriodEvalsDto();
+                    ped.PeriodId = period.Id;
+                    ped.PeriodName = period.Name;
+                    ped.PeriodAbbrev = period.Abbrev;
+                    ped.Active = period.Active;
 
-                    List<GradeDto> grades = new List<GradeDto> ();
-
-                    for (int j = 0; j < UserEvals.Count (); j++) {
-                        // calculate each grade of the selected course
-                        var elt = UserEvals[j];
-                        if (elt.Grade.IsNumeric ()) {
-                            var evalDate = elt.Evaluation.EvalDate.ToShortDateString ();
-                            var evalType = elt.Evaluation.EvalType.Name;
-                            var evalName = elt.Evaluation.Name;
-                            double gradeMax = Convert.ToDouble (elt.Evaluation.MaxGrade);
-                            double gradeValue = Convert.ToDouble (elt.Grade.Replace (".", ","));
-                            // grade are ajusted to 20 as MAx. Avg is on 20
-                            double ajustedGrade = Math.Round (20 * gradeValue / gradeMax, 2);
-                            double coeff = elt.Evaluation.Coeff;
-                            //data for course average
-                            gradesSum += ajustedGrade * coeff;
-                            coeffSum += coeff;
-
-                            // get class grades for the current user grade (evaluation)
-                            var EvalClassGrades = await _context.UserEvaluations
-                                .Where (e => e.EvaluationId == elt.EvaluationId &&
-                                    e.Evaluation.GradeInLetter == false && e.Evaluation.Graded == true &&
-                                    e.Grade.IsNumeric ())
-                                .Select (e => e.Grade).ToListAsync ();
-
-                            double classMin = 1000;
-                            double classMax = -1000;
-                            //get class min and max of evaluation
-                            foreach (var item in EvalClassGrades) {
-                                var ddd = item;
-                                var grade = Convert.ToDouble (item.Replace (".", ","));
-                                classMin = grade < classMin? grade : classMin;
-                                classMax = grade > classMax? grade : classMax;
-                            }
-                            double EvalGradeMin = classMin;
-                            double EvalGradeMax = classMax;
-
-                            //enter grade data "as it is" in the user grades data list
-                            GradeDto gradeDto = new GradeDto ();
-                            gradeDto.EvalType = evalType;
-                            gradeDto.EvalDate = evalDate;
-                            gradeDto.EvalName = evalName;
-                            gradeDto.Grade = Math.Round (gradeValue, 2);
-                            gradeDto.GradeMax = gradeMax;
-                            gradeDto.Coeff = coeff;
-                            gradeDto.ClassGradeMin = EvalGradeMin;
-                            gradeDto.ClassGradeMax = EvalGradeMax;
-                            grades.Add (gradeDto);
-                        }
+                    var userPeriodEvals = userEvals.Where(e => e.Evaluation.PeriodId == period.Id).ToList();
+                    if(userPeriodEvals.Count() > 0)
+                    {
+                        UserEvalsDto periodEvals = GetUserCourseEvals(userPeriodEvals, acourse, aclass);
+                        ped.UserCourseAvg = periodEvals.UserCourseAvg;
+                        ped.ClassCourseAvg = periodEvals.ClassCourseAvg;
+                        ped.grades = periodEvals.grades;
                     }
 
-                    //calculate user grade avg for the selected course
-                    double gradesAvg = Math.Round (gradesSum / coeffSum, 2);
-                    //data for general user average
-
-                    //get course coeff
-                    var courseCoeffData = await _context.CourseCoefficients
-                        .FirstOrDefaultAsync (c => c.ClassLevelid == aclass.ClassLevelId &&
-                            c.CourseId == acourse.Id && c.ClassTypeId == aclass.ClassTypeId);
-                    double courseCoeff = courseCoeffData.Coefficient;
-
-                    //get the class course average - to be compared with the user average
-                    double ClassCourseAvg = GetClassCourseEvalData (acourse.Id, classId);
-
-                    userEvalsDto.UserCourseAvg = gradesAvg;
-                    userEvalsDto.ClassCourseAvg = ClassCourseAvg;
-                    userEvalsDto.CourseCoeff = courseCoeff;
-                    userEvalsDto.grades = grades;
-                    coursesWithEvals.Add (userEvalsDto);
-                } else {
-                    // there is no grade for the course - User course AVG set to -1000.
-                    userEvalsDto.UserCourseAvg = -1000;
-                    coursesWithEvals.Add (userEvalsDto);
+                    userEvalsDto.PeriodEvals.Add(ped);
                 }
+
+                coursesWithEvals.Add(userEvalsDto);
+                // userEvalsDto.CourseId = acourse.Id;
+                // userEvalsDto.CourseName = acourse.Name;
+                // userEvalsDto.CourseAbbrev = acourse.Abbreviation;
+                // userEvalsDto.GradedOutOf = 20;
+
+                // // are evals evailable fro the cuurent course?
+                // if (UserEvals.Count () > 0) {
+
+                //     List<GradeDto> grades = new List<GradeDto> ();
+
+                //     for (int j = 0; j < UserEvals.Count (); j++) {
+                //         // calculate each grade of the selected course
+                //         var elt = UserEvals[j];
+                //         if (elt.Grade.IsNumeric ()) {
+                //             var evalDate = elt.Evaluation.EvalDate.ToShortDateString ();
+                //             var evalType = elt.Evaluation.EvalType.Name;
+                //             var evalName = elt.Evaluation.Name;
+                //             double gradeMax = Convert.ToDouble (elt.Evaluation.MaxGrade);
+                //             double gradeValue = Convert.ToDouble (elt.Grade.Replace (".", ","));
+                //             // grade are ajusted to 20 as MAx. Avg is on 20
+                //             double ajustedGrade = Math.Round (20 * gradeValue / gradeMax, 2);
+                //             double coeff = elt.Evaluation.Coeff;
+                //             //data for course average
+                //             gradesSum += ajustedGrade * coeff;
+                //             coeffSum += coeff;
+
+                //             // get class grades for the current user grade (evaluation)
+                //             var EvalClassGrades = await _context.UserEvaluations
+                //                 .Where (e => e.EvaluationId == elt.EvaluationId &&
+                //                     e.Evaluation.GradeInLetter == false && e.Evaluation.Graded == true &&
+                //                     e.Grade.IsNumeric ())
+                //                 .Select (e => e.Grade).ToListAsync ();
+
+                //             double classMin = 999999;
+                //             double classMax = -999999;
+                //             //get class min and max of evaluation
+                //             foreach (var item in EvalClassGrades) {
+                //                 var ddd = item;
+                //                 var grade = Convert.ToDouble (item.Replace (".", ","));
+                //                 classMin = grade < classMin? grade : classMin;
+                //                 classMax = grade > classMax? grade : classMax;
+                //             }
+                //             double EvalGradeMin = classMin;
+                //             double EvalGradeMax = classMax;
+
+                //             //enter grade data "as it is" in the user grades data list
+                //             GradeDto gradeDto = new GradeDto ();
+                //             gradeDto.EvalType = evalType;
+                //             gradeDto.EvalDate = evalDate;
+                //             gradeDto.EvalName = evalName;
+                //             gradeDto.Grade = Math.Round (gradeValue, 2);
+                //             gradeDto.GradeMax = gradeMax;
+                //             gradeDto.Coeff = coeff;
+                //             gradeDto.ClassGradeMin = EvalGradeMin;
+                //             gradeDto.ClassGradeMax = EvalGradeMax;
+                //             grades.Add (gradeDto);
+                //         }
+                //     }
+
+                //     //calculate user grade avg for the selected course
+                //     double gradesAvg = Math.Round (gradesSum / coeffSum, 2);
+                //     //data for general user average
+
+                //     //get course coeff
+                //     var courseCoeffData = await _context.CourseCoefficients
+                //         .FirstOrDefaultAsync (c => c.ClassLevelid == aclass.ClassLevelId &&
+                //             c.CourseId == acourse.Id && c.ClassTypeId == aclass.ClassTypeId);
+                //     double courseCoeff = courseCoeffData.Coefficient;
+
+                //     //get the class course average - to be compared with the user average
+                //     double ClassCourseAvg = GetClassCourseEvalData (acourse.Id, aclass.Id);
+
+                //     userEvalsDto.UserCourseAvg = gradesAvg;
+                //     userEvalsDto.ClassCourseAvg = ClassCourseAvg;
+                //     userEvalsDto.CourseCoeff = courseCoeff;
+                //     userEvalsDto.grades = grades;
+                //     coursesWithEvals.Add (userEvalsDto);
+                // } else {
+                //     // there is no grade for the course - User course AVG set to -1000.
+                //     userEvalsDto.UserCourseAvg = -1000;
+                //     coursesWithEvals.Add (userEvalsDto);
+                // }
             }
 
             return coursesWithEvals;
+        }
+
+        public UserEvalsDto GetUserCourseEvals(List<UserEvaluation> UserEvals, Course acourse, Class aclass)
+        {
+            UserEvalsDto userEvalsDto = new UserEvalsDto();
+            userEvalsDto.CourseId = acourse.Id;
+            userEvalsDto.CourseName = acourse.Name;
+            userEvalsDto.CourseAbbrev = acourse.Abbreviation;
+            userEvalsDto.GradedOutOf = 20;
+
+            double gradesSum = 0;
+            double coeffSum = 0;
+
+            // are evals evailable fro the cuurent course?
+            if (UserEvals.Count () > 0) {
+
+                List<GradeDto> grades = new List<GradeDto> ();
+
+                for (int j = 0; j < UserEvals.Count (); j++) {
+                    // calculate each grade of the selected course
+                    var elt = UserEvals[j];
+                    if (elt.Grade.IsNumeric ()) {
+                        var evalDate = elt.Evaluation.EvalDate.ToShortDateString ();
+                        var evalType = elt.Evaluation.EvalType.Name;
+                        var evalName = elt.Evaluation.Name;
+                        double gradeMax = Convert.ToDouble (elt.Evaluation.MaxGrade);
+                        double gradeValue = Convert.ToDouble (elt.Grade.Replace (".", ","));
+                        // grade are ajusted to 20 as MAx. Avg is on 20
+                        double ajustedGrade = Math.Round (20 * gradeValue / gradeMax, 2);
+                        double coeff = elt.Evaluation.Coeff;
+                        //data for course average
+                        gradesSum += ajustedGrade * coeff;
+                        coeffSum += coeff;
+
+                        // get class grades for the current user grade (evaluation)
+                        var EvalClassGrades = _context.UserEvaluations
+                            .Where (e => e.EvaluationId == elt.EvaluationId &&
+                                e.Evaluation.GradeInLetter == false && e.Evaluation.Graded == true &&
+                                e.Grade.IsNumeric ())
+                            .Select (e => e.Grade).ToList();
+
+                        double classMin = 999999;
+                        double classMax = -999999;
+                        //get class min and max of evaluation
+                        foreach (var item in EvalClassGrades) {
+                            var ddd = item;
+                            var grade = Convert.ToDouble (item.Replace (".", ","));
+                            classMin = grade < classMin? grade : classMin;
+                            classMax = grade > classMax? grade : classMax;
+                        }
+                        double EvalGradeMin = classMin;
+                        double EvalGradeMax = classMax;
+
+                        //enter grade data "as it is" in the user grades data list
+                        GradeDto gradeDto = new GradeDto ();
+                        gradeDto.EvalType = evalType;
+                        gradeDto.EvalDate = evalDate;
+                        gradeDto.EvalName = evalName;
+                        gradeDto.Grade = Math.Round (gradeValue, 2);
+                        gradeDto.GradeMax = gradeMax;
+                        gradeDto.Coeff = coeff;
+                        gradeDto.ClassGradeMin = EvalGradeMin;
+                        gradeDto.ClassGradeMax = EvalGradeMax;
+                        grades.Add (gradeDto);
+                    }
+                }
+
+                //calculate user grade avg for the selected course
+                double gradesAvg = Math.Round (gradesSum / coeffSum, 2);
+                //data for general user average
+
+                //get course coeff
+                var courseCoeffData = _context.CourseCoefficients
+                    .FirstOrDefault(c => c.ClassLevelid == aclass.ClassLevelId &&
+                        c.CourseId == acourse.Id && c.ClassTypeId == aclass.ClassTypeId);
+                double courseCoeff = courseCoeffData.Coefficient;
+
+                //get the class course average - to be compared with the user average
+                double ClassCourseAvg = GetClassCourseEvalData (acourse.Id, aclass.Id);
+
+                userEvalsDto.UserCourseAvg = gradesAvg;
+                userEvalsDto.ClassCourseAvg = ClassCourseAvg;
+                userEvalsDto.CourseCoeff = courseCoeff;
+                userEvalsDto.grades = grades;
+                //coursesWithEvals.Add (userEvalsDto);
+            } else {
+                // there is no grade for the course - User course AVG set to -1000.
+                userEvalsDto.UserCourseAvg = -1000;
+                //coursesWithEvals.Add (userEvalsDto);
+            }
+
+            return userEvalsDto;
         }
 
         public double GetClassCourseEvalData (int courseId, int classId) {

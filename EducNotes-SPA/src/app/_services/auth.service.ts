@@ -22,7 +22,7 @@ export class AuthService {
   jwtHelper = new JwtHelperService();
   decodedToken: any;
   currentUser: User;
-  newUser = <User>{};
+  newUser = <User>{id: 0};
   currentPeriod: Period;
 
   photoUrl = new BehaviorSubject<string>('../../assets/user.png');
@@ -72,7 +72,7 @@ export class AuthService {
     this.currentPeriod = null;
     this.currentChild = null;
     this.alertify.info('vous êtes déconnecté');
-    this.router.navigate(['/signin']);
+    this.router.navigate(['/']);
   }
 
   register(user: User) {
