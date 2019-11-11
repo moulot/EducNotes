@@ -96,8 +96,8 @@ export class TresoService {
     return this.http.post(this.baseUrl + 'treso/EditPeriodicity/' + id + '/' + periodicityName , {});
   }
 
-  EditPayableAt(id: number, payableAt: PayableAt) {
-    return this.http.post(this.baseUrl + 'treso/EditPayableAt'  , payableAt);
+  EditPayableAt(id: number, payableAt: any) {
+    return this.http.post(this.baseUrl + 'treso/EditPayableAt/' + id  , payableAt);
   }
 
 
