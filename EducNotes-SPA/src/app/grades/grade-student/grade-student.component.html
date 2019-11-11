@@ -1,130 +1,299 @@
 <div class="row">
 
-  <div class="col-md-12 mb-1">
-    <div class="row">
-      <div class="col-md-6 d-flex">
-        <p class="text-20 font-weight-300 m-0">{{student?.firstName}} {{student?.lastName}} ({{student?.className}})</p>
-        <div class="ml-2">
-          <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-20 font-weight-300 m-0">
-            - moyenne : <label class="text-danger"><b>{{studentAvg}} / 20</b></label>
-          </p>
-          <p *ngIf="studentAvg >= 10" class="text-20 font-weight-300 m-0">
-            - moyenne : <label class="text-success"><b>{{studentAvg}} / 20</b></label>
-          </p>
-          <p *ngIf="studentAvg === -1000" class="text-20 font-weight-300 m-0">
-            - moyenne : <label class="text-primary"><b>N/A</b></label>
-          </p>
-        </div>
-      </div>
-      <!-- <div class="col-md-6">
-        <button type="button" (click)="loadDefaultChart()" mdbBtn size="sm" color="light" mdbWavesEffect>graphe général</button>
-      </div> -->
-    </div>
-  </div>
+  <!-- <div class="col-md-12 mb-1">
+    <p class="lead m-0">notes - notes par période</p>
+  </div> -->
+    
+  <div class="col-md-12" *ngIf="showChildrenList">
 
-  <div class="col-md-6">
+    <p class="text-15 text-muted m-1">sélectionner un enfant pour voir ses notes</p>
 
     <div class="row">
 
-      <div class="col-md-12">
-          <button type="button" (click)="loadDefaultChart()" mdbBtn size="sm" color="light" mdbWavesEffect>graphe général</button>
-        <button type="button" (click)="loadDefaultChart()" class="mr-2" mdbBtn size="sm" color="primary" mdbWavesEffect>1er trim</button>
-        <button type="button" (click)="loadDefaultChart()" class="mr-2" mdbBtn size="sm" color="light" mdbWavesEffect>2e trim</button>
-        <button type="button" (click)="loadDefaultChart()" mdbBtn size="sm" color="light" mdbWavesEffect>3e trim</button>
+      <div class="col-md-9 col-sm-12">
+        <app-children-list [children]="children"></app-children-list>
       </div>
 
-      <div class="col-md-12 mb-2">
-        <div class="card">
-          <div class="card-body p-2">
-            <div class="row">
-              <div class="col-md-3 mb-2" (click)="loadData(course)" *ngFor="let course of userCourses" style="cursor: pointer">
-                <div class="card">
-                  <div class="card-body text-center p-2">
-                    <p class="text-muted text-16 mb-1">{{course.courseAbbrev}}</p>
-                    <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000" class="text-primary text-danger text-18 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                    <p *ngIf="course.userCourseAvg >= 10" class="text-primary text-success text-18 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                    <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-18 line-height-1 m-0">N/A</p>
-                  </div>
-                </div>
+      <div class="col-md-3 col-sm-12">
+        <div class="row">
+
+          <div class="col-md-12 col-sm-12">
+            <div class="card mb-4 p-2">
+              <div class="card-body">
+                <div class="card-title m-0">mon agenda</div>
+                <p class="text-small text-muted">programme de la semaine.</p>
+                <nz-timeline>
+                  <nz-timeline-item nzColor="green">
+                    <div>
+                      <strong class="mr-1"><a href="#">8:30 - évènement à venir</a></strong>
+                      <p class="text-muted">desc de l'info à venir</p>
+                    </div>
+                  </nz-timeline-item>
+                  <nz-timeline-item nzColor="green">
+                    <div>
+                      <strong class="mr-1"><a href="#">10:30 - info suivante</a></strong>
+                      <p class="text-muted">desc infos en temps réel ici</p>
+                    </div>
+                  </nz-timeline-item>
+                  <nz-timeline-item [nzDot]="dotTemplate" nzColor="red">
+                    <p>un évènement parent, élève ici</p>
+                  </nz-timeline-item>
+                  <nz-timeline-item>
+                    <p>réunion profs / parents</p>
+                    <p>détails de l'évènement</p>
+                  </nz-timeline-item>
+                  <nz-timeline-item nzColor="gray">
+                    <p>infos supplémentaires</p>
+                  </nz-timeline-item>
+                  <nz-timeline-item nzColor="gray">
+                    <p>infos 4</p>
+                    <p>détails de l'information</p>
+                  </nz-timeline-item>
+                </nz-timeline>
+                <ng-template #dotTemplate>
+                  <i nz-icon nzType="clock-circle-o" style="font-size: 16px;"></i>
+                </ng-template>
               </div>
-            </div>
-          </div>      
-        </div>
-      
-      </div>
-              
-      <div class="col-md-12 mb-2">
-        <div class="card">
-          <div class="card-body">
-            <p class="lead">détails des notes</p>
-            <div *ngFor="let grade of evalData; let i = index">
-              <p class="text-muted text-14 m-0">
-                {{grade.evalDate}}. {{grade.evalType}} (-){{grade.classGradeMin}} 
-                <label class="text-danger" *ngIf="aboveAvg[i] === false"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
-                <label class="text-success" *ngIf="aboveAvg[i] === true"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
-                (+){{grade.classGradeMax}}
-              </p>
             </div>
           </div>
+
         </div>
       </div>
-  
+
     </div>
 
   </div>
 
-  <div class="col-md-6">
-
+  <div class="col-md-12" *ngIf="!showChildrenList">
+  
     <div class="row">
 
-      <!-- <div class="col-md-12">
-        <button type="button" (click)="loadDefaultChart()" mdbBtn size="sm"
-          color="light" mdbWavesEffect>graphe général</button>    
+      <div *ngIf="isParentConnected" class="col-md-12 mb-2">
+        <app-users-header [student]="student" (getUser)="getUser($event)"></app-users-header>
       </div>
- -->
-      <div class="col-md-12">
-        <div class="card">
-            <div class="card-body p-0">
-              <div class="row">
-                <div class="col-md-12">
-                  <!-- <p class="text-15 m-0 p-1">graphes des notes de l'élève - notes sur 20</p>
-                  <div echarts [options]="chartLineOption3" style="height: 150px"></div> -->
+
+      <div class="col-md-6">
     
-                  <div *ngIf="!showDefaultChart" style="display: block;">
-                    <canvas mdbChart height="175"
-                      [chartType]="chartType"
-                      [datasets]="chartDatasets"
-                      [labels]="chartLabels"
-                      [colors]="chartColors"
-                      [options]="chartOptions"
-                      [legend]="true"
-                      (chartHover)="chartHovered($event)"
-                      (chartClick)="chartClicked($event)">
-                    </canvas>
+        <div class="row">
+    
+          <div class="col-md-12 mb-2">
+            <div class="card">
+              <div class="card-body text-center p-2">
+                <button type="button" *ngIf="btnColor[0] === 'primary'" (click)="loadDefaultChart()" mdbBtn
+                  size="sm" color="primary" mdbWavesEffect>graphe general</button>
+                <button type="button" *ngIf="btnColor[0] === 'light'" (click)="loadDefaultChart()" mdbBtn
+                  size="sm" color="light" mdbWavesEffect>graphe general</button>
+                <span *ngFor="let period of periods; let i = index">
+                <button type="button" *ngIf="btnColor[i+1] === 'primary' && btnDisabled[i]" (click)="loadChartSetBtn(period.id, i+1)" mdbBtn
+                  size="sm" color="primary" disabled mdbWavesEffect>{{period.abbrev}}</button>
+                <button type="button" *ngIf="btnColor[i+1] === 'primary' && !btnDisabled[i]" (click)="loadChartSetBtn(period.id, i+1)" mdbBtn
+                  size="sm" color="primary" mdbWavesEffect>{{period.abbrev}}</button>
+                <button type="button" *ngIf="btnColor[i+1] === 'light' && btnDisabled[i]" (click)="loadChartSetBtn(period.id, i+1)" mdbBtn
+                  size="sm" color="light" disabled mdbWavesEffect>{{period.abbrev}}</button>
+                <button type="button" *ngIf="btnColor[i+1] === 'light' && !btnDisabled[i]" (click)="loadChartSetBtn(period.id, i+1)" mdbBtn
+                  size="sm" color="light" mdbWavesEffect>{{period.abbrev}}</button>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-12" *ngIf="selectedPeriod">
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <div class="card">
+                  <div class="card-body text-center p-1">
+                    <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-15 font-weight-400 m-0">
+                      moy. {{periodName}} : <label class="text-danger"><b>{{periodAvg}} / 20</b></label>
+                    </p>
+                    <p *ngIf="studentAvg >= 10" class="text-15 font-weight-400 m-0">
+                      moy. {{periodName}} : <label class="text-success"><b>{{periodAvg}} / 20</b></label>
+                    </p>
+                    <p *ngIf="studentAvg === -1000" class="text-15 font-weight-400 m-0">
+                      moy. {{periodName}} : <label class="text-primary"><b>N/A</b></label>
+                    </p>
+                  </div>      
+                </div>
+              </div>
+              <div class="col-md-6 mb-2">
+                <div class="card">
+                  <div class="card-body text-center p-1">
+                    <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-15 font-weight-400 m-0">
+                      moy. générale : <label class="text-danger"><b>{{studentAvg}} / 20</b></label>
+                    </p>
+                    <p *ngIf="studentAvg >= 10" class="text-15 font-weight-400 m-0">
+                      moy. générale : <label class="text-success"><b>{{studentAvg}} / 20</b></label>
+                    </p>
+                    <p *ngIf="studentAvg === -1000" class="text-15 font-weight-400 m-0">
+                      moy. générale : <label class="text-primary"><b>N/A</b></label>
+                    </p>
                   </div>
-    
-                  <div *ngIf="showDefaultChart" style="display: block">
-                    <canvas mdbChart height="175"
-                      [chartType]="radarchartType"
-                      [datasets]="radarchartDatasets"
-                      [labels]="radarchartLabels"
-                      [colors]="radarchartColors"
-                      [options]="radarchartOptions"
-                      [legend]="true"
-                      (chartHover)="radarchartHovered($event)"
-                      (chartClick)="radarchartClicked($event)">
-                    </canvas>
-                  </div>
-    
                 </div>
               </div>
             </div>
+          </div>
+            
+          <div class="col-md-12" *ngIf="!selectedPeriod">
+            <div class="card">
+              <div class="card-body text-center p-1">
+                <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-15 font-weight-400 m-0">
+                  moyenne générale : <label class="text-danger"><b>{{studentAvg}} / 20</b></label>
+                </p>
+                <p *ngIf="studentAvg >= 10" class="text-15 font-weight-400 m-0">
+                  moyenne générale : <label class="text-success"><b>{{studentAvg}} / 20</b></label>
+                </p>
+                <p *ngIf="studentAvg === -1000" class="text-15 font-weight-300 m-0">
+                  moyenne générale : <label class="text-primary"><b>N/A</b></label>
+                </p>
+              </div>      
+            </div>
+          </div>
+              
+          <div class="col-md-12 mb-2">
+            <div class="card">
+              <div class="card-body">
+                <div *ngIf="!selectedPeriod">
+                  <div class="row">
+                    <div class="col-md-3 mb-2" *ngFor="let course of userCourses">
+                      <div class="card">
+                        <div *ngIf="course.userCourseAvg !== -1000" (click)="loadData(course)" style="cursor: pointer">
+                          <div class="card-body text-center p-2">
+                            <span class="text-muted text-16 mb-1 mr-1">{{course.courseAbbrev}} : </span>
+                            <span *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000" class="text-primary text-danger text-16 line-height-1 m-0">{{course.userCourseAvg}}</span>
+                            <span *ngIf="course.userCourseAvg >= 10" class="text-primary text-success text-16 line-height-1 m-0">{{course.userCourseAvg}}</span>
+                            <!-- <p class="text-muted text-16 mb-1 mr-1">{{course.courseAbbrev}} : </p>
+                            <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000" class="text-primary text-danger text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                            <p *ngIf="course.userCourseAvg >= 10" class="text-primary text-success text-16 line-height-1 m-0">{{course.userCourseAvg}}</p> -->
+                          </div>
+                        </div>
+                        <div *ngIf="course.userCourseAvg === -1000">
+                          <div class="card-body text-center p-2">
+                            <span class="text-muted text-16 mb-1 mr-1">{{course.courseAbbrev}} : </span>
+                            <span *ngIf="course.userCourseAvg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</span>
+                            <!-- <p class="text-muted text-16 mb-1 mr-1">{{course.courseAbbrev}} : </p>
+                            <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</p> -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="selectedPeriod">
+                  <div class="row">
+                    <div class="col-md-3 mb-2" *ngFor="let course of coursesAvgs">
+                      <div class="card">
+                        <div *ngIf="course.avg !== -1000" (click)="loadData(course)" style="cursor: pointer">
+                          <div class="card-body text-center p-2">
+                            <span class="text-muted text-16 mb-1 mr-1">{{course.abbrev}} : </span>
+                            <span *ngIf="course.avg < 10 && course.avg > -1000" class="text-primary text-danger text-16  line-height-1 m-0">{{course.avg}}</span>
+                            <span *ngIf="course.avg >= 10" class="text-primary text-success text-16 line-height-1 m-0">{{course.avg}}</span>
+                            <!-- <p class="text-muted text-16 mb-1 mr-1">{{course.abbrev}} : </p>
+                            <p *ngIf="course.avg < 10 && course.avg > -1000" class="text-primary text-danger text-16  line-height-1 m-0">{{course.avg}}</p>
+                            <p *ngIf="course.avg >= 10" class="text-primary text-success text-16 line-height-1 m-0">{{course.avg}}</p> -->
+                          </div>
+                        </div>
+                        <div *ngIf="course.avg === -1000">
+                          <div class="card-body text-center p-2">
+                            <span class="text-muted text-16 mb-1 mr-1">{{course.abbrev}} : </span>
+                            <span *ngIf="course.avg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</span>
+                            <!-- <p class="text-muted text-16 mb-1 mr-1">{{course.abbrev}} : </p>
+                            <p *ngIf="course.avg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</p> -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>     
+            </div>
+          
+          </div>
+                  
+          <div class="col-md-12 mb-2">
+            <div class="card">
+              <div class="card-body p-2">
+                <p class="text-17 font-weight-300 m-0">détails des notes</p>
+                <div *ngIf="selectedCourse">
+                  <table mdbTable hover="true" small="true">
+                    <thead>
+                      <tr>
+                        <th *ngFor="let head of headElts" scope="col">{{head}} </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr mdbTableCol *ngFor="let grade of evalData; let i = index">
+                        <td class="m-0">{{grade.evalDate}}</td>
+                        <td>{{grade.evalType}}</td>
+                        <td>
+                          <label class="text-danger" *ngIf="aboveAvg[i] === false"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
+                          <label class="text-success" *ngIf="aboveAvg[i] === true"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
+                        </td>
+                        <td>{{grade.classGradeMin}}</td>
+                        <td>{{grade.classGradeMax}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div *ngIf="!selectedCourse">
+                  <p class="text-18 font-weight-400 m-0 p-4">sélectionner un cours pour visualiser les notes</p>
+                </div>
+              </div>
+            </div>
+          </div>
       
         </div>
-
+    
       </div>
-    </div>
-      
-  </div>
+    
+      <div class="col-md-6">
+    
+        <div class="row">
 
+          <div class="col-md-12">
+            <div class="card">
+                <div class="card-body p-0">
+                  <div class="row">
+                    <div class="col-md-12">
+        
+                      <div *ngIf="!showDefaultChart" style="display: block;">
+                        <canvas mdbChart height="175"
+                          [chartType]="chartType"
+                          [datasets]="chartDatasets"
+                          [labels]="chartLabels"
+                          [colors]="chartColors"
+                          [options]="chartOptions"
+                          [legend]="true"
+                          (chartHover)="chartHovered($event)"
+                          (chartClick)="chartClicked($event)">
+                        </canvas>
+                      </div>
+        
+                      <div *ngIf="showDefaultChart" style="display: block">
+                        <canvas mdbChart height="175"
+                          [chartType]="radarchartType"
+                          [datasets]="radarchartDatasets"
+                          [labels]="radarchartLabels"
+                          [colors]="radarchartColors"
+                          [options]="radarchartOptions"
+                          [legend]="true"
+                          (chartHover)="radarchartHovered($event)"
+                          (chartClick)="radarchartClicked($event)">
+                        </canvas>
+                      </div>
+        
+                    </div>
+                  </div>
+                </div>
+          
+            </div>
+    
+          </div>
+
+        </div>
+          
+      </div>
+        
+    </div>
+        
+  </div>
+        
 </div>

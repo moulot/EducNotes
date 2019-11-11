@@ -70,7 +70,10 @@ export class GradeAddFormComponent implements OnInit {
 
   saveNotes() {
 
-    const evalClosed = this.closed;
+    let evalClosed = false;
+    if (this.closed === true) {
+      evalClosed = true;
+    }
 
     for (let i = 0; i < this.userGrades.length; i++) {
       const elt = this.userGrades[i];

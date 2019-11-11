@@ -147,7 +147,7 @@ export const appRoutes: Routes = [
             { path: 'editTeacher/:id', component: NewTeacherComponent, resolve: { teacher: TeacherManagementResolver } },
             { path: 'preregister', component: PreRegisterComponent },
             { path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve: { classes: LevelClassesResolver } },
-            { path: 'studentGrades/:id', component: GradeStudentComponent, resolve: { student: StudentResolver } },
+            { path: 'studentGrades/:id', component: GradeStudentComponent}, // , resolve: { student: StudentResolver } },
             { path: 'school', component: SchoolComponent, resolve: { school: SchoolResolver } },
             { path: 'productsList', component: ProductsListComponent, resolve: { products: ProductsListResolver } },
             { path: 'createProduct', component: ProductFormComponent },

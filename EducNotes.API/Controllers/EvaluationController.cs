@@ -108,11 +108,19 @@ namespace EducNotes.API.Controllers
         [HttpGet("Class/{classId}/CoursesWithEvals/{userId}")]
         public async Task<IActionResult> GetCoursesWithEvals(int userId, int classId)
         {
+            var periods = await _context.Periods
+                                .OrderBy(o => o.Abbrev)
+                                .ToListAsync();
+
+            // List<Boolean> activatedPeriods = new List<bool>();
+                
+            List<UserEvalsDto> coursesWithEvals = await _repo.GetUserGrades(userId, classId);
+
             double courseAvgSum = 0;
             double courseCoeffSum = 0;
             double GeneralAvg = -1000;
 
-            List<UserEvalsDto> coursesWithEvals = await _repo.GetUserGrades(userId, classId);
+            List<PeriodAvgDto> periodAvgs = new List<PeriodAvgDto>();
 
             if(coursesWithEvals.Count() > 0)
             {
@@ -124,10 +132,51 @@ namespace EducNotes.API.Controllers
 
                 if(courseCoeffSum > 0)
                     GeneralAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
+
+                foreach (var period in periods)
+                {
+
+                    PeriodAvgDto pad = new PeriodAvgDto();
+                    pad.PeriodId = period.Id;
+                    pad.PeriodName = period.Name;
+                    pad.PeriodAbbrev = period.Abbrev;
+                    pad.StartDate = period.StartDate;
+                    pad.EndDate = period.EndDate;
+                    //set activated period depending on startDate
+                    if(DateTime.Now.Date >= period.StartDate)
+                    {
+                        pad.activated = true;
+                    }
+                    else
+                    {
+                        pad.activated = false;
+                    }
+                    pad.Active = period.Active;
+                    pad.Avg = -1000;
+
+                    double periodAvgSum = 0;
+                    double coeffSum = 0;
+                    foreach (var course in coursesWithEvals)
+                    {
+                        var periodData = course.PeriodEvals.FirstOrDefault(p => p.PeriodId == period.Id);
+                        if(periodData.grades != null)
+                        {
+                            periodAvgSum += periodData.UserCourseAvg * course.CourseCoeff;
+                            coeffSum += course.CourseCoeff;
+                        }
+                    }
+
+                    if(coeffSum > 0)
+                        pad.Avg = Math.Round(periodAvgSum / coeffSum, 2);
+
+                    periodAvgs.Add(pad);
+                }
             }
 
             return Ok(new {
                 StudentAvg = GeneralAvg,
+                periodAvgs = periodAvgs,
+                periods = periods,
                 coursesWithEvals = coursesWithEvals
             });
         }
