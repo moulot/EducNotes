@@ -70,7 +70,7 @@ export class AuthService {
     this.decodedToken = null;
     this.currentUser = null;
     this.currentPeriod = null;
-    this.currentChild = null;
+    this.changeCurrentChild(this.newUser);
     this.alertify.info('vous êtes déconnecté');
     this.router.navigate(['/']);
   }
