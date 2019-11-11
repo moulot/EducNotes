@@ -1,23 +1,152 @@
-<div class="row justify-content-center align-items-center mt-3"
-    [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+<div class="row justify-content-center align-items-center mt-3 animated zoomInUp">
 
     <div class="col-md-8">
-        <div class="card p-3">
-            <form nz-form [formGroup]="productForm" (ngSubmit)="save()">
-                <div class="md-form">
-                    <input mdbInput type="text" id="name" class="form-control" formControlName="name">
-                    <label for="name" class="">Nom du Service</label>
+        <form [formGroup]="productForm" class="text-center" style="color: #757575;" *ngIf="!showRecap">
+            <!-- <form [formGroup]="productForm" (ngSubmit)="save()" class="text-center" style="color: #757575;" *ngIf="!showRecap"> -->
+            <mdb-card>
+                <mdb-card-body class="px-lg-5 pt-0">
+                    <div class="md-form">
+                        <mdb-select [options]="productTypes" formControlName="productTypeId"
+                            placeholder="Choisir le type de service"></mdb-select>
+                    </div>
+                    <div class="md-form">
+                        <input mdbInput type="text" id="name" class="form-control" formControlName="name">
+                        <label for="name" class="">Nom du Service</label>
+                    </div>
+                    <div class="md-form">
+                        <textarea type="text" formControlName="comment" id="comment"
+                            class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
+                        <label for="comment">Commentaire</label>
+                    </div>
+                    <div class="md-form">
+                        <mdb-select [options]="payableAts" formControlName="payableAtId" placeholder="type d'alerte ">
+                        </mdb-select>
+                    </div>
+                    <div class="md-form">
+                        <mdb-select [options]="recoveryTypes" formControlName="recoveryTypeId"
+                            (ngModelChange)="getSelectedRecoveryType($event)" placeholder="Type de recouvrement">
+                        </mdb-select>
+                    </div>
+                    <div *ngIf="showPeriodeOrDeadLine">
+                        <div *ngIf="!showPeriodicities" class="md-form animated fadeInRight">
+                            <input mdbInput type="text" id="deadLineCount" class="form-control"
+                                formControlName="deadLineCount">
+                            <label for="deadLineCount">nombre d'échéances</label>
+                        </div>
+                        <div *ngIf="showPeriodicities" class="md-form animated fadeInRight">
+                            <mdb-select [options]="periodicities" formControlName="periodicityId"
+                                placeholder="Type de période"></mdb-select>
+                        </div>
+                    </div>
+                    <div class="md-form m-0">
+                        <button type="button" mdbBtn color="light" size="sm" (click)="onNext1()" mdbPageScroll
+                            href="#section1" [disabled]="!productForm.valid" mdbWavesEffect>suivant</button>
+                    </div>
+                </mdb-card-body>
+            </mdb-card>
+
+            <div id="section1">
+                <div *ngIf="showDeadLines" class="mt-1 animated fadeInRight">
+                    <mdb-card>
+                        <mdb-card-body>
+                            <div formArrayName="deadlines"
+                                *ngFor="let deadLine of productForm.get('deadlines')['controls']; let i = index">
+                                <div [formGroupName]="i">
+                                    <!-- formulaire pour editer les echéances générées au nombre saisi plus haut -->
+                                    <div class="form-row">
+                                        <div class="col">
+                                            <div class="md-form">
+                                                    <mdb-select style="width: 100%" [options]="deadLines" formControlName="id"
+                                                    placeholder="choisir l'échéance"></mdb-select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="md-form">
+                                                <input mdbInput type="number" id="percentage" class="form-control"
+                                                    formControlName="percentage">
+                                                <label for="percentage">pourcentage</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-row m-0">
+                                <button type="button" mdbBtn color="light" size="sm" (click)="onNext2()" mdbPageScroll
+                                    href="#totalAmontDiv" mdbWavesEffect>suivant</button>
+                            </div>
+                        </mdb-card-body>
+                    </mdb-card>
                 </div>
-                <div class="md-form">
-                    <textarea type="text" formControlName="comment" id="comment"
-                        class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
-                    <label for="form7">Commentaire</label>
+                <div id="totalAmontDiv">
+                    <div *ngIf="showTotalAmount" class="mt-1 animated fadeInRight">
+                        <mdb-card>
+                            <mdb-card-body>
+                                <div class="form-row">
+                                    <div class="col">
+                                        <div class="md-form">
+                                            <input mdbInput type="number" id="amount" class="form-control"
+                                                formControlName="price">
+                                            <label for="price">montant total</label>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="md-form">
+                                            <mdb-select [options]="billlingTypes" formControlName="isByLevel"
+                                                placeholder="type de facturation">
+                                            </mdb-select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row m-0">
+                                    <button type="button" mdbBtn color="light" size="sm" (click)="onNext3()"
+                                        mdbPageScroll href="#totalAmontDiv" mdbWavesEffect>suivant</button>
+                                </div>
+                            </mdb-card-body>
+                        </mdb-card>
+
+                    </div>
                 </div>
-                <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!productForm.valid"
-                    mdbWavesEffect>enregistrer</button>
-                <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
-                    [routerLink]="['/productsList']">annuler</button>
-            </form>
+
+            </div>
+
+        </form>
+        <div id="finalSection">
+            <div *ngIf="showLevels" class="mt-1 animated fadeInRight">
+                <span class="text-lg-center"> entrez les montants pour chaque niveau</span>
+                <table mdbTable class="z-depth-1">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Niveau</th>
+                            <th>Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let level of levels; let i = index">
+                            <th scope="row" valign="middle">{{i+1}}</th>
+                            <td scope="row" valign="middle">{{level.name}}</td>
+                            <td scope="row" valign="middle">
+                                <input type="text" name="lamout" [(ngModel)]="level.price" id="lprice" class="form-control"
+                                    mdbInput>
+    
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="submit" mdbBtn color="primary" size="sm" (click)="recap()" mdbWavesEffect>suivant</button>
+            </div>
+            <div class="animated fadeInRight" *ngIf="showRecap">
+                <div class="d-depth-1">
+                    {{productForm.value|json}}
+                    <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!productForm.valid" (click)="save()"
+                        mdbWavesEffect>enregistrer</button>
+                    <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
+                        [routerLink]="['/productsList']">annuler</button>
+                </div>
+            </div>
+    
         </div>
     </div>
 </div>

@@ -7,5 +7,6 @@ namespace EducNotes.API.Models
         public Product Product { get; set; }
         public int DeadLineId { get; set; }
         public DeadLine DeadLine { get; set; }
+        public double Percentage { get; set; }
     }
 }

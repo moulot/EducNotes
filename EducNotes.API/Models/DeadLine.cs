@@ -8,10 +8,10 @@ namespace EducNotes.API.Models {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Comment { get; set; }
-        public decimal Amount { get; set; }
+        // public decimal Amount { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime InsertDate { get; set; }
-        public bool isByAmount { get; set; }
+        // public bool isByAmount { get; set; }
 
     }
 }
