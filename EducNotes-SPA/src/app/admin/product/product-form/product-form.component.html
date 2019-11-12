@@ -19,6 +19,11 @@
                         <label for="comment">Commentaire</label>
                     </div>
                     <div class="md-form">
+                            <mdb-select [options]="billlingTypes" formControlName="isByLevelId"
+                            placeholder="type de facturation">
+                        </mdb-select>
+                    </div>
+                    <div class="md-form">
                         <mdb-select [options]="payableAts" formControlName="payableAtId" placeholder="type d'alerte ">
                         </mdb-select>
                     </div>
@@ -91,13 +96,7 @@
                                             <label for="price">montant total</label>
                                         </div>
                                     </div>
-                                    <div class="col">
-                                        <div class="md-form">
-                                            <mdb-select [options]="billlingTypes" formControlName="isByLevelId"
-                                                placeholder="type de facturation">
-                                            </mdb-select>
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                                 <div class="form-row m-0">
                                     <button type="button" mdbBtn color="light" size="sm" (click)="onNext3()"
@@ -140,7 +139,7 @@
             <div class="animated lightSpeedIn" *ngIf="showRecap">
                 <div class="card">
                     <div class="card-body">
-                        <div class="cart-title"><s>Récapitulatif</s></div>
+                        <div class="cart-title"><u>Récapitulatif</u></div>
                         <table style="width: 100%;">
                             <tr>
                                 <td><b>Service : </b></td>

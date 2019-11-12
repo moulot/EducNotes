@@ -78,7 +78,7 @@ export class ProductFormComponent implements OnInit {
     this.productForm = this.fb.group({
       name: [this.formModel.name, Validators.required],
       productTypeId: [this.formModel.productTypeId, Validators.required],
-      isByLevelId: [null],
+      isByLevelId: [null, Validators.required],
       recoveryTypeId: [null, Validators.required],
       payableAtId: [null, Validators.required],
       periodicityId: [null],
@@ -104,13 +104,7 @@ export class ProductFormComponent implements OnInit {
   }
 
   onNext3() {
-    if (this.productForm.value.isByLevelId === 2) {
-      // montant unique
-      // besoin de charger tous les niveaux
-      this.showLevels = true;
-    } else {
-      this.showRecap = true;
-    }
+    this.showRecap = true;
   }
 
 
@@ -143,16 +137,14 @@ export class ProductFormComponent implements OnInit {
         (<FormArray>this.productForm.get('deadlines')).push(this.addDeadlineFormGroup());
       }
       this.showDeadLines = true;
-      // document.querySelector('#deadlinesDiv').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // document.getElementById('deadlinesDiv').scrollIntoView();
-
     } else {
-      // affichage direct du montant du service
-      this.showTotalAmount = true;
-      // document.querySelector('#totalAmontDiv').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // document.getElementById('totalAmontDiv').scrollIntoView();
-
-
+      if (this.productForm.value.isByLevelId === 2) {
+        // montant unique
+        // besoin de charger tous les niveaux
+        this.showLevels = true;
+      } else {
+        this.showTotalAmount = true;
+      }
     }
 
   }
@@ -185,7 +177,7 @@ export class ProductFormComponent implements OnInit {
       dataTosave.levels = this.levels;
     }
 
-    if (Number(dataTosave.isByLevelId)  !== 2) {
+    if (Number(dataTosave.isByLevelId) !== 2) {
       dataTosave.isByLevel = false;
     }
 
@@ -253,7 +245,7 @@ export class ProductFormComponent implements OnInit {
     this.deadLines = [];
     this.tresoService.getDeadlines().subscribe((res: any[]) => {
       for (let i = 0; i < res.length; i++) {
-        const ele = {value : res[i].id, label : res[i].name + ' (' + res[i].dueDate + ')' };
+        const ele = { value: res[i].id, label: res[i].name + ' (' + res[i].dueDate + ')' };
         this.deadLines = [...this.deadLines, ele];
       }
     });
