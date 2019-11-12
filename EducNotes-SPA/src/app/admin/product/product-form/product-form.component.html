@@ -1,6 +1,6 @@
 <div class="row justify-content-center align-items-center mt-3 animated zoomInUp">
 
-    <div class="col-md-8">
+    <div class="col-md-6">
         <form [formGroup]="productForm" class="text-center" style="color: #757575;" *ngIf="!showRecap">
             <!-- <form [formGroup]="productForm" (ngSubmit)="save()" class="text-center" style="color: #757575;" *ngIf="!showRecap"> -->
             <mdb-card>
@@ -56,7 +56,7 @@
                                     <div class="form-row">
                                         <div class="col">
                                             <div class="md-form">
-                                                    <mdb-select style="width: 100%" [options]="deadLines" formControlName="id"
+                                                    <mdb-select style="width: 100%" [options]="deadLines" formControlName="deadLineId"
                                                     placeholder="choisir l'échéance"></mdb-select>
 
                                             </div>
@@ -93,7 +93,7 @@
                                     </div>
                                     <div class="col">
                                         <div class="md-form">
-                                            <mdb-select [options]="billlingTypes" formControlName="isByLevel"
+                                            <mdb-select [options]="billlingTypes" formControlName="isByLevelId"
                                                 placeholder="type de facturation">
                                             </mdb-select>
                                         </div>
@@ -137,13 +137,32 @@
                 </table>
                 <button type="submit" mdbBtn color="primary" size="sm" (click)="recap()" mdbWavesEffect>suivant</button>
             </div>
-            <div class="animated fadeInRight" *ngIf="showRecap">
+            <div class="animated lightSpeedIn" *ngIf="showRecap">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="cart-title"><s>Récapitulatif</s></div>
+                        <table style="width: 100%;">
+                            <tr>
+                                <td><b>Service : </b></td>
+                                <td>{{productForm.value.name}} ({{productForm.value.comment}})</td>
+                            </tr>
+                            <tr>
+                                <td>récouvrement <span *ngIf="productForm.value.recoveryTypeId === byDeadLineTypeId"> par échéances({{productForm.value.deadlines.count}})</span></td>
+                            </tr>
+                            <tr>
+                                <td>type d'alerte </td>
+                                <td>
+
+                                </td>
+                            </tr>
+                        </table>
+                            <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!productForm.valid" (click)="save()"
+                                mdbWavesEffect>enregistrer</button>
+                            <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
+                                [routerLink]="['/productsList']">annuler</button>
+                    </div>
+                </div>
                 <div class="d-depth-1">
-                    {{productForm.value|json}}
-                    <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!productForm.valid" (click)="save()"
-                        mdbWavesEffect>enregistrer</button>
-                    <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
-                        [routerLink]="['/productsList']">annuler</button>
                 </div>
             </div>
     

@@ -10,7 +10,6 @@ import { PayableAt } from 'src/app/_models/payable-at';
 import { Product } from 'src/app/_models/product';
 import { Utils } from 'src/app/shared/utils';
 import { ClassService } from 'src/app/_services/class.service';
-import { element } from 'protractor';
 
 @Component({
   selector: 'app-product-form',
@@ -79,7 +78,7 @@ export class ProductFormComponent implements OnInit {
     this.productForm = this.fb.group({
       name: [this.formModel.name, Validators.required],
       productTypeId: [this.formModel.productTypeId, Validators.required],
-      isByLevel: [null],
+      isByLevelId: [null],
       recoveryTypeId: [null, Validators.required],
       payableAtId: [null, Validators.required],
       periodicityId: [null],
@@ -94,7 +93,7 @@ export class ProductFormComponent implements OnInit {
 
   addDeadlineFormGroup(): FormGroup {
     return this.fb.group({
-      id: [null],
+      deadLineId: [null],
       percentage: ['']
 
     });
@@ -105,7 +104,7 @@ export class ProductFormComponent implements OnInit {
   }
 
   onNext3() {
-    if (this.productForm.value.isByLevel === 2) {
+    if (this.productForm.value.isByLevelId === 2) {
       // montant unique
       // besoin de charger tous les niveaux
       this.showLevels = true;
@@ -181,11 +180,12 @@ export class ProductFormComponent implements OnInit {
   createProduct() {
     const dataTosave = Object.assign({}, this.productForm.value);
     // dataTosave.productTypeId = this.schoolServicetypeId;
-    if (dataTosave.isBylevel === 2) {
+    if (Number(dataTosave.isByLevelId) === 2) {
       dataTosave.isByLevel = true;
+      dataTosave.levels = this.levels;
     }
 
-    if (dataTosave.isBylevel !== 2) {
+    if (Number(dataTosave.isByLevelId)  !== 2) {
       dataTosave.isByLevel = false;
     }
 
@@ -253,7 +253,7 @@ export class ProductFormComponent implements OnInit {
     this.deadLines = [];
     this.tresoService.getDeadlines().subscribe((res: any[]) => {
       for (let i = 0; i < res.length; i++) {
-        const ele = {value : res[i].id, label : res[i].name + '(' + res[i].dueDate + ')' };
+        const ele = {value : res[i].id, label : res[i].name + ' (' + res[i].dueDate + ')' };
         this.deadLines = [...this.deadLines, ele];
       }
     });

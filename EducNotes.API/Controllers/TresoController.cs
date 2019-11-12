@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,7 +38,9 @@ namespace EducNotes.API.Controllers {
     [HttpGet ("GetDeadLines")]
     public async Task<IActionResult> GetDeadLines () {
       var deadLines = await _context.DeadLines.OrderBy (p => p.DueDate).ToListAsync ();
-      return Ok (deadLines);
+      var res = _mapper.Map<IEnumerable<DealLineDetailsDto>> (deadLines);
+
+      return Ok (res);
     }
 
     [HttpGet ("GetProducts")]
@@ -117,19 +120,19 @@ namespace EducNotes.API.Controllers {
       if (!produit.IsPeriodic) {
         // des échéances sont sélectionnées     
         foreach (var deadline in productToCreate.Deadlines) {
-          if(deadline.DeadlLineId != null && deadline.Percentage!=null)
+          if(deadline.DeadLineId != null && deadline.Percentage!=null)
           _repo.Add (new ProductDeadLine {
-                                            DeadLineId = Convert.ToInt32(deadline.DeadlLineId), 
+                                            DeadLineId = Convert.ToInt32(deadline.DeadLineId), 
                                             ProductId = produit.Id,
-                                            Percentage = Convert.ToDouble(deadline.Percentage)
-                                              });
+                                            Percentage = Convert.ToDecimal(deadline.Percentage)
+                                          });
         }
       }
       
       if(productToCreate.IsByLevel)
       {
         // les montants sont définis par niveau
-        foreach (var level in productToCreate.levels)
+        foreach (var level in productToCreate.Levels)
         {
           if(level.Price != null)
             _repo.Add(new ClassLevelProduct{ProductId = produit.Id, ClasssLevelId = level.id,Price = Convert.ToDecimal(level.Price)});
