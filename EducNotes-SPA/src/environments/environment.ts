@@ -11,7 +11,8 @@ export const environment = {
   adminTypeId: 4,
   callSheetAbsence: 3,
   schoolServiceId: 1,
-  maxChildNumber: 6
+  maxChildNumber: 6,
+  byDeadLineTypeId: 1
 };
 
 /*

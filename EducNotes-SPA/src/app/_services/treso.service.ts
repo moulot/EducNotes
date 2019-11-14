@@ -13,6 +13,15 @@ import { PayableAt } from '../_models/payable-at';
 })
 export class TresoService {
   baseUrl = environment.apiUrl;
+  recouvrementTypes  = [
+    {value : 1 , label : 'par échéance'},
+    {value : 2 , label : 'périodique'}
+  ];
+
+  billingTypes  = [
+    {value : 1 , label : 'montant unique'},
+    {value : 2 , label : 'montant par niveau'}
+  ];
 
   constructor(private http: HttpClient) { }
 

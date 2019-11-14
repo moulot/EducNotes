@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,7 +38,9 @@ namespace EducNotes.API.Controllers {
     [HttpGet ("GetDeadLines")]
     public async Task<IActionResult> GetDeadLines () {
       var deadLines = await _context.DeadLines.OrderBy (p => p.DueDate).ToListAsync ();
-      return Ok (deadLines);
+      var res = _mapper.Map<IEnumerable<DealLineDetailsDto>> (deadLines);
+
+      return Ok (res);
     }
 
     [HttpGet ("GetProducts")]
@@ -113,6 +116,30 @@ namespace EducNotes.API.Controllers {
     public async Task<IActionResult> CreateProduct (ProductDto productToCreate) {
       var produit = _mapper.Map<Product> (productToCreate);
       _context.Products.Add (produit);
+
+      if (!produit.IsPeriodic) {
+        // des échéances sont sélectionnées     
+        foreach (var deadline in productToCreate.Deadlines) {
+          if(deadline.DeadLineId != null && deadline.Percentage!=null)
+          _repo.Add (new ProductDeadLine {
+                                            DeadLineId = Convert.ToInt32(deadline.DeadLineId), 
+                                            ProductId = produit.Id,
+                                            Percentage = Convert.ToDecimal(deadline.Percentage)
+                                          });
+        }
+      }
+      
+      if(productToCreate.IsByLevel)
+      {
+        // les montants sont définis par niveau
+        foreach (var level in productToCreate.Levels)
+        {
+          if(level.Price != null)
+            _repo.Add(new ClassLevelProduct{ProductId = produit.Id, ClasssLevelId = level.id,Price = Convert.ToDecimal(level.Price)});
+        }
+        
+      }
+
       if (await _repo.SaveAll ())
         return Ok ();
 
@@ -183,7 +210,7 @@ namespace EducNotes.API.Controllers {
         dl.Name = dtToCreate.Name;
         dl.Comment = dtToCreate.Comment;
         dl.DueDate = DateTime.ParseExact (dtToCreate.DueDate, "dd/MM/yyyy", frC);
-        dl.Amount = dtToCreate.Amount;
+        // dl.Amount = dtToCreate.Amount;
         _repo.Update (dl);
         if (await _repo.SaveAll ())
           return Ok ();
@@ -225,8 +252,7 @@ namespace EducNotes.API.Controllers {
     [HttpPost ("EditPayableAt/{payableAtId}")]
     public async Task<IActionResult> EditPeriodicity (int payableAtId, PayableDto payableToUpdate) {
       var p = await _context.PayableAts.FirstOrDefaultAsync (a => a.Id == payableAtId);
-      if (p != null) 
-      {
+      if (p != null) {
         p.Name = payableToUpdate.Name;
         p.DayCount = payableToUpdate.DayCount;
         _repo.Update (p);
