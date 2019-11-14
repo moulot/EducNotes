@@ -1,96 +1,170 @@
 <div class="row">
+
   <div class="col-md-12 mb-2">
-    <p class="text-15 m-0">vide de classe - évènements</p>
-  </div>
-  <div class="col-md-12 smooth-scroll mb-2">
-    <a mdbPageScroll href="#abs"><button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>absences ({{nbAbsences}})</button></a>
-    <a mdbPageScroll href="#san"><button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>sanctions ({{nbSanctions}})</button></a>
-    <button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>encouragements</button>
+    <p class="lead m-0">vie de la classe - évènements</p>
   </div>
 
-  <!-- <div class="col-md-4">
-    <div class="md-form">
-      <input type="text" [(ngModel)]="searchText" class="form-control" id="search" mdbInput>
-      <label for="search">recherche</label>
+  <div class="col-md-12" *ngIf="showChildrenList">
+
+    <p class="text-15 text-muted m-1">sélectionner un enfant pour voir ses évènements</p>
+
+    <div class="row">
+
+      <div class="col-md-9 col-sm-12">
+        <app-children-list [url]="url" [children]="children"></app-children-list>
+      </div>
+
+      <div class="col-md-3 col-sm-12">
+        <div class="row">
+
+          <div class="col-md-12 col-sm-12">
+            <div class="card mb-4 p-2">
+              <div class="card-body">
+                <div class="card-title m-0">mon agenda</div>
+                <p class="text-small text-muted">programme de la semaine.</p>
+                <nz-timeline>
+                  <nz-timeline-item nzColor="green">
+                    <div>
+                      <strong class="mr-1"><a href="#">8:30 - évènement à venir</a></strong>
+                      <p class="text-muted">desc de l'info à venir</p>
+                    </div>
+                  </nz-timeline-item>
+                  <nz-timeline-item nzColor="green">
+                    <div>
+                      <strong class="mr-1"><a href="#">10:30 - info suivante</a></strong>
+                      <p class="text-muted">desc infos en temps réel ici</p>
+                    </div>
+                  </nz-timeline-item>
+                  <nz-timeline-item [nzDot]="dotTemplate" nzColor="red">
+                    <p>un évènement parent, élève ici</p>
+                  </nz-timeline-item>
+                  <nz-timeline-item>
+                    <p>réunion profs / parents</p>
+                    <p>détails de l'évènement</p>
+                  </nz-timeline-item>
+                  <nz-timeline-item nzColor="gray">
+                    <p>infos supplémentaires</p>
+                  </nz-timeline-item>
+                  <nz-timeline-item nzColor="gray">
+                    <p>infos 4</p>
+                    <p>détails de l'information</p>
+                  </nz-timeline-item>
+                </nz-timeline>
+                <ng-template #dotTemplate>
+                  <i nz-icon nzType="clock-circle-o" style="font-size: 16px;"></i>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
-  </div> -->
 
-  <div id="abs"></div>
-  <div></div>
-  <div class="col-md-12">
-    <p class="text-20 m-1">absences</p>
-    <table mdbTable #tableEl="mdbTable" class=" z-depth-1 mx-auto">
-      <thead>
-        <tr>
-          <th *ngFor="let head of absenceHeadElts; let i = index" scope="col">{{head}}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let el of absences; let i = index">
-          <!-- <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex" scope="row">{{el.absenceType}}</td>
-          <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex &&
-            i < mdbTablePagination.lastItemIndex && el.startDate == el.endDate">{{ el.startDate }} de {{el.startTime}} à {{el.endTime}}</td>
-          <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex &&
-            i < mdbTablePagination.lastItemIndex && el.startDate != el.endDate">du {{ el.startDate }} {{el.startTime}} à {{el.endDate}} {{el.endTime}}</td>
-          <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.justified}}</td>
-          <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.reason}}</td>
-          <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.comment}}</td> -->
-          <td  scope="row">{{el.absenceType}}</td>
-          <td *ngIf="el.startDate == el.endDate">{{ el.startDate }} de {{el.startTime}} à {{el.endTime}}</td>
-          <td *ngIf="el.startDate != el.endDate">du {{ el.startDate }} {{el.startTime}} à {{el.endDate}} {{el.endTime}}</td>
-          <td >{{el.justified}}</td>
-          <td >{{el.reason}}</td>
-          <td >{{el.comment}}</td>
-        </tr>
-      </tbody>
-      <!-- <tfoot class="grey lighten-5 w-100">
-        <tr>
-          <td colspan="5">
-            <mdb-table-pagination [tableEl]="tableEl" [searchDataSource]="absences"></mdb-table-pagination>
-          </td>
-        </tr>
-      </tfoot> -->
-    </table>      
   </div>
 
-  <!-- <div class="col-md-4">
-    <div class="md-form">
-      <input type="text" [(ngModel)]="searchText1" class="form-control" id="search1" mdbInput>
-      <label for="search1">recherche</label>
+  <div class="col-md-12" *ngIf="!showChildrenList">
+
+    <div class="row">
+
+      <div *ngIf="isParentConnected" class="col-md-12 mb-2">
+        <app-users-header [student]="student" (getUser)="getUser($event)"></app-users-header>
+      </div>
+        
+      <div class="col-md-12 smooth-scroll mb-2">
+        <a mdbPageScroll href="#abs"><button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>absences ({{nbAbsences}})</button></a>
+        <a mdbPageScroll href="#san"><button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>sanctions ({{nbSanctions}})</button></a>
+        <button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>encouragements</button>
+      </div>
+
+      <!-- <div class="col-md-4">
+        <div class="md-form">
+          <input type="text" [(ngModel)]="searchText" class="form-control" id="search" mdbInput>
+          <label for="search">recherche</label>
+        </div>
+      </div> -->
+
+      <div id="abs"></div>
+      <div></div>
+      <div class="col-md-12">
+        <p class="text-20 m-1">absences</p>
+        <table mdbTable #tableEl="mdbTable" class=" z-depth-1 mx-auto">
+          <thead>
+            <tr>
+              <th *ngFor="let head of absenceHeadElts; let i = index" scope="col">{{head}}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let el of absences; let i = index">
+              <!-- <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex" scope="row">{{el.absenceType}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex &&
+                i < mdbTablePagination.lastItemIndex && el.startDate == el.endDate">{{ el.startDate }} de {{el.startTime}} à {{el.endTime}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex &&
+                i < mdbTablePagination.lastItemIndex && el.startDate != el.endDate">du {{ el.startDate }} {{el.startTime}} à {{el.endDate}} {{el.endTime}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.justified}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.reason}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.comment}}</td> -->
+              <td  scope="row">{{el.absenceType}}</td>
+              <td *ngIf="el.startDate == el.endDate">{{ el.startDate }} de {{el.startTime}} à {{el.endTime}}</td>
+              <td *ngIf="el.startDate != el.endDate">du {{ el.startDate }} {{el.startTime}} à {{el.endDate}} {{el.endTime}}</td>
+              <td >{{el.justified}}</td>
+              <td >{{el.reason}}</td>
+              <td >{{el.comment}}</td>
+            </tr>
+          </tbody>
+          <!-- <tfoot class="grey lighten-5 w-100">
+            <tr>
+              <td colspan="5">
+                <mdb-table-pagination [tableEl]="tableEl" [searchDataSource]="absences"></mdb-table-pagination>
+              </td>
+            </tr>
+          </tfoot> -->
+        </table>      
+      </div>
+
+      <!-- <div class="col-md-4">
+        <div class="md-form">
+          <input type="text" [(ngModel)]="searchText1" class="form-control" id="search1" mdbInput>
+          <label for="search1">recherche</label>
+        </div>
+      </div> -->
+
+      <div class="col-md-12">
+        <p id="san" class="text-20 m-1">sanctions</p>
+        <table mdbTable #tableEl1="mdbTable" class=" z-depth-1 mx-auto">
+          <thead>
+            <tr>
+              <th *ngFor="let head of sanctionHeadElts; let i = index" scope="col">{{head}}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="p-0 m-0" *ngFor="let el of sanctions; let i = index">
+              <!-- <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex" scope="row">{{el.sanctionDate}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.sanctionName}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.reason}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.sanctionedBy}}</td>
+              <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.comment}}</td> -->
+              <td scope="row">{{el.sanctionDate}}</td>
+              <td >{{el.sanctionName}}</td>
+              <td >{{el.reason}}</td>
+              <td >{{el.sanctionedBy}}</td>
+              <td >{{el.comment}}</td>
+            </tr>
+          </tbody>
+          <!-- <tfoot class="grey lighten-5 w-100">
+            <tr>
+              <td colspan="5">
+                <mdb-table-pagination [tableEl]="tableEl1" [searchDataSource]="sanctions"></mdb-table-pagination>
+              </td>
+            </tr>
+          </tfoot> -->
+        </table>    
+      </div>
     </div>
-  </div> -->
 
-  <div class="col-md-12">
-    <p id="san" class="text-20 m-1">sanctions</p>
-    <table mdbTable #tableEl1="mdbTable" class=" z-depth-1 mx-auto">
-      <thead>
-        <tr>
-          <th *ngFor="let head of sanctionHeadElts; let i = index" scope="col">{{head}}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="p-0 m-0" *ngFor="let el of sanctions; let i = index">
-          <!-- <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex" scope="row">{{el.sanctionDate}}</td>
-          <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.sanctionName}}</td>
-          <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.reason}}</td>
-          <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.sanctionedBy}}</td>
-          <td *ngIf="i+1 >= mdbTablePagination1.firstItemIndex && i < mdbTablePagination1.lastItemIndex">{{el.comment}}</td> -->
-          <td scope="row">{{el.sanctionDate}}</td>
-          <td >{{el.sanctionName}}</td>
-          <td >{{el.reason}}</td>
-          <td >{{el.sanctionedBy}}</td>
-          <td >{{el.comment}}</td>
-        </tr>
-      </tbody>
-      <!-- <tfoot class="grey lighten-5 w-100">
-        <tr>
-          <td colspan="5">
-            <mdb-table-pagination [tableEl]="tableEl1" [searchDataSource]="sanctions"></mdb-table-pagination>
-          </td>
-        </tr>
-      </tfoot> -->
-    </table>    
   </div>
+
 </div>

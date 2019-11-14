@@ -16,11 +16,12 @@ import { UserService } from 'src/app/_services/user.service';
 export class HomePanelComponent implements OnInit {
   studentTypeId: number = environment.studentTypeId;
   teacherTypeId: number = environment.teacherTypeId;
- parentTypeId: number = environment.parentTypeId;
+  parentTypeId: number = environment.parentTypeId;
   adminTypeId: number = environment.adminTypeId;
   user: User;
-  // currentChild: User;
-  // isChildSelected = false;
+  currentChild: User;
+  userIsParent = true;
+  childSelected = false;
 
   constructor(private http: HttpClient, public authService: AuthService,
       private alertify: AlertifyService, private router: Router,
@@ -29,9 +30,10 @@ export class HomePanelComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.currentUser;
-    // this.authService.currentChild.subscribe(child => this.currentChild = child);
-    // if (this.currentChild.id !== 0) {
-    //   this.isChildSelected = true;
+    // if (this.parentLoggedIn()) {
+    //   this.userIsParent = true;
+    // } else {
+    //   this.userIsParent = false;
     // }
   }
 
@@ -53,15 +55,6 @@ export class HomePanelComponent implements OnInit {
   teacherLoggedIn() {
     return this.authService.teacherLoggedIn();
   }
-
-  // logout() {
-  //   localStorage.removeItem('token');
-  //   localStorage.removeItem('user');
-  //   this.authService.decodedToken = null;
-  //   this.authService.currentUser = null;
-  //   this.alertify.infoBar('logged out');
-  //   this.router.navigate(['/members']);
-  // }
 
   // registerToggle() {
   //   this.registerMode = !this.registerMode;

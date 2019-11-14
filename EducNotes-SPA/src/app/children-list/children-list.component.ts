@@ -12,7 +12,7 @@ import { AuthService } from '../_services/auth.service';
 })
 export class ChildrenListComponent implements OnInit {
   @Input() children: User[];
-  url = '/studentAgendaP';
+  @Input() url: string;
   viewMode: 'list' | 'grid' = 'list';
   allSelected: boolean;
   page = 1;
