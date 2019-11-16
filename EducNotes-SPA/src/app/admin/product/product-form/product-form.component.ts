@@ -10,6 +10,8 @@ import { PayableAt } from 'src/app/_models/payable-at';
 import { Product } from 'src/app/_models/product';
 import { Utils } from 'src/app/shared/utils';
 import { ClassService } from 'src/app/_services/class.service';
+import { formatDate } from '@angular/common';
+import { Alert } from 'selenium-webdriver';
 
 @Component({
   selector: 'app-product-form',
@@ -24,13 +26,14 @@ export class ProductFormComponent implements OnInit {
   formModel: any;
   editMode = 'add';
   periodicities;
-  payableAts;
+  payableAts: any[];
   showDeadLines = false;
   showPeriodicities = false;
   showPeriodeOrDeadLine = false;
   showLevels = false;
   showTotalAmount = false;
   showRecap = false;
+  formData;
   recoveryTypes;
   billlingTypes;
   levels;
@@ -77,9 +80,9 @@ export class ProductFormComponent implements OnInit {
   createProductForm() {
     this.productForm = this.fb.group({
       name: [this.formModel.name, Validators.required],
-      productTypeId: [this.formModel.productTypeId, Validators.required],
+      // productTypeId: [this.formModel.productTypeId, Validators.required],
       isByLevelId: [null, Validators.required],
-      recoveryTypeId: [null, Validators.required],
+      isPeriodic: [null, Validators.required],
       payableAtId: [null, Validators.required],
       periodicityId: [null],
       price: [null],
@@ -99,38 +102,10 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
-  onNext2() {
-    this.showTotalAmount = true;
-  }
-
-  onNext3() {
-    this.showRecap = true;
-  }
-
-
-  // onNext() {
-  //   if (this.productForm.value.bylevel === 2) {
-  //     // montant unique
-  //     // besoin de charger tous les niveaux
-  //     this.showLevels = true;
-  //   } else {
-  //     this.showRecap = true;
-  //   }
-  // }
-  getSelectedRecoveryType(event: number) {
-    this.showPeriodeOrDeadLine = true;
-    if (event === this.byDeadLineTypeId) {
-      // afficher le champ du nombre d'échéance
-      this.showPeriodicities = false;
-    } else {
-      this.showPeriodicities = true;
-
-    }
-  }
 
   onNext1() {
-    const recoveryId = this.productForm.value.recoveryTypeId;
-    if (recoveryId === this.byDeadLineTypeId) {
+
+    if (this.productForm.value.isPeriodic === false) {
       //  le champ du nombre d'échéance est sélectionné
       (<FormArray>this.productForm.get('deadlines')).clear();
       for (let i = 0; i < this.productForm.value.deadLineCount; i++) {
@@ -149,6 +124,71 @@ export class ProductFormComponent implements OnInit {
 
   }
 
+  onNext2() {
+    if (this.productForm.value.isByLevelId === 2) {
+      // montant unique
+      // besoin de charger tous les niveaux
+      this.showLevels = true;
+    } else {
+      this.showTotalAmount = true;
+    }
+  }
+
+  onNext3() {
+    this.formData = Object.assign({}, this.productForm.value);
+    this.formData.payableAtName = this.payableAts.find(a => a.value === this.formData.payableAtId).label;
+    if (this.formData.isPeriodic) {
+      // facturation périodique
+      this.formData.periodicityName = this.periodicities.find(a => a.value === this.formData.periodicityId).label;
+    }
+
+    if (!this.formData.isPeriodic) {
+      // facturation par échéances
+      this.formData.deadlines = [];
+    //  debugger;
+      for (let i = 0; i < this.formData.deadlines.length; i++) {
+        const element = this.formData.deadlines[i];
+        if (element.deadLineId && element.percentage) {
+          // l'element existe
+          this.formData.deadlines = [...this.formData, element];
+        }
+
+      }
+    }
+    if (Number(this.formData.isByLevelId) === 2) {
+      // isByLevel = true;
+      this.formData.levels = [];
+      for (let i = 0; i < this.levels.length; i++) {
+        const element = this.levels[i];
+        if (element.price) {
+          this.formData.levels = [...this.formData.levels, element];
+        }
+      }
+
+    }
+    this.showRecap = true;
+  }
+
+
+  // onNext() {
+  //   if (this.productForm.value.bylevel === 2) {
+  //     // montant unique
+  //     // besoin de charger tous les niveaux
+  //     this.showLevels = true;
+  //   } else {
+  //     this.showRecap = true;
+  //   }
+  // }
+  getSelectedRecoveryType(event: boolean) {
+    this.showPeriodeOrDeadLine = true;
+    if (event === !this.byDeadLineTypeId) {
+      // afficher le champ du nombre d'échéance
+      this.showPeriodicities = false;
+    } else {
+      this.showPeriodicities = true;
+
+    }
+  }
 
   showTotalAmountForm() {
     this.showTotalAmount = true;
@@ -171,6 +211,7 @@ export class ProductFormComponent implements OnInit {
 
   createProduct() {
     const dataTosave = Object.assign({}, this.productForm.value);
+    dataTosave.productTypeId = this.schoolServicetypeId;
     // dataTosave.productTypeId = this.schoolServicetypeId;
     if (Number(dataTosave.isByLevelId) === 2) {
       dataTosave.isByLevel = true;
@@ -181,13 +222,13 @@ export class ProductFormComponent implements OnInit {
       dataTosave.isByLevel = false;
     }
 
-    if (dataTosave.recoveryTypeId === 1) {
-      dataTosave.isPeriodic = false;
-    }
+    // if (dataTosave.recoveryTypeId === 1) {
+    //   dataTosave.isPeriodic = false;
+    // }
 
-    if (dataTosave.recoveryTypeId !== 1) {
-      dataTosave.isPeriodic = true;
-    }
+    // if (dataTosave.recoveryTypeId !== 1) {
+    //   dataTosave.isPeriodic = true;
+    // }
 
 
     this.tresoService.createProduct(dataTosave).subscribe(() => {

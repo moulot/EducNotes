@@ -8,5 +8,6 @@ namespace EducNotes.API.Models
         public int DeadLineId { get; set; }
         public DeadLine DeadLine { get; set; }
         public decimal Percentage { get; set; }
+        
     }
 }

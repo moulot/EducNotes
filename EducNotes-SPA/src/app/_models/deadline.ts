@@ -3,5 +3,5 @@ export interface DeadLine {
     name: string;
     comment: string;
     // amount: number;
-    dueDate: Date;
+    dueDate: string;
 }

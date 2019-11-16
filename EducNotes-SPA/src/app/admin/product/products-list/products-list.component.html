@@ -6,15 +6,16 @@
 
   <div [@animate]="{value:'*',params:{delay: 300+'ms', y:'80px'}}" class="col-lg-12 col-md-12">
 
-    <div class="card mb-4">
-      <div class="card-body p-0">
+    <div class="card mb-4 col-md-12 col-lg-12">
+      <div class=" p-0">
 
         <div class="card-title border-bottom d-flex align-items-center m-0 p-3">
-          <button class="btn btn-outline-primary btn-sm" [routerLink]="['/createProduct']">ajouter un service</button>
+          <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect [routerLink]="['/createProduct']">ajouter
+            un service</button>
           <span class="flex-grow-1"></span>
         </div>
 
-        <div *ngFor="let prod of products" class="d-flex border-bottom justify-content-between p-3">
+        <!-- <div *ngFor="let prod of products" class="d-flex border-bottom justify-content-between p-3">
           <div class="flex-grow-1">
             <span class="text-small text-muted">nom</span>
             <h6 class="m-0">{{prod.name}}</h6>
@@ -30,8 +31,56 @@
               <button class="btn btn-outline-primary btn-sm" [routerLink]="['/editProduct', prod.id]">modifier</button>
             </h6>
           </div>
-        </div>
+        </div> -->
 
+
+        <table mdbTable class="z-depth-1 m-2">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Service</th>
+              <th>Montant</th>
+              <th>Type récouvrement</th>
+              <th>Type d'alerte</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let prod of products; let i = index">
+              <th scope="row">{{i+1}}</th>
+              <td>{{prod.name}} <span *ngIf="prod.comment">({{prod.comment}})</span></td>
+              <td>
+                <span *ngIf="prod.price">{{prod.price}}</span>
+                <span *ngIf="!prod.price">
+                  <ng-template #popTemplate>
+                    <div> <span *ngFor="let level of prod.classLevelProducts">{{level.classLevel.name}}:{{level.price}}
+                        <br></span></div>
+                  </ng-template>
+                  définie par niveau <button id="popTemplate" type="button" mdbBtn color="light" size="sm"
+                    mdbPopoverHeader="liste des montants par niveau" [mdbPopover]="popTemplate" mdbWavesEffect>
+                    {{prod.classLevelProducts.length}}
+                  </button>
+                </span>
+              </td>
+              <td>
+                <span *ngIf="prod.isPeriodic"> {{prod.periodicity.name}}</span>
+                <span *ngIf="!prod.isPeriodic">
+                    <ng-template #popTemplate>
+                      <div> <span
+                          *ngFor="let deadline of prod.productDeadLines">{{deadline.deadLine.name}}:{{deadline.percentage}}%
+                          <br></span></div>
+                    </ng-template>
+                    définie par niveau <button id="popTemplate" type="button" mdbBtn color="light" size="sm"
+                      mdbPopoverHeader="liste des montants par niveau" [mdbPopover]="popTemplate" mdbWavesEffect>
+                      {{prod.productDeadLines.length}}
+                    </button>
+                </span>
+              </td>
+              <td>
+                {{prod.payableAt.name}} ({{prod.payableAt.dayCount}})
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 

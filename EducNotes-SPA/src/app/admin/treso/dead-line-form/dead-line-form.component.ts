@@ -49,7 +49,7 @@ export class DeadLineFormComponent implements OnInit {
   createDeadLineForm() {
     this.deadLineForm = this.fb.group({
       name: [this.formModel.name, Validators.required],
-      amount: [this.formModel.amount, Validators.required],
+      // amount: [this.formModel.amount, Validators.required],
       comment: [this.formModel.comment],
       dueDate: [this.formModel.dueDate, Validators.required]
     });
