@@ -42,6 +42,7 @@ export class StudentAgendaComponent implements OnInit {
   parent: User;
   children: User[];
   isParentConnected = false;
+  url = '/studentAgendaP';
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,

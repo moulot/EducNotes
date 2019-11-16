@@ -37,6 +37,7 @@ export class GradeStudentComponent implements OnInit {
   children: User[];
   periodAvg: number;
   periodName = '';
+  url = '/studentGradesP';
 
   headElts = ['date', 'type', 'note', '(-)', '(+)'];
 

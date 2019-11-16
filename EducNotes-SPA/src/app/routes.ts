@@ -78,7 +78,6 @@ import { ClassTeachersComponent } from './classes/class-teachers/class-teachers.
 import { CourseCoefficientsComponent } from './admin/courses-management/course-coefficients/course-coefficients.component';
 import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
 import { CoefficientFormResolver } from './_resolvers/coeffiient-form-form-resolver';
-import { StudentDashboard1Component } from './views/dashboard/student-dashboard1/student-dashboard1.component';
 import { PeriodicitiesComponent } from './admin/treso/periodicities/periodicities.component';
 import { PeriodicityFormComponent } from './admin/treso/periodicity-form/periodicity-form.component';
 import { PeriodicityFormResolver } from './_resolvers/periodicity-form-resolver';
@@ -87,6 +86,7 @@ import { PayableAtListResolver } from './_resolvers/payableAt-list-resolver';
 import { PayableAtsComponent } from './admin/treso/payableAts/payableAts.component';
 import { PayableFormComponent } from './admin/treso/payable-form/payable-form.component';
 import { PayableFormResolver } from './_resolvers/payable-form-resolver';
+import { StudentDashboardComponent } from './views/dashboard/student-dashboard/student-dashboard.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -118,19 +118,21 @@ export const appRoutes: Routes = [
             { path: 'classes', component: ClassPanelComponent },
             { path: 'grades', component: GradePanelComponent },
             { path: 'classLife/:classId', component: ClassLifeComponent },
-            { path: 'studentLife/:id', component: StudentLifeComponent, resolve: { student: StudentResolver } },
+            { path: 'studentLife/:id', component: StudentLifeComponent }, // resolve: { student: StudentResolver } },
+            { path: 'studentLifeP/:id', component: StudentLifeComponent },
             { path: 'studentNotes/:id', component: GradeStudentComponent },
             { path: 'classScheduleEdit', component: ClassScheduleComponent },
             { path: 'studentsClass/:classId', component: ClassStudentsComponent },
             { path: 'agendas/:classId', component: ClassAgendaComponent },
-            { path: 'student', component: StudentDashboard1Component },
-            { path: 'studentFromP/:id', component: StudentDashboard1Component },
+            { path: 'student', component: StudentDashboardComponent },
+            { path: 'studentFromP/:id', component: StudentDashboardComponent },
             { path: 'parent', component: ParentDashboardComponent, resolve: { parent: UserHomeResolver } },
             { path: 'teacher', component: TeacherDashboardComponent, resolve: { teacher: UserHomeResolver } },
             { path: 'admins', component: AdminDashboardComponent, resolve: { admin: UserHomeResolver } },
             { path: 'inscriptions', component: InscriptionComponent },
             { path: 'agendas/:classId', component: ClassAgendaComponent },
-            { path: 'classStaff/:classId', component: ClassTeachersComponent, resolve: { classId: ClassResolver } },
+            { path: 'classStaff/:id', component: ClassTeachersComponent }, // resolve: { classId: ClassResolver } },
+            { path: 'classStaffP/:id', component: ClassTeachersComponent },
             { path: 'addEval', component: EvalAddFormComponent },
             { path: 'callSheet/:id', component: ClassCallSheetComponent, resolve: { schedule: CallSheetResolver } },
             { path: 'inscriptions', component: InscriptionComponent },
@@ -148,6 +150,7 @@ export const appRoutes: Routes = [
             { path: 'preregister', component: PreRegisterComponent },
             { path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve: { classes: LevelClassesResolver } },
             { path: 'studentGrades/:id', component: GradeStudentComponent}, // , resolve: { student: StudentResolver } },
+            { path: 'studentGradesP/:id', component: GradeStudentComponent},
             { path: 'school', component: SchoolComponent, resolve: { school: SchoolResolver } },
             { path: 'productsList', component: ProductsListComponent, resolve: { products: ProductsListResolver } },
             { path: 'createProduct', component: ProductFormComponent },
@@ -157,7 +160,7 @@ export const appRoutes: Routes = [
             { path: 'deadLines', component: DeadLineListComponent, resolve: { deadlines: DeadLineListResolver } },
             { path: 'createDeadLine', component: DeadLineFormComponent },
             { path: 'editDeadLine/:id', component: DeadLineFormComponent, resolve: { deadline: DeadLineFormResolver } },
-            { path: 'studentAgenda/:id', component: StudentAgendaComponent, resolve: { student: StudentResolver } },
+            { path: 'studentAgenda/:id', component: StudentAgendaComponent }, // resolve: { student: StudentResolver } },
             { path: 'studentAgendaP/:id', component: StudentAgendaComponent },
             { path: 'coefficients', component: CourseCoefficientsComponent },
             { path: 'addCoefficient', component: CoefficientFormComponent },

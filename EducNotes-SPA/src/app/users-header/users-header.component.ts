@@ -23,7 +23,6 @@ export class UsersHeaderComponent implements OnInit {
 
   ngOnInit() {
     this.parent = this.authService.currentUser;
-    // console.log('parent: ' + this.parent.id);
     this.getChildren(this.parent.id);
   }
 
