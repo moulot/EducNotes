@@ -5,10 +5,10 @@
             <!-- <form [formGroup]="productForm" (ngSubmit)="save()" class="text-center" style="color: #757575;" *ngIf="!showRecap"> -->
             <mdb-card>
                 <mdb-card-body class="px-lg-5 pt-0">
-                    <div class="md-form">
+                    <!-- <div class="md-form">
                         <mdb-select [options]="productTypes" formControlName="productTypeId"
                             placeholder="Choisir le type de service"></mdb-select>
-                    </div>
+                    </div> -->
                     <div class="md-form">
                         <input mdbInput type="text" id="name" class="form-control" formControlName="name">
                         <label for="name" class="">Nom du Service</label>
@@ -19,7 +19,7 @@
                         <label for="comment">Commentaire</label>
                     </div>
                     <div class="md-form">
-                            <mdb-select [options]="billlingTypes" formControlName="isByLevelId"
+                        <mdb-select [options]="billlingTypes" formControlName="isByLevelId"
                             placeholder="type de facturation">
                         </mdb-select>
                     </div>
@@ -28,7 +28,7 @@
                         </mdb-select>
                     </div>
                     <div class="md-form">
-                        <mdb-select [options]="recoveryTypes" formControlName="recoveryTypeId"
+                        <mdb-select [options]="recoveryTypes" formControlName="isPeriodic"
                             (ngModelChange)="getSelectedRecoveryType($event)" placeholder="Type de recouvrement">
                         </mdb-select>
                     </div>
@@ -61,8 +61,9 @@
                                     <div class="form-row">
                                         <div class="col">
                                             <div class="md-form">
-                                                    <mdb-select style="width: 100%" [options]="deadLines" formControlName="deadLineId"
-                                                    placeholder="choisir l'échéance"></mdb-select>
+                                                <mdb-select style="width: 100%" [options]="deadLines"
+                                                    formControlName="deadLineId" placeholder="choisir l'échéance">
+                                                </mdb-select>
 
                                             </div>
                                         </div>
@@ -96,7 +97,7 @@
                                             <label for="price">montant total</label>
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                                 <div class="form-row m-0">
                                     <button type="button" mdbBtn color="light" size="sm" (click)="onNext3()"
@@ -127,9 +128,9 @@
                             <th scope="row" valign="middle">{{i+1}}</th>
                             <td scope="row" valign="middle">{{level.name}}</td>
                             <td scope="row" valign="middle">
-                                <input type="text" name="lamout" [(ngModel)]="level.price" id="lprice" class="form-control"
-                                    mdbInput>
-    
+                                <input type="text" name="lamout" [(ngModel)]="level.price" id="lprice"
+                                    class="form-control" mdbInput>
+
                             </td>
                         </tr>
                     </tbody>
@@ -140,31 +141,57 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="cart-title"><u>Récapitulatif</u></div>
+                        {{formData|json}}
                         <table style="width: 100%;">
                             <tr>
                                 <td><b>Service : </b></td>
-                                <td>{{productForm.value.name}} ({{productForm.value.comment}})</td>
+                                <td>{{formData.name}} ({{formData.comment}})</td>
                             </tr>
                             <tr>
-                                <td>récouvrement <span *ngIf="productForm.value.recoveryTypeId === byDeadLineTypeId"> par échéances({{productForm.value.deadlines.count}})</span></td>
-                            </tr>
-                            <tr>
-                                <td>type d'alerte </td>
+                                <td> <b>facturation par</b> </td>
                                 <td>
+                                    <span *ngIf="formData.isPeriodic"> par période ({{formData.periodicityName}})</span>
+                                    <span *ngIf="!formData.isPeriodic">
+                                        <ng-template #popTemplate>
+                                            <div> <span
+                                                    *ngFor="let deadline of formData.deadlines">{{deadline.deadLine.name}}:{{deadline.percentage}}%
+                                                    <br></span></div>
+                                        </ng-template>
+                                        définie par échéances <button id="popTemplate" type="button" mdbBtn
+                                            color="light" size="sm" mdbPopoverHeader="liste des montants par niveau"
+                                            [mdbPopover]="popTemplate" mdbWavesEffect>
+                                            {{formData.deadlines.length}}
+                                        </button>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td> <b> Montant</b> </td>
+                                <td>
+                                    <span *ngIf="formData.price">{{formData.price}}</span>
+                                    <span *ngIf="!formData.price">
+                                        definie par niveau
+                                    </span>
 
                                 </td>
                             </tr>
+                            <tr>
+                                <td><b>type d'alerte</b></td>
+                                <td>
+                                    {{formData.payableAtName}}
+                                </td>
+                            </tr>
                         </table>
-                            <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!productForm.valid" (click)="save()"
-                                mdbWavesEffect>enregistrer</button>
-                            <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
-                                [routerLink]="['/productsList']">annuler</button>
+                        <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!productForm.valid"
+                            (click)="save()" mdbWavesEffect>enregistrer</button>
+                        <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
+                            [routerLink]="['/productsList']">annuler</button>
                     </div>
                 </div>
                 <div class="d-depth-1">
                 </div>
             </div>
-    
+
         </div>
     </div>
 </div>

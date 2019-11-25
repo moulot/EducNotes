@@ -12,7 +12,7 @@ export const environment = {
   callSheetAbsence: 3,
   schoolServiceId: 1,
   maxChildNumber: 6,
-  byDeadLineTypeId: 1
+  byDeadLineTypeId: true
 };
 
 /*

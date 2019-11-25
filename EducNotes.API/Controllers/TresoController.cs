@@ -9,6 +9,7 @@ using EducNotes.API.Dtos;
 using EducNotes.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace EducNotes.API.Controllers {
   [Route ("api/[controller]")]
@@ -18,10 +19,12 @@ namespace EducNotes.API.Controllers {
     private readonly DataContext _context;
     private readonly IEducNotesRepository _repo;
     private readonly IMapper _mapper;
+    private readonly IConfiguration _config;
 
-    public TresoController (DataContext context, IEducNotesRepository repo, IMapper mapper) {
+    public TresoController (DataContext context, IEducNotesRepository repo, IMapper mapper, IConfiguration config) {
       _context = context;
       _repo = repo;
+      _config = config;
       _mapper = mapper;
     }
 
@@ -45,8 +48,47 @@ namespace EducNotes.API.Controllers {
 
     [HttpGet ("GetProducts")]
     public async Task<IActionResult> GetProducts () {
-      var products = await _context.Products.OrderBy (p => p.Name).ToListAsync ();
-      return Ok (products);
+      // var products = await _context.Products.OrderBy (p => p.Name).ToListAsync ();
+      // return Ok (products);
+      int schoolServiceTypeId = _config.GetValue<int> ("AppSettings:schoolServiceTypeId");
+      var prods = await _context.Products
+        .Include (a => a.Periodicity)
+        .Include (a => a.PayableAt)
+        .Where (p => p.ProductTypeId == schoolServiceTypeId)
+        .OrderBy (a => a.Name)
+        .ToListAsync ();
+
+      var produits = new List<SchoolServicesDto> ();
+      foreach (var prod in prods) {
+        var produit = new SchoolServicesDto {
+          id = prod.Id,
+          Name = prod.Name,
+          Comment = prod.Comment,
+          Price = prod.Price,
+          IsByLevel = prod.IsByLevel,
+          IsPeriodic = prod.IsPeriodic,
+          Periodicity = prod.Periodicity,
+          PayableAt = prod.PayableAt
+        };
+
+        if (!prod.IsPeriodic) {
+          produit.ProductDeadLines = await _context.ProductDeadLines
+            .Include (d => d.DeadLine)
+            .Where (p => p.ProductId == prod.Id)
+            .ToListAsync ();
+        }
+
+        if (prod.IsByLevel) {
+          produit.ClassLevelProducts = await _context.ClassLevelProducts
+            .Include (d => d.ClassLevel)
+            .Where (p => p.ProductId == prod.Id)
+            .ToListAsync ();
+        }
+        produits.Add(produit);
+      }
+
+      return Ok(produits);
+
     }
 
     [HttpGet ("GetPeriodicities")]
@@ -91,7 +133,7 @@ namespace EducNotes.API.Controllers {
     public async Task<IActionResult> GetLvlServices (int classLevelId) {
       var services = await _context.ClassLevelProducts
         .Include (p => p.Product)
-        .Where (p => p.ClasssLevelId == classLevelId)
+        .Where (p => p.ClassLevelId == classLevelId)
         .OrderBy (p => p.Product.Name)
         .ToListAsync ();
       return Ok (services);
@@ -120,24 +162,22 @@ namespace EducNotes.API.Controllers {
       if (!produit.IsPeriodic) {
         // des échéances sont sélectionnées     
         foreach (var deadline in productToCreate.Deadlines) {
-          if(deadline.DeadLineId != null && deadline.Percentage!=null)
-          _repo.Add (new ProductDeadLine {
-                                            DeadLineId = Convert.ToInt32(deadline.DeadLineId), 
-                                            ProductId = produit.Id,
-                                            Percentage = Convert.ToDecimal(deadline.Percentage)
-                                          });
+          if (deadline.DeadLineId != null && deadline.Percentage != null)
+            _repo.Add (new ProductDeadLine {
+              DeadLineId = Convert.ToInt32 (deadline.DeadLineId),
+                ProductId = produit.Id,
+                Percentage = Convert.ToDecimal (deadline.Percentage)
+            });
         }
       }
-      
-      if(productToCreate.IsByLevel)
-      {
+
+      if (productToCreate.IsByLevel) {
         // les montants sont définis par niveau
-        foreach (var level in productToCreate.Levels)
-        {
-          if(level.Price != null)
-            _repo.Add(new ClassLevelProduct{ProductId = produit.Id, ClasssLevelId = level.id,Price = Convert.ToDecimal(level.Price)});
+        foreach (var level in productToCreate.Levels) {
+          if (level.Price != null)
+            _repo.Add (new ClassLevelProduct { ProductId = produit.Id, ClassLevelId = level.id, Price = Convert.ToDecimal (level.Price) });
         }
-        
+
       }
 
       if (await _repo.SaveAll ())
@@ -162,9 +202,9 @@ namespace EducNotes.API.Controllers {
       int productId = lvlprodToCreate.ProductId;
 
       foreach (var levelid in lvlprodToCreate.ClassLevelIds) {
-        var lvlprod = await _context.ClassLevelProducts.FirstOrDefaultAsync (a => a.ClasssLevelId == levelid && a.ProductId == productId);
+        var lvlprod = await _context.ClassLevelProducts.FirstOrDefaultAsync (a => a.ClassLevelId == levelid && a.ProductId == productId);
         if (lvlprod == null) {
-          var lp = new ClassLevelProduct { ProductId = productId, ClasssLevelId = levelid, Price = amount };
+          var lp = new ClassLevelProduct { ProductId = productId, ClassLevelId = levelid, Price = amount };
           _repo.Add (lp);
         }
       }
