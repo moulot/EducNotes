@@ -143,38 +143,51 @@ namespace EducNotes.API.Controllers {
             return BadRequest ("Aucun emploi du temps trouvé");
         }
 
-        [HttpGet ("{classId}/CourseWithTeacher")]
-        public async Task<IActionResult> GetCourseWithTeacher (int classId) {
-            var teachersData = await _context.ClassCourses
-                .Include (i => i.Teacher).ThenInclude (i => i.Photos)
-                .Include (i => i.Course)
-                .Where (u => u.ClassId == classId)
-                .Distinct ().ToListAsync ();
+        [HttpGet("{classId}/teachers")]
+        public async Task<IActionResult> GetClassTeachers(int classId)
+        {
+            var teachers = await _context.ClassCourses
+                            .Include(i => i.Teacher)
+                            .Where(t => t.ClassId == classId)
+                            .Select(t => t.Teacher).Distinct().ToListAsync();
 
-            List<TeacherForListDto> coursesWithTeacher = new List<TeacherForListDto> ();
-            foreach (var data in teachersData) {
-                TeacherForListDto teacherCourse = new TeacherForListDto ();
-                teacherCourse.Id = Convert.ToInt32 (data.TeacherId);
+            var teachersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(teachers);
+
+            return Ok(teachersToReturn);
+        }
+
+        [HttpGet("{classId}/CourseWithTeacher")]
+        public async Task<IActionResult> GetCourseWithTeacher(int classId) {
+            var teachersData = await _context.ClassCourses
+                                .Include(i => i.Teacher).ThenInclude(i => i.Photos)
+                                .Include(i => i.Course)
+                                .Where(u => u.ClassId == classId)
+                                .Distinct().ToListAsync();
+
+            List<TeacherForListDto> coursesWithTeacher = new List<TeacherForListDto>();
+            foreach(var data in teachersData) {
+                TeacherForListDto teacherCourse = new TeacherForListDto();
+                teacherCourse.Id = Convert.ToInt32(data.TeacherId);
                 teacherCourse.LastName = data.Teacher.LastName;
                 teacherCourse.FirstName = data.Teacher.FirstName;
                 teacherCourse.Email = data.Teacher.Email;
                 teacherCourse.PhotoUrl = ""; //data.Teacher.Photos.FirstOrDefault(p => p.IsMain).Url;
                 teacherCourse.PhoneNumber = data.Teacher.PhoneNumber;
-                teacherCourse.DateOfBirth = data.Teacher.DateOfBirth.ToShortDateString ();
+                teacherCourse.DateOfBirth = data.Teacher.DateOfBirth.ToShortDateString();
                 teacherCourse.SeconPhoneNumber = data.Teacher.SecondPhoneNumber;
                 teacherCourse.Course = data.Course;
-                coursesWithTeacher.Add (teacherCourse);
+                coursesWithTeacher.Add(teacherCourse);
             }
 
-            return Ok (coursesWithTeacher);
+            return Ok(coursesWithTeacher);
         }
 
         [HttpGet ("{classId}/Students")]
-        public async Task<IActionResult> GetClassStudents (int classId) {
+        public async Task<IActionResult> GetClassStudents (int classId){
             var studentsFromRepo = await _repo.GetClassStudents (classId);
-            var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>> (studentsFromRepo);
+            var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(studentsFromRepo);
 
-            return Ok (usersToReturn);
+            return Ok(usersToReturn);
         }
 
         [HttpGet ("Agenda/{agendaId}/SetTask/{value}")]
@@ -485,10 +498,10 @@ namespace EducNotes.API.Controllers {
         }
 
         [HttpGet ("{classId}/classCourses")]
-        public async Task<IActionResult> GetClassCourses (int classId) {
+        public async Task<IActionResult> GetClassCourses(int classId) {
             var courses = await _context.ClassCourses
-                .Where (c => c.ClassId == classId)
-                .Select (s => s.Course).ToListAsync ();
+                .Where(c => c.ClassId == classId)
+                .Select(s => s.Course).ToListAsync();
 
             return Ok (courses);
         }

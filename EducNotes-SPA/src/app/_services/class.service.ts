@@ -21,8 +21,12 @@ export class ClassService {
     return this.http.get<Class>(this.baseUrl + 'classes/' + classId);
   }
 
-  getClassTeachers(classId): Observable<User[]> {
+  getCourseWithTeacher(classId): Observable<User[]> {
     return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/CourseWithTeacher');
+  }
+
+  getClassTeachers(classId): Observable<User[]> {
+    return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/teachers');
   }
 
   getTodayToNDaysAgenda(classId, toNbDays) {

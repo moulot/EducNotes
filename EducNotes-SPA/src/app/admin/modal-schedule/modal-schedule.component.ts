@@ -5,7 +5,6 @@ import { ClassService } from 'src/app/_services/class.service';
 import { UserService } from 'src/app/_services/user.service';
 import { User } from 'src/app/_models/user';
 import { Course } from 'src/app/_models/course';
-import { Class } from 'src/app/_models/class';
 import { Schedule } from 'src/app/_models/schedule';
 import { Router } from '@angular/router';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -17,7 +16,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class ModalScheduleComponent implements OnInit {
   @Input() classId: number;
-  // classes: Class[];
   courses: Course[];
   teachers: User[];
   timeMask = [/\d/, /\d/, ':', /\d/, /\d/];
@@ -31,7 +29,7 @@ export class ModalScheduleComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
     private classService: ClassService, private userService: UserService,
-    private router: Router, public activeModal: NgbActiveModal) { }
+    public activeModal: NgbActiveModal) { }
 
   ngOnInit() {
     this.createScheduleForm();
@@ -237,21 +235,6 @@ export class ModalScheduleComponent implements OnInit {
     this.activeModal.dismiss();
   }
 
-  // getClasses() {
-  //   this.classService.getAllClasses().subscribe((data: Class[]) => {
-  //     this.classes = data;
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
-
-  // onClassChanged() {
-  //   const classId = this.scheduleForm.value.aclass;
-  //   if (classId !== '') {
-  //     this.getClassTeachers(classId);
-  //   }
-  // }
-
   onTeacherChanged() {
     const teacherId = this.scheduleForm.value.teacher;
     this.getTeacherCourses(teacherId);
@@ -276,16 +259,13 @@ export class ModalScheduleComponent implements OnInit {
   }
 
   loadTeacherSelect() {
-    console.log(this.teachers);
     for (let i = 0; i < this.teachers.length; i++) {
-      console.log('i: ' + i);
       const elt = this.teachers[i];
       this.teacherOptions = [...this.teacherOptions, {value: elt.id, label: elt.firstName + ' ' + elt.lastName}];
     }
   }
 
   loadCourseSelect() {
-    console.log(this.courses);
     for (let i = 0; i < this.courses.length; i++) {
       const elt = this.courses[i];
       this.courseOptions = [...this.courseOptions, {value: elt.id, label: elt.name}];

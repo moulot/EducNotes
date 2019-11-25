@@ -28,6 +28,7 @@ export class TeacherDashboardComponent implements OnInit {
   nextCourses: any;
   evalsToCome: any;
   evalsToBeGraded: any;
+  optionsCourse: any[] = [];
 
   constructor(private userService: UserService, private authService: AuthService,
     private adminService: AdminService, public alertify: AlertifyService, private router: Router,
@@ -66,8 +67,15 @@ export class TeacherDashboardComponent implements OnInit {
   }
 
   getTeacherNextCourses(teacherId) {
-    this.userService.getTeacherNextCourses(teacherId).subscribe(data => {
+    this.userService.getTeacherNextCourses(teacherId).subscribe((data: any) => {
       this.nextCourses = data;
+      for (let i = 0; i < data.length; i++) {
+        const elt = data[i];
+        const option = {value: elt.scheduleId, label: elt.className + ' ' + elt.courseName + ' ' +
+          elt.startHourMin + ' - ' + elt.endHourMin};
+        this.optionsCourse = [...this.optionsCourse, option];
+
+      }
     });
   }
 

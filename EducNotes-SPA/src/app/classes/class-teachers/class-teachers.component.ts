@@ -64,7 +64,6 @@ export class ClassTeachersComponent implements OnInit {
       if (loggedUser.id !== this.student.id) {
         this.isParentConnected = true;
       }
-
       this.getClassTeachers(this.student.classId);
     }, error => {
       this.alertify.error(error);
@@ -72,7 +71,7 @@ export class ClassTeachersComponent implements OnInit {
   }
 
   getClassTeachers(classId) {
-    this.classService.getClassTeachers(classId).subscribe(teachers => {
+    this.classService.getCourseWithTeacher(classId).subscribe(teachers => {
       this.teachers = teachers;
     });
   }

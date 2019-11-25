@@ -3,9 +3,11 @@
 <!-- <div class="card-header p-1"><b>{{item.startHourMin}} - {{item.endHourMin}}</b></div> -->
 <div class="card-body p-1" [ngStyle]="{'background-color': item.color}">
   <div>
-    <p class="text-12 m-0">{{item.startHourMin}} - {{item.endHourMin}}</p>
-    <p class="text-12 m-0"><b>{{item.courseName | uppercase}}</b></p>
-    <p class="text-12 text-capitalize m-0">{{item.teacherName}}</p>
+    <div class="d-flex">
+      <p class="flex-grow-1 font-weight-600 text-11 m-0">{{item.courseName | uppercase}}</p>
+      <p class="text-11 m-0">{{item.startHourMin}} - {{item.endHourMin}}</p>
+    </div>
+    <!-- <p class="text-12 text-capitalize m-0">{{item.teacherName}}</p> -->
   </div>
 </div>
 </div>

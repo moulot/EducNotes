@@ -195,6 +195,8 @@ import { PayableAtsComponent } from './admin/treso/payableAts/payableAts.compone
 import { PayableAtListResolver } from './_resolvers/payableAt-list-resolver';
 import { PayableFormComponent } from './admin/treso/payable-form/payable-form.component';
 import { PayableFormResolver } from './_resolvers/payable-form-resolver';
+import { FullScreenDirective } from './_directives/full-screen.directive';
+import { StudentScheduleComponent } from './schedule/student-schedule/student-schedule.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -221,6 +223,7 @@ export function tokenGetter() {
       MemberMessagesComponent,
       AdminPanelComponent,
       HasRoleDirective,
+      FullScreenDirective,
       UserManagementComponent,
       PhotoManagementComponent,
       RolesModalComponent,
@@ -324,7 +327,8 @@ export function tokenGetter() {
       PeriodicitiesComponent,
       PeriodicityFormComponent,
       PayableAtsComponent,
-      PayableFormComponent
+      PayableFormComponent,
+      StudentScheduleComponent
    ],
    imports: [
       FormWizardModule,

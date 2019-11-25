@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 export class ClassScheduleComponent implements OnInit {
   @ViewChild('classSelect', {static: false}) classSelect: ElementRef;
   classId: number;
-  classes: Class[];
+  // classes: Class[];
   scheduleItems: any;
   scheduleForm: FormGroup;
   ngbModalRef: NgbModalRef;
@@ -36,6 +36,7 @@ export class ClassScheduleComponent implements OnInit {
   classControl = new FormControl();
   hourCols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
   weekdays = [0, 1, 2, 3, 4, 5];
+  optionsClass: any[] = [];
 
   constructor(private classService: ClassService, public alertify: AlertifyService,
     private modalService: NgbModal, private router: Router) { }
@@ -46,7 +47,12 @@ export class ClassScheduleComponent implements OnInit {
 
   getClasses() {
     this.classService.getAllClasses().subscribe((data: Class[]) => {
-      this.classes = data;
+      // this.classes = data;
+      for (let i = 0; i < data.length; i++) {
+        const elt = data[i];
+        const element = {value: elt.id, label: 'classe ' + elt.name};
+        this.optionsClass = [...this.optionsClass, element];
+      }
     }, error => {
       this.alertify.error(error);
     });
@@ -102,7 +108,6 @@ export class ClassScheduleComponent implements OnInit {
       }
 
       this.dayItems = [this.monCourses, this.tueCourses, this.wedCourses, this.thuCourses, this.friCourses, this.satCourses];
-
     }, error => {
       this.alertify.error(error);
     });

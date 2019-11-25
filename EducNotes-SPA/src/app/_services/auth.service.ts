@@ -72,7 +72,7 @@ export class AuthService {
     this.currentPeriod = null;
     this.changeCurrentChild(this.newUser);
     this.alertify.info('vous êtes déconnecté');
-    this.router.navigate(['/']);
+    this.router.navigate(['/signin']);
   }
 
   register(user: User) {

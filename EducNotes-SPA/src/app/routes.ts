@@ -87,6 +87,7 @@ import { PayableAtsComponent } from './admin/treso/payableAts/payableAts.compone
 import { PayableFormComponent } from './admin/treso/payable-form/payable-form.component';
 import { PayableFormResolver } from './_resolvers/payable-form-resolver';
 import { StudentDashboardComponent } from './views/dashboard/student-dashboard/student-dashboard.component';
+import { StudentScheduleComponent } from './schedule/student-schedule/student-schedule.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -133,6 +134,8 @@ export const appRoutes: Routes = [
             { path: 'agendas/:classId', component: ClassAgendaComponent },
             { path: 'classStaff/:id', component: ClassTeachersComponent }, // resolve: { classId: ClassResolver } },
             { path: 'classStaffP/:id', component: ClassTeachersComponent },
+            { path: 'studentSchedule/:id', component: StudentScheduleComponent },
+            { path: 'studentScheduleP/:id', component: StudentScheduleComponent },
             { path: 'addEval', component: EvalAddFormComponent },
             { path: 'callSheet/:id', component: ClassCallSheetComponent, resolve: { schedule: CallSheetResolver } },
             { path: 'inscriptions', component: InscriptionComponent },

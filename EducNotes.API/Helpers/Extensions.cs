@@ -52,7 +52,7 @@ namespace EducNotes.API.Helpers
             var netHours = startHourMin.Hour - startCourseHour;
             var mins = startHourMin.Minute;
 
-            var top = scheduleHourSize * (netHours + (double)mins/60) + 2 * netHours;
+            var top = scheduleHourSize * (netHours + (double)mins/60) + 1 * netHours;
             top = Math.Round(top, 2);
             return (top + "px").Replace(",", ".");            
         }
