@@ -10,30 +10,29 @@ import { environment } from 'src/environments/environment';
 
 
 @Component({
-  selector: 'app-self-register',
-  templateUrl: './self-register.component.html',
-  styleUrls: ['./self-register.component.scss'],
-  animations: [SharedAnimations]
+   selector: 'app-self-register',
+   templateUrl: './self-register.component.html',
+   styleUrls: ['./self-register.component.scss'],
+   animations: [SharedAnimations]
 })
 export class SelfRegisterComponent implements OnInit {
 
-  user: User;
-  maxChild: number;
-  parentTypeId = environment.parentTypeId;
-  teacherTypeId = environment.teacherTypeId;
+   user: User;
+   maxChild: number;
+   parentTypeId = environment.parentTypeId;
+   teacherTypeId = environment.teacherTypeId;
 
 
-  constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
-     private alertify: AlertifyService,  private router: Router, private userService: UserService) { }
+   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
+      private alertify: AlertifyService, private router: Router, private userService: UserService) { }
 
-  ngOnInit() {
+   ngOnInit() {
 
-    this.route.data.subscribe(data => {
-       this.user = data['user'].user;
-       this.maxChild = data['user'].maxChild;
-      //  this.maxChild = data['user'].maxChild;
+      this.route.data.subscribe(data => {
+
+         this.user = data['user'].user;
+         this.maxChild = data['user'].maxChild;
+         //  this.maxChild = data['user'].maxChild;
       });
    }
-
- 
 }

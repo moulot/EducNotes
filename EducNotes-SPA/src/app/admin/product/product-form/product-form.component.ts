@@ -10,8 +10,6 @@ import { PayableAt } from 'src/app/_models/payable-at';
 import { Product } from 'src/app/_models/product';
 import { Utils } from 'src/app/shared/utils';
 import { ClassService } from 'src/app/_services/class.service';
-import { formatDate } from '@angular/common';
-import { Alert } from 'selenium-webdriver';
 
 @Component({
   selector: 'app-product-form',
@@ -41,6 +39,10 @@ export class ProductFormComponent implements OnInit {
   byDeadLineTypeId = environment.byDeadLineTypeId;
   schoolServicetypeId = environment.schoolServiceId;
   myDatePickerOptions = Utils.myDatePickerOptions;
+  requirementOptions = [
+{value : false, label: 'NON'},
+{value : true, label: 'OUI'}
+  ];
 
 
   constructor(private tresoService: TresoService, private alertify: AlertifyService,
@@ -82,6 +84,7 @@ export class ProductFormComponent implements OnInit {
       name: [this.formModel.name, Validators.required],
       // productTypeId: [this.formModel.productTypeId, Validators.required],
       isByLevelId: [null, Validators.required],
+      isRequired: [null, Validators.required],
       isPeriodic: [null, Validators.required],
       payableAtId: [null, Validators.required],
       periodicityId: [null],
@@ -144,13 +147,15 @@ export class ProductFormComponent implements OnInit {
 
     if (!this.formData.isPeriodic) {
       // facturation par échéances
+      const temp = this.formData.deadlines;
       this.formData.deadlines = [];
     //  debugger;
-      for (let i = 0; i < this.formData.deadlines.length; i++) {
-        const element = this.formData.deadlines[i];
+      for (let i = 0; i < temp.length; i++) {
+        const element = temp[i];
+        element.name = this.deadLines.find(d => d.value === element.deadLineId).label;
         if (element.deadLineId && element.percentage) {
           // l'element existe
-          this.formData.deadlines = [...this.formData, element];
+          this.formData.deadlines = [...this.formData.deadlines, element];
         }
 
       }
@@ -196,6 +201,7 @@ export class ProductFormComponent implements OnInit {
 
   recap() {
     this.showRecap = true;
+    this.onNext3();
     this.showLevels = false;
   }
 

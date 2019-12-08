@@ -303,8 +303,7 @@ namespace EducNotes.API.Controllers
                 int maxChild = 0;
                 if (user.UserTypeId == _config.GetValue<int>("AppSettings:parentTypeId") && user.UserName == user.ValidationCode)
                 {
-                    var children = await _repo.GetChildren(user.Id);
-                    maxChild = children.Count();
+                    maxChild = await _repo.GetAssignedChildrenCount(user.Id);
 
                     return Ok(new
                     {
@@ -521,12 +520,48 @@ namespace EducNotes.API.Controllers
             // récuperation de tous les users
             var usersToUpdate = new List<UserForUpdateDto>();
             usersToUpdate.Add(model.user1);
+            int total =0;
             foreach (var children in model.children)
             {
                 usersToUpdate.Add(children);
+                total +=total + children.Products.Sum(x => Convert.ToInt32(x.Price));
             }
             var userscode = await _repo.ParentSelfInscription(parentId, usersToUpdate);
+
+            // enregistrement des services séléctionnés
+        
+            foreach (var child in model.children)
+            {
+                int childId = userscode.FirstOrDefault(s => s.SpaCode == child.SpaCode).UserId;
+                var newOrder = new Order  {
+                    TotalHT =total,
+                    TotalTTC = total,
+                    Discount = 0,
+                    TVA = 0,
+                    UserPId = parentId,
+                    UserId = childId
+                };
+                _repo.Add(newOrder);
+
+            foreach (var prod in child.Products)
+            {
+                var newOrderLine = new OrderLine  {
+                    OrderId = newOrder.Id,
+                    ProductId = prod.Id,
+                    AmountHT = prod.Price,
+                    AmountTTC = prod.Price,
+                    Discount = 0,
+                    Qty = 1,
+                    TVA=0
+
+                };
+                _repo.Add(newOrderLine);
+            }
+            }
+            if(await _repo.SaveAll())
             return Ok(userscode);
+
+            return BadRequest();
         }
 
 
@@ -664,6 +699,54 @@ namespace EducNotes.API.Controllers
 
             return BadRequest("Could not add the photo");
         }
+
+        [HttpGet("GetClassLvelProducts/{classLevelId}")]
+        public async Task<IActionResult> GetProducts(int classLevelId)
+        {
+            var prods = new List<Product>();
+            var prods_for_levels = await _context.ClassLevelProducts
+                                        .Where(c => c.ClassLevelId == classLevelId)
+                                        .ToListAsync();
+            var ids = prods_for_levels.Select(p => p.ProductId);
+
+            if (prods_for_levels != null)
+                prods = await _context.Products.Include(p => p.Periodicity).Where(p => p.IsRequired == true || !ids.Contains(p.Id)).ToListAsync();
+            else
+                prods = await _context.Products.Include(p => p.Periodicity).Where(p => p.IsRequired == true).ToListAsync();
+
+            var prodsToReturn = new List<ServiceDetailsDto>();
+            foreach (var prod in prods)
+            {
+                var produit = new ServiceDetailsDto
+                {
+                    Id = prod.Id,
+                    Price = Convert.ToDecimal(prod.Price),
+                    Details = prod.Name + " : " + prod.Price.ToString(),
+                    IsRequired = prod.IsRequired
+                };
+                if (prod.IsByLevel)
+                {
+                    var selectedLevelProd = prods_for_levels.FirstOrDefault(p => p.ProductId == prod.Id);
+                    // produit.Details += prods_for_levels.FirstOrDefault(p => p.ProductId == prod.Id).Price.ToString();
+                    produit.Details += selectedLevelProd.Price.ToString();
+                    produit.Price += selectedLevelProd.Price;
+                }
+                if (prod.IsPeriodic)
+                    produit.Details += " par période (" + prod.Periodicity.Name + ")";
+                else
+                    produit.Details += " par échéances";
+                prodsToReturn.Add(produit);
+            }
+
+            return Ok(prodsToReturn);
+        }
+
+        [HttpGet("GetClasses")]
+        public async Task<IActionResult> GetClasses()
+        {
+            return Ok(await _context.Classes.ToListAsync());
+        }
+
 
 
 

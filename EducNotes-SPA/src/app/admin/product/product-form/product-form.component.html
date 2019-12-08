@@ -14,13 +14,15 @@
                         <label for="name" class="">Nom du Service</label>
                     </div>
                     <div class="md-form">
-                        <textarea type="text" formControlName="comment" id="comment"
-                            class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
+                        <textarea type="text" formControlName="comment" id="comment" class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
                         <label for="comment">Commentaire</label>
                     </div>
                     <div class="md-form">
-                        <mdb-select [options]="billlingTypes" formControlName="isByLevelId"
-                            placeholder="type de facturation">
+                        <mdb-select [options]="billlingTypes" formControlName="isByLevelId" placeholder="type de facturation">
+                        </mdb-select>
+                    </div>
+                    <div class="md-form">
+                        <mdb-select [options]="requirementOptions" formControlName="isRequired" placeholder="service obligatoire">
                         </mdb-select>
                     </div>
                     <div class="md-form">
@@ -28,24 +30,20 @@
                         </mdb-select>
                     </div>
                     <div class="md-form">
-                        <mdb-select [options]="recoveryTypes" formControlName="isPeriodic"
-                            (ngModelChange)="getSelectedRecoveryType($event)" placeholder="Type de recouvrement">
+                        <mdb-select [options]="recoveryTypes" formControlName="isPeriodic" (ngModelChange)="getSelectedRecoveryType($event)" placeholder="Type de recouvrement">
                         </mdb-select>
                     </div>
                     <div *ngIf="showPeriodeOrDeadLine">
                         <div *ngIf="!showPeriodicities" class="md-form animated fadeInRight">
-                            <input mdbInput type="text" id="deadLineCount" class="form-control"
-                                formControlName="deadLineCount">
+                            <input mdbInput type="text" id="deadLineCount" class="form-control" formControlName="deadLineCount">
                             <label for="deadLineCount">nombre d'échéances</label>
                         </div>
                         <div *ngIf="showPeriodicities" class="md-form animated fadeInRight">
-                            <mdb-select [options]="periodicities" formControlName="periodicityId"
-                                placeholder="Type de période"></mdb-select>
+                            <mdb-select [options]="periodicities" formControlName="periodicityId" placeholder="Type de période"></mdb-select>
                         </div>
                     </div>
                     <div class="md-form m-0">
-                        <button type="button" mdbBtn color="light" size="sm" (click)="onNext1()" mdbPageScroll
-                            href="#section1" [disabled]="!productForm.valid" mdbWavesEffect>suivant</button>
+                        <button type="button" mdbBtn color="light" size="sm" (click)="onNext1()" mdbPageScroll href="#section1" [disabled]="!productForm.valid" mdbWavesEffect>suivant</button>
                     </div>
                 </mdb-card-body>
             </mdb-card>
@@ -54,23 +52,20 @@
                 <div *ngIf="showDeadLines" class="mt-1 animated fadeInRight">
                     <mdb-card>
                         <mdb-card-body>
-                            <div formArrayName="deadlines"
-                                *ngFor="let deadLine of productForm.get('deadlines')['controls']; let i = index">
+                            <div formArrayName="deadlines" *ngFor="let deadLine of productForm.get('deadlines')['controls']; let i = index">
                                 <div [formGroupName]="i">
                                     <!-- formulaire pour editer les echéances générées au nombre saisi plus haut -->
                                     <div class="form-row">
                                         <div class="col">
                                             <div class="md-form">
-                                                <mdb-select style="width: 100%" [options]="deadLines"
-                                                    formControlName="deadLineId" placeholder="choisir l'échéance">
+                                                <mdb-select style="width: 100%" [options]="deadLines" formControlName="deadLineId" placeholder="choisir l'échéance">
                                                 </mdb-select>
 
                                             </div>
                                         </div>
                                         <div class="col">
                                             <div class="md-form">
-                                                <input mdbInput type="number" id="percentage" class="form-control"
-                                                    formControlName="percentage">
+                                                <input mdbInput type="number" id="percentage" class="form-control" formControlName="percentage">
                                                 <label for="percentage">pourcentage</label>
                                             </div>
                                         </div>
@@ -79,8 +74,7 @@
 
                             </div>
                             <div class="form-row m-0">
-                                <button type="button" mdbBtn color="light" size="sm" (click)="onNext2()" mdbPageScroll
-                                    href="#totalAmontDiv" mdbWavesEffect>suivant</button>
+                                <button type="button" mdbBtn color="light" size="sm" (click)="onNext2()" mdbPageScroll href="#totalAmontDiv" mdbWavesEffect>suivant</button>
                             </div>
                         </mdb-card-body>
                     </mdb-card>
@@ -92,16 +86,14 @@
                                 <div class="form-row">
                                     <div class="col">
                                         <div class="md-form">
-                                            <input mdbInput type="number" id="amount" class="form-control"
-                                                formControlName="price">
-                                            <label for="price">montant total</label>
+                                            <input mdbInput type="number" id="amount" class="form-control" formControlName="price">
+                                            <label for="price">montant</label>
                                         </div>
                                     </div>
 
                                 </div>
                                 <div class="form-row m-0">
-                                    <button type="button" mdbBtn color="light" size="sm" (click)="onNext3()"
-                                        mdbPageScroll href="#totalAmontDiv" mdbWavesEffect>suivant</button>
+                                    <button type="button" mdbBtn color="light" size="sm" (click)="onNext3()" mdbPageScroll href="#totalAmontDiv" mdbWavesEffect>suivant</button>
                                 </div>
                             </mdb-card-body>
                         </mdb-card>
@@ -128,8 +120,7 @@
                             <th scope="row" valign="middle">{{i+1}}</th>
                             <td scope="row" valign="middle">{{level.name}}</td>
                             <td scope="row" valign="middle">
-                                <input type="text" name="lamout" [(ngModel)]="level.price" id="lprice"
-                                    class="form-control" mdbInput>
+                                <input type="text" name="lamout" [(ngModel)]="level.price" id="lprice" class="form-control" mdbInput>
 
                             </td>
                         </tr>
@@ -141,11 +132,10 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="cart-title"><u>Récapitulatif</u></div>
-                        {{formData|json}}
                         <table style="width: 100%;">
                             <tr>
                                 <td><b>Service : </b></td>
-                                <td>{{formData.name}} ({{formData.comment}})</td>
+                                <td>{{formData.name}} ({{formData.comment}}) <span *ngIf="formData.isRequired"> <b>obligatoire</b></span></td>
                             </tr>
                             <tr>
                                 <td> <b>facturation par</b> </td>
@@ -156,42 +146,38 @@
                                             <div> <span
                                                     *ngFor="let deadline of formData.deadlines">{{deadline.deadLine.name}}:{{deadline.percentage}}%
                                                     <br></span></div>
-                                        </ng-template>
-                                        définie par échéances <button id="popTemplate" type="button" mdbBtn
-                                            color="light" size="sm" mdbPopoverHeader="liste des montants par niveau"
-                                            [mdbPopover]="popTemplate" mdbWavesEffect>
+                    </ng-template>
+                    définie par échéances <button id="popTemplate" type="button" mdbBtn color="light" size="sm" mdbPopoverHeader="liste des montants par niveau" [mdbPopover]="popTemplate" mdbWavesEffect>
                                             {{formData.deadlines.length}}
                                         </button>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td> <b> Montant</b> </td>
-                                <td>
-                                    <span *ngIf="formData.price">{{formData.price}}</span>
-                                    <span *ngIf="!formData.price">
+                    </span>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td> <b> Montant</b> </td>
+                        <td>
+                            <span *ngIf="formData.price">{{formData.price}}</span>
+                            <span *ngIf="!formData.price">
                                         definie par niveau
                                     </span>
 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><b>type d'alerte</b></td>
-                                <td>
-                                    {{formData.payableAtName}}
-                                </td>
-                            </tr>
-                        </table>
-                        <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!productForm.valid"
-                            (click)="save()" mdbWavesEffect>enregistrer</button>
-                        <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
-                            [routerLink]="['/productsList']">annuler</button>
-                    </div>
-                </div>
-                <div class="d-depth-1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>type d'alerte</b></td>
+                        <td>
+                            {{formData.payableAtName}}
+                        </td>
+                    </tr>
+                    </table>
+                    <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!productForm.valid" (click)="save()" mdbWavesEffect>enregistrer</button>
+                    <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect [routerLink]="['/productsList']">annuler</button>
                 </div>
             </div>
-
+            <div class="d-depth-1">
+            </div>
         </div>
+
     </div>
+</div>
 </div>
