@@ -116,28 +116,14 @@ export class ParentRegisterComponent implements OnInit {
   }
 
   initializeParams(val: string) {
-    // this.editModel = {};
-    // this.editModel.lastName = val;
-    // this.editModel.dateOfBirth = null;
-    // this.editModel.firstName = '';
-    // this.editModel.userName = '';
-    // this.editModel.password = '';
-    // this.editModel.checkPassword = '';
-    // this.editModel.gender = null;
-    // this.editModel.levelId = null;
-    // this.editModel.phoneNumber = '';
-    // this.editModel.productIds = [];
-    // this.editModel.email = '';
-    // this.editModel.secondPhoneNumber = '';
-
     this.editModel = {};
     this.editModel.lastName = val;
-    this.editModel.dateOfBirth = '01/01/2000';
-    this.editModel.firstName = 'issouf';
-    this.editModel.userName = 'issouf';
-    this.editModel.password = 'password';
+    this.editModel.dateOfBirth = null;
+    this.editModel.firstName = '';
+    this.editModel.userName = '';
+    this.editModel.password = '';
     this.editModel.checkPassword = '';
-    this.editModel.gender = 1;
+    this.editModel.gender = null;
     this.editModel.levelId = null;
     this.editModel.phoneNumber = '';
     this.editModel.productIds = [];
@@ -147,18 +133,18 @@ export class ParentRegisterComponent implements OnInit {
 
   createParentsForms() {
     this.user1Form = this.fb.group({
-      lastName: ['KABORE', Validators.required],
-      firstName: ['MOHAMED', Validators.required],
-      userName: ['momo'],
-      password: ['password', Validators.required],
+      lastName: ['', Validators.required],
+      firstName: ['', Validators.required],
+      userName: [''],
+      password: ['', Validators.required],
       checkPassword: [null, [Validators.required, this.user1confirmationValidator]],
-      gender: [1, Validators.required],
-      dateOfBirth: ['01011990'],
-      cityId: [1, Validators.required],
-      districtId: [1, Validators.required],
-      phoneNumber: ['07390636', Validators.required],
+      gender: [null, Validators.required],
+      dateOfBirth: [''],
+      cityId: [null, Validators.required],
+      districtId: [null, Validators.required],
+      phoneNumber: ['', Validators.required],
       email: [this.user1.email, [Validators.email]],
-      secondPhoneNumber: ['02893429']
+      secondPhoneNumber: ['']
     });
 
   }
@@ -433,7 +419,8 @@ export class ParentRegisterComponent implements OnInit {
         });
       }
       if (element === this.usersSpaCode[this.usersSpaCode.length - 1]) {
-        this.logUser();
+      this.logUser();
+
       }
       // fin de la boucle
     }
@@ -484,11 +471,18 @@ export class ParentRegisterComponent implements OnInit {
 
   logUser() {
     const user = { userName: this.user1.userName, password: this.user1.password };
-    const res = this.authService.login(user).subscribe(() => {
-      this.router.navigate(['/home']);
-    }, error => {
-      this.alertify.error(error);
-    });
+
+    setTimeout(() => {
+      this.authService.login(user).subscribe(() => {
+        this.router.navigate(['/home']);
+      }, error => {
+        this.alertify.error(error);
+      }); }, 5000);
+    // this.authService.login(user).subscribe(() => {
+    //   this.router.navigate(['/home']);
+    // }, error => {
+    //   this.alertify.error(error);
+    // });
   }
 
   getProducts() {

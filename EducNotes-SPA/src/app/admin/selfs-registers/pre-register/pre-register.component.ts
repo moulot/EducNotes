@@ -108,10 +108,9 @@ export class PreRegisterComponent implements OnInit {
   save() {
     this.adminService.sendRegisterEmail(this.authService.decodedToken.nameid, this.user).subscribe(() => {
       this.alertify.success('enregistrement terminé');
-      this.registerForm.reset();
       this.submitText = 'enregistrer';
+      this.ngOnInit();
     }, error => {
-      console.log();
       this.submitText = 'enregistrer';
     });
 

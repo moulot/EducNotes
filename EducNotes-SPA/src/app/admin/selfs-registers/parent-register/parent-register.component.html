@@ -1,4 +1,20 @@
-<mdb-stepper #stepper [linear]="true">
+<div class="animated flash" *ngIf="wait">
+
+    <mdb-card>
+
+        <mdb-card-header class="info-color white-text text-center py-4">
+            <p class="lead">Traitement en cours</p>
+        </mdb-card-header>
+
+        <!--Card content-->
+        <mdb-card-body>
+            <h3>patienter s'il vous plait...</h3>
+        </mdb-card-body>
+    </mdb-card>
+
+
+</div>
+<mdb-stepper #stepper [linear]="true" *ngIf="!wait" class="animated slideInDown">
     <mdb-step name="Infos Parent" [stepForm]="user1Form" class="step1">
         <div class="col-md-12">
             <mdb-card>
@@ -155,7 +171,10 @@
                                         <div class="flex-grow-1">
                                             <h6 class="m-0"> {{child.lastName}} {{child.firstName}} </h6>
                                             <p class="m-0 text-small text-muted">Niveau:{{child.level}} &nbsp;&nbsp; Date de naissance: {{child.dateOfBirth}} </p>
-                                            <p class="m-0 text-small text-muted"> <span *ngIf="child.email"> Email: {{child.email}} </span> <span *ngIf="child.phoneNumber || child.secondPhoneNumber"> &nbsp;&nbsp; Contact(s): {{child.phoneNumber}} {{child.secondPhoneNumber}}</span> </p>
+                                            <p class="m-0 text-small text-muted"> <span *ngIf="child.email"> Email:
+                                                    {{child.email}} </span> <span *ngIf="child.phoneNumber || child.secondPhoneNumber"> &nbsp;&nbsp;
+                                                    Contact(s): {{child.phoneNumber}} {{child.secondPhoneNumber}}</span>
+                                            </p>
                                             <div>
                                                 <span></span>
                                                 <table class="table-condensed table-stripped">
