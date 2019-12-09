@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { AuthService } from './_services/auth.service';
 import {JwtHelperService} from '@auth0/angular-jwt';
 import { User } from './_models/user';
 import { Period } from './_models/period';
 import { PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
 import { NavigationService } from './shared/services/navigation.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -14,9 +15,22 @@ import { NavigationService } from './shared/services/navigation.service';
 export class AppComponent implements OnInit {
   jwtHelper = new JwtHelperService();
   @ViewChild(PerfectScrollbarDirective, { static: true }) perfectScrollbar: PerfectScrollbarDirective;
+  userActivity;
+  userInactive: Subject<any> = new Subject();
+  constructor(public navService: NavigationService, private authService: AuthService) {
+    this.setTimeout();
+    this.userInactive.subscribe(() => console.log('user has been inactive for 3s'));
+  }
 
-  constructor(public navService: NavigationService, private authService: AuthService) {}
 
+  setTimeout() {
+    this.userActivity = setTimeout(() => this.userInactive.next(undefined), 3000);
+  }
+
+  @HostListener('window:mousemove') refreshUserState() {
+    clearTimeout(this.userActivity);
+    this.setTimeout();
+  }
   ngOnInit() {
     const token = localStorage.getItem('token');
     const user: User = JSON.parse(localStorage.getItem('user'));

@@ -9,6 +9,7 @@ namespace EducNotes.API.Dtos
         public int ProductTypeId { get; set; }
         public bool IsByLevel { get; set; }
         public bool IsPeriodic { get; set; }
+        public bool IsRequired { get; set; }
         public int RecoveryTypeId { get; set; }
         public int PayableAtId { get; set; }
         public int? PeriodicityId { get; set; }

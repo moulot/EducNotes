@@ -13,11 +13,10 @@ namespace EducNotes.API.Dtos
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        
+
         public string Email { get; set; }
         public int? ClassLevelId { get; set; }
-
-         public string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
         public string SecondPhoneNumber { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public List<int?> CourseIds { get; set; }
@@ -27,9 +26,6 @@ namespace EducNotes.API.Dtos
         public int? CityId { get; set; }
         public byte? Gender { get; set; }
         public int? SpaCode { get; set; }
-     
-        
-       
-       
+        public List<ServiceSelectionDto> Products { get; set; }
     }
 }

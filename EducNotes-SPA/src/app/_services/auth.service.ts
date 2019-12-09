@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
-import {map} from 'rxjs/operators';
-import {JwtHelperService} from '@auth0/angular-jwt';
+import { map } from 'rxjs/operators';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from 'src/environments/environment';
 import { User } from '../_models/user';
 import { Period } from '../_models/period';
@@ -22,7 +22,7 @@ export class AuthService {
   jwtHelper = new JwtHelperService();
   decodedToken: any;
   currentUser: User;
-  newUser = <User>{id: 0};
+  newUser = <User>{ id: 0 };
   currentPeriod: Period;
 
   photoUrl = new BehaviorSubject<string>('../../assets/user.png');
@@ -80,38 +80,38 @@ export class AuthService {
   }
 
   setUserPassword(id: number, password: string) {
-     return this.http.post(this.baseUrl + id + '/setPassword/' + password, {})
-    .pipe(
-      map((response: any) => {
-        const user = response;
-        if (user) {
-          localStorage.setItem('token', user.token);
-          localStorage.setItem('user', JSON.stringify(user.user));
-          this.decodedToken = this.jwtHelper.decodeToken(user.token);
-          this.currentUser = user.user;
-          this.changeMemberPhoto(this.currentUser.photoUrl);
-        }
-      })
-    );
+    return this.http.post(this.baseUrl + id + '/setPassword/' + password, {})
+      .pipe(
+        map((response: any) => {
+          const user = response;
+          if (user) {
+            localStorage.setItem('token', user.token);
+            localStorage.setItem('user', JSON.stringify(user.user));
+            this.decodedToken = this.jwtHelper.decodeToken(user.token);
+            this.currentUser = user.user;
+            this.changeMemberPhoto(this.currentUser.photoUrl);
+          }
+        })
+      );
   }
 
 
 
   setUserLoginPassword(id: number, loginModel: any) {
-    return this.http.post(this.baseUrl  + id +  '/setLoginPassword', loginModel)
-   .pipe(
-     map((response: any) => {
-       const user = response;
-       if (user) {
-         localStorage.setItem('token', user.token);
-         localStorage.setItem('user', JSON.stringify(user.user));
-         this.decodedToken = this.jwtHelper.decodeToken(user.token);
-         this.currentUser = user.user;
-         this.changeMemberPhoto(this.currentUser.photoUrl);
-       }
-     })
-   );
- }
+    return this.http.post(this.baseUrl + id + '/setLoginPassword', loginModel)
+      .pipe(
+        map((response: any) => {
+          const user = response;
+          if (user) {
+            localStorage.setItem('token', user.token);
+            localStorage.setItem('user', JSON.stringify(user.user));
+            this.decodedToken = this.jwtHelper.decodeToken(user.token);
+            this.currentUser = user.user;
+            this.changeMemberPhoto(this.currentUser.photoUrl);
+          }
+        })
+      );
+  }
 
   forgotPassord(email: string) {
     return this.http.get(this.baseUrl + email + '/ForgotPassword');
@@ -158,7 +158,7 @@ export class AuthService {
     localStorage.removeItem('user');
     this.decodedToken = null;
     this.currentUser = null;
-    return this.http.get(this.baseUrl  + 'emailValidation/' + token);
+    return this.http.get(this.baseUrl + 'emailValidation/' + token);
 
   }
 
@@ -167,7 +167,7 @@ export class AuthService {
     localStorage.removeItem('user');
     this.decodedToken = null;
     this.currentUser = null;
-    return this.http.get(this.baseUrl  + 'ResetPassword/' + token);
+    return this.http.get(this.baseUrl + 'ResetPassword/' + token);
 
   }
 
@@ -191,7 +191,7 @@ export class AuthService {
     return this.http.get(this.baseUrl + 'GetEmails');
   }
   getUserNames() {
-   return this.http.get(this.baseUrl + 'GetUserNames');
+    return this.http.get(this.baseUrl + 'GetUserNames');
   }
 
   getAllCities() {
@@ -206,7 +206,7 @@ export class AuthService {
     return this.http.get(this.baseUrl + 'GetDistrictsByCityId/' + id);
   }
 
-   // le post pour enrgister la preinscription : model {father:any,mother:any; children : any[]}
+  // le post pour enrgister la preinscription : model {father:any,mother:any; children : any[]}
   parentSelfInscription(userId: number, data: any) {
     return this.http.post(this.baseUrl + userId + '/ParentSelfPreinscription', data);
     // .pipe(
@@ -227,33 +227,36 @@ export class AuthService {
 
   teacherSelfPreinscription(userId: number, data: any) {
     return this.http.post(this.baseUrl + userId + '/TeacherSelfPreinscription', data)
-    .pipe(
-      map((response: any) => {
-        const user = response;
-        if (user) {
-          localStorage.setItem('token', user.token);
-          localStorage.setItem('user', JSON.stringify(user.user));
-          localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
-          this.decodedToken = this.jwtHelper.decodeToken(user.token);
-          this.currentUser = user.user;
-          this.currentPeriod = user.currentPeriod;
-          this.changeMemberPhoto(this.currentUser.photoUrl);
-        }
-      })
-    );
+      .pipe(
+        map((response: any) => {
+          const user = response;
+          if (user) {
+            localStorage.setItem('token', user.token);
+            localStorage.setItem('user', JSON.stringify(user.user));
+            localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
+            this.decodedToken = this.jwtHelper.decodeToken(user.token);
+            this.currentUser = user.user;
+            this.currentPeriod = user.currentPeriod;
+            this.changeMemberPhoto(this.currentUser.photoUrl);
+          }
+        })
+      );
   }
 
   emailExist(email: string) {
-    return this.http.get(this.baseUrl +  email + '/VerifyEmail');
+    return this.http.get(this.baseUrl + email + '/VerifyEmail');
   }
 
   userNameExist(userName: string) {
-    return this.http.get(this.baseUrl +  userName + '/VerifyUserName');
+    return this.http.get(this.baseUrl + userName + '/VerifyUserName');
   }
 
-  addUserPhoto(userId: number, photo: any ) {
+  addUserPhoto(userId: number, photo: any) {
     // return this.http.post(environment.apiUrl + 'users/' + userId + '/photos', photo);
-    return this.http.post(this.baseUrl  + userId + '/AddPhotoForUser', photo);
+    return this.http.post(this.baseUrl + userId + '/AddPhotoForUser', photo);
   }
 
+  getClassLevelProducts(classLevelid: number) {
+    return this.http.get(this.baseUrl + 'GetClassLvelProducts/' + classLevelid);
+  }
 }

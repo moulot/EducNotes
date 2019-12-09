@@ -10,11 +10,11 @@ namespace EducNotes.API.Data
 {
     public interface IEducNotesRepository
     {
-        void Add<T>(T entity) where T: class;
-        void Update<T>(T entity) where T: class;
-        void Delete<T>(T entity) where T: class;
+        void Add<T>(T entity) where T : class;
+        void Update<T>(T entity) where T : class;
+        void Delete<T>(T entity) where T : class;
         void DeleteAll<T>(List<T> entities) where T : class;
-        Task<bool> SaveAll();    
+        Task<bool> SaveAll();
         Task<PagedList<User>> GetUsers(UserParams userParams);
         Task<User> GetUser(int id, bool isCurrentUser);
         Task<IEnumerable<User>> GetChildren(int parentId);
@@ -31,45 +31,47 @@ namespace EducNotes.API.Data
         List<int> GetWeekDays(DateTime date);
         Task<IEnumerable<Schedule>> GetScheduleDay(int classId, int day);
         Task<Like> GetLike(int userId, int recipientId);
-        Task<bool> EmailExist(string email);    
-        Task<bool> UserNameExist(string userName);    
+        Task<bool> EmailExist(string email);
+        Task<bool> UserNameExist(string userName);
 
 
-        Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister,int insertUserId);
+        Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId);
 
         Task<IEnumerable<User>> GetStudentsForClass(int classId);
         Task<IEnumerable<Agenda>> GetClassAgenda(int classId);
         Task<List<AgendaForListDto>> GetUserClassAgenda(int classId, DateTime startDate, DateTime endDate);
-        Task<IEnumerable<UserType>> getUserTypes(); 
+        Task<IEnumerable<UserType>> getUserTypes();
 
         //Task<List<coursClass>> GetTeacherCoursesAndClasses(int teacherId);
         Task<Course> GetCourse(int Id);
         Task<bool> SendEmail(EmailFormDto emailFormDto);
-        bool SendSms(List<string> phoneNumbers,string content);
+        bool SendSms(List<string> phoneNumbers, string content);
 
-         Task<IEnumerable<City>> GetAllCities();
-         Task<IEnumerable<District>> GetAllGetDistrictsByCityIdCities(int id);
+        Task<IEnumerable<City>> GetAllCities();
+        Task<IEnumerable<District>> GetAllGetDistrictsByCityIdCities(int id);
 
-        void AddInscription(int levelId,int userId);
-        void AddUserLink(int userId,int parentId);
+        void AddInscription(int levelId, int userId);
+        void AddUserLink(int userId, int parentId);
 
         Task<User> GetUserByEmail(string email);
-        Task<bool> SendResetPasswordLink(string email,string code);
+        Task<bool> SendResetPasswordLink(string email, string code);
         Task<User> GetUserByCode(string code);
         Task<User> GetSingleUser(string userName);
         Task<List<UserEvalsDto>> GetUserGrades(int userId, int classId);
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
         Task<IEnumerable<ClassType>> GetClassTypes();
-        Task<int> AddSelfRegister(User user,string roleName,bool sendLink, int currentUserId);
+        Task<int> AddSelfRegister(User user, string roleName, bool sendLink, int currentUserId);
         Task<List<string>> GetEmails();
         Task<List<string>> GetUserNames();
         Task<List<ClassLevel>> GetLevels();
         Task sendOk(int userTypeId, int userId);
-        Task<List<UserSpaCodeDto>> ParentSelfInscription(int parentId,List<UserForUpdateDto> userToUpdate);
+        Task<List<UserSpaCodeDto>> ParentSelfInscription(int parentId, List<UserForUpdateDto> userToUpdate);
 
+        Task<int> GetAssignedChildrenCount(int parentId);
+        Task<bool> SaveProductSelection(int userPid, int userId,List<ServiceSelectionDto> products);
 
     }
 }

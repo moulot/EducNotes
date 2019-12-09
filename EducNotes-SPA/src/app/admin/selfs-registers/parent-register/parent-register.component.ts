@@ -1,16 +1,17 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UserService } from 'src/app/_services/user.service';
-import { AlertifyService } from 'src/app/_services/alertify.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
+import { Utils } from 'src/app/shared/utils';
 import { City } from 'src/app/_models/city';
 import { District } from 'src/app/_models/district';
-import { AuthService } from 'src/app/_services/auth.service';
-import { environment } from 'src/environments/environment';
-import { Utils } from 'src/app/shared/utils';
 import { UserSpaCode } from 'src/app/_models/userSpaCode';
-import { HttpClient } from '@angular/common/http';
+import { AlertifyService } from 'src/app/_services/alertify.service';
+import { AuthService } from 'src/app/_services/auth.service';
+import { UserService } from 'src/app/_services/user.service';
+import { environment } from 'src/environments/environment';
+
 
 
 @Component({
@@ -30,6 +31,8 @@ export class ParentRegisterComponent implements OnInit {
   parents: any = [];
   levels: any[] = [];
   cities: any[] = [];
+  products: any[] = [];
+  productsSelected: any[] = [];
   cityId: number;
   user1Disctricts: any[] = [];
   user2Districts: District[];
@@ -78,6 +81,7 @@ export class ParentRegisterComponent implements OnInit {
     private http: HttpClient) { }
 
   ngOnInit() {
+    console.log(this.maxChild);
     this.userId = this.user1.id;
     this.createParentsForms();
     this.getCities();
@@ -116,11 +120,13 @@ export class ParentRegisterComponent implements OnInit {
     this.editModel.lastName = val;
     this.editModel.dateOfBirth = null;
     this.editModel.firstName = '';
+    this.editModel.userName = '';
     this.editModel.password = '';
     this.editModel.checkPassword = '';
     this.editModel.gender = null;
     this.editModel.levelId = null;
     this.editModel.phoneNumber = '';
+    this.editModel.productIds = [];
     this.editModel.email = '';
     this.editModel.secondPhoneNumber = '';
   }
@@ -133,7 +139,7 @@ export class ParentRegisterComponent implements OnInit {
       password: ['', Validators.required],
       checkPassword: [null, [Validators.required, this.user1confirmationValidator]],
       gender: [null, Validators.required],
-      dateOfBirth: [null],
+      dateOfBirth: [''],
       cityId: [null, Validators.required],
       districtId: [null, Validators.required],
       phoneNumber: ['', Validators.required],
@@ -153,6 +159,7 @@ export class ParentRegisterComponent implements OnInit {
       checkPassword: [this.editModel.checkPassword, [Validators.required, this.childrenconfirmationValidator]],
       firstName: [this.editModel.firstName, Validators.nullValidator],
       gender: [this.editModel.gender, Validators.required],
+      productIds: [this.editModel.productIds],
       levelId: [this.editModel.levelId, Validators.required],
       phoneNumber: [this.editModel.phoneNumber, Validators.nullValidator],
       email: [this.editModel.email, [Validators.nullValidator, Validators.nullValidator]],
@@ -210,6 +217,12 @@ export class ParentRegisterComponent implements OnInit {
   submitChild(): void {
     let enfant: any = {};
     enfant = Object.assign({}, this.childForm.value);
+    for (let i = 0; i < enfant.productIds.length; i++) {
+      const prod = this.products.find(a => a.value === enfant.productIds[i]);
+      prod.id = prod.value;
+      this.productsSelected = [...this.productsSelected, prod];
+    }
+    enfant.products = this.productsSelected;
     enfant.photoUrl = this.childPhotoUrl;
     enfant.level = this.levels.find(item => item.value === enfant.levelId).label;
     if (this.editionMode === 'add') {
@@ -289,9 +302,11 @@ export class ParentRegisterComponent implements OnInit {
 
 
   confirm(element: any): void {
-    this.children.splice(this.children.findIndex(p => p.id === element.id), 1);
-    this.secondFormGroup.patchValue({ active: null });
-    // this.alertify.info('suppression éffectuée');
+    if (confirm('confirmez-vous cette suppression ?')) {
+      this.children.splice(this.children.findIndex(p => p.id === element.id), 1);
+      this.secondFormGroup.patchValue({ active: null });
+      this.alertify.info('suppression éffectuée');
+    }
   }
 
   edit(element: any): void {
@@ -301,6 +316,7 @@ export class ParentRegisterComponent implements OnInit {
     this.childPhotoUrl = element.photoUrl;
     this.editionMode = 'edit';
     this.createChildForm();
+    this.getProducts();
     this.open();
   }
 
@@ -370,11 +386,13 @@ export class ParentRegisterComponent implements OnInit {
       elt.dateOfBirth = Utils.inputDateDDMMYY(elt.dateOfBirth, '/');
       elt.userTypeId = this.studentTypeId;
     }
+
     usersToSave.children = this.children;
 
     // first Step : Enregistrement des Users
-    this.authService.parentSelfInscription(this.userId, usersToSave).subscribe((res: UserSpaCode[]) => {
+    const firstStep = this.authService.parentSelfInscription(this.userId, usersToSave).subscribe((res: UserSpaCode[]) => {
       this.usersSpaCode = res;
+      firstStep.unsubscribe();
       this.savePhotos();
     }, error => {
       this.wait = false;
@@ -401,7 +419,8 @@ export class ParentRegisterComponent implements OnInit {
         });
       }
       if (element === this.usersSpaCode[this.usersSpaCode.length - 1]) {
-        this.logUser();
+      this.logUser();
+
       }
       // fin de la boucle
     }
@@ -452,8 +471,36 @@ export class ParentRegisterComponent implements OnInit {
 
   logUser() {
     const user = { userName: this.user1.userName, password: this.user1.password };
-    this.authService.login(user).subscribe(() => {
-      this.router.navigate(['/home']);
+
+    setTimeout(() => {
+      this.authService.login(user).subscribe(() => {
+        this.router.navigate(['/home']);
+      }, error => {
+        this.alertify.error(error);
+      }); }, 5000);
+    // this.authService.login(user).subscribe(() => {
+    //   this.router.navigate(['/home']);
+    // }, error => {
+    //   this.alertify.error(error);
+    // });
+  }
+
+  getProducts() {
+    this.products = [];
+    this.productsSelected = [];
+    const classLevelId = this.childForm.value.levelId;
+    this.authService.getClassLevelProducts(classLevelId).subscribe((res: any[]) => {
+      for (let i = 0; i < res.length; i++) {
+        const element = res[i];
+        element.value = element.id;
+        element.label = element.details;
+        if (element.isRequired === true) {
+          this.productsSelected = [...this.productsSelected, element];
+        } else {
+          this.products = [...this.products, element];
+        }
+      }
+
     }, error => {
       this.alertify.error(error);
     });

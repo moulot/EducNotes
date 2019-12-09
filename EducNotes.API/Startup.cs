@@ -151,7 +151,7 @@ namespace EducNotes.API
            // seeder.SeedUsers();
         //    app.UseCors(x => x.WithOrigins("http://localhost:4200")
         //         .AllowAnyHeader().AllowAnyMethod().AllowCredentials());
-           app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
             app.UseAuthentication();
             app.UseDefaultFiles();
             app.UseStaticFiles();
