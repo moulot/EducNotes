@@ -15,18 +15,10 @@
           <div class="form-group col-md-3 mb-1">
             <mdb-select [options]="teacherOptions" formControlName="teacher" name="teacher"
               (ngModelChange)="onTeacherChanged()" placeholder="enseignant"></mdb-select>
-            <select class="form-control mr-2 mb-0" id="teacher">
-              <option value=""></option>
-              <option *ngFor="let item of teachers" value="{{item.id}}">{{item.lastName}} {{item.firstName}}</option>
-            </select>
           </div>
 
           <div class="form-group col-md-3 mb-0">
             <mdb-select [options]="courseOptions" placeholder="cours" name="course" formControlName="course"></mdb-select>
-            <select class="form-control mb-0" id="course">
-              <option value=""></option>
-              <option *ngFor="let item of courses" value="{{item.id}}">{{item.name}}</option>
-            </select>
           </div>
   
         </div>
@@ -245,8 +237,8 @@
         <div class="mt-2 mb-3" style="border-top: 1px solid #cccccc"></div>
 
         <div class="float-right">
-          <button type="button" class="btn btn-outline-default mr-2" (click)="closeModal()" >Cancel</button>
-          <button type="submit" [disabled]="scheduleForm.hasError('formNOK')" class="btn btn-outline-primary" >Ok</button>
+          <button type="button" class="mr-2" mdbBtn size="sm" color="light" (click)="closeModal()" mdbWavesEffect>Cancel</button>
+          <button type="submit" [disabled]="scheduleForm.hasError('formNOK')" mdbBtn size="sm" color="primary" mdbWavesEffect>Ok</button>
         </div>
 
       </form>

@@ -80,9 +80,6 @@ export class TeacherDashboardComponent implements OnInit {
   }
 
   goToClass() {
-    // const dataToArray = this.coursesControl.value.split('#');
-    // const classId = dataToArray[0];
-    // const scheduleId = dataToArray[1];
     const scheduleId = this.coursesControl.value;
     this.router.navigate(['/callSheet', scheduleId]); // , {queryParams: {sch: scheduleId}, skipLocationChange: true});
   }

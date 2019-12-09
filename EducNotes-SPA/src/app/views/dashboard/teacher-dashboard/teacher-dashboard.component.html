@@ -3,34 +3,6 @@
   <div class="col-lg-5 col-md-12">
     <div class="row">
 
-      <!-- <div class="col-md-12 mb-2">
-        <div class="card card-icon">
-          <div class="card-body p-2">
-            <div class="d-flex">
-              <i class="i-Receipt-4 icon mr-3"></i>
-              <div class="content">
-                <p class="lead pt-0 mt-0 mb-1">feuille d'appel</p>
-                <div *ngIf="nextCourses?.length > 0">
-                  <div class="d-flex">
-                    <nz-select #classSelect nzShowSearch nzPlaceHolder="choisir le cours" style="width: 300px"
-                      [formControl]="coursesControl" class="mr-1" nzAllowClear>
-                      <nz-option *ngFor="let item of nextCourses" nzValue="{{item.scheduleId}}"
-                        nzLabel="{{item.className}} {{item.courseName}} {{item.startHourMin}} - {{item.endHourMin}}"></nz-option>
-                    </nz-select>
-                    <button type="button" (click)="goToClass()" class="btn btn-sm btn-outline-primary">OK</button> 
-                  </div>
-                </div>
-                <div *ngIf="nextCourses?.length == 0">
-                  <div class="d-flex">
-                    <p class="text-15 text-muted m-0">pas de cours aujourd'hui</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
-
       <div class="col-md-12">
 
           <div class="card">

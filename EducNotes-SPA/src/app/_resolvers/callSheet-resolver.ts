@@ -10,8 +10,8 @@ import { ClassService } from '../_services/class.service';
 export class CallSheetResolver implements Resolve<Schedule> {
     constructor(private classService: ClassService, private router: Router, private alertify: AlertifyService) {}
 
-    resolve(route: ActivatedRouteSnapshot): Observable<Schedule> {
-        return this.classService.getSchedule(route.params['id']).pipe(
+    resolve(route: ActivatedRouteSnapshot): Observable<any> {
+        return this.classService.getSessionData(route.params['id']).pipe(
             catchError(() => {
                 this.alertify.error('problème de récupération de données');
                 this.router.navigate(['/home']);

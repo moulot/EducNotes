@@ -58,6 +58,10 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/Schedule/' + id);
   }
 
+  getSessionData(scheduleId) {
+    return this.http.get(this.baseUrl + 'classes/SessionData/' + scheduleId);
+  }
+
   getSession(scheduleId) {
     return this.http.get(this.baseUrl + 'classes/Session/' + scheduleId);
   }

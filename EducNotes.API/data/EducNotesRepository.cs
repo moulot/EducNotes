@@ -243,7 +243,7 @@ namespace EducNotes.API.Data {
         public async Task<IEnumerable<User>> GetClassStudents (int classId) {
             return await _context.Users
                 .Include (i => i.Photos)
-                .Include (i => i.Class)
+                //.Include (i => i.Class)
                 .Where (u => u.ClassId == classId)
                 .OrderBy (e => e.LastName).ThenBy (e => e.FirstName)
                 .ToListAsync ();
@@ -270,29 +270,29 @@ namespace EducNotes.API.Data {
         //             .GroupBy(g => g.DueDate).ToListAsync();
         // }
 
-        public async Task<IEnumerable<Agenda>> GetClassAgenda (int classId) {
+        public async Task<IEnumerable<Agenda>> GetClassAgenda(int classId) {
             return await _context.Agendas
-                .Include (i => i.Class)
-                .Include (i => i.Course)
-                .Where (a => a.ClassId == classId)
-                .OrderBy (o => o.DueDate).ToListAsync ();
+                .Include(i => i.Class)
+                .Include(i => i.Course)
+                .Where(a => a.ClassId == classId)
+                .OrderBy(o => o.DueDate).ToListAsync();
         }
-        public async Task<IEnumerable<User>> GetStudentsForClass (int classId) {
+        public async Task<IEnumerable<User>> GetStudentsForClass(int classId) {
             return await _context.Users
-                .Include (i => i.Photos)
-                .Include (i => i.Class)
-                .Where (u => u.ClassId == classId)
-                .OrderBy (e => e.LastName).ThenBy (e => e.FirstName)
-                .ToListAsync ();
+                .Include(i => i.Photos)
+                .Include(i => i.Class)
+                .Where(u => u.ClassId == classId)
+                .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
+                .ToListAsync();
         }
 
-        public async Task<IEnumerable<UserType>> getUserTypes () {
-            return await _context.UserTypes.Where (u => u.Name != "Admin").ToListAsync ();
+        public async Task<IEnumerable<UserType>> getUserTypes() {
+            return await _context.UserTypes.Where(u => u.Name != "Admin").ToListAsync();
         }
 
-        public async Task<bool> EmailExist (string email) {
-            var user = await _context.Users.FirstOrDefaultAsync (e => e.Email == email);
-            if (user != null)
+        public async Task<bool> EmailExist(string email) {
+            var user = await _context.Users.FirstOrDefaultAsync(e => e.Email == email);
+            if(user != null)
                 return true;
             return
             false;
@@ -844,49 +844,49 @@ namespace EducNotes.API.Data {
             return Math.Round (gradesSum / coeffSum, 2);
         }
 
-        public async Task<List<AgendaForListDto>> GetUserClassAgenda (int classId, DateTime startDate, DateTime endDate) {
+        public async Task<List<AgendaForListDto>> GetUserClassAgenda(int classId, DateTime startDate, DateTime endDate) {
             List<Agenda> classAgenda = await _context.Agendas
-                .Include (i => i.Course)
-                .OrderBy (o => o.DueDate)
-                .Where (a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= endDate)
-                .ToListAsync ();
+                .Include(i => i.Course)
+                .OrderBy(o => o.DueDate)
+                .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= endDate)
+                .ToListAsync();
 
-            var agendaDates = classAgenda.OrderBy (o => o.DueDate)
-                .Select (a => a.DueDate).Distinct ().ToList ();
+            var agendaDates = classAgenda.OrderBy(o => o.DueDate)
+                .Select(a => a.DueDate).Distinct().ToList();
 
-            List<AgendaForListDto> AgendaList = new List<AgendaForListDto> ();
-            foreach (var date in agendaDates) {
-                AgendaForListDto afld = new AgendaForListDto ();
+            List<AgendaForListDto> AgendaList = new List<AgendaForListDto>();
+            foreach(var date in agendaDates) {
+                AgendaForListDto afld = new AgendaForListDto();
                 afld.DueDate = date;
 
-                //CultureInfo frC = new CultureInfo("fr-FR");
-                var shortDueDate = date.ToString ("ddd dd MMM"); //, frC);
-                var longDueDate = date.ToString ("dd MMMM yyyy"); //, frC);
-                var dueDateAbbrev = date.ToString ("ddd dd").Replace (".", "");
+                CultureInfo frC = new CultureInfo("fr-FR");
+                var shortDueDate = date.ToString("ddd dd MMM", frC);
+                var longDueDate = date.ToString("dd MMMM yyyy", frC);
+                var dueDateAbbrev = date.ToString("ddd dd").Replace(".", "");
 
                 afld.ShortDueDate = shortDueDate;
                 afld.LongDueDate = longDueDate;
                 afld.DueDateAbbrev = dueDateAbbrev;
 
                 //get agenda tasks Done Status
-                afld.AgendaItems = new List<AgendaItemDto> ();
+                afld.AgendaItems = new List<AgendaItemDto>();
 
-                var agendaItems = classAgenda.Where (a => a.DueDate.Date == date.Date).ToList ();
-                foreach (var item in agendaItems) {
-                    AgendaItemDto aid = new AgendaItemDto ();
+                var agendaItems = classAgenda.Where (a => a.DueDate.Date == date.Date).ToList();
+                foreach(var item in agendaItems) {
+                    AgendaItemDto aid = new AgendaItemDto();
                     aid.CourseId = item.CourseId;
                     aid.CourseName = item.Course.Name;
                     aid.CourseAbbrev = item.Course.Abbreviation;
                     aid.CourseColor = item.Course.Color;
-                    aid.strDateAdded = item.DateAdded.ToShortDateString ();
+                    aid.strDateAdded = item.DateAdded.ToShortDateString();
                     aid.TaskDesc = item.TaskDesc;
                     aid.AgendaId = item.Id;
                     aid.Done = item.Done;
-                    afld.AgendaItems.Add (aid);
+                    afld.AgendaItems.Add(aid);
                 }
-                afld.NbItems = agendaItems.Count ();
+                afld.NbItems = agendaItems.Count();
 
-                AgendaList.Add (afld);
+                AgendaList.Add(afld);
             }
 
             return AgendaList;

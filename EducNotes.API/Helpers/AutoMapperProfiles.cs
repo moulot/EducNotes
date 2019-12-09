@@ -19,9 +19,9 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom (src => src.Photos.FirstOrDefault (p => p.IsMain).Url);
                 })
                 .ForMember (dest => dest.Age, opt => {
-                    opt.MapFrom (d => d.DateOfBirth.CalculateAge ());
+                    opt.MapFrom (d => d.DateOfBirth.CalculateAge());
                 });
-            CreateMap<User, UserForAutoCompleteDto> ()
+            CreateMap<User, UserForAutoCompleteDto>()
                 .ForMember (dest => dest.ClassName, opt => {
                     opt.MapFrom (src => src.Class.Name);
                 })
@@ -29,21 +29,25 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom (src => src.UserType.Name);
                 });
 
-            CreateMap<User, UserForDetailedDto> ()
+            CreateMap<User, UserForCallSheetDto>()
                 .ForMember (dest => dest.PhotoUrl, opt => {
-                    opt.MapFrom (src => src.Photos.FirstOrDefault (p => p.IsMain).Url);
+                    opt.MapFrom (src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
+                });
+            CreateMap<User, UserForDetailedDto>()
+                .ForMember (dest => dest.PhotoUrl, opt => {
+                    opt.MapFrom (src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
                 })
                 .ForMember (dest => dest.Age, opt => {
-                    opt.MapFrom (d => d.DateOfBirth.CalculateAge ());
+                    opt.MapFrom (d => d.DateOfBirth.CalculateAge());
                 })
                 .ForMember (dest => dest.ClassName, opt => {
                     opt.MapFrom (src => src.Class.Name);
                 });
-            CreateMap<Class, ClassDetailDto> ()
+            CreateMap<Class, ClassDetailDto>()
                 .ForMember (dest => dest.TotalStudent, opt => {
-                    opt.MapFrom (src => src.Students.Count ());
+                    opt.MapFrom (src => src.Students.Count());
                 });
-            CreateMap<Evaluation, EvalsForEditDto> ()
+            CreateMap<Evaluation, EvalsForEditDto>()
                 .ForMember (dest => dest.EvalDateExpired, opt => {
                     opt.MapFrom (src => (src.EvalDate.Date <= DateTime.Now.Date));
                 });

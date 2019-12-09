@@ -16,6 +16,9 @@ export class ClassAgendaComponent implements OnInit {
   strSunday: string;
   scheduleItems: any;
   classAgendaDays: any;
+  allCourses = true;
+  coursesWithTasks: any;
+  filteredAgenda: any;
   nbDayTasks = [0, 0, 0, 0, 0, 0];
   weekDays = [0, 0, 0, 0, 0, 0];
   agendaParams: any = {};
@@ -51,12 +54,13 @@ export class ClassAgendaComponent implements OnInit {
     this.classService.getClassCurrWeekAgenda(classId).subscribe((res: any) => {
 
       this.classAgendaDays = res.agendaItems;
+      this.filteredAgenda = res.agendaItems;
       this.monday = res.firstDayWeek;
       this.strMonday = res.strMonday;
       this.strSaturday = res.strSaturday;
       this.weekDays = res.weekDays;
       this.nbDayTasks = res.nbDayTasks;
-
+      this.coursesWithTasks = res.coursesWithTasks;
     }, error => {
       this.alertify.error(error);
     });
@@ -110,21 +114,53 @@ export class ClassAgendaComponent implements OnInit {
 
   loadMovedWeek(move: number) {
 
+    this.allCourses = true;
     this.agendaParams.dueDate = this.monday;
     this.agendaParams.moveWeek = move;
 
     this.classService.getClassMovedWeekAgenda(this.classRoom.id, this.agendaParams).subscribe((res: any) => {
 
       this.classAgendaDays = res.agendaItems;
+      this.filteredAgenda = res.agendaItems;
       this.monday = res.firstDayWeek;
       this.strMonday = res.strMonday;
       this.strSaturday = res.strSaturday;
       this.weekDays = res.weekDays;
       this.nbDayTasks = res.nbDayTasks;
-
+      this.coursesWithTasks = res.coursesWithTasks;
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  showAllCourses() {
+    if (this.allCourses === true) {
+      this.filteredAgenda = this.classAgendaDays;
+    }
+  }
+
+  showCourseItems(courseId) {
+    this.allCourses = false;
+    this.filteredAgenda = [];
+
+    for (let i = 0; i < this.classAgendaDays.length; i++) {
+      const elt = this.classAgendaDays[i];
+      const result = elt.courses.map(item => {
+        if (item.courseId === courseId) {
+          return item;
+        }
+      }).filter(item => !!item);
+      if (result.length > 0) {
+        const filteredElt = {
+          'dueDate': elt.dueDate,
+          'shortDueDate': elt.shortDueDate,
+          'longDueDate': elt.longDueDate,
+          'nbItems': result.length,
+          'courses': result
+        };
+        this.filteredAgenda = [...this.filteredAgenda, filteredElt];
+      }
+    }
   }
 
   selectDay(index) {
