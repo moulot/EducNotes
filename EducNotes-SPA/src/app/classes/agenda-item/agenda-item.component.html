@@ -1,4 +1,39 @@
-<div class="card mb-2">
+<div class="text-17 font-weight-400 m-0 p-0 d-flex mb-2">
+  <div>à remettre le {{items.dueDate}}</div>
+  <div class="ml-2">
+    <mdb-badge pill="true" class="badge-pill p-1" primary="true">{{items.courses.length}}</mdb-badge>
+  </div>
+</div>
+<div class="card mb-2" *ngFor="let course of items.courses">
+  <div class="card-body p-2">
+    <div class="row">
+      <div class="col-md-12 d-flex">
+        <div class="mr-2" [ngStyle]="{'background-color': course.courseColor}"
+          style="width: 10px;height: 100%;"></div>
+        <div class="flex-grow-1">
+          <div class="d-flex">
+            <div class="flex-grow-1 text-17">{{course.courseName}}</div>
+          </div>
+          <div>
+            <p class="text-15 text-muted m-0 mt-1">{{course.taskDesc}}</p>
+          </div>
+        </div>
+        <!-- <div>
+          <p class="text-15 mt-2 m-0">donné le {{course.dateAdded}}</p>
+        </div> -->
+      </div>
+    </div>
+    <div class="d-flex">
+      <div class="flex-grow-1"></div>
+      <div>
+        <p class="text-13 mt-2 m-0">donné le {{course.dateAdded}}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- <div class="card mb-2">
   <div class="card-body">
     <div class="card-title d-flex">
       <div class="flex-grow-1">{{items.dueDate}}</div>
@@ -16,15 +51,5 @@
         </div>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- <div class="card m-2">
-  <div class="card-header"><h5><strong>{{items.dueDate}}</strong></h5></div>
-  <div class="card-body">
-      <div *ngFor="let course of items.courses" class="d-flex justify-content-between m-2">
-        <div><h6><strong>{{course.courseName}}</strong> : {{course.taskDesc}}</h6></div>
-        <div><h6>donné {{course.dateAdded}}</h6></div>
-      </div>
   </div>
 </div> -->

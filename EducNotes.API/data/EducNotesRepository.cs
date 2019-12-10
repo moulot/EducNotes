@@ -278,11 +278,11 @@ namespace EducNotes.API.Data
         public async Task<IEnumerable<User>> GetClassStudents(int classId)
         {
             return await _context.Users
-                .Include(i => i.Photos)
-                .Include(i => i.Class)
-                .Where(u => u.ClassId == classId)
-                .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
-                .ToListAsync();
+                .Include (i => i.Photos)
+                //.Include (i => i.Class)
+                .Where (u => u.ClassId == classId)
+                .OrderBy (e => e.LastName).ThenBy (e => e.FirstName)
+                .ToListAsync ();
         }
 
         public async Task<IEnumerable<CourseSkill>> GetCourseSkills(int courseId)

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using EducNotes.API.Models;
 
 namespace EducNotes.API.Dtos
 {
@@ -16,7 +15,8 @@ namespace EducNotes.API.Dtos
 
     public class CourseTask
     {
-        public string   CourseName { get; set; }
+        public int CourseId {get; set; }
+        public string CourseName { get; set; }
         public string CourseColor { get; set; }
         public string DateAdded { get; set; }
         public string ShortDateAdded { get; set; }

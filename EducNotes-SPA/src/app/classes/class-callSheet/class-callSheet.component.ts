@@ -22,6 +22,7 @@ export class ClassCallSheetComponent implements OnInit {
   searchControl: FormControl = new FormControl();
   schedule: any;
   session = <Session>{};
+  sessionData: any;
   viewMode: 'list' | 'grid' = 'grid';
   allSelected: boolean;
   page = 1;
@@ -38,19 +39,11 @@ export class ClassCallSheetComponent implements OnInit {
     private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
-    this.route.data.subscribe(data => {
-      this.schedule = data['schedule'];
-      this.getSession(this.schedule.id);
-  });
-
-    this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
-      this.filerData(value);
-    });
-  }
-
-  loadStudents(classId) {
-    this.classService.getClassStudents(classId).subscribe(data => {
-      this.students = data;
+    this.route.data.subscribe((data: any) => {
+      this.sessionData = data['session'];
+      this.session = this.sessionData.session;
+      this.getSessionAbsents(this.session.id);
+      this.students = this.sessionData.classStudents;
       for (let i = 0; i < this.students.length; i++) {
         const id = this.students[i].id;
         let elt = <CallSheet>{};
@@ -64,11 +57,55 @@ export class ClassCallSheetComponent implements OnInit {
         }
         this.isAbsent = [...this.isAbsent, elt];
       }
-      this.filteredStudents = data;
+      this.filteredStudents = this.students;
+  });
+
+    this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
+      this.filerData(value);
+    });
+  }
+
+  getSessionData(scheduleId) {
+    this.classService.getSessionData(scheduleId).subscribe((session: any) => {
+      this.session = session.session;
+      this.getSessionAbsents(this.session.id);
+      this.students = session.classStudents;
     }, error => {
       this.alertify.error(error);
     });
   }
+
+  // getSession(scheduleId) {
+  //   this.classService.getSession(scheduleId).subscribe((session: Session) => {
+  //     this.session = session;
+  //     this.getSessionAbsents(this.session.id);
+  //     this.loadStudents(this.schedule.classId);
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
+
+  // loadStudents(classId) {
+  //   this.classService.getClassStudents(classId).subscribe(data => {
+  //     this.students = data;
+  //     for (let i = 0; i < this.students.length; i++) {
+  //       const id = this.students[i].id;
+  //       let elt = <CallSheet>{};
+  //       elt.id = id;
+  //       elt.absent = false;
+  //       if (this.sessionAbsents.length > 0) {
+  //         if (this.sessionAbsents.findIndex(s => Number(s.userId) === Number(id)) !== -1) {
+  //           elt.absent = true;
+  //           this.absents = [...this.absents, id];
+  //         }
+  //       }
+  //       this.isAbsent = [...this.isAbsent, elt];
+  //     }
+  //     this.filteredStudents = data;
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
 
   getSessionAbsents(sessionId: number) {
     this.classService.getAbsencesBySession(sessionId).subscribe(data => {
@@ -137,16 +174,5 @@ export class ClassCallSheetComponent implements OnInit {
       this.router.navigate(['/teacher']);
     });
   }
-
-  getSession(scheduleId) {
-    this.classService.getSession(scheduleId).subscribe((session: Session) => {
-      this.session = session;
-      this.getSessionAbsents(this.session.id);
-      this.loadStudents(this.schedule.classId);
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
 
 }
