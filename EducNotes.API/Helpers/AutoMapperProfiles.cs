@@ -166,6 +166,8 @@ namespace EducNotes.API.Helpers {
                 .ForMember (dest => dest.DueDate, opt => {
                     opt.MapFrom (src => src.DueDate.ToShortDateString());
                 });
+            CreateMap<PhotoForCreationDto, Fichier> ();
+
         
         }
     }

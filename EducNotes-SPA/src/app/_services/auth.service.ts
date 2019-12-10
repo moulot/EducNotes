@@ -259,4 +259,13 @@ export class AuthService {
   getClassLevelProducts(classLevelid: number) {
     return this.http.get(this.baseUrl + 'GetClassLvelProducts/' + classLevelid);
   }
+
+  saveFile(fichier: any) {
+    // return this.http.post(environment.apiUrl + 'users/' + userId + '/photos', photo);
+    return this.http.post(this.baseUrl + 'AddFile', fichier);
+  }
+
+  getAllFiles() {
+    return this.http.get(this.baseUrl + 'GetAllFiles');
+  }
 }

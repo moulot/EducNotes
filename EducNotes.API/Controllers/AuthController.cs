@@ -520,21 +520,22 @@ namespace EducNotes.API.Controllers
             // récuperation de tous les users
             var usersToUpdate = new List<UserForUpdateDto>();
             usersToUpdate.Add(model.user1);
-            int total =0;
+            int total = 0;
             foreach (var children in model.children)
             {
                 usersToUpdate.Add(children);
-                total +=total + children.Products.Sum(x => Convert.ToInt32(x.Price));
+                total += total + children.Products.Sum(x => Convert.ToInt32(x.Price));
             }
             var userscode = await _repo.ParentSelfInscription(parentId, usersToUpdate);
 
             // enregistrement des services séléctionnés
-        
+
             foreach (var child in model.children)
             {
                 int childId = userscode.FirstOrDefault(s => s.SpaCode == child.SpaCode).UserId;
-                var newOrder = new Order  {
-                    TotalHT =total,
+                var newOrder = new Order
+                {
+                    TotalHT = total,
                     TotalTTC = total,
                     Discount = 0,
                     TVA = 0,
@@ -543,23 +544,24 @@ namespace EducNotes.API.Controllers
                 };
                 _repo.Add(newOrder);
 
-            foreach (var prod in child.Products)
-            {
-                var newOrderLine = new OrderLine  {
-                    OrderId = newOrder.Id,
-                    ProductId = prod.Id,
-                    AmountHT = prod.Price,
-                    AmountTTC = prod.Price,
-                    Discount = 0,
-                    Qty = 1,
-                    TVA=0
+                foreach (var prod in child.Products)
+                {
+                    var newOrderLine = new OrderLine
+                    {
+                        OrderId = newOrder.Id,
+                        ProductId = prod.Id,
+                        AmountHT = prod.Price,
+                        AmountTTC = prod.Price,
+                        Discount = 0,
+                        Qty = 1,
+                        TVA = 0
 
-                };
-                _repo.Add(newOrderLine);
+                    };
+                    _repo.Add(newOrderLine);
+                }
             }
-            }
-            if(await _repo.SaveAll())
-            return Ok(userscode);
+            if (await _repo.SaveAll())
+                return Ok(userscode);
 
             return BadRequest();
         }
@@ -750,5 +752,49 @@ namespace EducNotes.API.Controllers
 
 
 
+
+
+
+        [HttpPost("AddFile")]
+        public async Task<IActionResult> AddFile([FromForm]PhotoForCreationDto photoForCreationDto)
+        {
+
+    
+            var file = photoForCreationDto.File;
+
+            var uploadResult = new ImageUploadResult();
+
+            if (file.Length > 0)
+            {
+                using (var stream = file.OpenReadStream())
+                {
+                    var uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(file.Name, stream)
+                    };
+
+                    uploadResult = _cloudinary.Upload(uploadParams);
+                }
+            }
+
+             photoForCreationDto.Url = uploadResult.Uri.ToString();
+             photoForCreationDto.PublicId = uploadResult.PublicId;
+
+
+            var fichier = _mapper.Map<Fichier>(photoForCreationDto);
+            fichier.Description = photoForCreationDto.File.FileName;
+            _repo.Add(fichier);
+
+            if (await _repo.SaveAll())
+                return Ok();
+
+            return BadRequest("Could not add the photo");
+        }
+
+        [HttpGet("GetAllFiles")]
+        public async Task<IActionResult> GetAllFiles()
+        {
+            return Ok(await _context.Fichiers.ToListAsync());
+        }
     }
 }

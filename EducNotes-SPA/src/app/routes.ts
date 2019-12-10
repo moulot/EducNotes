@@ -88,6 +88,7 @@ import { PayableFormComponent } from './admin/treso/payable-form/payable-form.co
 import { PayableFormResolver } from './_resolvers/payable-form-resolver';
 import { StudentDashboardComponent } from './views/dashboard/student-dashboard/student-dashboard.component';
 import { StudentScheduleComponent } from './schedule/student-schedule/student-schedule.component';
+import { ImportFichierComponent } from './admin/import-fichier/import-fichier.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -105,6 +106,7 @@ export const appRoutes: Routes = [
             { path: '', component: HomePanelComponent },
             { path: 'home', component: HomePanelComponent, resolve: { user: UserHomeResolver } },
             { path: 'broadcast', component: BroadcastComponent },
+            { path: 'fichier', component: ImportFichierComponent },
             { path: 'sendEmail', component: EmailComponent },
             { path: 'members', component: MemberListComponent, resolve: { users: MemberListResolver } },
             { path: 'members/:id', component: MemberDetailComponent, resolve: { user: MemberDetailResolver } },
