@@ -198,6 +198,7 @@ import { PayableFormResolver } from './_resolvers/payable-form-resolver';
 import { FullScreenDirective } from './_directives/full-screen.directive';
 import { StudentScheduleComponent } from './schedule/student-schedule/student-schedule.component';
 import { ConvertToPDFComponent } from './admin/_docs/convertToPDF/convertToPDF.component';
+import { ImportFichierComponent } from './admin/import-fichier/import-fichier.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -330,7 +331,8 @@ export function tokenGetter() {
       PayableAtsComponent,
       PayableFormComponent,
       StudentScheduleComponent,
-      ConvertToPDFComponent
+      ConvertToPDFComponent,
+      ImportFichierComponent
    ],
    imports: [
       FormWizardModule,

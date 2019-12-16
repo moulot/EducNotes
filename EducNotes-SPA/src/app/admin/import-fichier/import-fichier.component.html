@@ -1,0 +1,38 @@
+<div class="container">
+
+    <div class="card">
+        <input type="file" id="file" (change)="handleFileInput($event.target.files)">
+
+        <button type="button" mdbBtn color="primary" size="sm" mdbWavesEffect (click)="postFile()">enregistrer</button>
+
+        <!-- <div class="form-group">
+        <label for="file">Choose File</label>
+        <input type="submit" value="enregistrer"  />
+    </div> -->
+    </div>
+
+
+    <div>
+        <table mdbTable #tableEl="mdbTable" stickyHeader="true" hover="true" striped="true" class="z-depth-1">
+            <thead class="sticky-top">
+                <tr>
+                    <th># </th>
+                    <th>FICHIER </th>
+                    <th>date ajout </th>
+                </tr>
+            </thead>
+            <tbody #row>
+                <tr *ngFor="let fichier of fichiers, index as i">
+                    <td>{{i+1}}</td>
+                    <td>
+                        <a href="{{fichier.url}}" title="{{fichier.description}}"> <img src="../../../assets/pdf_file.ico" alt="{{fichier.description}}">&nbsp;
+                            <span>{{fichier.description}}</span></a>
+                    </td>
+                    <td>{{fichier.dateAdded|date :'EEEE-MMMM-yy'}}</td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
