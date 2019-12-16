@@ -40,6 +40,11 @@ export class AgendaListComponent implements OnInit {
   sessions: any[] = [];
   filteredSessions;
 
+  allCourses = true;
+  coursesWithTasks: any = [];
+  filteredAgenda: any = [];
+
+
   constructor(private userService: UserService, private fb: FormBuilder,
     private classService: ClassService, private authService: AuthService,
     public alertify: AlertifyService, private modalService: NgbModal) { }
@@ -160,6 +165,36 @@ export class AgendaListComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  showAllCourses() {
+    if (this.allCourses === true) {
+      // this.filteredAgenda = this.classAgendaByDate;
+    }
+  }
+
+  showCourseItems(courseId) {
+    // this.allCourses = false;
+    // this.filteredAgenda = [];
+
+    // for (let i = 0; i < this.classAgendaByDate.length; i++) {
+    //   const elt = this.classAgendaByDate[i];
+    //   const result = elt.agendaItems.map(item => {
+    //     if (item.courseId === courseId) {
+    //       return item;
+    //     }
+    //   }).filter(item => !!item);
+    //   if (result.length > 0) {
+    //     const filteredElt = {
+    //       'dueDate': elt.dueDate,
+    //       'shortDueDate': elt.shortDueDate,
+    //       'longDueDate': elt.longDueDate,
+    //       'nbItems': result.length,
+    //       'agendaItems': result
+    //     };
+    //     this.filteredAgenda = [...this.filteredAgenda, filteredElt];
+    //   }
+    // }
   }
 
 }

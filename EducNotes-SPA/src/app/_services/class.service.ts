@@ -8,6 +8,7 @@ import { Course } from '../_models/course';
 import { Class } from '../_models/class';
 import { Absence } from '../_models/absence';
 import { Schedule } from '../_models/schedule';
+import { PdfData } from '../_models/pdfData';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +45,10 @@ export class ClassService {
     params = params.append('moveWeek', agendaParams.moveWeek);
 
     return this.http.get(this.baseUrl + 'classes/' + classId + '/MovedWeekAgenda', { params });
+  }
+
+  getPDFFromHtml(data: any) {
+    return this.http.post(this.baseUrl + 'classes/HtmlToPDF', data);
   }
 
   getWeekDaysByDate(agendaParams): Observable<number[]> {
@@ -176,6 +181,7 @@ export class ClassService {
   saveTeacherAffectation(id: number, courseId: number, levelId: number, classIds: number[]) {
     return this.http.post(this.baseUrl + 'classes/' + id + '/' + courseId + '/' + levelId + ' /SaveTeacherAffectation', classIds);
   }
+
   updateTeacher(id: number, user: any) {
     return this.http.post(this.baseUrl + 'classes/' + id + '/UpdateTeacher', user);
   }

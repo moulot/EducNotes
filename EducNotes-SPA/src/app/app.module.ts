@@ -197,6 +197,7 @@ import { PayableFormComponent } from './admin/treso/payable-form/payable-form.co
 import { PayableFormResolver } from './_resolvers/payable-form-resolver';
 import { FullScreenDirective } from './_directives/full-screen.directive';
 import { StudentScheduleComponent } from './schedule/student-schedule/student-schedule.component';
+import { ConvertToPDFComponent } from './admin/_docs/convertToPDF/convertToPDF.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -328,7 +329,8 @@ export function tokenGetter() {
       PeriodicityFormComponent,
       PayableAtsComponent,
       PayableFormComponent,
-      StudentScheduleComponent
+      StudentScheduleComponent,
+      ConvertToPDFComponent
    ],
    imports: [
       FormWizardModule,

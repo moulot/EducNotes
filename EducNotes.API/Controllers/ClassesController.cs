@@ -363,6 +363,27 @@ namespace EducNotes.API.Controllers {
             return BadRequest("Aucun agenda trouvé");
         }
 
+        [HttpPost("HtmlToPDF")]
+        public IActionResult ConvertHtmlToPDF([FromBody] PdfDataDto pdfData) {
+            var html = pdfData.Html;
+            // Render any HTML fragment or document to HTML
+            var Renderer = new IronPdf.HtmlToPdf();
+            var PDF = Renderer.RenderHtmlAsPdf(html);
+            var OutputPath = "HtmlToPDF.pdf";
+            PDF.SaveAs(OutputPath);
+            // This neat trick opens our PDF file so we can see the result in our default PDF viewer
+            //System.Diagnostics.Process.Start(OutputPath);
+
+            // Create a PDF from any existing web page
+            var Renderer1 = new IronPdf.HtmlToPdf();
+            var PDF1 = Renderer1.RenderUrlAsPdf("https://ironpdf.com/tutorials/html-to-pdf/#exporting-a-pdf-using-existing-html-url");
+            PDF1.SaveAs("wikipedia.pdf");
+            // This neat trick opens our PDF file so we can see the result
+            //System.Diagnostics.Process.Start("wikipedia.pdf");
+
+            return NoContent();
+        }
+
         [HttpGet ("GetWeekDays")]
         public IActionResult GetWeekDaysByDate ([FromQuery] AgendaParams agendaParams) {
             var date = agendaParams.DueDate;
@@ -1079,7 +1100,7 @@ namespace EducNotes.API.Controllers {
             }
 
             if (await _repo.SaveAll ()) {
-                return Ok ();
+                return Ok();
             }
             return BadRequest ("impossiblle de terminer l'opération");
 

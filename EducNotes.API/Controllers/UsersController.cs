@@ -301,11 +301,10 @@ namespace EducNotes.API.Controllers
                                     .Where(w => w.TeacherId == teacherId)
                                     .ToListAsync();
 
-            var sessionsDto = teacherSchedule;//_mapper.Map<List<SessionsToReturnDto>>(teacherSchedule);
+            //var sessionsDto = teacherSchedule;//_mapper.Map<List<SessionsToReturnDto>>(teacherSchedule);
 
             // cahier de textes - periode de sessions des cours du professeur
             var today = DateTime.Now;
-
             for(int i = 0; i < 7; i++)
             {
                 var currentDate = today.AddDays(i);
@@ -314,7 +313,7 @@ namespace EducNotes.API.Controllers
                 if(day == 6 || day == 7)
                     continue;
                 
-                var daySessions = sessionsDto.Where(d => d.Day == day).OrderBy(d => d.StartHourMin);
+                var daySessions = teacherSchedule.Where(d => d.Day == day).OrderBy(d => d.StartHourMin);
                 var dayDate = Convert.ToDateTime(currentDate.ToShortDateString());
                 foreach (var session in daySessions)
                 {
@@ -352,6 +351,16 @@ namespace EducNotes.API.Controllers
         }
 
 
+        [HttpGet("{teacherId}/Courses")]
+        public async Task<IActionResult> GetTeacherCourses(int teacherId)
+        {
+            var courses = await _context.TeacherCourses
+                                    .Where(c => c.TeacherId == teacherId)
+                                    .Select(s => s.Course).ToListAsync();
+
+            return Ok(courses);
+        }
+
         [HttpGet("{teacherId}/Classes")]
         public async Task<IActionResult> GetTeacherClasses(int teacherId)
         {
@@ -369,16 +378,6 @@ namespace EducNotes.API.Controllers
                                     })
                                     .OrderBy(o => o.ClassName)
                                     .Distinct().ToListAsync();
-            
-            // var tclasses = await _context.ClassCourses
-            //             //.Include(i =>  i.Class)
-            //             .Where(c => c.TeacherId == teacherId)
-            //             .Select(s => s.Class).Distinct().ToListAsync();
-
-
-            // var teacherClasses = await _context.ClassCourses
-            //                                 .Include(i => i.Class).ThenInclude(i => i.Students).Distinct()
-            //                                 .Where(c => c.TeacherId == teacherId).Distinct().ToListAsync();
 
             return Ok(teacherClasses);
         }
@@ -419,16 +418,6 @@ namespace EducNotes.API.Controllers
             }
 
             return Ok(classesWithEvals);
-        }
-
-        [HttpGet("{teacherId}/Courses")]
-        public async Task<IActionResult> GetTeacherCourses(int teacherId)
-        {
-            var courses = await _context.TeacherCourses
-                                    .Where(c => c.TeacherId == teacherId)
-                                    .Select(s => s.Course).ToListAsync();
-
-            return Ok(courses);
         }
 
         // [HttpGet("{teacherId}/Courses")]

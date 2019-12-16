@@ -88,6 +88,7 @@ import { PayableFormComponent } from './admin/treso/payable-form/payable-form.co
 import { PayableFormResolver } from './_resolvers/payable-form-resolver';
 import { StudentDashboardComponent } from './views/dashboard/student-dashboard/student-dashboard.component';
 import { StudentScheduleComponent } from './schedule/student-schedule/student-schedule.component';
+import { ConvertToPDFComponent } from './admin/_docs/convertToPDF/convertToPDF.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -172,7 +173,8 @@ export const appRoutes: Routes = [
             { path: 'editPeriod/:id', component: PeriodicityFormComponent , resolve: { periodicity: PeriodicityFormResolver }},
             { path: 'payableAts', component: PayableAtsComponent , resolve: { payableAts: PayableAtListResolver }},
             { path: 'createPayable', component: PayableFormComponent },
-            { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }}
+            { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }},
+            { path: 'createPDF', component: ConvertToPDFComponent },
 
 
 
