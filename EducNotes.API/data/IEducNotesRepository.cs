@@ -58,6 +58,7 @@ namespace EducNotes.API.Data
         Task<User> GetUserByCode(string code);
         Task<User> GetSingleUser(string userName);
         Task<List<UserEvalsDto>> GetUserGrades(int userId, int classId);
+        IEnumerable<ClassAgendaToReturnDto> GetAgendaListByDueDate(IEnumerable<Agenda> agendaItems);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////

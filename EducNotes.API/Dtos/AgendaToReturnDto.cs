@@ -5,6 +5,7 @@ namespace EducNotes.API.Dtos
   public class AgendaToReturnDto
   {
     public int Id { get; set; }
+    public int ScheduleId { get; set; }
     public int TeacherId { get; set; }
     public string TeacherName { get; set; }
     public int CourseId { get; set; }

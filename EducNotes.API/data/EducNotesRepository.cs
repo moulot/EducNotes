@@ -540,6 +540,7 @@ namespace EducNotes.API.Data
             };
             Add(nouveau_link);
         }
+
         private string EditValidationContent(string userName, string code)
         {
             return "<h3><span>Educt'Notes</span></h3> <br>" +
@@ -547,6 +548,39 @@ namespace EducNotes.API.Data
                 "<p>Merci de bien vouloir valider votre compte au lien suivant :" +
                 " <a href=" + _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + code + " /> cliquer ici</a></p> <br>";
 
+        }
+
+        public IEnumerable<ClassAgendaToReturnDto> GetAgendaListByDueDate(IEnumerable<Agenda> agendaItems)
+        {
+            //selection de toutes les differentes dates
+            var dueDates = agendaItems.OrderBy(o => o.DueDate).Select(e => e.DueDate).Distinct();
+
+            var agendasToReturn = new List<ClassAgendaToReturnDto>();
+            foreach(var currDate in dueDates) {
+                var currentDateAgendas = agendaItems.Where(e => e.DueDate == currDate);
+                var agenda = new ClassAgendaToReturnDto();
+                agenda.dtDueDate = currDate;
+                agenda.DueDate = currDate.ToLongDateString();
+                agenda.DueDateDay = currDate.Day;
+                agenda.NbTasks = currentDateAgendas.Count();
+                var dayInt = (int)currDate.DayOfWeek;
+                agenda.DayInt = dayInt == 0 ? 7 : dayInt;
+                agenda.Courses = new List<CourseTask>();
+                foreach (var a in currentDateAgendas) {
+                    agenda.Courses.Add(new CourseTask {
+                        CourseId = a.Course.Id,
+                        CourseName = a.Course.Name,
+                        CourseColor = a.Course.Color,
+                        TaskDesc = a.TaskDesc,
+                        DateAdded = a.DateAdded.ToLongDateString(),
+                        ShortDateAdded = a.DateAdded.ToShortDateString()
+                    });
+                }
+
+                agendasToReturn.Add(agenda);
+            }
+
+            return agendasToReturn;
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////

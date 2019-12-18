@@ -117,8 +117,8 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'users/' + teacherId + '/NextCourses');
   }
 
-  getTeacherSessions(teacherId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/Sessions');
+  getTeacherSessions(teacherId, classId) {
+    return this.http.get(this.baseUrl + 'users/' + teacherId + '/Sessions/' + classId);
   }
 
   updateUser(id: number, user: User) {

@@ -13,6 +13,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Globalization;
 
 namespace EducNotes.API.Controllers
 {
@@ -275,16 +276,15 @@ namespace EducNotes.API.Controllers
             return Ok(teacherCourses);
         }
 
-        [HttpGet("{teacherId}/Sessions")]
-        public async Task<IActionResult> GetTeacherSessions(int teacherId)
+        [HttpGet("{teacherId}/Sessions/{classId}")]
+        public async Task<IActionResult> GetTeacherSessions(int teacherId, int classId)
         {
-            var agendas = new List<AgendaToReturnDto>();
-
             var teacherSchedule = await (from courses in _context.ClassCourses
                                     join Schedule in _context.Schedules
                                     on courses.CourseId equals Schedule.CourseId
                                     select new
                                     {
+                                        ScheduleId = Schedule.Id,
                                         TeacherId = courses.TeacherId,
                                         TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
                                         CourseId = courses.CourseId,
@@ -298,29 +298,32 @@ namespace EducNotes.API.Controllers
                                         StartHourMin = Schedule.StartHourMin.ToShortTimeString(),
                                         EndHourMin = Schedule.EndHourMin.ToShortTimeString()
                                     })
-                                    .Where(w => w.TeacherId == teacherId)
+                                    .Where(w => w.TeacherId == teacherId && w.ClassId == classId)
                                     .ToListAsync();
 
-            //var sessionsDto = teacherSchedule;//_mapper.Map<List<SessionsToReturnDto>>(teacherSchedule);
+            var today = DateTime.Now.Date;
+            var dayInt = (int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
+            var monday = today.AddDays(1 - dayInt);
+            var saturday = monday.AddDays(5);
+
+            var agendas = new List<AgendaToReturnDto>();
 
             // cahier de textes - periode de sessions des cours du professeur
-            var today = DateTime.Now;
+            // var today = DateTime.Now.Date;
             for(int i = 0; i < 7; i++)
             {
                 var currentDate = today.AddDays(i);
                 var day = ((int)currentDate.DayOfWeek == 0) ? 7 : (int)currentDate.DayOfWeek;
 
-                if(day == 6 || day == 7)
-                    continue;
+                if(day == 7) { continue; }
                 
                 var daySessions = teacherSchedule.Where(d => d.Day == day).OrderBy(d => d.StartHourMin);
-                var dayDate = Convert.ToDateTime(currentDate.ToShortDateString());
+                // var dayDate = Convert.ToDateTime(currentDate.ToShortDateString());
                 foreach (var session in daySessions)
                 {
                   var tasks = "";
                   var id = 0;
-                  var agenda = await _context.Agendas.SingleOrDefaultAsync(a => a.ClassId == session.ClassId &&
-                    a.CourseId == session.CourseId && a.DueDate == dayDate);
+                  var agenda = await _context.Agendas.SingleOrDefaultAsync(a => a.ScheduleId == session.ScheduleId);
                   if(agenda != null) {
                     tasks = agenda.TaskDesc;
                     id = agenda.Id;
@@ -328,11 +331,12 @@ namespace EducNotes.API.Controllers
 
                   var newAgenda = new AgendaToReturnDto {
                     Id = id,
+                    ScheduleId = session.ScheduleId,
                     TeacherId = Convert.ToInt32(session.TeacherId),
                     TeacherName = session.TeacherName,
                     CourseId = Convert.ToInt32(session.CourseId),
                     strDayDate = currentDate.ToShortDateString(),
-                    DayDate = dayDate,
+                    DayDate = currentDate,
                     Day = session.Day,
                     CourseName = session.CourseName,
                     CourseColor = session.CourseColor,
@@ -347,7 +351,45 @@ namespace EducNotes.API.Controllers
                 }
             }
 
-            return Ok(agendas);
+            var days = new List<string>();
+            var nbTasks = new List<int>();
+            for (int i = 0; i <= 5; i++) {
+                DateTime dt = monday.AddDays(i);
+                CultureInfo frC = new CultureInfo("fr-FR");
+                var shortdate = dt.ToString("ddd dd MMM", frC);
+                days.Add(shortdate);
+
+                // var item = items.FirstOrDefault(a => a.dtDueDate == dt);
+                // if(item != null)
+                //     nbTasks.Add (item.NbTasks);
+                // else
+                //     nbTasks.Add(0);
+            }
+
+            var itemsFromRepo = await _repo.GetClassAgenda(classId, monday, saturday);
+            var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
+
+            var classCourses = await _context.ClassCourses
+                .Where(c => c.ClassId == classId)
+                .Select(s => s.Course).ToListAsync();
+
+            List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto>();
+            foreach(var course in classCourses) {
+                CourseTasksDto ctd = new CourseTasksDto();
+                var nbItems = itemsFromRepo.Where(a => a.CourseId == course.Id).ToList().Count();
+                ctd.CourseId = course.Id;
+                ctd.CourseName = course.Name;
+                ctd.CourseAbbrev = course.Abbreviation;
+                ctd.CourseColor = course.Color;
+                ctd.NbTasks = nbItems;
+                coursesWithTasks.Add(ctd);
+            }
+
+            return Ok(new {
+                agendas,
+                weekDays = days,
+                coursesWithTasks
+            });
         }
 
 
