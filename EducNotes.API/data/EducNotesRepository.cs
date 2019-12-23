@@ -258,10 +258,9 @@ namespace EducNotes.API.Data
         public async Task<IEnumerable<Agenda>> GetClassAgenda(int classId, DateTime StartDate, DateTime EndDate)
         {
             return await _context.Agendas
-                .Include(i => i.Course)
-                .Where(a => a.ClassId == classId && a.DueDate.Date >= StartDate.Date &&
-                   a.DueDate.Date <= EndDate.Date)
-                .OrderBy(o => o.DueDate).ToListAsync();
+                        .Include(i => i.Course)
+                        .Where(a => a.ClassId == classId && a.DueDate.Date >= StartDate.Date && a.DueDate.Date <= EndDate.Date)
+                        .OrderBy(o => o.DueDate).ToListAsync();
         }
 
         public async Task<IEnumerable<Agenda>> GetClassAgendaTodayToNDays(int classId, int toNbDays)
@@ -1003,18 +1002,16 @@ namespace EducNotes.API.Data
                 .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= endDate)
                 .ToListAsync();
 
-            var agendaDates = classAgenda.OrderBy(o => o.DueDate)
-                .Select(a => a.DueDate).Distinct().ToList();
+            var agendaDates = classAgenda.OrderBy(o => o.DueDate).Select(a => a.DueDate).Distinct().ToList();
 
             List<AgendaForListDto> AgendaList = new List<AgendaForListDto>();
             foreach (var date in agendaDates)
             {
                 AgendaForListDto afld = new AgendaForListDto();
                 afld.DueDate = date;
-
                 //CultureInfo frC = new CultureInfo("fr-FR");
-                var shortDueDate = date.ToString("ddd dd MMM"); //, frC);
-                var longDueDate = date.ToString("dd MMMM yyyy"); //, frC);
+                var shortDueDate = date.ToString("ddd dd MMM");
+                var longDueDate = date.ToString("dd MMMM yyyy");
                 var dueDateAbbrev = date.ToString("ddd dd").Replace(".", "");
 
                 afld.ShortDueDate = shortDueDate;
@@ -1023,7 +1020,6 @@ namespace EducNotes.API.Data
 
                 //get agenda tasks Done Status
                 afld.AgendaItems = new List<AgendaItemDto>();
-
                 var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();
                 foreach (var item in agendaItems)
                 {

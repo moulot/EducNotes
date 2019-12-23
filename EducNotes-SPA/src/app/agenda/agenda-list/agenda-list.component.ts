@@ -44,11 +44,15 @@ export class AgendaListComponent implements OnInit {
 
   allCourses = true;
   coursesWithTasks: any = [];
-  filteredAgenda: any = [];
   nbDayTasks = [0, 0, 0, 0, 0, 0];
   weekDays = [];
+  weekDates = [];
   classControl = new FormControl();
   showSessionsData = false;
+  agendaParams: any = {};
+  monday: Date;
+  sessionsByDate = [];
+  sessionsByCourse = [];
 
   constructor(private userService: UserService, private fb: FormBuilder,
     private classService: ClassService, private authService: AuthService,
@@ -88,14 +92,6 @@ export class AgendaListComponent implements OnInit {
     this.filteredSessions = rows;
   }
 
-  // createSelectForm() {
-  //   this.selectForm = this.fb.group({
-  //     aclass: [null],
-  //     course: [null],
-  //     dates: [null]
-  //   });
-  // }
-
   // selectCourses() {
   //   const classid = Number(this.selectForm.value.aclass);
   //   const courseid = Number(this.selectForm.value.course);
@@ -127,7 +123,7 @@ export class AgendaListComponent implements OnInit {
       instance.session = session;
       instance.fct.subscribe((data) => {
         this.saveAgenda(data);
-        if(data.id === 0){
+        if (data.id === 0) {
           const itemIndex = this.coursesWithTasks.findIndex(item => item.courseId === data.courseId);
           const nb = this.coursesWithTasks[itemIndex].nbTasks;
           this.coursesWithTasks[itemIndex].nbTasks = nb + 1;
@@ -153,10 +149,12 @@ export class AgendaListComponent implements OnInit {
 
   getTeacherSessions(teacherId, classId) {
     this.userService.getTeacherSessions(teacherId, classId).subscribe((data: any) => {
-      this.sessions = data.agendas;
+      // this.sessions = data.agendas;
       this.filteredSessions = data.agendas;
       this.allSessions = data.agendas;
+      this.monday = data.monday;
       this.weekDays = data.weekDays;
+      this.weekDates = data.weekDates;
       this.coursesWithTasks = data.coursesWithTasks;
     }, error => {
       this.alertify.error(error);
@@ -186,7 +184,7 @@ export class AgendaListComponent implements OnInit {
 
   showAllCourses() {
     if (this.allCourses === true) {
-      // this.filteredAgenda = this.classAgendaByDate;
+      this.filteredSessions = this.allSessions;
     }
   }
 
@@ -201,47 +199,81 @@ export class AgendaListComponent implements OnInit {
   }
 
   showCourseItems(courseId) {
-    // this.allCourses = false;
-    // this.filteredAgenda = [];
+    this.allCourses = false;
+    this.filteredSessions = [];
+    this.sessionsByCourse = [];
 
-    // for (let i = 0; i < this.classAgendaByDate.length; i++) {
-    //   const elt = this.classAgendaByDate[i];
-    //   const result = elt.agendaItems.map(item => {
-    //     if (item.courseId === courseId) {
-    //       return item;
-    //     }
-    //   }).filter(item => !!item);
-    //   if (result.length > 0) {
-    //     const filteredElt = {
-    //       'dueDate': elt.dueDate,
-    //       'shortDueDate': elt.shortDueDate,
-    //       'longDueDate': elt.longDueDate,
-    //       'nbItems': result.length,
-    //       'agendaItems': result
-    //     };
-    //     this.filteredAgenda = [...this.filteredAgenda, filteredElt];
-    //   }
-    // }
+    for (let i = 0; i < this.allSessions.length; i++) {
+      const elt = this.allSessions[i];
+      const result = elt.agendaItems.map(item => {
+        if (item.courseId === courseId) {
+          return item;
+        }
+      }).filter(item => !!item);
+      console.log(result);
+      if (result.length > 0) {
+        const filteredElt = {
+          'dueDate': elt.dueDate,
+          'shortDueDate': elt.shortDueDate,
+          'longDueDate': elt.longDueDate,
+          'dueDateAbbrev': elt.DueDateAbbrev,
+          'nbItems': result.length,
+          'agendaItems': result
+        };
+        this.filteredSessions = [...this.filteredSessions, filteredElt];
+        this.sessionsByCourse = [...this.sessionsByDate, filteredElt];
+      }
+    }
+  }
+
+  showItemsByDate(courseId) {
+    this.allCourses = false;
+    this.filteredSessions = [];
+    this.sessionsByDate = [];
+
+    for (let i = 0; i < this.allSessions.length; i++) {
+      const elt = this.allSessions[i];
+      const result = elt.agendaItems.map(item => {
+        if (item.courseId === courseId) {
+          return item;
+        }
+      }).filter(item => !!item);
+      console.log(result);
+      if (result.length > 0) {
+        const filteredElt = {
+          'dueDate': elt.dueDate,
+          'shortDueDate': elt.shortDueDate,
+          'longDueDate': elt.longDueDate,
+          'dueDateAbbrev': elt.DueDateAbbrev,
+          'nbItems': result.length,
+          'agendaItems': result
+        };
+        this.filteredSessions = [...this.filteredSessions, filteredElt];
+        this.sessionsByDate = [...this.sessionsByDate, filteredElt];
+      }
+    }
   }
 
   loadMovedWeek(move: number) {
-    // this.allCourses = true;
-    // this.agendaParams.dueDate = this.monday;
-    // this.agendaParams.moveWeek = move;
+    this.allCourses = true;
+    this.agendaParams.dueDate = this.monday;
+    this.agendaParams.moveWeek = move;
 
-    // this.classService.getClassMovedWeekAgenda(this.classRoom.id, this.agendaParams).subscribe((res: any) => {
+    this.userService.getMovedWeekSessions(this.teacher.id, this.classId, this.agendaParams).subscribe((data: any) => {
 
-    //   this.classAgendaDays = res.agendaItems;
-    //   this.filteredAgenda = res.agendaItems;
-    //   this.monday = res.firstDayWeek;
-    //   this.strMonday = res.strMonday;
-    //   this.strSaturday = res.strSaturday;
-    //   this.weekDays = res.weekDays;
-    //   this.nbDayTasks = res.nbDayTasks;
-    //   this.coursesWithTasks = res.coursesWithTasks;
-    // }, error => {
-    //   this.alertify.error(error);
-    // });
+      this.sessions = data.agendas;
+      this.filteredSessions = data.agendas;
+      this.allSessions = data.agendas;
+      this.monday = data.monday;
+      this.weekDays = data.weekDays;
+      this.weekDates = data.weekDates;
+      this.coursesWithTasks = data.coursesWithTasks;
+      // this.strMonday = res.strMonday;
+      // this.strSaturday = res.strSaturday;
+      // this.nbDayTasks = res.nbDayTasks;
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
 }

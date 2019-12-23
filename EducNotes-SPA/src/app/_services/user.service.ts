@@ -121,6 +121,16 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'users/' + teacherId + '/Sessions/' + classId);
   }
 
+  getMovedWeekSessions(teacherId, classId, agendaParams) {
+
+    let params = new HttpParams();
+    params = params.append('dueDate', agendaParams.dueDate);
+    params = params.append('moveWeek', agendaParams.moveWeek);
+    console.log(agendaParams.dueDate);
+
+    return this.http.get(this.baseUrl + 'users/' + teacherId + '/MovedWeekSessions/' + classId, { params });
+  }
+
   updateUser(id: number, user: User) {
     return this.http.put(this.baseUrl + 'users/' + id, user);
   }

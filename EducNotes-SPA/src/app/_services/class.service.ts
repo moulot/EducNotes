@@ -43,7 +43,6 @@ export class ClassService {
     let params = new HttpParams();
     params = params.append('dueDate', agendaParams.dueDate);
     params = params.append('moveWeek', agendaParams.moveWeek);
-
     return this.http.get(this.baseUrl + 'classes/' + classId + '/MovedWeekAgenda', { params });
   }
 

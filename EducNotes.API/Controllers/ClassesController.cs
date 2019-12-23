@@ -209,15 +209,15 @@ namespace EducNotes.API.Controllers {
         }
 
         [HttpGet ("{classId}/MovedWeekAgenda")]
-        public async Task<IActionResult> getClassMovedWeekAgenda (int classId, [FromQuery] AgendaParams agendaParams) {
+        public async Task<IActionResult> getClassMovedWeekAgenda(int classId, [FromQuery] AgendaParams agendaParams) {
             var FromDate = agendaParams.DueDate.Date;
             var move = agendaParams.MoveWeek;
-            var date = FromDate.AddDays (move);
-            var dateDay = (int) date.DayOfWeek;
+            var date = FromDate.AddDays(move);
+            var dateDay = (int)date.DayOfWeek;
 
             var dayInt = dateDay == 0 ? 7 : dateDay;
-            DateTime monday = date.AddDays (1 - dayInt);
-            var saturday = monday.AddDays (5);
+            DateTime monday = date.AddDays(1 - dayInt);
+            var saturday = monday.AddDays(5);
 
             var itemsFromRepo = await _repo.GetClassAgenda(classId, monday, saturday);
             var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
@@ -577,36 +577,25 @@ namespace EducNotes.API.Controllers {
             return Ok (coursesWithAgenda.OrderBy (c => c.Name));
         }
 
-        [HttpGet ("{classId}/AgendaByDate")]
-        public async Task<IActionResult> GetAgendaByDate (int classId, [FromQuery] AgendaParams agendaParams) {
+        [HttpGet("{classId}/AgendaByDate")]
+        public async Task<IActionResult> GetAgendaByDate(int classId, [FromQuery]AgendaParams agendaParams)
+        {
             var nbDays = agendaParams.nbDays;
             var IsMovingPeriod = agendaParams.IsMovingPeriod;
             var startDate = agendaParams.CurrentDate.Date;
-            var endDate = startDate.AddDays (nbDays).Date;
-            if (IsMovingPeriod) {
-                if (nbDays > 0) {
-                    startDate = agendaParams.CurrentDate.AddDays (1).Date;
+            var endDate = startDate.AddDays(nbDays).Date;
+            if(IsMovingPeriod) {
+                if(nbDays > 0) {
+                    startDate = agendaParams.CurrentDate.AddDays(1).Date;
                     endDate = startDate.AddDays (nbDays).Date;
                 } else {
-                    startDate = agendaParams.CurrentDate.AddDays (-1).Date;
-                    endDate = startDate.AddDays (nbDays).Date;
+                    startDate = agendaParams.CurrentDate.AddDays(-1).Date;
+                    endDate = startDate.AddDays(nbDays).Date;
                 }
             }
 
-            var classAgenda = new List<Agenda> ();
-            if (startDate < endDate) {
-                classAgenda = await _context.Agendas
-                    .Include (i => i.Course)
-                    .OrderBy (o => o.DueDate)
-                    .Where (a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= endDate)
-                    .ToListAsync ();
-            } else {
-                classAgenda = await _context.Agendas
-                    .Include (i => i.Course)
-                    .OrderBy (o => o.DueDate)
-                    .Where (a => a.ClassId == classId && a.DueDate.Date >= endDate && a.DueDate <= startDate)
-                    .ToListAsync ();
-
+            var classAgenda = new List<Agenda>();
+            if(startDate > endDate) {
                 var temp = startDate;
                 startDate = endDate;
                 endDate = temp;
