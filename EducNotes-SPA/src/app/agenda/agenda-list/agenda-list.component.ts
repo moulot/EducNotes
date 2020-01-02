@@ -226,32 +226,13 @@ export class AgendaListComponent implements OnInit {
     }
   }
 
-  showItemsByDate(courseId) {
+  showItemsByDate(selectedDate) {
     this.allCourses = false;
     this.filteredSessions = [];
     this.sessionsByDate = [];
 
-    for (let i = 0; i < this.allSessions.length; i++) {
-      const elt = this.allSessions[i];
-      const result = elt.agendaItems.map(item => {
-        if (item.courseId === courseId) {
-          return item;
-        }
-      }).filter(item => !!item);
-      console.log(result);
-      if (result.length > 0) {
-        const filteredElt = {
-          'dueDate': elt.dueDate,
-          'shortDueDate': elt.shortDueDate,
-          'longDueDate': elt.longDueDate,
-          'dueDateAbbrev': elt.DueDateAbbrev,
-          'nbItems': result.length,
-          'agendaItems': result
-        };
-        this.filteredSessions = [...this.filteredSessions, filteredElt];
-        this.sessionsByDate = [...this.sessionsByDate, filteredElt];
-      }
-    }
+    const sessionsDay = this.allSessions.find(item => item.dueDate === selectedDate);
+    this.filteredSessions = [...this.filteredSessions, sessionsDay];
   }
 
   loadMovedWeek(move: number) {
@@ -268,9 +249,6 @@ export class AgendaListComponent implements OnInit {
       this.weekDays = data.weekDays;
       this.weekDates = data.weekDates;
       this.coursesWithTasks = data.coursesWithTasks;
-      // this.strMonday = res.strMonday;
-      // this.strSaturday = res.strSaturday;
-      // this.nbDayTasks = res.nbDayTasks;
     }, error => {
       this.alertify.error(error);
     });

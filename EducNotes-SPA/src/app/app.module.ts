@@ -199,6 +199,8 @@ import { FullScreenDirective } from './_directives/full-screen.directive';
 import { StudentScheduleComponent } from './schedule/student-schedule/student-schedule.component';
 import { ConvertToPDFComponent } from './admin/_docs/convertToPDF/convertToPDF.component';
 import { ImportFichierComponent } from './admin/import-fichier/import-fichier.component';
+import { CallSheetCardComponent } from './classes/callSheet-card/callSheet-card.component';
+import { SendSmsComponent } from './admin/sendSms/sendSms.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -332,7 +334,9 @@ export function tokenGetter() {
       PayableFormComponent,
       StudentScheduleComponent,
       ConvertToPDFComponent,
-      ImportFichierComponent
+      ImportFichierComponent,
+      CallSheetCardComponent,
+      SendSmsComponent
    ],
    imports: [
       FormWizardModule,

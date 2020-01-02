@@ -7,10 +7,10 @@ import { Schedule } from '../_models/schedule';
 import { ClassService } from '../_services/class.service';
 
 @Injectable()
-export class CallSheetResolver implements Resolve<Schedule> {
+export class CallSheetResolver implements Resolve<any> {
     constructor(private classService: ClassService, private router: Router, private alertify: AlertifyService) {}
 
-    resolve(route: ActivatedRouteSnapshot): Observable<any> {
+    resolve(route: ActivatedRouteSnapshot): any {
         return this.classService.getSessionData(route.params['id']).pipe(
             catchError(() => {
                 this.alertify.error('problème de récupération de données');

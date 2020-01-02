@@ -71,27 +71,27 @@
       <div class="text-center mb-2">
         <button type="button" mdbBtn class="p-2" (click)="loadMovedWeek(-7)" color="light"
           mdbWavesEffect><i class="i-Arrow-Left"></i></button>
-        <button type="button" mdbBtn  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[0])"  class="p-2" color="light" mdbWavesEffect>
           {{weekDays[0]}}
           <span *ngIf="nbDayTasks[0] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[0]}}</span>
         </button>
-        <button type="button" mdbBtn  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[1])"  class="p-2" color="light" mdbWavesEffect>
           {{weekDays[1]}}
           <span *ngIf="nbDayTasks[1] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[1]}}</span>
         </button>
-        <button type="button" mdbBtn  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[2])"  class="p-2" color="light" mdbWavesEffect>
           {{weekDays[2]}}
           <span *ngIf="nbDayTasks[2] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[2]}}</span>
         </button>
-        <button type="button" mdbBtn  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[3])"  class="p-2" color="light" mdbWavesEffect>
           {{weekDays[3]}}
           <span *ngIf="nbDayTasks[3] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[3]}}</span>
         </button>
-        <button type="button" mdbBtn  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[4])"  class="p-2" color="light" mdbWavesEffect>
           {{weekDays[4]}}
           <span *ngIf="nbDayTasks[4] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[4]}}</span>
         </button>
-        <button type="button" mdbBtn  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[5])"  class="p-2" color="light" mdbWavesEffect>
           {{weekDays[5]}}
           <span *ngIf="nbDayTasks[5] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[5]}}</span>
         </button>

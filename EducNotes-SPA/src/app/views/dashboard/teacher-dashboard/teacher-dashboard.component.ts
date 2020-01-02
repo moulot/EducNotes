@@ -7,7 +7,7 @@ import { CourseUser } from 'src/app/_models/courseUser';
 import { Period } from 'src/app/_models/period';
 import { AdminService } from 'src/app/_services/admin.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
 
 @Component({
@@ -24,21 +24,28 @@ export class TeacherDashboardComponent implements OnInit {
   selectedClass: any;
   students: User[];
   currentPeriod: Period;
-  coursesControl: FormControl = new FormControl();
   nextCourses: any;
   evalsToCome: any;
   evalsToBeGraded: any;
   optionsCourse: any[] = [];
+  sessionForm: FormGroup;
 
-  constructor(private userService: UserService, private authService: AuthService,
+  constructor(private userService: UserService, private authService: AuthService,private fb: FormBuilder,
     private adminService: AdminService, public alertify: AlertifyService, private router: Router,
     private evalService: EvaluationService, private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.createSessionForm();
     this.teacher = this.authService.currentUser;
     this.getTeacherClasses(this.teacher.id);
     this.getTeacherNextCourses(this.teacher.id);
     this.getEvals(this.teacher.id);
+  }
+
+  createSessionForm() {
+    this.sessionForm = this.fb.group({
+      course: [null, Validators.required]
+    });
   }
 
   getTeacherScheduleToday(teacherId) {
@@ -80,7 +87,7 @@ export class TeacherDashboardComponent implements OnInit {
   }
 
   goToClass() {
-    const scheduleId = this.coursesControl.value;
+    const scheduleId = this.sessionForm.value.course;
     this.router.navigate(['/callSheet', scheduleId]); // , {queryParams: {sch: scheduleId}, skipLocationChange: true});
   }
 

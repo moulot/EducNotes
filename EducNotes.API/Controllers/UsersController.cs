@@ -380,7 +380,7 @@ namespace EducNotes.API.Controllers
                 CultureInfo frC = new CultureInfo("fr-FR");
                 var shortdate = dt.ToString("ddd dd MMM", frC);
                 days.Add(shortdate);
-                weekDates.Add(dt);
+                weekDates.Add(dt.Date);
             }
 
             var itemsFromRepo = await _repo.GetClassAgenda(classId, monday, saturday);

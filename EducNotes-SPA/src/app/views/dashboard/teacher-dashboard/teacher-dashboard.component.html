@@ -10,22 +10,22 @@
               <div class="row">
   
                   <div class="col-md-12 mb-3">
+                    <form [formGroup]="sessionForm" (ngSubmit)="goToClass()">
                     <div class="p-2 border rounded">
-
                       <div class="content">
                         <p class="lead pt-0 mt-0 mb-1">feuille d'appel</p>
                         <div class="d-flex" *ngIf="nextCourses?.length > 0">
-                          <mdb-select [options]="optionsCourse" [formControl]="coursesControl"
+                          <mdb-select [options]="optionsCourse" formControlName="course" name="course"
                             placeholder="choisir le cours"></mdb-select>
-                          <button type="button" (click)="goToClass()" mdbBtn size="sm"
-                            class="p-2" color="light" mdbWavesEffect>OK</button>
+                          <button type="submit" mdbBtn [disabled]="!sessionForm.valid" size="sm"
+                            class="p-2" color="primary" mdbWavesEffect>valider</button>
                         </div>
                         <div *ngIf="nextCourses?.length == 0">
                           <p class="text-15 text-muted m-0">pas de cours aujourd'hui</p>
                         </div>
                       </div>
-
                     </div>
+                    </form>
                   </div>
 
                 <div *ngFor="let class of teacherClasses" class="col-md-12 mb-3">

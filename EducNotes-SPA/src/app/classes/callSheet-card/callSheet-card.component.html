@@ -1,0 +1,32 @@
+<mdb-flipping-card #cards>
+  <!--Front Side-->
+  <a class="rotate-btn" data-card="card-1" (click)="cards.toggle();addAbsent(index, student.id)">
+    <div class="face front tp-box_side tp-box_front">
+      <!--Avatar-->
+      <div class="avatar">
+          <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
+      </div>
+      <!--Content-->
+      <div class="card-body pt-3">
+        <h6>{{student.lastName}} {{student.firstName}}</h6>
+      </div>    
+    </div>
+  </a>
+  <!--/.Front Side-->
+
+  <!--Back Side-->
+  <a class="rotate-btn" data-card="card-1" (click)="cards.toggle();addAbsent(index, student.id)">
+    <div class="back tp-box_side tp-box_back pic-blured" style="padding: 0px;">
+      <!--Avatar-->
+      <div class="avatar">
+          <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
+      </div>
+      <!--Content-->
+      <div class="card-body pt-3">
+        <h6>{{student.lastName}} {{student.firstName}}</h6>
+      </div>
+      <div class="centered"><p class="text-22"><b>absent</b></p></div>
+    </div>
+  </a>
+  <!--/.Back Side-->
+</mdb-flipping-card>

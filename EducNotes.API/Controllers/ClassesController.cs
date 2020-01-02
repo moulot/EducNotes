@@ -748,7 +748,7 @@ namespace EducNotes.API.Controllers {
         [HttpGet("SessionData/{scheduleId}")]
         public async Task<IActionResult> GetSessionData(int scheduleId) {
             var schedule = await _context.Schedules
-                //.Include (i => i.Class)
+                .Include (i => i.Class)
                 .Include (i => i.Course)
                 .FirstOrDefaultAsync (s => s.Id == scheduleId);;
 
@@ -774,11 +774,16 @@ namespace EducNotes.API.Controllers {
 
             var sessionSchedule = _mapper.Map<ScheduleToReturnDto>(schedule);
 
+            List<Absence> sessionAbsences = new List<Absence>();
+            if(session != null)
+                sessionAbsences = await _context.Absences.Where(a => a.SessionId == session.Id).ToListAsync();
+
             if (session != null) {
                 return Ok(new {
                     session,
                     sessionSchedule,
-                    classStudents
+                    classStudents,
+                    sessionAbsences
                 });
             } else {
                 var newSession = _context.Add(new Session {
@@ -790,7 +795,8 @@ namespace EducNotes.API.Controllers {
                     return Ok(new {
                         session = newSession,
                         sessionSchedule,
-                        classStudents
+                        classStudents,
+                        sessionAbsences
                     });
 
                 return BadRequest("problème pour récupérer la session");
@@ -863,11 +869,10 @@ namespace EducNotes.API.Controllers {
             throw new Exception ($"la validation de l'apppel a échoué");
         }
 
-        [HttpGet ("absences/{sessionId}")]
-        public async Task<IActionResult> GetAbsencesBySessionId (int sessionId) {
-            var absences = await _context.Absences.Where (a => a.SessionId == sessionId).ToListAsync ();
-
-            return Ok (absences);
+        [HttpGet("absences/{sessionId}")]
+        public async Task<IActionResult> GetAbsencesBySessionId(int sessionId) {
+            var absences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
+            return Ok(absences);
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////

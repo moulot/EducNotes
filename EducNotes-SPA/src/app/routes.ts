@@ -90,6 +90,7 @@ import { StudentDashboardComponent } from './views/dashboard/student-dashboard/s
 import { StudentScheduleComponent } from './schedule/student-schedule/student-schedule.component';
 import { ConvertToPDFComponent } from './admin/_docs/convertToPDF/convertToPDF.component';
 import { ImportFichierComponent } from './admin/import-fichier/import-fichier.component';
+import { SendSmsComponent } from './admin/sendSms/sendSms.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -111,8 +112,7 @@ export const appRoutes: Routes = [
             { path: 'sendEmail', component: EmailComponent },
             { path: 'members', component: MemberListComponent, resolve: { users: MemberListResolver } },
             { path: 'members/:id', component: MemberDetailComponent, resolve: { user: MemberDetailResolver } },
-            {
-                path: 'member/edit', component: MemberEditComponent,
+            { path: 'member/edit', component: MemberEditComponent,
                 resolve: { user: MemberEditResolver }, canDeactivate: [PreventUnSavedChanges]
             },
             { path: 'messages', component: MessagesComponent, resolve: { messages: MessagesResolver } },
@@ -177,9 +177,7 @@ export const appRoutes: Routes = [
             { path: 'createPayable', component: PayableFormComponent },
             { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }},
             { path: 'createPDF', component: ConvertToPDFComponent },
-
-
-
+            {path: 'sendSms', component: SendSmsComponent}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

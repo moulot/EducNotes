@@ -8,7 +8,6 @@ import { Course } from '../_models/course';
 import { Class } from '../_models/class';
 import { Absence } from '../_models/absence';
 import { Schedule } from '../_models/schedule';
-import { PdfData } from '../_models/pdfData';
 
 @Injectable({
   providedIn: 'root'

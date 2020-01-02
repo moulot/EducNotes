@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2, ElementRef } from '@angular/core';
 import { Class } from 'src/app/_models/class';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,6 +10,8 @@ import { Absence } from 'src/app/_models/absence';
 import { environment } from 'src/environments/environment';
 import { Session } from 'src/app/_models/session';
 import { CallSheet } from 'src/app/_models/callSheet';
+import { CardsComponent } from 'src/app/views/ui-kits/cards/cards.component';
+import { fakeAsync } from '@angular/core/testing';
 
 @Component({
   selector: 'app-class-callSheet',
@@ -27,8 +29,8 @@ export class ClassCallSheetComponent implements OnInit {
   allSelected: boolean;
   page = 1;
   pageSize = 50;
-  students: any[] = [];
-  filteredStudents;
+  students: any = [];
+  filteredStudents: any;
   isAbsent: CallSheet[] = [];
   absents: number[] = [];
   absences: Absence[] = [];
@@ -39,41 +41,48 @@ export class ClassCallSheetComponent implements OnInit {
     private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
+
     this.route.data.subscribe((data: any) => {
       this.sessionData = data['session'];
+      this.schedule = this.sessionData.sessionSchedule;
       this.session = this.sessionData.session;
-      this.getSessionAbsents(this.session.id);
+      this.sessionAbsents = this.sessionData.sessionAbsences;
       this.students = this.sessionData.classStudents;
+
       for (let i = 0; i < this.students.length; i++) {
         const id = this.students[i].id;
-        let elt = <CallSheet>{};
+        const elt = <CallSheet>{};
         elt.id = id;
         elt.absent = false;
+        this.students[i].isAbsent = false;
+
         if (this.sessionAbsents.length > 0) {
           if (this.sessionAbsents.findIndex(s => Number(s.userId) === Number(id)) !== -1) {
             elt.absent = true;
             this.absents = [...this.absents, id];
+            this.students[i].isAbsent = true;
           }
         }
         this.isAbsent = [...this.isAbsent, elt];
       }
       this.filteredStudents = this.students;
-  });
+    });
 
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
       this.filerData(value);
     });
   }
 
-  getSessionData(scheduleId) {
-    this.classService.getSessionData(scheduleId).subscribe((session: any) => {
-      this.session = session.session;
-      this.getSessionAbsents(this.session.id);
-      this.students = session.classStudents;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
+  // getSessionData(scheduleId) {
+  //   this.classService.getSessionData(scheduleId).subscribe((session: any) => {
+  //     this.session = session.session;
+  //     this.getSessionAbsents(this.session.id);
+  //     this.students = session.classStudents;
+  //     this.sessionAbsents = session.sessionAbsences;
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
 
   // getSession(scheduleId) {
   //   this.classService.getSession(scheduleId).subscribe((session: Session) => {
@@ -107,21 +116,21 @@ export class ClassCallSheetComponent implements OnInit {
   //   });
   // }
 
-  getSessionAbsents(sessionId: number) {
-    this.classService.getAbsencesBySession(sessionId).subscribe(data => {
-      this.sessionAbsents = data;
-    });
-  }
+  // getSessionAbsents(sessionId: number) {
+  //   this.classService.getAbsencesBySession(sessionId).subscribe(data => {
+  //     this.sessionAbsents = data;
+  //     console.log(this.sessionAbsents);
+  //     console.log('nb abs: ' + this.sessionAbsents.length);
+  //   });
+  // }
 
   filerData(val) {
     if (val) {
       val = val.toLowerCase();
     } else {
-      return this.students = [...this.students];
+      return this.filteredStudents = [...this.students];
     }
-    // console.log('sess:' + this.students);
     const columns = Object.keys(this.students[0]);
-    // console.log('col:' + columns + ' - session0:' + this.students[0]);
     if (!columns.length) {
       return;
     }
@@ -137,14 +146,20 @@ export class ClassCallSheetComponent implements OnInit {
     this.filteredStudents = rows;
   }
 
-  setAbsences(index, studentId) {
+  // setAbsences(index, studentId) {
+  setAbsences(absenceData) {
+    const index = absenceData.index;
+    const studentId = absenceData.studentId;
     this.isAbsent[index].absent = !this.isAbsent[index].absent;
     const isAbsent = this.isAbsent[index].absent;
     const id = Number(studentId);
+    const student = this.students.find(s => s.id === studentId);
 
     if (isAbsent) {
+      student.isAbsent = true;
       this.absents = [...this.absents, id];
     } else {
+      student.isAbsent = false;
       const pos = this.absents.findIndex((value) => value === id);
       this.absents.splice(pos, 1);
     }
