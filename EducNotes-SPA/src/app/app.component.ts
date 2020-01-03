@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
   @ViewChild(PerfectScrollbarDirective, { static: true }) perfectScrollbar: PerfectScrollbarDirective;
   userActivity;
   userInactive: Subject<any> = new Subject();
+
   constructor(public navService: NavigationService, private authService: AuthService) {
     this.setTimeout();
     this.userInactive.subscribe(() => console.log('user has been inactive for 3s'));
@@ -31,6 +32,7 @@ export class AppComponent implements OnInit {
     clearTimeout(this.userActivity);
     this.setTimeout();
   }
+
   ngOnInit() {
     const token = localStorage.getItem('token');
     const user: User = JSON.parse(localStorage.getItem('user'));

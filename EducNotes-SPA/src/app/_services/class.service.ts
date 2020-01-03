@@ -8,7 +8,6 @@ import { Course } from '../_models/course';
 import { Class } from '../_models/class';
 import { Absence } from '../_models/absence';
 import { Schedule } from '../_models/schedule';
-import { PdfData } from '../_models/pdfData';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +42,6 @@ export class ClassService {
     let params = new HttpParams();
     params = params.append('dueDate', agendaParams.dueDate);
     params = params.append('moveWeek', agendaParams.moveWeek);
-
     return this.http.get(this.baseUrl + 'classes/' + classId + '/MovedWeekAgenda', { params });
   }
 

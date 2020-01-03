@@ -14,14 +14,14 @@ import { UserService } from 'src/app/_services/user.service';
   styleUrls: ['./home-panel.component.css']
 })
 export class HomePanelComponent implements OnInit {
-  studentTypeId: number = environment.studentTypeId;
-  teacherTypeId: number = environment.teacherTypeId;
-  parentTypeId: number = environment.parentTypeId;
-  adminTypeId: number = environment.adminTypeId;
-  user: User;
-  currentChild: User;
-  userIsParent = true;
-  childSelected = false;
+  // studentTypeId: number = environment.studentTypeId;
+  // teacherTypeId: number = environment.teacherTypeId;
+  // parentTypeId: number = environment.parentTypeId;
+  // adminTypeId: number = environment.adminTypeId;
+  // user: User;
+  // currentChild: User;
+  // userIsParent = true;
+  // childSelected = false;
 
   constructor(private http: HttpClient, public authService: AuthService,
       private alertify: AlertifyService, private router: Router,
@@ -29,7 +29,7 @@ export class HomePanelComponent implements OnInit {
       private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.user = this.authService.currentUser;
+    // this.user = this.authService.currentUser;
     // if (this.parentLoggedIn()) {
     //   this.userIsParent = true;
     // } else {

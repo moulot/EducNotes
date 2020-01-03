@@ -1,0 +1,31 @@
+<div class="row m-2">
+  <div class="col-12">
+    <p class="text-20 font-weight-500">envoi de SMS</p>
+  </div>
+  <div class="col-md-8">
+    <form [formGroup]="smsForm" (ngSubmit)="sendSms()">
+
+      <div class="row">
+        <div class="col-md-8 mb-1">
+          <div class="md-form">
+            <input mdbInput type="text" id="to" class="form-control"  formControlName="to">
+            <label for="to" class="">numéro destinataire</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 md-form p-0">
+          <textarea type="text" id="body" formControlName="body" class="md-textarea form-control" mdbInput></textarea>
+          <label for="body">message</label>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" class="mr-2" mdbBtn size="sm" color="primary" (click)="cancelForm()" mdbWavesEffect>annuler</button>
+        <button type="submit" [disabled]="!smsForm.valid" mdbBtn size="sm" color="primary" mdbWavesEffect>envoyer</button>
+      </div>
+
+    </form>
+  </div>
+</div>

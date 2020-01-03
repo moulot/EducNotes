@@ -209,18 +209,18 @@ namespace EducNotes.API.Controllers {
         }
 
         [HttpGet ("{classId}/MovedWeekAgenda")]
-        public async Task<IActionResult> getClassMovedWeekAgenda (int classId, [FromQuery] AgendaParams agendaParams) {
+        public async Task<IActionResult> getClassMovedWeekAgenda(int classId, [FromQuery] AgendaParams agendaParams) {
             var FromDate = agendaParams.DueDate.Date;
             var move = agendaParams.MoveWeek;
-            var date = FromDate.AddDays (move);
-            var dateDay = (int) date.DayOfWeek;
+            var date = FromDate.AddDays(move);
+            var dateDay = (int)date.DayOfWeek;
 
             var dayInt = dateDay == 0 ? 7 : dateDay;
-            DateTime monday = date.AddDays (1 - dayInt);
-            var saturday = monday.AddDays (5);
+            DateTime monday = date.AddDays(1 - dayInt);
+            var saturday = monday.AddDays(5);
 
             var itemsFromRepo = await _repo.GetClassAgenda(classId, monday, saturday);
-            var items = GetAgendaListByDueDate(itemsFromRepo);
+            var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
             var courses = await _context.ClassCourses
                 .Where(c => c.ClassId == classId)
@@ -271,7 +271,7 @@ namespace EducNotes.API.Controllers {
         [HttpGet ("{classId}/TodayToNDaysAgenda/{toNbDays}")]
         public async Task<IActionResult> getTodayToNDaysAgenda (int classId, int toNbDays) {
             var agendasFromRepo = await _repo.GetClassAgendaTodayToNDays (classId, toNbDays);
-            var items = GetAgendaListByDueDate (agendasFromRepo);
+            var items = _repo.GetAgendaListByDueDate (agendasFromRepo);
 
             var days = new List<string> ();
             var nbTasks = new List<int> ();
@@ -315,7 +315,7 @@ namespace EducNotes.API.Controllers {
             var saturday = monday.AddDays(5);
 
             var itemsFromRepo = await _repo.GetClassAgenda(classId, monday, saturday);
-            var items = GetAgendaListByDueDate(itemsFromRepo);
+            var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
             var courses = await _context.ClassCourses
                 .Where(c => c.ClassId == classId)
@@ -443,41 +443,9 @@ namespace EducNotes.API.Controllers {
             var agendaItems = await _repo.GetClassAgenda (classId, StartDate, EndDate);
 
             if (agendaItems != null)
-                return Ok (GetAgendaListByDueDate (agendaItems));
+                return Ok (_repo.GetAgendaListByDueDate (agendaItems));
 
             return BadRequest ("Aucun agenda trouvé");
-        }
-
-        private List<ClassAgendaToReturnDto> GetAgendaListByDueDate(IEnumerable<Agenda> agendaItems) {
-            //selection de toutes les differentes dates
-            var dueDates = agendaItems.OrderBy(o => o.DueDate).Select(e => e.DueDate).Distinct();
-
-            var agendasToReturn = new List<ClassAgendaToReturnDto>();
-            foreach(var currDate in dueDates) {
-                var currentDateAgendas = agendaItems.Where(e => e.DueDate == currDate);
-                var agenda = new ClassAgendaToReturnDto();
-                agenda.dtDueDate = currDate;
-                agenda.DueDate = currDate.ToLongDateString();
-                agenda.DueDateDay = currDate.Day;
-                agenda.NbTasks = currentDateAgendas.Count();
-                var dayInt = (int)currDate.DayOfWeek;
-                agenda.DayInt = dayInt == 0 ? 7 : dayInt;
-                agenda.Courses = new List<CourseTask>();
-                foreach (var a in currentDateAgendas) {
-                    agenda.Courses.Add(new CourseTask {
-                        CourseId = a.Course.Id,
-                        CourseName = a.Course.Name,
-                        CourseColor = a.Course.Color,
-                        TaskDesc = a.TaskDesc,
-                        DateAdded = a.DateAdded.ToLongDateString(),
-                        ShortDateAdded = a.DateAdded.ToShortDateString()
-                    });
-                }
-
-                agendasToReturn.Add(agenda);
-            }
-
-            return agendasToReturn;
         }
 
         [HttpGet ("{claissId}/agendas/{agendaId}")]
@@ -519,24 +487,24 @@ namespace EducNotes.API.Controllers {
         }
 
         [HttpPut ("SaveAgenda")]
-        public async Task<IActionResult> SaveAgendaItem ([FromBody] AgendaForSaveDto agendaForSaveDto) {
+        public async Task<IActionResult> SaveAgendaItem([FromBody] AgendaForSaveDto agendaForSaveDto) {
             var id = agendaForSaveDto.Id;
-            if (id == 0) {
-                Agenda newAgendaItem = new Agenda ();
-                _mapper.Map (agendaForSaveDto, newAgendaItem);
+            if(id == 0) {
+                Agenda newAgendaItem = new Agenda();
+                _mapper.Map(agendaForSaveDto, newAgendaItem);
                 newAgendaItem.DateAdded = DateTime.Now;
-                newAgendaItem.DoneSetById = int.Parse (User.FindFirst (ClaimTypes.NameIdentifier).Value);
-                _repo.Add (newAgendaItem);
+                newAgendaItem.DoneSetById = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                _repo.Add(newAgendaItem);
             } else {
-                var agendaItemFromRepo = await _repo.GetAgenda (id);
-                _mapper.Map (agendaForSaveDto, agendaItemFromRepo);
+                var agendaItemFromRepo = await _repo.GetAgenda(id);
+                _mapper.Map(agendaForSaveDto, agendaItemFromRepo);
                 agendaItemFromRepo.DateAdded = DateTime.Now;
             }
 
-            if (await _repo.SaveAll ())
-                return NoContent ();
+            if (await _repo.SaveAll())
+                return NoContent();
 
-            throw new Exception ($"Updating/Saving agendaItem failed");
+            throw new Exception($"Updating/Saving agendaItem failed");
         }
 
         [HttpGet ("GetAllCourses")]
@@ -609,36 +577,25 @@ namespace EducNotes.API.Controllers {
             return Ok (coursesWithAgenda.OrderBy (c => c.Name));
         }
 
-        [HttpGet ("{classId}/AgendaByDate")]
-        public async Task<IActionResult> GetAgendaByDate (int classId, [FromQuery] AgendaParams agendaParams) {
+        [HttpGet("{classId}/AgendaByDate")]
+        public async Task<IActionResult> GetAgendaByDate(int classId, [FromQuery]AgendaParams agendaParams)
+        {
             var nbDays = agendaParams.nbDays;
             var IsMovingPeriod = agendaParams.IsMovingPeriod;
             var startDate = agendaParams.CurrentDate.Date;
-            var endDate = startDate.AddDays (nbDays).Date;
-            if (IsMovingPeriod) {
-                if (nbDays > 0) {
-                    startDate = agendaParams.CurrentDate.AddDays (1).Date;
+            var endDate = startDate.AddDays(nbDays).Date;
+            if(IsMovingPeriod) {
+                if(nbDays > 0) {
+                    startDate = agendaParams.CurrentDate.AddDays(1).Date;
                     endDate = startDate.AddDays (nbDays).Date;
                 } else {
-                    startDate = agendaParams.CurrentDate.AddDays (-1).Date;
-                    endDate = startDate.AddDays (nbDays).Date;
+                    startDate = agendaParams.CurrentDate.AddDays(-1).Date;
+                    endDate = startDate.AddDays(nbDays).Date;
                 }
             }
 
-            var classAgenda = new List<Agenda> ();
-            if (startDate < endDate) {
-                classAgenda = await _context.Agendas
-                    .Include (i => i.Course)
-                    .OrderBy (o => o.DueDate)
-                    .Where (a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= endDate)
-                    .ToListAsync ();
-            } else {
-                classAgenda = await _context.Agendas
-                    .Include (i => i.Course)
-                    .OrderBy (o => o.DueDate)
-                    .Where (a => a.ClassId == classId && a.DueDate.Date >= endDate && a.DueDate <= startDate)
-                    .ToListAsync ();
-
+            var classAgenda = new List<Agenda>();
+            if(startDate > endDate) {
                 var temp = startDate;
                 startDate = endDate;
                 endDate = temp;
@@ -791,7 +748,7 @@ namespace EducNotes.API.Controllers {
         [HttpGet("SessionData/{scheduleId}")]
         public async Task<IActionResult> GetSessionData(int scheduleId) {
             var schedule = await _context.Schedules
-                //.Include (i => i.Class)
+                .Include (i => i.Class)
                 .Include (i => i.Course)
                 .FirstOrDefaultAsync (s => s.Id == scheduleId);;
 
@@ -817,11 +774,16 @@ namespace EducNotes.API.Controllers {
 
             var sessionSchedule = _mapper.Map<ScheduleToReturnDto>(schedule);
 
+            List<Absence> sessionAbsences = new List<Absence>();
+            if(session != null)
+                sessionAbsences = await _context.Absences.Where(a => a.SessionId == session.Id).ToListAsync();
+
             if (session != null) {
                 return Ok(new {
                     session,
                     sessionSchedule,
-                    classStudents
+                    classStudents,
+                    sessionAbsences
                 });
             } else {
                 var newSession = _context.Add(new Session {
@@ -833,7 +795,8 @@ namespace EducNotes.API.Controllers {
                     return Ok(new {
                         session = newSession,
                         sessionSchedule,
-                        classStudents
+                        classStudents,
+                        sessionAbsences
                     });
 
                 return BadRequest("problème pour récupérer la session");
@@ -906,11 +869,10 @@ namespace EducNotes.API.Controllers {
             throw new Exception ($"la validation de l'apppel a échoué");
         }
 
-        [HttpGet ("absences/{sessionId}")]
-        public async Task<IActionResult> GetAbsencesBySessionId (int sessionId) {
-            var absences = await _context.Absences.Where (a => a.SessionId == sessionId).ToListAsync ();
-
-            return Ok (absences);
+        [HttpGet("absences/{sessionId}")]
+        public async Task<IActionResult> GetAbsencesBySessionId(int sessionId) {
+            var absences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
+            return Ok(absences);
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -40,6 +40,7 @@ export class StudentDashboardComponent implements OnInit {
   searchText1 = '';
   previous: string;
   previous1: string;
+  showUsersList = false;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -47,16 +48,18 @@ export class StudentDashboardComponent implements OnInit {
 
   ngOnInit() {
 
-    this.route.params.subscribe(params => {
-      this.userIdFromRoute = params['id'];
-    });
-
+    // this.route.params.subscribe(params => {
+    //   this.userIdFromRoute = params['id'];
+    // });
+    // console.log(this.userIdFromRoute);
     // is the child connected? // id coming from route params
-    if (this.userIdFromRoute > 0) {
+    if (this.authService.studentLoggedIn()) {
       this.showChildrenList = false;
-      this.getUser(this.userIdFromRoute);
+      this.showUsersList = false;
+      this.getUser(this.authService.currentUser.id);
     } else {
       this.isParentConnected = true;
+      this.showUsersList = true;
       this.authService.currentChild.subscribe(child => this.currentChild = child);
       if (this.currentChild.id === 0) {
         this.showChildrenList = true;

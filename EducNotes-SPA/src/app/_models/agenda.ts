@@ -1,5 +1,6 @@
 export interface Agenda {
     id: number;
+    scheduleId: number;
     classId: number;
     courseId: number;
     dateAdded: Date;

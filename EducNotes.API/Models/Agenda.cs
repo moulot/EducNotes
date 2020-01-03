@@ -9,6 +9,8 @@ namespace EducNotes.API.Models
             Done = false;
         }
         public int Id { get; set; }
+        public int ScheduleId { get; set; }
+        public Schedule Schedule { get; set; }
         public int ClassId { get; set; }
         public Class Class { get; set; }
         public int CourseId { get; set; }

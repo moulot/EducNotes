@@ -117,7 +117,6 @@ export class ClassAgendaComponent implements OnInit {
     this.allCourses = true;
     this.agendaParams.dueDate = this.monday;
     this.agendaParams.moveWeek = move;
-
     this.classService.getClassMovedWeekAgenda(this.classRoom.id, this.agendaParams).subscribe((res: any) => {
 
       this.classAgendaDays = res.agendaItems;

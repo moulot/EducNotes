@@ -2,8 +2,8 @@
 <div class="row m-0">
 
   <div class="col-md-12">
-    <p class="text-15 font-weight-400 m-0 pb-1">feuille d'appel - classe {{schedule?.className}}. {{schedule?.courseName}} de 
-      {{schedule?.strStartHourMin}} à {{schedule?.strEndHourMin}} 
+    <p class="text-20 font-weight-400 m-0 pb-1">feuille d'appel - classe {{schedule.className}}. {{schedule.courseName}} de 
+      {{schedule.strStartHourMin}} à {{schedule.strEndHourMin}} 
     </p>
   </div>
   
@@ -14,7 +14,7 @@
   
   <div class="col-md-12 text-center mb-1">
     <div class="p-2 border rounded">
-      <p class="text-15 text-danger m-0">
+      <p class="text-20 text-danger m-0">
         <b *ngIf="absents.length <= 1">{{absents.length}} élève absent</b>
         <b *ngIf="absents.length > 1">{{absents.length}} élèves absents</b>
       </p>
@@ -33,95 +33,19 @@
   </div>
 
 </div>
+
+<!-- <div style="margin-top: 60px;"></div> -->
     
-  <!-- DATA LIST -->
-<div class="row m-2" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
+<!-- DATA LIST -->
+<div class="row m-2">
   <!-- SINGLE LIST ITEM -->
   <div *ngFor="let student of filteredStudents | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index" 
-    class="list-item"
-    [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-2': viewMode === 'grid'}"
-    [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}"
-  >
-    <!-- <a>
-      <div front class="card o-hidden mb-4 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
-        <div class="scene">
-          <div class="card-box" (click)="setAbsences(i, student.id)" [ngClass]="!isAbsent[i].absent ? 'card-box': 'is-flipped'">
-            <div class="cardFace">
-              <div class="list-thumb d-flex">
-                
-                <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
-              </div>
-              <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
-                <div class="card-body p-1 align-self-center d-flex flex-column justify-content-start align-items-lg-center"
-                  [ngClass]="{'flex-lg-row': viewMode === 'list'}">
-                  
-                  <div class="w-100 w-sm-100">
-                    <div class="item-title">{{student.lastName}} {{student.firstName}}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="cardFace cardFaceBack">
-              <div class="pic-blured d-flex">
-                
-                <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
-              </div>
-              <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
-                <div class="card-body p-1 align-self-center d-flex flex-column justify-content-start align-items-lg-center"
-                  [ngClass]="{'flex-lg-row': viewMode === 'list'}">
-                  
-                  <div class="w-100 w-sm-100">
-                    <div class="item-title">{{student.lastName}} {{student.firstName}}</div>
-                  </div>
-                </div>
-              </div>
-              <div class="centered"><p class="text-22"><b>absent</b></p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </a> -->
-    <a class="rotate-btn" data-card="card-1" (click)="cards.toggle()">
-      <mdb-flipping-card #cards>
-        <!--Front Side-->
-        <div class="face front tp-box_side tp-box_front">
-  
-          <!-- Image-->
-          <div class="card-up" style="height: 15%;"></div>
-          <!--Avatar-->
-          <div class="avatar">
-              <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
-          </div>
-          <!--Content-->
-          <div class="card-body">
-            <h4>{{student.lastName}} {{student.firstName}}</h4>
-          </div>
-
-        </div>
-        <!--/.Front Side-->
-  
-        <!--Back Side-->
-        <div class="back tp-box_side tp-box_back">
-  
-          <!-- Image-->
-          <div class="card-up" style="height: 15%;"></div>
-          <!--Avatar-->
-          <div class="avatar">
-              <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
-          </div>
-          <!--Content-->
-          <div class="card-body">
-            <h4>{{student.lastName}} {{student.firstName}}</h4>
-          </div>
-  
-        </div>
-        <!--/.Back Side-->
-      </mdb-flipping-card>
-    </a>
-
+    class="col-md-2 my-5" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+    <app-callSheet-card [student]="student" [index]="i" (setAbsences)="setAbsences($event)"></app-callSheet-card>
   </div>
   <!-- PAGINATION CONTROL -->
   <div class="col-md-12 mt-3" *ngIf="students?.length">
     <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
   </div>
+
 </div>

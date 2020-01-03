@@ -21,6 +21,7 @@ import { AgendaModalComponent } from '../agenda-modal/agenda-modal.component';
 })
 export class AgendaListComponent implements OnInit {
   @ViewChild('agendaForm', {static: false}) agendaForm: NgForm;
+  classId: number;
   selectForm: FormGroup;
   modalSession: any;
   allSessions: any = [];
@@ -39,20 +40,27 @@ export class AgendaListComponent implements OnInit {
   pageSize = 8;
   sessions: any[] = [];
   filteredSessions;
+  optionsClass: any[] = [];
 
   allCourses = true;
   coursesWithTasks: any = [];
-  filteredAgenda: any = [];
-
+  nbDayTasks = [0, 0, 0, 0, 0, 0];
+  weekDays = [];
+  weekDates = [];
+  classControl = new FormControl();
+  showSessionsData = false;
+  agendaParams: any = {};
+  monday: Date;
+  sessionsByDate = [];
+  sessionsByCourse = [];
 
   constructor(private userService: UserService, private fb: FormBuilder,
     private classService: ClassService, private authService: AuthService,
     public alertify: AlertifyService, private modalService: NgbModal) { }
 
   ngOnInit() {
-    this.createSelectForm();
+    // this.createSelectForm();
     this.teacher = this.authService.currentUser;
-    this.getTeacherSessions(this.teacher.id);
     this.getTeacherClasses(this.teacher.id);
     this.getTeacherCourses(this.teacher.id);
 
@@ -84,27 +92,19 @@ export class AgendaListComponent implements OnInit {
     this.filteredSessions = rows;
   }
 
-  createSelectForm() {
-    this.selectForm = this.fb.group({
-      aclass: [null],
-      course: [null],
-      dates: [null]
-    });
-  }
+  // selectCourses() {
+  //   const classid = Number(this.selectForm.value.aclass);
+  //   const courseid = Number(this.selectForm.value.course);
+  //   this.selectedSessions = [];
+  //   for (let i = 0; i < this.allSessions.length; i++) {
+  //     const elt = this.allSessions[i];
+  //     if (Number(elt.classId) === classid && Number(elt.courseId) === courseid) {
+  //       this.selectedSessions = [...this.selectedSessions, elt];
+  //     }
+  //   }
 
-  selectCourses() {
-    const classid = Number(this.selectForm.value.aclass);
-    const courseid = Number(this.selectForm.value.course);
-    this.selectedSessions = [];
-    for (let i = 0; i < this.allSessions.length; i++) {
-      const elt = this.allSessions[i];
-      if (Number(elt.classId) === classid && Number(elt.courseId) === courseid) {
-        this.selectedSessions = [...this.selectedSessions, elt];
-      }
-    }
-
-    this.filteredSessions = this.selectedSessions;
-  }
+  //   this.filteredSessions = this.selectedSessions;
+  // }
 
   resetSessions() {
     this.filteredSessions = this.allSessions;
@@ -123,12 +123,18 @@ export class AgendaListComponent implements OnInit {
       instance.session = session;
       instance.fct.subscribe((data) => {
         this.saveAgenda(data);
+        if (data.id === 0) {
+          const itemIndex = this.coursesWithTasks.findIndex(item => item.courseId === data.courseId);
+          const nb = this.coursesWithTasks[itemIndex].nbTasks;
+          this.coursesWithTasks[itemIndex].nbTasks = nb + 1;
+        }
       });
     }, 200);
   }
 
   saveAgenda(session) {
     this.agendaForSave.id = session.id;
+    this.agendaForSave.scheduleId = session.scheduleId;
     this.agendaForSave.classId = session.classId;
     this.agendaForSave.courseId = session.courseId;
     this.agendaForSave.dueDate = session.dayDate;
@@ -141,11 +147,15 @@ export class AgendaListComponent implements OnInit {
     });
   }
 
-  getTeacherSessions(teacherId) {
-    this.userService.getTeacherSessions(teacherId).subscribe((sessions: any[]) => {
-      this.sessions = sessions;
-      this.filteredSessions = sessions;
-      this.allSessions = sessions;
+  getTeacherSessions(teacherId, classId) {
+    this.userService.getTeacherSessions(teacherId, classId).subscribe((data: any) => {
+      // this.sessions = data.agendas;
+      this.filteredSessions = data.agendas;
+      this.allSessions = data.agendas;
+      this.monday = data.monday;
+      this.weekDays = data.weekDays;
+      this.weekDates = data.weekDates;
+      this.coursesWithTasks = data.coursesWithTasks;
     }, error => {
       this.alertify.error(error);
     });
@@ -154,6 +164,11 @@ export class AgendaListComponent implements OnInit {
   getTeacherClasses(teacherId) {
     this.userService.getTeacherClasses(teacherId).subscribe((courses: CourseUser[]) => {
       this.teacherClasses = courses;
+      for (let i = 0; i < this.teacherClasses.length; i++) {
+        const elt = this.teacherClasses[i];
+        const element = {value: elt.classId, label: 'classe ' + elt.className};
+        this.optionsClass = [...this.optionsClass, element];
+      }
     }, error => {
       this.alertify.error(error);
     });
@@ -169,32 +184,74 @@ export class AgendaListComponent implements OnInit {
 
   showAllCourses() {
     if (this.allCourses === true) {
-      // this.filteredAgenda = this.classAgendaByDate;
+      this.filteredSessions = this.allSessions;
+    }
+  }
+
+  classChanged() {
+    if (this.classControl.value !== '') {
+      this.classId = this.classControl.value;
+      this.getTeacherSessions(this.teacher.id, this.classId);
+      this.showSessionsData = true;
+    } else {
+      this.showSessionsData = false;
     }
   }
 
   showCourseItems(courseId) {
-    // this.allCourses = false;
-    // this.filteredAgenda = [];
+    this.allCourses = false;
+    this.filteredSessions = [];
+    this.sessionsByCourse = [];
 
-    // for (let i = 0; i < this.classAgendaByDate.length; i++) {
-    //   const elt = this.classAgendaByDate[i];
-    //   const result = elt.agendaItems.map(item => {
-    //     if (item.courseId === courseId) {
-    //       return item;
-    //     }
-    //   }).filter(item => !!item);
-    //   if (result.length > 0) {
-    //     const filteredElt = {
-    //       'dueDate': elt.dueDate,
-    //       'shortDueDate': elt.shortDueDate,
-    //       'longDueDate': elt.longDueDate,
-    //       'nbItems': result.length,
-    //       'agendaItems': result
-    //     };
-    //     this.filteredAgenda = [...this.filteredAgenda, filteredElt];
-    //   }
-    // }
+    for (let i = 0; i < this.allSessions.length; i++) {
+      const elt = this.allSessions[i];
+      const result = elt.agendaItems.map(item => {
+        if (item.courseId === courseId) {
+          return item;
+        }
+      }).filter(item => !!item);
+      console.log(result);
+      if (result.length > 0) {
+        const filteredElt = {
+          'dueDate': elt.dueDate,
+          'shortDueDate': elt.shortDueDate,
+          'longDueDate': elt.longDueDate,
+          'dueDateAbbrev': elt.DueDateAbbrev,
+          'nbItems': result.length,
+          'agendaItems': result
+        };
+        this.filteredSessions = [...this.filteredSessions, filteredElt];
+        this.sessionsByCourse = [...this.sessionsByDate, filteredElt];
+      }
+    }
+  }
+
+  showItemsByDate(selectedDate) {
+    this.allCourses = false;
+    this.filteredSessions = [];
+    this.sessionsByDate = [];
+
+    const sessionsDay = this.allSessions.find(item => item.dueDate === selectedDate);
+    this.filteredSessions = [...this.filteredSessions, sessionsDay];
+  }
+
+  loadMovedWeek(move: number) {
+    this.allCourses = true;
+    this.agendaParams.dueDate = this.monday;
+    this.agendaParams.moveWeek = move;
+
+    this.userService.getMovedWeekSessions(this.teacher.id, this.classId, this.agendaParams).subscribe((data: any) => {
+
+      this.sessions = data.agendas;
+      this.filteredSessions = data.agendas;
+      this.allSessions = data.agendas;
+      this.monday = data.monday;
+      this.weekDays = data.weekDays;
+      this.weekDates = data.weekDates;
+      this.coursesWithTasks = data.coursesWithTasks;
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
 }
