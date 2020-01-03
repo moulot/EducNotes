@@ -34,17 +34,30 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom (src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
                 });
             CreateMap<User, UserForDetailedDto>()
-                .ForMember (dest => dest.PhotoUrl, opt => {
+                .ForMember(dest => dest.PhotoUrl, opt => {
+                    opt.MapFrom (src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
+                })
+                .ForMember(dest => dest.Age, opt => {
+                    opt.MapFrom (d => d.DateOfBirth.CalculateAge());
+                })
+                .ForMember(dest => dest.ClassName, opt => {
+                    opt.MapFrom (src => src.Class.Name);
+                });
+            CreateMap<User, UserForAccountDto>()
+                .ForMember(dest => dest.PhotoUrl, opt => {
                     opt.MapFrom (src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
                 })
                 .ForMember (dest => dest.Age, opt => {
                     opt.MapFrom (d => d.DateOfBirth.CalculateAge());
                 })
-                .ForMember (dest => dest.ClassName, opt => {
+                .ForMember(dest => dest.ClassName, opt => {
                     opt.MapFrom (src => src.Class.Name);
+                })
+                .ForMember(dest => dest.UserTypeName, opt => {
+                    opt.MapFrom(src => src.UserType.Name);
                 });
             CreateMap<Class, ClassDetailDto>()
-                .ForMember (dest => dest.TotalStudent, opt => {
+                .ForMember(dest => dest.TotalStudent, opt => {
                     opt.MapFrom (src => src.Students.Count());
                 });
             CreateMap<Evaluation, EvalsForEditDto>()

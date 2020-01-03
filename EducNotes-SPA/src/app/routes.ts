@@ -91,6 +91,8 @@ import { StudentScheduleComponent } from './schedule/student-schedule/student-sc
 import { ConvertToPDFComponent } from './admin/_docs/convertToPDF/convertToPDF.component';
 import { ImportFichierComponent } from './admin/import-fichier/import-fichier.component';
 import { SendSmsComponent } from './admin/sendSms/sendSms.component';
+import { UserAccountComponent } from './users/user-account/user-account.component';
+import { UserAccountResolver } from './_resolvers/user-account-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -177,7 +179,8 @@ export const appRoutes: Routes = [
             { path: 'createPayable', component: PayableFormComponent },
             { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }},
             { path: 'createPDF', component: ConvertToPDFComponent },
-            {path: 'sendSms', component: SendSmsComponent}
+            {path: 'sendSms', component: SendSmsComponent},
+            {path: 'userAccount', component: UserAccountComponent, resolve: { user: UserAccountResolver } }
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }
