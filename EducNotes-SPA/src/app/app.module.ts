@@ -201,6 +201,9 @@ import { ConvertToPDFComponent } from './admin/_docs/convertToPDF/convertToPDF.c
 import { ImportFichierComponent } from './admin/import-fichier/import-fichier.component';
 import { CallSheetCardComponent } from './classes/callSheet-card/callSheet-card.component';
 import { SendSmsComponent } from './admin/sendSms/sendSms.component';
+import { UserAccountComponent } from './users/user-account/user-account.component';
+import { UserAccountResolver } from './_resolvers/user-account-resolver';
+import { UserAccountCardComponent } from './users/user-account-card/user-account-card.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -336,7 +339,9 @@ export function tokenGetter() {
       ConvertToPDFComponent,
       ImportFichierComponent,
       CallSheetCardComponent,
-      SendSmsComponent
+      SendSmsComponent,
+      UserAccountComponent,
+      UserAccountCardComponent
    ],
    imports: [
       FormWizardModule,
@@ -426,6 +431,7 @@ export function tokenGetter() {
       PeriodicityFormResolver,
       PayableAtListResolver,
       PayableFormResolver,
+      UserAccountResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

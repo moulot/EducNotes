@@ -89,6 +89,10 @@ constructor(private http: HttpClient) {}
     return this.http.get<User>(this.baseUrl + 'users/' + id);
   }
 
+  getUserAccount(id): Observable<User> {
+    return this.http.get<User>(this.baseUrl + 'users/Account/' + id);
+  }
+
   getChildren(parentId): Observable<User[]> {
     return this.http.get<User[]>(this.baseUrl + 'users/' + parentId + '/Children');
   }

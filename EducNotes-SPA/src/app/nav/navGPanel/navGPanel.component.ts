@@ -96,6 +96,10 @@ export class NavGPanelComponent implements OnInit {
     this.authService.logout();
   }
 
+  goToAccount() {
+    this.router.navigate(['/userAccount']);
+  }
+
   loggedIn() {
     return this.authService.loggedIn();
   }
@@ -115,14 +119,5 @@ export class NavGPanelComponent implements OnInit {
   adminLoggedIn() {
     return this.authService.adminLoggedIn();
   }
-
-  // logout() {
-  //   localStorage.removeItem('token');
-  //   localStorage.removeItem('user');
-  //   this.authService.decodedToken = null;
-  //   this.authService.currentUser = null;
-  //   this.alertify.infoBar('logged out');
-  //   this.router.navigate(['/home']);
-  // }
 
 }

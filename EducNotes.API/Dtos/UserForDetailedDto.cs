@@ -7,7 +7,6 @@ namespace EducNotes.API.Dtos
     public class UserForDetailedDto
     {
         private ICollection<Photo> photos;
-
         public int Id { get; set; }
         public string UserName { get; set; }
         public string FirstName { get; set; }

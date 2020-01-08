@@ -129,7 +129,7 @@
             <div class="dropdown-header">
                 <i class="i-Lock-User mr-1"></i><label class="text-capitalize">{{user.firstName}} {{user.lastName}}</label>
             </div>
-            <button class="dropdown-item">mon compte</button>
+            <button class="dropdown-item" (click)="goToAccount()">mon compte</button>
             <button class="dropdown-item" (click)=" logout()">se déconnecter</button>
         </div>
     </div>
