@@ -18,4 +18,13 @@ export class CommService {
   sendSms(data: clickatellParams) {
     return this.http.post(this.baseUrl + 'comm/sendSms', data);
   }
+
+  getSmsCategories() {
+    return this.http.get(this.baseUrl + 'comm/SmsCategories');
+  }
+
+  addSmsTemplate(smsTemplate: any) {
+    return this.http.post(this.baseUrl + 'comm/SaveSmsTemplate', smsTemplate);
+  }
+
 }

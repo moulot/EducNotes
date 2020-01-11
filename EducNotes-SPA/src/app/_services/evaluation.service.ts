@@ -26,6 +26,10 @@ export class EvaluationService {
     return this.http.get<EvalType[]>(this.baseUrl + 'evaluation/EvalTypes');
   }
 
+  getFormData() {
+    return this.http.get(this.baseUrl + 'evaluation/FormData');
+  }
+
   getCoursesSkills() {
     return this.http.get(this.baseUrl + 'evaluation/CoursesSkills');
   }

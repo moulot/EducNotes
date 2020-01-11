@@ -28,6 +28,17 @@ namespace EducNotes.API.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("FormData")]
+        public async Task<IActionResult> GetFormData()
+        {
+            var periods = await _context.Periods.OrderBy(o => o.Name).ToListAsync();
+            var types = await _context.EvalTypes.OrderBy(o => o.Name).ToListAsync();
+            return Ok(new {
+                periods,
+                types
+            });
+        }
+
         [HttpGet("Periods")]
         public async Task<IActionResult> GetPeriods()
         {
@@ -213,46 +224,46 @@ namespace EducNotes.API.Controllers
         [HttpGet("Teacher/{teacherId}/EvalsToCome")]
         public async Task<IActionResult> GetTeacherEvalsToCome(int teacherId)
         {
-            var classIds = await _context.ClassCourses
-                            .Where(c => c.TeacherId == teacherId)
-                            .Select(c => c.ClassId).Distinct().ToListAsync();
+            var classes = await _context.ClassCourses
+                                .Where(c => c.TeacherId == teacherId)
+                                .Select(c => c.Class).Distinct().ToListAsync();
 
             var today = DateTime.Now.Date;
-            List<Evaluation> nextEvals = new List<Evaluation>();
-            foreach (var classId in classIds)
+            List<ClassEvalForListDto> evalsToCome = new List<ClassEvalForListDto>();
+            foreach (var aclass in classes)
             {
+                ClassEvalForListDto cefl = new ClassEvalForListDto();
+                cefl.ClassId = aclass.Id;
+                cefl.ClassName = aclass.Name;
+
                 var classEvals = await _context.Evaluations
                                 .Include(i => i.Course)
                                 .Include(i => i.Class)
                                 .Include(i => i.EvalType)
-                                .Where(e => e.UserId == teacherId && e.ClassId == classId && e.EvalDate.Date >= today)
+                                .Where(e => e.UserId == teacherId && e.ClassId == aclass.Id && e.EvalDate.Date >= today)
                                 .ToListAsync();
                 
-                foreach (var eval in classEvals)
-                {
-                    nextEvals.Add(eval);
-                }
+                cefl.Evals = _mapper.Map<List<EvaluationForListDto>>(classEvals).OrderBy(e => e.EvalDate);
+                evalsToCome.Add(cefl);
             }
 
-            var evalsToCome = _mapper.Map<List<EvaluationForListDto>>(nextEvals).OrderBy(e => e.EvalDate);
-
-            List<Evaluation> prevEvals = new List<Evaluation>();
-            foreach (var classId in classIds)
+            List<ClassEvalForListDto> evalsToBeGraded = new List<ClassEvalForListDto>();
+            foreach (var aclass in classes)
             {
+                ClassEvalForListDto cefl = new ClassEvalForListDto();
+                cefl.ClassId = aclass.Id;
+                cefl.ClassName = aclass.Name;
+
                 var classEvals = await _context.Evaluations
                                 .Include(i => i.Course)
                                 .Include(i => i.Class)
                                 .Include(i => i.EvalType)
-                                .Where(e => e.UserId == teacherId && e.ClassId == classId && e.EvalDate.Date <= today &&
+                                .Where(e => e.UserId == teacherId && e.ClassId == aclass.Id && e.EvalDate.Date <= today &&
                                     e.Closed == false).ToListAsync();
                 
-                foreach (var eval in classEvals)
-                {
-                    prevEvals.Add(eval);
-                }
+                cefl.Evals = _mapper.Map<List<EvaluationForListDto>>(classEvals).OrderBy(e => e.EvalDate);
+                evalsToBeGraded.Add(cefl);
             }
-
-            var evalsToBeGraded = _mapper.Map<List<EvaluationForListDto>>(prevEvals).OrderBy(e => e.EvalDate);
 
             return Ok(new {
                 evalsToCome = evalsToCome,
@@ -263,13 +274,7 @@ namespace EducNotes.API.Controllers
         [HttpGet("Class/{classId}/EvalsToCome")]
         public async Task<IActionResult> GetEvalsToCome(int classId)
         {
-            var today = DateTime.Now.Date;
-            var evals = await _context.Evaluations
-                        .Include(i => i.Course)
-                        .Include(i => i.EvalType)
-                        .Where(e => e.ClassId == classId && e.EvalDate.Date >= today).ToListAsync();
-
-            var evalsToReturn = _mapper.Map<List<EvaluationForListDto>>(evals);
+            var evalsToReturn = await _repo.GetEvalsToCome(classId);
 
             return Ok(evalsToReturn);
         }

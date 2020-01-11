@@ -93,6 +93,7 @@ import { ImportFichierComponent } from './admin/import-fichier/import-fichier.co
 import { SendSmsComponent } from './admin/sendSms/sendSms.component';
 import { UserAccountComponent } from './users/user-account/user-account.component';
 import { UserAccountResolver } from './_resolvers/user-account-resolver';
+import { SmsTemplateComponent } from './admin/sms-template/sms-template.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -180,7 +181,8 @@ export const appRoutes: Routes = [
             { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }},
             { path: 'createPDF', component: ConvertToPDFComponent },
             {path: 'sendSms', component: SendSmsComponent},
-            {path: 'userAccount', component: UserAccountComponent, resolve: { user: UserAccountResolver } }
+            {path: 'userAccount', component: UserAccountComponent, resolve: { user: UserAccountResolver } },
+            {path: 'SmsTemplates', component: SmsTemplateComponent}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

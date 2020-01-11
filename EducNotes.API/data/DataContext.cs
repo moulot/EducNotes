@@ -51,6 +51,10 @@ namespace EducNotes.API.Data {
             public DbSet<ClassLevelSchedule> ClassLevelSchedules { get; set; }
             public DbSet<Event> Events { get; set; }
             public DbSet<EventType> EventTypes { get; set; }
+            public DbSet<Sms> Sms { get; set; }
+            public DbSet<SmsCategory> SmsCategories { get; set; }
+            public DbSet<SmsTemplate> SmsTemplates { get; set; }
+            public DbSet<UserSmsTemplate> UserSmsTemplates { get; set; }
             /////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////

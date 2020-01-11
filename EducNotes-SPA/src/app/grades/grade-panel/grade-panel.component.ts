@@ -40,6 +40,11 @@ export class GradePanelComponent implements OnInit {
 
   searchControl: FormControl = new FormControl();
   filteredUserGrades: any = [];
+  evalsToBeGraded: any;
+  evalsToCome: any;
+  optionsClass = [];
+  optionsCourse = [];
+  optionsPeriod = [];
 
   constructor(private userService: UserService, private evalService: EvaluationService,
     private fb: FormBuilder, private authService: AuthService, public alertify: AlertifyService) { }
@@ -48,11 +53,9 @@ export class GradePanelComponent implements OnInit {
     this.currentPeriod = this.authService.currentPeriod;
     this.teacher = this.authService.currentUser;
     this.createNotesForm();
-    this.getTeacherClasses(this.teacher.id);
-    this.getTeacherCourses(this.teacher.id);
-    this.getPeriods();
-    this.getEvalTypes();
-    this.getClassesWithEvalsCurrPeriod(this.teacher.id);
+    this.getGradesData(this.teacher.id);
+    this.getEvals(this.teacher.id);
+    this.getFormData();
 
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
       this.filerData(value);
@@ -80,6 +83,15 @@ export class GradePanelComponent implements OnInit {
       }
     });
     this.filteredUserGrades = rows;
+  }
+
+  getEvals(teacherId) {
+    this.evalService.getTeacherEvalsToCome(teacherId).subscribe((evals: any) => {
+      this.evalsToCome = evals.evalsToCome;
+      this.evalsToBeGraded = evals.evalsToBeGraded;
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
   enterGrades(evaluation, userGrades, index) {
@@ -114,44 +126,34 @@ export class GradePanelComponent implements OnInit {
     this.showTable = false;
   }
 
-  getTeacherClasses(teacherId) {
-    this.userService.getTeacherClasses(teacherId).subscribe((courses: CourseUser[]) => {
-      this.teacherClasses = courses;
-    }, error => {
-      this.alertify.error(error);
+  getGradesData(teacherId) {
+    this.userService.getGradesData(teacherId, this.currentPeriod.id).subscribe((data: any) => {
+      this.teacherClasses = data.teacherClasses;
+      this.teacherCourses = data.teacherCourses;
+      this.classesWithEvals = data.classesWithEvals;
+      for (let i = 0; i < this.teacherCourses.length; i++) {
+        const elt = this.teacherCourses[i];
+        const element = {value: elt.id, label: elt.name};
+        this.optionsCourse = [...this.optionsCourse, element];
+      }
+      for (let i = 0; i < this.teacherClasses.length; i++) {
+        const elt = this.teacherClasses[i];
+        const element = {value: elt.classId, label: 'classe ' + elt.className};
+        this.optionsClass = [...this.optionsClass, element];
+      }
     });
   }
 
-  getClassesWithEvalsCurrPeriod(teacherId) {
-    this.userService.getTeacherClassesWithEvalsByPeriod(teacherId, this.currentPeriod.id).subscribe(data => {
-      this.classesWithEvals = data;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
-  getTeacherCourses(teacherId) {
-    this.userService.getTeacherCourses(teacherId).subscribe(courses => {
-      this.teacherCourses = courses;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
-  getPeriods() {
-    this.evalService.getPeriods().subscribe((periods: Period[]) => {
-      this.periods = periods;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
-  getEvalTypes() {
-    this.evalService.getEvalTypes().subscribe((types: EvalType[]) => {
-      this.evalTypes = types;
-    }, error => {
-      this.alertify.error(error);
-    });
+  getFormData() {
+    this.evalService.getFormData().subscribe((data: any) => {
+      this.periods = data.periods;
+      this.evalTypes = data.types;
+      for (let i = 0; i < this.periods.length; i++) {
+        const elt = this.periods[i];
+        const element = {value: elt.id, label: elt.name};
+        this.optionsPeriod = [...this.optionsPeriod, element];
+      }
+  });
   }
 
   showNotes() {

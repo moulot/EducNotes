@@ -204,6 +204,7 @@ import { SendSmsComponent } from './admin/sendSms/sendSms.component';
 import { UserAccountComponent } from './users/user-account/user-account.component';
 import { UserAccountResolver } from './_resolvers/user-account-resolver';
 import { UserAccountCardComponent } from './users/user-account-card/user-account-card.component';
+import { SmsTemplateComponent } from './admin/sms-template/sms-template.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -341,7 +342,8 @@ export function tokenGetter() {
       CallSheetCardComponent,
       SendSmsComponent,
       UserAccountComponent,
-      UserAccountCardComponent
+      UserAccountCardComponent,
+      SmsTemplateComponent
    ],
    imports: [
       FormWizardModule,

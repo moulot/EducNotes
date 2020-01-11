@@ -289,6 +289,7 @@ export class ParentRegisterComponent implements OnInit {
       }
     });
   }
+
   childNameVerification() {
     const userName = this.childForm.value.userName;
     this.childNameExist = false;

@@ -339,21 +339,92 @@ namespace EducNotes.API.Data
             false;
         }
 
-        // public async Task<List<coursClass>> GetTeacherCoursesAndClasses(int teacherId)
-        // {
-        //     var cousrsesusers = await _context.CourseUsers.Include(c => c.Course).Where(a => a.TeacherId == teacherId).Select(e => e.Course).ToListAsync();
-        //     var classcourses = new List<coursClass>();
-        //     foreach (var cours in cousrsesusers)
-        //     {
-        //         classcourses.Add(new coursClass
-        //         {
-        //             Course = cours,
-        //             classes = _context.ClassCourses.Include(c => c.Class).Where(c => c.CourseId == cours.Id).ToList()
+        public async Task<List<Course>> GetTeacherCourses(int teacherId)
+        {
+            var courses = await _context.TeacherCourses
+                                    .Where(c => c.TeacherId == teacherId)
+                                    .Select(s => s.Course).ToListAsync();
 
-        //         });
-        //     }
-        //     return classcourses;
-        // }
+            return courses;
+        }
+
+        public async Task<List<TeacherClassesDto>> GetTeacherClasses(int teacherId)
+        {
+            var classesData = await (from courses in _context.ClassCourses
+                                    join classes in _context.Classes
+                                    on courses.ClassId equals classes.Id
+                                    where courses.TeacherId == teacherId
+                                    select new {
+                                        ClassId = classes.Id,
+                                        ClassName = classes.Name,
+                                        NbStudents = _context.Users.Where(u => u.ClassId == classes.Id).Count()
+                                    })
+                                    .OrderBy(o => o.ClassName)
+                                    .Distinct().ToListAsync();
+
+            List<TeacherClassesDto> teacherClasses = new List<TeacherClassesDto>();
+            foreach (var aclass in classesData)
+            {
+                TeacherClassesDto tcd = new TeacherClassesDto();
+                tcd.ClassId = aclass.ClassId;
+                tcd.ClassName = aclass.ClassName;
+                tcd.NbStudents = aclass.NbStudents;
+                teacherClasses.Add(tcd);
+            }
+
+            return teacherClasses;
+        }
+
+        public async Task<List<ClassesWithEvalsDto>> GetTeacherClassesWithEvalsByPeriod(int teacherId, int periodId)
+        {
+            var Classes = await _context.ClassCourses
+                                    .Include(i => i.Class).ThenInclude(i => i.Students)
+                                    .Where(c => c.TeacherId == teacherId).Distinct().ToListAsync();
+
+            List<ClassesWithEvalsDto> classesWithEvals = new List<ClassesWithEvalsDto>();
+            foreach (var aclass in Classes)
+            {
+              List<Evaluation> ClassEvals = await _context.Evaluations
+                                .Include(i => i.Course)
+                                .Include(i => i.EvalType)
+                                .Where(e => e.ClassId == aclass.ClassId && e.PeriodId == periodId).ToListAsync();
+
+              if (ClassEvals.Count > 0)
+              {
+                    var OpenedEvals = ClassEvals.FindAll(e => e.Closed == false);
+                    var OpenedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(OpenedEvals);
+                    var ToBeGradedEvals = ClassEvals.FindAll(e => e.Closed == true);
+                    var ToBeGradedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(ToBeGradedEvals);
+                    var NbEvals = OpenedEvals.Count() + ToBeGradedEvals.Count();
+
+                    ClassesWithEvalsDto classDto = new ClassesWithEvalsDto();
+                    classDto.ClassId = Convert.ToInt32(aclass.ClassId);
+                    classDto.ClassName = aclass.Class.Name;
+                    classDto.NbStudents = aclass.Class.Students.Count();
+                    classDto.NbEvals = NbEvals;
+                    classDto.OpenedEvals = OpenedEvalsDto;
+                    classDto.ToBeGradedEvals = ToBeGradedEvalsDto;
+
+                    classesWithEvals.Add(classDto);
+              }
+            }
+
+            return classesWithEvals;
+        }
+
+        public async Task<List<EvaluationForListDto>> GetEvalsToCome(int classId)
+        {
+            var today = DateTime.Now.Date;
+            var evals = await _context.Evaluations
+                        .Include(i => i.Course)
+                        .Include(i => i.EvalType)
+                        .Where(e => e.ClassId == classId && e.EvalDate.Date >= today).ToListAsync();
+
+            var evalsToReturn = _mapper.Map<List<EvaluationForListDto>>(evals);
+
+            return evalsToReturn;
+        }
+
 
         public async Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId)
         {

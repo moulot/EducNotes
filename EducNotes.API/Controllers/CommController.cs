@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using EducNotes.API.Data;
 using EducNotes.API.Dtos;
+using EducNotes.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Twilio;
@@ -56,6 +59,7 @@ namespace EducNotes.API.Controllers
             Dictionary<string, string> Params = new Dictionary<string, string>();
             Params.Add("content", smsData.Content);
             Params.Add("to", smsData.To);
+            Params.Add("validityPeriod", "1");
 
             Params["to"] = CreateRecipientList(Params["to"]);
             string JsonArray = JsonConvert.SerializeObject(Params, Formatting.None);
@@ -94,6 +98,37 @@ namespace EducNotes.API.Controllers
             to = to + string.Join("\",\"", tmp);
             to = to + "\"]";
             return to;
+        }
+
+        // [HttpPost("CallBack")]
+        // public async GetCallBackData([FromBody] CallBackDto callBackData)
+        // {
+
+        // }
+
+        [HttpGet("SmsCategories")]
+        public async Task<IActionResult> GetSmsCtegories()
+        {
+            var smsCats =  await _context.SmsCategories
+                                    .OrderBy(c => c.Name).ToListAsync();
+            return Ok(smsCats);
+    
+        }
+
+        [HttpPost("SaveSmsTemplate")]
+        public async Task<IActionResult> AddSmsTemplate ([FromBody] SmsTemplateDto smsTemplateDto)
+        {
+            var smsTemplate = new SmsTemplate {
+                Id = smsTemplateDto.Id,
+                Name = smsTemplateDto.Name,
+                SmsCategoryId = smsTemplateDto.SmsCategoryId,
+                Content = smsTemplateDto.Content
+            };
+
+            _repo.Add(smsTemplateDto);
+            if (await _repo.SaveAll()) { return Ok(); }
+            return BadRequest("impossible d'ajouter ce cours");
+
         }
     }
 }

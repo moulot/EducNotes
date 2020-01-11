@@ -105,6 +105,10 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'users/' + teacherId + '/Schedule');
   }
 
+  getGradesData(teacherId, periodId) {
+    return this.http.get(this.baseUrl + 'users/' + teacherId + '/GradesData/' + periodId);
+  }
+
   getTeacherClasses(teacherId) {
     return this.http.get(this.baseUrl + 'users/' + teacherId + '/Classes');
   }

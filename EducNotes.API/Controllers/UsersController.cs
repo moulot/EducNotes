@@ -572,6 +572,20 @@ namespace EducNotes.API.Controllers
             return BadRequest("Aucun agenda trouvé");
         }
 
+        [HttpGet("{teacherId}/GradesData/{periodId}")]
+        public async Task<IActionResult> GetGradesData(int teacherId, int periodId)
+        {
+            var teacherCourses = await _repo.GetTeacherCourses(teacherId);
+            var teacherClasses = await _repo.GetTeacherClasses(teacherId);
+            var classesWithEvals = await _repo.GetTeacherClassesWithEvalsByPeriod(teacherId, periodId);
+
+            return Ok(new{
+                teacherCourses,
+                teacherClasses,
+                classesWithEvals
+            });
+        }
+
         [HttpGet("{teacherId}/Courses")]
         public async Task<IActionResult> GetTeacherCourses(int teacherId)
         {

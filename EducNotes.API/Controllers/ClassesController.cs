@@ -728,9 +728,9 @@ namespace EducNotes.API.Controllers {
         }
 
         [HttpPost ("AddCourse")]
-        public async Task<IActionResult> AddCourse ([FromBody] CourseDto newCourseDto) {
+        public async Task<IActionResult> AddCourse([FromBody] CourseDto newCourseDto) {
             var course = new Course { Name = newCourseDto.Name, Abbreviation = newCourseDto.Abbreviation, Color = newCourseDto.Color };
-            _repo.Add (course);
+            _repo.Add(course);
             // foreach (var item in courseDto.classLevelIds)
             // {
             //     var classes = await _context.Classes.Where(a=>a.ClassLevelId == Convert.ToInt32(item)).Select(a=>a.Id).ToListAsync();
@@ -739,10 +739,10 @@ namespace EducNotes.API.Controllers {
             //       _repo.Add(new ClassCourse {CourseId = course.Id,ClassId = classId});
             //     }
             // }
-            if (await _repo.SaveAll ())
-                return Ok ();
+            if (await _repo.SaveAll())
+                return Ok();
 
-            return BadRequest ("impossible d'ajouter ce cours");
+            return BadRequest("impossible d'ajouter ce cours");
         }
 
         [HttpGet("SessionData/{scheduleId}")]
