@@ -58,6 +58,7 @@
                                 <div class="md-form">
                                     <input type="text" class="form-control" id="userName" (blur)="user1NameVerification()" formControlName="userName" class="form-control" mdbInput>
                                     <label for="userName">nom d'utilisateur</label>
+                                    <span *ngIf="user1NameExist" class="text-danger">nom d'utilisateur déja utilisé... Veuillez reéssayer un autre</span>
                                 </div>
                             </div>
                         </div>
@@ -72,6 +73,7 @@
                                 <div class="md-form">
                                     <input type="text" class="form-control" id="dateofBirth" formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
                                     <label for="dateofBirth">Date de naissance</label>
+
                                 </div>
                             </div>
                         </div>
@@ -138,7 +140,7 @@
 
         </div>
 
-        <button mdbBtn size="sm" color="primary" (click)="stepper.next()">CONTINUER</button>
+        <button mdbBtn size="sm" color="primary" (click)="stepper.next()" [disabled]="!user1Form.valid || user1NameExist === true" >CONTINUER</button>
     </mdb-step>
     <mdb-step name="Infos Enfant(s)" [stepForm]="secondFormGroup" class="step2">
         <div *ngIf="showChildenList" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
@@ -255,8 +257,9 @@
                                 </div>
                                 <div class="col">
                                     <div class="md-form">
-                                        <input type="text" id="cuserName" (blur)="childNameVerification()" formControlName="userName" class="form-control" mdbInput>
+                                        <input type="text"  id="cuserName" (blur)="childNameVerification()" formControlName="userName" class="form-control" mdbInput>
                                         <label for="cuserName">nom d'utilisateur</label>
+                                        <span *ngIf="childNameExist" class="text-danger">nom d'utilisateur déja utilisé... Veuillez réessayer un autre</span>
                                     </div>
                                 </div>
                             </div>

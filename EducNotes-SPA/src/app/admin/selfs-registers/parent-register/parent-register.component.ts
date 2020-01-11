@@ -135,7 +135,7 @@ export class ParentRegisterComponent implements OnInit {
     this.user1Form = this.fb.group({
       lastName: ['', Validators.required],
       firstName: ['', Validators.required],
-      userName: [''],
+      userName: ['', Validators.required],
       password: ['', Validators.required],
       checkPassword: [null, [Validators.required, this.user1confirmationValidator]],
       gender: [null, Validators.required],
