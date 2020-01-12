@@ -3,6 +3,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommService } from 'src/app/_services/comm.service';
 import { SmsTemplate } from 'src/app/_models/smsTemplate';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-sms-template',
@@ -10,51 +11,20 @@ import { SmsTemplate } from 'src/app/_models/smsTemplate';
   styleUrls: ['./sms-template.component.scss']
 })
 export class SmsTemplateComponent implements OnInit {
-  templateForm: FormGroup;
-  optionsSmsCategory = [];
-  smsCategories: any;
+  smsTemplates: any;
 
-  constructor(private fb: FormBuilder, private alertify: AlertifyService, private commService: CommService) { }
+  constructor(private route: ActivatedRoute, private alertify: AlertifyService,
+    private commService: CommService, private router: Router) { }
 
   ngOnInit() {
-    this.createTemplateForm();
-  }
-
-  createTemplateForm() {
-
-    this.templateForm = this.fb.group({
-      name: ['', Validators.required],
-      categoryId: ['', Validators.required],
-      content: ['', Validators.required]
+    this.route.data.subscribe(data => {
+      this.smsTemplates = data['templates'];
+      console.log(this.smsTemplates);
     });
   }
 
-  getCategories() {
-    this.commService.getSmsCategories().subscribe((data: any) => {
-      for (let i = 0; i < data.length; i++) {
-        const elt = data[i];
-        const element = {value: elt.id, label: elt.name};
-        this.optionsSmsCategory = [...this.optionsSmsCategory, element];
-      }
-    }, error => {
-      this.alertify.error(error);
-    });
+  addNew() {
+    this.router.navigate(['/AddSmsTemplate']);
   }
 
-  saveTemplate() {
-    const templateData = <SmsTemplate>{};
-    templateData.id = 0;
-    templateData.name = this.templateForm.value.name;
-    templateData.smsCategoryId = this.templateForm.value.categoryId;
-    templateData.content = this.templateForm.value.content;
-    this.commService.addSmsTemplate(templateData).subscribe(() => {
-      this.alertify.success('le modèle de sms a bien été enregistré.');
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
-  cancelForm() {
-    this.templateForm.reset();
-  }
 }

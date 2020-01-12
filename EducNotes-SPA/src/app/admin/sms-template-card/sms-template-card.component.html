@@ -1,0 +1,58 @@
+<mdb-flipping-card #cards>
+    <!--Front Side-->
+    <div class="face front tp-box_side tp-box_front">
+
+      <!--Content-->
+      <div class="card-body p-2">
+        <h5>{{template.name}}</h5>
+        <p class="text-16">catégorie: <label class="font-weight-450">{{template.smsCategoryName}}</label></p>
+        <p class="text-15 font-weigth-450 my-2">message</p>
+        <p class="text-15 mb-2">{{template.content}}</p>
+        <!--Triggering button-->
+        <a class="rotate-btn" data-card="card-1" (click)="cards.toggle()">
+          <mdb-icon fas icon="redo"></mdb-icon> Click here to rotate</a>
+      </div>
+    </div>
+    <!--/.Front Side-->
+
+    <!--Back Side-->
+    <div class="back tp-box_side tp-box_back">
+
+      <!--Content-->
+      <h4>About me</h4>
+      <hr>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime quae, dolores dicta. Blanditiis rem
+        amet repellat,
+        dolores nihil quae in mollitia asperiores ut rerum repellendus, voluptatum eum, officia laudantium
+        quaerat?</p>
+      <hr>
+      <!--Social Icons-->
+      <ul class="list-inline">
+        <li class="list-inline-item">
+          <a class="icons-sm fb-ic">
+            <mdb-icon fab icon="facebook-f"></mdb-icon>
+          </a>
+        </li>
+        <li class="list-inline-item">
+          <a class="icons-sm tw-ic">
+            <mdb-icon fab icon="twitter"></mdb-icon>
+          </a>
+        </li>
+        <li class="list-inline-item">
+          <a class="icons-sm gplus-ic">
+            <mdb-icon fab icon="google-plus"></mdb-icon>
+          </a>
+        </li>
+        <li class="list-inline-item">
+          <a class="icons-sm li-ic">
+            <mdb-icon fab icon="linkedin-in"></mdb-icon>
+          </a>
+        </li>
+      </ul>
+      <!--Triggering button-->
+      <a class="rotate-btn" data-card="card-1" (click)="cards.toggle()">
+        <mdb-icon fas icon="undo"></mdb-icon> Click here to rotate back</a>
+
+    </div>
+    <!--/.Back Side-->
+</mdb-flipping-card>

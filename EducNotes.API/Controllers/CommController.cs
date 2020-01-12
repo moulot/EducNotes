@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using EducNotes.API.Data;
@@ -115,19 +117,34 @@ namespace EducNotes.API.Controllers
     
         }
 
-        [HttpPost("SaveSmsTemplate")]
-        public async Task<IActionResult> AddSmsTemplate ([FromBody] SmsTemplateDto smsTemplateDto)
+        [HttpGet("SmsTemplates")]
+        public async Task<IActionResult> GetSmsTemplates()
         {
-            var smsTemplate = new SmsTemplate {
-                Id = smsTemplateDto.Id,
-                Name = smsTemplateDto.Name,
-                SmsCategoryId = smsTemplateDto.SmsCategoryId,
-                Content = smsTemplateDto.Content
-            };
+            var templates = await _context.SmsTemplates
+                                    .Include(i => i.SmsCategory)
+                                    .OrderBy(s => s.Name).ToListAsync();
+            var templatesToReturn = _mapper.Map<IEnumerable<SmsTemplateForListDto>>(templates);
+            return Ok(templatesToReturn);
+        }
 
-            _repo.Add(smsTemplateDto);
+        [HttpPut("SaveSmsTemplate")]
+        public async Task<IActionResult> AddSmsTemplate ([FromBody] SmsTemplateForSaveDto smsTemplateDto)
+        {
+            var id = smsTemplateDto.Id;
+            if(id == 0) {
+                SmsTemplate newTemplate = new SmsTemplate();
+                _mapper.Map(smsTemplateDto, newTemplate);
+                _repo.Add(newTemplate);
+            } else {
+                var templateFromRepo = await _repo.GetSmsTemplate(id);
+                _mapper.Map(smsTemplateDto, templateFromRepo);
+            }
+
             if (await _repo.SaveAll()) { return Ok(); }
-            return BadRequest("impossible d'ajouter ce cours");
+
+            // throw new Exception($"Updating/Saving agendaItem failed");
+
+            return BadRequest("ajout du modèle sms a échoué");
 
         }
     }

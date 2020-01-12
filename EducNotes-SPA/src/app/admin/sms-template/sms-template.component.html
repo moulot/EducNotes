@@ -1,35 +1,10 @@
 <div class="row m-2">
   <div class="col-md-12 mb-2">
-    <p class="text-20 font-weight-450">modèles Sms</p>
-  </div>
-  <div class="col-md-12">
-    <form [formGroup]="templateForm" (ngSubmit)="saveTemplate()">
-      <div class="row">
-
-        <div class="col-md-6">
-          <div class="md-form">
-            <input mdbInput type="text" id="name" class="form-control" formControlName="name" mdbValidate>
-            <label for="lastName" class="">libellé modèle</label>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <mdb-select [options]="optionsSmsCategory" formControlName="category" placeholder="catégorie du sms"></mdb-select>
-        </div>
-      
-        <div class="col-md-6 p-0">
-          <div class="md-form">
-            <textarea type="text" id="content" formControlName="content" class="md-textarea form-control" mdbInput></textarea>
-            <label for="body">message</label>  
-          </div>
-        </div>
-
-        <div class="clo-md-6">
-          <button type="button" class="mr-2" mdbBtn size="sm" color="primary" (click)="cancelForm()" mdbWavesEffect>annuler</button>
-          <button type="submit" [disabled]="!templateForm.valid" mdbBtn size="sm" color="primary" mdbWavesEffect>envoyer</button>
-        </div>
-
-      </div>
-    </form>
+    <button type="button" class="mr-2" mdbBtn size="sm" color="primary" (click)="addNew()" mdbWavesEffect>nouveau modèle</button>
   </div>
 </div>
+<div class="row">
+  <div *ngFor="let item of smsTemplates" class="col-md-3 my-2">
+    <app-sms-template-card [template]="item"></app-sms-template-card>
+  </div>
+</div>>

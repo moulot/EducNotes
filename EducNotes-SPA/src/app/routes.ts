@@ -94,6 +94,8 @@ import { SendSmsComponent } from './admin/sendSms/sendSms.component';
 import { UserAccountComponent } from './users/user-account/user-account.component';
 import { UserAccountResolver } from './_resolvers/user-account-resolver';
 import { SmsTemplateComponent } from './admin/sms-template/sms-template.component';
+import { AddSmsTemplateComponent } from './admin/add-smsTemplate/add-smsTemplate.component';
+import { SmsTemplateHomeResolver } from './_resolvers/sms-template-home-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -182,7 +184,8 @@ export const appRoutes: Routes = [
             { path: 'createPDF', component: ConvertToPDFComponent },
             {path: 'sendSms', component: SendSmsComponent},
             {path: 'userAccount', component: UserAccountComponent, resolve: { user: UserAccountResolver } },
-            {path: 'SmsTemplates', component: SmsTemplateComponent}
+            {path: 'SmsTemplates', component: SmsTemplateComponent, resolve: { templates: SmsTemplateHomeResolver} },
+            {path: 'AddSmsTemplate', component: AddSmsTemplateComponent}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

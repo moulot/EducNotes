@@ -61,6 +61,7 @@ namespace EducNotes.API.Data
         Task<List<Course>> GetTeacherCourses(int teacherId);
         Task<List<ClassesWithEvalsDto>> GetTeacherClassesWithEvalsByPeriod(int teacherId, int periodId);
         Task<List<EvaluationForListDto>> GetEvalsToCome(int classId);
+        Task<SmsTemplate> GetSmsTemplate(int smsTemplateId);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////

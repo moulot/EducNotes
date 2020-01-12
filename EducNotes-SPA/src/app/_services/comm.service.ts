@@ -3,6 +3,7 @@ import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Sms } from '../_models/sms';
 import { clickatellParams } from '../_models/clickatellParams';
+import { SmsTemplate } from '../_models/smsTemplate';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +24,12 @@ export class CommService {
     return this.http.get(this.baseUrl + 'comm/SmsCategories');
   }
 
-  addSmsTemplate(smsTemplate: any) {
-    return this.http.post(this.baseUrl + 'comm/SaveSmsTemplate', smsTemplate);
+  getSmsTemplates() {
+    return this.http.get(this.baseUrl + 'comm/SmsTemplates');
+  }
+
+  saveSmsTemplate(smsTemplate: SmsTemplate) {
+    return this.http.put(this.baseUrl + 'comm/SaveSmsTemplate', smsTemplate);
   }
 
 }

@@ -486,7 +486,7 @@ namespace EducNotes.API.Controllers {
             return BadRequest ("problème d'enregistrement des données");
         }
 
-        [HttpPut ("SaveAgenda")]
+        [HttpPut("SaveAgenda")]
         public async Task<IActionResult> SaveAgendaItem([FromBody] AgendaForSaveDto agendaForSaveDto) {
             var id = agendaForSaveDto.Id;
             if(id == 0) {
