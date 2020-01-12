@@ -207,7 +207,7 @@ import { UserAccountCardComponent } from './users/user-account-card/user-account
 import { SmsTemplateComponent } from './admin/sms-template/sms-template.component';
 import { AddSmsTemplateComponent } from './admin/add-smsTemplate/add-smsTemplate.component';
 import { SmsTemplateHomeResolver } from './_resolvers/sms-template-home-resolver';
-import { SmsTemplateCardComponent } from './admin/sms-template-card/sms-template-card.component';
+import { EditSmsTemplateResolver } from './_resolvers/edit-sms-template-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -347,8 +347,7 @@ export function tokenGetter() {
       UserAccountComponent,
       UserAccountCardComponent,
       SmsTemplateComponent,
-      AddSmsTemplateComponent,
-      SmsTemplateCardComponent
+      AddSmsTemplateComponent
    ],
    imports: [
       FormWizardModule,
@@ -440,6 +439,7 @@ export function tokenGetter() {
       PayableFormResolver,
       UserAccountResolver,
       SmsTemplateHomeResolver,
+      EditSmsTemplateResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

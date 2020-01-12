@@ -127,6 +127,13 @@ namespace EducNotes.API.Controllers
             return Ok(templatesToReturn);
         }
 
+        [HttpGet("SmsTemplates/{id}")]
+        public async Task<IActionResult> GetSmsTemplate(int id)
+        {
+            var template = await _context.SmsTemplates.FirstOrDefaultAsync(t => t.Id == id);
+            return Ok(template);
+        }
+
         [HttpPut("SaveSmsTemplate")]
         public async Task<IActionResult> AddSmsTemplate ([FromBody] SmsTemplateForSaveDto smsTemplateDto)
         {

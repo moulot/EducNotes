@@ -2,9 +2,25 @@
   <div class="col-md-12 mb-2">
     <button type="button" class="mr-2" mdbBtn size="sm" color="primary" (click)="addNew()" mdbWavesEffect>nouveau modèle</button>
   </div>
-</div>
-<div class="row">
-  <div *ngFor="let item of smsTemplates" class="col-md-3 my-2">
-    <app-sms-template-card [template]="item"></app-sms-template-card>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title">modèles de sms</div>
+        <div *ngFor="let item of smsTemplates">
+          <div class="p-2 border rounded my-1">
+            <div class="row p-2">
+              <div class="col-md-1 text-15 font-weight-450">
+                <a (click)="editSmsTemplate(item.id)" style="text-decoration: underline;">editer</a>
+              </div>
+              <div class="col-md-2 text-15 font-weight-450">{{item.name}}</div>
+              <div class="col-md-2 text-15">{{item.smsCategoryName}}</div>
+              <div class="col-md-7 text-15">{{item.content}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>>
+
+</div>

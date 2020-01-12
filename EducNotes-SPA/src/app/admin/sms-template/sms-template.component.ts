@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommService } from 'src/app/_services/comm.service';
 import { SmsTemplate } from 'src/app/_models/smsTemplate';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Utils } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-sms-template',
@@ -12,6 +13,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class SmsTemplateComponent implements OnInit {
   smsTemplates: any;
+  HeadElts = ['action', 'name', 'catégorie', 'message'];
 
   constructor(private route: ActivatedRoute, private alertify: AlertifyService,
     private commService: CommService, private router: Router) { }
@@ -19,12 +21,16 @@ export class SmsTemplateComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe(data => {
       this.smsTemplates = data['templates'];
-      console.log(this.smsTemplates);
     });
+    Utils.smoothScrollToTop();
   }
 
   addNew() {
     this.router.navigate(['/AddSmsTemplate']);
+  }
+
+  editSmsTemplate(id) {
+    this.router.navigate(['/EditSmsTemplate', id]);
   }
 
 }

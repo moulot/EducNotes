@@ -13,7 +13,7 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 export class ClassesPanelComponent implements OnInit {
 
   constructor(private adminService: AdminService, private route: ActivatedRoute,
-    private router: Router, private alertify: AlertifyService) {}
+    private alertify: AlertifyService) {}
 
   levels: any[];
   lev: any [] = [];
@@ -21,14 +21,14 @@ export class ClassesPanelComponent implements OnInit {
    ngOnInit() {
         this.route.data.subscribe(data => {
           this.levels = data.levels;
-          });
-          for (let index = 0; index < this.levels.length; index++) {
-            const element: any = {
-              id: this.levels[index].id,
-              name: this.levels[index].name
-            };
-            this.lev = [...this.lev, element];
-          }
+        });
+        for (let index = 0; index < this.levels.length; index++) {
+          const element: any = {
+            id: this.levels[index].id,
+            name: this.levels[index].name
+          };
+          this.lev = [...this.lev, element];
+        }
     }
     newClass() {
       this.addNew = !this.addNew;

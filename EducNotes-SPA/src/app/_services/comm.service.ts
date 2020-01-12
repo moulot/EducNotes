@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Sms } from '../_models/sms';
 import { clickatellParams } from '../_models/clickatellParams';
 import { SmsTemplate } from '../_models/smsTemplate';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,10 @@ export class CommService {
 
   getSmsTemplates() {
     return this.http.get(this.baseUrl + 'comm/SmsTemplates');
+  }
+
+  getSmsTemplateById(id) {
+    return this.http.get(this.baseUrl + 'comm/SmsTemplates/' + id);
   }
 
   saveSmsTemplate(smsTemplate: SmsTemplate) {

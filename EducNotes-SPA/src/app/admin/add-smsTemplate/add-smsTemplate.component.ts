@@ -3,7 +3,7 @@ import { SmsTemplate } from 'src/app/_models/smsTemplate';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { CommService } from 'src/app/_services/comm.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-add-smsTemplate',
@@ -14,21 +14,34 @@ export class AddSmsTemplateComponent implements OnInit {
   templateForm: FormGroup;
   optionsSmsCategory = [];
   smsCategories: any;
+  template: SmsTemplate;
+  name: string;
+  content: string;
+  categoryId: number;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
-    private commService: CommService, private router: Router) { }
+    private commService: CommService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.route.data.subscribe(data => {
+      this.template = data['template'];
+      if (this.template) {
+        this.name = this.template.name;
+        this.content = this.template.content;
+        this.categoryId = this.template.smsCategoryId;
+      }
+    });
     this.createTemplateForm();
     this.getCategories();
+
   }
 
   createTemplateForm() {
 
     this.templateForm = this.fb.group({
-      name: ['', Validators.required],
-      category: ['', Validators.required],
-      content: ['', Validators.required]
+      name: [this.name, Validators.required],
+      category: [this.categoryId, Validators.required],
+      content: [this.content, Validators.required]
     });
   }
 
@@ -59,6 +72,6 @@ export class AddSmsTemplateComponent implements OnInit {
   }
 
   cancelForm() {
-    this.templateForm.reset();
+    this.router.navigate(['/SmsTemplates']);
   }
 }
