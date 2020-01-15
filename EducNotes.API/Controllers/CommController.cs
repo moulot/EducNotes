@@ -154,5 +154,12 @@ namespace EducNotes.API.Controllers
             return BadRequest("ajout du modèle sms a échoué");
 
         }
+
+        [HttpGet("Tokens")]
+        public async Task<IActionResult> GetTokens()
+        {
+            var tokens = await _context.Tokens.OrderBy(t => t.Name).ToListAsync();
+            return Ok(tokens);
+        }
     }
 }

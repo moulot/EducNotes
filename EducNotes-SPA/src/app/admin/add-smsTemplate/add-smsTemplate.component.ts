@@ -15,9 +15,11 @@ export class AddSmsTemplateComponent implements OnInit {
   optionsSmsCategory = [];
   smsCategories: any;
   template: SmsTemplate;
+  templateId = 0;
   name: string;
   content: string;
   categoryId: number;
+  tokens: any;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
     private commService: CommService, private router: Router, private route: ActivatedRoute) { }
@@ -26,6 +28,7 @@ export class AddSmsTemplateComponent implements OnInit {
     this.route.data.subscribe(data => {
       this.template = data['template'];
       if (this.template) {
+        this.templateId = this.template.id;
         this.name = this.template.name;
         this.content = this.template.content;
         this.categoryId = this.template.smsCategoryId;
@@ -33,6 +36,7 @@ export class AddSmsTemplateComponent implements OnInit {
     });
     this.createTemplateForm();
     this.getCategories();
+    this.getTokens();
 
   }
 
@@ -57,9 +61,17 @@ export class AddSmsTemplateComponent implements OnInit {
     });
   }
 
+  getTokens() {
+    this.commService.getTokens().subscribe(tokens => {
+      this.tokens = tokens;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
   saveTemplate() {
     const templateData = <SmsTemplate>{};
-    templateData.id = 0;
+    templateData.id = this.templateId;
     templateData.name = this.templateForm.value.name;
     templateData.smsCategoryId = this.templateForm.value.category;
     templateData.content = this.templateForm.value.content;

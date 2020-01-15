@@ -5,8 +5,8 @@
         <img src="{{user.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
       </div>
       <div class="col-md-10">
-        <p class="text-35 text-muted font-weight-500 text-capitalize p-0 m-0">{{user.lastName}} {{user.firstName}}</p>
-        <p class="text-17 text-primary p-0 mx-1 my-0">{{user.email}}</p>
+        <p class="text-20 text-muted font-weight-500 text-capitalize p-0 m-0">{{user.lastName}} {{user.firstName}}</p>
+        <p class="text-15 text-primary p-0 mx-1 my-0">{{user.email}}</p>
         <div class="p-0 m-0">
           <label class="text-15 text-primary p-0 mx-1">{{user.phoneNumber}}</label>
           <label *ngIf="user.secondPhoneNumber.length > 0" class="text-15 text-primary p-0 mx-1">/ {{user.secondPhoneNumber}}</label>
@@ -18,9 +18,43 @@
 
 <div class="row m-2">
   <div class="col-md-12 m-1" style="border-top: #cccccc 1px solid;"></div>
-  <div class="col-md-12 text-25 font-weight-300 mt-0 mb-3">enfants</div>
-  <div class="col-md-3 my-5" *ngFor="let child of user.children">
+  <div class="col-md-12 text-20 font-weight-300 mt-0 mb-3">mes enfants</div>
+  <div class="col-md-2 my-5" *ngFor="let child of user.children">
     <app-user-account-card [child]=child></app-user-account-card>
   </div>
-  <div class="col-md-12 m-1" style="border-top: #cccccc 1px solid;"></div>
 </div>
+
+<div class="row m-2">
+  <div class="col-md-12 m-1" style="border-top: #cccccc 1px solid;"></div>
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-2"><p class=" text-20 font-weight-300 mt-0 mb-3">mes sms à recevoir</p></div>
+      <div class="col-md-10">
+        <div *ngIf="smsChoiceChanged">
+          <button type="button" mdbBtn color="primary" size="sm" (click)="saveUserSMS()" 
+            mdbWavesEffect>valider le choix des sms</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-3" *ngFor="let cat of user.smsByCategory; let i = index">
+        <div class="card mb-3">
+          <div class="card-body p-2">
+            <p class="text-15 m-0 font-weight-450">{{cat.categoryName}}</p>
+            <hr class="my-1">
+            <div *ngFor="let sms of cat.userSmsTemplates; let j = index" class="my-3">
+              <label class="switch switch-primary mr-3">
+                <input type="checkbox" (change)="setSmsChoice(sms.smsTemplateId, sms.active)" [(ngModel)]="sms.active">
+                <span class="slider"></span> {{sms.smsName}}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -129,9 +129,64 @@ namespace EducNotes.API.Controllers
             var Children = await _repo.GetChildren(id);
             var childrenToReturn = _mapper.Map<IEnumerable<UserForAccountDto>>(Children);
 
+            var categories = await _context.SmsCategories.OrderBy(s => s.Name).ToListAsync();
+            var smsTemplates = await _context.SmsTemplates.OrderBy(s => s.Name).ToListAsync();
+            var userSms = await _context.UserSmsTemplates.Where(s => s.UserId == user.Id).ToListAsync();
+
+            List<SmsByCategoryDto> SmsByCategory = new List<SmsByCategoryDto>();
+            foreach (var cat in categories)
+            {
+                SmsByCategoryDto sbcd = new SmsByCategoryDto();
+                sbcd.UserSmsTemplates = new List<UserSmsTemplateDto>();
+                sbcd.CategoryId = cat.Id;
+                sbcd.CategoryName = cat.Name;
+                var userTemplates = smsTemplates.FindAll(s => s.SmsCategoryId == cat.Id);
+                if(userTemplates.Count() > 0)
+                {
+                    foreach (var item in userTemplates)
+                    {
+                        UserSmsTemplateDto ustd = new UserSmsTemplateDto();
+                        
+                        ustd.UserId = user.Id;
+                        ustd.SmsTemplateId = item.Id;
+                        ustd.SmsName = item.Name;
+                        ustd.Content = item.Content;
+                        ustd.SmsCategoryId = item.SmsCategoryId;
+                        ustd.Active = userSms.FirstOrDefault(u => u.SmsTemplateId == item.Id) != null ? true : false;
+                        sbcd.UserSmsTemplates.Add(ustd);
+                    }
+                    SmsByCategory.Add(sbcd);
+                }
+            }
+
             userToReturn.Children = childrenToReturn;
+            userToReturn.SmsByCategory = SmsByCategory;
+            userToReturn.UserSms = userSms;
 
             return Ok(userToReturn);
+        }
+
+        [HttpPut("{id}/saveSMS")]
+        public async Task<IActionResult> SaveUserSMS(int id, [FromBody] List<int> smsIds)
+        {
+            List<UserSmsTemplate> oldUserSMS = await _context.UserSmsTemplates.Where(s => s.UserId == id).ToListAsync();
+            if(oldUserSMS.Count() > 0)
+                _repo.DeleteAll(oldUserSMS);
+
+            List<UserSmsTemplate> newUserSMS = new List<UserSmsTemplate>();
+            foreach (var smsId in smsIds)
+            {
+                UserSmsTemplate ust = new UserSmsTemplate();
+                ust.UserId = id;
+                ust.SmsTemplateId = smsId;
+                newUserSMS.Add(ust);
+            }
+            _context.AddRange(newUserSMS);
+
+            if (await _repo.SaveAll())
+                return Ok();
+
+            throw new Exception($"la validation des sms a échoué");
         }
 
         [HttpGet("Types")]

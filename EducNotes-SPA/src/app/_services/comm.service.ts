@@ -37,4 +37,12 @@ export class CommService {
     return this.http.put(this.baseUrl + 'comm/SaveSmsTemplate', smsTemplate);
   }
 
+  getSmsByCategory() {
+    return this.http.get(this.baseUrl + 'comm/SmsByCategory');
+  }
+
+  getTokens() {
+    return this.http.get(this.baseUrl + 'comm/Tokens');
+  }
+
 }

@@ -62,6 +62,9 @@ namespace EducNotes.API.Data
         Task<List<ClassesWithEvalsDto>> GetTeacherClassesWithEvalsByPeriod(int teacherId, int periodId);
         Task<List<EvaluationForListDto>> GetEvalsToCome(int classId);
         Task<SmsTemplate> GetSmsTemplate(int smsTemplateId);
+        void Clickatell_SendSMS(clickatellParamsDto smsData);
+        List<Sms> SetSmsDataFromAbsences(List<AbsenceSmsDto> absences, string SmsContent);
+        List<string> SendBatchSMS(List<Sms> smsData);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////

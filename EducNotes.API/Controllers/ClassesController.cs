@@ -12,6 +12,7 @@ using EducNotes.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace EducNotes.API.Controllers {
     [Route ("api/[controller]")]
@@ -720,11 +721,11 @@ namespace EducNotes.API.Controllers {
         }
 
         [HttpPost ("{classId}/DeleteClass")]
-        public async Task<IActionResult> DeleteClass (int classId) {
-            _repo.Delete (_context.Classes.FirstOrDefault (e => e.Id == classId));
-            if (await _repo.SaveAll ())
-                return Ok (classId);
-            return BadRequest ("impossible de supprimer cette classe");
+        public async Task<IActionResult> DeleteClass(int classId) {
+            _repo.Delete(_context.Classes.FirstOrDefault(e => e.Id == classId));
+            if (await _repo.SaveAll())
+                return Ok(classId);
+            return BadRequest("impossible de supprimer cette classe");
         }
 
         [HttpPost ("AddCourse")]
@@ -849,24 +850,75 @@ namespace EducNotes.API.Controllers {
         }
 
         [HttpPut ("SaveCallSheet/{sessionId}")]
-        public async Task<IActionResult> SaveCallSheet (int sessionId, [FromBody] Absence[] absences) {
+        public async Task<IActionResult> SaveCallSheet(int sessionId, [FromBody] Absence[] absences) {
             //delete old absents (update: delete + add)
-            if (sessionId > 0) {
-                List<Absence> oldAbsences = await _context.Absences.Where (a => a.SessionId == sessionId).ToListAsync ();
-                if (oldAbsences.Count () > 0)
-                    _repo.DeleteAll (oldAbsences);
+            if(sessionId > 0) {
+                List<Absence> oldAbsences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
+                if(oldAbsences.Count() > 0)
+                    _repo.DeleteAll(oldAbsences);
             }
+
+            // absence Sms data
+            int smsId = _config.GetValue<int>("AppSettings:AbsenceSms");
+            var AbsenceSms = _context.SmsTemplates.FirstOrDefault(s => s.Id == smsId);
+
+            var ids = absences.Select(u => u.UserId);
+            var parents = _context.UserLinks.Where(u => ids.Contains(u.UserId)).Distinct().ToList();
+            List<AbsenceSmsDto> absSmsData = new List<AbsenceSmsDto>();
 
             //add new absents
             for (int i = 0; i < absences.Length; i++) {
                 Absence absence = absences[i];
-                _repo.Add (absence);
+                _repo.Add(absence);
+
+                //set absence sms data
+                var session = _context.Sessions.First(s => s.Id == absence.SessionId);
+                var schedule = _context.Schedules
+                                .Include(c => c.Class)
+                                .Include(c => c.Course)
+                                .First(s => s.Id == session.ScheduleId);
+
+                int childId = absence.UserId;
+                var child = _context.Users.First(u => u.Id == childId);
+                List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
+                foreach (var parentId in parentIds)
+                {
+                    // is the parent subscribed to the Absence sms?
+                    var userTemplate = _context.UserSmsTemplates.FirstOrDefault(
+                                        u => u.UserId == parentId && u.SmsTemplateId == AbsenceSms.Id);
+                    if(userTemplate != null)
+                    {
+                        var parent = _context.Users.First(p => p.Id == parentId);
+                        AbsenceSmsDto asd = new AbsenceSmsDto();
+                        asd.ChildId = childId;
+                        asd.ChildFirstName = child.FirstName;
+                        asd.ChildLastName = child.LastName;
+                        asd.ParentId = parent.Id;
+                        asd.ParentFirstName = parent.FirstName;
+                        asd.ParentLastName = parent.LastName;
+                        asd.CourseName = schedule.Course.Abbreviation;
+                        asd.CourseStartHour = schedule.StartHourMin.ToShortTimeString();
+                        asd.CourseEndHour = schedule.EndHourMin.ToShortTimeString();
+                        asd.PhoneNumber = parent.PhoneNumber;
+                        absSmsData.Add(asd);
+                    }
+                }
             }
 
-            if (await _repo.SaveAll ())
-                return NoContent ();
+            List<Sms> absSms = _repo.SetSmsDataFromAbsences(absSmsData, AbsenceSms.Content);
+            _context.AddRange(absSms);
 
-            throw new Exception ($"la validation de l'apppel a échoué");
+            List<string> results = _repo.SendBatchSMS(absSms);
+            foreach (var result in results)
+            {
+                string[] data = result.Split(",");
+                var ddd = 2;
+            }
+
+            if (await _repo.SaveAll())
+                return Ok();
+
+            throw new Exception($"la validation de l'apppel a échoué");
         }
 
         [HttpGet("absences/{sessionId}")]

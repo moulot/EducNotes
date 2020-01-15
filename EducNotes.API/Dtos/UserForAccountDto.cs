@@ -22,5 +22,7 @@ namespace EducNotes.API.Dtos
         public int UserTypeId { get; set; }
         public string UserTypeName { get; set; }
         public IEnumerable<UserForAccountDto> Children { get; set; }
+        public IEnumerable<SmsByCategoryDto> SmsByCategory { get; set; }
+        public IEnumerable<UserSmsTemplate> UserSms { get; set; }
     }
 }

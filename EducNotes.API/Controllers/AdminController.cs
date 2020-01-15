@@ -579,9 +579,9 @@ namespace EducNotes.API.Controllers {
           }
 
           if (ut == parentTypeId) {
-            var ids = users.Select (u => u.Id);
+            var ids = users.Select(u => u.Id);
             var parents = _context.UserLinks
-              .Where (u => ids.Contains (u.UserId)).Select (u => u.UserP).Distinct ();
+              .Where(u => ids.Contains (u.UserId)).Select (u => u.UserP).Distinct ();
 
             foreach (var user in parents) {
               if (!string.IsNullOrEmpty (user.Email))

@@ -73,57 +73,6 @@ export class ClassCallSheetComponent implements OnInit {
     });
   }
 
-  // getSessionData(scheduleId) {
-  //   this.classService.getSessionData(scheduleId).subscribe((session: any) => {
-  //     this.session = session.session;
-  //     this.getSessionAbsents(this.session.id);
-  //     this.students = session.classStudents;
-  //     this.sessionAbsents = session.sessionAbsences;
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
-
-  // getSession(scheduleId) {
-  //   this.classService.getSession(scheduleId).subscribe((session: Session) => {
-  //     this.session = session;
-  //     this.getSessionAbsents(this.session.id);
-  //     this.loadStudents(this.schedule.classId);
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
-
-  // loadStudents(classId) {
-  //   this.classService.getClassStudents(classId).subscribe(data => {
-  //     this.students = data;
-  //     for (let i = 0; i < this.students.length; i++) {
-  //       const id = this.students[i].id;
-  //       let elt = <CallSheet>{};
-  //       elt.id = id;
-  //       elt.absent = false;
-  //       if (this.sessionAbsents.length > 0) {
-  //         if (this.sessionAbsents.findIndex(s => Number(s.userId) === Number(id)) !== -1) {
-  //           elt.absent = true;
-  //           this.absents = [...this.absents, id];
-  //         }
-  //       }
-  //       this.isAbsent = [...this.isAbsent, elt];
-  //     }
-  //     this.filteredStudents = data;
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
-
-  // getSessionAbsents(sessionId: number) {
-  //   this.classService.getAbsencesBySession(sessionId).subscribe(data => {
-  //     this.sessionAbsents = data;
-  //     console.log(this.sessionAbsents);
-  //     console.log('nb abs: ' + this.sessionAbsents.length);
-  //   });
-  // }
-
   filerData(val) {
     if (val) {
       val = val.toLowerCase();

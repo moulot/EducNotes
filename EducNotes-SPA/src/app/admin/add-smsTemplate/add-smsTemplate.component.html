@@ -29,6 +29,13 @@
             <label for="content">message</label>  
           </div>
         </div>
+        <div class="col-md-8">
+          <p class="text-15 font-weight-450">entrez les tags dans le message du sms pour y inclure des données dynamiques</p>
+          <div *ngFor="let token of tokens">
+            <label class="text-13 mr-2">{{token.name}}:</label>
+            <label class="text-1"><b>{{token.tokenString}}</b></label>
+          </div>
+        </div>
       </div>
 
       <div class="row">

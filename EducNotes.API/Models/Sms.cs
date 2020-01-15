@@ -10,16 +10,15 @@ namespace EducNotes.API.Models
         public User ToUser { get; set; }
         public string From { get; set; }
         public string Content { get; set; }
-        public DateTime TimeToSend { get; set; }
-        // public byte StatusFlag { get; set; }
-        public DateTime InsertDate { get; set; }
-        public int InsertUserId { get; set; }
-        public User InsertUser { get; set; }
-        public DateTime UpdateDate { get; set; }
-        public int UpdateUserId { get; set; }
-        public User UpdateUser { get; set; }
+        public Boolean Binary { get; set; }
+        public string ClientMsgId { get; set; }
+        public DateTime scheduledDeliveryTime { get; set; }
+        public string UserDataHeader { get; set; }
+        public int validityPeriod { get; set; }
+        public string Charset { get; set; }
+
         public string res_ApiMsgId { get; set; }
-        public Boolean res_accepted { get; set; }
+        public Boolean res_Accepted { get; set; }
         public int res_ErrorCode { get; set; }
         public string res_Error { get; set; }
         public string res_ErrorDesc { get; set; }
