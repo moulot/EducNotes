@@ -8,11 +8,11 @@ import { User } from '../_models/user';
 import { AuthService } from '../_services/auth.service';
 
 @Injectable()
-export class UserAccountResolver implements Resolve<User> {
+export class UserAccountResolver implements Resolve<any> {
     constructor(private userService: UserService, private authService: AuthService,
         private router: Router, private alertify: AlertifyService) {}
 
-    resolve(route: ActivatedRouteSnapshot): Observable<User> {
+    resolve(route: ActivatedRouteSnapshot): any {
         return this.userService.getUserAccount(this.authService.decodedToken.nameid).pipe(
             catchError(error => {
                 this.alertify.error('problème de récupération de données');
