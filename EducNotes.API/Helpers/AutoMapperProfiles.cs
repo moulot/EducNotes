@@ -50,6 +50,16 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.Age, opt => {
                     opt.MapFrom(d => d.DateOfBirth.CalculateAge());
                 })
+                .ForMember(dest => dest.UserTypeName, opt => {
+                    opt.MapFrom(src => src.UserType.Name);
+                });
+            CreateMap<User, ChildForAccountDto>()
+                .ForMember(dest => dest.PhotoUrl, opt => {
+                    opt.MapFrom(src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
+                })
+                .ForMember(dest => dest.Age, opt => {
+                    opt.MapFrom(d => d.DateOfBirth.CalculateAge());
+                })
                 .ForMember(dest => dest.ClassName, opt => {
                     opt.MapFrom(src => src.Class.Name);
                 })
@@ -63,6 +73,20 @@ namespace EducNotes.API.Helpers {
             CreateMap<Evaluation, EvalsForEditDto>()
                 .ForMember(dest => dest.EvalDateExpired, opt => {
                     opt.MapFrom(src => (src.EvalDate.Date <= DateTime.Now.Date));
+                });
+            CreateMap<Evaluation, EvalForEditDto>()
+                .ForMember(dest => dest.EvalDate, opt => {
+                    opt.MapFrom(src => src.EvalDate.ToShortDateString());
+                })
+                .ForMember(dest => dest.EvalDateExpired, opt => {
+                    opt.MapFrom(src => (src.EvalDate.Date <= DateTime.Now.Date));
+                });
+            CreateMap<UserEvaluation, ClassEvalGradesDto>()
+                .ForMember(dest => dest.PhotoUrl, opt => {
+                    opt.MapFrom(src => src.User.Photos.FirstOrDefault(p => p.IsMain).Url);
+                })
+                .ForMember(dest => dest.StudentName, opt => {
+                    opt.MapFrom(src => src.User.LastName + " " + src.User.FirstName);
                 });
             CreateMap<Photo, PhotosForDetailedDto>();
             CreateMap<UserForUpdateDto, User>();

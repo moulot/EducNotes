@@ -89,12 +89,12 @@ constructor(private http: HttpClient) {}
     return this.http.get<User>(this.baseUrl + 'users/' + id);
   }
 
-  getUserAccount(id): Observable<User> {
-    return this.http.get<User>(this.baseUrl + 'users/Account/' + id);
+  getParentAccount(id): any {
+    return this.http.get(this.baseUrl + 'users/Account/' + id);
   }
 
-  saveUserSms(id, sms: number[]) {
-    return this.http.put(this.baseUrl + 'users/' + id + '/saveSms', sms);
+  saveUserSms(parentId, sms: any) {
+    return this.http.put(this.baseUrl + 'users/' + parentId + '/saveSms', sms);
   }
 
   getChildren(parentId): Observable<User[]> {

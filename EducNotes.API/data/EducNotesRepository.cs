@@ -116,6 +116,7 @@ namespace EducNotes.API.Data
             return await _context.Users
                 .Include(i => i.Photos)
                 .Include(i => i.Class)
+                .Include(i => i.UserType)
                 .Where(u => userIds.Contains(u.Id) && u.ValidatedCode == true).ToListAsync();
         }
 

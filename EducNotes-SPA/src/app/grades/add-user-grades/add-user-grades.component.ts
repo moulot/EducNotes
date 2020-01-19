@@ -1,27 +1,24 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { EvaluationService } from 'src/app/_services/evaluation.service';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { UserEvaluation } from 'src/app/_models/userEvaluation';
-import { AlertifyService } from 'src/app/_services/alertify.service';
-import { debounceTime } from 'rxjs/operators';
-import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { Utils } from 'src/app/shared/utils';
+import { UserEvaluation } from 'src/app/_models/userEvaluation';
+import { debounceTime } from 'rxjs/operators';
+import { EvaluationService } from 'src/app/_services/evaluation.service';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { AlertifyService } from 'src/app/_services/alertify.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 
 @Component({
-  selector: 'app-grade-addForm',
-  templateUrl: './grade-addForm.component.html',
-  styleUrls: ['./grade-addForm.component.css'],
+  selector: 'app-add-user-grades',
+  templateUrl: './add-user-grades.component.html',
+  styleUrls: ['./add-user-grades.component.scss'],
   animations: [SharedAnimations]
 })
-export class GradeAddFormComponent implements OnInit {
-  @Output() toggleView = new EventEmitter<boolean>();
-  @Output() cancelNotesFrom = new EventEmitter<any>();
-  selectedEval: any;
+export class AddUserGradesComponent implements OnInit {
+  eval: any;
   userGrades: any = [];
   newUserGrades: any = [];
   notesForm: FormGroup;
-  model: any = {};
-  gradeIndex: number;
   userEvals: UserEvaluation[] = [];
   searchControl: FormControl = new FormControl();
   filteredUserGrades: any = [];
@@ -30,16 +27,20 @@ export class GradeAddFormComponent implements OnInit {
   pageSize = 15;
   closed: boolean;
 
-  constructor(private evalService: EvaluationService, private fb: FormBuilder, private alertify: AlertifyService) { }
+  constructor(private evalService: EvaluationService, private fb: FormBuilder,
+    private alertify: AlertifyService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
-    this.selectedEval = this.evalService.currentEval;
-    this.closed = this.selectedEval.closed;
-    this.userGrades = this.evalService.userGrades;
-    console.log(this.userGrades);
-    this.filteredUserGrades = this.userGrades;
-    this.newUserGrades = this.userGrades;
-    this.gradeIndex = this.evalService.gradeIndex;
+    this.route.data.subscribe((data: any) => {
+      const classEval = data['data'];
+      this.eval = classEval.eval;
+      this.userGrades = classEval.usersEval;
+      this.filteredUserGrades = this.userGrades;
+      this.newUserGrades = this.userGrades;
+      this.closed = this.eval.closed;
+      console.log(this.eval);
+      console.log(this.userGrades);
+    });
 
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
       this.filerData(value);
@@ -78,13 +79,11 @@ export class GradeAddFormComponent implements OnInit {
 
     for (let i = 0; i < this.userGrades.length; i++) {
       const elt = this.userGrades[i];
-      const grade = elt.grades[this.gradeIndex];
-      const comment = elt.comments[this.gradeIndex];
       const ue = <UserEvaluation>{};
-      ue.evaluationId = this.selectedEval.id;
+      ue.evaluationId = this.eval.id;
       ue.userId = elt.userId;
-      ue.grade = grade;
-      ue.comment = comment;
+      ue.grade = elt.grade;
+      ue.comment = elt.comment;
       this.userEvals = [...this.userEvals, ue];
     }
 
@@ -93,14 +92,12 @@ export class GradeAddFormComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
     }, () => {
-      this.evalService.setCurrentCurrentEval(this.selectedEval, this.newUserGrades);
-      this.toggleView.emit();
-      Utils.smoothScrollToTop();
+      this.router.navigate(['/grades']);
+      // Utils.smoothScrollToTop();
     });
   }
 
   cancelForm() {
-    this.toggleView.emit();
     Utils.smoothScrollToTop();
   }
 

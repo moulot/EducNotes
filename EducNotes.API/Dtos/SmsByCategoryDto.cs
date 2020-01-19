@@ -7,6 +7,6 @@ namespace EducNotes.API.Dtos
     {
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
-        public List<UserSmsTemplateDto> UserSmsTemplates { get; set; }
+        public List<UserSmsTemplateDto> Sms { get; set; }
     }
 }

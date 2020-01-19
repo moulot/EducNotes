@@ -180,19 +180,13 @@ namespace EducNotes.API.Controllers {
 
       userParams.userId = currentUserId;
 
-      // if(string.IsNullOrEmpty(userParams.Gender))
-      // {
-      //     userParams.Gender = userFromRepo.Gender == "male" ? "female" : "male";
-      // }
+      var users = await _repo.GetUsers(userParams);
 
-      var users = await _repo.GetUsers (userParams);
+      var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
 
-      var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>> (users);
+      Response.AddPagination(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
 
-      Response.AddPagination (users.CurrentPage, users.PageSize,
-        users.TotalCount, users.TotalPages);
-
-      return Ok (usersToReturn);
+      return Ok(usersToReturn);
     }
 
     // [HttpGet("{id}", Name = "GetUser")]

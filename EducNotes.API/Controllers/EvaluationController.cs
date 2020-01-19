@@ -55,65 +55,82 @@ namespace EducNotes.API.Controllers
             return Ok(types);
         }
 
+        [HttpGet("ClassEval/{id}")]
+        public async Task<IActionResult> GetClassEval(int id)
+        {
+            var evalFromRepo = await _context.Evaluations
+                                        .Include(i => i.Class)
+                                        .Include(i => i.Course)
+                                        .Include(i => i.EvalType)
+                                        .FirstOrDefaultAsync(e => e.Id == id);
+            var eval = _mapper.Map<EvalForEditDto>(evalFromRepo);
+
+            var usersEvalFromRepo = await _context.UserEvaluations
+                                    .Include(i => i.User).ThenInclude(p => p.Photos)
+                                    .Where(u => u.EvaluationId == id)
+                                    .OrderBy(o => o.User.LastName)
+                                    .ToListAsync();
+            var usersEval = _mapper.Map<IEnumerable<ClassEvalGradesDto>>(usersEvalFromRepo);
+
+            return Ok(new {
+                eval,
+                usersEval
+            });
+        }
+
         // only graded evaluations are considered here...
         [HttpGet("Class/{classId}/Course/{courseId}/Period/{periodId}")]
         public async Task<IActionResult> GetUserEvaluations(int classId, int courseId, int periodId)
         {
-          var evalsFromRepo = await _context.Evaluations
-                          .Include(i => i.EvalType)
-                          .Where(e => e.ClassId == classId && e.CourseId == courseId &&
-                            e.PeriodId == periodId && e.Graded == true)
-                          .OrderBy(o => o.EvalDate)
-                          .ToListAsync();
+            var evalsFromRepo = await _context.Evaluations
+                            .Include(i => i.EvalType)
+                            .Where(e => e.ClassId == classId && e.CourseId == courseId &&
+                                e.PeriodId == periodId && e.Graded == true)
+                            .OrderBy(o => o.EvalDate)
+                            .ToListAsync();
 
-          var evalsForEditDto = _mapper.Map<IEnumerable<EvalsForEditDto>>(evalsFromRepo);
+            var evals = _mapper.Map<IEnumerable<EvalsForEditDto>>(evalsFromRepo);
 
-          var usersFromRepo = await _repo.GetClassStudents(classId);
-          var users = _mapper.Map<IEnumerable<UserForDetailedDto>>(usersFromRepo);
+            var usersFromRepo = await _repo.GetClassStudents(classId);
+            var users = _mapper.Map<IEnumerable<UserForDetailedDto>>(usersFromRepo);
 
-          List<UserEvaluation> uevals = await _context.UserEvaluations
-                          .Where(u => u.Evaluation.ClassId == classId && u.Evaluation.CourseId == courseId &&
-                                  u.Evaluation.PeriodId == periodId && u.Evaluation.Graded == true)
-                          .OrderBy(o => o.Evaluation.EvalDate).ToListAsync();
+            List<UserEvaluation> uevals = await _context.UserEvaluations
+                            .Where(u => u.Evaluation.ClassId == classId && u.Evaluation.CourseId == courseId &&
+                                    u.Evaluation.PeriodId == periodId && u.Evaluation.Graded == true)
+                            .OrderBy(o => o.Evaluation.EvalDate).ToListAsync();
 
-          List<UserGradesToReturnDto> usersWithGrades = new List<UserGradesToReturnDto>();
+            List<UserGradesToReturnDto> usersWithGrades = new List<UserGradesToReturnDto>();
 
-          for (int i = 0; i < users.Count(); i++)
-          {
-            UserGradesToReturnDto usergrades = new UserGradesToReturnDto();
-            var user = users.ElementAt(i);
-            int userid = user.Id;
-            var userdata = await _repo.GetUser(userid, false);
-            string userName = userdata.LastName + ' ' + userdata.FirstName;
-
-            usergrades.UserId = userid;                
-            usergrades.StudentName = userName;
-            // usergrades.Age = userdata.DateOfBirth.CalculateAge();
-            IEnumerable<Photo> photoUrls = _context.Photos.Where(p => p.UserId == userid);
-            string photoUrl = "";
-            if(photoUrls.Count() > 0)
-                photoUrl = photoUrls.SingleOrDefault(s => s.IsMain == true).Url;
-            usergrades.PhotoUrl = photoUrl;
-            usergrades.Grades = new List<string>();
-            usergrades.Comments = new List<string>();
-            List<UserEvaluation> ugrades = uevals.FindAll(e => e.UserId == userid);
-            for(int j = 0; j < ugrades.Count(); j++)
+            for(int i = 0; i < users.Count(); i++)
             {
-                UserEvaluation ugrade = ugrades[j];
-                //grades
-                string grade = ugrade.Grade == null ? "" : ugrade.Grade;
-                usergrades.Grades.Add(grade);
-                //comments
-                string comment = ugrade.Comment == null ? "" : ugrade.Comment;
-                usergrades.Comments.Add(comment);
-            }
-            usersWithGrades.Add(usergrades);
-          }
+                UserGradesToReturnDto usergrades = new UserGradesToReturnDto();
+                var user = users.ElementAt(i);
+                int userid = user.Id;
+                string userName = user.LastName + ' ' + user.FirstName;
 
-          return Ok(new {
-              userGrades = usersWithGrades,
-              evals = evalsForEditDto
-          });
+                usergrades.UserId = userid;
+                usergrades.StudentName = userName;
+                usergrades.PhotoUrl = user.PhotoUrl;
+                usergrades.Grades = new List<decimal>();
+                usergrades.Comments = new List<string>();
+                List<UserEvaluation> ugrades = uevals.FindAll(e => e.UserId == userid);
+                for(int j = 0; j < ugrades.Count(); j++)
+                {
+                    UserEvaluation ugrade = ugrades[j];
+                    //grades
+                    decimal grade = ugrade.Grade == "" ? -1000 : Convert.ToDecimal(ugrade.Grade);
+                    usergrades.Grades.Add(grade);
+                    //comments
+                    string comment = ugrade.Comment == null ? "" : ugrade.Comment;
+                    usergrades.Comments.Add(comment);
+                }
+                usersWithGrades.Add(usergrades);
+            }
+
+            return Ok(new {
+                userGrades = usersWithGrades,
+                evals
+            });
         }
 
         [HttpGet("Class/{classId}/CoursesWithEvals/{userId}")]
@@ -216,7 +233,8 @@ namespace EducNotes.API.Controllers
                                                                         Checked = false
                                                                     }).ToList()
                                                     }).ToList()
-                                    }).ToListAsync();
+                                    }
+                                ).ToListAsync();
 
             return Ok(skills);
         }

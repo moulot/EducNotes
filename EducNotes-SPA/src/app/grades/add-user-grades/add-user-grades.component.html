@@ -1,0 +1,104 @@
+<div class="row">
+
+  <div class="col-md-12">
+    <div class="lead text-15 m-0 pb-2">
+      saisie des notes - classe : {{eval.className}}. {{eval.name}} du {{eval.evalDate}}</div>
+  </div>
+
+  <div class="col-md-12">
+    <form #evalForm="ngForm" (ngSubmit)="saveNotes()">
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="md-form form-sm m-0">
+            <input mdbInput type="text" id="search" class="form-control" [formControl]="searchControl" mdbValidate>
+            <label for="search" class="">rechercher élève</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA LIST LG -->
+      <div class="row d-none d-md-block">
+        <div class="col-md-12">
+          <div *ngFor="let student of filteredUserGrades; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+            <div class="card my-1">
+              <div class="card-body p-0 d-flex">
+                <div class="my-auto" style="width: 25%;">
+                  <div class="div-thumb">
+                    <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
+                    <label class="text-17 ml-2">{{student.studentName}}</label>
+                  </div>
+                </div>
+                <div class="my-auto mr-4" style="width: 10%;">
+                  <div class="md-form form-sm m-0">
+                    <input mdbInput type="text" id="note + {{i}}" class="form-control form-control-sm"
+                      [(ngModel)]="student.grade" name="note + {{i}}">
+                    <label for="note + {{i}}" class="">note / {{eval.maxGrade}}</label>
+                  </div>
+                </div>
+                <div class="my-auto" style="width: 50%;">
+                  <div class="md-form form-sm m-0">
+                    <input mdbInput type="text" id="comment + {{i}}" class="form-control form-control-sm"
+                      [(ngModel)]="student.comment" name="comment + {{i}}">
+                    <label for="comment + {{i}}" class="">commentaire</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA LIST SM -->
+      <div class="row d-md-none">
+        <div class="col-md-12">
+          <div *ngFor="let student of filteredUserGrades; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+            <div class="card my-1">
+              <div class="card-body p-0 d-flex">
+                <div class="div-thumb-block">
+                  <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
+                </div>
+                <div class="flex-grow-1">
+                  <div class="ml-1 my-1" style="width: 30%;">
+                    <input type="text" placeholder="note/{{eval.maxGrade}}" id="sm-note + {{i}}" class="form-control form-control-sm"
+                      [(ngModel)]="student.grade" name="sm-note + {{i}}">
+                  </div>
+                  <div class="mb-1 ml-1" style="width: 98%;">
+                    <input  type="text" placeholder="commentaire" id="sm-comment + {{i}}" class="form-control form-control-sm"
+                      [(ngModel)]="student.comment" name="sm-comment + {{i}}">
+                  </div>
+                </div>
+              </div>
+              <div class="text-15 ml-1 mb-1 text-capitalize">{{student.studentName}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-mb-12">
+        <div class="p-2 my-2 border rounded">
+          <div>
+            <label class="switch switch-success mr-3">
+              <span class="text-17 font-weight-400">cloturer les notes</span>
+              <input type="checkbox" [(ngModel)]="closed" name="evalClosed">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <hr class="my-1">
+          <div>
+            <div class="row">
+              <div class="col-md-8 mb-1">
+                <button mdbBtn type="submit" block="true" color="primary" size="sm" mdbWavesEffect>valider</button>
+              </div>
+              <div class="col-md-4">
+                <button mdbBtn type="button" block="true" (click)="cancelForm()" color="primary" size="sm" mdbWavesEffect>annuler</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+</div>

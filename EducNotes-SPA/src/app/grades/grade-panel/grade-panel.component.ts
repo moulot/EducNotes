@@ -10,6 +10,7 @@ import { Period } from 'src/app/_models/period';
 import { EvalType } from 'src/app/_models/evalType';
 import { debounceTime } from 'rxjs/operators';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -46,8 +47,8 @@ export class GradePanelComponent implements OnInit {
   optionsCourse = [];
   optionsPeriod = [];
 
-  constructor(private userService: UserService, private evalService: EvaluationService,
-    private fb: FormBuilder, private authService: AuthService, public alertify: AlertifyService) { }
+  constructor(private userService: UserService, private evalService: EvaluationService, private fb: FormBuilder,
+    private authService: AuthService, public alertify: AlertifyService, private route: Router) { }
 
   ngOnInit() {
     this.currentPeriod = this.authService.currentPeriod;
@@ -98,6 +99,11 @@ export class GradePanelComponent implements OnInit {
     this.evalService.setCurrentCurrentEval(evaluation, userGrades);
     this.evalService.setColIndex(index);
     this.toggleView();
+  }
+
+  addUsersGrades(evalId) {
+    // this.evalService.setCurrentCurrentEval(evaluation, userGrades);
+    this.route.navigate(['/AddUserGrades', evalId]);
   }
 
   createNotesForm() {
@@ -165,6 +171,7 @@ export class GradePanelComponent implements OnInit {
       this.evals = data.evals;
       this.userGrades = data.userGrades;
       this.filteredUserGrades = data.userGrades;
+      // console.log(this.userGrades);
     }, error => {
       this.alertify.error(error);
     }, () => {

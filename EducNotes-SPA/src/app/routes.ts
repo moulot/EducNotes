@@ -97,6 +97,9 @@ import { SmsTemplateComponent } from './admin/sms-template/sms-template.componen
 import { AddSmsTemplateComponent } from './admin/add-smsTemplate/add-smsTemplate.component';
 import { SmsTemplateHomeResolver } from './_resolvers/sms-template-home-resolver';
 import { EditSmsTemplateResolver } from './_resolvers/edit-sms-template-resolver';
+import { GradeAddFormComponent } from './grades/grade-addForm/grade-addForm.component';
+import { AddUserGradesComponent } from './grades/add-user-grades/add-user-grades.component';
+import { ClassGradesResolver } from './_resolvers/class-grades-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -184,10 +187,11 @@ export const appRoutes: Routes = [
             { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }},
             { path: 'createPDF', component: ConvertToPDFComponent },
             {path: 'sendSms', component: SendSmsComponent},
-            {path: 'userAccount', component: UserAccountComponent, resolve: { user: UserAccountResolver } },
+            {path: 'userAccount', component: UserAccountComponent, resolve: { parent: UserAccountResolver } },
             {path: 'SmsTemplates', component: SmsTemplateComponent, resolve: { templates: SmsTemplateHomeResolver} },
             {path: 'AddSmsTemplate', component: AddSmsTemplateComponent},
-            {path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} }
+            {path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} },
+            {path: 'AddUserGrades/:evalId', component: AddUserGradesComponent, resolve: {data: ClassGradesResolver}}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

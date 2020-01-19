@@ -123,62 +123,76 @@ namespace EducNotes.API.Controllers
             var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
             
             var user = await _repo.GetUser(id, isCurrentUser);
+            var parent = _mapper.Map<UserForAccountDto>(user);
 
-            var userToReturn = _mapper.Map<UserForAccountDto>(user);
-
-            var Children = await _repo.GetChildren(id);
-            var childrenToReturn = _mapper.Map<IEnumerable<UserForAccountDto>>(Children);
+            var ChildrenFromRepo = await _repo.GetChildren(id);
+            var children = _mapper.Map<IEnumerable<ChildForAccountDto>>(ChildrenFromRepo);
 
             var categories = await _context.SmsCategories.OrderBy(s => s.Name).ToListAsync();
             var smsTemplates = await _context.SmsTemplates.OrderBy(s => s.Name).ToListAsync();
-            var userSms = await _context.UserSmsTemplates.Where(s => s.UserId == user.Id).ToListAsync();
 
-            List<SmsByCategoryDto> SmsByCategory = new List<SmsByCategoryDto>();
-            foreach (var cat in categories)
+            parent.Children = new List<ChildSmsDto>();
+            List<ChildSmsDto> childrenSms = new List<ChildSmsDto>();
+            foreach (var child in children)
             {
-                SmsByCategoryDto sbcd = new SmsByCategoryDto();
-                sbcd.UserSmsTemplates = new List<UserSmsTemplateDto>();
-                sbcd.CategoryId = cat.Id;
-                sbcd.CategoryName = cat.Name;
-                var userTemplates = smsTemplates.FindAll(s => s.SmsCategoryId == cat.Id);
-                if(userTemplates.Count() > 0)
+                ChildSmsDto childWithSms = new ChildSmsDto();
+                childWithSms.Child = child;
+                childWithSms.SmsByCategory = new List<SmsByCategoryDto>();
+
+                var userSms = await _context.UserSmsTemplates
+                                .Where(s => s.ChildId == child.Id && s.ParentId == parent.Id).ToListAsync();
+
+                List<SmsByCategoryDto> SmsByCategory = new List<SmsByCategoryDto>();
+                foreach (var cat in categories)
                 {
-                    foreach (var item in userTemplates)
+                    SmsByCategoryDto sbcd = new SmsByCategoryDto();
+                    sbcd.CategoryId = cat.Id;
+                    sbcd.CategoryName = cat.Name;
+                    sbcd.Sms = new List<UserSmsTemplateDto>();
+
+                    var SmsByCat = smsTemplates.FindAll(s => s.SmsCategoryId == cat.Id).OrderBy(s => s.Name);
+                    if(SmsByCat.Count() > 0)
                     {
-                        UserSmsTemplateDto ustd = new UserSmsTemplateDto();
-                        
-                        ustd.UserId = user.Id;
-                        ustd.SmsTemplateId = item.Id;
-                        ustd.SmsName = item.Name;
-                        ustd.Content = item.Content;
-                        ustd.SmsCategoryId = item.SmsCategoryId;
-                        ustd.Active = userSms.FirstOrDefault(u => u.SmsTemplateId == item.Id) != null ? true : false;
-                        sbcd.UserSmsTemplates.Add(ustd);
+                        foreach (var item in SmsByCat)
+                        {
+                            UserSmsTemplateDto ustd = new UserSmsTemplateDto();
+                            
+                            ustd.UserId = user.Id;
+                            ustd.SmsTemplateId = item.Id;
+                            ustd.SmsName = item.Name;
+                            ustd.Content = item.Content;
+                            ustd.SmsCategoryId = item.SmsCategoryId;
+                            ustd.Active = userSms.FirstOrDefault(u => u.SmsTemplateId == item.Id) != null ? true : false;
+                            sbcd.Sms.Add(ustd);
+
+                        }
+                        SmsByCategory.Add(sbcd);
+                        childWithSms.SmsByCategory.Add(sbcd);
                     }
-                    SmsByCategory.Add(sbcd);
                 }
+                parent.Children.Add(childWithSms);
             }
 
-            userToReturn.Children = childrenToReturn;
-            userToReturn.SmsByCategory = SmsByCategory;
-            userToReturn.UserSms = userSms;
-
-            return Ok(userToReturn);
+            return Ok(parent);
         }
 
         [HttpPut("{id}/saveSMS")]
-        public async Task<IActionResult> SaveUserSMS(int id, [FromBody] List<int> smsIds)
+        public async Task<IActionResult> SaveUserSMS(int id, [FromBody] List<SmsDataDto> smsData)
         {
-            List<UserSmsTemplate> oldUserSMS = await _context.UserSmsTemplates.Where(s => s.UserId == id).ToListAsync();
-            if(oldUserSMS.Count() > 0)
-                _repo.DeleteAll(oldUserSMS);
-
             List<UserSmsTemplate> newUserSMS = new List<UserSmsTemplate>();
-            foreach (var smsId in smsIds)
+            foreach (var sms in smsData)
             {
+                int childId = sms.ChildId;
+                int smsId = sms.SmsId;
+
+                List<UserSmsTemplate> oldUserSMS = await _context.UserSmsTemplates.Where(s => s.ChildId == childId).ToListAsync();
+                if(oldUserSMS.Count() > 0)
+                    _repo.DeleteAll(oldUserSMS);
+
                 UserSmsTemplate ust = new UserSmsTemplate();
-                ust.UserId = id;
+                ust.ChildId = childId;
                 ust.SmsTemplateId = smsId;
+                ust.ParentId = id;
                 newUserSMS.Add(ust);
             }
             _context.AddRange(newUserSMS);

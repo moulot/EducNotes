@@ -849,7 +849,7 @@ namespace EducNotes.API.Controllers {
             }
         }
 
-        [HttpPut ("SaveCallSheet/{sessionId}")]
+        [HttpPut("SaveCallSheet/{sessionId}")]
         public async Task<IActionResult> SaveCallSheet(int sessionId, [FromBody] Absence[] absences) {
             //delete old absents (update: delete + add)
             if(sessionId > 0) {
@@ -885,7 +885,8 @@ namespace EducNotes.API.Controllers {
                 {
                     // is the parent subscribed to the Absence sms?
                     var userTemplate = _context.UserSmsTemplates.FirstOrDefault(
-                                        u => u.UserId == parentId && u.SmsTemplateId == AbsenceSms.Id);
+                                        u => u.ParentId == parentId && u.SmsTemplateId == AbsenceSms.Id &&
+                                        u.ChildId == childId);
                     if(userTemplate != null)
                     {
                         var parent = _context.Users.First(p => p.Id == parentId);
@@ -909,10 +910,31 @@ namespace EducNotes.API.Controllers {
             _context.AddRange(absSms);
 
             List<string> results = _repo.SendBatchSMS(absSms);
-            foreach (var result in results)
+            for (int i = 0; i < results.Count(); i++)
             {
+                // result messages from clickatell Api
+                string result = results[i];
+                int pos = result.IndexOf(":") + 1;
+                result = result.Substring(pos);
                 string[] data = result.Split(",");
-                var ddd = 2;
+                string apiMsgId = (data[0].Split(":"))[1].Replace("\"", "");
+                Boolean accepted = Convert.ToBoolean((data[1].Split(":"))[1].Replace("\"", ""));
+                string to = (data[2].Split(":"))[1].Replace("\"", "");
+                string errorCodeData = (data[3].Split(":"))[1].Replace("\"", "");
+                int errorCode = errorCodeData == "null" ? 0 : Convert.ToInt32(errorCodeData);
+                string error = (data[4].Split(":"))[1].Replace("\"", "");
+                string errorDesc = (data[5].Split(":"))[1].Replace("\"", "");
+
+                Sms sms = absSms[i];
+                sms.res_ApiMsgId = apiMsgId;
+                sms.res_Accepted = accepted;
+                if(errorCode > 0)
+                {
+                    sms.res_ErrorCode = errorCode;
+                    sms.res_Error = error;
+                    sms.res_ErrorDesc = errorDesc;
+                }
+                _repo.Add(sms);
             }
 
             if (await _repo.SaveAll())
@@ -926,10 +948,6 @@ namespace EducNotes.API.Controllers {
             var absences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
             return Ok(absences);
         }
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [HttpGet ("GetAllCoursesDetails")]
         public async Task<IActionResult> GetAllCoursesDetails () {
