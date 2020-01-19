@@ -716,6 +716,7 @@ namespace EducNotes.API.Data
                             parentFromRepo.UserName = user.UserName.ToLower();
                             parentFromRepo.LastName = user.LastName;
                             parentFromRepo.FirstName = user.FirstName;
+                            parentFromRepo.Gender = Convert.ToByte(user.Gender);
                             if (user.DateOfBirth != null)
                                 parentFromRepo.DateOfBirth = Convert.ToDateTime(user.DateOfBirth);
                             parentFromRepo.CityId = user.CityId;
@@ -756,6 +757,7 @@ namespace EducNotes.API.Data
                             child.UserName = user.UserName.ToLower();
                             child.LastName = user.LastName;
                             child.FirstName = user.FirstName;
+                            child.Gender = Convert.ToByte(user.Gender);
                             if (child.DateOfBirth != null)
                                 child.DateOfBirth = Convert.ToDateTime(user.DateOfBirth);
                             child.CityId = user.CityId;
