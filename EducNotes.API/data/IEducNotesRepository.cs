@@ -33,8 +33,6 @@ namespace EducNotes.API.Data
         Task<Like> GetLike(int userId, int recipientId);
         Task<bool> EmailExist(string email);
         Task<bool> UserNameExist(string userName);
-
-
         Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId);
 
         Task<IEnumerable<User>> GetStudentsForClass(int classId);
@@ -59,7 +57,14 @@ namespace EducNotes.API.Data
         Task<User> GetSingleUser(string userName);
         Task<List<UserEvalsDto>> GetUserGrades(int userId, int classId);
         IEnumerable<ClassAgendaToReturnDto> GetAgendaListByDueDate(IEnumerable<Agenda> agendaItems);
-        // Task<IActionResult> GetTeacherSessions(int teacherId, int classId)
+        Task<List<TeacherClassesDto>> GetTeacherClasses(int teacherId);
+        Task<List<Course>> GetTeacherCourses(int teacherId);
+        Task<List<ClassesWithEvalsDto>> GetTeacherClassesWithEvalsByPeriod(int teacherId, int periodId);
+        Task<List<EvaluationForListDto>> GetEvalsToCome(int classId);
+        Task<SmsTemplate> GetSmsTemplate(int smsTemplateId);
+        void Clickatell_SendSMS(clickatellParamsDto smsData);
+        List<Sms> SetSmsDataFromAbsences(List<AbsenceSmsDto> absences, string SmsContent);
+        List<string> SendBatchSMS(List<Sms> smsData);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////

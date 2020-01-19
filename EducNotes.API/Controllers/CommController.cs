@@ -1,11 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using EducNotes.API.Data;
 using EducNotes.API.Dtos;
+using EducNotes.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Twilio;
@@ -56,6 +61,7 @@ namespace EducNotes.API.Controllers
             Dictionary<string, string> Params = new Dictionary<string, string>();
             Params.Add("content", smsData.Content);
             Params.Add("to", smsData.To);
+            Params.Add("validityPeriod", "1");
 
             Params["to"] = CreateRecipientList(Params["to"]);
             string JsonArray = JsonConvert.SerializeObject(Params, Formatting.None);
@@ -94,6 +100,66 @@ namespace EducNotes.API.Controllers
             to = to + string.Join("\",\"", tmp);
             to = to + "\"]";
             return to;
+        }
+
+        // [HttpPost("CallBack")]
+        // public async GetCallBackData([FromBody] CallBackDto callBackData)
+        // {
+
+        // }
+
+        [HttpGet("SmsCategories")]
+        public async Task<IActionResult> GetSmsCtegories()
+        {
+            var smsCats =  await _context.SmsCategories
+                                    .OrderBy(c => c.Name).ToListAsync();
+            return Ok(smsCats);
+    
+        }
+
+        [HttpGet("SmsTemplates")]
+        public async Task<IActionResult> GetSmsTemplates()
+        {
+            var templates = await _context.SmsTemplates
+                                    .Include(i => i.SmsCategory)
+                                    .OrderBy(s => s.Name).ToListAsync();
+            var templatesToReturn = _mapper.Map<IEnumerable<SmsTemplateForListDto>>(templates);
+            return Ok(templatesToReturn);
+        }
+
+        [HttpGet("SmsTemplates/{id}")]
+        public async Task<IActionResult> GetSmsTemplate(int id)
+        {
+            var template = await _context.SmsTemplates.FirstOrDefaultAsync(t => t.Id == id);
+            return Ok(template);
+        }
+
+        [HttpPut("SaveSmsTemplate")]
+        public async Task<IActionResult> AddSmsTemplate ([FromBody] SmsTemplateForSaveDto smsTemplateDto)
+        {
+            var id = smsTemplateDto.Id;
+            if(id == 0) {
+                SmsTemplate newTemplate = new SmsTemplate();
+                _mapper.Map(smsTemplateDto, newTemplate);
+                _repo.Add(newTemplate);
+            } else {
+                var templateFromRepo = await _repo.GetSmsTemplate(id);
+                _mapper.Map(smsTemplateDto, templateFromRepo);
+            }
+
+            if (await _repo.SaveAll()) { return Ok(); }
+
+            // throw new Exception($"Updating/Saving agendaItem failed");
+
+            return BadRequest("ajout du modèle sms a échoué");
+
+        }
+
+        [HttpGet("Tokens")]
+        public async Task<IActionResult> GetTokens()
+        {
+            var tokens = await _context.Tokens.OrderBy(t => t.Name).ToListAsync();
+            return Ok(tokens);
         }
     }
 }

@@ -1,20 +1,18 @@
 
-export class clickatellParams {
-  public content: string;
+export interface clickatellParams {
+  content: string;
+  to: string;
+  from: string;
 
-  public to: string;
+  binary: Boolean;
 
-  public from: string;
+  clientMsgId: string;
 
-  public binary: Boolean;
+  scheduledDeliveryTime: Date;
 
-  public clientMsgId: string;
+  userDataHeader: string;
 
-  public scheduledDeliveryTime: Date;
+  validityPeriod: number;
 
-  public userDataHeader: string;
-
-  public validityPeriod: number;
-
-  public charset: string;
+  charset: string;
 }

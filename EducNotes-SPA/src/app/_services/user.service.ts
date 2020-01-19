@@ -89,8 +89,12 @@ constructor(private http: HttpClient) {}
     return this.http.get<User>(this.baseUrl + 'users/' + id);
   }
 
-  getUserAccount(id): Observable<User> {
-    return this.http.get<User>(this.baseUrl + 'users/Account/' + id);
+  getParentAccount(id): any {
+    return this.http.get(this.baseUrl + 'users/Account/' + id);
+  }
+
+  saveUserSms(parentId, sms: any) {
+    return this.http.put(this.baseUrl + 'users/' + parentId + '/saveSms', sms);
   }
 
   getChildren(parentId): Observable<User[]> {
@@ -103,6 +107,10 @@ constructor(private http: HttpClient) {}
 
   getTeacherSchedule(teacherId) {
     return this.http.get(this.baseUrl + 'users/' + teacherId + '/Schedule');
+  }
+
+  getGradesData(teacherId, periodId) {
+    return this.http.get(this.baseUrl + 'users/' + teacherId + '/GradesData/' + periodId);
   }
 
   getTeacherClasses(teacherId) {

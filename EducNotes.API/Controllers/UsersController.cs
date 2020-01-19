@@ -123,15 +123,84 @@ namespace EducNotes.API.Controllers
             var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
             
             var user = await _repo.GetUser(id, isCurrentUser);
+            var parent = _mapper.Map<UserForAccountDto>(user);
 
-            var userToReturn = _mapper.Map<UserForAccountDto>(user);
+            var ChildrenFromRepo = await _repo.GetChildren(id);
+            var children = _mapper.Map<IEnumerable<ChildForAccountDto>>(ChildrenFromRepo);
 
-            var Children = await _repo.GetChildren(id);
-            var childrenToReturn = _mapper.Map<IEnumerable<UserForAccountDto>>(Children);
+            var categories = await _context.SmsCategories.OrderBy(s => s.Name).ToListAsync();
+            var smsTemplates = await _context.SmsTemplates.OrderBy(s => s.Name).ToListAsync();
 
-            userToReturn.Children = childrenToReturn;
+            parent.Children = new List<ChildSmsDto>();
+            List<ChildSmsDto> childrenSms = new List<ChildSmsDto>();
+            foreach (var child in children)
+            {
+                ChildSmsDto childWithSms = new ChildSmsDto();
+                childWithSms.Child = child;
+                childWithSms.SmsByCategory = new List<SmsByCategoryDto>();
 
-            return Ok(userToReturn);
+                var userSms = await _context.UserSmsTemplates
+                                .Where(s => s.ChildId == child.Id && s.ParentId == parent.Id).ToListAsync();
+
+                List<SmsByCategoryDto> SmsByCategory = new List<SmsByCategoryDto>();
+                foreach (var cat in categories)
+                {
+                    SmsByCategoryDto sbcd = new SmsByCategoryDto();
+                    sbcd.CategoryId = cat.Id;
+                    sbcd.CategoryName = cat.Name;
+                    sbcd.Sms = new List<UserSmsTemplateDto>();
+
+                    var SmsByCat = smsTemplates.FindAll(s => s.SmsCategoryId == cat.Id).OrderBy(s => s.Name);
+                    if(SmsByCat.Count() > 0)
+                    {
+                        foreach (var item in SmsByCat)
+                        {
+                            UserSmsTemplateDto ustd = new UserSmsTemplateDto();
+                            
+                            ustd.UserId = user.Id;
+                            ustd.SmsTemplateId = item.Id;
+                            ustd.SmsName = item.Name;
+                            ustd.Content = item.Content;
+                            ustd.SmsCategoryId = item.SmsCategoryId;
+                            ustd.Active = userSms.FirstOrDefault(u => u.SmsTemplateId == item.Id) != null ? true : false;
+                            sbcd.Sms.Add(ustd);
+
+                        }
+                        SmsByCategory.Add(sbcd);
+                        childWithSms.SmsByCategory.Add(sbcd);
+                    }
+                }
+                parent.Children.Add(childWithSms);
+            }
+
+            return Ok(parent);
+        }
+
+        [HttpPut("{id}/saveSMS")]
+        public async Task<IActionResult> SaveUserSMS(int id, [FromBody] List<SmsDataDto> smsData)
+        {
+            List<UserSmsTemplate> newUserSMS = new List<UserSmsTemplate>();
+            foreach (var sms in smsData)
+            {
+                int childId = sms.ChildId;
+                int smsId = sms.SmsId;
+
+                List<UserSmsTemplate> oldUserSMS = await _context.UserSmsTemplates.Where(s => s.ChildId == childId).ToListAsync();
+                if(oldUserSMS.Count() > 0)
+                    _repo.DeleteAll(oldUserSMS);
+
+                UserSmsTemplate ust = new UserSmsTemplate();
+                ust.ChildId = childId;
+                ust.SmsTemplateId = smsId;
+                ust.ParentId = id;
+                newUserSMS.Add(ust);
+            }
+            _context.AddRange(newUserSMS);
+
+            if (await _repo.SaveAll())
+                return Ok();
+
+            throw new Exception($"la validation des sms a échoué");
         }
 
         [HttpGet("Types")]
@@ -570,6 +639,20 @@ namespace EducNotes.API.Controllers
             }
 
             return BadRequest("Aucun agenda trouvé");
+        }
+
+        [HttpGet("{teacherId}/GradesData/{periodId}")]
+        public async Task<IActionResult> GetGradesData(int teacherId, int periodId)
+        {
+            var teacherCourses = await _repo.GetTeacherCourses(teacherId);
+            var teacherClasses = await _repo.GetTeacherClasses(teacherId);
+            var classesWithEvals = await _repo.GetTeacherClassesWithEvalsByPeriod(teacherId, periodId);
+
+            return Ok(new{
+                teacherCourses,
+                teacherClasses,
+                classesWithEvals
+            });
         }
 
         [HttpGet("{teacherId}/Courses")]

@@ -47,8 +47,8 @@ namespace EducNotes.API.Data {
                 }
 
                 var city = new City { Name = "Abidjan" };
-                context.Add (city);
-                context.SaveChanges ();
+                context.Add(city);
+                context.SaveChanges();
 
                 var districts = new List<District> {
                     new District { Name = "Cocody", CityId = 1 },
@@ -56,20 +56,20 @@ namespace EducNotes.API.Data {
                     new District { Name = "2 Plateaux", CityId = 1 },
                     new District { Name = "Djibi", CityId = 1 },
                 };
-                context.AddRange (districts);
+                context.AddRange(districts);
 
                 var AbsenceTypes = new List<AbsenceType> {
                     new AbsenceType { Name = "Absence" },
                     new AbsenceType { Name = "Retard" },
                     new AbsenceType { Name = "Appel" }
                 };
-                context.AddRange (AbsenceTypes);
+                context.AddRange(AbsenceTypes);
 
                 var inscTypes = new List<InscriptionType> {
                     new InscriptionType { Name = "FromParent" },
                     new InscriptionType { Name = "FromSchool" }
                 };
-                context.AddRange (inscTypes);
+                context.AddRange(inscTypes);
 
                 var classLevels = new List<ClassLevel> {
                     new ClassLevel { Name = "TPS", DsplSeq = 1 },
@@ -89,7 +89,7 @@ namespace EducNotes.API.Data {
                     new ClassLevel { Name = "1ere", DsplSeq = 15 },
                     new ClassLevel { Name = "Tle", DsplSeq = 16 }
                 };
-                context.AddRange (classLevels);
+                context.AddRange(classLevels);
 
                 var skills = new List<Skill> {
                     new Skill { Name = "skill1" },

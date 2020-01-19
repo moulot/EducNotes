@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.Encodings.Web;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace EducNotes.API.Data
@@ -114,6 +116,7 @@ namespace EducNotes.API.Data
             return await _context.Users
                 .Include(i => i.Photos)
                 .Include(i => i.Class)
+                .Include(i => i.UserType)
                 .Where(u => userIds.Contains(u.Id) && u.ValidatedCode == true).ToListAsync();
         }
 
@@ -216,9 +219,15 @@ namespace EducNotes.API.Data
         {
             return await _context.Agendas.FirstOrDefaultAsync(a => a.Id == agendaId);
         }
+
         public async Task<User> GetUserByCode(string code)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.ValidationCode == code);
+        }
+
+        public async Task<SmsTemplate> GetSmsTemplate(int smsTemplateId)
+        {
+            return await _context.SmsTemplates.FirstOrDefaultAsync(s => s.Id == smsTemplateId);
         }
 
         public List<int> GetWeekDays(DateTime date)
@@ -339,21 +348,92 @@ namespace EducNotes.API.Data
             false;
         }
 
-        // public async Task<List<coursClass>> GetTeacherCoursesAndClasses(int teacherId)
-        // {
-        //     var cousrsesusers = await _context.CourseUsers.Include(c => c.Course).Where(a => a.TeacherId == teacherId).Select(e => e.Course).ToListAsync();
-        //     var classcourses = new List<coursClass>();
-        //     foreach (var cours in cousrsesusers)
-        //     {
-        //         classcourses.Add(new coursClass
-        //         {
-        //             Course = cours,
-        //             classes = _context.ClassCourses.Include(c => c.Class).Where(c => c.CourseId == cours.Id).ToList()
+        public async Task<List<Course>> GetTeacherCourses(int teacherId)
+        {
+            var courses = await _context.TeacherCourses
+                                    .Where(c => c.TeacherId == teacherId)
+                                    .Select(s => s.Course).ToListAsync();
 
-        //         });
-        //     }
-        //     return classcourses;
-        // }
+            return courses;
+        }
+
+        public async Task<List<TeacherClassesDto>> GetTeacherClasses(int teacherId)
+        {
+            var classesData = await (from courses in _context.ClassCourses
+                                    join classes in _context.Classes
+                                    on courses.ClassId equals classes.Id
+                                    where courses.TeacherId == teacherId
+                                    select new {
+                                        ClassId = classes.Id,
+                                        ClassName = classes.Name,
+                                        NbStudents = _context.Users.Where(u => u.ClassId == classes.Id).Count()
+                                    })
+                                    .OrderBy(o => o.ClassName)
+                                    .Distinct().ToListAsync();
+
+            List<TeacherClassesDto> teacherClasses = new List<TeacherClassesDto>();
+            foreach (var aclass in classesData)
+            {
+                TeacherClassesDto tcd = new TeacherClassesDto();
+                tcd.ClassId = aclass.ClassId;
+                tcd.ClassName = aclass.ClassName;
+                tcd.NbStudents = aclass.NbStudents;
+                teacherClasses.Add(tcd);
+            }
+
+            return teacherClasses;
+        }
+
+        public async Task<List<ClassesWithEvalsDto>> GetTeacherClassesWithEvalsByPeriod(int teacherId, int periodId)
+        {
+            var Classes = await _context.ClassCourses
+                                    .Include(i => i.Class).ThenInclude(i => i.Students)
+                                    .Where(c => c.TeacherId == teacherId).Distinct().ToListAsync();
+
+            List<ClassesWithEvalsDto> classesWithEvals = new List<ClassesWithEvalsDto>();
+            foreach (var aclass in Classes)
+            {
+              List<Evaluation> ClassEvals = await _context.Evaluations
+                                .Include(i => i.Course)
+                                .Include(i => i.EvalType)
+                                .Where(e => e.ClassId == aclass.ClassId && e.PeriodId == periodId).ToListAsync();
+
+              if (ClassEvals.Count > 0)
+              {
+                    var OpenedEvals = ClassEvals.FindAll(e => e.Closed == false);
+                    var OpenedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(OpenedEvals);
+                    var ToBeGradedEvals = ClassEvals.FindAll(e => e.Closed == true);
+                    var ToBeGradedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(ToBeGradedEvals);
+                    var NbEvals = OpenedEvals.Count() + ToBeGradedEvals.Count();
+
+                    ClassesWithEvalsDto classDto = new ClassesWithEvalsDto();
+                    classDto.ClassId = Convert.ToInt32(aclass.ClassId);
+                    classDto.ClassName = aclass.Class.Name;
+                    classDto.NbStudents = aclass.Class.Students.Count();
+                    classDto.NbEvals = NbEvals;
+                    classDto.OpenedEvals = OpenedEvalsDto;
+                    classDto.ToBeGradedEvals = ToBeGradedEvalsDto;
+
+                    classesWithEvals.Add(classDto);
+              }
+            }
+
+            return classesWithEvals;
+        }
+
+        public async Task<List<EvaluationForListDto>> GetEvalsToCome(int classId)
+        {
+            var today = DateTime.Now.Date;
+            var evals = await _context.Evaluations
+                        .Include(i => i.Course)
+                        .Include(i => i.EvalType)
+                        .Where(e => e.ClassId == classId && e.EvalDate.Date >= today).ToListAsync();
+
+            var evalsToReturn = _mapper.Map<List<EvaluationForListDto>>(evals);
+
+            return evalsToReturn;
+        }
+
 
         public async Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId)
         {
@@ -1081,9 +1161,170 @@ namespace EducNotes.API.Data
                 _context.Add(newOrderLine);
             }
             if(await _context.SaveChangesAsync()>0)
-            return true;
+                return true;
             
             return false;
         }
+
+        public List<string> SendBatchSMS(List<Sms> smsData)
+        {
+            List<string> result = new List<string>();
+            foreach (var sms in smsData)
+            {
+                Dictionary<string, string> Params = new Dictionary<string, string>();
+                Params.Add("content", sms.Content);
+                Params.Add("to", sms.To);
+                Params.Add("validityPeriod", "1");
+
+                Params["to"] = CreateRecipientList(Params["to"]);
+                string JsonArray = JsonConvert.SerializeObject(Params, Formatting.None);
+                JsonArray = JsonArray.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
+                
+                string Token = _config.GetValue<string>("AppSettings:CLICKATELL_TOKEN");
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://platform.clickatell.com/messages");
+                httpWebRequest.ContentType = "application/json";
+                httpWebRequest.Method = "POST";
+                httpWebRequest.Accept = "application/json";
+                httpWebRequest.PreAuthenticate = true;
+                httpWebRequest.Headers.Add("Authorization", Token);
+
+                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                {
+                    streamWriter.Write(JsonArray);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    result.Add(streamReader.ReadToEnd());
+                }
+            }
+
+            return result;
+        }
+
+        public void Clickatell_SendSMS(clickatellParamsDto smsData)
+        {
+            Dictionary<string, string> Params = new Dictionary<string, string>();
+            Params.Add("content", smsData.Content);
+            Params.Add("to", smsData.To);
+            Params.Add("validityPeriod", "1");
+
+            Params["to"] = CreateRecipientList(Params["to"]);
+            string JsonArray = JsonConvert.SerializeObject(Params, Formatting.None);
+            JsonArray = JsonArray.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
+            
+            string Token = _config.GetValue<string>("AppSettings:CLICKATELL_TOKEN");
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://platform.clickatell.com/messages");
+            httpWebRequest.ContentType = "application/json";
+            httpWebRequest.Method = "POST";
+            httpWebRequest.Accept = "application/json";
+            httpWebRequest.PreAuthenticate = true;
+            httpWebRequest.Headers.Add("Authorization", Token);
+
+            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            {
+                streamWriter.Write(JsonArray);
+                streamWriter.Flush();
+                streamWriter.Close();
+            }
+
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                var result = streamReader.ReadToEnd();
+            }
+        }
+
+        public List<Sms> SetSmsDataFromAbsences(List<AbsenceSmsDto> absences, string SmsContent)
+        {
+            List<Sms> AbsencesSms = new List<Sms>();
+            List<Token> tokens = GetTokens();
+
+            foreach (var abs in absences)
+            {
+                Sms newSms = new Sms();
+
+                newSms.To = abs.PhoneNumber;
+                newSms.ToUserId = abs.ParentId;
+                // replace tokens with dynamic data
+                List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
+                newSms.Content = ReplaceTokens(tags, SmsContent);
+                AbsencesSms.Add(newSms);
+            }
+
+            return AbsencesSms;
+        }
+
+        public string ReplaceTokens(List<TokenDto> tokens, string content)
+        {
+            foreach (var token in tokens)
+            {
+                content = content.Replace(token.TokenString, token.Value);
+            }
+            return content;
+        }
+
+        public List<Token> GetTokens()
+        {
+            var tokens = _context.Tokens.OrderBy(t => t.Name).ToList();
+            return tokens;
+        }
+
+        public List<TokenDto> GetTokenAbsenceValues(List<Token> tokens, AbsenceSmsDto absSms)
+        {
+            List<TokenDto> tokenValues = new List<TokenDto>();
+
+            foreach (var token in tokens)
+            {
+                TokenDto td = new TokenDto();
+                td.TokenString = token.TokenString;
+                
+                switch (td.TokenString)
+                {
+                    case "<P_ENFANT>":
+                        td.Value = absSms.ChildFirstName;
+                        break;
+                    case "<N_ENFANT>":
+                        td.Value = absSms.ChildLastName;
+                        break;
+                    case "<N_PARENT>":
+                        td.Value = absSms.ParentLastName;
+                        break;
+                    case "<P_PARENT>":
+                        td.Value = absSms.ParentFirstName;
+                        break;
+                    case "<COURS>":
+                        td.Value = absSms.CourseName;
+                        break;
+                    case "<HORAIRE_COURS>":
+                        td.Value = absSms.CourseStartHour + " - " + absSms.CourseEndHour;
+                        break;
+                    default:
+                        break;
+                }
+
+                tokenValues.Add(td);
+            }
+
+            return tokenValues;
+        }
+
+        //This function converts the recipients list into an array string so it can be parsed correctly by the json array.
+        public static string CreateRecipientList(string to)
+        {
+            string[] tmp = to.Split(',');
+            to = "[\"";
+            to = to + string.Join("\",\"", tmp);
+            to = to + "\"]";
+            return to;
+        }
+
     }
 }

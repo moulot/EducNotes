@@ -2,14 +2,14 @@
   <div class="col-md-12">
     <div class="row">
       <div class="col-md-1">
-        <img src="{{user.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
+        <img src="{{parent.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
       </div>
       <div class="col-md-10">
-        <p class="text-35 text-muted font-weight-500 text-capitalize p-0 m-0">{{user.lastName}} {{user.firstName}}</p>
-        <p class="text-17 text-primary p-0 mx-1 my-0">{{user.email}}</p>
+        <p class="text-20 text-muted font-weight-500 text-capitalize p-0 m-0">{{parent.lastName}} {{parent.firstName}}</p>
+        <p class="text-15 text-primary p-0 mx-1 my-0">{{parent.email}}</p>
         <div class="p-0 m-0">
-          <label class="text-15 text-primary p-0 mx-1">{{user.phoneNumber}}</label>
-          <label *ngIf="user.secondPhoneNumber.length > 0" class="text-15 text-primary p-0 mx-1">/ {{user.secondPhoneNumber}}</label>
+          <label class="text-15 text-primary p-0 mx-1">{{parent.phoneNumber}}</label>
+          <label *ngIf="parent.secondPhoneNumber.length > 0" class="text-15 text-primary p-0 mx-1">/ {{parent.secondPhoneNumber}}</label>
         </div>
       </div>
     </div>
@@ -18,9 +18,19 @@
 
 <div class="row m-2">
   <div class="col-md-12 m-1" style="border-top: #cccccc 1px solid;"></div>
-  <div class="col-md-12 text-25 font-weight-300 mt-0 mb-3">enfants</div>
-  <div class="col-md-3 my-5" *ngFor="let child of user.children">
-    <app-user-account-card [child]=child></app-user-account-card>
+  <div class="col-md-12 text-20 font-weight-300 mt-0 mb-3">mes enfants</div>
+  <div class="col-md-2 my-5" *ngFor="let child of parent.children">
+    <app-user-account-card [child]=child.child></app-user-account-card>
   </div>
+</div>
+
+<div class="row m-2">
   <div class="col-md-12 m-1" style="border-top: #cccccc 1px solid;"></div>
+  <div class="col-md-12">
+    <div class="col-md-12"><p class=" text-20 font-weight-300 mt-0 mb-3">mes sms à recevoir</p></div>
+  </div>
+  <div class="col-md-12">
+    <app-child-sms-card [children]="parent.children" (setSmsChoice)="setSmsChoice($event)"
+    (saveUserSMS)="saveUserSMS($event)"></app-child-sms-card>
+  </div>
 </div>

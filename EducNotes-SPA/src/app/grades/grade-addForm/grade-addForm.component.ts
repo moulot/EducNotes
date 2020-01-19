@@ -36,6 +36,7 @@ export class GradeAddFormComponent implements OnInit {
     this.selectedEval = this.evalService.currentEval;
     this.closed = this.selectedEval.closed;
     this.userGrades = this.evalService.userGrades;
+    console.log(this.userGrades);
     this.filteredUserGrades = this.userGrades;
     this.newUserGrades = this.userGrades;
     this.gradeIndex = this.evalService.gradeIndex;

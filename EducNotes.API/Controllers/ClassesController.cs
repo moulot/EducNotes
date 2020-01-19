@@ -12,6 +12,7 @@ using EducNotes.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace EducNotes.API.Controllers {
     [Route ("api/[controller]")]
@@ -486,7 +487,7 @@ namespace EducNotes.API.Controllers {
             return BadRequest ("problème d'enregistrement des données");
         }
 
-        [HttpPut ("SaveAgenda")]
+        [HttpPut("SaveAgenda")]
         public async Task<IActionResult> SaveAgendaItem([FromBody] AgendaForSaveDto agendaForSaveDto) {
             var id = agendaForSaveDto.Id;
             if(id == 0) {
@@ -720,17 +721,17 @@ namespace EducNotes.API.Controllers {
         }
 
         [HttpPost ("{classId}/DeleteClass")]
-        public async Task<IActionResult> DeleteClass (int classId) {
-            _repo.Delete (_context.Classes.FirstOrDefault (e => e.Id == classId));
-            if (await _repo.SaveAll ())
-                return Ok (classId);
-            return BadRequest ("impossible de supprimer cette classe");
+        public async Task<IActionResult> DeleteClass(int classId) {
+            _repo.Delete(_context.Classes.FirstOrDefault(e => e.Id == classId));
+            if (await _repo.SaveAll())
+                return Ok(classId);
+            return BadRequest("impossible de supprimer cette classe");
         }
 
         [HttpPost ("AddCourse")]
-        public async Task<IActionResult> AddCourse ([FromBody] CourseDto newCourseDto) {
+        public async Task<IActionResult> AddCourse([FromBody] CourseDto newCourseDto) {
             var course = new Course { Name = newCourseDto.Name, Abbreviation = newCourseDto.Abbreviation, Color = newCourseDto.Color };
-            _repo.Add (course);
+            _repo.Add(course);
             // foreach (var item in courseDto.classLevelIds)
             // {
             //     var classes = await _context.Classes.Where(a=>a.ClassLevelId == Convert.ToInt32(item)).Select(a=>a.Id).ToListAsync();
@@ -739,10 +740,10 @@ namespace EducNotes.API.Controllers {
             //       _repo.Add(new ClassCourse {CourseId = course.Id,ClassId = classId});
             //     }
             // }
-            if (await _repo.SaveAll ())
-                return Ok ();
+            if (await _repo.SaveAll())
+                return Ok();
 
-            return BadRequest ("impossible d'ajouter ce cours");
+            return BadRequest("impossible d'ajouter ce cours");
         }
 
         [HttpGet("SessionData/{scheduleId}")]
@@ -848,25 +849,98 @@ namespace EducNotes.API.Controllers {
             }
         }
 
-        [HttpPut ("SaveCallSheet/{sessionId}")]
-        public async Task<IActionResult> SaveCallSheet (int sessionId, [FromBody] Absence[] absences) {
+        [HttpPut("SaveCallSheet/{sessionId}")]
+        public async Task<IActionResult> SaveCallSheet(int sessionId, [FromBody] Absence[] absences) {
             //delete old absents (update: delete + add)
-            if (sessionId > 0) {
-                List<Absence> oldAbsences = await _context.Absences.Where (a => a.SessionId == sessionId).ToListAsync ();
-                if (oldAbsences.Count () > 0)
-                    _repo.DeleteAll (oldAbsences);
+            if(sessionId > 0) {
+                List<Absence> oldAbsences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
+                if(oldAbsences.Count() > 0)
+                    _repo.DeleteAll(oldAbsences);
             }
+
+            // absence Sms data
+            int smsId = _config.GetValue<int>("AppSettings:AbsenceSms");
+            var AbsenceSms = _context.SmsTemplates.FirstOrDefault(s => s.Id == smsId);
+
+            var ids = absences.Select(u => u.UserId);
+            var parents = _context.UserLinks.Where(u => ids.Contains(u.UserId)).Distinct().ToList();
+            List<AbsenceSmsDto> absSmsData = new List<AbsenceSmsDto>();
 
             //add new absents
             for (int i = 0; i < absences.Length; i++) {
                 Absence absence = absences[i];
-                _repo.Add (absence);
+                _repo.Add(absence);
+
+                //set absence sms data
+                var session = _context.Sessions.First(s => s.Id == absence.SessionId);
+                var schedule = _context.Schedules
+                                .Include(c => c.Class)
+                                .Include(c => c.Course)
+                                .First(s => s.Id == session.ScheduleId);
+
+                int childId = absence.UserId;
+                var child = _context.Users.First(u => u.Id == childId);
+                List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
+                foreach (var parentId in parentIds)
+                {
+                    // is the parent subscribed to the Absence sms?
+                    var userTemplate = _context.UserSmsTemplates.FirstOrDefault(
+                                        u => u.ParentId == parentId && u.SmsTemplateId == AbsenceSms.Id &&
+                                        u.ChildId == childId);
+                    if(userTemplate != null)
+                    {
+                        var parent = _context.Users.First(p => p.Id == parentId);
+                        AbsenceSmsDto asd = new AbsenceSmsDto();
+                        asd.ChildId = childId;
+                        asd.ChildFirstName = child.FirstName;
+                        asd.ChildLastName = child.LastName;
+                        asd.ParentId = parent.Id;
+                        asd.ParentFirstName = parent.FirstName;
+                        asd.ParentLastName = parent.LastName;
+                        asd.CourseName = schedule.Course.Abbreviation;
+                        asd.CourseStartHour = schedule.StartHourMin.ToShortTimeString();
+                        asd.CourseEndHour = schedule.EndHourMin.ToShortTimeString();
+                        asd.PhoneNumber = parent.PhoneNumber;
+                        absSmsData.Add(asd);
+                    }
+                }
             }
 
-            if (await _repo.SaveAll ())
-                return NoContent ();
+            List<Sms> absSms = _repo.SetSmsDataFromAbsences(absSmsData, AbsenceSms.Content);
+            _context.AddRange(absSms);
 
-            throw new Exception ($"la validation de l'apppel a échoué");
+            List<string> results = _repo.SendBatchSMS(absSms);
+            for (int i = 0; i < results.Count(); i++)
+            {
+                // result messages from clickatell Api
+                string result = results[i];
+                int pos = result.IndexOf(":") + 1;
+                result = result.Substring(pos);
+                string[] data = result.Split(",");
+                string apiMsgId = (data[0].Split(":"))[1].Replace("\"", "");
+                Boolean accepted = Convert.ToBoolean((data[1].Split(":"))[1].Replace("\"", ""));
+                string to = (data[2].Split(":"))[1].Replace("\"", "");
+                string errorCodeData = (data[3].Split(":"))[1].Replace("\"", "");
+                int errorCode = errorCodeData == "null" ? 0 : Convert.ToInt32(errorCodeData);
+                string error = (data[4].Split(":"))[1].Replace("\"", "");
+                string errorDesc = (data[5].Split(":"))[1].Replace("\"", "");
+
+                Sms sms = absSms[i];
+                sms.res_ApiMsgId = apiMsgId;
+                sms.res_Accepted = accepted;
+                if(errorCode > 0)
+                {
+                    sms.res_ErrorCode = errorCode;
+                    sms.res_Error = error;
+                    sms.res_ErrorDesc = errorDesc;
+                }
+                _repo.Add(sms);
+            }
+
+            if (await _repo.SaveAll())
+                return Ok();
+
+            throw new Exception($"la validation de l'apppel a échoué");
         }
 
         [HttpGet("absences/{sessionId}")]
@@ -874,10 +948,6 @@ namespace EducNotes.API.Controllers {
             var absences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
             return Ok(absences);
         }
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [HttpGet ("GetAllCoursesDetails")]
         public async Task<IActionResult> GetAllCoursesDetails () {

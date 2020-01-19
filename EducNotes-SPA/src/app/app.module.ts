@@ -204,6 +204,13 @@ import { SendSmsComponent } from './admin/sendSms/sendSms.component';
 import { UserAccountComponent } from './users/user-account/user-account.component';
 import { UserAccountResolver } from './_resolvers/user-account-resolver';
 import { UserAccountCardComponent } from './users/user-account-card/user-account-card.component';
+import { SmsTemplateComponent } from './admin/sms-template/sms-template.component';
+import { AddSmsTemplateComponent } from './admin/add-smsTemplate/add-smsTemplate.component';
+import { SmsTemplateHomeResolver } from './_resolvers/sms-template-home-resolver';
+import { EditSmsTemplateResolver } from './_resolvers/edit-sms-template-resolver';
+import { AddUserGradesComponent } from './grades/add-user-grades/add-user-grades.component';
+import { ClassGradesResolver } from './_resolvers/class-grades-resolver';
+import { ChildSmsCardComponent } from './users/child-sms-card/child-sms-card.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -341,7 +348,11 @@ export function tokenGetter() {
       CallSheetCardComponent,
       SendSmsComponent,
       UserAccountComponent,
-      UserAccountCardComponent
+      UserAccountCardComponent,
+      SmsTemplateComponent,
+      AddSmsTemplateComponent,
+      AddUserGradesComponent,
+      ChildSmsCardComponent
    ],
    imports: [
       FormWizardModule,
@@ -432,6 +443,9 @@ export function tokenGetter() {
       PayableAtListResolver,
       PayableFormResolver,
       UserAccountResolver,
+      SmsTemplateHomeResolver,
+      EditSmsTemplateResolver,
+      ClassGradesResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

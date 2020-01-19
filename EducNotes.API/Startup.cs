@@ -119,11 +119,11 @@ namespace EducNotes.API
         //  This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            var cultureInfo = new CultureInfo("fr-FR");
-            cultureInfo.NumberFormat.CurrencySymbol = "F";
+            // var cultureInfo = new CultureInfo("fr-FR");
+            // cultureInfo.NumberFormat.CurrencySymbol = "F";
 
-            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            // CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            // CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             if (env.IsDevelopment())
             {

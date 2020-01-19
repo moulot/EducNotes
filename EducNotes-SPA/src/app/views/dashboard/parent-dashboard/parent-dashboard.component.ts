@@ -6,6 +6,7 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AuthService } from 'src/app/_services/auth.service';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
 import { Router } from '@angular/router';
+import { Utils } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-parent-dashboard',
@@ -32,6 +33,7 @@ export class ParentDashboardComponent implements OnInit {
   ngOnInit() {
     this.parent = this.authService.currentUser;
     this.getChildren(this.parent.id);
+    Utils.smoothScrollToTop();
   }
 
   getChildren(parentId: number) {

@@ -11,8 +11,8 @@ namespace EducNotes.API.Dtos
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public int ClassId { get; set; }
-        public string ClassName { get; set; }
+        // public int ClassId { get; set; }
+        // public string ClassName { get; set; }
         public byte Gender { get; set; }
         public DateTime DateOfBirth { get; set; }
         public int Age { get; set; }
@@ -21,6 +21,8 @@ namespace EducNotes.API.Dtos
         public string SecondPhoneNumber { get; set; }
         public int UserTypeId { get; set; }
         public string UserTypeName { get; set; }
-        public IEnumerable<UserForAccountDto> Children { get; set; }
+        public List<ChildSmsDto> Children { get; set; }
+        // public IEnumerable<SmsByCategoryDto> SmsByCategory { get; set; }
+        // public IEnumerable<UserSmsTemplate> UserSms { get; set; }
     }
 }
