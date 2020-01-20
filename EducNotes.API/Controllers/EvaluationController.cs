@@ -9,6 +9,7 @@ using EducNotes.API.Helpers;
 using EducNotes.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace EducNotes.API.Controllers
 {
@@ -20,12 +21,14 @@ namespace EducNotes.API.Controllers
         private readonly DataContext _context;
         private readonly IEducNotesRepository _repo;
         private readonly IMapper _mapper;
+        public IConfiguration _config { get; }
 
-        public EvaluationController(DataContext context, IEducNotesRepository repo, IMapper mapper)
+        public EvaluationController(DataContext context, IEducNotesRepository repo, IMapper mapper, IConfiguration config)
         {
             _context = context;
             _repo = repo;
             _mapper = mapper;
+            _config = config;
         }
 
         [HttpGet("FormData")]
@@ -370,15 +373,55 @@ namespace EducNotes.API.Controllers
                 //get the current evaluation id
                 int evalId = userGrades[0].EvaluationId;
                 //delete previous evaluation data
-                var previousData = _context.UserEvaluations.Where(e => e.EvaluationId == evalId);
+                List<UserEvaluation> previousData = await _context.UserEvaluations.Where(e => e.EvaluationId == evalId).ToListAsync();
                 foreach (UserEvaluation ue in previousData)
                 {
                     _repo.Delete(ue);
                 }
 
-                foreach (UserEvaluation ue in userGrades)
+                _context.UpdateRange(userGrades);
+
+                //send sms to subscribed parents to the service
+
+                // eval Sms data
+                int smsId = _config.GetValue<int>("AppSettings:NewEvalSms");
+                var NewEvalSms = _context.SmsTemplates.FirstOrDefault(s => s.Id == smsId);
+
+                List<double> classGrades = userGrades.Select(g => Convert.ToDouble(g.Grade)).ToList();
+                double classEvalMin = classGrades.Min();
+                double classEvalMax = classGrades.Max();
+                double classEvalAvg = _repo.GetClassEvalAvg(userGrades);
+
+                var childIds = userGrades.Select(i => i.UserId);
+                var parents = _context.UserLinks.Where(u => childIds.Contains(u.UserId)).Distinct().ToList();
+                List<EvalSmsDto> EvalSmsData = new List<EvalSmsDto>();
+    
+                foreach (var childId in childIds)
                 {
-                    _repo.Update(ue);
+                    var child = await _context.Users.FirstAsync(u => u.Id == childId);
+                    List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
+
+                    foreach (var parentId in parentIds)
+                    {
+                        // is the parent subscribed to the eval sms?
+                        var userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
+                                            u => u.ParentId == parentId && u.SmsTemplateId == NewEvalSms.Id &&
+                                            u.ChildId == childId);
+                        if(userTemplate != null)
+                        {
+                            var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
+                            EvalSmsDto esd = new EvalSmsDto();
+                            esd.ChildId = childId;
+                            esd.ChildFirstName = child.FirstName;
+                            esd.ChildLastName = child.LastName;
+                            esd.ParentId = parent.Id;
+                            esd.ParentFirstName = parent.FirstName;
+                            esd.ParentLastName = parent.LastName.FirstLetterToUpper();
+                            esd.ParentGender = parent.Gender;
+                            esd.ParentCellPhone = parent.PhoneNumber;
+                            EvalSmsData.Add(esd);
+                        }
+                    }
                 }
 
                 //did we close the evaluation grades?

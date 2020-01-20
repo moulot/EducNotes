@@ -65,6 +65,7 @@ namespace EducNotes.API.Data
         void Clickatell_SendSMS(clickatellParamsDto smsData);
         List<Sms> SetSmsDataFromAbsences(List<AbsenceSmsDto> absences, string SmsContent);
         List<string> SendBatchSMS(List<Sms> smsData);
+        double GetClassEvalAvg(List<UserEvaluation> classGrades);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////

@@ -33,7 +33,7 @@ namespace EducNotes.API.Data {
                     StartCoursesHour = DateTime.Now.Date,
                     EndCoursesHour = DateTime.Now.Date
                 };
-                context.Add (school);
+                context.Add(school);
 
                 var roles = new List<Role> {
                     new Role { Name = "élève" },
@@ -43,7 +43,7 @@ namespace EducNotes.API.Data {
                 };
 
                 foreach (var role in roles) {
-                    roleManager.CreateAsync (role).Wait ();
+                    roleManager.CreateAsync(role).Wait ();
                 }
 
                 var city = new City { Name = "Abidjan" };
@@ -105,8 +105,8 @@ namespace EducNotes.API.Data {
                     new Skill { Name = "skill11" },
                     new Skill { Name = "skill12" }
                 };
-                context.AddRange (skills);
-                context.SaveChanges ();
+                context.AddRange(skills);
+                context.SaveChanges();
 
                 var progElts = new List<ProgramElement> {
                     new ProgramElement { Name = "progElt1", SkillId = 1 },
@@ -122,7 +122,7 @@ namespace EducNotes.API.Data {
                     new ProgramElement { Name = "progElt11", SkillId = 9 },
                     new ProgramElement { Name = "progElt12", SkillId = 1 }
                 };
-                context.AddRange (progElts);
+                context.AddRange(progElts);
 
                 var paymentTypes = new List<PaymentType> {
                     new PaymentType { Name = "espèces" },
@@ -130,14 +130,14 @@ namespace EducNotes.API.Data {
                     new PaymentType { Name = "virement" },
                     new PaymentType { Name = "paiement mobible" }
                 };
-                context.AddRange (paymentTypes);
+                context.AddRange(paymentTypes);
 
                 var pers = new List<Period> {
                     new Period { Name = "1er trimestre", Active = true },
                     new Period { Name = "2e trimestre", Active = false },
                     new Period { Name = "3e trimestre", Active = false }
                 };
-                context.AddRange (pers);
+                context.AddRange(pers);
 
                 // var feeTypes = new List<FeeType>
                 // {
@@ -158,7 +158,62 @@ namespace EducNotes.API.Data {
                     new EvalType { Name = "rapport de stage" },
                     new EvalType { Name = "tenue de cahier" }
                 };
-                context.AddRange (evalTypes);
+                context.AddRange(evalTypes);
+
+                var tokens = new List<Token> {
+                    new Token {Name = "prénom enfant", TokenString = "<P_ENFANT>"},
+                    new Token {Name = "nom enfant", TokenString = "<N_ENFANT>"},
+                    new Token {Name = "nom parent", TokenString = "<N_PARENT>"},
+                    new Token {Name = "prénom parent", TokenString = "<P_PARENT>"},
+                    new Token {Name = "cours", TokenString = "<COURS>"},
+                    new Token {Name = "horaire cours", TokenString = "<HORAIRE_COURS>"},
+                    new Token {Name = "moyenne cours", TokenString = "<MOY_COURS>"},
+                    new Token {Name = "moyenne générale", TokenString = "<MOY_GLE>"},
+                    new Token {Name = "classe enfant", TokenString = "<CLASSE_ENFANT>"},
+                    new Token {Name = "note cours", TokenString = "<NOTE_COURS>"},
+                    new Token {Name = "note cours la plus basse", TokenString = "<NOTE_COURS_BASSE>"},
+                    new Token {Name = "note cours la plus haute", TokenString = "<NOTE_COURS_HAUTE>"},
+                    new Token {Name = "date session de cours", TokenString = "<DATE_COURS>"},
+                    new Token {Name = "préfixe au nom", TokenString = "<M_MME>"}
+                };
+                context.AddRange(tokens);
+
+                var rewards = new List<Reward> {
+                    new Reward {Name = "recompense 1"},
+                    new Reward {Name = "recompense 2"},
+                    new Reward {Name = "recompense 3"}
+                };
+                context.AddRange(rewards);
+
+                var sanctions = new List<Sanction> {
+                    new Sanction {Name = "sanction 1"},
+                    new Sanction {Name = "sanction 2"},
+                    new Sanction {Name = "sanction 3"}
+                };
+                context.AddRange(sanctions);
+
+                var eventTypes = new List<EventType> {
+                    new EventType {Name = "évaluation" },
+                    new EventType {Name = "cours" },
+                    new EventType {Name = "rendz-vous" },
+                    new EventType {Name = "réunion" }
+                };
+                context.AddRange(eventTypes);
+
+                var smsCat = new List<SmsCategory> {
+                    new SmsCategory {Name = "notes"},
+                    new SmsCategory {Name = "vie de classe"},
+                    new SmsCategory {Name = "administration"},
+                    new SmsCategory {Name = "alertes"},
+                    new SmsCategory {Name = "communication"}
+                };
+                context.AddRange(smsCat);
+
+                var periodicities = new List<Periodicity> {
+                    new Periodicity {Name = "mensuel"},
+                    new Periodicity {Name = "trimestriel"}
+                };
+                context.AddRange(periodicities);
 
                 var userTypes = new List<UserType> {
                     new UserType { Name = "élève" },
@@ -166,8 +221,8 @@ namespace EducNotes.API.Data {
                     new UserType { Name = "parent" },
                     new UserType { Name = "admin" }
                 };
-                context.AddRange (userTypes);
-                context.SaveChanges ();
+                context.AddRange(userTypes);
+                context.SaveChanges();
 
                 // foreach (var user in users)
                 // {

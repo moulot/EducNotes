@@ -81,7 +81,7 @@ export class ParentRegisterComponent implements OnInit {
     private http: HttpClient) { }
 
   ngOnInit() {
-    console.log(this.maxChild);
+    // console.log(this.maxChild);
     this.userId = this.user1.id;
     this.createParentsForms();
     this.getCities();

@@ -187,7 +187,7 @@ export const appRoutes: Routes = [
             { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }},
             { path: 'createPDF', component: ConvertToPDFComponent },
             {path: 'sendSms', component: SendSmsComponent},
-            {path: 'userAccount', component: UserAccountComponent, resolve: { parent: UserAccountResolver } },
+            {path: 'userAccount', component: UserAccountComponent, resolve: { account: UserAccountResolver } },
             {path: 'SmsTemplates', component: SmsTemplateComponent, resolve: { templates: SmsTemplateHomeResolver} },
             {path: 'AddSmsTemplate', component: AddSmsTemplateComponent},
             {path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} },

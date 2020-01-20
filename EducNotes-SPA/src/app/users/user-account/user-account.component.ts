@@ -10,7 +10,7 @@ import { Utils } from 'src/app/shared/utils';
   styleUrls: ['./user-account.component.scss']
 })
 export class UserAccountComponent implements OnInit {
-  parent: any;
+  parent: any = [];
   selectedSms = [];
   // smsChoiceChanged = false;
 
@@ -19,12 +19,10 @@ export class UserAccountComponent implements OnInit {
 
   ngOnInit() {
     this.route.data.subscribe((data: any) => {
-      this.parent = data['parent'];
-      // set initial users sms activated
-      for (let i = 0; i < parent.length; i++) {
-        const elt = parent[i];
-        
-      }
+      const account = data['account'];
+      this.parent = account.parent;
+      this.selectedSms = account.activeSms;
+      console.log(this.selectedSms);
     });
   }
 
@@ -45,7 +43,7 @@ export class UserAccountComponent implements OnInit {
         this.selectedSms.splice(smsFound , 1);
       }
     }
-    // console.log(this.selectedSms);
+    console.log(this.selectedSms);
   }
 
   saveUserSMS() {

@@ -35,7 +35,8 @@ namespace EducNotes.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DataContext>(Options => Options.UseSqlServer(Configuration
-                .GetConnectionString("DefaultConnection")));
+                .GetConnectionString("DefaultConnection"))
+                );
 
             // services.AddDefaultIdentity<IdentityUser>(config =>
             // {
