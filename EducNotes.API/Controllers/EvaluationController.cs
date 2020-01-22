@@ -372,6 +372,8 @@ namespace EducNotes.API.Controllers
             {
                 //get the current evaluation id
                 int evalId = userGrades[0].EvaluationId;
+                var currentEval = await _context.Evaluations.SingleOrDefaultAsync(e => e.Id == evalId);
+
                 //delete previous evaluation data
                 List<UserEvaluation> previousData = await _context.UserEvaluations.Where(e => e.EvaluationId == evalId).ToListAsync();
                 foreach (UserEvaluation ue in previousData)
@@ -390,7 +392,7 @@ namespace EducNotes.API.Controllers
                 List<double> classGrades = userGrades.Select(g => Convert.ToDouble(g.Grade)).ToList();
                 double classEvalMin = classGrades.Min();
                 double classEvalMax = classGrades.Max();
-                double classEvalAvg = _repo.GetClassEvalAvg(userGrades);
+                double classEvalAvg = _repo.GetClassEvalAvg(userGrades, Convert.ToDouble(currentEval.MaxGrade));
 
                 var childIds = userGrades.Select(i => i.UserId);
                 var parents = _context.UserLinks.Where(u => childIds.Contains(u.UserId)).Distinct().ToList();
@@ -425,12 +427,11 @@ namespace EducNotes.API.Controllers
                 }
 
                 //did we close the evaluation grades?
-                var evalToBeClosed = await _context.Evaluations.SingleOrDefaultAsync(e => e.Id == evalId);
-                if(evalToBeClosed != null)
+                if(currentEval != null)
                 {
-                    evalToBeClosed.Closed = evalClosed;
+                    currentEval.Closed = evalClosed;
                 }
-                _repo.Update(evalToBeClosed);
+                _repo.Update(currentEval);
 
                 if(await _repo.SaveAll())
                     return NoContent();

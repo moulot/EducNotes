@@ -786,7 +786,6 @@ namespace EducNotes.API.Data
             {
                 try
                 {
-
                     foreach (var user in userToUpdate)
                     {
 
@@ -1053,14 +1052,14 @@ namespace EducNotes.API.Data
             return userEvalsDto;
         }
 
-        public double GetClassEvalAvg(List<UserEvaluation> classGrades)
+        public double GetClassEvalAvg(List<UserEvaluation> classGrades, double maxGrade)
         {
             double gradesSum = 0;
             double coeffSum = 0;
             for (int i = 0; i < classGrades.Count(); i++)
             {
                 var elt = classGrades[i];
-                double gradeMax = Convert.ToDouble(elt.Evaluation.MaxGrade);
+                double gradeMax = maxGrade;
                 double gradeValue = Convert.ToDouble(elt.Grade);
                 // grade are ajusted to 20 as MAx. Avg is on 20
                 double ajustedGrade = Math.Round(20 * gradeValue / gradeMax, 2);

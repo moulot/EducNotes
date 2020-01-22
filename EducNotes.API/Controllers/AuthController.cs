@@ -514,7 +514,7 @@ namespace EducNotes.API.Controllers
         //     }
         // }
 
-        [HttpPost("{parentId}/ParentSelfPreinscription")] // enregistrement de préinscription : perer , mere et enfants
+        [HttpPost("{parentId}/ParentSelfPreinscription")] // enregistrement de préinscription : pere, mere et enfants
         public async Task<IActionResult> ParentSelfPreinscription(int parentId, [FromBody]ParentSefRegisterDto model)
         {
             // récuperation de tous les users

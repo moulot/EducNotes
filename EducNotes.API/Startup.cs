@@ -106,7 +106,7 @@ namespace EducNotes.API
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 });
 
-            //services.BuildServiceProvider().GetService<DataContext>().Database.Migrate();
+            services.BuildServiceProvider().GetService<DataContext>().Database.Migrate();
             services.AddCors();
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             //Mapper.Reset();
