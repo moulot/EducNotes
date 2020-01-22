@@ -872,35 +872,37 @@ namespace EducNotes.API.Controllers {
                 _repo.Add(absence);
 
                 //set absence sms data
-                var session = _context.Sessions.First(s => s.Id == absence.SessionId);
-                var schedule = _context.Schedules
-                                .Include(c => c.Class)
-                                .Include(c => c.Course)
-                                .First(s => s.Id == session.ScheduleId);
+                var session = await _context.Sessions.FirstAsync(s => s.Id == absence.SessionId);
+                var schedule = await _context.Schedules
+                                        .Include(c => c.Class)
+                                        .Include(c => c.Course)
+                                        .FirstAsync(s => s.Id == session.ScheduleId);
 
                 int childId = absence.UserId;
-                var child = _context.Users.First(u => u.Id == childId);
+                var child = await _context.Users.FirstAsync(u => u.Id == childId);
                 List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
                 foreach (var parentId in parentIds)
                 {
                     // is the parent subscribed to the Absence sms?
-                    var userTemplate = _context.UserSmsTemplates.FirstOrDefault(
+                    var userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
                                         u => u.ParentId == parentId && u.SmsTemplateId == AbsenceSms.Id &&
                                         u.ChildId == childId);
                     if(userTemplate != null)
                     {
-                        var parent = _context.Users.First(p => p.Id == parentId);
+                        var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
                         AbsenceSmsDto asd = new AbsenceSmsDto();
                         asd.ChildId = childId;
                         asd.ChildFirstName = child.FirstName;
                         asd.ChildLastName = child.LastName;
                         asd.ParentId = parent.Id;
                         asd.ParentFirstName = parent.FirstName;
-                        asd.ParentLastName = parent.LastName;
+                        asd.ParentLastName = parent.LastName.FirstLetterToUpper();
+                        asd.ParentGender = parent.Gender;
                         asd.CourseName = schedule.Course.Abbreviation;
+                        asd.SessionDate = session.SessionDate.ToShortDateString();
                         asd.CourseStartHour = schedule.StartHourMin.ToShortTimeString();
                         asd.CourseEndHour = schedule.EndHourMin.ToShortTimeString();
-                        asd.PhoneNumber = parent.PhoneNumber;
+                        asd.ParentCellPhone = parent.PhoneNumber;
                         absSmsData.Add(asd);
                     }
                 }

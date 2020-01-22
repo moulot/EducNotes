@@ -133,6 +133,7 @@ namespace EducNotes.API.Controllers
 
             parent.Children = new List<ChildSmsDto>();
             List<ChildSmsDto> childrenSms = new List<ChildSmsDto>();
+            List<SmsDataDto> activeSms = new List<SmsDataDto>();
             foreach (var child in children)
             {
                 ChildSmsDto childWithSms = new ChildSmsDto();
@@ -153,11 +154,13 @@ namespace EducNotes.API.Controllers
                     var SmsByCat = smsTemplates.FindAll(s => s.SmsCategoryId == cat.Id).OrderBy(s => s.Name);
                     if(SmsByCat.Count() > 0)
                     {
+                        SmsDataDto sdd = new SmsDataDto();
                         foreach (var item in SmsByCat)
                         {
                             UserSmsTemplateDto ustd = new UserSmsTemplateDto();
                             
-                            ustd.UserId = user.Id;
+                            ustd.ChildId = child.Id;
+                            ustd.ParentId = parent.Id;
                             ustd.SmsTemplateId = item.Id;
                             ustd.SmsName = item.Name;
                             ustd.Content = item.Content;
@@ -165,6 +168,12 @@ namespace EducNotes.API.Controllers
                             ustd.Active = userSms.FirstOrDefault(u => u.SmsTemplateId == item.Id) != null ? true : false;
                             sbcd.Sms.Add(ustd);
 
+                            if(ustd.Active)
+                            {
+                                sdd.ChildId = child.Id;
+                                sdd.SmsId = item.Id;
+                                activeSms.Add(sdd);
+                            }
                         }
                         SmsByCategory.Add(sbcd);
                         childWithSms.SmsByCategory.Add(sbcd);
@@ -173,7 +182,10 @@ namespace EducNotes.API.Controllers
                 parent.Children.Add(childWithSms);
             }
 
-            return Ok(parent);
+            return Ok(new{
+                parent,
+                activeSms
+            });
         }
 
         [HttpPut("{id}/saveSMS")]

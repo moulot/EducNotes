@@ -953,6 +953,13 @@ namespace EducNotes.API.Data
             return coursesWithEvals;
         }
 
+        public EvalSmsDto GetUSerSmsEvalData(int ChildId, List<UserEvaluation> ClassEvals)
+        {
+            EvalSmsDto smsData = new EvalSmsDto();
+
+            return smsData;
+        }
+
         public UserEvalsDto GetUserCourseEvals(List<UserEvaluation> UserEvals, Course acourse, Class aclass)
         {
             UserEvalsDto userEvalsDto = new UserEvalsDto();
@@ -967,7 +974,6 @@ namespace EducNotes.API.Data
             // are evals evailable fro the cuurent course?
             if (UserEvals.Count() > 0)
             {
-
                 List<GradeDto> grades = new List<GradeDto>();
 
                 for (int j = 0; j < UserEvals.Count(); j++)
@@ -979,10 +985,10 @@ namespace EducNotes.API.Data
                         var evalDate = elt.Evaluation.EvalDate.ToShortDateString();
                         var evalType = elt.Evaluation.EvalType.Name;
                         var evalName = elt.Evaluation.Name;
-                        double gradeMax = Convert.ToDouble(elt.Evaluation.MaxGrade);
+                        double maxGrade = Convert.ToDouble(elt.Evaluation.MaxGrade);
                         double gradeValue = Convert.ToDouble(elt.Grade.Replace(".", ","));
                         // grade are ajusted to 20 as MAx. Avg is on 20
-                        double ajustedGrade = Math.Round(20 * gradeValue / gradeMax, 2);
+                        double ajustedGrade = Math.Round(20 * gradeValue / maxGrade, 2);
                         double coeff = elt.Evaluation.Coeff;
                         //data for course average
                         gradesSum += ajustedGrade * coeff;
@@ -991,8 +997,7 @@ namespace EducNotes.API.Data
                         // get class grades for the current user grade (evaluation)
                         var EvalClassGrades = _context.UserEvaluations
                             .Where(e => e.EvaluationId == elt.EvaluationId &&
-                               e.Evaluation.GradeInLetter == false && e.Evaluation.Graded == true &&
-                               e.Grade.IsNumeric())
+                               e.Evaluation.GradeInLetter == false && e.Evaluation.Graded == true && e.Grade.IsNumeric())
                             .Select(e => e.Grade).ToList();
 
                         double classMin = 999999;
@@ -1000,7 +1005,6 @@ namespace EducNotes.API.Data
                         //get class min and max of evaluation
                         foreach (var item in EvalClassGrades)
                         {
-                            var ddd = item;
                             var grade = Convert.ToDouble(item.Replace(".", ","));
                             classMin = grade < classMin ? grade : classMin;
                             classMax = grade > classMax ? grade : classMax;
@@ -1014,7 +1018,7 @@ namespace EducNotes.API.Data
                         gradeDto.EvalDate = evalDate;
                         gradeDto.EvalName = evalName;
                         gradeDto.Grade = Math.Round(gradeValue, 2);
-                        gradeDto.GradeMax = gradeMax;
+                        gradeDto.GradeMax = maxGrade;
                         gradeDto.Coeff = coeff;
                         gradeDto.ClassGradeMin = EvalGradeMin;
                         gradeDto.ClassGradeMax = EvalGradeMax;
@@ -1047,6 +1051,25 @@ namespace EducNotes.API.Data
             }
 
             return userEvalsDto;
+        }
+
+        public double GetClassEvalAvg(List<UserEvaluation> classGrades)
+        {
+            double gradesSum = 0;
+            double coeffSum = 0;
+            for (int i = 0; i < classGrades.Count(); i++)
+            {
+                var elt = classGrades[i];
+                double gradeMax = Convert.ToDouble(elt.Evaluation.MaxGrade);
+                double gradeValue = Convert.ToDouble(elt.Grade);
+                // grade are ajusted to 20 as MAx. Avg is on 20
+                double ajustedGrade = Math.Round(20 * gradeValue / gradeMax, 2);
+                double coeff = elt.Evaluation.Coeff;
+                gradesSum += ajustedGrade * coeff;
+                coeffSum += coeff;
+            }
+
+            return Math.Round(gradesSum / coeffSum, 2);
         }
 
         public double GetClassCourseEvalData(int courseId, int classId)
@@ -1251,7 +1274,7 @@ namespace EducNotes.API.Data
             {
                 Sms newSms = new Sms();
 
-                newSms.To = abs.PhoneNumber;
+                newSms.To = abs.ParentCellPhone;
                 newSms.ToUserId = abs.ParentId;
                 // replace tokens with dynamic data
                 List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
@@ -1300,8 +1323,14 @@ namespace EducNotes.API.Data
                     case "<P_PARENT>":
                         td.Value = absSms.ParentFirstName;
                         break;
+                    case "<M_MME>":
+                        td.Value = absSms.ParentGender == 0 ? "Mme" : "M.";
+                        break;
                     case "<COURS>":
                         td.Value = absSms.CourseName;
+                        break;
+                    case "<DATE_COURS>":
+                        td.Value = absSms.SessionDate;
                         break;
                     case "<HORAIRE_COURS>":
                         td.Value = absSms.CourseStartHour + " - " + absSms.CourseEndHour;

@@ -10,10 +10,11 @@ namespace EducNotes.API.Dtos
         public int ParentId { get; set; }
         public string ParentFirstName { get; set; }
         public string ParentLastName { get; set; }
+        public byte ParentGender { get; set; }
         public string SessionDate { get; set; }
         public string CourseName { get; set; }
         public string CourseStartHour { get; set; }
         public string CourseEndHour { get; set; }
-        public string PhoneNumber { get; set; }
+        public string ParentCellPhone { get; set; }
     }
 }
