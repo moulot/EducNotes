@@ -689,7 +689,7 @@ namespace EducNotes.API.Data
                         if (sendLink)
                         {
                             // envoi du lien
-                            var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + appUser.ValidationCode;
+                            var callbackUrl = _config.GetValue<String>("AppSettings:DefaultSelRegisterLink") + appUser.ValidationCode;
                             var email = new Email
                             {
 
