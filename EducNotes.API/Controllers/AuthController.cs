@@ -311,6 +311,14 @@ namespace EducNotes.API.Controllers
                         maxChild = maxChild
                     });
                 }
+
+                else if (user.UserTypeId == _config.GetValue<int>("AppSettings:TeacherTypeId") && user.UserName == user.ValidationCode)
+                {
+                    return Ok(new
+                    {
+                        user = _mapper.Map<UserForDetailedDto>(user)
+                    });
+                }
                 else
                     return BadRequest("ce lien ,'existe pas");
 
@@ -759,7 +767,7 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> AddFile([FromForm]PhotoForCreationDto photoForCreationDto)
         {
 
-    
+
             var file = photoForCreationDto.File;
 
             var uploadResult = new ImageUploadResult();
@@ -777,8 +785,8 @@ namespace EducNotes.API.Controllers
                 }
             }
 
-             photoForCreationDto.Url = uploadResult.Uri.ToString();
-             photoForCreationDto.PublicId = uploadResult.PublicId;
+            photoForCreationDto.Url = uploadResult.Uri.ToString();
+            photoForCreationDto.PublicId = uploadResult.PublicId;
 
 
             var fichier = _mapper.Map<Fichier>(photoForCreationDto);
