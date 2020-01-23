@@ -52,7 +52,7 @@ namespace EducNotes.API.Data
         void AddUserLink(int userId, int parentId);
 
         Task<User> GetUserByEmail(string email);
-        Task<bool> SendResetPasswordLink(string email, string code);
+        Task<bool> SendResetPasswordLink(User user, string code);
         Task<User> GetUserByCode(string code);
         Task<User> GetSingleUser(string userName);
         Task<List<UserEvalsDto>> GetUserGrades(int userId, int classId);

@@ -517,15 +517,31 @@ namespace EducNotes.API.Data
         {
             return await _context.Courses.FirstOrDefaultAsync(c => c.Id == Id);
         }
-        public async Task<bool> SendResetPasswordLink(string email, string code)
+        public async Task<bool> SendResetPasswordLink(User user, string code)
         {
             var emailform = new EmailFormDto
             {
-                toEmail = email,
+               // toEmail = email,
                 subject = "Réinitialisation de mot passe ",
                 //content ="Votre code de validation: "+ "<b>"+code.ToString()+"</b>"
                 content = ResetPasswordContent(code)
             };
+
+                var callbackUrl = _config.GetValue<String>("AppSettings:DefaultResetPasswordLink") + code;
+                            var email = new Email
+                            {
+
+                                InsertUserId = user.Id,
+                                UpdateUserId =  user.Id,
+                                StatusFlag = 0,
+                                Subject = "Réinitialisation de mot passe ",
+                                ToAddress = user.Email,
+                                Body = $"veuillez cliquer sur le lien suivant pour réinitiliser votre mot de passe : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                                FromAddress = "no-reply@educnotes.com",
+                                EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
+                            };
+                            Add(email);
+
             try
             {
                 var res = await SendEmail(emailform);

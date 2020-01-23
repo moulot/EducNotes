@@ -133,7 +133,7 @@ namespace EducNotes.API.Controllers
                     return BadRequest("compte pas encore activé....");
                 // envoi du mail pour le reset du password
                 user.ValidationCode = Guid.NewGuid().ToString();
-                if (await _repo.SendResetPasswordLink(user.Email, user.ValidationCode))
+                if (await _repo.SendResetPasswordLink(user, user.ValidationCode))
                 {
                     // envoi effectuer
                     user.ForgotPasswordCount += 1;
