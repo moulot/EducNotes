@@ -102,7 +102,6 @@ export class GradePanelComponent implements OnInit {
   }
 
   addUsersGrades(evalId) {
-    // this.evalService.setCurrentCurrentEval(evaluation, userGrades);
     this.route.navigate(['/AddUserGrades', evalId]);
   }
 
@@ -159,7 +158,7 @@ export class GradePanelComponent implements OnInit {
         const element = {value: elt.id, label: elt.name};
         this.optionsPeriod = [...this.optionsPeriod, element];
       }
-  });
+    });
   }
 
   showNotes() {
@@ -171,7 +170,8 @@ export class GradePanelComponent implements OnInit {
       this.evals = data.evals;
       this.userGrades = data.userGrades;
       this.filteredUserGrades = data.userGrades;
-      // console.log(this.userGrades);
+      console.log(this.filteredUserGrades);
+      console.log(this.evals);
     }, error => {
       this.alertify.error(error);
     }, () => {

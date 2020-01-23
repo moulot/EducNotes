@@ -446,7 +446,7 @@ namespace EducNotes.API.Controllers {
       if (model.UserTypeId == teacherTypeId) {
         var TeacherRole = await _context.Roles.FirstOrDefaultAsync (a => a.Id == teacherRoleId);
 
-        string code = Guid.NewGuid ().ToString ();
+        string code = Guid.NewGuid().ToString();
         var teacher = new User {
           ValidationCode = code,
           Email = model.Email,
@@ -454,7 +454,7 @@ namespace EducNotes.API.Controllers {
           UserTypeId = teacherTypeId
         };
         // enregistrement du professeur
-        int userId = await _repo.AddSelfRegister (teacher, TeacherRole.Name, true, currentUserId);
+        int userId = await _repo.AddSelfRegister(teacher, TeacherRole.Name, true, currentUserId);
         if (userId > 0) {
           foreach (var courseId in model.CourseIds) {
             var ClassCourse = new ClassCourse {
@@ -470,8 +470,8 @@ namespace EducNotes.API.Controllers {
       }
 
       if (model.UserTypeId == parentTypeId) {
-        var ParentRole = await _context.Roles.FirstOrDefaultAsync (a => a.Id == parentTypeId);
-        string code = Guid.NewGuid ().ToString ();
+        var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentTypeId);
+        string code = Guid.NewGuid().ToString();
 
         var parent = new User {
           ValidationCode = code,
@@ -480,7 +480,7 @@ namespace EducNotes.API.Controllers {
           UserTypeId = parentTypeId
         };
 
-        int parentId = await _repo.AddSelfRegister (parent, ParentRole.Name, true, currentUserId);
+        int parentId = await _repo.AddSelfRegister(parent, ParentRole.Name, true, currentUserId);
 
         if (parentId > 0) {
           for (int i = 0; i < model.TotalChild; i++) {
@@ -510,19 +510,19 @@ namespace EducNotes.API.Controllers {
       return BadRequest ();
     }
 
-    [HttpPost ("SendEmail")]
-    public async Task<IActionResult> SendEmail (EmailFormDto model) {
-      if (await _repo.SendEmail (model))
-        return Ok ("done");
+    [HttpPost("SendEmail")]
+    public async Task<IActionResult> SendEmail(EmailFormDto model) {
+      if (await _repo.SendEmail(model))
+        return Ok("done");
 
-      return BadRequest ("impossible d'envoyer le mail");
+      return BadRequest("impossible d'envoyer le mail");
     }
 
-    [HttpPost ("SendBatchEmail")]
+    [HttpPost("SendBatchEmail")]
     public async Task<IActionResult> SendBatchEmail (DataForEmail dataForEmail) {
-      var currentUserId = int.Parse (User.FindFirst (ClaimTypes.NameIdentifier).Value);
+      var currentUserId = int.Parse(User.FindFirst (ClaimTypes.NameIdentifier).Value);
 
-      Email newEmail = new Email ();
+      Email newEmail = new Email();
       newEmail.EmailTypeId = 1;
       newEmail.FromAddress = "no-reply@educnotes.com";
       newEmail.Subject = dataForEmail.Subject;
@@ -535,17 +535,17 @@ namespace EducNotes.API.Controllers {
       newEmail.UpdateUserId = currentUserId;
       newEmail.UpdateDate = DateTime.Now;
 
-      _context.Add (newEmail);
+      _context.Add(newEmail);
 
-      if (await _repo.SaveAll ()) {
-        return NoContent ();
+      if (await _repo.SaveAll()) {
+        return NoContent();
       } else {
         return BadRequest ("problème pour envoyer l\' email");
       }
     }
 
-    [HttpPost ("Broadcast")]
-    public async Task<IActionResult> Broadcast (DataForBroadcastDto dataForEmailDto) {
+    [HttpPost("Broadcast")]
+    public async Task<IActionResult> Broadcast(DataForBroadcastDto dataForEmailDto) {
       List<int> userTypeIds = dataForEmailDto.UserTypeIds;
       List<int> classLevelIds = dataForEmailDto.ClassLevelIds;
       List<int> classIds = dataForEmailDto.ClassIds;
@@ -553,16 +553,16 @@ namespace EducNotes.API.Controllers {
       string subject = dataForEmailDto.Subject;
       var currentUserId = int.Parse (User.FindFirst (ClaimTypes.NameIdentifier).Value);
 
-      List<string> recipientEmails = new List<string> ();
+      List<string> recipientEmails = new List<string>();
 
       var users = new List<User> ();
       foreach (var ut in userTypeIds) {
         if (ut == studentTypeId || ut == parentTypeId) {
-          if (users.Count () == 0) {
+          if (users.Count() == 0) {
             users = await _context.Users
               .Where (u => classIds.Contains (Convert.ToInt32 (u.ClassId)) && u.Active == 1 &&
                 u.UserTypeId == studentTypeId && u.EmailConfirmed == true)
-              .ToListAsync ();
+              .ToListAsync();
           }
 
           if (ut == studentTypeId) {
@@ -572,7 +572,7 @@ namespace EducNotes.API.Controllers {
             }
           }
 
-          if (ut == parentTypeId) {
+          if(ut == parentTypeId) {
             var ids = users.Select(u => u.Id);
             var parents = _context.UserLinks
               .Where(u => ids.Contains (u.UserId)).Select (u => u.UserP).Distinct ();

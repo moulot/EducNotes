@@ -196,10 +196,10 @@
                     <label class="ml-2">{{student.studentName}}</label>
                   </div>
                 </div>
-                <div class="w-10 my-auto ml-2" *ngFor="let grade of student.grades, index as i">
+                <div class="w-10 my-auto ml-2" *ngFor="let grade of student.grades, index as j">
                   <div *ngIf="grade > -1000">
-                    <div *ngIf="grade >= evals[i].maxGrade/2" class="text-15 font-weight-450">{{grade}}</div>
-                    <div *ngIf="grade < evals[i].maxGrade/2" class="text-15 text-danger font-weight-450">{{grade}}</div>
+                    <div *ngIf="grade >= evals[j].maxGrade/2" class="text-15 font-weight-450">{{grade}}</div>
+                    <div *ngIf="grade < evals[j].maxGrade/2" class="text-15 text-danger font-weight-450">{{grade}}</div>
                   </div>
                 </div>
               </div>
