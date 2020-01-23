@@ -133,7 +133,7 @@ namespace EducNotes.API.Controllers
                     return BadRequest("compte pas encore activé....");
                 // envoi du mail pour le reset du password
                 user.ValidationCode = Guid.NewGuid().ToString();
-                if (await _repo.SendResetPasswordLink(user.Email, user.ValidationCode))
+                if (await _repo.SendResetPasswordLink(user, user.ValidationCode))
                 {
                     // envoi effectuer
                     user.ForgotPasswordCount += 1;
@@ -309,6 +309,14 @@ namespace EducNotes.API.Controllers
                     {
                         user = _mapper.Map<UserForDetailedDto>(user),
                         maxChild = maxChild
+                    });
+                }
+
+                else if (user.UserTypeId == _config.GetValue<int>("AppSettings:TeacherTypeId") && user.UserName == user.ValidationCode)
+                {
+                    return Ok(new
+                    {
+                        user = _mapper.Map<UserForDetailedDto>(user)
                     });
                 }
                 else
@@ -759,7 +767,7 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> AddFile([FromForm]PhotoForCreationDto photoForCreationDto)
         {
 
-    
+
             var file = photoForCreationDto.File;
 
             var uploadResult = new ImageUploadResult();
@@ -777,8 +785,8 @@ namespace EducNotes.API.Controllers
                 }
             }
 
-             photoForCreationDto.Url = uploadResult.Uri.ToString();
-             photoForCreationDto.PublicId = uploadResult.PublicId;
+            photoForCreationDto.Url = uploadResult.Uri.ToString();
+            photoForCreationDto.PublicId = uploadResult.PublicId;
 
 
             var fichier = _mapper.Map<Fichier>(photoForCreationDto);
