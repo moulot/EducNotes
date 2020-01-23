@@ -97,7 +97,6 @@ import { SmsTemplateComponent } from './admin/sms-template/sms-template.componen
 import { AddSmsTemplateComponent } from './admin/add-smsTemplate/add-smsTemplate.component';
 import { SmsTemplateHomeResolver } from './_resolvers/sms-template-home-resolver';
 import { EditSmsTemplateResolver } from './_resolvers/edit-sms-template-resolver';
-import { GradeAddFormComponent } from './grades/grade-addForm/grade-addForm.component';
 import { AddUserGradesComponent } from './grades/add-user-grades/add-user-grades.component';
 import { ClassGradesResolver } from './_resolvers/class-grades-resolver';
 

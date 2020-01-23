@@ -153,7 +153,7 @@ export class AuthService {
     return isMatch;
   }
 
-  confirmemail(token: string) {
+  confirmEmail(token: string) {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.decodedToken = null;
