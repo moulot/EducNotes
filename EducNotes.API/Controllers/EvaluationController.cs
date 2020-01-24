@@ -71,7 +71,7 @@ namespace EducNotes.API.Controllers
             var usersEvalFromRepo = await _context.UserEvaluations
                                     .Include(i => i.User).ThenInclude(p => p.Photos)
                                     .Where(u => u.EvaluationId == id)
-                                    .OrderBy(o => o.User.LastName)
+                                    .OrderBy(o => o.User.LastName).ThenBy(o => o.User.FirstName)
                                     .ToListAsync();
             var usersEval = _mapper.Map<IEnumerable<ClassEvalGradesDto>>(usersEvalFromRepo);
 
@@ -114,14 +114,14 @@ namespace EducNotes.API.Controllers
                 usergrades.UserId = userid;
                 usergrades.StudentName = userName;
                 usergrades.PhotoUrl = user.PhotoUrl;
-                usergrades.Grades = new List<decimal>();
+                usergrades.Grades = new List<double>();
                 usergrades.Comments = new List<string>();
                 List<UserEvaluation> ugrades = uevals.FindAll(e => e.UserId == userid);
                 for(int j = 0; j < ugrades.Count(); j++)
                 {
                     UserEvaluation ugrade = ugrades[j];
                     //grades
-                    decimal grade = ugrade.Grade == "" ? -1000 : Convert.ToDecimal(ugrade.Grade);
+                    double grade = ugrade.Grade == null ? -1000 : Convert.ToDouble(ugrade.Grade);
                     usergrades.Grades.Add(grade);
                     //comments
                     string comment = ugrade.Comment == null ? "" : ugrade.Comment;
@@ -402,7 +402,6 @@ namespace EducNotes.API.Controllers
                 {
                     var child = await _context.Users.FirstAsync(u => u.Id == childId);
                     List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
-
                     foreach (var parentId in parentIds)
                     {
                         // is the parent subscribed to the eval sms?

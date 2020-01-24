@@ -10,7 +10,7 @@ export  class EmailConfirmResolver implements Resolve<User> {
 
     constructor(private router: Router, private authService: AuthService, private alertify: AlertifyService) {}
     resolve(route: ActivatedRouteSnapshot): Observable<User> {
-        return this.authService.confirmemail(route.params['code']).pipe(
+        return this.authService.confirmEmail(route.params['code']).pipe(
             catchError(error => {
                 this.alertify.error(error);
                 this.router.navigate(['/Home']);

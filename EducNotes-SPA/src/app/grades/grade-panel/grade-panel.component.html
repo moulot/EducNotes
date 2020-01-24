@@ -60,28 +60,36 @@
 
               <div *ngFor="let class of evalsToBeGraded">
                 <p class="text-20 font-weight-450 m-0">classe {{class.className}}</p>
-                <div *ngFor="let eval of class.evals">
-                  <div class="card mb-2">
-                    <div class="card-body p-2">
-                      <div class="row">
-                        <div class="col-md-12 d-flex">
-                          <div class="box-course mr-2" [ngStyle]="{'background-color': eval.courseColor}" style="width: 10px;height: 100%;"></div>
-                          <div class="flex-grow-1">
-                            <div class="d-flex">
-                              <div class="flex-grow-1">
-                                <p class="m-0"><b>{{eval.courseName}}</b></p>
+                <div *ngIf="class.evals.length > 0">
+                  <div *ngFor="let eval of class.evals">
+                    <div class="card mb-2">
+                      <div class="card-body p-2">
+                        <div class="row">
+                          <div class="col-md-12 d-flex">
+                            <div class="box-course mr-2" [ngStyle]="{'background-color': eval.courseColor}" style="width: 10px;height: 100%;"></div>
+                            <div class="flex-grow-1">
+                              <div class="d-flex">
+                                <div class="flex-grow-1">
+                                  <p class="m-0"><b>{{eval.courseName}}</b></p>
+                                </div>
+                                <div class="m-0 text-12 text-muted">fait le {{eval.evalDate}}</div>    
                               </div>
-                              <div class="m-0 text-12 text-muted">fait le {{eval.evalDate}}</div>    
+                              <div class="m-0 text-14 p-0">{{eval.name}} - {{eval.evalTypeName}}</div>
                             </div>
-                            <div class="m-0 text-14 p-0">{{eval.name}} - {{eval.evalTypeName}}</div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+                <div *ngIf="class.evals.length == 0">
+                  <div class="card mb-2">
+                    <div class="card-body p-2">
+                      <p class="lead m-0">pas d'évaluation à venir</p>
+                    </div>
+                  </div>  
+                </div>
               </div>
-
             </div>
           </div>
 

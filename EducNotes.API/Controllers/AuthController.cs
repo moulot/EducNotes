@@ -301,7 +301,7 @@ namespace EducNotes.API.Controllers
                 if (user.EmailConfirmed == true)
                     return BadRequest("cet compte a déja été confirmé...");
                 int maxChild = 0;
-                if (user.UserTypeId == _config.GetValue<int>("AppSettings:parentTypeId") && user.UserName == user.ValidationCode)
+                if (user.UserTypeId == _config.GetValue<int>("AppSettings:parentTypeId") && user.ValidationCode == user.ValidationCode)
                 {
                     maxChild = await _repo.GetAssignedChildrenCount(user.Id);
 
@@ -320,7 +320,7 @@ namespace EducNotes.API.Controllers
                     });
                 }
                 else
-                    return BadRequest("ce lien ,'existe pas");
+                    return BadRequest("ce lien n'existe pas");
 
 
 

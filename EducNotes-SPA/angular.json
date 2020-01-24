@@ -31,6 +31,7 @@
               "src/assets"
             ],
             "styles": [
+              "src/styles.scss",
               "src/assets/styles/app/_app.scss",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss",
@@ -39,8 +40,7 @@
               "node_modules/@fortawesome/fontawesome-free/scss/brands.scss",
               "node_modules/ng-uikit-pro-standard/assets/scss/bootstrap/bootstrap.scss",
               "node_modules/ng-uikit-pro-standard/assets/scss/mdb.scss",
-              "node_modules/animate.css/animate.css",
-              "src/styles.scss"
+              "node_modules/animate.css/animate.css"
             ],
             "scripts": [
               "node_modules/echarts/dist/echarts.min.js",

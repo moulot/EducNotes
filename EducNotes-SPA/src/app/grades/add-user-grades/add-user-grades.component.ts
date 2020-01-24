@@ -80,6 +80,7 @@ export class AddUserGradesComponent implements OnInit {
     for (let i = 0; i < this.userGrades.length; i++) {
       const elt = this.userGrades[i];
       const ue = <UserEvaluation>{};
+      ue.id = elt.id;
       ue.evaluationId = this.eval.id;
       ue.userId = elt.userId;
       ue.grade = elt.grade;
@@ -88,12 +89,11 @@ export class AddUserGradesComponent implements OnInit {
     }
 
     this.evalService.saveUserGrades(this.userEvals, evalClosed).subscribe(() => {
-      this.alertify.success('ajout des notes OK');
+      this.alertify.success('ajout des notes validé');
     }, error => {
       this.alertify.error(error);
     }, () => {
       this.router.navigate(['/grades']);
-      // Utils.smoothScrollToTop();
     });
   }
 
