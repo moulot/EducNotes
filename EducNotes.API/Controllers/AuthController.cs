@@ -406,121 +406,7 @@ namespace EducNotes.API.Controllers
             return Ok(await _repo.GetAllGetDistrictsByCityIdCities(id));
         }
 
-        // [HttpPost("{id}/ParentSelfPreinscription")] // enregistrement de préinscription : perer , mere et enfants
-        // public async Task<IActionResult> ParentSelfPreinscription( int id,[FromBody]ParentSefRegisterDto model)
-        // {
-        //     // int user2Id = 0;
-        //     var parentForRegister = model.user1;
-        //         try
-        //         {
-        //           // mise a jour du user1
-        //           var parentFromRepo =await _repo.GetUser(id,true);
-
-        //           parentFromRepo.UserName = parentForRegister.UserName.ToLower();
-        //           parentFromRepo.LastName = parentForRegister.LastName;
-        //           parentFromRepo.FirstName = parentForRegister.FirstName;
-        //           if(parentForRegister.DateOfBirth!=null)
-        //           parentFromRepo.DateOfBirth = Convert.ToDateTime(parentForRegister.DateOfBirth);
-        //           parentFromRepo.CityId = parentForRegister.CityId;
-        //           parentFromRepo.DistrictId = parentForRegister.DistrictId;
-        //           parentFromRepo.PhoneNumber = parentForRegister.PhoneNumber;
-        //           parentFromRepo.SecondPhoneNumber = parentForRegister.SecondPhoneNumber;
-        //           // configuration du nouveau mot de passe
-        //           var newPassword=_userManager.PasswordHasher.HashPassword(parentFromRepo,parentForRegister.Password);
-        //           parentFromRepo.PasswordHash = newPassword;
-        //           parentFromRepo.ValidatedCode = true;
-        //           parentFromRepo.EmailConfirmed =true;
-        //           parentFromRepo.ValidationDate = DateTime.Now;
-        //           var res = await _userManager.UpdateAsync(parentFromRepo);
-
-
-        //             //ajout du user 2
-        //             // if(!string.IsNullOrEmpty(model.user2.LastName) &&  !string.IsNullOrEmpty(model.user2.FirstName))
-        //             // {
-        //             //   model.user2.UserName = model.user2.UserName.ToLower();
-        //             //     var user2 = _mapper.Map<User>(model.user2);
-        //             //     user2.UserTypeId =  parentTypeId;
-        //             //     user2Id = await _repo.AddUserPreInscription(Guid.NewGuid(),user2,parentRoleId,false);
-        //             // }
-
-        //             var  c= await _repo.GetChildren(id);
-        //             var childrenFromRepo = c.ToList();
-
-        //             for (int i = 0; i < model.children.Count(); i++)
-        //                 {
-        //                     var chilForRegister = model.children[i];
-        //                     var childFromRepo = childrenFromRepo[i];
-        //                     int classLevelId = Convert.ToInt32(chilForRegister.LevelId);
-        //                     childFromRepo.UserName = chilForRegister.UserName.ToLower();
-        //                     childFromRepo.LastName = chilForRegister.LastName;
-        //                     childFromRepo.FirstName = chilForRegister.FirstName;
-        //                     if(chilForRegister.DateOfBirth != null)
-        //                     childFromRepo.DateOfBirth = Convert.ToDateTime(chilForRegister.DateOfBirth);
-        //                     childFromRepo.CityId = chilForRegister.CityId;
-        //                     childFromRepo.DistrictId = chilForRegister.DistrictId;
-        //                     childFromRepo.PhoneNumber = chilForRegister.PhoneNumber;
-        //                     childFromRepo.SecondPhoneNumber = chilForRegister.SecondPhoneNumber;
-        //                      // configuration du mot de passe
-        //                     var newPass=_userManager.PasswordHasher.HashPassword(childFromRepo,chilForRegister.Password);
-        //                     childFromRepo.PasswordHash = newPass;
-        //                     childFromRepo.ValidatedCode = true;
-        //                     childFromRepo.EmailConfirmed =true;
-        //                     childFromRepo.ValidationDate = DateTime.Now;
-        //                     var resultat = await _userManager.UpdateAsync(childFromRepo);
-        //                    //_repo.Update(child);
-        //                   // child.UserTypeId =  studentTypeId;
-        //                     // int userId = 0;
-        //                     // userId=await _repo.AddUserPreInscription(Guid.NewGuid(),child,memberRoleId);
-
-        //                     //enregistrement de l inscription
-        //                     var insc = new Inscription {
-        //                       InsertDate = DateTime.Now,
-        //                       ClassLevelId = classLevelId,
-        //                       UserId = childFromRepo.Id,
-        //                       InsertUserId = id,
-        //                       InscriptionTypeId = parentIsncrTypeId,
-
-        //                       Validated = false
-        //                     };
-        //                       _repo.Add(insc);
-
-        //                     //   if(user2Id>0)
-        //                     //   {
-        //                     //       var userlink = new UserLink{
-        //                     //         UserId = child.Id ,
-        //                     //         UserPId = user2Id                           
-        //                     //       };
-        //                     //       _repo.Add(userlink);
-        //                     //   }
-
-
-        //                 } 
-
-        //                 if(!await _repo.SaveAll())
-        //                 return BadRequest();
-
-        //                  // envoi de l'email pour confirmation de l'activation du compte au premier utilisateur
-        //                 var mail = new EmailFormDto{
-        //                   subject ="Compte confirmé",
-        //                   content ="<b> "+parentFromRepo.LastName + " "+ parentFromRepo.FirstName + "</b>, votre compte a bien été enregistré",
-        //                   toEmail = parentFromRepo.Email
-        //                 };
-        //                 await _repo.SendEmail(mail);
-        //                 Period CurrentPeriod = await _context.Periods.Where(p => p.Active == 1).FirstOrDefaultAsync();
-        //                 return Ok(new
-        //                 {
-        //                     token = await GenerateJwtToken(parentFromRepo),
-        //                     user = _mapper.Map<UserForListDto>(parentFromRepo),
-        //                     currentPeriod = CurrentPeriod
-        //                 });
-
-        //     }
-        //     catch (System.Exception ex)
-        //     {
-
-        //         return BadRequest(ex);
-        //     }
-        // }
+    
 
         [HttpPost("{parentId}/ParentSelfPreinscription")] // enregistrement de préinscription : pere, mere et enfants
         public async Task<IActionResult> ParentSelfPreinscription(int parentId, [FromBody]ParentSefRegisterDto model)
@@ -576,8 +462,8 @@ namespace EducNotes.API.Controllers
 
 
 
-        [HttpPost("{id}/TeacherSelfPreinscription")] // enregistrement de préinscription : perer , mere et enfants
-        public async Task<IActionResult> TeacherSelfPreinscription(int id, [FromBody]UserForRegisterDto userToUpdate)
+        [HttpPost("{id}/TeacherSelfPreinscription")] // enregistrement de préinscription : professeur
+        public async Task<IActionResult> TeacherSelfPreinscription(int id, [FromBody]UserForUpdateDto userToUpdate)
         {
             var userFromRepo = await _repo.GetUser(id, true);
             userToUpdate.UserName = userToUpdate.UserName.ToLower();

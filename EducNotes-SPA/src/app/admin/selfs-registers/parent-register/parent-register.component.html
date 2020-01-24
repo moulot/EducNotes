@@ -14,7 +14,7 @@
 
 
 </div>
-<mdb-stepper #stepper [linear]="true" *ngIf="!wait" class="animated slideInDown">
+<mdb-stepper #stepper [vertical]="true" *ngIf="!wait" class="animated slideInUp">
     <mdb-step name="Infos Parent" [stepForm]="user1Form" class="step1">
         <div class="col-md-12">
             <mdb-card>
@@ -23,7 +23,7 @@
                         <div class="form-row m-0">
                             <div class="file-field md-form m-0">
                                 <div mdbBtn color="primary" size="sm" class="waves-light" mdbWavesEffect>
-                                    <span>Photo</span>
+                                    <span>Cliquer ici pour ajouter une photo</span>
                                     <input type="file" accept='image/*' mdbFileSelect (change)="parentImgResult($event)">
                                 </div>
                                 <div class="file-path-wrapper">
@@ -33,13 +33,13 @@
                         </div>
 
                         <div class="form-row">
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <input type="text" class="form-control" id="lastName" formControlName="lastName" class="form-control" mdbInput>
                                     <label for="lastName">Nom</label>
                                 </div>
                             </div>
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <input type="text" class="form-control" id="firstName" formControlName="firstName" mdbInput>
                                     <label for="firstName">Prénom(s)</label>
@@ -48,13 +48,13 @@
                         </div>
 
                         <div class="form-row">
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <input type="text" class="form-control" id="email" readonly formControlName="email" class="form-control" mdbInput>
                                     <label for="email">Email</label>
                                 </div>
                             </div>
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <input type="text" class="form-control" id="userName" (blur)="user1NameVerification()" formControlName="userName" class="form-control" mdbInput>
                                     <label for="userName">nom d'utilisateur</label>
@@ -64,12 +64,12 @@
                         </div>
 
                         <div class="form-row">
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <mdb-select id="gender" [options]="sexe" placeholder="Sexe" formControlName="gender"></mdb-select>
                                 </div>
                             </div>
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <input type="text" class="form-control" id="dateofBirth" formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
                                     <label for="dateofBirth">Date de naissance</label>
@@ -79,7 +79,7 @@
                         </div>
 
                         <div class="form-row">
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <input type="password" mdbValidate id="password" minlength="4" (change)="updateUser1ConfirmValidator()" formControlName="password" class="form-control" mdbInput>
                                     <label for="password">mot de passe</label>
@@ -87,7 +87,7 @@
                                     <span *ngIf="user1Form.get('password').dirty && user1Form.get('password').errors" class="text-danger">Le mot de passe doit comporter au moins 4 caractères.</span>
                                 </div>
                             </div>
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <input type="password" class="form-control" mdbValidate id="checkPassword" formControlName="checkPassword" class="form-control" mdbInput>
                                     <label for="checkPassword">Confirmer le mot de passe</label>
@@ -105,13 +105,13 @@
                         </div>
 
                         <div class="form-row">
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <input type="text" class="form-control" id="phoneNumber" [textMask]="{mask: phoneMask}" formControlName="phoneNumber" class="form-control" mdbInput>
                                     <label for="phoneNumber">Contact principal</label>
                                 </div>
                             </div>
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <input type="text" class="form-control" id="sphone" [textMask]="{mask: phoneMask}" formControlName="secondPhoneNumber" class="form-control" mdbInput>
                                     <label for="sphone">Deuxieme Contact</label>
@@ -120,12 +120,12 @@
                         </div>
 
                         <div class="form-row">
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <mdb-select id="cityId" [options]="cities" placeholder="ville de résidence" (ngModelChange)="getUser1Districts()" formControlName="cityId"></mdb-select>
                                 </div>
                             </div>
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="md-form">
                                     <mdb-select id="districtId" [options]="user1Disctricts" placeholder="quartier/commune de résidence" formControlName="districtId">
                                     </mdb-select>
@@ -223,7 +223,7 @@
                             <div class="form-row">
                                 <div class="file-field md-form">
                                     <div mdbBtn color="primary" size="sm" class="waves-light" mdbWavesEffect>
-                                        <span>Photo</span>
+                                        <span>    <span>Cliquer ici pour ajouter une photo</span></span>
                                         <input type="file" accept='image/*' mdbFileSelect (change)="childImgResult($event)">
                                     </div>
                                     <div class="file-path-wrapper">
@@ -233,13 +233,13 @@
                             </div>
 
                             <div class="form-row">
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="md-form">
                                         <input type="text" id="clastName" formControlName="lastName" class="form-control" mdbInput>
                                         <label for="clastName">Nom</label>
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="md-form">
                                         <input type="text" id="cfirstName" formControlName="firstName" class="form-control" mdbInput>
                                         <label for="cfirstName">Prénom(s)</label>
@@ -248,12 +248,12 @@
                             </div>
 
                             <div class="form-row">
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="md-form">
                                         <mdb-select id="cgender" [options]="sexe" placeholder="Sexe" formControlName="gender"></mdb-select>
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="md-form">
                                         <input type="text"  id="cuserName" (blur)="childNameVerification()" formControlName="userName" class="form-control" mdbInput>
                                         <label for="cuserName">nom d'utilisateur</label>
@@ -263,7 +263,7 @@
                             </div>
 
                             <div class="form-row">
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="md-form">
                                         <input type="password" mdbValidate id="cpassword" minlength="4" (change)="updateChilConfirmValidator()" formControlName="password" class="form-control" mdbInput>
                                         <label for="cpassword">mot de passe</label>
@@ -271,7 +271,7 @@
                                             caractères.</span>
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="md-form">
                                         <input type="password" mdbValidate id="ccheckPassword" minlength="4" formControlName="checkPassword" class="form-control" mdbInput>
                                         <label for="ccheckPassword">Confirmer le mot de passe</label>
@@ -289,13 +289,13 @@
                             </div>
 
                             <div class="form-row">
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="md-form">
                                         <input type="text" class="form-control" id="cemail"  formControlName="email" class="form-control" mdbInput>
                                         <label for="cemail">Email (facultatif)</label>
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="md-form">
                                         <input type="text" class="form-control" id="cdateofBirth" formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
                                         <label for="cdateofBirth">Date de naissance*</label>
@@ -304,13 +304,13 @@
                             </div>
 
                             <div class="form-row">
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="md-form">
                                         <input type="text" class="form-control" id="cphoneNumber" [textMask]="{mask: phoneMask}" formControlName="phoneNumber" class="form-control" mdbInput>
                                         <label for="cphoneNumber">Contact principal(facultatif)</label>
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="md-form">
                                         <input type="text" class="form-control" id="csphone" [textMask]="{mask: phoneMask}" formControlName="secondPhoneNumber" class="form-control" mdbInput>
                                         <label for="csphone">Deuxieme Contact(facultatif)</label>
@@ -318,13 +318,13 @@
                                 </div>
                             </div>
                             <div class="form-row">
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="row m-2">
                                         <mdb-select id="clevelId" [options]="levels" placeholder="Choisir le niveau" (ngModelChange)="getProducts()" formControlName="levelId"></mdb-select>
                                     </div>
                                 </div>
 
-                                <div class="col">
+                                <div class="col-md-6">
                                     <div class="row m-2">
                                         <mdb-select id="productIds" [highlightFirst]="false" [options]="products" [multiple]="true" placeholder="services additionnels" formControlName="productIds"></mdb-select>
                                     </div>

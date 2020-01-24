@@ -35,6 +35,10 @@ export class NewUserComponent implements OnInit {
   userId: number;
   phoneMask = [/\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
   birthDateMask = [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/];
+  sexe = [
+    { value: 1, label: 'Homme' },
+    { value: 0, label: 'Femme' }
+  ];
 
   userNameExist = false;
 
@@ -58,7 +62,7 @@ export class NewUserComponent implements OnInit {
     }
 
     // récupération des emails existant
-    this.getEmails();
+   // this.getEmails();
     this.createUserForm();
     // if is an child
     if (this.userTypeId === this.studentTypeId) {
@@ -137,7 +141,7 @@ export class NewUserComponent implements OnInit {
   createUserForm() {
 
     this.userForm = this.fb.group({
-      dateOfBirth: [null, Validators.nullValidator],
+      dateOfBirth: ['', Validators.required],
       lastName: ['', Validators.required],
       firstName: ['', Validators.nullValidator],
       userName: ['', Validators.nullValidator],
@@ -155,10 +159,14 @@ export class NewUserComponent implements OnInit {
 
   saveUser() {
    const teacher = Object.assign({}, this.userForm.value);
+   console.log('1:' + teacher.dateOfBirth);
   const dd = teacher.dateOfBirth;
-   teacher.dateOfBirth = Utils.inputDateDDMMYY(dd, '/');
+  console.log('2:' + dd);
+    teacher.dateOfBirth = Utils.inputDateDDMMYY(dd, '/');
+   console.log('3:' + teacher.dateOfBirth);
    teacher.userTypeId = this.teacherTypeId;
-   this.authService.teacherSelfPreinscription(this.userId, this.userForm.value).subscribe(() => {
+
+   this.authService.teacherSelfPreinscription(this.userId, teacher).subscribe(() => {
       this.alertify.success('enregistrement terminé...');
       this.router.navigate(['/parents']);
 

@@ -53,6 +53,7 @@ export class Utils {
     // date : dd/mm/yyyy where char = /
     static inputDateDDMMYY(date: string, char: string) {
         const dt = date.split(char);
+        console.log('table dt:' + dt);
         return new Date(Number(dt[2]), Number(dt[1]) - 1, Number(dt[0]));
     }
 
