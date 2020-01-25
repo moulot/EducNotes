@@ -1,127 +1,116 @@
+<div class="row justify-content-center align-items-center mt-3">
+  <div class="col-md-6">
+    <mdb-card>
+      <mdb-card-header class="info-color white-text text-center py-4">
+        <h5>
+          <strong style="color: white;">Veuillez renseigner les champs ci-dessous</strong>
+        </h5>
+      </mdb-card-header>
+      <mdb-card-body class="pt-0">
+        <form class="text-center" style="color: #757575;" [formGroup]="userForm" (ngSubmit)="saveUser()">
+  
+          <div class="col-md-12">
+            <div class="md-form form-group">
+              <input type="text" class="form-control" id="lastName" formControlName="lastName" class="form-control"
+                mdbInput>
+              <label for="lastName">Nom</label>
+            </div>
+  
+          </div>
+          <div class="col-md-12">
+            <div class="md-form form-group">
+              <input type="text" class="form-control" id="firstName" formControlName="firstName" mdbInput>
+              <label for="firstName">Prénom(s)</label>
+            </div>
+          </div>
+  
+          <div class="col-md-12">
+            <div class="md-form form-group">
+              <input type="text" class="form-control" id="userName" (blur)="userNameVerification()"
+                formControlName="userName" class="form-control" mdbInput>
+              <label for="userName">nom d'utilisateur</label>
+              <span *ngIf="userNameExist" class="text-danger">nom d'utilisateur déja utilisé... Veuillez reéssayer un
+                autre</span>
+            </div>
+          </div>
+  
+          <div class="col-md-12">
+            <div class="md-form form-group">
+              <input type="password" mdbValidate id="password" minlength="4" (change)="updateConfirmValidator()"
+                formControlName="password" class="form-control" mdbInput>
+              <label for="password">mot de passe</label>
+              <span *ngIf="userForm.get('password').dirty && userForm.get('password').errors" class="text-danger">Le mot
+                de passe doit comporter au moins 4 caractères.</span>
+            </div>
+          </div>
+  
+          <div class="col-md-12">
+            <div class="md-form form-group">
+              <input type="password" class="form-control" mdbValidate id="checkPassword" formControlName="checkPassword"
+                class="form-control" mdbInput>
+              <label for="checkPassword">Confirmer le mot de passe</label>
+  
+              <div class="text-danger"
+                *ngIf="userForm.get('checkPassword').dirty && userForm.get('checkPassword').errors">
+                <span *ngIf="userForm.get('checkPassword').hasError('required')">
+                  Confirmer le mot de passe!
+                </span>
+                <span *ngIf="userForm.get('checkPassword').hasError('confirm')">
+                  Les deux mots de passe que vous entrez sont differents !
+                </span>
+              </div>
+            </div>
+          </div>
+  
+  
+          <div class="col-md-12">
+            <div class="md-form form-group">
+              <input type="text" class="form-control" id="email" readonly formControlName="email" class="form-control"
+                mdbInput>
+              <label for="email">Email</label>
+            </div>
+          </div>
 
-<div  class="row justify-content-center align-items-center mt-3"  [@animate]="{value:'*',params:{delay: 100+'ms', x:'50px'}}">
-  <div class="col-md-8">
-    <div class="card">
-        <form nz-form [formGroup]="userForm" (ngSubmit)="saveUser()" class="mt-2">
-            <nz-form-item>
-                <nz-form-label [nzSm]="6" [nzXs]="24">Nom </nz-form-label>
-                <nz-form-control [nzSm]="14" [nzXs]="24">
-                  <input nz-input placeholder="entrer le nom" formControlName="lastName" id="clastName" >
-               </nz-form-control>
-            </nz-form-item>
+          <div class="col-md-12">
+            <div class="md-form form-group">
+                <input type="text" class="form-control" id="dateofBirth" formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
+                <label for="dateofBirth">Date de naissance</label>
 
-            <nz-form-item>
-                  <nz-form-label [nzSm]="6" [nzXs]="24">Prénom(s)</nz-form-label>
-                  <nz-form-control [nzSm]="14" [nzXs]="24">
-                    <input nz-input placeholder="prénom(s)" formControlName="firstName" id="cfirstName">
-                  </nz-form-control>
-             </nz-form-item>
-             
-             <nz-form-item>
-              <nz-form-label [nzSm]="6" [nzXs]="24">Nom utilisateur</nz-form-label>
-              <nz-form-control [nzSm]="14" [nzXs]="24">
-                <input nz-input (blur)="userNameVerification()" placeholder="entrer le login ou nom d'utilisateur" formControlName="userName" id="userName">
-                <span class="text-danger" *ngIf="userNameExist"> ce nom d'utilisateur est déjà utilisé</span>
-              </nz-form-control>
-              </nz-form-item>
-
-              <nz-form-item >
-              <nz-form-label [nzSm]="6" [nzXs]="24">Mot de passe</nz-form-label>
-              <nz-form-control  [nzSm]="14" [nzXs]="24">
-                  <input nz-input type="password" id="password" placeholder="mot de passe" formControlName="password" (ngModelChange)="updateConfirmValidator()" minlength="4">
-                  <nz-form-explain *ngIf="userForm.get('password').dirty && userForm.get('password').errors">Entrer votre mot de passe s'il vous plait</nz-form-explain>
-                </nz-form-control>
-              </nz-form-item>
-
-              <nz-form-item>
-              <nz-form-label [nzSm]="6" [nzXs]="24">Confirmer le mot de passe</nz-form-label>
-              <nz-form-control  [nzSm]="14" [nzXs]="24">
-                  <input nz-input type="password" placeholder="confirmer le mot de passe" formControlName="checkPassword" id="checkPassword" minlength="4">
-                  <nz-form-explain *ngIf="userForm.get('checkPassword').dirty && userForm.get('checkPassword').errors">
-                    <ng-container *ngIf="userForm.get('checkPassword').hasError('required')">
-                      Please confirm your password!
-                    </ng-container>
-                    <ng-container *ngIf="userForm.get('checkPassword').hasError('confirm')">
-                        Les deux mots de passe que vous entrez sont differents !
-                    </ng-container>
-                  </nz-form-explain>
-                </nz-form-control>
-              </nz-form-item>
-     
-             <nz-form-item>
-                <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="dateOfBirth">Date de naissance</nz-form-label>
-                <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="userForm.controls['dateOfBirth']">
-                    <!-- <nz-date-picker formControlName="dateOfBirth" id="datenaiss" [nzFormat]="'dd-MMMM-yyyy'"></nz-date-picker> -->
-                    <input class="form-control" id="datenaiss" placeholder="date de naissance"  formControlName="dateOfBirth" name="datenaiss" [textMask]="{mask: birthDateMask}">
-                  </nz-form-control>
-              </nz-form-item>
-
-              <nz-form-item>
-                  <nz-form-label [nzSm]="6" [nzXs]="24">Email</nz-form-label>
-                  <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="userForm.controls['email']" >
-                    <nz-input-group>
-                      <input type="text" nz-input placeholder="email" formControlName="email" id="cemail" [readonly]="selfRegister">
-                  <nz-form-explain *ngIf="userForm.get('email').touched && userForm.get('email').errors">Entrer un email valide!</nz-form-explain>
-                    </nz-input-group>
-                  </nz-form-control>
-              </nz-form-item>
-
-              <!-- <nz-form-item *ngIf="teacherMode && !selfRegister">
-                  <nz-form-label nzRequired nzFor="levelId"  [nzSm]="6" [nzXs]="24">choisir le nivau</nz-form-label>
-                  <nz-form-control  [nzValidateStatus]="userForm.controls['levelId']" [nzSm]="14" [nzXs]="24">
-                      <nz-select  nzAllowClear nzShowSearch nzPlaceHolder="Choisir la classe" formControlName="levelId" id="levelId">
-                          <nz-option *ngFor="let level of levels" [nzValue]="level.id" [nzLabel]="level.name"></nz-option>
-                      </nz-select>
-                  </nz-form-control>
-              </nz-form-item> -->
-
-              <nz-form-item>
-                <nz-form-label  nzRequired nzFor="gender" [nzSm]="6" [nzXs]="24">Sexe</nz-form-label>
-                <nz-form-control [nzValidateStatus]="userForm.controls['gender']" [nzSm]="14" [nzXs]="24">
-                    <nz-select  nzAllowClear nzShowSearch nzPlaceHolder="Choisir le sexe" formControlName="gender" id="gender">
-                        <nz-option nzValue="1" nzLabel="Homme"></nz-option>
-                        <nz-option nzValue="0" nzLabel="Femme"></nz-option>
-                      </nz-select>
-                </nz-form-control>
-              </nz-form-item>
-
-
-
-              <nz-form-item>
-                  <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="phoneNumber">Contact Principal</nz-form-label>
-                  <nz-form-control [nzValidateStatus]="userForm.controls['phoneNumber']" [nzSm]="14" [nzXs]="24">
-                      <input nz-input placeholder="numero principal" formControlName="phoneNumber" id="cphoneNumber" minlength="8"  [textMask]="{mask: phoneMask}" >
-                      <nz-form-explain *ngIf="userForm.get('phoneNumber').touched && userForm.get('phoneNumber').errors">Entrer un numéro de téléphone valide s'il vous plait!</nz-form-explain>
-                    </nz-form-control>
-               </nz-form-item>
-
-               <nz-form-item>
-                  <nz-form-label [nzSm]="6" [nzXs]="24">Deuxieme Contact</nz-form-label>
-                  <nz-form-control  [nzValidateStatus]="userForm.controls['secondPhoneNumber']" [nzSm]="14" [nzXs]="24">
-                      <input nz-input placeholder="autre numero" formControlName="secondPhoneNumber" id="sphoneNumber"  minlength="8"  [textMask]="{mask: phoneMask}" >
-                      <nz-form-explain *ngIf="userForm.get('secondPhoneNumber').touched && userForm.get('secondPhoneNumber').errors">numero nom valide!</nz-form-explain>
-                    </nz-form-control>
-               </nz-form-item>
-               <!-- <nz-form-item *ngIf="!selfRegister">
-                  <nz-form-label [nzSm]="6" [nzXs]="24"  nzFor="suffixe">Choisir ses cours</nz-form-label>
-                 <nz-form-control [nzSm]="14" [nzXs]="24"> 
-                  <nz-select style="width: 100%" formControlName="courseIds"  [nzSize]="'default'" nzMode="tags" nzPlaceHolder="Choisir ses cours">
-                      <nz-option *ngFor="let course of courses" [nzLabel]="course.name" [nzValue]="course.id"></nz-option>
-                  </nz-select>
-                  </nz-form-control>
-               </nz-form-item> -->
-               <nz-form-item>
-                  <nz-form-control [nzSpan]="14" [nzOffset]="6">
-                    <button class="btn btn-outline-primary " type="submit" [disabled]="!userForm.valid || userNameExist === true"><span>{{submitText}}</span></button>
-                    <!-- <button class="btn btn-outline-primary " type="submit"><span>{{submitText}}</span></button> -->
-                    <button type="button" (click)="close()" class="btn btn-outline-primary ml-2"><span>annuler</span></button>      
-                  </nz-form-control>
-
-              </nz-form-item>
+            </div>
+        </div>
+  
+          <div class="col-md-12">
+            <div class="md-form form-group">
+              <mdb-select id="gender" [options]="sexe" placeholder="Sexe" formControlName="gender"></mdb-select>
+            </div>
+          </div>
+  
+  
+          <div class="col-md-12">
+            <div class="md-form form-group">
+              <input type="text" class="form-control" id="phoneNumber" [textMask]="{mask: phoneMask}"
+                formControlName="phoneNumber" class="form-control" mdbInput>
+              <label for="phoneNumber">Contact principal</label>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="md-form form-group">
+              <input type="text" class="form-control" id="sphone" [textMask]="{mask: phoneMask}"
+                formControlName="secondPhoneNumber" class="form-control" mdbInput>
+              <label for="sphone">Deuxieme Contact</label>
+            </div>
+          </div>
+  
+  
+          <div class="row justify-content-center">
+            <button mdbBtn size="sm" color="primary"
+            [disabled]="!userForm.valid || userNameExist === true"><span>{{submitText}}</span></button>
+          <button (click)="close()" mdbBtn size="sm" color="light"><span>annuler</span></button>
+          </div>
         </form>
-    </div>
-
+      
+      </mdb-card-body>
+    </mdb-card>
+  
   </div>
-    
-    
 </div>

@@ -209,23 +209,11 @@ export class AuthService {
   // le post pour enrgister la preinscription : model {father:any,mother:any; children : any[]}
   parentSelfInscription(userId: number, data: any) {
     return this.http.post(this.baseUrl + userId + '/ParentSelfPreinscription', data);
-    // .pipe(
-    //   map((response: any) => {
-    //     const user = response;
-    //     if (user) {
-    //       localStorage.setItem('token', user.token);
-    //       localStorage.setItem('user', JSON.stringify(user.user));
-    //       localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
-    //       this.decodedToken = this.jwtHelper.decodeToken(user.token);
-    //       this.currentUser = user.user;
-    //       this.currentPeriod = user.currentPeriod;
-    //       this.changeMemberPhoto(this.currentUser.photoUrl);
-    //     }
-    //   })
-    // );
+
   }
 
   teacherSelfPreinscription(userId: number, data: any) {
+
     return this.http.post(this.baseUrl + userId + '/TeacherSelfPreinscription', data)
       .pipe(
         map((response: any) => {
