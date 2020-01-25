@@ -6,10 +6,10 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from '../_services/auth.service';
 @Injectable()
-export  class EmailConfirmResolver implements Resolve<User> {
+export  class EmailConfirmResolver implements Resolve<any> {
 
     constructor(private router: Router, private authService: AuthService, private alertify: AlertifyService) {}
-    resolve(route: ActivatedRouteSnapshot): Observable<User> {
+    resolve(route: ActivatedRouteSnapshot): any {
         return this.authService.confirmEmail(route.params['code']).pipe(
             catchError(error => {
                 this.alertify.error(error);

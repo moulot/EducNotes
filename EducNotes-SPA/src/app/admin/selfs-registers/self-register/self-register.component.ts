@@ -32,7 +32,6 @@ export class SelfRegisterComponent implements OnInit {
 
          this.user = data['user'].user;
          this.maxChild = data['user'].maxChild;
-         //  this.maxChild = data['user'].maxChild;
       });
    }
 }

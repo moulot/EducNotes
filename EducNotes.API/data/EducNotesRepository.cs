@@ -1049,7 +1049,7 @@ namespace EducNotes.API.Data
                 var courseCoeffData = _context.CourseCoefficients
                     .FirstOrDefault(c => c.ClassLevelid == aclass.ClassLevelId &&
                         c.CourseId == acourse.Id && c.ClassTypeId == aclass.ClassTypeId);
-                double courseCoeff = courseCoeffData.Coefficient;
+                double courseCoeff = 1;//courseCoeffData.Coefficient;
 
                 //get the class course average - to be compared with the user average
                 double ClassCourseAvg = GetClassCourseEvalData(acourse.Id, aclass.Id);
@@ -1164,8 +1164,9 @@ namespace EducNotes.API.Data
 
         public async Task<int> GetAssignedChildrenCount(int parentId)
         {
-            var userIds = await _context.UserLinks.Where(u => u.UserPId == parentId).Select(s => s.UserId)
-                                                    .ToListAsync();
+            var userIds = await _context.UserLinks
+                                .Where(u => u.UserPId == parentId)
+                                .Select(s => s.UserId).ToListAsync();
 
             return userIds.Count();
         }
@@ -1280,7 +1281,7 @@ namespace EducNotes.API.Data
             }
         }
 
-        public List<Sms> SetSmsDataFromAbsences(List<AbsenceSmsDto> absences, string SmsContent)
+        public List<Sms> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, string SmsContent)
         {
             List<Sms> AbsencesSms = new List<Sms>();
             List<Token> tokens = GetTokens();
@@ -1288,7 +1289,6 @@ namespace EducNotes.API.Data
             foreach (var abs in absences)
             {
                 Sms newSms = new Sms();
-
                 newSms.To = abs.ParentCellPhone;
                 newSms.ToUserId = abs.ParentId;
                 // replace tokens with dynamic data

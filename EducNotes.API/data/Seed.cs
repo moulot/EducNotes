@@ -217,7 +217,7 @@ namespace EducNotes.API.Data {
 
                 var userTypes = new List<UserType> {
                     new UserType { Name = "élève" },
-                    new UserType { Name = "professeur" },
+                    new UserType { Name = "enseignant" },
                     new UserType { Name = "parent" },
                     new UserType { Name = "admin" }
                 };
