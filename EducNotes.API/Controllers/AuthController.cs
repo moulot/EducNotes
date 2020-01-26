@@ -413,7 +413,7 @@ namespace EducNotes.API.Controllers
         {
             // récuperation de tous les users
             var usersToUpdate = new List<UserForUpdateDto>();
-            usersToUpdate.Add(model.user1);
+            usersToUpdate.Add(model.parent);
             int total = 0;
             foreach (var children in model.children)
             {

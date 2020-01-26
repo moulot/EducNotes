@@ -41,24 +41,35 @@ export class PreRegisterComponent implements OnInit {
     this.createRegisterForm();
   }
 
+
   getUserTypes() {
-    this.adminService.getUserTypes().subscribe((res: any[]) => {
-      for (let i = 0; i < res.length; i++) {
-        const element = { value: res[i].id, label: res[i].name };
-        if (Number(element.value) === this.teacherTypeId || Number(element.value) === this.parentTypeId) {
-          this.userTypes = [...this.userTypes, element];
+
+
+    if (this.userTypes.length === 0) {
+      this.adminService.getUserTypes().subscribe((res: any[]) => {
+
+        for (let i = 0; i < res.length; i++) {
+          const element = { value: res[i].id, label: res[i].name };
+          if (Number(element.value) === this.teacherTypeId || Number(element.value) === this.parentTypeId) {
+            this.userTypes = [...this.userTypes, element];
+          }
         }
-      }
-    });
+      });
+    }
+
   }
 
   getCourses() {
-    this.classService.getAllCourses().subscribe((res: any[]) => {
-      for (let i = 0; i < res.length; i++) {
-        const element = { value: res[i].id, label: res[i].name };
-        this.courses = [...this.courses, element];
-      }
-    });
+
+    if (this.courses.length === 0) {
+      this.classService.getAllCourses().subscribe((res: any[]) => {
+        for (let i = 0; i < res.length; i++) {
+          const element = { value: res[i].id, label: res[i].name };
+          this.courses = [...this.courses, element];
+        }
+      });
+    }
+
   }
 
   createRegisterForm() {
@@ -88,12 +99,12 @@ export class PreRegisterComponent implements OnInit {
 
   submit() {
     this.submitText = 'patienter...';
-    this.user = Object.assign({}, this.registerForm.value);
+    // this.user = Object.assign({}, this.registerForm.value);
     this.save();
   }
-  cancel() {
-    this.registerForm.reset();
-  }
+  // cancel() {
+  //   this.registerForm.reset();
+  // }
   typeCheicking() {
     this.showCourses = false;
     this.showNumber = false;
@@ -106,9 +117,10 @@ export class PreRegisterComponent implements OnInit {
     }
   }
   save() {
-    this.adminService.sendRegisterEmail(this.authService.decodedToken.nameid, this.user).subscribe(() => {
+    this.adminService.sendRegisterEmail(this.authService.decodedToken.nameid, this.registerForm.value).subscribe(() => {
       this.alertify.success('enregistrement terminé');
       this.submitText = 'enregistrer';
+      this.registerForm.reset();
       this.ngOnInit();
     }, error => {
       this.submitText = 'enregistrer';

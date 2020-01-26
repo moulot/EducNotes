@@ -457,7 +457,7 @@ namespace EducNotes.API.Controllers {
         int userId = await _repo.AddSelfRegister(teacher, TeacherRole.Name, true, currentUserId);
         if (userId > 0) {
           foreach (var courseId in model.CourseIds) {
-            var ClassCourse = new ClassCourse {
+            var ClassCourse = new TeacherCourse {
               TeacherId = userId,
               CourseId = courseId
             };

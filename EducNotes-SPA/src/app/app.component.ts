@@ -19,8 +19,8 @@ export class AppComponent implements OnInit {
   userInactive: Subject<any> = new Subject();
 
   constructor(public navService: NavigationService, private authService: AuthService) {
-    this.setTimeout();
-    this.userInactive.subscribe(() => console.log('user has been inactive for 3s'));
+    // this.setTimeout();
+    // this.userInactive.subscribe(() => console.log('user has been inactive for 3s'));
   }
 
 

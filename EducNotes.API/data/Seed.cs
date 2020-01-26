@@ -5,27 +5,49 @@ using EducNotes.API.Models;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 
-namespace EducNotes.API.Data {
-    public class Seed {
-        public static void SeedUsers (DataContext context, UserManager<User> userManager, RoleManager<Role> roleManager) {
-            if (!userManager.Users.Any ()) {
+namespace EducNotes.API.Data
+{
+    public class Seed
+    {
+        public static void SeedUsers(DataContext context, UserManager<User> userManager, RoleManager<Role> roleManager)
+        {
+            var teachersCourses = context.TeacherCourses.ToList();
+            if (teachersCourses.Count() == 0)
+            {
+                var classCourses = context.ClassCourses.ToList();
+                foreach (var classCourse in classCourses)
+                {
+                    var newteacherCourse = new TeacherCourse
+                    {
+                        TeacherId = Convert.ToInt32(classCourse.TeacherId),
+                        CourseId = Convert.ToInt32(classCourse.CourseId)
+                    };
+                    context.Add(newteacherCourse);
+                }
+                context.SaveChanges();
+
+            }
+
+            if (!userManager.Users.Any())
+            {
                 // var userData = System.IO.File.ReadAllText("Data/UserSeedData.json");
                 // var users = JsonConvert.DeserializeObject<List<User>>(userData);
-                var emailtypes = new List<EmailType> () {
+                var emailtypes = new List<EmailType>() {
                     new EmailType { Name = "Confirmation Email" },
                     new EmailType { Name = "Confirmed Email" }
                 };
-                context.AddRange (emailtypes);
+                context.AddRange(emailtypes);
 
-                var classtypes = new List<ClassType> () {
+                var classtypes = new List<ClassType>() {
                     new ClassType { Name = "scientifique" },
                     new ClassType { Name = "littéraire" },
                     new ClassType { Name = "semi-littéraire" }
                 };
 
-                context.Add(new ProductType{Name ="School Service"});
+                context.Add(new ProductType { Name = "School Service" });
 
-                var school = new Establishment {
+                var school = new Establishment
+                {
                     Name = "",
                     Location = "",
                     Phone = "",
@@ -42,8 +64,9 @@ namespace EducNotes.API.Data {
                     new Role { Name = "Admin" }
                 };
 
-                foreach (var role in roles) {
-                    roleManager.CreateAsync(role).Wait ();
+                foreach (var role in roles)
+                {
+                    roleManager.CreateAsync(role).Wait();
                 }
 
                 var city = new City { Name = "Abidjan" };
@@ -231,7 +254,8 @@ namespace EducNotes.API.Data {
                 //     userManager.AddToRoleAsync(user, "Professeur").Wait();
                 // }
 
-                var adminUser = new User {
+                var adminUser = new User
+                {
                     UserName = "Admin",
                     FirstName = "admin",
                     LastName = "admin",
@@ -241,11 +265,12 @@ namespace EducNotes.API.Data {
                     UserTypeId = 4
                 };
 
-                IdentityResult result = userManager.CreateAsync (adminUser, "password").Result;
+                IdentityResult result = userManager.CreateAsync(adminUser, "password").Result;
 
-                if (result.Succeeded) {
-                    var admin = userManager.FindByNameAsync ("Admin").Result;
-                    userManager.AddToRolesAsync (admin, new [] { "Admin", "Professeur" }).Wait ();
+                if (result.Succeeded)
+                {
+                    var admin = userManager.FindByNameAsync("Admin").Result;
+                    userManager.AddToRolesAsync(admin, new[] { "Admin", "Professeur" }).Wait();
                 }
 
                 //add students
