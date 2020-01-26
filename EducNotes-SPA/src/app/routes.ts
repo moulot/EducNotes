@@ -53,7 +53,6 @@ import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.co
 import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
 import { ClassResolver } from './_resolvers/class-resolver';
 import { AppImgCropperComponent } from './views/forms/img-cropper/img-cropper.component';
-import { StudentResolver } from './_resolvers/student-resolver';
 import { ProductsListComponent } from './admin/product/products-list/products-list.component';
 import { ProductFormComponent } from './admin/product/product-form/product-form.component';
 import { ClassLevelProductsComponent } from './admin/treso/class-level-products/class-level-products.component';

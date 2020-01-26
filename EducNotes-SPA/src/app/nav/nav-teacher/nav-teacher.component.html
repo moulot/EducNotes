@@ -1,4 +1,4 @@
-<div class="d-flex">
+<!-- <div class="d-flex">
   <div class="" routerLinkActive="active">
     <a class="text-15 text-muted mr-3" [routerLink]="['/home']">accueil</a>
   </div>
@@ -11,10 +11,22 @@
   <div class="" routerLinkActive="active">
     <a class="text-15 text-muted mr-3" [routerLink]="['/grades']">notes</a>
   </div>
-  <!-- <div class="" routerLinkActive="active">
-    <a class="text-15 text-muted" [routerLink]="['/classLife']">vie de classe</a>
-  </div> -->
   <div *appHasRole="['Admin', 'Moderator']" class="" routerLinkActive="active">
     <a class="text-15 text-muted" [routerLink]="['/admin']">Admin</a>
   </div>
-</div>
+</div> -->
+
+<ul class="navbar-nav mr-auto">
+  <li class="nav-item waves-light" mdbWavesEffect>
+    <a class="nav-link text-muted" [routerLink]="['/home']">accueil</a>
+  </li>
+  <li class="nav-item waves-light" mdbWavesEffect>
+    <a class="nav-link text-muted" [routerLink]="['/agenda']">cahier de textes</a>
+  </li>
+  <li class="nav-item waves-light" mdbWavesEffect>
+    <a class="nav-link text-muted" [routerLink]="['/classes']">classes</a>
+  </li>
+  <li class="nav-item waves-light" mdbWavesEffect>
+    <a class="nav-link text-muted" [routerLink]="['/grades']">notes</a>
+  </li>
+</ul>

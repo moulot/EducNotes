@@ -850,7 +850,8 @@ namespace EducNotes.API.Controllers {
         }
 
         [HttpPut("SaveCallSheet/{sessionId}")]
-        public async Task<IActionResult> SaveCallSheet(int sessionId, [FromBody] Absence[] absences) {
+        public async Task<IActionResult> SaveCallSheet(int sessionId, [FromBody] Absence[] absences)
+        {
             //delete old absents (update: delete + add)
             if(sessionId > 0) {
                 List<Absence> oldAbsences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
@@ -908,7 +909,7 @@ namespace EducNotes.API.Controllers {
                 }
             }
 
-            List<Sms> absSms = _repo.SetSmsDataFromAbsences(absSmsData, AbsenceSms.Content);
+            List<Sms> absSms = _repo.SetSmsDataForAbsences(absSmsData, AbsenceSms.Content);
             _context.AddRange(absSms);
 
             List<string> results = _repo.SendBatchSMS(absSms);

@@ -408,6 +408,7 @@ namespace EducNotes.API.Controllers
                         var userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
                                             u => u.ParentId == parentId && u.SmsTemplateId == NewEvalSms.Id &&
                                             u.ChildId == childId);
+                        
                         if(userTemplate != null)
                         {
                             var parent = await _context.Users.FirstAsync(p => p.Id == parentId);

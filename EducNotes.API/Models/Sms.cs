@@ -8,6 +8,10 @@ namespace EducNotes.API.Models
         public string To { get; set; }
         public int ToUserId { get; set; }
         public User ToUser { get; set; }
+        // public int AbsenceId { get; set; }
+        // public Absence Absence { get; set; }
+        // public int EvaluationId { get; set; }
+        // public Evaluation Evaluation { get; set; }
         public string From { get; set; }
         public string Content { get; set; }
         public Boolean Binary { get; set; }
