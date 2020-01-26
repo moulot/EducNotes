@@ -37,6 +37,9 @@
                 (click)="assignment(teacher)">Affecter</button>
             </div>
           </div>
+          <div *ngIf="teachersCourses.length===0">
+              <h3>Aucun enseignant enregistré pour l'instant...</h3>
+          </div>
 
         </div>
 

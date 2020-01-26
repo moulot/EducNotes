@@ -62,7 +62,7 @@ export class NewUserComponent implements OnInit {
     }
 
     // récupération des emails existant
-   // this.getEmails();
+    // this.getEmails();
     this.createUserForm();
     // if is an child
     if (this.userTypeId === this.studentTypeId) {
@@ -78,7 +78,7 @@ export class NewUserComponent implements OnInit {
     }
 
     if (this.userTypeId === this.teacherTypeId) {
-     // this.getCourses();
+      // this.getCourses();
       this.teacherMode = true;
 
     }
@@ -87,16 +87,16 @@ export class NewUserComponent implements OnInit {
 
   }
 
- userNameVerification() {
-   const userName = this.userForm.value.userName;
-   this.userNameExist = false;
-   this.authService.userNameExist(userName).subscribe((res: boolean) => {
-     if (res === true) {
+  userNameVerification() {
+    const userName = this.userForm.value.userName;
+    this.userNameExist = false;
+    this.authService.userNameExist(userName).subscribe((res: boolean) => {
+      if (res === true) {
         this.userNameExist = true;
         // this.user1Form.valid = false;
-     }
-   });
- }
+      }
+    });
+  }
 
   getEmails() {
     this.authService.getEmails().subscribe((res) => {
@@ -104,9 +104,9 @@ export class NewUserComponent implements OnInit {
     });
   }
   getUserNames() {
-   this.authService.getUserNames().subscribe((res) => {
-     this.userNamesList = res;
-   });
+    this.authService.getUserNames().subscribe((res) => {
+      this.userNamesList = res;
+    });
   }
 
   getClassLevels() {
@@ -145,8 +145,8 @@ export class NewUserComponent implements OnInit {
       lastName: ['', Validators.required],
       firstName: ['', Validators.nullValidator],
       userName: ['', Validators.nullValidator],
-      password         : [ null, [ Validators.required ] ],
-      checkPassword    : [ null, [ Validators.nullValidator, this.confirmationValidator ] ],
+      password: [null, [Validators.required]],
+      checkPassword: [null, [Validators.nullValidator, this.confirmationValidator]],
       gender: [null, Validators.required],
       // levelId: [null, Validators.nullValidator],
       // cityId: [null, Validators.nullValidator],
@@ -154,19 +154,20 @@ export class NewUserComponent implements OnInit {
       phoneNumber: [null, Validators.nullValidator],
       // courseIds: [null, Validators.nullValidator],
       email: [this.email, [Validators.nullValidator, Validators.nullValidator, Validators.email]],
-      secondPhoneNumber: ['', Validators.nullValidator]});
+      secondPhoneNumber: ['', Validators.nullValidator]
+    });
   }
 
   saveUser() {
-   const teacher = Object.assign({}, this.userForm.value);
-   console.log('1:' + teacher.dateOfBirth);
-  const dd = teacher.dateOfBirth;
-  console.log('2:' + dd);
+    const teacher = Object.assign({}, this.userForm.value);
+    console.log('1:' + teacher.dateOfBirth);
+    const dd = teacher.dateOfBirth;
+    console.log('2:' + dd);
     teacher.dateOfBirth = Utils.inputDateDDMMYY(dd, '/');
-   console.log('3:' + teacher.dateOfBirth);
-   teacher.userTypeId = this.teacherTypeId;
+    console.log('3:' + teacher.dateOfBirth);
+    teacher.userTypeId = this.teacherTypeId;
 
-   this.authService.teacherSelfPreinscription(this.userId, teacher).subscribe(() => {
+    this.authService.teacherSelfPreinscription(this.userId, teacher).subscribe(() => {
       this.alertify.success('enregistrement terminé...');
       this.router.navigate(['/parents']);
 
@@ -180,7 +181,7 @@ export class NewUserComponent implements OnInit {
 
   }
 
-  confirmationValidator = (control: FormControl): { [ s: string ]: boolean } => {
+  confirmationValidator = (control: FormControl): { [s: string]: boolean } => {
     if (!control.value) {
       return { required: true };
     } else if (control.value !== this.userForm.controls.password.value) {

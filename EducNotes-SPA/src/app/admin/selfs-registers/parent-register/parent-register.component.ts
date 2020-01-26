@@ -22,7 +22,7 @@ import { environment } from 'src/environments/environment';
 })
 export class ParentRegisterComponent implements OnInit {
 
-  @Input() user1: any;
+  @Input() parent: any;
   @Input() maxChild: number;
   // user2: User;
   userTypes: any;
@@ -34,14 +34,14 @@ export class ParentRegisterComponent implements OnInit {
   products: any[] = [];
   productsSelected: any[] = [];
   cityId: number;
-  user1Disctricts: any[] = [];
+  parentDisctricts: any[] = [];
   user2Districts: District[];
   editionMode = 'add';
   i = 1;
   selectedIndex = 0;
   position = 'left';
   size = 'default';
-  user1Form: FormGroup;
+  parentForm: FormGroup;
   // user2Form: FormGroup;
   childForm: FormGroup;
   errorMessage = [];
@@ -53,10 +53,10 @@ export class ParentRegisterComponent implements OnInit {
   viewMode: 'list' | 'grid' = 'list';
   sameLocation: false;
   wait = false;
-  page = 1;
-  pageSize = 15;
+  // page = 1;
+  // pageSize = 15;
   userId: number;
-  user1NameExist = false;
+  parentNameExist = false;
   childNameExist = false;
   parentImg: any;
   userImgs: any[] = [];
@@ -71,8 +71,8 @@ export class ParentRegisterComponent implements OnInit {
     { value: 1, label: 'Homme' },
     { value: 0, label: 'Femme' }
   ];
-
   secondFormGroup: FormGroup;
+  showSuccessDiv = false;
 
 
 
@@ -82,7 +82,7 @@ export class ParentRegisterComponent implements OnInit {
 
   ngOnInit() {
     // console.log(this.maxChild);
-    this.userId = this.user1.id;
+    this.userId = this.parent.id;
     this.createParentsForms();
     this.getCities();
     this.getLevels();
@@ -132,18 +132,18 @@ export class ParentRegisterComponent implements OnInit {
   }
 
   createParentsForms() {
-    this.user1Form = this.fb.group({
+    this.parentForm = this.fb.group({
       lastName: ['', Validators.required],
       firstName: ['', Validators.required],
       userName: ['', Validators.required],
       password: ['', Validators.required],
-      checkPassword: [null, [Validators.required, this.user1confirmationValidator]],
+      checkPassword: [null, [Validators.required, this.parentconfirmationValidator]],
       gender: [null, Validators.required],
       dateOfBirth: [''],
       cityId: [null, Validators.required],
       districtId: [null, Validators.required],
       phoneNumber: ['', Validators.required],
-      email: [this.user1.email, [Validators.email]],
+      email: [this.parent.email, [Validators.email]],
       secondPhoneNumber: ['']
     });
 
@@ -167,10 +167,10 @@ export class ParentRegisterComponent implements OnInit {
     });
   }
 
-  user1confirmationValidator = (control: FormControl): { [s: string]: boolean } => {
+  parentconfirmationValidator = (control: FormControl): { [s: string]: boolean } => {
     if (!control.value) {
       return { required: true };
-    } else if (control.value !== this.user1Form.controls.password.value) {
+    } else if (control.value !== this.parentForm.controls.password.value) {
       return { confirm: true, error: true };
     }
   }
@@ -183,19 +183,19 @@ export class ParentRegisterComponent implements OnInit {
     }
   }
 
-  updateUser1ConfirmValidator(): void {
+  updateparentConfirmValidator(): void {
     /** wait for refresh value */
-    Promise.resolve().then(() => this.user1Form.controls.checkPassword.updateValueAndValidity());
+    Promise.resolve().then(() => this.parentForm.controls.checkPassword.updateValueAndValidity());
   }
 
   updateUser2ConfirmValidator(): void {
     /** wait for refresh value */
-    Promise.resolve().then(() => this.user1Form.controls.checkPassword.updateValueAndValidity());
+    Promise.resolve().then(() => this.parentForm.controls.checkPassword.updateValueAndValidity());
   }
 
   updateChilConfirmValidator(): void {
     /** wait for refresh value */
-    Promise.resolve().then(() => this.user1Form.controls.checkPassword.updateValueAndValidity());
+    Promise.resolve().then(() => this.parentForm.controls.checkPassword.updateValueAndValidity());
   }
 
   onStep1Next(e) {
@@ -206,7 +206,7 @@ export class ParentRegisterComponent implements OnInit {
     //  this.emailsVerification();
     this.next();
     this.parents = [];
-    this.parents = [...this.parents, this.user1];
+    this.parents = [...this.parents, this.parent];
     // this.parents = [...this.parents, this.user2];
   }
 
@@ -243,7 +243,7 @@ export class ParentRegisterComponent implements OnInit {
     this.childPhotoUrl = '';
     this.editionMode = 'add';
     this.i = this.i + 1;
-    this.initializeParams(this.user1Form.value.lastName);
+    this.initializeParams(this.parentForm.value.lastName);
     this.createChildForm();
     this.showChildenList = false;
 
@@ -266,26 +266,18 @@ export class ParentRegisterComponent implements OnInit {
   }
 
   next() {
-    this.user1 = Object.assign({}, this.user1Form.value);
-    this.user1.userTypeId = this.parentTypeId;
-    this.user1.spaCode = 1;
-    this.user1.photoUrl = this.parentPhotoUrl;
-    //  const img = this.userImgs.find(s => s.spaCode === 1);
-    //  if (img) {
-    //    this.user1.image = img.image.image;
-    //  }
-
-    //  const userBirthOfDate = this.user1Form.value.dateOfBirth;
-    //  console.log(userBirthOfDate);
+    this.parent = Object.assign({}, this.parentForm.value);
+    this.parent.userTypeId = this.parentTypeId;
+    this.parent.spaCode = 1;
+    this.parent.photoUrl = this.parentPhotoUrl;
   }
 
-  user1NameVerification() {
-    const userName = this.user1Form.value.userName;
-    this.user1NameExist = false;
+  parentNameVerification() {
+    const userName = this.parentForm.value.userName;
+    this.parentNameExist = false;
     this.authService.userNameExist(userName).subscribe((res: boolean) => {
       if (res === true) {
-        this.user1NameExist = true;
-        // this.user1Form.valid = false;
+        this.parentNameExist = true;
       }
     });
   }
@@ -296,7 +288,6 @@ export class ParentRegisterComponent implements OnInit {
     this.authService.userNameExist(userName).subscribe((res: boolean) => {
       if (res === true) {
         this.childNameExist = true;
-        //  childForm.valid = false;
       }
     });
   }
@@ -376,10 +367,10 @@ export class ParentRegisterComponent implements OnInit {
     this.wait = true;
 
     const usersToSave: any = {};
-    usersToSave.user1 = this.user1;
-    const dt = usersToSave.user1.dateOfBirth;
+    usersToSave.parent = this.parent;
+    const dt = usersToSave.parent.dateOfBirth;
     // formatage date de naissance du père
-    usersToSave.user1.dateOfBirth = Utils.inputDateDDMMYY(dt, '/');
+    usersToSave.parent.dateOfBirth = Utils.inputDateDDMMYY(dt, '/');
 
     // formatage date de naissance des enfants
     for (let i = 0; i < this.children.length; i++) {
@@ -420,7 +411,7 @@ export class ParentRegisterComponent implements OnInit {
         });
       }
       if (element === this.usersSpaCode[this.usersSpaCode.length - 1]) {
-      this.logUser();
+      this.showSuccessDiv = true;
 
       }
       // fin de la boucle
@@ -428,15 +419,15 @@ export class ParentRegisterComponent implements OnInit {
 
   }
 
-  getUser1Districts() {
-    const id = this.user1Form.value.cityId;
+  getParentDistricts() {
+    const id = this.parentForm.value.cityId;
     if (id) {
-      this.user1Form.value.cityId = '';
-      this.user1Disctricts = [];
+      this.parentForm.value.cityId = '';
+      this.parentDisctricts = [];
       this.authService.getDistrictsByCityId(id).subscribe((res: any[]) => {
         for (let i = 0; i < res.length; i++) {
           const element = { value: res[i].id, label: res[i].name };
-          this.user1Disctricts = [...this.user1Disctricts, element];
+          this.parentDisctricts = [...this.parentDisctricts, element];
         }
       }, error => {
         console.log(error);
@@ -447,8 +438,8 @@ export class ParentRegisterComponent implements OnInit {
 
   emailsVerification() {
     this.errorMessage = [];
-    if (this.user1.email) {
-      this.authService.emailExist(this.user1.email).subscribe((response: boolean) => {
+    if (this.parent.email) {
+      this.authService.emailExist(this.parent.email).subscribe((response: boolean) => {
         if (response === true) {
           this.errorMessage.push('l\'email du père est déja utilisé');
         }
@@ -470,21 +461,21 @@ export class ParentRegisterComponent implements OnInit {
     }
   }
 
-  logUser() {
-    const user = { userName: this.user1.userName, password: this.user1.password };
+  // logUser() {
+  //   const user = { userName: this.parent.userName, password: this.parent.password };
 
-    setTimeout(() => {
-      this.authService.login(user).subscribe(() => {
-        this.router.navigate(['/home']);
-      }, error => {
-        this.alertify.error(error);
-      }); }, 5000);
-    // this.authService.login(user).subscribe(() => {
-    //   this.router.navigate(['/home']);
-    // }, error => {
-    //   this.alertify.error(error);
-    // });
-  }
+  //   setTimeout(() => {
+  //     this.authService.login(user).subscribe(() => {
+  //       this.router.navigate(['/home']);
+  //     }, error => {
+  //       this.alertify.error(error);
+  //     }); }, 5000);
+  //   // this.authService.login(user).subscribe(() => {
+  //   //   this.router.navigate(['/home']);
+  //   // }, error => {
+  //   //   this.alertify.error(error);
+  //   // });
+  // }
 
   getProducts() {
     this.products = [];
@@ -503,7 +494,7 @@ export class ParentRegisterComponent implements OnInit {
       }
 
     }, error => {
-      this.alertify.error(error);
+      // this.alertify.error(error);
     });
   }
 

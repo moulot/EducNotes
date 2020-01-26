@@ -14,12 +14,12 @@
   </div>
 
   <mdb-stepper #stepper [vertical]="true" class="m-0 p-0" *ngIf="!wait" class="animated slideInUp">
-    <mdb-step name="inscription du parent" [stepForm]="user1Form" class="step1 m-0">
+    <mdb-step name="inscription du parent" [stepForm]="parentForm" class="step1 m-0">
       <div class="row">
         <div class="col-md-12">
           <div class="card">
             <div class="card-body p-2">
-              <form class="" style="color: #757575;" [formGroup]="user1Form">
+              <form class="" style="color: #757575;" [formGroup]="parentForm">
                 <div class="row">
                   <div class="col-md-2">
                     <!-- <div class="font-weight-300 mb-2  d-flex justify-content-center">photo de profil</div> -->
@@ -57,9 +57,9 @@
                       </div>
                       <div class="col-md-4">
                         <div class="md-form form-sm mt-2 mb-0">
-                          <input type="text" class="form-control" id="userName" (blur)="user1NameVerification()" formControlName="userName" class="form-control" mdbInput>
+                          <input type="text" class="form-control" id="userName" (blur)="parentNameVerification()" formControlName="userName" class="form-control" mdbInput>
                           <label for="userName">nom d'utilisateur</label>
-                          <span *ngIf="user1NameExist" class="text-danger">nom d'utilisateur déja utilisé... Veuillez reéssayer un autre</span>
+                          <span *ngIf="parentNameExist" class="text-danger">nom d'utilisateur déja utilisé... Veuillez reéssayer un autre</span>
                         </div>
                       </div>
                       <div class="col-md-3">
@@ -75,12 +75,12 @@
                       </div>
                       <div class="col-md-3">
                         <div class="md-form form-sm mt-2 mb-0">
-                          <mdb-select id="cityId" [options]="cities" placeholder="ville de résidence" (ngModelChange)="getUser1Districts()" formControlName="cityId"></mdb-select>
+                          <mdb-select id="cityId" [options]="cities" placeholder="ville de résidence" (ngModelChange)="getParentDistricts()" formControlName="cityId"></mdb-select>
                         </div>
                       </div>
                       <div class="col-md-3">
                         <div class="md-form form-sm mt-2 mb-0">
-                          <mdb-select id="districtId" [options]="user1Disctricts" placeholder="quartier/commune" formControlName="districtId">
+                          <mdb-select id="districtId" [options]="parentDisctricts" placeholder="quartier/commune" formControlName="districtId">
                           </mdb-select>
                         </div>
                       </div>
@@ -104,9 +104,9 @@
                       </div>
                       <div class="col-md-4">
                         <div class="md-form form-sm mt-2 mb-0">
-                          <input type="password" mdbValidate id="password" minlength="4" (change)="updateUser1ConfirmValidator()" formControlName="password" class="form-control" mdbInput>
+                          <input type="password" mdbValidate id="password" minlength="4" (change)="updateparentConfirmValidator()" formControlName="password" class="form-control" mdbInput>
                           <label for="password">mot de passe</label>  
-                          <span *ngIf="user1Form.get('password').dirty && user1Form.get('password').errors" class="text-danger">le mot de passe doit comporter au moins 4 caractères.</span>
+                          <span *ngIf="parentForm.get('password').dirty && parentForm.get('password').errors" class="text-danger">le mot de passe doit comporter au moins 4 caractères.</span>
                         </div>
                       </div>
                       <div class="col-md-4">
@@ -114,9 +114,9 @@
                           <input type="password" class="form-control" mdbValidate id="checkPassword" formControlName="checkPassword" class="form-control" mdbInput>
                           <label for="checkPassword">confirmer le mot de passe</label>
   
-                          <div class="text-danger" *ngIf="user1Form.get('checkPassword').dirty && user1Form.get('checkPassword').errors">
-                            <span *ngIf="user1Form.get('checkPassword').hasError('required')">confirmer le mot de passe!</span>
-                            <span *ngIf="user1Form.get('checkPassword').hasError('confirm')">
+                          <div class="text-danger" *ngIf="parentForm.get('checkPassword').dirty && parentForm.get('checkPassword').errors">
+                            <span *ngIf="parentForm.get('checkPassword').hasError('required')">confirmer le mot de passe!</span>
+                            <span *ngIf="parentForm.get('checkPassword').hasError('confirm')">
                               les deux mots de passe que vous entrez sont differents!
                             </span>
                           </div>
@@ -126,7 +126,7 @@
                   </div>
                   <div class="col-md-12"><hr></div>
                   <div class="col-md-12">
-                    <button mdbBtn size="sm" color="primary" (click)="stepper.next()" [disabled]="!user1Form.valid || user1NameExist === true" >CONTINUER</button>
+                    <button mdbBtn size="sm" color="primary" (click)="stepper.next()" [disabled]="!parentForm.valid || childNameExist === true" >CONTINUER</button>
                   </div>
                 </div>
               </form>
@@ -165,9 +165,11 @@
   
                                         <div class="flex-grow-1">
                                             <h6 class="m-0"> {{child.lastName}} {{child.firstName}} </h6>
-                                            <p class="m-0 text-small text-muted">Niveau:{{child.level}} &nbsp;&nbsp; Date de naissance: {{child.dateOfBirth}} </p>
+                                            <p class="m-0 text-small text-muted">Niveau:{{child.level}} &nbsp;&nbsp;
+                                                Date de naissance: {{child.dateOfBirth}} </p>
                                             <p class="m-0 text-small text-muted"> <span *ngIf="child.email"> Email:
-                                                    {{child.email}} </span> <span *ngIf="child.phoneNumber || child.secondPhoneNumber"> &nbsp;&nbsp;
+                                                    {{child.email}} </span> <span
+                                                    *ngIf="child.phoneNumber || child.secondPhoneNumber"> &nbsp;&nbsp;
                                                     Contact(s): {{child.phoneNumber}} {{child.secondPhoneNumber}}</span>
                                             </p>
                                             <div>
@@ -177,16 +179,18 @@
                                                         <th>#</th>
                                                         <th>Frais </th>
                                                     </tr>
-                                                    <tr *ngFor="let prod of productsSelected, index as i">
+                                                    <tr *ngFor="let prod of productsSelected,index as i">
                                                         <td>{{i+1}}</td>
                                                         <td>{{prod.details}}</td>
                                                     </tr>
                                                 </table>
                                             </div>
                                             <p>
-                                                <button mdbBtn type="button" color="light" size="sm" mdbWavesEffect (click)="edit(child)" class="mr-1">editer</button>
-                                                <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect (click)="confirm(child)">supprimer</button>
-                                            
+                                                <button mdbBtn type="button" color="light" size="sm" mdbWavesEffect
+                                                    (click)="edit(child)" class="mr-1">editer</button>
+                                                <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
+                                                    (click)="confirm(child)">supprimer</button>
+
                                             </p>
                                         </div>
                                     </div>
@@ -228,13 +232,15 @@
                             <div class="form-row">
                                 <div class="col-md-6">
                                     <div class="md-form">
-                                        <input type="text" id="clastName" formControlName="lastName" class="form-control" mdbInput>
+                                        <input type="text" id="clastName" formControlName="lastName"
+                                            class="form-control" mdbInput>
                                         <label for="clastName">Nom</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="md-form">
-                                        <input type="text" id="cfirstName" formControlName="firstName" class="form-control" mdbInput>
+                                        <input type="text" id="cfirstName" formControlName="firstName"
+                                            class="form-control" mdbInput>
                                         <label for="cfirstName">Prénom(s)</label>
                                     </div>
                                 </div>
@@ -243,14 +249,17 @@
                             <div class="form-row">
                                 <div class="col-md-6">
                                     <div class="md-form">
-                                        <mdb-select id="cgender" [options]="sexe" placeholder="Sexe" formControlName="gender"></mdb-select>
+                                        <mdb-select id="cgender" [options]="sexe" placeholder="Sexe"
+                                            formControlName="gender"></mdb-select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="md-form">
-                                        <input type="text"  id="cuserName" (blur)="childNameVerification()" formControlName="userName" class="form-control" mdbInput>
+                                        <input type="text" id="cuserName" (blur)="childNameVerification()"
+                                            formControlName="userName" class="form-control" mdbInput>
                                         <label for="cuserName">nom d'utilisateur</label>
-                                        <span *ngIf="childNameExist" class="text-danger">nom d'utilisateur déja utilisé... Veuillez réessayer un autre</span>
+                                        <span *ngIf="childNameExist" class="text-danger">nom d'utilisateur déja
+                                            utilisé... Veuillez réessayer un autre</span>
                                     </div>
                                 </div>
                             </div>
@@ -258,15 +267,20 @@
                             <div class="form-row">
                                 <div class="col-md-6">
                                     <div class="md-form">
-                                        <input type="password" mdbValidate id="cpassword" minlength="4" (change)="updateChilConfirmValidator()" formControlName="password" class="form-control" mdbInput>
+                                        <input type="password" mdbValidate id="cpassword" minlength="4"
+                                            (change)="updateChilConfirmValidator()" formControlName="password"
+                                            class="form-control" mdbInput>
                                         <label for="cpassword">mot de passe</label>
-                                        <span *ngIf="childForm.get('password').dirty && childForm.get('password').errors" class="text-danger">Le mot de passe doit comporter au moins 4
+                                        <span
+                                            *ngIf="childForm.get('password').dirty && childForm.get('password').errors"
+                                            class="text-danger">Le mot de passe doit comporter au moins 4
                                             caractères.</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="md-form">
-                                        <input type="password" mdbValidate id="ccheckPassword" minlength="4" formControlName="checkPassword" class="form-control" mdbInput>
+                                        <input type="password" mdbValidate id="ccheckPassword" minlength="4"
+                                            formControlName="checkPassword" class="form-control" mdbInput>
                                         <label for="ccheckPassword">Confirmer le mot de passe</label>
   
                                         <div class="text-danger" *ngIf="childForm.get('checkPassword').dirty && childForm.get('checkPassword').errors">
@@ -284,13 +298,15 @@
                             <div class="form-row">
                                 <div class="col-md-6">
                                     <div class="md-form">
-                                        <input type="text" class="form-control" id="cemail"  formControlName="email" class="form-control" mdbInput>
+                                        <input type="text" class="form-control" id="cemail" formControlName="email"
+                                            class="form-control" mdbInput>
                                         <label for="cemail">Email (facultatif)</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="md-form">
-                                        <input type="text" class="form-control" id="cdateofBirth" formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
+                                        <input type="text" class="form-control" id="cdateofBirth"
+                                            formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
                                         <label for="cdateofBirth">Date de naissance*</label>
                                     </div>
                                 </div>
@@ -299,13 +315,17 @@
                             <div class="form-row">
                                 <div class="col-md-6">
                                     <div class="md-form">
-                                        <input type="text" class="form-control" id="cphoneNumber" [textMask]="{mask: phoneMask}" formControlName="phoneNumber" class="form-control" mdbInput>
+                                        <input type="text" class="form-control" id="cphoneNumber"
+                                            [textMask]="{mask: phoneMask}" formControlName="phoneNumber"
+                                            class="form-control" mdbInput>
                                         <label for="cphoneNumber">Contact principal(facultatif)</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="md-form">
-                                        <input type="text" class="form-control" id="csphone" [textMask]="{mask: phoneMask}" formControlName="secondPhoneNumber" class="form-control" mdbInput>
+                                        <input type="text" class="form-control" id="csphone"
+                                            [textMask]="{mask: phoneMask}" formControlName="secondPhoneNumber"
+                                            class="form-control" mdbInput>
                                         <label for="csphone">Deuxieme Contact(facultatif)</label>
                                     </div>
                                 </div>
@@ -313,20 +333,34 @@
                             <div class="form-row">
                                 <div class="col-md-6">
                                     <div class="row m-2">
-                                        <mdb-select id="clevelId" [options]="levels" placeholder="Choisir le niveau" (ngModelChange)="getProducts()" formControlName="levelId"></mdb-select>
+                                        <mdb-select id="clevelId" [options]="levels" placeholder="Choisir le niveau"
+                                            (ngModelChange)="getProducts()" formControlName="levelId"></mdb-select>
                                     </div>
                                 </div>
   
                                 <div class="col-md-6">
                                     <div class="row m-2">
-                                        <mdb-select id="productIds" [highlightFirst]="false" [options]="products" [multiple]="true" placeholder="services additionnels" formControlName="productIds"></mdb-select>
+                                        <mdb-select id="productIds" [highlightFirst]="false" [options]="products"
+                                            [multiple]="true" placeholder="services additionnels"
+                                            formControlName="productIds"></mdb-select>
                                     </div>
                                 </div>
   
                             </div>
+                            
+                        
                             <div class="form-row">
-                                <button mdbBtn type="button" color="primary" size="sm" mdbWavesEffect [disabled]="!childForm.valid || childNameExist === true" (click)="submitChild()">enregistrer</button>
-                                <button type="button" mdbBtn color="light" mdbWavesEffect size="sm" (click)="open()">annuler</button>
+                                <div class="file-field md-form">
+                                    <div mdbBtn color="primary" size="sm" class="waves-light" mdbWavesEffect>
+                                        <span> <span>Cliquer ici pour ajouter une photo</span></span>
+                                        <input type="file" accept='image/*' mdbFileSelect
+                                            (change)="childImgResult($event)">
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <img [src]="childPhotoUrl" class="rounded-circle imgUpload"
+                                            *ngIf="childPhotoUrl" alt="">
+                                    </div>
+                                </div>
                             </div>
   
                         </form>
@@ -355,8 +389,10 @@
   
                                 <div class="flex-grow-1">
                                     <h6 class="m-0"> {{child.lastName}} {{child.firstName}} </h6>
-                                    <p class="m-0 text-small text-muted">Niveau:{{child.level}} &nbsp;&nbsp; Date de naissance: {{child.dateOfBirth}} </p>
-                                    <p class="m-0 text-small text-muted"> Email: {{child.email}} &nbsp;&nbsp; Contact(s): {{child.phoneNumber}} {{child.secondPhoneNumber}} </p>
+                                    <p class="m-0 text-small text-muted">Niveau:{{child.level}} &nbsp;&nbsp; Date de
+                                        naissance: {{child.dateOfBirth}} </p>
+                                    <p class="m-0 text-small text-muted"> Email: {{child.email}} &nbsp;&nbsp;
+                                        Contact(s): {{child.phoneNumber}} {{child.secondPhoneNumber}} </p>
                                 </div>
   
                             </div>
@@ -373,9 +409,11 @@
   
                             <img class="rounded-circle" src="{{user1.photoUrl || '../../../../assets/user.png'}}" alt="">
                             <div class="flex-grow-1">
-                                <h6 class="m-0"> {{user1.lastName}} {{user1.firstName}} </h6>
-                                <!-- <p class="m-0 text-small text-muted">ville: {{item.city}} &nbsp;&nbsp;  Quartier:  {{item.district}}   </p>  -->
-                                <p class="m-0 text-small text-muted"> Email: {{user1.email}} &nbsp;&nbsp; Contact(s): {{user1.phoneNumber}} {{user1.secondPhoneNumber}} </p>
+                                <h6 class="m-0"> {{parent.lastName}} {{parent.firstName}} </h6>
+                                <p class="m-0 text-small text-muted">ville: {{parent.city}} &nbsp;&nbsp; Quartier:
+                                    {{parent.district}} </p>
+                                <p class="m-0 text-small text-muted"> Email: {{parent.email}} &nbsp;&nbsp; Contact(s):
+                                    {{parent.phoneNumber}} {{parent.secondPhoneNumber}} </p>
                             </div>
   
                         </div>
