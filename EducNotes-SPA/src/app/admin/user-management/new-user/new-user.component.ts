@@ -41,6 +41,7 @@ export class NewUserComponent implements OnInit {
   ];
 
   userNameExist = false;
+  showSuccessDiv = false;
 
 
 
@@ -159,19 +160,17 @@ export class NewUserComponent implements OnInit {
   }
 
   saveUser() {
+    this.submitText = 'patienter...';
     const teacher = Object.assign({}, this.userForm.value);
-    console.log('1:' + teacher.dateOfBirth);
     const dd = teacher.dateOfBirth;
-    console.log('2:' + dd);
     teacher.dateOfBirth = Utils.inputDateDDMMYY(dd, '/');
-    console.log('3:' + teacher.dateOfBirth);
     teacher.userTypeId = this.teacherTypeId;
 
     this.authService.teacherSelfPreinscription(this.userId, teacher).subscribe(() => {
       this.alertify.success('enregistrement terminé...');
-      this.router.navigate(['/parents']);
-
+      this.showSuccessDiv = true;
     }, error => {
+      this.submitText = 'enregistrer';
       console.log(error);
     });
 
