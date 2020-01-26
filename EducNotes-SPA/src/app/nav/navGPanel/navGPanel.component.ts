@@ -76,22 +76,6 @@ export class NavGPanelComponent implements OnInit {
     this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
   }
 
-  // toggelSidebar() {
-  //   const state = this.navService.sidebarState;
-  //   if (state.childnavOpen && state.sidenavOpen) {
-  //     return state.childnavOpen = false;
-  //   }
-  //   if (!state.childnavOpen && state.sidenavOpen) {
-  //     return state.sidenavOpen = false;
-  //   }
-  //   if (!state.sidenavOpen && !state.childnavOpen) {
-  //       state.sidenavOpen = true;
-  //       // setTimeout(() => {
-  //       //     state.childnavOpen = false;
-  //       // }, 50);
-  //   }
-  // }
-
   logout() {
     this.authService.logout();
   }

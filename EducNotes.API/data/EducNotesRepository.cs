@@ -1049,7 +1049,9 @@ namespace EducNotes.API.Data
                 var courseCoeffData = _context.CourseCoefficients
                     .FirstOrDefault(c => c.ClassLevelid == aclass.ClassLevelId &&
                         c.CourseId == acourse.Id && c.ClassTypeId == aclass.ClassTypeId);
-                double courseCoeff = 1;//courseCoeffData.Coefficient;
+                double courseCoeff = 1;
+                if(courseCoeffData != null)
+                    courseCoeff = courseCoeffData.Coefficient;
 
                 //get the class course average - to be compared with the user average
                 double ClassCourseAvg = GetClassCourseEvalData(acourse.Id, aclass.Id);

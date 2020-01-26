@@ -1,6 +1,7 @@
 <div class="app-admin-wrap layout-sidebar-large">
     <div>
-        <app-navGPanel *ngIf="loggedIn()"></app-navGPanel>
+      <app-navGPanel *ngIf="loggedIn()"></app-navGPanel>
+      <!-- <app-navNotLogged *ngIf="!loggedIn()"></app-navNotLogged> -->
     </div>
     <div class=" d-flex flex-column" [ngClass]="loggedIn() ? 'main-content-wrap' : ''">
       <div class="container-fluid">

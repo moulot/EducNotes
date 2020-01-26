@@ -17,21 +17,18 @@ import { environment } from 'src/environments/environment';
 })
 export class SelfRegisterComponent implements OnInit {
 
-   user: User;
-   maxChild: number;
-   parentTypeId = environment.parentTypeId;
-   teacherTypeId = environment.teacherTypeId;
+  user: User;
+  maxChild: number;
+  parentTypeId = environment.parentTypeId;
+  teacherTypeId = environment.teacherTypeId;
 
+  constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
+    private alertify: AlertifyService, private router: Router, private userService: UserService) { }
 
-   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
-      private alertify: AlertifyService, private router: Router, private userService: UserService) { }
-
-   ngOnInit() {
-
-      this.route.data.subscribe(data => {
-
-         this.user = data['user'].user;
-         this.maxChild = data['user'].maxChild;
-      });
-   }
+  ngOnInit() {
+    this.route.data.subscribe(data => {
+      this.user = data['user'].user;
+      this.maxChild = data['user'].maxChild;
+    });
+  }
 }
