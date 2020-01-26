@@ -15,6 +15,7 @@ namespace EducNotes.API.Data
             if (teachersCourses.Count() == 0)
             {
                 var classCourses = context.ClassCourses.ToList();
+                // ajout des teachersCourses
                 foreach (var classCourse in classCourses)
                 {
                     var newteacherCourse = new TeacherCourse
@@ -24,6 +25,10 @@ namespace EducNotes.API.Data
                     };
                     context.Add(newteacherCourse);
                 }
+                // suppression 
+                context.ClassCourses.RemoveRange(classCourses);
+
+
                 context.SaveChanges();
 
             }
