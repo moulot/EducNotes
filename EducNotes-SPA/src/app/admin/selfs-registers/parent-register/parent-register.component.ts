@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, HostListener } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
@@ -74,29 +74,68 @@ export class ParentRegisterComponent implements OnInit {
   secondFormGroup: FormGroup;
   showSuccessDiv = false;
 
-
+  firstFormGroup1: FormGroup;
+  secondFormGroup1: FormGroup;
+  isVertical = false;
 
   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
     private alertify: AlertifyService, private router: Router, private userService: UserService,
     private http: HttpClient) { }
 
-  ngOnInit() {
-    // console.log(this.maxChild);
+    @HostListener('window:resize') onWindowResize() {
+
+    if (window.innerWidth <= 768) {
+      this.isVertical = true;
+    } else {
+      this.isVertical = false;
+    }
+  }
+
+  @HostListener('window:load') onWindowLoad() {
+
+    if (window.innerWidth <= 768) {
+      this.isVertical = true;
+    } else {
+      this.isVertical = false;
+    }
+  }
+
+  // VerticalOrHorizontalStepper() {
+  //   return (window.innerWidth < 768);
+  // }
+
+    ngOnInit() {
     this.userId = this.parent.id;
     this.createParentsForms();
     this.getCities();
     this.getLevels();
 
+    // this.VerticalOrHorizontalStepper();
+
+    this.firstFormGroup1 = new FormGroup({
+      email: new FormControl('', [Validators.required, Validators.email])
+    });
+    this.secondFormGroup1 = new FormGroup({
+      password: new FormControl('', Validators.required)
+    });
 
     this.secondFormGroup = new FormGroup({
       active: new FormControl(null, Validators.required)
     });
   }
 
+  get email() { return this.firstFormGroup1.get('email'); }
+  get password() { return this.secondFormGroup1.get('password'); }
+
+  onSubmit() {
+    // do something here
+  }
+
   onFileSelected(event) {
     //  this.selectedFiles = <File>event.target.files[0];
     // this.savePhotos();
   }
+
   getCities() {
     this.authService.getAllCities().subscribe((res: City[]) => {
       for (let i = 0; i < res.length; i++) {
@@ -207,7 +246,6 @@ export class ParentRegisterComponent implements OnInit {
     this.next();
     this.parents = [];
     this.parents = [...this.parents, this.parent];
-    // this.parents = [...this.parents, this.user2];
   }
 
   onComplete(e) {

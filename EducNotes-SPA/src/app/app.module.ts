@@ -212,6 +212,7 @@ import { AddUserGradesComponent } from './grades/add-user-grades/add-user-grades
 import { ClassGradesResolver } from './_resolvers/class-grades-resolver';
 import { ChildSmsCardComponent } from './users/child-sms-card/child-sms-card.component';
 import { NavNotLoggedComponent } from './nav/navNotLogged/navNotLogged.component';
+import { RegisterChildCardComponent } from './admin/selfs-registers/register-child-card/register-child-card.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -354,7 +355,8 @@ export function tokenGetter() {
       AddSmsTemplateComponent,
       AddUserGradesComponent,
       ChildSmsCardComponent,
-      NavNotLoggedComponent
+      NavNotLoggedComponent,
+      RegisterChildCardComponent
    ],
    imports: [
       FormWizardModule,
