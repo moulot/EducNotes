@@ -1,43 +1,35 @@
-<div class="row justify-content-center align-items-center mt-3"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
- 
-    <div class="col-md-8" >
-        <div class="card pt-2">
-            <form nz-form [formGroup]="courseForm" (ngSubmit)="save()">
-              
-                <nz-form-item>
-                    <nz-form-label [nzSm]="6" [nzXs]="24"  nzFor="name">Nom</nz-form-label>
-                    <nz-form-control [nzSm]="14" [nzXs]="24">
-                      <input nz-input formControlName="name" id="name">
-                    </nz-form-control>
-                </nz-form-item>
-                <nz-form-item>
-                  <nz-form-label [nzSm]="6" [nzXs]="24"  nzFor="abbreviation">Abreviation</nz-form-label>
-                  <nz-form-control [nzSm]="14" [nzXs]="24">
-                    <input nz-input formControlName="abbreviation" id="abbreviation">
-                  </nz-form-control>
-              </nz-form-item>
+<div class="row  mt-1 justify-content-center align-items-center animated zoomInUp">
 
-              <nz-form-item>
-                <nz-form-label [nzSm]="6" [nzXs]="24"  nzFor="abbreviation">Choisir la couleur</nz-form-label>
-                <nz-form-control [nzSm]="14" [nzXs]="24" >
-                  <input  nz-input name="color" formControlName="color" [(colorPicker)]="color" [style.background]="color"
-                  (colorPickerChange)="setColor()" >
-                </nz-form-control>
-              
-                </nz-form-item>
-                
-                <nz-form-item>
-                  <nz-form-control [nzSpan]="14" [nzOffset]="6">
-                      <button type="submit" [disabled]="!courseForm.valid || submitText!='enregistrer'"
-                        class="btn btn-outline-primary btn-sm"><span>{{submitText}}</span></button>
-                      <button type="button"  class="btn btn-outline-primary btn-sm ml-2" [routerLink]="['/courses']" routerLinkActive="router-link-active" ><span>annuler</span></button>
-                    
-                    </nz-form-control>
-                </nz-form-item>
-        </form>
-          
-            
-        </div>
-    </div>
+  <div class="col-md-6">
+    <form [formGroup]="courseForm" style="color: #757575;" (ngSubmit)="save()">
+
+      <mdb-card>
+        <mdb-card-body class="px-lg-5 pt-0">
+          <div class="md-form">
+            <input mdbInput type="text" id="name" class="form-control" formControlName="name">
+            <label for="name" class="">Nom</label>
+          </div>
+
+          <div class="md-form">
+            <input mdbInput type="text" id="abbreviation" class="form-control" formControlName="abbreviation">
+            <label for="name" class="">Abreviation</label>
+          </div>
+
+          <div class="md-form">
+            <input mdbInput type="text" id="color" class="form-control" formControlName="color" [(colorPicker)]="color" [style.background]="color"
+            (colorPickerChange)="setColor()">
+            <label for="color" class="">Choisir la couleur</label>
+          </div>
+
+          <div class="md-form">
+            <button type="submit" [disabled]="!courseForm.valid || submitText!='enregistrer'" mdbBtn
+            color="info" size="sm" mdbWavesEffect><span>{{submitText}}</span></button>
+        <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
+            [routerLink]="['/courses']" routerLinkActive="router-link-active">annuler</button>
+          </div>
+
+        </mdb-card-body>
+      </mdb-card>
+    </form>
   </div>
-
+</div>

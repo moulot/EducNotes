@@ -3,7 +3,7 @@
 
     <div class="col-md-8">
         <div class="card p-3">
-            <form nz-form [formGroup]="payableForm" (ngSubmit)="save()">
+            <form [formGroup]="payableForm" (ngSubmit)="save()">
                 <div class="md-form">
                     <input mdbInput type="text" id="name" class="form-control" formControlName="name">
                     <label for="name" class="">Nom </label>

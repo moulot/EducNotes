@@ -12,17 +12,17 @@ import { Router } from '@angular/router';
   animations: [SharedAnimations]
 })
 export class NewClassComponent implements OnInit {
-  levels: any;
+  levels: any = [];
 
   classTypes;
   classForm: FormGroup;
   errorMessage = '';
   submitText = 'enregistrer';
- suffixes = [{id: 1, name: 'A,B,C,...'}, {id: 2, name: '1,2,3,.....' }];
+  suffixes = [{ value: 1, label: 'A,B,C,...' }, { value: 2, label: '1,2,3,.....' }];
 
 
-  constructor(private fb: FormBuilder,private router: Router,
-     private classService: ClassService, private alertify: AlertifyService) { }
+  constructor(private fb: FormBuilder, private router: Router,
+    private classService: ClassService, private alertify: AlertifyService) { }
 
   ngOnInit() {
 
@@ -33,36 +33,44 @@ export class NewClassComponent implements OnInit {
   }
 
   getLevels() {
-    this.classService.getLevels().subscribe((res) => {
-      this.levels = res;
+    this.classService.getLevels().subscribe((res: any[]) => {
+
+      for (let i = 0; i < res.length; i++) {
+        const ele = { value: res[i].id, label: res[i].name };
+        this.levels = [...this.levels, ele];
+      }
     }, error => {
       this.alertify.error(error);
     });
   }
   getClassTypes() {
-   this.classService.getClassTypes().subscribe((res) => {
-     this.classTypes = res;
-   });
+    this.classService.getClassTypes().subscribe((res: any[]) => {
+      for (let i = 0; i < res.length; i++) {
+        const ele = { value: res[i].id, label: res[i].name };
+        this.classTypes = [...this.classTypes, ele];
+      }
+    });
   }
   createClassForm() {
     this.classForm = this.fb.group({
       levelId: [null, Validators.required],
       classTypeId: [null, Validators.nullValidator],
-       name: [, Validators.nullValidator],
+      name: [, Validators.nullValidator],
       suffixe: [null, Validators.nullValidator],
       maxStudent: [null, Validators.nullValidator],
-      number: [null, Validators.nullValidator]});
+      number: [null, Validators.nullValidator]
+    });
   }
 
   save() {
     this.errorMessage = '';
-    const classFromForm =  Object.assign({}, this.classForm.value);
+    const classFromForm = Object.assign({}, this.classForm.value);
     if (classFromForm.suffixe) {
       if (!classFromForm.number) {
         this.alertify.error('veuillez saisir le nombre de classe');
-         } else {
-           this.saveClass(classFromForm);
-         }
+      } else {
+        this.saveClass(classFromForm);
+      }
 
     } else if (!classFromForm.name) {
       if (!classFromForm.suffixe) {
@@ -81,15 +89,15 @@ export class NewClassComponent implements OnInit {
   saveClass(element) {
     this.submitText = 'patientez...';
 
-     this.classService.saveNewClasses(element).subscribe(next => {
-        this.submitText = 'enregistrer';
-        this.alertify.success('enregistrement terminé...');
-        this.router.navigate(['classesPanel']);
-      }, error => {
-        console.log(error);
-        this.submitText = 'enregistrer';
-        this.errorMessage = error;
-      });
+    this.classService.saveNewClasses(element).subscribe(next => {
+      this.submitText = 'enregistrer';
+      this.alertify.success('enregistrement terminé...');
+      this.router.navigate(['classesPanel']);
+    }, error => {
+      console.log(error);
+      this.submitText = 'enregistrer';
+      this.errorMessage = error;
+    });
   }
 
 }
