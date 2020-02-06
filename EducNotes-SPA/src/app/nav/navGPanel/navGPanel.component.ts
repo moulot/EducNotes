@@ -1,10 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { User } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Router } from '@angular/router';
-import { NavigationService } from 'src/app/shared/services/navigation.service';
+import { NavbarComponent } from 'ng-uikit-pro-standard';
 
 @Component({
   selector: 'app-navGPanel',
@@ -12,6 +12,7 @@ import { NavigationService } from 'src/app/shared/services/navigation.service';
   styleUrls: ['./navGPanel.component.scss']
 })
 export class NavGPanelComponent implements OnInit {
+  @ViewChild('navbarid', {static: false}) navbaridRef: NavbarComponent; // Get the NavbarComponent
   user: User;
   studentTypeId = environment.studentTypeId;
   teacherTypeId = environment.teacherTypeId;
@@ -23,7 +24,7 @@ export class NavGPanelComponent implements OnInit {
 
     // editer par mohamed
   constructor(public authService: AuthService, private alertify: AlertifyService,
-    private router: Router, private navService: NavigationService) {
+    private router: Router) {
       this.notifications = [
         {
           icon: 'i-Speach-Bubble-6',
@@ -74,6 +75,12 @@ export class NavGPanelComponent implements OnInit {
   ngOnInit() {
     this.user = this.authService.currentUser;
     this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
+  }
+
+  closeNav() {
+    if (this.navbaridRef.shown) {
+      this.navbaridRef.toggle(); // Hide the collapse menu after click
+    }
   }
 
   logout() {

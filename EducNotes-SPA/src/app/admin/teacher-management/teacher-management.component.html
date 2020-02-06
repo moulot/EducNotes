@@ -1,46 +1,82 @@
-<div class="row justify-content-center align-items-center" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+<div class="row" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
 
-  <div class="col-md-10">
-    <div>
-      <div class="card mb-4">
-        <div class="card-body">
-          <div class="d-flex">
-            <div class="card-title flex-grow-1">liste des enseignants</div>
-            <div>
-              <button mdbBtn color="info" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']"
-                routerLinkActive="router-link-active">ajouter un enseignant</button>
+  <div class="col-md-12">
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="d-flex">
+              <div class="flex-grow-1">
+                <span class="text-20 font-weight-400 m-0 my-auto">liste des enseignants</span>
+              </div>
+              <div>
+                <button mdbBtn color="primary" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']"
+                  routerLinkActive="router-link-active">ajouter un enseignant</button>
+              </div>
+            </div>
+            <hr class="mt-1 mb-4">
+          </div>
+          <div class="col-md-12">
+            <div *ngFor="let teacher of teachersCourses">
+              <div class="row">
+                <div class="col-md-5 d-flex">
+                  <div><img class="avatar-md rounded-circle mr-3" src="{{teacher.photoUrl || '../../assets/user.png'}}" alt=""></div>
+                  <div>
+                    <div class="text-17 font-weight-400 text-capitalize m-0">{{teacher.lastName}} {{teacher.firstName}}</div>
+                    <div class="text-15">{{teacher.email}}</div>
+                    <div class="text-15">{{teacher.phoneNumber}} {{teacher.secondPhoneNumber}}</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="text-17 font-weight-400">cours</div>
+                  <div *ngIf="teacher.courseClasses.length === 0">aucune affectation</div>
+                  <div *ngIf="teacher.courseClasses.length > 0">
+                    <div class="d-flex" *ngFor="let course of teacher.courseClasses">
+                      <div class="text-15 mr-2 font-weight-350">{{course.course.name}} :</div>
+                      <div *ngIf="course.classes.length > 0">
+                        <span *ngFor="let class of course.classes"><a href="">{{class.name}}, </a></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <!-- <div class="float-right"> -->
+                  <button mdbBtn color="info" class="ml-0" size="sm" mdbWavesEffect
+                    [routerLink]="['/editTeacher', teacher.id]">Editer</button>
+                  <button mdbBtn color="info" size="sm" mdbWavesEffect class="ml-2"
+                    [routerLink]="['/teacherAssignment', teacher.id]" [disabled]="teacher.courseClasses.length === 0"
+                    (click)="assignment(teacher)">Affecter</button>
+                  <!-- </div> -->
+                </div>
+                <div class="col-md-12"><hr class="my-4"></div>
+              </div>
             </div>
           </div>
-          <div class="mb-4" style="border-top: 1px solid #cccccc"></div>
-
-          <div class="d-flex border-bottom-dotted-dim pb-3 mb-3" *ngFor="let teacher of teachersCourses">
-            <img class="avatar-md rounded mr-3" src="{{teacher.photoUrl || '../../assets/user.png'}}" alt="">
-            <div class="flex-grow-1">
-              <h6 class="m-0">{{teacher.lastName}} {{teacher.firstName}} </h6>
-              <span> {{teacher.email}}.&nbsp; &nbsp; Contact: {{teacher.phoneNumber}} {{teacher.secondPhoneNumber}}
-              </span>
-              <p class="m-0 text text-muted"><b>Cours : </b> <span *ngIf="teacher.courseClasses.length===0">Aucun</span>
-                <span *ngIf="teacher.courseClasses.length>0">
-                  <span *ngFor="let course of teacher.courseClasses">
-                    {{course.course.name}} <span *ngIf="course.classes.length>0">:<span
-                        *ngFor="let class of course.classes"><a href="">{{class.name}}, </a></span></span>
-                  </span>
+        </div>
+        <!-- <div class="d-flex mb-3" *ngFor="let teacher of teachersCourses">
+          <div class="flex-grow-1">
+            <h6 class="m-0">{{teacher.lastName}} {{teacher.firstName}} </h6>
+            <span> {{teacher.email}}.&nbsp; &nbsp; Contact: {{teacher.phoneNumber}} {{teacher.secondPhoneNumber}}
+            </span>
+            <p class="m-0 text text-muted"><b>Cours : </b> <span *ngIf="teacher.courseClasses.length===0">Aucun</span>
+              <span *ngIf="teacher.courseClasses.length>0">
+                <span *ngFor="let course of teacher.courseClasses">
+                  {{course.course.name}} <span *ngIf="course.classes.length>0">:<span
+                      *ngFor="let class of course.classes"><a href="">{{class.name}}, </a></span></span>
                 </span>
-
-              </p>
-            </div>
-            <div>
-              <button mdbBtn color="info" size="sm" mdbWavesEffect [routerLink]="['/editTeacher',teacher.id]"
-                routerLinkActive="router-link-active">Editer</button>
-              <button mdbBtn color="light" size="sm" mdbWavesEffect class="ml-2"
-                [routerLink]="['/teacherAssignment',teacher.id]" [disabled]="teacher.courseClasses.length===0"
-                (click)="assignment(teacher)">Affecter</button>
-            </div>
+              </span>
+            </p>
           </div>
-          <div *ngIf="teachersCourses.length===0">
-              <h3>Aucun enseignant enregistré pour l'instant...</h3>
+          <div>
+            <button mdbBtn color="info" size="sm" mdbWavesEffect [routerLink]="['/editTeacher',teacher.id]"
+              routerLinkActive="router-link-active">Editer</button>
+            <button mdbBtn color="light" size="sm" mdbWavesEffect class="ml-2"
+              [routerLink]="['/teacherAssignment',teacher.id]" [disabled]="teacher.courseClasses.length===0"
+              (click)="assignment(teacher)">Affecter</button>
           </div>
-
+        </div> -->
+        <div *ngIf="teachersCourses.length === 0">
+            <h3>Aucun enseignant enregistré pour l'instant...</h3>
         </div>
 
       </div>
@@ -69,4 +105,5 @@
       </div>
     </div>
   </div>
+
 </div>

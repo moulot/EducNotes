@@ -1,7 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { User } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
-import { environment } from 'src/environments/environment';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Router } from '@angular/router';
 
@@ -11,6 +10,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./nav-parent.component.css']
 })
 export class NavParentComponent implements OnInit {
+  @Output() closeNav = new EventEmitter();
   user: User;
   photoUrl: string;
   currentChild: User;
@@ -25,6 +25,10 @@ export class NavParentComponent implements OnInit {
       this.currentChild.id = 0;
     }
     this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
+  }
+
+  closeNavOnClick() {
+    this.closeNav.emit();
   }
 
   loggedIn() {
