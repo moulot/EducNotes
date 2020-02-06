@@ -784,7 +784,7 @@ namespace EducNotes.API.Data
                         toEmail = parent.Email,
                         subject = "Confirmation mise en salle de votre enfant ",
                         content = "<b> Bonjour " + parent.LastName + " " + parent.FirstName + "</b>, <br>" +
-                        "Votre enfant <b>" + student.FirstName + " " + student.FirstName +
+                        "Votre enfant <b>" + student.LastName + " " + student.FirstName +
                         " </b> a bien été enregistré(s) dans la classe de <b>" + student.Class.Name
                     };
                     await SendEmail(emailform);
