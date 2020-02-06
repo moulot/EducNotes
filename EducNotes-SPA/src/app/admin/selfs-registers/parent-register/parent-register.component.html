@@ -1,458 +1,387 @@
-<div class="animated flash" *ngIf="wait && showSuccessDiv===false">
+<!-- <div class="z-depth-1 m-2">
+  <div class="div p-4">
+    <mdb-stepper #stepper1 [linear]="true" [vertical]="false">
+      <mdb-step name="Step 1" label="Type something" [stepForm]="firstFormGroup1">
+        <form [formGroup]="firstFormGroup1">
+          <div class="md-form">
+            <input type="text" class="form-control" mdbInput mdbValidate formControlName="email">
+            <label for="">Email</label>
+            <mdb-error *ngIf="email.invalid && (email.dirty || email.touched)">Input invalid</mdb-error>
+            <mdb-success *ngIf="email.valid && (email.dirty || email.touched)">Input valid</mdb-success>
+          </div>
+        </form>
+        <button mdbBtn size="sm" color="primary" (click)="stepper1.next()">CONTINUE</button>
+      </mdb-step>
+      <mdb-step name="Step 2" [stepForm]="secondFormGroup1">
+        <form [formGroup]="secondFormGroup1">
+          <div class="md-form">
+            <input type="password" class="form-control" mdbInput mdbValidate formControlName="password">
+            <label for="">Password</label>
+            <mdb-error *ngIf="password.invalid && (password.dirty || password.touched)">Input invalid</mdb-error>
+            <mdb-success *ngIf="password.valid && (password.dirty || password.touched)">Input valid</mdb-success>
+          </div>
+        </form>
+        <button mdbBtn size="sm" color="primary" (click)="stepper1.next()">CONTINUE</button>
+        <button mdbBtn size="sm" color="secondary" (click)="stepper1.previous()">BACK</button>
+      </mdb-step>
+      <mdb-step name="Step 3" label="Step 3 label">
+        <p class="pl-2">Finish!</p>
+        <div class="step-actions">
+          <button mdbBtn size="sm" color="primary" (click)="onSubmit()">SUBMIT</button>
+        </div>
+      </mdb-step>
+    </mdb-stepper>
+  </div>
+</div> -->
 
-    <mdb-card>
-
+<div class="row m-2">
+  <div class="col-md-12">
+    <div class="lead">Educ'Notes - inscription du parent et de ses enfants</div>
+  </div>
+  
+  <div class="col-md-12">
+    <div class="animated flash" *ngIf="wait">
+      <mdb-card>
         <mdb-card-header class="info-color white-text text-center py-4">
-            <p class="lead">Traitement en cours</p>
+          <p class="lead">Traitement en cours</p>
         </mdb-card-header>
-
-        <!--Card content-->
+    
         <mdb-card-body>
-            <h3>patienter s'il vous plait...</h3>
+          <h3>patienter s'il vous plait...</h3>
         </mdb-card-body>
-    </mdb-card>
+      </mdb-card>
+    </div>
+  </div>
 
-
-</div>
-<mdb-stepper #stepper [vertical]="true" *ngIf="!wait && showSuccessDiv===false" class="animated slideInUp">
-    <mdb-step name="Infos Parent" [stepForm]="parentForm" class="step1">
-        <div class="col-md-12">
-            <mdb-card>
-                <mdb-card-body class="pt-0">
-                    <form class="text-center" style="color: #757575;" [formGroup]="parentForm">
-
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <input type="text" class="form-control" id="lastName" formControlName="lastName"
-                                        class="form-control" mdbInput>
-                                    <label for="lastName">Nom</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <input type="text" class="form-control" id="firstName" formControlName="firstName"
-                                        mdbInput>
-                                    <label for="firstName">Prénom(s)</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <input type="text" class="form-control" id="email" readonly formControlName="email"
-                                        class="form-control" mdbInput>
-                                    <label for="email">Email</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <input type="text" class="form-control" id="userName"
-                                        (blur)="parentNameVerification()" formControlName="userName" class="form-control"
-                                        mdbInput>
-                                    <label for="userName">nom d'utilisateur</label>
-                                    <span *ngIf="parentNameExist" class="text-danger">nom d'utilisateur déja utilisé...
-                                        Veuillez reéssayer un autre</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <mdb-select id="gender" [options]="sexe" placeholder="Sexe"
-                                        formControlName="gender"></mdb-select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <input type="text" class="form-control" id="dateofBirth"
-                                        formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
-                                    <label for="dateofBirth">Date de naissance</label>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <input type="password" mdbValidate id="password" minlength="4"
-                                        (change)="updateparentConfirmValidator()" formControlName="password"
-                                        class="form-control" mdbInput>
-                                    <label for="password">mot de passe</label>
-
-                                    <span *ngIf="parentForm.get('password').dirty && parentForm.get('password').errors"
-                                        class="text-danger">Le mot de passe doit comporter au moins 4 caractères.</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <input type="password" class="form-control" mdbValidate id="checkPassword"
-                                        formControlName="checkPassword" class="form-control" mdbInput>
-                                    <label for="checkPassword">Confirmer le mot de passe</label>
-
-                                    <div class="text-danger"
-                                        *ngIf="parentForm.get('checkPassword').dirty && parentForm.get('checkPassword').errors">
-                                        <span *ngIf="parentForm.get('checkPassword').hasError('required')">
-                                            Confirmer le mot de passe!
-                                        </span>
-                                        <span *ngIf="parentForm.get('checkPassword').hasError('confirm')">
-                                            Les deux mots de passe que vous entrez sont differents !
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <input type="text" class="form-control" id="phoneNumber"
-                                        [textMask]="{mask: phoneMask}" formControlName="phoneNumber"
-                                        class="form-control" mdbInput>
-                                    <label for="phoneNumber">Contact principal</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <input type="text" class="form-control" id="sphone" [textMask]="{mask: phoneMask}"
-                                        formControlName="secondPhoneNumber" class="form-control" mdbInput>
-                                    <label for="sphone">Deuxieme Contact</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <mdb-select id="cityId" [options]="cities" placeholder="ville de résidence"
-                                        (ngModelChange)="getparentDistricts()" formControlName="cityId"></mdb-select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="md-form">
-                                    <mdb-select id="districtId" [options]="parentDisctricts"
-                                        placeholder="quartier/commune de résidence" formControlName="districtId">
-                                    </mdb-select>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row m-0">
-                            <div class="file-field md-form m-0">
-                                <div mdbBtn color="primary" size="sm" class="waves-light" mdbWavesEffect>
-                                    <span>Cliquer ici pour ajouter une photo</span>
-                                    <input type="file" accept='image/*' mdbFileSelect
-                                        (change)="parentImgResult($event)">
-                                </div>
-                                <div class="file-path-wrapper">
-                                    <img [src]="parentPhotoUrl" class="rounded-circle imgUpload" *ngIf="parentPhotoUrl"
-                                        alt="">
-                                </div>
-                            </div>
-                        </div>
-
-                    </form>
-                </mdb-card-body>
-            </mdb-card>
-
-        </div>
-
-        <button mdbBtn size="sm" color="primary" (click)="stepper.next()"
-            [disabled]="!parentForm.valid || parentNameExist === true">CONTINUER</button>
-    </mdb-step>
-    <mdb-step name="Infos Enfant(s)" [stepForm]="secondFormGroup" class="step2">
-        <div *ngIf="showChildenList" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
-            <div class="card">
-                <div class="card-body">
-                    <ngb-alert type="info" [dismissible]="false">
-                        <strong class="text-capitalize">info!</strong> vous avez {{maxChild}} enfant(s) pré-inscris.
-                        <p>{{children.length}} sur {{maxChild}} enregistré(s)</p>
-                    </ngb-alert>
-
-                    <button type="button" mdbBtn color="info" mdbWavesEffect size="sm" (click)="add()"
-                        *ngIf="children.length < maxChild">ajouter enfant</button>
-
-                    <div class="col-md-12" *ngIf="children.length > 0">
-                        <div class="card">
-                            <div class="card-body p-0">
-                                <div class="card-title">Enfants</div>
-                                <div *ngFor="let child of children">
-                                    <div class="d-flex align-items-center border-bottom-dotted-dim mb-1">
-
-
-                                        <div *ngIf="child.photoUrl" class="mr-2">
-                                            <img src="{{child.photoUrl}}" class='rounded-circle'>
-                                        </div>
-                                        <div *ngIf="!child.photoUrl">
-                                            <i class="i-Girl m-2" style="font-size: 2rem" *ngIf="child.gender == 0"></i>
-                                            <i class="i-Boy m-2" style="font-size: 2rem" *ngIf="child.gender == 1"></i>
-                                        </div>
-
-
-                                        <div class="flex-grow-1">
-                                            <h6 class="m-0"> {{child.lastName}} {{child.firstName}} </h6>
-                                            <p class="m-0 text-small text-muted">Niveau:{{child.level}} &nbsp;&nbsp;
-                                                Date de naissance: {{child.dateOfBirth}} </p>
-                                            <p class="m-0 text-small text-muted"> <span *ngIf="child.email"> Email:
-                                                    {{child.email}} </span> <span
-                                                    *ngIf="child.phoneNumber || child.secondPhoneNumber"> &nbsp;&nbsp;
-                                                    Contact(s): {{child.phoneNumber}} {{child.secondPhoneNumber}}</span>
-                                            </p>
-                                            <div>
-                                                <span></span>
-                                                <table class="table-condensed table-stripped">
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>Frais </th>
-                                                    </tr>
-                                                    <tr *ngFor="let prod of productsSelected,index as i">
-                                                        <td>{{i+1}}</td>
-                                                        <td>{{prod.details}}</td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                            <p>
-                                                <button mdbBtn type="button" color="light" size="sm" mdbWavesEffect
-                                                    (click)="edit(child)" class="mr-1">editer</button>
-                                                <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
-                                                    (click)="confirm(child)">supprimer</button>
-
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div *ngIf="children.length === maxChild">
-                <button mdbBtn size="sm" color="primary" (click)="stepper.next(); onStep3Next()">CONTINUER</button>
-                <button mdbBtn size="sm" color="secondary" (click)="stepper.previous()">RETOUR</button>
-            </div>
-        </div>
-        <!-- ----------------------------------------------------------------------------------------------------  -->
-        <!-- ---------------------------------------FORMULAIRE DES ENFANTS--------------------------------------- -->
-        <!-- ----------------------------------------------------------------------------------------------------  -->
-
-        <div *ngIf="!showChildenList" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
-            <div class="col-md-12">
-                <mdb-card>
-                    <mdb-card-body class="pt-0">
-                        <form class="text-center" style="color: #757575;" [formGroup]="childForm">
-
-                            <div class="form-row">
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="text" id="clastName" formControlName="lastName"
-                                            class="form-control" mdbInput>
-                                        <label for="clastName">Nom</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="text" id="cfirstName" formControlName="firstName"
-                                            class="form-control" mdbInput>
-                                        <label for="cfirstName">Prénom(s)</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <mdb-select id="cgender" [options]="sexe" placeholder="Sexe"
-                                            formControlName="gender"></mdb-select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="text" id="cuserName" (blur)="childNameVerification()"
-                                            formControlName="userName" class="form-control" mdbInput>
-                                        <label for="cuserName">nom d'utilisateur</label>
-                                        <span *ngIf="childNameExist" class="text-danger">nom d'utilisateur déja
-                                            utilisé... Veuillez réessayer un autre</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="password" mdbValidate id="cpassword" minlength="4"
-                                            (change)="updateChilConfirmValidator()" formControlName="password"
-                                            class="form-control" mdbInput>
-                                        <label for="cpassword">mot de passe</label>
-                                        <span
-                                            *ngIf="childForm.get('password').dirty && childForm.get('password').errors"
-                                            class="text-danger">Le mot de passe doit comporter au moins 4
-                                            caractères.</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="password" mdbValidate id="ccheckPassword" minlength="4"
-                                            formControlName="checkPassword" class="form-control" mdbInput>
-                                        <label for="ccheckPassword">Confirmer le mot de passe</label>
-
-                                        <div class="text-danger"
-                                            *ngIf="childForm.get('checkPassword').dirty && childForm.get('checkPassword').errors">
-                                            <span *ngIf="childForm.get('checkPassword').hasError('required')">
-                                                Confirmer le mot de passe!
-                                            </span>
-                                            <span *ngIf="childForm.get('checkPassword').hasError('confirm')">
-                                                Les deux mots de passe que vous entrez sont differents !
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="text" class="form-control" id="cemail" formControlName="email"
-                                            class="form-control" mdbInput>
-                                        <label for="cemail">Email (facultatif)</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="text" class="form-control" id="cdateofBirth"
-                                            formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
-                                        <label for="cdateofBirth">Date de naissance*</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="text" class="form-control" id="cphoneNumber"
-                                            [textMask]="{mask: phoneMask}" formControlName="phoneNumber"
-                                            class="form-control" mdbInput>
-                                        <label for="cphoneNumber">Contact principal(facultatif)</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="text" class="form-control" id="csphone"
-                                            [textMask]="{mask: phoneMask}" formControlName="secondPhoneNumber"
-                                            class="form-control" mdbInput>
-                                        <label for="csphone">Deuxieme Contact(facultatif)</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col-md-6">
-                                    <div class="row m-2">
-                                        <mdb-select id="clevelId" [options]="levels" placeholder="Choisir le niveau"
-                                            (ngModelChange)="getProducts()" formControlName="levelId"></mdb-select>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="row m-2">
-                                        <mdb-select id="productIds" [highlightFirst]="false" [options]="products"
-                                            [multiple]="true" placeholder="services additionnels"
-                                            formControlName="productIds"></mdb-select>
-                                    </div>
-                                </div>
-
-                            </div>
-                            
-                        
-                            <div class="form-row">
-                                <div class="file-field md-form">
-                                    <div mdbBtn color="primary" size="sm" class="waves-light" mdbWavesEffect>
-                                        <span> <span>Cliquer ici pour ajouter une photo</span></span>
-                                        <input type="file" accept='image/*' mdbFileSelect
-                                            (change)="childImgResult($event)">
-                                    </div>
-                                    <div class="file-path-wrapper">
-                                        <img [src]="childPhotoUrl" class="rounded-circle imgUpload"
-                                            *ngIf="childPhotoUrl" alt="">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <button mdbBtn type="button" color="primary" size="sm" mdbWavesEffect
-                                    [disabled]="!childForm.valid || childNameExist === true"
-                                    (click)="submitChild()">enregistrer</button>
-                                <button type="button" mdbBtn color="light" mdbWavesEffect size="sm"
-                                    (click)="open()">annuler</button>
-                            </div>
-                        </form>
-                    </mdb-card-body>
-                </mdb-card>
-            </div>
-        </div>
-
-    </mdb-step>
-    <mdb-step name="Récapitulatif" label="Dernière étape" class="step3">
+  <div class="col-md-12">
+    <mdb-stepper #stepper *ngIf="!wait" [vertical]="isVertical" class="animated slideInUp">
+      <mdb-step name="inscription" label="infos des parents" [stepForm]="parentForm" class="step1">
         <div class="row">
-            <div class="col-md-6" *ngIf="children.length>0">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="card-title">Enfants</div>
-                        <div *ngFor="let child of children">
-
-                            <div class="d-flex align-items-center border-bottom-dotted-dim pb-3 mb-3">
-                                <div *ngIf="child.photoUrl" class="mr-2">
-                                    <img src="{{child.photoUrl}}" class='rounded-circle'>
-                                </div>
-                                <div *ngIf="!child.photoUrl">
-                                    <i class="i-Girl m-2" style="font-size: 2rem" *ngIf="child.gender == 0"></i>
-                                    <i class="i-Boy m-2" style="font-size: 2rem" *ngIf="child.gender == 1"></i>
-                                </div>
-
-                                <div class="flex-grow-1">
-                                    <h6 class="m-0"> {{child.lastName}} {{child.firstName}} </h6>
-                                    <p class="m-0 text-small text-muted">Niveau:{{child.level}} &nbsp;&nbsp; Date de
-                                        naissance: {{child.dateOfBirth}} </p>
-                                    <p class="m-0 text-small text-muted"> Email: {{child.email}} &nbsp;&nbsp;
-                                        Contact(s): {{child.phoneNumber}} {{child.secondPhoneNumber}} </p>
-                                </div>
-
-                            </div>
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-body p-2">
+                <form style="color: #757575;" [formGroup]="parentForm">
+                  <div class="row">
+                    <div class="col-md-2">
+                      <!-- <div class="font-weight-300 mb-2  d-flex justify-content-center">photo de profil</div> -->
+                      <div class="row">
+                        <div class="col-md-12 d-flex justify-content-center mb-2">
+                          <div class="file-path-wrapper m-0 p-1" style="width: 100px; height: 100px;">
+                            <img [src]="parentPhotoUrl || '../../assets/user.png'" class="rounded-circle imgUpload" alt="">
+                          </div>
                         </div>
-
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6" *ngIf="parents.length>0">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="card-title">Parents</div>
-                        <div class="d-flex align-items-center border-bottom-dotted-dim pb-3 mb-3">
-
-                            <img class="rounded-circle" src="{{parent.photoUrl || '../../../../assets/user.png'}}"
-                                alt="">
-                            <div class="flex-grow-1">
-                                <h6 class="m-0"> {{parent.lastName}} {{parent.firstName}} </h6>
-                                <p class="m-0 text-small text-muted">ville: {{parent.city}} &nbsp;&nbsp; Quartier:
-                                    {{parent.district}} </p>
-                                <p class="m-0 text-small text-muted"> Email: {{parent.email}} &nbsp;&nbsp; Contact(s):
-                                    {{parent.phoneNumber}} {{parent.secondPhoneNumber}} </p>
+                        <div class="col-md-12 d-flex justify-content-center">
+                          <div class="m-0">
+                            <div class="file-field md-form m-0">
+                              <div mdbBtn color="primary" size="sm" class="waves-light" mdbWavesEffect>
+                                <span>choisir la photo</span>
+                                <input type="file" accept='image/*' mdbFileSelect (change)="parentImgResult($event)">
+                              </div>
                             </div>
-
+                          </div>
                         </div>
-
+                      </div>
                     </div>
+                    <div class="col-md-10">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <input type="text" class="form-control" id="lastName" formControlName="lastName" class="form-control" mdbInput>
+                            <label for="lastName">nom</label>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <input type="text" class="form-control" id="firstName" formControlName="firstName" mdbInput>
+                            <label for="firstName">prénom</label>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <input type="text" class="form-control" id="userName" (blur)="parentNameVerification()" formControlName="userName" class="form-control" mdbInput>
+                            <label for="userName">nom d'utilisateur</label>
+                            <span *ngIf="parentNameExist" class="text-danger">nom d'utilisateur déja utilisé... Veuillez reéssayer un autre</span>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <mdb-select id="gender" [options]="sexe" placeholder="sexe" formControlName="gender"></mdb-select>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <input type="text" class="form-control" id="dateofBirth" formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
+                            <label for="dateofBirth">date de naissance</label>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <mdb-select id="cityId" [options]="cities" placeholder="ville de résidence" (ngModelChange)="getParentDistricts()" formControlName="cityId"></mdb-select>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <mdb-select id="districtId" [options]="parentDisctricts" placeholder="quartier/commune" formControlName="districtId">
+                            </mdb-select>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <input type="text" class="form-control" id="email" readonly formControlName="email" class="form-control" mdbInput>
+                            <label for="email">email</label>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <input type="text" class="form-control" id="phoneNumber" [textMask]="{mask: phoneMask}" formControlName="phoneNumber" class="form-control" mdbInput>
+                            <label for="phoneNumber">cellulaire</label>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <input type="text" class="form-control" id="sphone" [textMask]="{mask: phoneMask}" formControlName="secondPhoneNumber" class="form-control" mdbInput>
+                            <label for="sphone">deuxieme Contact</label>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <input type="password" mdbValidate id="password" minlength="4" (change)="updateparentConfirmValidator()" formControlName="password" class="form-control" mdbInput>
+                            <label for="password">mot de passe</label>  
+                            <span *ngIf="parentForm.get('password').dirty && parentForm.get('password').errors" class="text-danger">le mot de passe doit comporter au moins 4 caractères.</span>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form form-sm mt-2 mb-0">
+                            <input type="password" class="form-control" mdbValidate id="checkPassword" formControlName="checkPassword" class="form-control" mdbInput>
+                            <label for="checkPassword">confirmer le mot de passe</label>
+    
+                            <div class="text-danger" *ngIf="parentForm.get('checkPassword').dirty && parentForm.get('checkPassword').errors">
+                              <span *ngIf="parentForm.get('checkPassword').hasError('required')">confirmer le mot de passe!</span>
+                              <span *ngIf="parentForm.get('checkPassword').hasError('confirm')">
+                                les deux mots de passe que vous entrez sont differents!
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-12"><hr></div>
+                    <div class="col-md-12">
+                      <button mdbBtn size="sm" color="primary" (click)="stepper.next()" [disabled]="!parentForm.valid || childNameExist === true" >CONTINUER</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mdb-step>
+      <mdb-step name="inscription des enfants" [stepForm]="secondFormGroup" class="step2">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-body p-2">  
+                <div *ngIf="showChildenList" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="alert alert-primary" role="alert">
+                        <p class="text-17 font-weight-400 m-0">vous avez {{maxChild}} enfants préinscris. {{children.length}} enfant(s) sur {{maxChild}} enregistré(s)</p>
+                      </div>
+                    </div>
+                    <div class="col-md-12">
+                      <button type="button" mdbBtn color="light" mdbWavesEffect size="sm" (click)="add()" *ngIf="children.length < maxChild">ajouter enfant</button>
+                    </div>
+                    <div class="col-md-12" *ngIf="children.length > 0">
+                      <div class="row">
+                        <div class="col-md-12"><hr></div>
+                        <div class="col-md-3 mt-5 mb-md-5 mb-1" *ngFor="let child of children">
+                          <app-register-child-card [child]="child" (prodSelected)="productsSelected"
+                            (edit)="edit($event)" (confirm)="confirm($event)"></app-register-child-card>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-12"><hr></div>
+                    <div class="col-md-12">
+                      <button mdbBtn size="sm" color="primary" (click)="stepper.next(); onStep3Next()">CONTINUER</button>
+                      <button mdbBtn size="sm" color="primary" (click)="stepper.previous()">RETOUR</button>
+                    </div>
+                  </div>
                 </div>
+                <!-- ---------------------------------------------------------------------------------------------------- -->
+                <!-- ---------------------------------------FORMULAIRE DES ENFANTS--------------------------------------- -->
+                <!-- ---------------------------------------------------------------------------------------------------- -->  
+                <div *ngIf="!showChildenList" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+                  <form style="color: #757575;" [formGroup]="childForm">
+
+                    <div class="row">
+                      <div class="col-md-2">
+                        <div class="row">
+                          <div class="col-md-12 d-flex justify-content-center mb-2">
+                            <div class="file-path-wrapper m-0 p-1" style="width: 100px; height: 100px;">
+                              <img [src]="childPhotoUrl || '../../assets/user.png'" class="rounded-circle imgUpload" alt="">
+                            </div>
+                          </div>
+                          <div class="col-md-12 d-flex justify-content-center">
+                            <div class="m-0">
+                              <div class="file-field md-form m-0">
+                                <div mdbBtn color="primary" size="sm" class="waves-light" mdbWavesEffect>
+                                  <span>choisir la photo</span>
+                                  <input type="file" accept='image/*' mdbFileSelect (change)="childImgResult($event)">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-10">
+                        <div class="row">
+                          <div class="col-md-4">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <input type="text" class="form-control" id="clastName" formControlName="lastName" class="form-control" mdbInput>
+                              <label for="lastName">nom</label>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <input type="text" class="form-control" id="cfirstName" formControlName="firstName" mdbInput>
+                              <label for="firstName">prénom</label>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <input type="text" class="form-control" id="cuserName" (blur)="childNameVerification()" formControlName="userName" class="form-control" mdbInput>
+                              <label for="userName">nom d'utilisateur</label>
+                              <span *ngIf="childNameExist" class="text-danger">nom d'utilisateur déja utilisé... Veuillez reéssayer un autre</span>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <mdb-select id="cgender" [options]="sexe" placeholder="sexe" formControlName="gender"></mdb-select>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <input type="text" class="form-control" id="cdateofBirth" formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
+                              <label for="cdateofBirth">date de naissance</label>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <mdb-select id="clevelId" [options]="levels" placeholder="choisir le niveau" formControlName="levelId"
+                                (ngModelChange)="getProducts()"></mdb-select>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <input type="text" class="form-control" id="cemail" formControlName="email" class="form-control" mdbInput>
+                              <label for="cemail">email</label>
+                            </div>
+                          </div>
+                          <div class="col-md-3">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <input type="text" class="form-control" id="cphoneNumber" [textMask]="{mask: phoneMask}" formControlName="phoneNumber" class="form-control" mdbInput>
+                              <label for="cphoneNumber">cellulaire</label>
+                            </div>
+                          </div>
+                          <div class="col-md-3">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <input type="text" class="form-control" id="csphone" [textMask]="{mask: phoneMask}" formControlName="secondPhoneNumber" class="form-control" mdbInput>
+                              <label for="csphone">deuxieme Contact</label>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <input type="password" mdbValidate id="cpassword" minlength="4" (change)="updateChilConfirmValidator()" formControlName="password" class="form-control" mdbInput>
+                              <label for="cpassword">mot de passe</label>  
+                              <span *ngIf="childForm.get('password').dirty && childForm.get('password').errors" class="text-danger">le mot de passe doit comporter au moins 4 caractères.</span>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <input type="password" class="form-control" mdbValidate id="ccheckPassword" formControlName="checkPassword" class="form-control" mdbInput>
+                              <label for="ccheckPassword">confirmer le mot de passe</label>
+      
+                              <div class="text-danger" *ngIf="childForm.get('checkPassword').dirty && childForm.get('checkPassword').errors">
+                                <span *ngIf="childForm.get('checkPassword').hasError('required')">confirmer le mot de passe!</span>
+                                <span *ngIf="childForm.get('checkPassword').hasError('confirm')">
+                                  les deux mots de passe que vous entrez sont differents!
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="md-form form-sm mt-2 mb-0">
+                              <mdb-select id="productIds" [highlightFirst]="false" [options]="products"
+                                [multiple]="true" placeholder="services additionnels" formControlName="productIds"></mdb-select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-12"><hr></div>
+                      <div class="col-md-12">
+                        <button mdbBtn type="button" color="light" size="sm" mdbWavesEffect
+                          [disabled]="!childForm.valid || childNameExist === true"
+                          (click)="submitChild()">enregistrer</button>
+                          <button type="button" mdbBtn color="light" mdbWavesEffect size="sm" (click)="open()">annuler</button>
+                      </div>
+                    </div>
+
+                  </form>
+                </div>
+              </div>
             </div>
-            <div class="col-md-12">
-                <button mdbBtn size="sm" color="primary" (click)="onComplete()">terminer</button>
+          </div>
+        </div>
+      </mdb-step>
+      <mdb-step name="récapitulatif de l'inscription" class="step3">
+        <div class="row">
+          <div class="col-md-3" *ngIf="parents.length > 0">
+            <p class="text-17 font-weight-400 m-0">parent</p>
+            <hr class="">
+            <div class="pt-5 mb-5">
+              <mdb-card class="testimonial-card">
+                <!--Avatar-->
+                <div class="avatar mx-auto">
+                  <img src="{{parent.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+                </div>
+                <mdb-card-body class="p-2">
+                  <p class="text-15 m-0">{{parent.lastName}} {{parent.firstName}}</p>
+                  <p class="text-15 m-0" *ngIf="parent.email">{{parent.email}}</p>
+                  <!-- <p class="text-15 m-0" *ngIf="!parent.email">email: N/D</p> -->
+                  <div class="text-15 m-0" *ngIf="parent.phoneNumber">cell: {{parent.phoneNumber}}</div>
+                  <div class="text-15 m-0" *ngIf="!parent.phoneNumber">cell: N/D</div>
+                </mdb-card-body>
+              </mdb-card>
             </div>
+          </div>
+          <div class="col-md-9" *ngIf="children.length>0">
+            <p class="text-17 font-weight-400 m-0">enfants</p>
+            <hr class="">
+            <div class="row">
+              <div class="col-md-4 my-5" *ngFor="let child of children">
+                <div *ngIf="children.length > 0">
+                  <mdb-card class="testimonial-card">
+                    <!--Avatar-->
+                    <div class="avatar mx-auto">
+                      <img src="{{child.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+                    </div>
+                    <mdb-card-body class="p-2">
+                      <p class="text-17 m-0">{{child.lastName}} {{child.firstName}}</p>
+                      <p class="text-17 m-0">classe <b>{{child.level}}</b></p>
+                      <!-- <p class="text-15 m-0" *ngIf="child.email">email: {{child.email}}</p>
+                      <p class="text-15 m-0" *ngIf="!child.email">email: N/D</p> -->
+                      <!-- <div class="text-15 m-0" *ngIf="child.phoneNumber">cell: {{child.phoneNumber}}</div> -->
+                      <!-- <div class="text-15 m-0" *ngIf="!child.phoneNumber">cell: N/D</div> -->
+                    </mdb-card-body>
+                  </mdb-card>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <hr>
+            <button mdbBtn size="sm" color="primary" (click)="onComplete()">terminer</button>
+          </div>
         </div>
     </mdb-step>
 </mdb-stepper>

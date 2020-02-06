@@ -110,17 +110,12 @@ namespace EducNotes.API.Controllers
                     {
                         token = await GenerateJwtToken(user),
                         user = userToReturn
-
                     });
                 }
                 return BadRequest("impossible de terminé l'action");
             }
             return NotFound();
         }
-
-
-
-
 
         [HttpGet("{email}/ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(string email)
@@ -225,11 +220,9 @@ namespace EducNotes.API.Controllers
         {
             var claims = new List<Claim>
                     {
-                                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                                new Claim(ClaimTypes.Name, user.UserName)
-                            };
-
-
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Name, user.UserName)
+                    };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8
                 .GetBytes(_config.GetSection("AppSettings:Token").Value));

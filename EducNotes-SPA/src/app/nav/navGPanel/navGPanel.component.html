@@ -1,4 +1,4 @@
-<mdb-navbar SideClass="navbar navbar-expand-md navbar-light white ie-nav fixed-top scrolling-navbar" [containerInside]="false">
+<mdb-navbar #navbarid SideClass="navbar navbar-expand-md navbar-light white ie-nav fixed-top scrolling-navbar" [containerInside]="false">
     <mdb-navbar-brand>
         <div class="logo">
             <img src="../../../assets/images/hat_logo.png" alt="">
@@ -7,19 +7,19 @@
     <links>
         <ul class="navbar-nav mr-auto">
             <div *ngIf="parentLoggedIn()">
-                <app-nav-parent></app-nav-parent>
+                <app-nav-parent (closeNav)="closeNav()"></app-nav-parent>
             </div>        
             
             <div *ngIf="studentLoggedIn()">
-                <app-nav-student></app-nav-student>
+                <app-nav-student (closeNav)="closeNav()"></app-nav-student>
             </div>        
             
             <div *ngIf="teacherLoggedIn()">
-                <app-nav-teacher></app-nav-teacher>
+                <app-nav-teacher (closeNav)="closeNav()"></app-nav-teacher>
             </div>        
                 
             <div *ngIf="adminLoggedIn()">
-                <app-nav-admin></app-nav-admin>
+                <app-nav-admin (closeNav)="closeNav()"></app-nav-admin>
             </div>
         </ul>
         <ul class="navbar-nav nav-flex-icons">

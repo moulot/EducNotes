@@ -11,29 +11,7 @@ namespace EducNotes.API.Data
     {
         public static void SeedUsers(DataContext context, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
-            var teachersCourses = context.TeacherCourses.ToList();
-            if (teachersCourses.Count() == 0)
-            {
-                var classCourses = context.ClassCourses.ToList();
-                // ajout des teachersCourses
-                foreach (var classCourse in classCourses)
-                {
-                    var newteacherCourse = new TeacherCourse
-                    {
-                        TeacherId = Convert.ToInt32(classCourse.TeacherId),
-                        CourseId = Convert.ToInt32(classCourse.CourseId)
-                    };
-                    context.Add(newteacherCourse);
-                }
-                // suppression 
-                context.ClassCourses.RemoveRange(classCourses);
-
-
-                context.SaveChanges();
-
-            }
-
-            if (!userManager.Users.Any())
+          if (!userManager.Users.Any())
             {
                 // var userData = System.IO.File.ReadAllText("Data/UserSeedData.json");
                 // var users = JsonConvert.DeserializeObject<List<User>>(userData);

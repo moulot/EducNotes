@@ -1,0 +1,25 @@
+<mdb-card class="testimonial-card">
+  <!--Avatar-->
+  <div class="avatar mx-auto">
+    <img src="{{child.photoUrl || '../../assets/user.png'}}" class="rounded-circle img-responsive">
+  </div>
+
+  <mdb-card-body class="p-2">
+    <p class="text-17 m-0">{{child.lastName}} {{child.firstName}}</p>
+    <p class="text-17 m-0">classe <b>{{child.level}}</b></p>
+    <!-- <p class="text-15 m-0" *ngIf="child.email">email: {{child.email}}</p>
+    <p class="text-15 m-0" *ngIf="!child.email">email: N/D</p>
+    <div class="text-15 m-0" *ngIf="child.phoneNumber">cell: {{child.phoneNumber}}</div>
+    <div class="text-15 m-0" *ngIf="!child.phoneNumber">cell: N/D</div> -->
+  </mdb-card-body>
+  <mdb-card-footer>
+    <div class="row d-flex">
+      <div class="text-center w-50">
+        <div class="text-15 text-primary csr-link" (click)="editChild(child)" style="cursor: pointer;">editer</div>
+      </div>
+      <div class="text-center w-50">
+        <div class="text-15 text-primary csr-link" (click)="confirmChild(child)" style="cursor: pointer;">supprimer</div>
+      </div>
+    </div>
+  </mdb-card-footer>
+</mdb-card>

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { User } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./nav-teacher.component.css']
 })
 export class NavTeacherComponent implements OnInit {
+  @Output() closeNav = new EventEmitter();
   user: User;
   photoUrl: string;
 
@@ -19,6 +20,10 @@ export class NavTeacherComponent implements OnInit {
   ngOnInit() {
     this.user = this.authService.currentUser;
     this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
+  }
+
+  closeNavOnClick() {
+    this.closeNav.emit();
   }
 
   loggedIn() {

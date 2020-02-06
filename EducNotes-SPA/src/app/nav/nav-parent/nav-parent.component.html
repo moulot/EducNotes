@@ -20,22 +20,22 @@
 
 <ul class="navbar-nav mr-auto">
   <li class="nav-item waves-light" mdbWavesEffect>
-    <a class="nav-link text-muted" [routerLink]="['/home']">accueil</a>
+    <a class="nav-link text-muted" (click)="closeNavOnClick()" [routerLink]="['/home']">accueil</a>
   </li>
   <li class="nav-item waves-light" mdbWavesEffect>
-    <a class="nav-link text-muted" [routerLink]="['/studentAgenda', currentChild?.id]">cahier de textes</a>
+    <a class="nav-link text-muted" (click)="closeNavOnClick()" [routerLink]="['/studentAgenda', currentChild?.id]">cahier de textes</a>
   </li>
   <li class="nav-item waves-light" mdbWavesEffect>
-    <a class="nav-link text-muted" [routerLink]="['/studentGrades', currentChild?.id]">notes</a>
+    <a class="nav-link text-muted" (click)="closeNavOnClick()" [routerLink]="['/studentGrades', currentChild?.id]">notes</a>
   </li>
   <li class="nav-item dropdown btn-group" dropdown>
     <a dropdownToggle type="button" class="nav-link text-muted dropdown-toggle waves-light" mdbWavesEffect>
       vie scolaire
     </a>
     <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
-      <a class="dropdown-item" [routerLink]="['/studentSchedule', currentChild?.id]">emploi du temps</a>
-      <a class="dropdown-item" [routerLink]="['/studentLife', currentChild?.id]">absences/sanctions</a>
-      <a class="dropdown-item" [routerLink]="['/classStaff', currentChild?.id]">équipe pédagogique</a>
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/studentSchedule', currentChild?.id]">emploi du temps</a>
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/studentLife', currentChild?.id]">absences/sanctions</a>
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/classStaff', currentChild?.id]">équipe pédagogique</a>
     </div>
   </li>
 </ul>

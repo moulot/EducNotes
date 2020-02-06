@@ -1,41 +1,26 @@
-<div  class="row justify-content-center align-items-center mt-3"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
-  <div class="col-md-6">
-      <div class="col-md-12"> <p class="card-title">spécification des classes de l'enseignant <b>{{teacher.lastName}} {{teacher.firstName}}</b></p> </div>
-      <div class="card mt-3 p-2">
-          <nz-form-item>
-              <nz-form-label [nzSm]="6" [nzXs]="24">Choisir le cours </nz-form-label>
-              <nz-form-control  [nzSm]="14" [nzXs]="24">
-                  <nz-select style="width: 100%" [(ngModel)]="courseId"  [nzSize]="'default'" nzPlaceHolder="Choisir ses cours"  (ngModelChange)="changeCourseId()">
-                      <nz-option *ngFor="let course of courses" [nzLabel]="course.name" [nzValue]="course.id"></nz-option>
-                    </nz-select>
-              </nz-form-control>
-          </nz-form-item>
+<div  class="row m-2" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+  <div class="col-md-12">
+    <div class="text-17 font-weight-300">enseignant <b class="text-capitalize">{{teacher.lastName}} {{teacher.firstName}}</b> - affectation des classes</div>
+    <hr>
+    <form [formGroup]="Form" (ngSubmit)="assignment()">
+      <div class="col-md-3">
+        <mdb-select [options]="courseOptions" placeholder="choisir le cours" (ngModelChange)="changeCourse()"
+          name="course" formControlName="course"></mdb-select>
+      </div>
+      <div class="col-md-3">
+        <mdb-select [options]="levelOptions" placeholder="choisir le niveau" (ngModelChange)="getClasses()"
+          name="level" formControlName="level"></mdb-select>
+      </div>
+      <div class="col-md-3">
+        <mdb-select [options]="classOptions" [multiple]="true" placeholder="choisir les classes"
+          name="classes" formControlName="classes"></mdb-select>
+      </div>
+      <div class="col-md-6"><hr class="mb-1"></div>
+      <div class="col-md-6">
+        <button type="submit" [disabled]="classIds.length === 0" mdbBtn color="primary" size="sm" mdbWavesEffect>valider</button>
+        <button type="button" [routerLink]="['/teachers']" mdbBtn color="primary" size="sm" mdbWavesEffect >annuler</button>
+      </div>
+    </form>
+  </div>
 
-          <nz-form-item>
-              <nz-form-label [nzSm]="6" [nzXs]="24">Choisir le niveau </nz-form-label>
-              <nz-form-control  [nzSm]="14" [nzXs]="24">
-                <nz-select [nzDisabled]="!courseId" style="width: 100%" [(ngModel)]="levelId"  [nzSize]="'default'" 
-                (ngModelChange)="getClasses()" nzPlaceHolder="Choisir le niveau">
-                  <nz-option *ngFor="let level of levels" [nzLabel]="level.name" [nzValue]="level.id"></nz-option>
-                </nz-select>
-              </nz-form-control>
-          </nz-form-item>
-
-          <nz-form-item>
-              <nz-form-label [nzSm]="6" [nzXs]="24">Choisir la classes </nz-form-label>
-              <nz-form-control  [nzSm]="14" [nzXs]="24">
-                <nz-select style="width: 100%" [(ngModel)]="classIds" [nzDisabled]="!levelId"  [nzSize]="'default'" nzMode="tags" nzPlaceHolder="Choisir les classes">
-                  <nz-option *ngFor="let class of classes" [nzLabel]="class.name" [nzValue]="class.id"></nz-option>
-                </nz-select>
-              </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
-            <nz-form-control  [nzSm]="14" [nzXs]="24">
-                <button type="submit" [disabled]=" submitText!='enregistrer' || !classIds" mdbBtn color="info" size="sm" mdbWavesEffect (click)="assignment()">{{submitText}}</button>
-                <button type="button" [routerLink]="['/teachers']" mdbBtn color="info" size="sm" mdbWavesEffect >annuler</button>
-            </nz-form-control>
-          </nz-form-item>
-     </div>
-  
-   </div>
- </div>
+</div>

@@ -1021,30 +1021,35 @@ namespace EducNotes.API.Controllers {
             }
         }
 
-        [HttpGet ("GetAllTeachersCourses")]
-        public async Task<IActionResult> GetAllTeachersCourses () {
+        [HttpGet("GetAllTeachersCourses")]
+        public async Task<IActionResult> GetAllTeachersCourses() {
             //recuperation de tous les professeurs ainsi que les cours affectés
             var teachers = await _context.Users
-                .Include (p => p.Photos)
-                .Where (u => u.UserTypeId == teacherTypeId && u.ValidatedCode == true)
-                .OrderBy (t => t.LastName).ThenBy (t => t.FirstName).ToListAsync ();
+                .Include(p => p.Photos)
+                .Where(u => u.UserTypeId == teacherTypeId && u.ValidatedCode == true)
+                .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
 
-            CultureInfo frC = new CultureInfo ("fr-FR");
+            CultureInfo frC = new CultureInfo("fr-FR");
 
-            var teachersToReturn = new List<TeacherForListDto> ();
-            foreach (var teacher in teachers) {
-                var tdetails = new TeacherForListDto ();
+            var teachersToReturn = new List<TeacherForListDto>();
+            foreach(var teacher in teachers) {
+                var tdetails = new TeacherForListDto();
                 tdetails.PhoneNumber = teacher.PhoneNumber;
                 tdetails.SeconPhoneNumber = teacher.SecondPhoneNumber;
                 tdetails.Email = teacher.Email;
                 tdetails.Id = teacher.Id;
                 tdetails.LastName = teacher.LastName;
                 tdetails.FirstName = teacher.FirstName;
-                tdetails.DateOfBirth = teacher.DateOfBirth.ToString ("dd/MM/yyyy", frC);
+                tdetails.DateOfBirth = teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
                 tdetails.CourseClasses = new List<TeacherCourseClassesDto> ();
-                // tdetails.PhotoUrl = teacher.Photos.FirstOrDefault(i => i.IsMain == true).Url;
-                var allteacherCourses = await _context.TeacherCourses.Include (c => c.Course).Where (t => t.TeacherId == teacher.Id).ToListAsync ();
-
+                var photo = teacher.Photos.FirstOrDefault(i => i.IsMain == true);
+                if(photo != null)
+                  tdetails.PhotoUrl = photo.Url;
+                
+                var allteacherCourses = await _context.TeacherCourses
+                                              .Include(c => c.Course)
+                                              .Where(t => t.TeacherId == teacher.Id).ToListAsync();
+                
                 foreach (var cours in allteacherCourses) {
                     var cdetails = new TeacherCourseClassesDto ();
                     cdetails.Course = cours.Course;
@@ -1055,11 +1060,10 @@ namespace EducNotes.API.Controllers {
                         cdetails.Classes = classes.Select (c => c.Class).ToList ();
                     tdetails.CourseClasses.Add (cdetails);
                 }
-                teachersToReturn.Add (tdetails);
+                teachersToReturn.Add(tdetails);
             }
 
             return Ok(teachersToReturn);
-
         }
 
         [HttpPost ("{id}/UpdateTeacher")]
@@ -1106,48 +1110,69 @@ namespace EducNotes.API.Controllers {
                 return BadRequest ("impossible de terminer l'action");
 
             }
-
             return BadRequest ("veuillez selectionner au moins un cours");
         }
 
         [HttpPost ("{id}/{courseId}/{levelId}/SaveTeacherAffectation")]
-        public async Task<IActionResult> SaveTeacherAffectation (int id, int courseId, int levelId, [FromBody] List<int?> classIds) {
-            var classcourses = await _context.ClassCourses.Include (c => c.Class)
-                .Where (c => c.CourseId == courseId && c.Class.ClassLevelId == levelId)
-                .ToListAsync ();
-            // récupération des classIds
-            var tt = classcourses.Select (c => c.ClassId).Distinct ().ToList ();
-            foreach (var item in classIds.Except (tt)) {
-                //ajout d'une nouvelle ligne
-                _context.Add (new ClassCourse { CourseId = courseId, ClassId = item, TeacherId = id });
-            }
-            foreach (var item in classIds) {
-                var cc = classcourses.FirstOrDefault (c => c.ClassId == item);
-                if (cc != null) {
-                    cc.TeacherId = id;
-                }
-            }
-            var u = classcourses.Where (t => t.TeacherId == id).Select (c => c.ClassId);
-            foreach (var item in u.Except (classIds)) {
-                var cc = classcourses.FirstOrDefault (c => c.ClassId == item);
-                cc.TeacherId = null;
+        public async Task<IActionResult> SaveTeacherAffectation(int id, int courseId, int levelId, [FromBody] List<int?> classIds)
+        {
+          var classcourses = await _context.ClassCourses
+                                    .Include(c => c.Class)
+                                    .Where(c => c.CourseId == courseId && c.Class.ClassLevelId == levelId)
+                                    .ToListAsync();
 
-            }
+          Boolean dataToBeSaved = false;
+          
+          // récupération des classIds
+          var cids = classcourses.Select(c => c.ClassId).Distinct().ToList();
 
-            if (await _repo.SaveAll ()) {
-                return Ok();
-            }
-            return BadRequest ("impossiblle de terminer l'opération");
+          //add new affection (new lines in DB)
+          foreach(var item in classIds.Except(cids)) {
+            ClassCourse classCourse = new ClassCourse
+            {
+              CourseId = courseId,
+              ClassId = item,
+              TeacherId = id
+            };
+            _context.Add(classCourse);
+            dataToBeSaved = true;
+          }
 
+          //set teacher for existing class/course
+          foreach (var item in classIds) {
+            var cc = classcourses.FirstOrDefault(c => c.ClassId == item && c.TeacherId == null);
+            if(cc != null) {
+              cc.TeacherId = id;
+              dataToBeSaved = true;
+            }
+          }
+          
+          //remove teacher from class/course as it's unselected
+          var u = classcourses.Where(t => t.TeacherId == id).Select (c => c.ClassId);
+          foreach(var item in u.Except(classIds)) {
+            var cc = classcourses.FirstOrDefault(c => c.ClassId == item);
+            cc.TeacherId = null;
+            dataToBeSaved = true;
+          }
+
+          if(dataToBeSaved && await _repo.SaveAll()) {
+            return Ok();
+          }
+          else
+          {
+              return NoContent();
+          }
+          
+          //return BadRequest("problème pour affecter les classes");
         }
 
         [HttpGet ("TeacherClassCoursByLevel/{teacherId}/{levelId}/{courseId}")]
-        public async Task<IActionResult> TeacherClassCoursByLevel (int teacherid, int levelId, int courseId) {
-            var res = await _context.ClassCourses.Include (c => c.Class)
-                .Where (c => c.TeacherId == teacherid && c.CourseId == courseId && c.Class.ClassLevelId == levelId)
-                .ToListAsync ();
+        public async Task<IActionResult> TeacherClassCoursByLevel(int teacherid, int levelId, int courseId) {
+          var res = await _context.ClassCourses.Include(c => c.Class)
+            .Where(c => c.TeacherId == teacherid && c.CourseId == courseId && c.Class.ClassLevelId == levelId)
+            .ToListAsync();
 
-            return Ok (res);
+          return Ok(res);
         }
 
         [HttpGet ("Course/{courseId}")]
