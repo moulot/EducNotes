@@ -88,7 +88,7 @@ export class TeacherDashboardComponent implements OnInit {
 
   goToClass() {
     const scheduleId = this.sessionForm.value.course;
-    this.router.navigate(['/callSheet', scheduleId]); // , {queryParams: {sch: scheduleId}, skipLocationChange: true});
+    this.router.navigate(['/classSession', scheduleId]); // , {queryParams: {sch: scheduleId}, skipLocationChange: true});
   }
 
   // showModal(p: any) {

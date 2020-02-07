@@ -365,6 +365,7 @@ namespace EducNotes.API.Data
                                     where courses.TeacherId == teacherId
                                     select new {
                                         ClassId = classes.Id,
+                                        ClassLevelId = classes.ClassLevelId,
                                         ClassName = classes.Name,
                                         NbStudents = _context.Users.Where(u => u.ClassId == classes.Id).Count()
                                     })
@@ -376,6 +377,7 @@ namespace EducNotes.API.Data
             {
                 TeacherClassesDto tcd = new TeacherClassesDto();
                 tcd.ClassId = aclass.ClassId;
+                tcd.ClassLevelId = aclass.ClassLevelId;
                 tcd.ClassName = aclass.ClassName;
                 tcd.NbStudents = aclass.NbStudents;
                 teacherClasses.Add(tcd);

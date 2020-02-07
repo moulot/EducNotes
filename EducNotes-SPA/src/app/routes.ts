@@ -98,6 +98,9 @@ import { SmsTemplateHomeResolver } from './_resolvers/sms-template-home-resolver
 import { EditSmsTemplateResolver } from './_resolvers/edit-sms-template-resolver';
 import { AddUserGradesComponent } from './grades/add-user-grades/add-user-grades.component';
 import { ClassGradesResolver } from './_resolvers/class-grades-resolver';
+import { ClassProgressComponent } from './classes/class-progress/class-progress.component';
+import { ClassSessionComponent } from './classes/class-session/class-session.component';
+import { TeacherProgramComponent } from './classes/teacher-program/teacher-program.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -147,6 +150,7 @@ export const appRoutes: Routes = [
             { path: 'studentScheduleP/:id', component: StudentScheduleComponent },
             { path: 'addEval', component: EvalAddFormComponent },
             { path: 'callSheet/:id', component: ClassCallSheetComponent, resolve: { session: CallSheetResolver } },
+            { path: 'classSession/:id', component: ClassSessionComponent, resolve: { session: CallSheetResolver } },
             { path: 'inscriptions', component: InscriptionComponent },
             { path: 'inscriptionsList', component: InscriptionsListComponent },
             { path: 'classesPanel', component: ClassesPanelComponent, resolve: { levels: ClassesListResolver } },
@@ -189,7 +193,8 @@ export const appRoutes: Routes = [
             {path: 'SmsTemplates', component: SmsTemplateComponent, resolve: { templates: SmsTemplateHomeResolver} },
             {path: 'AddSmsTemplate', component: AddSmsTemplateComponent},
             {path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} },
-            {path: 'AddUserGrades/:evalId', component: AddUserGradesComponent, resolve: {data: ClassGradesResolver}}
+            {path: 'AddUserGrades/:evalId', component: AddUserGradesComponent, resolve: {data: ClassGradesResolver}},
+            {path: 'teacherProgram', component: TeacherProgramComponent}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }
