@@ -9,6 +9,7 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { Class } from 'src/app/_models/class';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
   selector: 'app-inscriptions-list',
@@ -20,7 +21,7 @@ export class InscriptionsListComponent implements OnInit {
 
   constructor(private adminService: AdminService, private alertify: AlertifyService,
     private modalService: NgbModal, private fb: FormBuilder, private classService: ClassService,
-    private toastr: ToastrService) { }
+    private toastr: ToastrService, private authService: AuthService) { }
 
   levels: any[] = [];
   searchForm: FormGroup;
@@ -108,7 +109,7 @@ export class InscriptionsListComponent implements OnInit {
   }
 
   studentAffectation() {
-    this.adminService.studentAffectation(this.classId, this.selectedIds).subscribe(() => {
+    this.adminService.studentAffectation(this.classId, this.selectedIds, this.authService.decodedToken).subscribe(() => {
       this.searchStudents();
       this.alertify.success('enegistrement terminé...');
       this.classId = null;

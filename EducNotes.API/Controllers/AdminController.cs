@@ -258,7 +258,7 @@ namespace EducNotes.API.Controllers {
     /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     [HttpPost ("{classId}/StudentAffectation")]
-    public async Task<IActionResult> StudentAffectation (int classId, List<StudentPostingDto> model) {
+    public async Task<IActionResult> StudentAffectation (int classId, List<StudentPostingDto> model,int userId) {
       if (model.Count () > 0) {
         foreach (var student in model) {
           var user = await _context.Users.FirstOrDefaultAsync (u => u.Id == student.UserId);
@@ -272,7 +272,7 @@ namespace EducNotes.API.Controllers {
         if (await _repo.SaveAll ()) {
           //envoi du mail d'affectation à chaque parent
           foreach (var student in model) {
-            await _repo.sendOk (studentTypeId, student.UserId);
+            await _repo.sendOk (studentTypeId, userId);
           }
           return Ok ();
         }
