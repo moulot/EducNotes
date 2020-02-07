@@ -211,6 +211,7 @@ import { NavNotLoggedComponent } from './nav/navNotLogged/navNotLogged.component
 import { RegisterChildCardComponent } from './admin/selfs-registers/register-child-card/register-child-card.component';
 import { ClassSessionComponent } from './classes/class-session/class-session.component';
 import { ClassProgressComponent } from './classes/class-progress/class-progress.component';
+import { TeacherProgramComponent } from './classes/teacher-program/teacher-program.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -351,7 +352,8 @@ export function tokenGetter() {
       NavNotLoggedComponent,
       RegisterChildCardComponent,
       ClassSessionComponent,
-      ClassProgressComponent
+      ClassProgressComponent,
+      TeacherProgramComponent
    ],
    imports: [
       FormWizardModule,

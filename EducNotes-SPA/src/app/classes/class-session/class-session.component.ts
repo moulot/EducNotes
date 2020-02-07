@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Session } from 'inspector';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Session } from 'src/app/_models/session';
 
 @Component({
   selector: 'app-class-session',
