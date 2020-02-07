@@ -1,0 +1,46 @@
+<div class="row m-2">
+
+  <div class="col-md-12">
+    <p class="lead"><b>session de cours</b> - classe {{schedule.className}}. {{schedule.courseName}} de 
+      {{schedule.strStartHourMin}} à {{schedule.strEndHourMin}} 
+    </p>
+  </div>
+
+  <div class="col-md-12 mt-1">
+    <div class="row">
+      <div class="col-md-6 mb-2">
+
+        <div class="p-1 border rounded">
+          <div class="content">
+            <p class="text-center m-0">
+              <button type="button" mdbBtn block="true" color="primary" mdbWavesEffect>
+                <span class="text-17 text-lowercase">saisir progression du cours</span>
+              </button>
+            </p>
+          </div>
+        </div>
+
+      </div>
+      <div class="col-md-6">
+
+        <div class="p-1 border rounded">
+          <div class="content">
+            <p class="text-center m-0">
+              <button type="button" mdbBtn block="true" (click)="goToCallSheet()" color="primary" mdbWavesEffect>
+                <span class="text-17 text-lowercase">faire l'appel du cours</span>
+              </button>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12 mt-2">
+    <div class="row">
+      <div class="col-md-12 text-17 font-weight-300">information du cours</div>
+      <div class="col-md-12"><hr class="mt-1"></div>
+    </div>
+  </div>
+</div>

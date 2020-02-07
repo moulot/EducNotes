@@ -49,9 +49,6 @@ import { LoginComponent } from './login/login.component';
 import { ClassService } from './_services/class.service';
 import { BooknoteComponent } from './admin/booknote/booknote.component';
 import { HomePanelComponent } from './home/home-panel/home-panel.component';
-import { HomeParentComponent } from './home/home-parent/home-parent.component';
-import { HomeStudentComponent } from './home/home-student/home-student.component';
-import { HomeTeacherComponent } from './home/home-teacher/home-teacher.component';
 import { UserCardComponent } from './users/user-card/user-card.component';
 import { AgendaPanelComponent } from './agenda/agenda-panel/agenda-panel.component';
 import { AgendaListComponent } from './agenda/agenda-list/agenda-list.component';
@@ -60,7 +57,6 @@ import { NavStudentComponent } from './nav/nav-student/nav-student.component';
 import { NavParentComponent } from './nav/nav-parent/nav-parent.component';
 import { NavTeacherComponent } from './nav/nav-teacher/nav-teacher.component';
 import { NavAdminComponent } from './nav/nav-admin/nav-admin.component';
-import { HomeAdminComponent } from './home/home-admin/home-admin.component';
 import { ClassPanelComponent } from './classes/class-panel/class-panel.component';
 import { StudentCardComponent } from './classes/student-card/student-card.component';
 import { ClassNavComponent } from './classes/class-nav/class-nav.component';
@@ -213,6 +209,8 @@ import { ClassGradesResolver } from './_resolvers/class-grades-resolver';
 import { ChildSmsCardComponent } from './users/child-sms-card/child-sms-card.component';
 import { NavNotLoggedComponent } from './nav/navNotLogged/navNotLogged.component';
 import { RegisterChildCardComponent } from './admin/selfs-registers/register-child-card/register-child-card.component';
+import { ClassSessionComponent } from './classes/class-session/class-session.component';
+import { ClassProgressComponent } from './classes/class-progress/class-progress.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -245,9 +243,6 @@ export function tokenGetter() {
       RolesModalComponent,
       LoginComponent,
       BooknoteComponent,
-      HomeParentComponent,
-      HomeStudentComponent,
-      HomeTeacherComponent,
       UserCardComponent,
       AgendaPanelComponent,
       AgendaListComponent,
@@ -256,7 +251,6 @@ export function tokenGetter() {
       NavParentComponent,
       NavTeacherComponent,
       NavAdminComponent,
-      HomeAdminComponent,
       ClassPanelComponent,
       StudentCardComponent,
       ClassNavComponent,
@@ -315,7 +309,6 @@ export function tokenGetter() {
       NewUserComponent,
       ParentRegisterComponent,
       TeacherAssignmentComponent,
-      HomeParentComponent,
       AccountHistoryComponent,
       LevelClassesComponent,
       ClassLifeComponent,
@@ -356,7 +349,9 @@ export function tokenGetter() {
       AddUserGradesComponent,
       ChildSmsCardComponent,
       NavNotLoggedComponent,
-      RegisterChildCardComponent
+      RegisterChildCardComponent,
+      ClassSessionComponent,
+      ClassProgressComponent
    ],
    imports: [
       FormWizardModule,

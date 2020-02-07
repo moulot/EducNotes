@@ -3,86 +3,86 @@
   <div class="col-lg-5 col-md-12">
     <div class="row">
 
-      <div class="col-md-12">
+    <div class="col-md-12">
 
-          <div class="card">
-            <div class="card-body">
-              <div class="row">
-  
-                  <div class="col-md-12 mb-3">
-                    <form [formGroup]="sessionForm" (ngSubmit)="goToClass()">
-                    <div class="p-2 border rounded">
-                      <div class="content">
-                        <p class="lead pt-0 mt-0 mb-1">feuille d'appel</p>
-                        <div class="d-flex" *ngIf="nextCourses?.length > 0">
-                          <mdb-select [options]="optionsCourse" formControlName="course" name="course"
-                            placeholder="choisir le cours"></mdb-select>
-                          <button type="submit" mdbBtn [disabled]="!sessionForm.valid" size="sm"
-                            class="p-2" color="primary" mdbWavesEffect>valider</button>
-                        </div>
-                        <div *ngIf="nextCourses?.length == 0">
-                          <p class="text-15 text-muted m-0">pas de cours aujourd'hui</p>
-                        </div>
-                      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+
+              <div class="col-md-12 mb-3">
+                <form [formGroup]="sessionForm" (ngSubmit)="goToClass()">
+                <div class="p-2 border rounded">
+                  <div class="content">
+                    <p class="lead pt-0 mt-0 mb-1">feuille d'appel</p>
+                    <div class="d-flex" *ngIf="nextCourses?.length > 0">
+                      <mdb-select [options]="optionsCourse" formControlName="course" name="course"
+                        placeholder="choisir le cours"></mdb-select>
+                      <button type="submit" mdbBtn [disabled]="!sessionForm.valid" size="sm"
+                        class="p-2" color="primary" mdbWavesEffect>valider</button>
                     </div>
-                    </form>
-                  </div>
-
-                <div *ngFor="let class of teacherClasses" class="col-md-12 mb-3">
-                  <div class="p-2 border rounded">
-                    <div>
-                      <h3 class="lead mb-2">classe {{class.className}}</h3>
-                      <div class="row">
-                        <div class="col-md-3 mb-1">
-                          <a [routerLink]="['/studentsClass', class.classId]">
-                            <div class="card card-icon m-0 ">
-                              <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                                <i class="i-MaleFemale"></i>
-                                <p class="text-muted mt-2 mb-2">{{class.nbStudents}} élèves</p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                        <div class="col-md-3 mb-1">
-                          <a [routerLink]="['/agendas', class.classId]">
-                            <div class="card card-icon m-0 ">
-                              <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                                <i class="i-Receipt"></i>
-                                <p class="text-muted mt-2 mb-2">c. textes</p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                        <div class="col-md-3 mb-1">
-                          <a [routerLink]="['/notes']">
-                            <div class="card card-icon mb-0 ">
-                              <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                                <i class="i-Pen-5"></i>
-                                <p class="text-muted mt-2 mb-2">notes</p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                        <div class="col-md-3">
-                          <a [routerLink]="['/classLife', class.classId]">
-                            <div class="card card-icon mb-0 ">
-                              <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                                <i class="i-Conference"></i>
-                              <p class="text-muted mt-2 mb-2">vie classe</p>
-                            </div>
-                          </div>
-                          </a>
-                        </div>
-                      </div>
+                    <div *ngIf="nextCourses?.length == 0">
+                      <p class="text-15 text-muted m-0">pas de cours aujourd'hui</p>
                     </div>
                   </div>
                 </div>
-                      
+                </form>
+              </div>
+
+            <div *ngFor="let class of teacherClasses" class="col-md-12 mb-3">
+              <div class="p-2 border rounded">
+                <div>
+                  <h3 class="lead mb-2">classe {{class.className}}</h3>
+                  <div class="row">
+                    <div class="col-md-3 mb-1">
+                      <a [routerLink]="['/studentsClass', class.classId]">
+                        <div class="card card-icon m-0 ">
+                          <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                            <i class="i-MaleFemale"></i>
+                            <p class="text-muted mt-2 mb-2">{{class.nbStudents}} élèves</p>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                    <div class="col-md-3 mb-1">
+                      <a [routerLink]="['/agendas', class.classId]">
+                        <div class="card card-icon m-0 ">
+                          <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                            <i class="i-Receipt"></i>
+                            <p class="text-muted mt-2 mb-2">c. textes</p>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                    <div class="col-md-3 mb-1">
+                      <a [routerLink]="['/notes']">
+                        <div class="card card-icon mb-0 ">
+                          <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                            <i class="i-Pen-5"></i>
+                            <p class="text-muted mt-2 mb-2">notes</p>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                    <div class="col-md-3">
+                      <a [routerLink]="['/classLife', class.classId]">
+                        <div class="card card-icon mb-0 ">
+                          <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                            <i class="i-Conference"></i>
+                          <p class="text-muted mt-2 mb-2">vie classe</p>
+                        </div>
+                      </div>
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+                  
           </div>
-
+        </div>
       </div>
+
+    </div>
 
     </div>    
   </div>

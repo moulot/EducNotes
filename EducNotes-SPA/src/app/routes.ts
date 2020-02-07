@@ -98,6 +98,8 @@ import { SmsTemplateHomeResolver } from './_resolvers/sms-template-home-resolver
 import { EditSmsTemplateResolver } from './_resolvers/edit-sms-template-resolver';
 import { AddUserGradesComponent } from './grades/add-user-grades/add-user-grades.component';
 import { ClassGradesResolver } from './_resolvers/class-grades-resolver';
+import { ClassProgressComponent } from './classes/class-progress/class-progress.component';
+import { ClassSessionComponent } from './classes/class-session/class-session.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -147,6 +149,7 @@ export const appRoutes: Routes = [
             { path: 'studentScheduleP/:id', component: StudentScheduleComponent },
             { path: 'addEval', component: EvalAddFormComponent },
             { path: 'callSheet/:id', component: ClassCallSheetComponent, resolve: { session: CallSheetResolver } },
+            { path: 'classSession/:id', component: ClassSessionComponent, resolve: { session: CallSheetResolver } },
             { path: 'inscriptions', component: InscriptionComponent },
             { path: 'inscriptionsList', component: InscriptionsListComponent },
             { path: 'classesPanel', component: ClassesPanelComponent, resolve: { levels: ClassesListResolver } },
