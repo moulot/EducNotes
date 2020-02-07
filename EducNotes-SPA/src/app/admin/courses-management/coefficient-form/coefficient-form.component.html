@@ -2,7 +2,7 @@
  
   <div class="col-md-8" >
       <div class="card p-3">
-              <form nz-form [formGroup]="coefficientForm" (ngSubmit)="save()">
+              <form  [formGroup]="coefficientForm" (ngSubmit)="save()">
                       <div class="md-form">
                         <mdb-select id="levelId" [options]="levels"  placeholder="Choisir le niveau"  formControlName="classLevelId"></mdb-select>
                       </div>

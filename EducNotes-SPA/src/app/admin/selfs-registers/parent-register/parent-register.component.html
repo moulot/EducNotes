@@ -383,7 +383,19 @@
             <button mdbBtn size="sm" color="primary" (click)="onComplete()">terminer</button>
           </div>
         </div>
-      </mdb-step>
-    </mdb-stepper>
-  </div>
-</div>
+    </mdb-step>
+</mdb-stepper>
+
+<mdb-card *ngIf="showSuccessDiv" class="animated zoomInUp mt-2">
+  <mdb-card-body>
+
+    <mdb-card-title>
+      <h4>Enregistrement terminé...</h4>
+    </mdb-card-title>
+
+    <mdb-card-text>
+      Veuillez cliquer sur le lien ci-dessous pour acceder à la page de connexion
+    </mdb-card-text>
+    <button mdbBtn type="button" color="primary" size="sm" mdbWavesEffect  [routerLink]="['/signIn']">page de connexion</button>
+  </mdb-card-body>
+</mdb-card>

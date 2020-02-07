@@ -39,7 +39,7 @@ import { PhotoEditorComponent } from './members/photo-editor/photo-editor.compon
 import { ListsResolver } from './_resolvers/lists.resolver';
 import { MessagesResolver } from './_resolvers/messages.resolver.';
 import { MemberMessagesComponent } from './members/member-messages/member-messages.component';
-import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
+// import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 import { HasRoleDirective } from './_directives/hasRole.directive';
 import { UserManagementComponent } from './admin/user-management/user-management.component';
 import { PhotoManagementComponent } from './admin/photo-management/photo-management.component';
@@ -81,11 +81,11 @@ import { FirstStepFinishmentComponent } from './registration/firstStep-finishmen
 import { ConfirmEmailComponent } from './registration/confirm-email/confirm-email.component';
 import { MemberPasswordSettingComponent } from './members/member-password-setting/member-password-setting.component';
 import { PreInscriptionComponent } from './admin/pre-inscription/pre-inscription.component';
-import { UserTypesComponent } from './admin/user-types/user-types.component';
-import { AdministrationUsersComponent } from './admin/administration-users/administration-users.component';
-import { CoursClassesManagementComponent } from './admin/cours-classes-management/cours-classes-management.component';
-import { UserListComponent } from './users/user-list/user-list.component';
-import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
+// import { UserTypesComponent } from './admin/user-types/user-types.component';
+// import { AdministrationUsersComponent } from './admin/administration-users/administration-users.component';
+// import { CoursClassesManagementComponent } from './admin/cours-classes-management/cours-classes-management.component';
+// import { UserListComponent } from './users/user-list/user-list.component';
+// import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
 import { SigninComponent } from './views/sessions/signin/signin.component';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
@@ -124,7 +124,7 @@ import { ClassesPanelComponent } from './admin/class-managemet/classes-panel/cla
 import { NewClassComponent } from './admin/class-managemet/new-class/new-class.component';
 import { CoursesPanelComponent } from './admin/courses-management/courses-panel/courses-panel.component';
 import { NewCourseComponent } from './admin/courses-management/new-course/new-course.component';
-import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
+// import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
 import { PreRegisterComponent } from './admin/selfs-registers/pre-register/pre-register.component';
 import { SelfRegisterComponent } from './admin/selfs-registers/self-register/self-register.component';
 import { ClassesListResolver } from './_resolvers/classes-list-resolver';
@@ -235,7 +235,7 @@ export function tokenGetter() {
       PhotoEditorComponent,
       TimeAgoPipe,
       MemberMessagesComponent,
-      AdminPanelComponent,
+      // AdminPanelComponent,
       HasRoleDirective,
       FullScreenDirective,
       UserManagementComponent,
@@ -270,11 +270,11 @@ export function tokenGetter() {
       ConfirmEmailComponent,
       PreInscriptionComponent,
       MemberPasswordSettingComponent,
-      TeacherManagementComponent,
-      CoursClassesManagementComponent,
-      UserTypesComponent,
-      AdministrationUsersComponent,
-      UserListComponent,
+      // TeacherManagementComponent,
+      // CoursClassesManagementComponent,
+      // UserTypesComponent,
+      // AdministrationUsersComponent,
+      // UserListComponent,
       SigninComponent,
       FullscreenTableComponent,
       PagingTableComponent,
@@ -300,7 +300,7 @@ export function tokenGetter() {
       NewClassComponent,
       CoursesPanelComponent,
       NewCourseComponent,
-      NewTeacherComponent,
+      // NewTeacherComponent,
       PreRegisterComponent,
       SelfRegisterComponent,
       NavGPanelComponent,

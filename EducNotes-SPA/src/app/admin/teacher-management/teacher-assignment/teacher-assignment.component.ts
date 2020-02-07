@@ -56,7 +56,7 @@ export class TeacherAssignmentComponent implements OnInit {
     this.Form = this.fb.group({
       course: ['', Validators.required],
       level: ['', Validators.required],
-      classes: [classSelected, this.minSelectedCheckboxes]
+      classes: [classSelected]
     });
   }
 

@@ -1,5 +1,5 @@
-<div class="row justify-content-center align-items-center mt-3">
-  <div class="col-md-6">
+<div class="row justify-content-center align-items-center mt-3 animated zoomInDown">
+  <div class="col-md-6" *ngIf="showSuccessDiv===false">
     <mdb-card>
       <mdb-card-header class="info-color white-text text-center py-4">
         <h5>
@@ -104,7 +104,7 @@
   
           <div class="row justify-content-center">
             <button mdbBtn size="sm" color="primary"
-            [disabled]="!userForm.valid || userNameExist === true"><span>{{submitText}}</span></button>
+            [disabled]="!userForm.valid || userNameExist === true "><span>{{submitText}}</span></button>
           <button (click)="close()" mdbBtn size="sm" color="light"><span>annuler</span></button>
           </div>
         </form>
@@ -113,4 +113,18 @@
     </mdb-card>
   
   </div>
+
+  <mdb-card *ngIf="showSuccessDiv" class="animated zoomInUp mt-2">
+    <mdb-card-body>
+  
+      <mdb-card-title>
+        <h4>Enregistrement terminé...</h4>
+      </mdb-card-title>
+  
+      <mdb-card-text>
+        Veuillez cliquer sur le lien ci-dessous pour acceder à la page de connexion
+      </mdb-card-text>
+      <button mdbBtn type="button" color="primary" size="sm" mdbWavesEffect  [routerLink]="['/signIn']">page de connexion</button>
+    </mdb-card-body>
+  </mdb-card>
 </div>
