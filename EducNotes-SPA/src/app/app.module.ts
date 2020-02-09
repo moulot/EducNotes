@@ -212,6 +212,8 @@ import { RegisterChildCardComponent } from './admin/selfs-registers/register-chi
 import { ClassSessionComponent } from './classes/class-session/class-session.component';
 import { ClassProgressComponent } from './classes/class-progress/class-progress.component';
 import { TeacherProgramComponent } from './classes/teacher-program/teacher-program.component';
+import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
+import { ClassProgramDataComponent } from './classes/class-program-data/class-program-data.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -353,7 +355,8 @@ export function tokenGetter() {
       RegisterChildCardComponent,
       ClassSessionComponent,
       ClassProgressComponent,
-      TeacherProgramComponent
+      TeacherProgramComponent,
+      ClassProgramDataComponent
    ],
    imports: [
       FormWizardModule,
@@ -447,6 +450,7 @@ export function tokenGetter() {
       SmsTemplateHomeResolver,
       EditSmsTemplateResolver,
       ClassGradesResolver,
+      TeacherProgramResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

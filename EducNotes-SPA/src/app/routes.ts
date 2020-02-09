@@ -101,6 +101,7 @@ import { ClassGradesResolver } from './_resolvers/class-grades-resolver';
 import { ClassProgressComponent } from './classes/class-progress/class-progress.component';
 import { ClassSessionComponent } from './classes/class-session/class-session.component';
 import { TeacherProgramComponent } from './classes/teacher-program/teacher-program.component';
+import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -194,7 +195,8 @@ export const appRoutes: Routes = [
             {path: 'AddSmsTemplate', component: AddSmsTemplateComponent},
             {path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} },
             {path: 'AddUserGrades/:evalId', component: AddUserGradesComponent, resolve: {data: ClassGradesResolver}},
-            {path: 'teacherProgram', component: TeacherProgramComponent}
+            {path: 'teacherProgram', component: TeacherProgramComponent},
+            {path: 'classProgram/:courseId', component: ClassProgressComponent, resolve: {program: TeacherProgramResolver}}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

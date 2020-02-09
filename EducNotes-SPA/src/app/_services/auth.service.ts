@@ -31,15 +31,22 @@ export class AuthService {
   child = new BehaviorSubject<User>(this.newUser);
   currentChild = this.child.asObservable();
 
+  classId = new BehaviorSubject<number>(0);
+  currentClassId = this.classId.asObservable();
+
   constructor(private http: HttpClient, private alertify: AlertifyService,
     private router: Router) { }
 
-  changeMemberPhoto(photoUrl: string) {
+  changeUserPhoto(photoUrl: string) {
     this.photoUrl.next(photoUrl);
   }
 
   changeCurrentChild(child: User) {
     this.child.next(child);
+  }
+
+  changeCurrentClassId(classId: number) {
+    this.classId.next(classId);
   }
 
   login(model: any) {
@@ -52,11 +59,13 @@ export class AuthService {
             localStorage.setItem('user', JSON.stringify(user.user));
             localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
             localStorage.setItem('currentChild', JSON.stringify(this.newUser));
+            localStorage.setItem('currentClassId', '0');
             this.decodedToken = this.jwtHelper.decodeToken(user.token);
             this.currentUser = user.user;
             this.currentPeriod = user.currentPeriod;
             this.changeCurrentChild(this.newUser);
-            this.changeMemberPhoto(this.currentUser.photoUrl);
+            this.changeCurrentClassId(0);
+            this.changeUserPhoto(this.currentUser.photoUrl);
           }
         })
       );
@@ -67,9 +76,11 @@ export class AuthService {
     localStorage.removeItem('user');
     localStorage.removeItem('currentPeriod');
     localStorage.removeItem('currentChild');
+    localStorage.removeItem('currentClassId');
     this.decodedToken = null;
     this.currentUser = null;
     this.currentPeriod = null;
+    this.currentClassId = null;
     this.changeCurrentChild(this.newUser);
     this.alertify.info('vous êtes déconnecté');
     this.router.navigate(['/signin']);
@@ -89,13 +100,11 @@ export class AuthService {
             localStorage.setItem('user', JSON.stringify(user.user));
             this.decodedToken = this.jwtHelper.decodeToken(user.token);
             this.currentUser = user.user;
-            this.changeMemberPhoto(this.currentUser.photoUrl);
+            this.changeUserPhoto(this.currentUser.photoUrl);
           }
         })
       );
   }
-
-
 
   setUserLoginPassword(id: number, loginModel: any) {
     return this.http.post(this.baseUrl + id + '/setLoginPassword', loginModel)
@@ -107,7 +116,7 @@ export class AuthService {
             localStorage.setItem('user', JSON.stringify(user.user));
             this.decodedToken = this.jwtHelper.decodeToken(user.token);
             this.currentUser = user.user;
-            this.changeMemberPhoto(this.currentUser.photoUrl);
+            this.changeUserPhoto(this.currentUser.photoUrl);
           }
         })
       );
@@ -181,7 +190,7 @@ export class AuthService {
             localStorage.setItem('user', JSON.stringify(user.user));
             this.decodedToken = this.jwtHelper.decodeToken(user.token);
             this.currentUser = user.user;
-            this.changeMemberPhoto(this.currentUser.photoUrl);
+            this.changeUserPhoto(this.currentUser.photoUrl);
           }
         })
       );

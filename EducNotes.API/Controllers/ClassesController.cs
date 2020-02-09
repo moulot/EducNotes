@@ -849,19 +849,24 @@ namespace EducNotes.API.Controllers {
             }
         }
 
-        [HttpGet("Courses/{courseId}/teacher/{teacherId}/Program")]
+        [HttpGet("courses/{courseId}/teacher/{teacherId}/Program")]
         public async Task<IActionResult> ClassesWithProgram(int courseId, int teacherId)
         {
-          //get teacher classes
+          // course data
+          var course = await _context.Courses.FirstAsync(c => c.Id == courseId);
+          //get teacher data (classes & courses)
           List<TeacherClassesDto> teacherClasses = await _repo.GetTeacherClasses(teacherId);
 
           //for each class get themes and lessons...
-          List<ClassWithThemesDto> classesWithThemes = new List<ClassWithThemesDto>();
+          List<ClassWithThemesDto> classesWithProgram = new List<ClassWithThemesDto>();
           foreach (var aclass in teacherClasses)
           {
             ClassWithThemesDto cwtd = new ClassWithThemesDto();
-            cwtd.Id = aclass.ClassId;
-            cwtd.Name = aclass.ClassName;
+            cwtd.ClassId = aclass.ClassId;
+            cwtd.ClassName = aclass.ClassName;
+            cwtd.CourseId = courseId;
+            cwtd.CourseName = course.Name;
+            cwtd.CourseAbbrev = course.Abbreviation;
 
             //Progeam from Theme
             cwtd.Themes = new List<ThemeDto>();
@@ -905,56 +910,42 @@ namespace EducNotes.API.Controllers {
                   ld.Contents.Add(lcd);
                 }
               }
-              classesWithThemes.Add(cwtd);
             }
 
             //Progeam from Lessons (when lessons don't come from themes)
             cwtd.Lessons = new List<LessonDto>();
-            var LessonsFromDB = await _context.Themes
-                                        .Where(t => t.ClassLevelId == aclass.ClassLevelId && t.CourseId == courseId)
-                                        .ToListAsync();
-            foreach (var theme in themesFromDB)
+            var LessonsFromDB = await _context.Lessons
+                                      .Where(t => t.ClassLevelId == aclass.ClassLevelId && t.CourseId == courseId)
+                                      .ToListAsync();
+            foreach (var lesson in LessonsFromDB)
             {
-              ThemeDto td = new ThemeDto();
-              td.Id = theme.Id;
-              td.Name = theme.Name;
-              td.ClassLevelId = theme.ClassLevelId;
-              td.CourseId = theme.CourseId;
-              td.Desc = theme.Desc;
-              cwtd.Themes.Add(td);
+              LessonDto ld = new LessonDto();
+              ld.Id = lesson.Id;
+              ld.ThemeId = lesson.ThemeId;
+              ld.ClassLevelId = lesson.ClassLevelId;
+              ld.CourseId = lesson.CourseId;
+              ld.Name = lesson.Name;
+              ld.Desc = lesson.Desc;
+              cwtd.Lessons.Add(ld);
 
-              td.Lessons = new List<LessonDto>();
-              var themeLessons = await _context.Lessons.Where(i => i.ThemeId == theme.Id).ToListAsync();
-              foreach (var lesson in themeLessons)
+              ld.Contents = new List<LessonContentDto>();
+              var lessonContents = await _context.LessonContents.Where(c => c.LessonId == lesson.Id).ToListAsync();
+              foreach (var content in lessonContents)
               {
-                LessonDto ld = new LessonDto();
-                ld.Id = lesson.Id;
-                ld.ThemeId = lesson.ThemeId;
-                ld.ClassLevelId = lesson.ClassLevelId;
-                ld.CourseId = lesson.CourseId;
-                ld.Name = lesson.Name;
-                ld.Desc = lesson.Desc;
-                td.Lessons.Add(ld);
-
-                ld.Contents = new List<LessonContentDto>();
-                var lessonContents = await _context.LessonContents.Where(c => c.LessonId == lesson.Id).ToListAsync();
-                foreach (var content in lessonContents)
-                {
-                  LessonContentDto lcd = new LessonContentDto();
-                  lcd.Id = content.Id;
-                  lcd.LessonId = content.LessonId;
-                  lcd.Name = content.Name;
-                  lcd.Desc = content.Desc;
-                  lcd.NbHours = content.NbHours;
-                  lcd.SessionNum = content.SessionNum;
-                  ld.Contents.Add(lcd);
-                }
+                LessonContentDto lcd = new LessonContentDto();
+                lcd.Id = content.Id;
+                lcd.LessonId = content.LessonId;
+                lcd.Name = content.Name;
+                lcd.Desc = content.Desc;
+                lcd.NbHours = content.NbHours;
+                lcd.SessionNum = content.SessionNum;
+                ld.Contents.Add(lcd);
               }
-              classesWithThemes.Add(cwtd);
             }
+            classesWithProgram.Add(cwtd);
           }
 
-          return Ok(classesWithThemes);
+          return Ok(classesWithProgram);
         }
 
         [HttpPut("SaveCallSheet/{sessionId}")]
