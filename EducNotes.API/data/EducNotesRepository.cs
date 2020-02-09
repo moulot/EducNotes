@@ -780,15 +780,19 @@ namespace EducNotes.API.Data
                 // formatage du mail
                 foreach (var parent in parents)
                 {
-                    var emailform = new EmailFormDto
-                    {
-                        toEmail = parent.Email,
-                        subject = "Confirmation mise en salle de votre enfant ",
-                        content = "<b> Bonjour " + parent.LastName + " " + parent.FirstName + "</b>, <br>" +
-                        "Votre enfant <b>" + student.LastName + " " + student.FirstName +
-                        " </b> a bien été enregistré(s) dans la classe de <b>" + student.Class.Name
-                    };
-                    await SendEmail(emailform);
+                    var email = new Email();
+                                email.InsertDate = DateTime.Now;
+                                email.InsertUserId = userId;
+                                email.UpdateUserId = userId;
+                                email.StatusFlag = 0;
+                                email.Subject = "Confirmation mise en salle de votre enfant";
+                                email.ToAddress = parent.Email;
+                                email.Body = "<b> Bonjour " + parent.LastName + " " + parent.FirstName + "</b>, <br>" +
+                                                "Votre enfant <b>" + student.LastName + " " + student.FirstName +
+                                                " </b> a bien été enregistré(s) dans la classe de <b>" + student.Class.Name;
+                                email.FromAddress = "no-reply@educnotes.com";
+                                email.EmailTypeId = _config.GetValue<int>("AppSettings:confirmedEmailtypeId");
+                                Add(email);
                 }
 
             }
