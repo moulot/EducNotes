@@ -16,7 +16,43 @@ export class Utils {
         todayBtnTxt: 'Auj',
         clearBtnTxt: 'effacer',
         closeBtnTxt: 'fermer',
-        dateFormat: 'dd/mm/yyyy'
+
+        // format
+        dateFormat: 'dd/mm/yyyy',
+
+        // auto close
+        closeAfterSelect: true,
+
+        // First day of the week
+        // firstDayOfWeek: 'mo',
+
+        // // // Disable dates
+        // disableUntil: {year: 2018, month: 10, day: 1},
+        // disableSince: {year: 2018, month: 10, day: 31},
+        // disableDays: [{year: 2018, month: 10, day: 3}],
+        // disableDateRanges: [{begin: {year: 2018, month: 10, day: 5}, end: {year: 2018, month: 10, day: 7}}],
+        // disableWeekends: false,
+
+        // // Enable dates (when disabled)
+
+        // // Year limits
+        // minYear: 1000,
+        // maxYear: 9999,
+
+        // // Show Today button
+        // showTodayBtn: true,
+
+        // // Show Clear date button
+        // showClearDateBtn: true,
+
+        // markCurrentDay: true,
+        // markDates: [{dates: [{year: 2018, month: 10, day: 20}], color: '#303030'}],
+        // markWeekends: undefined,
+        // disableHeaderButtons: false,
+        // showWeekNumbers: false,
+        // height: '100px',
+        // width: '50%',
+        // selectionTxtFontSize: '15px'
       };
 
     static isMobile() {

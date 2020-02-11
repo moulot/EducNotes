@@ -353,7 +353,6 @@ namespace EducNotes.API.Data
             var courses = await _context.TeacherCourses
                                     .Where(c => c.TeacherId == teacherId)
                                     .Select(s => s.Course).ToListAsync();
-
             return courses;
         }
 

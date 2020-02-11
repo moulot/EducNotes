@@ -81,11 +81,6 @@ import { FirstStepFinishmentComponent } from './registration/firstStep-finishmen
 import { ConfirmEmailComponent } from './registration/confirm-email/confirm-email.component';
 import { MemberPasswordSettingComponent } from './members/member-password-setting/member-password-setting.component';
 import { PreInscriptionComponent } from './admin/pre-inscription/pre-inscription.component';
-// import { UserTypesComponent } from './admin/user-types/user-types.component';
-// import { AdministrationUsersComponent } from './admin/administration-users/administration-users.component';
-// import { CoursClassesManagementComponent } from './admin/cours-classes-management/cours-classes-management.component';
-// import { UserListComponent } from './users/user-list/user-list.component';
-// import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
 import { SigninComponent } from './views/sessions/signin/signin.component';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
@@ -98,7 +93,6 @@ import { FilterTableComponent } from './views/data-tables/filter-table/filter-ta
 import { AgendaModalComponent } from './agenda/agenda-modal/agenda-modal.component';
 import { ClassStudentsComponent } from './classes/class-students/class-students.component';
 import { ClassAgendaComponent } from './classes/class-agenda/class-agenda.component';
-import { ParentDashboardComponent } from './views/dashboard/parent-dashboard/parent-dashboard.component';
 import { StudentDashboardComponent } from './views/dashboard/student-dashboard/student-dashboard.component';
 import { TeacherDashboardComponent } from './views/dashboard/teacher-dashboard/teacher-dashboard.component';
 import { UserHomeResolver } from './_resolvers/user-home-resolver';
@@ -180,7 +174,6 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { CourseCoefficientsComponent } from './admin/courses-management/course-coefficients/course-coefficients.component';
 import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
 import { CoefficientFormResolver } from './_resolvers/coeffiient-form-form-resolver';
-import { TimelineComponent } from './views/dashboard/timeline/timeline.component';
 import { ChildrenListComponent } from './children-list/children-list.component';
 import { UsersHeaderComponent } from './users-header/users-header.component';
 import { PeriodicitiesComponent } from './admin/treso/periodicities/periodicities.component';
@@ -215,6 +208,9 @@ import { TeacherProgramComponent } from './classes/teacher-program/teacher-progr
 import { NewThemeComponent } from './programs/new-theme/new-theme.component';
 import { ThemesListComponent } from './programs/new-theme/themes-list/themes-list.component';
 
+import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
+import { ClassProgramDataComponent } from './classes/class-program-data/class-program-data.component';
+import { TimelineComponent } from './shared/components/timeline/timeline.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -287,7 +283,6 @@ export function tokenGetter() {
       AgendaModalComponent,
       ClassStudentsComponent,
       ClassAgendaComponent,
-      ParentDashboardComponent,
       StudentDashboardComponent,
       TeacherDashboardComponent,
       AdminDashboardComponent,
@@ -334,7 +329,6 @@ export function tokenGetter() {
       ClassTeachersComponent,
       CourseCoefficientsComponent,
       CoefficientFormComponent,
-      TimelineComponent,
       ChildrenListComponent,
       UsersHeaderComponent,
       PeriodicitiesComponent,
@@ -358,7 +352,9 @@ export function tokenGetter() {
       ClassProgressComponent,
       TeacherProgramComponent,
       NewThemeComponent,
-      ThemesListComponent
+      ThemesListComponent,
+      ClassProgramDataComponent,
+      TimelineComponent
    ],
    imports: [
       FormWizardModule,
@@ -452,6 +448,7 @@ export function tokenGetter() {
       SmsTemplateHomeResolver,
       EditSmsTemplateResolver,
       ClassGradesResolver,
+      TeacherProgramResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

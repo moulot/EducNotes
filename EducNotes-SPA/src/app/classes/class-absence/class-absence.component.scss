@@ -1,0 +1,11 @@
+.mdb-date-time {
+  mdb-date-picker::ng-deep .mydp,
+  mdb-time-picker::ng-deep .tp {
+    &,
+    input,
+    .md-form {
+      height: 0;
+      width: 0;
+    }
+  }
+}

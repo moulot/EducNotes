@@ -135,7 +135,7 @@ export class ClassCallSheetComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
     }, () => {
-      this.router.navigate(['/teacher']);
+      this.router.navigate(['/classSession', this.schedule.id]);
     });
   }
 

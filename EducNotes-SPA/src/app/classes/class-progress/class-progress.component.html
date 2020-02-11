@@ -1,1 +1,15 @@
-yes!
+<div class="row m-2">
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-1">
+        <a [routerLink]="['/classSession', 45]"><mdb-icon far icon="arrow-alt-circle-left"></mdb-icon>retour</a>
+      </div>
+      <div class="col-md-11">
+        <p class="text-20 font-weight-400 m-0 pb-1">classe {{program.className}} - progression du cours de {{program.courseName}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <app-class-program-data [aclass]="program"></app-class-program-data>
+  </div>
+</div>

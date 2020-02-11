@@ -38,6 +38,7 @@ export class AppComponent implements OnInit {
     const user: User = JSON.parse(localStorage.getItem('user'));
     const currentPeriod: Period = JSON.parse(localStorage.getItem('currentPeriod'));
     const currentChild: User = JSON.parse(localStorage.getItem('currentChild'));
+    const currentClassId = localStorage.getItem('currentClassId');
     if (token) {
       this.authService.decodedToken = this.jwtHelper.decodeToken(token);
     }
@@ -45,7 +46,8 @@ export class AppComponent implements OnInit {
       this.authService.currentUser = user;
       this.authService.currentPeriod = currentPeriod;
       this.authService.changeCurrentChild(currentChild);
-      this.authService.changeMemberPhoto(user.photoUrl);
+      this.authService.changeUserPhoto(user.photoUrl);
+      this.authService.changeCurrentClassId(Number(currentClassId));
     }
   }
 

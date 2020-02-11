@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { ParentDashboardComponent } from './parent-dashboard.component';
+import { ClassProgramDataComponent } from './class-program-data.component';
 
-describe('ParentDashboardComponent', () => {
-  let component: ParentDashboardComponent;
-  let fixture: ComponentFixture<ParentDashboardComponent>;
+describe('ClassProgramDataComponent', () => {
+  let component: ClassProgramDataComponent;
+  let fixture: ComponentFixture<ClassProgramDataComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ParentDashboardComponent ]
+      declarations: [ ClassProgramDataComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ParentDashboardComponent);
+    fixture = TestBed.createComponent(ClassProgramDataComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

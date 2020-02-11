@@ -1,60 +1,125 @@
 
 <form [formGroup]="absenceForm" (ngSubmit)="saveAbsence(false)">
-
-  <div class="form-group">
-    <nz-radio-group formControlName="type">
-      <label nz-radio nzValue="1">absence</label>
-      <label nz-radio nzValue="2">retard</label>
-    </nz-radio-group>
-    <div *ngIf="absenceForm.get('type').errors && absenceForm.get('type').touched"
-      class="text-danger">choisir un élève svp</div>
-  </div>
-  
-  <div class="form-group">
-    <nz-select style="width: 200px;" nzShowSearch nzAllowClear nzPlaceHolder="choisir un élève"
-      id="student" name="student" formControlName="student">
-      <nz-option *ngFor="let user of students" nzLabel="{{user.lastName}} {{user.firstName}}"
-        nzValue="{{user.id}}"></nz-option>
-    </nz-select>
-    <div *ngIf="absenceForm.get('student').errors && absenceForm.get('student').touched"
-      class="text-danger">choisir un élève svp</div>
-  </div>
-  
-  <div class="form-group">
-    <nz-range-picker id="dates" name="dates" class="mr-3"
-      formControlName="dates" nzShowTime nzFormat="dd-MM-yyyy HH:mm"></nz-range-picker>                  
-    <div *ngIf="absenceForm.get('dates').errors && absenceForm.get('dates').touched"
-      class="text-danger">précisez les dates</div>
-  </div>
-
-  <div class="form-group">
-    <nz-select style="width: 100px;" nzShowSearch nzAllowClear nzPlaceHolder="justifié ?"
-      id="justified" name="justified" formControlName="justified">
-      <nz-option nzLabel="NON" nzValue="0"></nz-option>
-      <nz-option nzLabel="OUI" nzValue="1"></nz-option>
-    </nz-select>
-    <div *ngIf="absenceForm.get('justified').errors && absenceForm.get('justified').touched"
-      class="text-danger">précisez si justifié</div>
-  </div>
-
-  <div class="form-group">
-    <input type="text" id="reason" name="reason"
-    class="form-control mr-3" formControlName="reason" placeholder="motif">
-    <div *ngIf="absenceForm.get('reason').errors && absenceForm.get('reason').touched"
-      class="text-danger">saisir le motif svp</div>
-  </div>
-
-  <div class="form-group">
-    <label for="comment" class="text-secondary">commentaire</label><br>
-    <textarea name="comment" class="form-control" formControlName="comment" 
-      id="comment" cols="5" rows="2" style="resize: none;"></textarea>
+  <div class="row">
+    <div class="col-md-12 mb-1">
+      <div class="form-check form-check-inline">
+        <input type="radio" class="form-check-input" id="absence" value="1" formControlName="type" name="type" mdbInput>
+        <label class="form-check-label" for="absence">absence</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input type="radio" class="form-check-input" id="late" value="2" formControlName="type" name="type" mdbInput>
+        <label class="form-check-label" for="late">retard</label>
+      </div>
+      <div *ngIf="absenceForm.get('type').errors && absenceForm.get('type').touched"
+        class="text-small text-danger">choisir le type</div>
+    </div>
+    <div class="col-md-12 mb-1">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="md-form form-sm m-0">
+            <mdb-select [options]="studentOptions" formControlName="student" placeholder="choisir un élève"></mdb-select>
+            <div *ngIf="absenceForm.get('student').errors && absenceForm.get('student').touched"
+              class="text-small text-danger">choisir un élève svp</div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="md-form mdb-date-time form-sm m-0">
+                <input
+                  (focus)="this.startDate.openBtnClicked()"
+                  #inputStartD
+                  class="form-control date-time picker-opener"
+                  data-open="picker2"
+                  placeholder="date début"
+                  type="text"
+                />
+                <mdb-date-picker
+                  (dateChanged)="onSDateChange($event)"
+                  [options]="myDatePickerOptions"
+                  #startDate
+                  formControlName="startDate"
+                  name="startDate"
+                ></mdb-date-picker>
+                <mdb-time-picker
+                  (timeChanged)="onSTimeChange($event)"
+                  [buttonLabel]="'Done'"
+                  [twelvehour]="false"
+                  [darktheme]="true"
+                  #startTime
+                  formControlName="startTime"
+                  name="startTime"
+                ></mdb-time-picker>
+                <div *ngIf="absenceForm.get('startDate').errors && absenceForm.get('startDate').touched"
+                  class="text-small text-danger">saisir la date début</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="md-form mdb-date-time form-sm m-0">
+                <input
+                  (focus)="this.endDate.openBtnClicked()"
+                  #inputEndD
+                  class="form-control date-time picker-opener"
+                  data-open="picker2"
+                  placeholder="date fin"
+                  type="text"
+                />
+                <mdb-date-picker
+                  (dateChanged)="onEDateChange($event)"
+                  [options]="myDatePickerOptions"
+                  #endDate
+                  formControlName="endDate"
+                  name="endDate"
+                ></mdb-date-picker>
+                <mdb-time-picker
+                  (timeChanged)="onETimeChange($event)"
+                  [buttonLabel]="'Done'"
+                  [twelvehour]="false"
+                  [darktheme]="true"
+                  #endTime
+                  formControlName="endTime"
+                  name="endTime"
+                ></mdb-time-picker>
+                <div *ngIf="absenceForm.get('endDate').errors && absenceForm.get('endDate').touched"
+                  class="text-small text-danger">saisir date fin</div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    <div class="col-md-12 mb-1">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="md-form form-sm m-0">
+            <mdb-select [options]="justifiedOptions" formControlName="justified" placeholder="justifié?"></mdb-select>
+            <div *ngIf="absenceForm.get('justified').errors && absenceForm.get('justified').touched"
+              class="text-small text-danger">précisez si justifié</div>
+          </div>
+        </div>
+        <div class="col-md-9">
+          <div class="md-form form-sm m-0">
+            <input mdbInput type="text" id="reason" class="form-control" formControlName="reason" mdbValidate>
+            <label for="reason">motif</label>
+            <div *ngIf="absenceForm.get('reason').errors && absenceForm.get('reason').touched"
+              class="text-small text-danger">saisir le motif svp</div>
+          </div>
+        </div>
+        </div>
     </div>
 
-  <div class="form-group text-center">
-    <button class="btn btn-outline-primary mr-2" [disabled]="!absenceForm.valid" type="submit">valider</button>
-    <button class="btn btn-outline-primary mr-2" [disabled]="!absenceForm.valid"
-      type="button" (click)="saveAbsence(true)">valider et nouveau</button>
-    <button class="btn btn-outline-defaut" (click)="cancel()" type="button">annuler</button>
+    <div class="col-md-12 mb-1">
+      <div class="md-form form-sm m-0">
+        <textarea type="text" id="comment" formControlName="comment" class="md-textarea form-control" mdbInput></textarea>
+        <label for="comment">commentaire</label>
+      </div>
+    </div>
+
+    <div class="col-md-12">
+      <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!absenceForm.valid" mdbWavesEffect>valider</button>
+      <button type="button" mdbBtn size="sm" color="primary" [disabled]="!absenceForm.valid"
+        (click)="saveAbsence(true)" mdbWavesEffect>valider et nouveau</button>
+      <button type="button" mdbBtn size="sm" color="primary" (click)="cancel()" mdbWavesEffect>annuler</button>
+    </div>
   </div>
-      
 </form>

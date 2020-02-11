@@ -69,8 +69,7 @@ export class EvalAddFormComponent implements OnInit {
         notCounted: [false],
         isNegative: [false]
       })
-    } // , { validator: Validators.compose([CustomValidators.maxGradeValidator])}
-    );
+    }); // , { validator: Validators.compose([CustomValidators.maxGradeValidator])}
   }
 
   createEvaluation(more: boolean) {

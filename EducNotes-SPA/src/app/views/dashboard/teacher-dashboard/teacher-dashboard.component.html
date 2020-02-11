@@ -174,49 +174,7 @@
   </div>
 
   <div class="col-lg-3 col-md-12">
-    <div class="row">
-
-      <div class="col-md-12 col-sm-12">
-        <div class="card mb-2 p-2">
-          <div class="card-body">
-            <div class="lead m-0">mon agenda</div>
-            <p class="text-small text-muted">programme de la semaine.</p>
-            <nz-timeline>
-              <nz-timeline-item nzColor="green">
-                <div>
-                  <strong class="mr-1"><a href="#">8:30 - math 5e A</a></strong>
-                  <p class="text-muted">devoir surveillé</p>
-                </div>
-              </nz-timeline-item>
-              <nz-timeline-item nzColor="green">
-                <div>
-                  <strong class="mr-1"><a href="#">10:30 - physique 5e A</a></strong>
-                  <p class="text-muted"></p>
-                </div>
-              </nz-timeline-item>
-              <nz-timeline-item [nzDot]="dotTemplate" nzColor="red">
-                <p>Solve initial network problems 3 2015-09-01</p>
-              </nz-timeline-item>
-              <nz-timeline-item>
-                <p>Technical testing 1</p>
-                <p>Technical testing 3 2015-09-01</p>
-              </nz-timeline-item>
-              <nz-timeline-item nzColor="gray">
-                <p>Technical testing 1</p>
-              </nz-timeline-item>
-              <nz-timeline-item nzColor="gray">
-                <p>Technical testing 1</p>
-                <p>Technical testing 2</p>
-              </nz-timeline-item>
-            </nz-timeline>
-            <ng-template #dotTemplate>
-              <i nz-icon nzType="clock-circle-o" style="font-size: 16px;"></i>
-            </ng-template>
-          </div>
-        </div>
-      </div>
-
-    </div>
+    <app-timeline></app-timeline>
   </div>
 
 </div>

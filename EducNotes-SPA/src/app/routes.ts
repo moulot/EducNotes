@@ -20,7 +20,6 @@ import { GradePanelComponent } from './grades/grade-panel/grade-panel.component'
 import { ClassStudentsComponent } from './classes/class-students/class-students.component';
 import { ClassAgendaComponent } from './classes/class-agenda/class-agenda.component';
 import { UserHomeResolver } from './_resolvers/user-home-resolver';
-import { ParentDashboardComponent } from './views/dashboard/parent-dashboard/parent-dashboard.component';
 import { TeacherDashboardComponent } from './views/dashboard/teacher-dashboard/teacher-dashboard.component';
 
 import { InscriptionComponent } from './views/forms/inscription/inscription.component';
@@ -103,6 +102,7 @@ import { ClassSessionComponent } from './classes/class-session/class-session.com
 import { TeacherProgramComponent } from './classes/teacher-program/teacher-program.component';
 import { ThemesListComponent } from './programs/new-theme/themes-list/themes-list.component';
 import { NewThemeComponent } from './programs/new-theme/new-theme.component';
+import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -142,7 +142,6 @@ export const appRoutes: Routes = [
             { path: 'agendas/:classId', component: ClassAgendaComponent },
             { path: 'student', component: StudentDashboardComponent },
             { path: 'studentFromP/:id', component: StudentDashboardComponent },
-            { path: 'parent', component: ParentDashboardComponent, resolve: { parent: UserHomeResolver } },
             { path: 'teacher', component: TeacherDashboardComponent, resolve: { teacher: UserHomeResolver } },
             { path: 'admins', component: AdminDashboardComponent, resolve: { admin: UserHomeResolver } },
             { path: 'inscriptions', component: InscriptionComponent },
@@ -197,6 +196,7 @@ export const appRoutes: Routes = [
             {path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} },
             {path: 'AddUserGrades/:evalId', component: AddUserGradesComponent, resolve: {data: ClassGradesResolver}},
             {path: 'teacherProgram', component: TeacherProgramComponent},
+            {path: 'classProgram/:courseId', component: ClassProgressComponent, resolve: {program: TeacherProgramResolver}},
             {path: 'themesList', component: ThemesListComponent},
             {path: 'newTheme', component: NewThemeComponent}
         ]

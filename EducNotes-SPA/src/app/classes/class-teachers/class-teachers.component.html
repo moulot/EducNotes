@@ -11,49 +11,7 @@
       </div>
 
       <div class="col-md-3 col-sm-12">
-        <div class="row">
-
-          <div class="col-md-12 col-sm-12">
-            <div class="card mb-4 p-2">
-              <div class="card-body">
-                <div class="card-title m-0">mon agenda</div>
-                <p class="text-small text-muted">programme de la semaine.</p>
-                <nz-timeline>
-                  <nz-timeline-item nzColor="green">
-                    <div>
-                      <strong class="mr-1"><a href="#">8:30 - évènement à venir</a></strong>
-                      <p class="text-muted">desc de l'info à venir</p>
-                    </div>
-                  </nz-timeline-item>
-                  <nz-timeline-item nzColor="green">
-                    <div>
-                      <strong class="mr-1"><a href="#">10:30 - info suivante</a></strong>
-                      <p class="text-muted">desc infos en temps réel ici</p>
-                    </div>
-                  </nz-timeline-item>
-                  <nz-timeline-item [nzDot]="dotTemplate" nzColor="red">
-                    <p>un évènement parent, élève ici</p>
-                  </nz-timeline-item>
-                  <nz-timeline-item>
-                    <p>réunion profs / parents</p>
-                    <p>détails de l'évènement</p>
-                  </nz-timeline-item>
-                  <nz-timeline-item nzColor="gray">
-                    <p>infos supplémentaires</p>
-                  </nz-timeline-item>
-                  <nz-timeline-item nzColor="gray">
-                    <p>infos 4</p>
-                    <p>détails de l'information</p>
-                  </nz-timeline-item>
-                </nz-timeline>
-                <ng-template #dotTemplate>
-                  <i nz-icon nzType="clock-circle-o" style="font-size: 16px;"></i>
-                </ng-template>
-              </div>
-            </div>
-          </div>
-
-        </div>
+        <app-timeline></app-timeline>
       </div>
 
     </div>

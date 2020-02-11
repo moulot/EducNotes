@@ -1,6 +1,6 @@
 <div #classLifeReport class="m-2" *ngIf="!toggleFormAdd">
 
-    <p class="lead">classe {{selectedClass.name}} - vie scolaire</p>
+    <p class="lead">vie scolaire - classe {{selectedClass?.name}}</p>
 
     <div class="row">
 
@@ -54,7 +54,7 @@
 
     </div>
 
-    <button class="btn btn-outline-primary mb-1" (click)="toggleForm()">
+    <button type="button" mdbBtn (click)="toggleForm()" size="sm" color="primary" mdbWavesEffect>
       saisir évènement de la vie de classe
     </button>
   
@@ -111,27 +111,30 @@
 
   </div>
               
-  <div #classLifeForm class="m-2" *ngIf="toggleFormAdd">
-
-    <button class="btn btn-outline-primary mb-1" (click)="toggleForm()">
+  <div #classLifeForm class="row m-2" *ngIf="toggleFormAdd">
+    <div class="col-md-9">
+      <div class="lead">Saisie de la vie scolaire</div>
+    </div>
+    <div class="col-md-3 float-right">
+      <button type="button" mdbBtn (click)="toggleForm()" size="sm" color="primary" mdbWavesEffect>
         afficher la vie de la classe
       </button>
-  
-    <h2 class="text-center text-secondary mt-2">Saisie de la vie scolaire</h2>
-    <hr>
-    
-    <nz-tabset nzTabPosition="left">
-      <nz-tab nzTitle="absence">
-        <app-class-absence [students]="students" (loadAbsences)="loadAbsences(selectedClass.id)"
-          (toggleForm)="toggleForm($event)"></app-class-absence>
-      </nz-tab>
-      <nz-tab nzTitle="sanction">
-        <app-class-sanction [students]="students" (loadSanctions)="loadSanctions(selectedClass.id)"
-          (toggleForm)="toggleForm($event)" [selectedClass]="selectedClass"></app-class-sanction>
-      </nz-tab>
-      <nz-tab nzTitle="encouragement">
-        saisie ici des recompenses, encouragements
-      </nz-tab>
-    </nz-tabset>
-
+    </div>  
+    <div class="col-md-12"><hr class="mt-1"></div>
+    <div class="col-md-12">
+      <!-- Nav Tabs -->
+      <mdb-tabset #staticTabs [vertical]="true" [buttonClass]="'md-pills pills-primary text-center transparent'" [contentClass]="'card'">
+        <mdb-tab heading="absence">
+          <app-class-absence [students]="students" (loadAbsences)="loadAbsences(selectedClass.id)"
+            (toggleForm)="toggleForm($event)"></app-class-absence>
+        </mdb-tab>
+        <mdb-tab heading="sanction">
+          <app-class-sanction [students]="students" (loadSanctions)="loadSanctions(selectedClass.id)"
+            (toggleForm)="toggleForm($event)" [selectedClass]="selectedClass"></app-class-sanction>
+        </mdb-tab>
+        <mdb-tab heading="Contact">
+          saisie ici des recompenses, encouragements
+        </mdb-tab>
+      </mdb-tabset>    
+    </div>
   </div>

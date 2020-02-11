@@ -670,10 +670,7 @@ namespace EducNotes.API.Controllers
         [HttpGet("{teacherId}/Courses")]
         public async Task<IActionResult> GetTeacherCourses(int teacherId)
         {
-            var courses = await _context.TeacherCourses
-                                    .Where(c => c.TeacherId == teacherId)
-                                    .Select(s => s.Course).ToListAsync();
-
+            var courses = await _repo.GetTeacherCourses(teacherId);
             return Ok(courses);
         }
 

@@ -281,5 +281,8 @@ export class ClassService {
   saveNewTheme(theme) {
     return this.http.post(this.baseUrl + 'classes/SaveNewTheme', theme);
   }
+  getTeacherCourseProgram(courseId: number, teacherId: number) {
+    return this.http.get(this.baseUrl + 'classes/courses/' + courseId + '/teacher/' + teacherId + '/Program');
+  }
 
 }
