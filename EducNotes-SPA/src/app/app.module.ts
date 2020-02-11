@@ -98,7 +98,6 @@ import { FilterTableComponent } from './views/data-tables/filter-table/filter-ta
 import { AgendaModalComponent } from './agenda/agenda-modal/agenda-modal.component';
 import { ClassStudentsComponent } from './classes/class-students/class-students.component';
 import { ClassAgendaComponent } from './classes/class-agenda/class-agenda.component';
-import { ParentDashboardComponent } from './views/dashboard/parent-dashboard/parent-dashboard.component';
 import { StudentDashboardComponent } from './views/dashboard/student-dashboard/student-dashboard.component';
 import { TeacherDashboardComponent } from './views/dashboard/teacher-dashboard/teacher-dashboard.component';
 import { UserHomeResolver } from './_resolvers/user-home-resolver';
@@ -180,7 +179,6 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { CourseCoefficientsComponent } from './admin/courses-management/course-coefficients/course-coefficients.component';
 import { CoefficientFormComponent } from './admin/courses-management/coefficient-form/coefficient-form.component';
 import { CoefficientFormResolver } from './_resolvers/coeffiient-form-form-resolver';
-import { TimelineComponent } from './views/dashboard/timeline/timeline.component';
 import { ChildrenListComponent } from './children-list/children-list.component';
 import { UsersHeaderComponent } from './users-header/users-header.component';
 import { PeriodicitiesComponent } from './admin/treso/periodicities/periodicities.component';
@@ -214,6 +212,7 @@ import { ClassProgressComponent } from './classes/class-progress/class-progress.
 import { TeacherProgramComponent } from './classes/teacher-program/teacher-program.component';
 import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
 import { ClassProgramDataComponent } from './classes/class-program-data/class-program-data.component';
+import { TimelineComponent } from './shared/components/timeline/timeline.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -286,7 +285,6 @@ export function tokenGetter() {
       AgendaModalComponent,
       ClassStudentsComponent,
       ClassAgendaComponent,
-      ParentDashboardComponent,
       StudentDashboardComponent,
       TeacherDashboardComponent,
       AdminDashboardComponent,
@@ -333,7 +331,6 @@ export function tokenGetter() {
       ClassTeachersComponent,
       CourseCoefficientsComponent,
       CoefficientFormComponent,
-      TimelineComponent,
       ChildrenListComponent,
       UsersHeaderComponent,
       PeriodicitiesComponent,
@@ -356,7 +353,8 @@ export function tokenGetter() {
       ClassSessionComponent,
       ClassProgressComponent,
       TeacherProgramComponent,
-      ClassProgramDataComponent
+      ClassProgramDataComponent,
+      TimelineComponent
    ],
    imports: [
       FormWizardModule,

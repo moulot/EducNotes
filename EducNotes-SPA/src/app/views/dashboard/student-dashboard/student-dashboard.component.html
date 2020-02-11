@@ -1,35 +1,25 @@
-<div class="mb-2" *ngIf="showUsersList">
+<div class="mb-2" *ngIf="showUsersList && !showChildrenList">
   <app-users-header [student]="student" (getUser)="getUser($event)"></app-users-header>
 </div>
 
 <div class="row">
 
+  <p class="text-15 text-muted m-1">sélectionner un enfant pour voir ses évènements</p>
   <div class="col-md-9" *ngIf="showChildrenList">
-
-    <p class="text-15 text-muted m-1">sélectionner un enfant pour voir ses évènements</p>
-
     <div class="row">
-
       <div class="col-md-12 col-sm-12">
         <app-children-list [url]="url" [children]="children"></app-children-list>
       </div>
-
     </div>
-
   </div>
 
   <div class="col-md-9" *ngIf="!showChildrenList">
-
     <div class="row m-0">
-
       <div class="col-lg-12 col-md-12">
-
         <div class="row">
           <div class="col-md-6">
-
             <div class="row">
               <div class="col-md-12">
-
                 <div class="card mb-4">
                   <div class="card-body p-2">
                     <div class="card-title d-flex">
@@ -38,25 +28,17 @@
                         <button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>détails</button>
                       </div>
                     </div>
-
                     <div *ngIf="agendaItems?.length == 0">
                       <div class="card pt-5 pb-5 pl-2 pr-2">
                         <h6 class="text-muted">pas de devoirs à faire cette semaine...</h6>
                       </div>
                     </div>
-
                     <div *ngIf="agendaItems?.length != 0">
-
-                      <!-- <mdb-accordion [multiple]="true"> -->
-
                       <div *ngFor="let items of agendaItems">
-
                         <div class="card mb-1">
                           <div class="card-body p-2">
-
                             <p class="text-15">{{items.dueDate}}</p>
                             <div *ngFor="let course of items.courses">
-
                               <div class="card mb-1">
                                 <div class="card-body p-2">
                                   <div class="row">
@@ -76,31 +58,19 @@
                                   </div>
                                 </div>
                               </div>
-
                             </div>
-
                           </div>
                         </div>
-
                       </div>
-
-                      <!-- </mdb-accordion> -->
-
                     </div>
-
                   </div>
                 </div>
-
               </div>
             </div>
-
           </div>
           <div class="col-md-6">
-
             <div class="row">
-
               <div class="col-md-12">
-
                 <div class="row mb-2">
                   <!-- ICON BG -->
                   <div class="col-md-6 mb-1">
@@ -116,7 +86,6 @@
                       </div>
                     </div>
                   </div>
-
                   <div class="col-md-6 mb-1">
                     <div class="card card-icon-bg o-hidden">
                       <div class="card-body align-items-center text-center">
@@ -128,7 +97,6 @@
                       </div>
                     </div>
                   </div>
-
                   <div class="col-md-6">
                     <div class="card card-icon-bg o-hidden">
                       <div class="card-body align-items-center text-center">
@@ -140,7 +108,6 @@
                       </div>
                     </div>
                   </div>
-
                   <div class="col-md-6">
                     <div class="card card-icon-bg o-hidden">
                       <div class="card-body align-items-center text-center">
@@ -152,19 +119,13 @@
                       </div>
                     </div>
                   </div>
-
                 </div>
-
               </div>
-
               <div class="col-md-12">
-
                 <div class="row">
-
                   <div class="col-md-12 mb-2">
                     <div class="card">
                       <div class="card-body p-2">
-
                         <div class="d-flex">
                           <div class="lead flex-grow-1">notes</div>
                           <div>
@@ -173,9 +134,7 @@
                             <!-- <button [routerLink]="['/studentGrades', student?.id]"  class="btn btn-outline-primary btn-sm">détails</button> -->
                           </div>
                         </div>
-
                         <div class="row">
-
                           <div *ngFor="let course of userCourses" class="col-md-4">
                             <div class="card mb-1">
                               <div class="card-body text-center p-2">
@@ -188,17 +147,12 @@
                               </div>
                             </div>
                           </div>
-
                         </div>
-
                       </div>
                     </div>
                   </div>
-
                 </div>
-
               </div>
-
               <div class="col-md-12">
                 <div class="card mb-4">
                   <div class="card-body p-2">
@@ -232,125 +186,15 @@
                   </div>
                 </div>
               </div>
-
             </div>
-
           </div>
         </div>
-
-        <!-- <div class="row">
-
-          <div class="col-md-12">
-            <div class="card mb-4">
-              <div class="card-body">
-                <div class="card-title d-flex">
-                  <div class="flex-grow-1 lead">évaluations à venir</div>
-                  <div>
-                    <button type="button" mdbBtn size="sm" color="light" mdbWavesEffect>détails</button>
-                  </div>
-                </div>
-                <div *ngFor="let eval of evalsToCome">
-                  <div class="card mb-2">
-                    <div class="card-body p-2">
-                      <div class="row">
-                        <div class="col-md-12 d-flex">
-                          <div class="box-course mr-2" [ngStyle]="{'background-color': eval.courseColor}" style="width: 20px;height: 100%;"></div>
-                          <div class="flex-grow-1">
-                            <div class="d-flex">
-                              <div class="flex-grow-1">
-                                <p class="m-0"><b>{{eval.courseName}}</b></p>
-                              </div>
-                              <div class="m-0 text-12 text-muted">prévue le {{eval.evalDate}}</div>    
-                            </div>
-                            <div class="m-0 text-14 p-0">{{eval.evalTypeName}}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        
-        </div> -->
-
-        <!-- <div class="row">
-
-          <div class="col-md-12">
-            <div class="card mb-2">
-              <div class="card-body">
-                <div class="card-title d-flex">
-                  <div class="flex-grow-1">vie scolaire</div>
-                  <div>
-                    <button class="btn btn-outline-primary btn-sm">détails</button>
-                  </div>
-                </div>
-                  <div class="d-flex align-items-center border-bottom-dotted-dim pb-4">
-                    <div class="box-course mr-3"></div>
-                    <div class="flex-grow-1">
-                      <h6 class="m-0">course.courseName</h6>
-                      <p class="m-0 text-18 text-muted">course.taskDesc</p>
-                      <p class="m-0 text-small text-muted">donné le course.dateAdded</p>
-                    </div>
-                  </div>
-              </div>
-            </div>
-          </div>
-
-        </div> -->
-
       </div>
-
     </div>
-
   </div>
 
-  
   <div class="col-md-3 col-sm-12">
-    <div class="row">
-
-      <div class="col-md-12 col-sm-12">
-        <div class="card mb-4 p-2">
-          <div class="card-body">
-            <div class="card-title m-0">mon agenda</div>
-            <p class="text-small text-muted">programme de la semaine.</p>
-            <nz-timeline>
-              <nz-timeline-item nzColor="green">
-                <div>
-                  <strong class="mr-1"><a href="#">8:30 - évènement à venir</a></strong>
-                  <p class="text-muted">desc de l'info à venir</p>
-                </div>
-              </nz-timeline-item>
-              <nz-timeline-item nzColor="green">
-                <div>
-                  <strong class="mr-1"><a href="#">10:30 - info suivante</a></strong>
-                  <p class="text-muted">desc infos en temps réel ici</p>
-                </div>
-              </nz-timeline-item>
-              <nz-timeline-item [nzDot]="dotTemplate" nzColor="red">
-                <p>un évènement parent, élève ici</p>
-              </nz-timeline-item>
-              <nz-timeline-item>
-                <p>réunion profs / parents</p>
-                <p>détails de l'évènement</p>
-              </nz-timeline-item>
-              <nz-timeline-item nzColor="gray">
-                <p>infos supplémentaires</p>
-              </nz-timeline-item>
-              <nz-timeline-item nzColor="gray">
-                <p>infos 4</p>
-                <p>détails de l'information</p>
-              </nz-timeline-item>
-            </nz-timeline>
-            <ng-template #dotTemplate>
-              <i nz-icon nzType="clock-circle-o" style="font-size: 16px;"></i>
-            </ng-template>
-          </div>
-        </div>
-      </div>
-
-    </div>
+    <app-timeline></app-timeline>
   </div>
 
 </div>

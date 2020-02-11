@@ -15,8 +15,6 @@ import { UserService } from 'src/app/_services/user.service';
   styleUrls: ['./student-dashboard.component.scss']
 })
 export class StudentDashboardComponent implements OnInit {
-  // @Input() userIsParent: boolean;
-  // @Input() childSelected: boolean;
   student: User;
   classRoom: Class;
   strFirstDay: string;
@@ -48,11 +46,6 @@ export class StudentDashboardComponent implements OnInit {
 
   ngOnInit() {
 
-    // this.route.params.subscribe(params => {
-    //   this.userIdFromRoute = params['id'];
-    // });
-    // console.log(this.userIdFromRoute);
-    // is the child connected? // id coming from route params
     if (this.authService.studentLoggedIn()) {
       this.showChildrenList = false;
       this.showUsersList = false;

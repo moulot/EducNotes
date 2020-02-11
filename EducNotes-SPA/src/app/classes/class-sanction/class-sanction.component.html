@@ -1,59 +1,71 @@
 <form [formGroup]="sanctionForm" (ngSubmit)="saveSanction(false)">
-
-    <div class="form-group">
-      <nz-select style="width: 200px;" nzShowSearch nzAllowClear nzPlaceHolder="choisir un élève"
-        id="student" name="student" formControlName="student">
-        <nz-option *ngFor="let user of students" nzLabel="{{user.lastName}} {{user.firstName}}"
-          nzValue="{{user.id}}"></nz-option>
-      </nz-select>
-      <div *ngIf="sanctionForm.get('student').errors && sanctionForm.get('student').touched"
-        class="text-danger">choisir un élève svp</div>
+  <div class="row">
+    <div class="col-md-12 mb-1">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="md-form form-sm m-0">
+            <mdb-select [options]="sanctionOptions" formControlName="sanction" placeholder="choisir la sanction"></mdb-select>
+            <div *ngIf="sanctionForm.get('sanction').errors && sanctionForm.get('sanction').touched" class="text-small text-danger">
+              choisir une sanction svp
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="md-form form-sm m-0">
+            <mdb-select [options]="studentOptions" formControlName="student" placeholder="choisir l'élève"></mdb-select>
+            <div *ngIf="sanctionForm.get('student').errors && sanctionForm.get('student').touched"
+              class="text-small text-danger">choisir un élève svp</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="md-form form-sm m-0">
+            <mdb-select [options]="teacherOptions" formControlName="sanctionedBy" placeholder="choisir le professeur"></mdb-select>
+            <div *ngIf="sanctionForm.get('sanctionedBy').errors && sanctionForm.get('sanctionedBy').touched"
+              class="text-small text-danger">choisir le professeur svp</div>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <div class="form-group">
-      <nz-select style="width: 200px;" nzShowSearch nzAllowClear nzPlaceHolder="choisir la sanction"
-      id="sanction" name="sanction" formControlName="sanction">
-        <nz-option *ngFor="let sanction of sanctions" nzLabel="{{sanction.name}}"
-          nzValue="{{sanction.id}}"></nz-option>
-      </nz-select>
-      <div *ngIf="sanctionForm.get('sanction').errors && sanctionForm.get('sanction').touched"
-        class="text-danger">choisir une sanction svp</div>
+    <div class="col-md-12 mb-1">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="md-form form-sm mt-0">
+            <mdb-date-picker name="sanctionDate" [options]="myDatePickerOptions" [placeholder]="'choisir la date'"
+            formControlName="sanctionDate"></mdb-date-picker>
+            <div *ngIf="sanctionForm.get('sanctionDate').errors && sanctionForm.get('sanctionDate').touched"
+              class="text-small text-danger mt-5">saisir la date svp</div>
+          </div>
+        </div>
+        <!-- <div class="col-md-4">
+          <div class="md-form form-sm mt-0">
+            <mdb-date-picker name="date" [options]="myDatePickerOptions" [placeholder]="'choisir la date'"
+              formControlName="date"></mdb-date-picker>
+            <div *ngIf="sanctionForm.get('date').errors && sanctionForm.get('date').touched"
+              class="text-danger">saisir la date svp</div>
+          </div>
+        </div> -->
     </div>
+    </div>
+    <div class="col-md-12 mb-1">
+      <div class="md-form form-sm">
+        <input mdbInput type="text" id="sreason" class="form-control" formControlName="reason" mdbValidate>
+        <label for="sreason">motif</label>
+        <div *ngIf="sanctionForm.get('reason').errors && sanctionForm.get('reason').touched"
+          class="text-small text-danger">saisir le motif svp</div>
+      </div>
+    </div>
+    <div class="col-md-12 mt-0 mb-1">
+      <div class="md-form form-sm m-0">
+        <textarea type="text" id="scomment" formControlName="comment" class="md-textarea form-control" mdbInput></textarea>
+        <label for="scomment">commentaire</label>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <button type="submit" mdbBtn size="sm" color="primary" [disabled]="!sanctionForm.valid" mdbWavesEffect>valider</button>
+    <button type="button" mdbBtn size="sm" color="primary" (click)="saveSanction(true)"
+      [disabled]="!sanctionForm.valid" mdbWavesEffect>valider et nouveau</button>
+    <button type="button" mdbBtn size="sm" color="primary" (click)="cancel()">annuler</button>
+  </div>
       
-      <div class="form-group">
-        <nz-date-picker id="date" nzShowTime nzFormat="dd-MMMM-yyyy"
-          name="date" formControlName="date"></nz-date-picker>
-    </div>
-  
-    <div class="form-group">
-      <nz-select style="width: 200px;" nzShowSearch nzAllowClear nzPlaceHolder="choisir le professeur"
-        id="sanctionedBy" name="sanctionedBy" formControlName="sanctionedBy">
-        <nz-option *ngFor="let user of classTeachers" nzLabel="{{user.lastName}} {{user.firstName}}"
-          nzValue="{{user.id}}"></nz-option>
-      </nz-select>
-      <div *ngIf="sanctionForm.get('sanctionedBy').errors && sanctionForm.get('sanctionedBy').touched"
-        class="text-danger">choisir le professeur svp</div>
-    </div>
-      
-    <div class="form-group">
-      <input type="text" id="reason" name="reason"
-        class="form-control mr-3" formControlName="reason" placeholder="motif">
-      <div *ngIf="sanctionForm.get('reason').errors && sanctionForm.get('reason').touched"
-        class="text-danger">saisir le motif svp</div>
-    </div>
-
-    <div class="form-group">
-      <label for="comment" class="text-secondary">commentaire</label><br>
-      <textarea name="comment" class="form-control" formControlName="comment" 
-        id="comment" cols="5" rows="2" style="resize: none;"></textarea>
-    </div>
-
-    <div class="form-group text-center">
-      <button class="btn btn-outline-primary mr-2" [disabled]="!sanctionForm.valid" type="submit">valider</button>
-      <button class="btn btn-outline-primary mr-2" (click)="saveSanction(true)"
-        [disabled]="!sanctionForm.valid" type="button">valider et nouveau</button>
-      <button class="btn btn-default" (click)="cancel()" type="button">annuler</button>
-    </div>
-        
-  </form>
-  
+</form>

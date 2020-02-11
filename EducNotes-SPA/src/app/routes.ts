@@ -20,7 +20,6 @@ import { GradePanelComponent } from './grades/grade-panel/grade-panel.component'
 import { ClassStudentsComponent } from './classes/class-students/class-students.component';
 import { ClassAgendaComponent } from './classes/class-agenda/class-agenda.component';
 import { UserHomeResolver } from './_resolvers/user-home-resolver';
-import { ParentDashboardComponent } from './views/dashboard/parent-dashboard/parent-dashboard.component';
 import { TeacherDashboardComponent } from './views/dashboard/teacher-dashboard/teacher-dashboard.component';
 
 import { InscriptionComponent } from './views/forms/inscription/inscription.component';
@@ -141,7 +140,6 @@ export const appRoutes: Routes = [
             { path: 'agendas/:classId', component: ClassAgendaComponent },
             { path: 'student', component: StudentDashboardComponent },
             { path: 'studentFromP/:id', component: StudentDashboardComponent },
-            { path: 'parent', component: ParentDashboardComponent, resolve: { parent: UserHomeResolver } },
             { path: 'teacher', component: TeacherDashboardComponent, resolve: { teacher: UserHomeResolver } },
             { path: 'admins', component: AdminDashboardComponent, resolve: { admin: UserHomeResolver } },
             { path: 'inscriptions', component: InscriptionComponent },

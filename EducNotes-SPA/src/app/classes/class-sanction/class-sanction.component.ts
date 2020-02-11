@@ -6,6 +6,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { UserSanction } from 'src/app/_models/userSanction';
 import { Sanction } from 'src/app/_models/sanction';
 import { UserService } from 'src/app/_services/user.service';
+import { Utils } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-class-sanction',
@@ -20,12 +21,21 @@ export class ClassSanctionComponent implements OnInit {
   sanctionForm: FormGroup;
   classTeachers: User[];
   newSanction = <UserSanction>{};
-  sanctions = <Sanction>{};
+  sanctions: Sanction[];
+  sanctionOptions = [];
+  studentOptions = [];
+  teacherOptions = [];
+  myDatePickerOptions = Utils.myDatePickerOptions;
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
     private userService: UserService, private fb: FormBuilder) { }
 
   ngOnInit() {
+    for (let i = 0; i < this.students.length; i++) {
+      const student = this.students[i];
+      const element = {value: student.id, label: student.lastName + ' ' + student.firstName};
+      this.studentOptions = [...this.studentOptions, element];
+    }
     this.createSanctionForm();
     this.getClassTeachers(this.selectedClass.id);
     this.getSanctions();
@@ -35,7 +45,8 @@ export class ClassSanctionComponent implements OnInit {
     this.sanctionForm = this.fb.group({
       student: [null, Validators.required],
       sanction: [null, Validators.required],
-      date: [null, Validators.required],
+      // date: [null, Validators.required],
+      sanctionDate: [null, Validators.required],
       sanctionedBy: [null, Validators.required],
       reason: ['', Validators.required],
       comment: ['']
@@ -45,14 +56,24 @@ export class ClassSanctionComponent implements OnInit {
   getClassTeachers(classId) {
     this.classService.getClassTeachers(classId).subscribe(teachers => {
       this.classTeachers = teachers;
+      for (let i = 0; i < teachers.length; i++) {
+        const teacher = teachers[i];
+        const element = {value: teacher.id, label: teacher.lastName + ' ' + teacher.firstName};
+        this.teacherOptions = [...this.teacherOptions, element];
+      }
     }, error => {
       this.alertify.error(error);
     });
   }
 
   getSanctions() {
-    this.classService.getSanctions().subscribe((sanctions: Sanction) => {
+    this.classService.getSanctions().subscribe((sanctions: Sanction[]) => {
       this.sanctions = sanctions;
+      for (let i = 0; i < sanctions.length; i++) {
+        const sanction = sanctions[i];
+        const element = {value: sanction.id, label: sanction.name};
+        this.sanctionOptions = [...this.sanctionOptions, element];
+      }
     });
   }
 

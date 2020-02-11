@@ -1,23 +1,23 @@
 <div class="container">
   <div class="row">
-    <div class="col-md-6">
+    <div *ngFor="let theme of treeData" class="col-md-4; let i = index">
       <mdb-tree
       (checked)="onCheck($event)"
       (checkedKeys)="onCheckedKeys($event)"
       (nodesChanged)="onNodesChanged($event)"
-      [expandAll]="false"
+      [expandAll]="expanded"
       [checkboxes]="true"
       textField="name"
       childrenField="children"
       checkboxesField="checked"
       [toggleOnTitleClick]="true"
-      [nodes]="treeData"
+      [nodes]="theme"
       ></mdb-tree>
     </div>
   </div>
 </div>
 
-<div class="row">
+<!-- <div class="row">
   <div class="col-md-4" *ngFor="let theme of aclass.themes; let i = index">
     <div class="text-20 font-weight-350">{{i+1}}. {{theme.name}}</div>
     <div class="ml-3 my-2" *ngFor="let lesson of theme.lessons; let j = index">
@@ -27,4 +27,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->

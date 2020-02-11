@@ -385,43 +385,42 @@ namespace EducNotes.API.Controllers {
             return NoContent();
         }
 
-        [HttpGet ("GetWeekDays")]
-        public IActionResult GetWeekDaysByDate ([FromQuery] AgendaParams agendaParams) {
+        [HttpGet("GetWeekDays")]
+        public IActionResult GetWeekDaysByDate([FromQuery] AgendaParams agendaParams) {
             var date = agendaParams.DueDate;
 
-            var weekDays = _repo.GetWeekDays (date);
+            var weekDays = _repo.GetWeekDays(date);
 
-            return Ok (weekDays);
+            return Ok(weekDays);
         }
 
-        [HttpGet ("GetSanctions")]
-        public async Task<IActionResult> GetSanctions () {
-            var sanctions = await _context.Sanctions.OrderBy (o => o.Name).ToListAsync ();
-
-            return Ok (sanctions);
+        [HttpGet("GetSanctions")]
+        public async Task<IActionResult> GetSanctions() {
+            var sanctions = await _context.Sanctions.OrderBy (o => o.Name).ToListAsync();
+            return Ok(sanctions);
         }
 
-        [HttpGet ("{classid}/Absences")]
-        public async Task<IActionResult> GetClassAbsences (int classId) {
-            var studentType = Convert.ToInt32 (_config.GetSection ("AppSettings:StudentTypeId").Value);
+        [HttpGet("{classid}/Absences")]
+        public async Task<IActionResult> GetClassAbsences(int classId) {
+            var studentType = Convert.ToInt32(_config.GetSection ("AppSettings:StudentTypeId").Value);
             var absences = await _context.Absences
-                .Include (i => i.User)
-                .Where (a => a.User.ClassId == classId && a.User.UserTypeId == studentType)
-                .OrderByDescending (o => o.StartDate).ToListAsync ();
+                .Include(i => i.User)
+                .Where(a => a.User.ClassId == classId && a.User.UserTypeId == studentType)
+                .OrderByDescending(o => o.StartDate).ToListAsync();
 
-            var nbClassAbscences = absences.Count ();
+            var nbClassAbscences = absences.Count();
 
-            var absencesToReturn = _mapper.Map<IEnumerable<AbsencesToReturnDto>> (absences);
+            var absencesToReturn = _mapper.Map<IEnumerable<AbsencesToReturnDto>>(absences);
 
-            return Ok (new {
+            return Ok(new {
                 absences = absencesToReturn,
-                    nbAbsences = nbClassAbscences
+                nbAbsences = nbClassAbscences
             });
         }
 
-        [HttpGet ("{classId}/ClassSanctions")]
-        public async Task<IActionResult> GetClassSanctions (int classId) {
-            var studentType = Convert.ToInt32 (_config.GetSection ("AppSettings:StudentTypeId").Value);
+        [HttpGet("{classId}/ClassSanctions")]
+        public async Task<IActionResult> GetClassSanctions(int classId) {
+            var studentType = Convert.ToInt32(_config.GetSection ("AppSettings:StudentTypeId").Value);
             var sanctions = await _context.UserSanctions
                 .Include (i => i.Sanction)
                 .Include (i => i.User)
