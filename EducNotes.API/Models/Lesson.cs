@@ -11,5 +11,7 @@ namespace EducNotes.API.Models
         public Theme Theme { get; set; }
         public string Name { get; set; }
         public string Desc { get; set; }
+        public  int DsplSeq { get; set; }
+
     }
 }

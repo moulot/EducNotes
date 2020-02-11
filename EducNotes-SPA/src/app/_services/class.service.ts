@@ -278,4 +278,8 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'classes/EditCoefficient/' + id + '/' + coeffficient, {});
   }
 
+  saveNewTheme(theme) {
+    return this.http.post(this.baseUrl + 'classes/SaveNewTheme', theme);
+  }
+
 }

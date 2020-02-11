@@ -212,6 +212,9 @@ import { RegisterChildCardComponent } from './admin/selfs-registers/register-chi
 import { ClassSessionComponent } from './classes/class-session/class-session.component';
 import { ClassProgressComponent } from './classes/class-progress/class-progress.component';
 import { TeacherProgramComponent } from './classes/teacher-program/teacher-program.component';
+import { NewThemeComponent } from './programs/new-theme/new-theme.component';
+import { ThemesListComponent } from './programs/new-theme/themes-list/themes-list.component';
+
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -353,7 +356,9 @@ export function tokenGetter() {
       RegisterChildCardComponent,
       ClassSessionComponent,
       ClassProgressComponent,
-      TeacherProgramComponent
+      TeacherProgramComponent,
+      NewThemeComponent,
+      ThemesListComponent
    ],
    imports: [
       FormWizardModule,

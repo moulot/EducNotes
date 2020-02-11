@@ -9,5 +9,6 @@ namespace EducNotes.API.Models
         public Lesson Lesson { get; set; }
         public int NbHours { get; set; }
         public byte? SessionNum { get; set; }
+        public  int DsplSeq { get; set; }
     }
 }
