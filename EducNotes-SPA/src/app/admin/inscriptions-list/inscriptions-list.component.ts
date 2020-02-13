@@ -41,8 +41,9 @@ export class InscriptionsListComponent implements OnInit {
   page = 1;
   pageSize = 8;
   className = '';
-
+ userId;
   ngOnInit() {
+    this.userId = this.authService.decodedToken.nameid;
     this.getLevels();
     this.createSearchForm();
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
@@ -109,7 +110,7 @@ export class InscriptionsListComponent implements OnInit {
   }
 
   studentAffectation() {
-    this.adminService.studentAffectation(this.classId, this.selectedIds, this.authService.decodedToken).subscribe(() => {
+    this.adminService.studentAffectation(this.classId, this.selectedIds, this.userId).subscribe(() => {
       this.searchStudents();
       this.alertify.success('enegistrement terminé...');
       this.classId = null;

@@ -278,6 +278,9 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'classes/EditCoefficient/' + id + '/' + coeffficient, {});
   }
 
+  saveNewTheme(theme) {
+    return this.http.post(this.baseUrl + 'classes/SaveNewTheme', theme);
+  }
   getTeacherCourseProgram(courseId: number, teacherId: number) {
     return this.http.get(this.baseUrl + 'classes/courses/' + courseId + '/teacher/' + teacherId + '/Program');
   }

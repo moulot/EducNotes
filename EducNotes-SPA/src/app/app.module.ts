@@ -81,11 +81,6 @@ import { FirstStepFinishmentComponent } from './registration/firstStep-finishmen
 import { ConfirmEmailComponent } from './registration/confirm-email/confirm-email.component';
 import { MemberPasswordSettingComponent } from './members/member-password-setting/member-password-setting.component';
 import { PreInscriptionComponent } from './admin/pre-inscription/pre-inscription.component';
-// import { UserTypesComponent } from './admin/user-types/user-types.component';
-// import { AdministrationUsersComponent } from './admin/administration-users/administration-users.component';
-// import { CoursClassesManagementComponent } from './admin/cours-classes-management/cours-classes-management.component';
-// import { UserListComponent } from './users/user-list/user-list.component';
-// import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
 import { SigninComponent } from './views/sessions/signin/signin.component';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
@@ -210,6 +205,9 @@ import { RegisterChildCardComponent } from './admin/selfs-registers/register-chi
 import { ClassSessionComponent } from './classes/class-session/class-session.component';
 import { ClassProgressComponent } from './classes/class-progress/class-progress.component';
 import { TeacherProgramComponent } from './classes/teacher-program/teacher-program.component';
+import { NewThemeComponent } from './programs/new-theme/new-theme.component';
+import { ThemesListComponent } from './programs/new-theme/themes-list/themes-list.component';
+
 import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
 import { ClassProgramDataComponent } from './classes/class-program-data/class-program-data.component';
 import { TimelineComponent } from './shared/components/timeline/timeline.component';
@@ -353,6 +351,8 @@ export function tokenGetter() {
       ClassSessionComponent,
       ClassProgressComponent,
       TeacherProgramComponent,
+      NewThemeComponent,
+      ThemesListComponent,
       ClassProgramDataComponent,
       TimelineComponent
    ],
