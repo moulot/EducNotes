@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace EducNotes.API.Models
 {
   public class Theme
@@ -9,5 +11,6 @@ namespace EducNotes.API.Models
     public Course Course { get; set; }
     public string Name { get; set; }
     public string Desc { get; set; }
+    public ICollection<Lesson> Lessons { get; set; }
   }
 }
