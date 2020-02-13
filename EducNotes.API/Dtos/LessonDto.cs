@@ -10,6 +10,8 @@ namespace EducNotes.API.Dtos
         public int? CourseId { get; set; }
         public string Name { get; set; }
         public string Desc { get; set; }
+        public int DsplSeq { get; set; }
+
         public List<LessonContentDto> Contents { get; set; }
     }
 }

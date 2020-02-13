@@ -1,1 +1,64 @@
-<button type="button" [routerLink]="['/newTheme']" mdbBtn color="primary" mdbWavesEffect>ajouter un theme</button>
+<div class="row  justify-content-center align-items-center animated zoomInUp">
+    <div class="col-md-12" *ngIf="!searchDiv">
+    
+        <mdb-card>
+            <mdb-card-body>
+                <form [formGroup]="searchForm" style="color: #757575;" (ngSubmit)="searchTheme()">
+                    <div class="form-row">
+                        <div class="col">
+                            <div class="md-form">
+                                <mdb-select [options]="levels" placeholder="Choisir le niveau" label="niveau d'etude"
+                                    formControlName="classLevelId"></mdb-select>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="md-form">
+                                <mdb-select [options]="courses" placeholder="Choisir le cours" label="choisir le cours"
+                                    formControlName="courseId"></mdb-select>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="md-form">
+                                <button type="button" size="sm" mdbBtn
+                                    [disabled]="searchForm.value.classLevelId && !searchForm.value.courseId" color="light"
+                                    (click)="searchTheme()" mdbWavesEffect>rechercher</button>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="md-form">
+                                <button type="button" [routerLink]="['/newTheme']" size="sm" mdbBtn color="primary" mdbWavesEffect>ajouter un
+                                    theme</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </mdb-card-body>
+        </mdb-card>
+
+        <mdb-card class="" *ngIf="searchDiv">
+         <h3 *ngIf="!noResult && themes.length===0"><b>Patienter...</b></h3>
+         <h3 *ngIf="noResult"><b>{{noResult}}</b></h3>
+         <div *ngIf="themes.length>0">
+            <mdb-accordion [multiple]="true" *ngFor="let cont of themes">
+                <mdb-accordion-item [collapsed]="true">
+                  <mdb-accordion-item-head>
+                  <!-- <b *ngIf="cont.lesson.themeId">Thème : {{cont.lesson.theme.name}}</b>
+                  <b *ngIf="!cont.lesson.themeId">Thème : {{cont.lesson.name}}</b> -->
+                  </mdb-accordion-item-head>
+                  <mdb-accordion-item-body>
+                    <div>
+
+                    </div>
+
+                    
+                  </mdb-accordion-item-body>
+                </mdb-accordion-item>
+              
+              </mdb-accordion>
+         </div>
+
+
+        </mdb-card>
+    </div>
+</div>

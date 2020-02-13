@@ -211,6 +211,8 @@ import { ThemesListComponent } from './programs/new-theme/themes-list/themes-lis
 import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
 import { ClassProgramDataComponent } from './classes/class-program-data/class-program-data.component';
 import { TimelineComponent } from './shared/components/timeline/timeline.component';
+import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
+import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -270,7 +272,7 @@ export function tokenGetter() {
       ConfirmEmailComponent,
       PreInscriptionComponent,
       MemberPasswordSettingComponent,
-      // TeacherManagementComponent,
+      TeacherManagementComponent,
       // CoursClassesManagementComponent,
       // UserTypesComponent,
       // AdministrationUsersComponent,
@@ -299,7 +301,7 @@ export function tokenGetter() {
       NewClassComponent,
       CoursesPanelComponent,
       NewCourseComponent,
-      // NewTeacherComponent,
+      NewTeacherComponent,
       PreRegisterComponent,
       SelfRegisterComponent,
       NavGPanelComponent,

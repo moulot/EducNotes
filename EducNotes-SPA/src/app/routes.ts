@@ -64,7 +64,7 @@ import { ProductsListResolver } from './_resolvers/products-list-resolver';
 import { ProductFormResolver } from './_resolvers/product-form-resolver';
 import { NewCourseComponent } from './admin/courses-management/new-course/new-course.component';
 import { CourseFormResolver } from './_resolvers/course-form-resolver';
-// import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
+import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
 import { TeacherFormResolver } from './_resolvers/teacher-form-resolver';
 import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-assignment/teacher-assignment.component';
 import { NewClassComponent } from './admin/class-managemet/new-class/new-class.component';
@@ -103,6 +103,7 @@ import { TeacherProgramComponent } from './classes/teacher-program/teacher-progr
 import { ThemesListComponent } from './programs/new-theme/themes-list/themes-list.component';
 import { NewThemeComponent } from './programs/new-theme/new-theme.component';
 import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
+import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -157,13 +158,13 @@ export const appRoutes: Routes = [
             { path: 'classesPanel', component: ClassesPanelComponent, resolve: { levels: ClassesListResolver } },
             { path: 'addClass', component: NewClassComponent },
             { path: 'classSchedule/:classId', component: SchedulePanelComponent, resolve: { class: ClassResolver } },
-            // { path: 'teachers', component: TeacherManagementComponent, resolve: { teachers: TeacherManagementResolver } },
-            // { path: 'addTeacher', component: NewTeacherComponent },
+            { path: 'teachers', component: TeacherManagementComponent, resolve: { teachers: TeacherManagementResolver } },
+            { path: 'addTeacher', component: NewTeacherComponent },
             { path: 'teacherAssignment/:id', component: TeacherAssignmentComponent, resolve: { teacher: TeacherFormResolver } },
             { path: 'courses', component: CoursesPanelComponent, resolve: { courses: CoursesListResolver } },
             { path: 'addCourse', component: NewCourseComponent },
             { path: 'editCourse/:id', component: NewCourseComponent, resolve: { course: CourseFormResolver } },
-            // { path: 'editTeacher/:id', component: NewTeacherComponent, resolve: { teacher: TeacherManagementResolver } },
+            { path: 'editTeacher/:id', component: NewTeacherComponent, resolve: { teacher: TeacherManagementResolver } },
             { path: 'preregister', component: PreRegisterComponent },
             { path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve: { classes: LevelClassesResolver } },
             { path: 'studentGrades/:id', component: GradeStudentComponent}, // , resolve: { student: StudentResolver } },
