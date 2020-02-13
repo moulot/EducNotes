@@ -81,7 +81,8 @@ export class ClassSanctionComponent implements OnInit {
     this.newSanction.userId = this.sanctionForm.value.student;
     this.newSanction.sanctionId = this.sanctionForm.value.sanction;
     this.newSanction.sanctionedById = this.sanctionForm.value.sanctionedBy;
-    this.newSanction.sanctionDate = this.sanctionForm.value.date;
+    const dateData = this.sanctionForm.value.sanctionDate.split('/');
+    this.newSanction.sanctionDate = new Date(dateData[2], dateData[1] - 1, dateData[0]);
     this.newSanction.reason = this.sanctionForm.value.reason;
     this.newSanction.comment = this.sanctionForm.value.comment;
 

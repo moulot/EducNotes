@@ -4,13 +4,9 @@
 
 <div class="row">
 
-  <p class="text-15 text-muted m-1">sélectionner un enfant pour voir ses évènements</p>
   <div class="col-md-9" *ngIf="showChildrenList">
-    <div class="row">
-      <div class="col-md-12 col-sm-12">
-        <app-children-list [url]="url" [children]="children"></app-children-list>
-      </div>
-    </div>
+    <p class="text-15 text-muted mb-3">sélectionner un enfant pour voir ses évènements</p>
+    <app-children-list [url]="url" [children]="children" (getUser)="getUser($event)"></app-children-list>
   </div>
 
   <div class="col-md-9" *ngIf="!showChildrenList">

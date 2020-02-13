@@ -1,8 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { User } from '../_models/user';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { SharedAnimations } from '../shared/animations/shared-animations';
 import { Router } from '@angular/router';
 import { AuthService } from '../_services/auth.service';
+import { User } from '../_models/user';
 
 @Component({
   selector: 'app-children-list',
@@ -11,21 +11,19 @@ import { AuthService } from '../_services/auth.service';
   animations: [SharedAnimations]
 })
 export class ChildrenListComponent implements OnInit {
-  @Input() children: User[];
+  // @Input() student: User;
+  @Input() children: any[];
   @Input() url: string;
-  viewMode: 'list' | 'grid' = 'list';
-  allSelected: boolean;
-  page = 1;
-  pageSize = 8;
+  @Output() getUser = new EventEmitter<any>();
 
   constructor(private router: Router, private authService: AuthService) { }
 
   ngOnInit() {
   }
 
-  goToPage(child) {
+  goToChildPage(child) {
     this.authService.changeCurrentChild(child);
-    this.router.navigate([this.url, child.id]);
+    this.getUser.emit(child.id);
   }
 
 }
