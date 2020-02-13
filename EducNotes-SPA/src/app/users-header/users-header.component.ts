@@ -37,19 +37,6 @@ export class UsersHeaderComponent implements OnInit {
     });
   }
 
-  // selectChild(child) {
-  //   this.selectedUser = this.children.find(c => c.id === child.id);
-  //   this.unSelectedUsers = [];
-  //   for (let i = 0; i < this.children.length; i++) {
-  //     const elt = this.children[i];
-  //     if (elt.id !== this.selectedUser.id) {
-  //       this.unSelectedUsers = [...this.unSelectedUsers, elt];
-  //     }
-  //   }
-  //   this.authService.changeCurrentChild(child);
-  //   this.getUser.emit(child.id);
-  // }
-
   getChildren(parentId) {
     this.userService.getChildren(parentId).subscribe((users: User[]) => {
       this.children = users;

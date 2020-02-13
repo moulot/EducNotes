@@ -7,7 +7,7 @@
     </div>
 
     <div class="col-md-12 mb-2">
-      <div class="row">
+      <div class="form-row">
         <div class="col-md-3">
           <mdb-select [options]="optionsClass" formControlName="newaclass" placeholder="choisir la classe"></mdb-select>
           <div *ngIf="newEvalForm.get('newaclass').errors && newEvalForm.get('newaclass').touched"
@@ -27,14 +27,14 @@
     </div>
 
     <div class="col-md-12 mb-2">
-      <div class="row">
+      <div class="form-row">
 
         <div class="col-md-3">
           <div class="md-form mt-1 mb-0">
             <input mdbInput type="text" formControlName="evalName" id="evalName" class="form-control">
             <label for="evalName" class="">libellé</label>
             <div *ngIf="newEvalForm.get('evalName').errors && newEvalForm.get('evalName').touched"
-              class="text-small text-danger mr-2" style="width: 250px">saisir le libellé svp</div>
+              class="text-small text-danger" style="width: 250px">saisir le libellé svp</div>
           </div>
         </div>
         <div class="col-md-3">

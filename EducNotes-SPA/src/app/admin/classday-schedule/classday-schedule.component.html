@@ -1,13 +1,16 @@
 <div class="card" style="position:absolute; width: 100%" *ngFor="let item of items"
-[ngStyle]="{'top': item.top, 'height': item.height}">
+  [ngStyle]="{'top': item.top, 'height': item.height}">
 <!-- <div class="card-header p-1"><b>{{item.startHourMin}} - {{item.endHourMin}}</b></div> -->
-<div class="card-body p-1" [ngStyle]="{'background-color': item.color}">
-  <div>
+  <div class="card-body p-1" [ngStyle]="{'background-color': item.color}">
+    <div class="float-right">
+      <button type="button" class="close" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
     <div class="d-flex">
       <p class="flex-grow-1 font-weight-600 text-11 m-0">{{item.courseName | uppercase}}</p>
       <p class="text-11 m-0">{{item.startHourMin}} - {{item.endHourMin}}</p>
     </div>
-    <!-- <p class="text-12 text-capitalize m-0">{{item.teacherName}}</p> -->
+    <p class="flex-grow-1 text-12 text-capitalize m-0">{{item.teacherName}}</p>
   </div>
-</div>
 </div>
