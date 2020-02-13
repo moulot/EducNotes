@@ -117,6 +117,7 @@ export const appRoutes: Routes = [
         children: [
             { path: '', component: HomePanelComponent },
             { path: 'home', component: HomePanelComponent, resolve: { user: UserHomeResolver } },
+            // {path: 'studentHome/:id', component: StudentDashboardComponent},
             { path: 'broadcast', component: BroadcastComponent },
             { path: 'fichier', component: ImportFichierComponent },
             { path: 'sendEmail', component: EmailComponent },

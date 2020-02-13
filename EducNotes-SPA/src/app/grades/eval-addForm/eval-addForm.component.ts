@@ -12,6 +12,7 @@ import { Evaluation } from 'src/app/_models/evaluation';
 import { User } from 'src/app/_models/user';
 import { Router } from '@angular/router';
 import { Utils } from 'src/app/shared/utils';
+import { MDBModalService, MDBModalRef } from 'ng-uikit-pro-standard';
 
 @Component({
   selector: 'app-eval-addForm',
@@ -27,7 +28,8 @@ export class EvalAddFormComponent implements OnInit {
   periods: Period[];
   evalTypes: EvalType[];
   nzModalRef: NzModalRef;
-  courseSkills: any = [];
+  coursesSkills: any = [];
+  selCourseSkills: any = [];
   skillsSelected: any = [];
   teacherClasses: any;
   newEvaluation = <Evaluation>{};
@@ -38,10 +40,11 @@ export class EvalAddFormComponent implements OnInit {
   optionsCourse: any[] = [];
   optionsPeriod: any[] = [];
   optionsEvalType: any[] = [];
+  modalRef: MDBModalRef;
 
   constructor(private userService: UserService, private evalService: EvaluationService,
     private fb: FormBuilder, private authService: AuthService, private router: Router,
-    public alertify: AlertifyService, private nzModalService: NzModalService) { }
+    public alertify: AlertifyService, private nzModalService: NzModalService, private modalService: MDBModalService) { }
 
   ngOnInit() {
     this.createNewEvalForm();
@@ -62,12 +65,12 @@ export class EvalAddFormComponent implements OnInit {
       evalType: [null, Validators.required],
       evalDate: [null, Validators.required],
       grades: this.fb.group({
-        isGraded: [false],
-        gradeInLetter: [false],
+        evalGraded: [false],
+        // gradeInLetter: [false],
         evalMaxGrade: [''],
         evalCoeff: ['0'],
-        notCounted: [false],
-        isNegative: [false]
+        // notCounted: [false],
+        // isNegative: [false]
       })
     }); // , { validator: Validators.compose([CustomValidators.maxGradeValidator])}
   }
@@ -79,7 +82,7 @@ export class EvalAddFormComponent implements OnInit {
     this.newEvaluation.evalTypeId = this.newEvalForm.value.evalType;
     const dateData = this.newEvalForm.value.evalDate.split('/');
     this.newEvaluation.evalDate = new Date(dateData[2], dateData[1] - 1, dateData[0]);
-    this.newEvaluation.graded = this.newEvalForm.controls['grades'].value.isGraded;
+    this.newEvaluation.graded = this.newEvalForm.controls['grades'].value.evalGraded;
     this.newEvaluation.periodId = this.newEvalForm.value.newperiod;
     this.newEvaluation.canBeNagative = this.newEvalForm.controls['grades'].value.isNegative;
     this.newEvaluation.classId = this.newEvalForm.value.newaclass;
@@ -113,6 +116,7 @@ export class EvalAddFormComponent implements OnInit {
 
   newCancel() {
     this.newEvalForm.reset();
+    this.skillsSelected = [];
   }
 
   toggleGrade() {
@@ -182,41 +186,38 @@ export class EvalAddFormComponent implements OnInit {
 
   loadCoursesSkills() {
     this.evalService.getCoursesSkills().subscribe(data => {
-      this.courseSkills = data;
+      this.coursesSkills = data;
     }, error => {
       this.alertify.error(error);
     });
   }
 
+  courseChanged() {
+    const courseId = this.newEvalForm.value.newcourse;
+    this.selCourseSkills = this.coursesSkills.filter(el => el.courseId === courseId);
+  }
+
   addSkills() {
-
-    this.nzModalRef = this.nzModalService.create<SkillsModalComponent>({
-      nzTitle: 'compétences',
-      nzWrapClassName: 'vertical-center-modal',
-      nzWidth: '950px',
-      nzContent: SkillsModalComponent,
-      nzFooter: [
-        {
-          label: 'fermer',
-          shape: 'primary',
-          onClick: () => this.nzModalRef.destroy()
-        }
-      ],
-      nzComponentParams: {
-        title: 'title in component',
-        subtitle: 'component sub title.',
-        coursesSkills : this.courseSkills
+    const modalOptions = {
+      backdrop: true,
+      keyboard: true,
+      focus: true,
+      show: false,
+      ignoreBackdropClick: false,
+      class: 'modal-lg',
+      containerClass: 'overflow-auto',
+      animated: true,
+      data: {
+        courseSkills : this.selCourseSkills[0]
       }
+    };
+
+    this.modalRef = this.modalService.show(SkillsModalComponent, modalOptions);
+
+    this.modalRef.content.updateProgElt.subscribe( (data) => {
+      this.skillsSelected = [...this.skillsSelected, data];
+      this.skillsSelected = this.skillsSelected.filter(el => el.checked === true);
     });
-
-    setTimeout(() => {
-      const instance = this.nzModalRef.getContentComponent();
-      instance.updateProgElt.subscribe((data) => {
-        this.skillsSelected = [...this.skillsSelected, data];
-        this.skillsSelected = this.skillsSelected.filter(el => el.checked === true);
-      });
-    }, 300);
-
   }
 
 }

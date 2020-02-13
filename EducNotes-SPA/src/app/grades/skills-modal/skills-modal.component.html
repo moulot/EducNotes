@@ -1,4 +1,41 @@
-<div class="row" style="overflow-y: scroll;min-height: 300px;max-height: 300px">
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">×</span>
+    </button>
+    <div class="text-15 font-weight-375 w-100" id="myModalLabel">compétences pour {{courseSkills.courseName}}</div>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+          <button type="button" mdbBtn *ngFor="let cs of courseSkills.skills" 
+            (click)="loadProgElts(cs.progElts)" color="light" class="waves-light ml-0 mb-2" mdbWavesEffect>
+              {{cs.skillName}}
+          </button>
+        </div>
+      </div>
+      <div class="col-md-9">
+        <div *ngIf="!progElts" class="jumbotron m-2">
+          <h5 class="lead">sélectionner une compétence...</h5>
+        </div>
+        <div *ngIf="progElts">
+          <div *ngFor="let item of progElts">
+            <mdb-checkbox (ngModelChange)="addProgElt($event, item)"  [(ngModel)]="item.checked" value="{{item.progEltId}}">
+              <span class="text-15 mb-1">{{item.progEltName}}</span>
+            </mdb-checkbox>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" mdbBtn size="sm" color="primary" class="waves-light" aria-label="Close"
+      (click)="modalRef.hide()" mdbWavesEffect>fermer</button>
+  </div>
+</div>
+
+<!-- <div class="row" style="overflow-y: scroll;min-height: 300px;max-height: 300px">
   <div class="col-sm-3" style="overflow-y: scroll;max-height: 300px">
     <nz-collapse nzAccordion>
       <nz-collapse-panel *ngFor="let cs of coursesSkills" [nzHeader]="cs.courseName">
@@ -23,4 +60,4 @@
       </div>
     </nz-list>
   </div>
-</div>
+</div> -->

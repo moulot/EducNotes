@@ -1,52 +1,33 @@
-<div class="row" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
-    <!-- SINGLE LIST ITEM -->
-    <div *ngFor="let child of children | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index"
-      class="list-item" [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-4': viewMode === 'grid'}"
-      [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
-      <div *ngIf="child.validatedCode">
-        <a (click)="goToPage(child)">
-          <div class="card mb-2 d-flex"
-            [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
-            <div class="img-box d-flex">
-              <!-- TUMBNAIL -->
-              <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="">
-            </div>
-            <div class="d-flex" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
-              <div class="child-data pl-2">
-                <!-- OTHER DATA -->
-                <p href="" class="m-0 lead text-capitalize w-100 w-sm-100"><b>{{child.lastName}}
-                    {{child.firstName}}
-                    - {{child.className}}</b></p>
-                <!-- <div><a href="" class="text-15">classe </a></div> -->
-                <div class="data-line w-100 w-sm-100">
-                  <a class=" text-15">moyenne : {{child.avg}}/20</a>
-                </div>
-                <div class="data-line w-100 w-sm-100">
-                  <label class="text-muted text-15 mb-0 mr-1">devoirs maison : </label>
-                  <span *ngFor="let item of child.agendaItems">
-                    <ng-template #hoverItems>
-                      <p *ngFor="let ai of item.agendaItems; let i = index" class="text-13 m-0"><b>{{i+1}}.
-                          {{ai.courseName}}</b>. {{ai.taskDesc}}</p>
-                    </ng-template>
-                    <a [mdbPopover]="hoverItems" placement="top" triggers="hover"
-                      class=" text-15 mr-3">{{item.dueDateAbbrev}}</a>
-                  </span>
-                </div>
-                <div class="w-100 w-sm-100 mb-0">
-                  <label class=" text-muted text-15 mr-1">absences : </label>
-                  <a class=" text-15 mr-1" href="">1</a>
-                  <label class=" text-muted text-15 mr-1">retards : </label>
-                  <a class=" text-15 mr-1" href="">3</a>
-                </div>
-              </div>
+<div class="row">
+  <div class="col-md-6 my-5" *ngFor="let child of children; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+    <mdb-card class="testimonial-card">
+      <div class="avatar mx-auto">
+        <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" class="rounded-circle">
+      </div>
+      <mdb-card-body class="text-left p-2">
+          <p class="text-center text-20 font-weight-400 m-0">{{child.lastName}} {{child.firstName}} - {{child.className}}</p>
+          <div><hr class="my-1"></div>
+          <div class="pl-2">
+            <div><a class="text-15 text-muted">moyenne : {{child.avg}}/20</a></div>
+            <label class="text-muted text-15 mb-0 mr-1">devoirs maison : </label>
+            <span *ngFor="let item of child.agendaItems">
+              <ng-template #hoverItems>
+                <p *ngFor="let ai of item.agendaItems; let i = index" class="text-13 m-0"><b>{{i+1}}.
+                    {{ai.courseName}}</b>. {{ai.taskDesc}}</p>
+              </ng-template>
+              <a [mdbPopover]="hoverItems" placement="top" triggers="hover"
+                class=" text-15 mr-3">{{item.dueDateAbbrev}}</a>
+            </span>
+            <div class="mb-0">
+              <label class=" text-muted text-15 mr-1">absences : </label>
+              <a class=" text-15 mr-1" href="">1</a>
+              <label class=" text-muted text-15 mr-1">retards : </label>
+              <a class=" text-15 mr-1" href="">3</a>
             </div>
           </div>
-        </a>
-      </div>
-    </div>
-    <!-- PAGINATION CONTROL -->
-    <!-- <div class="col-md-12 mt-3" *ngIf="children?.length">
-          <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
-        </div> -->
+          <div class="text-center"><a (click)="goToChildPage(child)" class="text-17 text-primary">sélectionner {{child.firstName}}</a></div>
+      </mdb-card-body>
+    </mdb-card>
   </div>
+</div>
 

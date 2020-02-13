@@ -30,7 +30,7 @@ export class StudentDashboardComponent implements OnInit {
   isParentConnected = false;
   showChildrenList = false;
   currentChild: User;
-  children: User[];
+  children: any[];
   url = '/home';
   parent: User;
   userIdFromRoute: any;
@@ -45,7 +45,6 @@ export class StudentDashboardComponent implements OnInit {
     private evalService: EvaluationService, private userService: UserService) { }
 
   ngOnInit() {
-
     if (this.authService.studentLoggedIn()) {
       this.showChildrenList = false;
       this.showUsersList = false;
@@ -63,23 +62,23 @@ export class StudentDashboardComponent implements OnInit {
         this.getUser(this.currentChild.id);
       }
     }
+  }
 
-}
+  getChildren(parentId: number) {
+    this.userService.getChildren(parentId).subscribe((users: User[]) => {
+      this.children = users;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
 
-getChildren(parentId: number) {
-  this.userService.getChildren(parentId).subscribe((users: User[]) => {
-    this.children = users;
-  }, error => {
-    this.alertify.error(error);
-  });
-}
-
-getUser(id) {
+  getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
       this.getAgenda(this.student.classId, this.toNbDays);
       this.getEvalsToCome(this.student.classId);
       this.getCoursesWithEvals(this.student.id, this.student.classId);
+      this.showChildrenList = false;
     }, error => {
       this.alertify.error(error);
     });

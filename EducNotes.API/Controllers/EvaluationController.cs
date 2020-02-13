@@ -216,27 +216,29 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetCourseSkillsWithProgElts()
         {
             var skills = await (from course in _context.Courses orderby course.Name
-                                    select new
-                                    {
-                                        CourseId = course.Id,
-                                        CourseName = course.Name,
-                                        Skills = (from skill in course.CourseSkills
-                                                    where skill.CourseId == course.Id
-                                                    select new
-                                                    {
-                                                        SkillId = skill.SkillId,
-                                                        SkillName = skill.Skill.Name,
-                                                        ProgElts = (from progElt in _context.ProgramElements
-                                                                    where skill.SkillId == progElt.SkillId
-                                                                    select new
-                                                                    {
-                                                                        SkillName = skill.Skill.Name,
-                                                                        ProgEltId = progElt.Id, 
-                                                                        ProgEltName = progElt.Name,
-                                                                        Checked = false
-                                                                    }).ToList()
-                                                    }).ToList()
-                                    }
+                                  select new
+                                  {
+                                    CourseId = course.Id,
+                                    CourseName = course.Name,
+                                    Skills = (from skill in course.CourseSkills
+                                              where skill.CourseId == course.Id
+                                              orderby skill.Skill.Name
+                                              select new
+                                              {
+                                                SkillId = skill.SkillId,
+                                                SkillName = skill.Skill.Name,
+                                                ProgElts = (from progElt in _context.ProgramElements
+                                                              where skill.SkillId == progElt.SkillId
+                                                              orderby progElt.Name
+                                                              select new
+                                                              {
+                                                                SkillName = skill.Skill.Name,
+                                                                ProgEltId = progElt.Id, 
+                                                                ProgEltName = progElt.Name,
+                                                                Checked = false
+                                                            }).ToList()
+                                              }).ToList()
+                                  }
                                 ).ToListAsync();
 
             return Ok(skills);
