@@ -104,4 +104,8 @@ export class Utils {
         }, 10);
     }
 
+    static isNumber(value: string | number): boolean {
+      return ((value != null) && (value !== '') && !isNaN(Number(value.toString())));
+    }
+
 }

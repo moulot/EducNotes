@@ -301,8 +301,8 @@ namespace EducNotes.API.Controllers
                                             StartHourMin = Schedule.StartHourMin.ToShortTimeString(),
                                             EndHourMin = Schedule.EndHourMin.ToShortTimeString()
                                         })
-                                        .Where(w => w.TeacherId == teacherId && w.Day == todayDay
-                                            && w.CourseStartHM.TimeOfDay >= todayHourMin)
+                                        .Where(w => w.TeacherId == teacherId && w.Day == todayDay)
+                                          //&& w.CourseStartHM.TimeOfDay >= todayHourMin)
                                         .OrderBy(o => o.StartHourMin)
                                         .Distinct()
                                         .Take(nextCourses)

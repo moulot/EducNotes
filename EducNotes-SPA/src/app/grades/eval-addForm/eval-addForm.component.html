@@ -71,6 +71,8 @@
                     name="evalMaxGrade" class="form-control form-control-sm">
                   <label for="maxG" class="">noté sur</label>
                 </div>
+                <!-- <div *ngIf="newEvalForm.controls['grades'].hasError('maxGradeNOK') && newEvalForm.get('maxGrade').touched"
+                  class="text-small text-danger">saisir la note max svp</div> -->
               </div>
               <div class="col-md-2">
                 <div class="md-form form-sm m-0">
@@ -78,6 +80,8 @@
                     name="evalCoeff" class="form-control form-control-sm">
                   <label for="coeff" class="">coefficient</label>
                 </div>
+                <!-- <div *ngIf="newEvalForm.controls['grades'].hasError('coeffNOK') && newEvalForm.controls['grades'].get('coeff').touched"
+                  class="text-small text-danger">saisir le coeff svp</div> -->
               </div>
             </div>
             <!-- <div class="form-group mt-2">
@@ -105,8 +109,9 @@
     </div>
 
     <div class="col-md-12">
-      <button type="submit" mdbBtn size="sm" color="primary" [disabled]="!newEvalForm.valid" mdbWavesEffect>valider</button>
-      <button type="button" mdbBtn size="sm" color="primary" [disabled]="!newEvalForm.valid"
+      <button type="submit" mdbBtn size="sm" color="primary"
+        [disabled]="newEvalForm.hasError('formNOK') || !newEvalForm.valid" mdbWavesEffect>valider</button>
+      <button type="button" mdbBtn size="sm" color="primary" [disabled]="newEvalForm.hasError('formNOK') ||!newEvalForm.valid"
         (click)="createEvaluation(true)">valider et nouveau</button>
       <button type="button" mdbBtn size="sm" color="primary" (click)="newCancel()">annuler</button>
     </div>  

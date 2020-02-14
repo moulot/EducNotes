@@ -13,6 +13,7 @@ import { User } from 'src/app/_models/user';
 import { Router } from '@angular/router';
 import { Utils } from 'src/app/shared/utils';
 import { MDBModalService, MDBModalRef } from 'ng-uikit-pro-standard';
+import { utils } from 'protractor';
 
 @Component({
   selector: 'app-eval-addForm',
@@ -67,12 +68,55 @@ export class EvalAddFormComponent implements OnInit {
       grades: this.fb.group({
         evalGraded: [false],
         // gradeInLetter: [false],
-        evalMaxGrade: [''],
-        evalCoeff: ['0'],
+        evalMaxGrade: [''], // {validator: this.maxGradeValidator}],
+        evalCoeff: ['1'], // {validator: this.coeffValidator}],
         // notCounted: [false],
         // isNegative: [false]
       })
-    }); // , { validator: Validators.compose([CustomValidators.maxGradeValidator])}
+    }, {validator: this.gradeDataValidator});
+  }
+
+  gradeDataValidator(g: FormGroup) {
+    const evalGraded = g.controls['grades'].get('evalGraded').value;
+    const evalMaxGrade = g.controls['grades'].get('evalMaxGrade').value;
+    const evalCoeff = g.controls['grades'].get('evalCoeff').value;
+    if (evalGraded) {
+      if (!Utils.isNumber(evalMaxGrade)) {
+        return {'maxGradeNOK': true};
+      }
+      if (!Utils.isNumber(evalCoeff)) {
+        return {'coeffNOK': true};
+      }
+    }
+    return null;
+  }
+
+  maxGradeValidator(g: FormGroup) {
+    const isGraded = g.get('evalGraded').value;
+    const maxGrade = g.get('evalMaxGrade').value;
+    if (isGraded === true) {
+      if (!Utils.isNumber(maxGrade)) {
+        return {'maxGradeNOK': true};
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  coeffValidator(g: FormGroup) {
+    const isGraded = g.get('evalGraded').value;
+    const evalCoeff = g.get('evalCoeff').value;
+    if (isGraded === true) {
+      if (!Utils.isNumber(evalCoeff)) {
+        return {'coeffNOK': true};
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   createEvaluation(more: boolean) {

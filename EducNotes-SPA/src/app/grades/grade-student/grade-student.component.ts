@@ -144,7 +144,7 @@ export class GradeStudentComponent implements OnInit {
     }
 
    this.getUserGrades(this.student.id, this.student.classId);
-
+    this.showChildrenList = false;
   }, error => {
       this.alertify.error(error);
     });

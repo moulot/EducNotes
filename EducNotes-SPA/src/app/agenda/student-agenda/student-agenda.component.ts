@@ -77,7 +77,7 @@ export class StudentAgendaComponent implements OnInit {
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
-
+      console.log('getuser -agenda');
       const loggedUser = this.authService.currentUser;
       if (loggedUser.id !== this.student.id) {
         this.isParentConnected = true;
@@ -94,6 +94,7 @@ export class StudentAgendaComponent implements OnInit {
       this.agendaParams.nbDays = this.nbDays;
       this.agendaParams.isMovingPeriod = false;
       this.getClassAgendaByDate(this.student.classId, this.agendaParams);
+      this.showChildrenList = false;
     }, error => {
       this.alertify.error(error);
     });

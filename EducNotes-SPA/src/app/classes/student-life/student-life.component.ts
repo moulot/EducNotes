@@ -99,6 +99,7 @@ export class StudentLifeComponent implements OnInit, AfterViewInit {
       }
 
       this.getLifeData(this.student.id);
+      this.showChildrenList = false;
     }, error => {
       this.alertify.error(error);
     });
