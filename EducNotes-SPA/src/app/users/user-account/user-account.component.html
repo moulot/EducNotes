@@ -20,7 +20,20 @@
   <div class="col-md-12 m-1" style="border-top: #cccccc 1px solid;"></div>
   <div class="col-md-12 text-20 font-weight-300 mt-0 mb-3">mes enfants</div>
   <div class="col-md-2 my-5" *ngFor="let child of parent.children">
-    <app-user-account-card [child]=child.child></app-user-account-card>
+    <mdb-card class="testimonial-card">
+      <!--Avatar-->
+      <div class="avatar mx-auto">
+        <img src="{{child.child.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+      </div>
+    
+      <mdb-card-body class="p-2">
+        <!--Name-->
+        <mdb-card-title>
+          <p class="text-15 m-0">{{child.child.lastName}} {{child.firstName}}</p>
+          <p class="text-15 m-0">classe {{child.child.className}}</p>
+        </mdb-card-title>
+      </mdb-card-body>
+    </mdb-card>
   </div>
 </div>
 

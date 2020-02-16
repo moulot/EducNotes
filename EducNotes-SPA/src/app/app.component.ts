@@ -6,6 +6,7 @@ import { Period } from './_models/period';
 import { PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
 import { NavigationService } from './shared/services/navigation.service';
 import { Subject } from 'rxjs';
+import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,7 @@ export class AppComponent implements OnInit {
   userActivity;
   userInactive: Subject<any> = new Subject();
 
-  constructor(public navService: NavigationService, private authService: AuthService) {
+  constructor(private mdbSpinningPreloader: MDBSpinningPreloader, private authService: AuthService) {
     // this.setTimeout();
     // this.userInactive.subscribe(() => console.log('user has been inactive for 3s'));
   }
@@ -49,6 +50,8 @@ export class AppComponent implements OnInit {
       this.authService.changeUserPhoto(user.photoUrl);
       this.authService.changeCurrentClassId(Number(currentClassId));
     }
+    this.setTimeout();
+    this.mdbSpinningPreloader.stop();
   }
 
   loggedIn() {

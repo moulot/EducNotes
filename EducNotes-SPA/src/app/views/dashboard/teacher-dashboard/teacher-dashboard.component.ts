@@ -30,6 +30,10 @@ export class TeacherDashboardComponent implements OnInit {
   optionsCourse: any[] = [];
   sessionForm: FormGroup;
 
+  // visible = true;
+  // date = new Date();
+  // today = this.date.getDate() + '/' + (this.date.getMonth() + 1) + '/' + this.date.getFullYear();
+
   constructor(private userService: UserService, private authService: AuthService,private fb: FormBuilder,
     private adminService: AdminService, public alertify: AlertifyService, private router: Router,
     private evalService: EvaluationService, private route: ActivatedRoute) { }
@@ -40,6 +44,9 @@ export class TeacherDashboardComponent implements OnInit {
     this.getTeacherClasses(this.teacher.id);
     this.getTeacherNextCourses(this.teacher.id);
     this.getEvals(this.teacher.id);
+    // setTimeout(() => {
+    //   this.visible = false;
+    //   }, 2000);
   }
 
   createSessionForm() {
@@ -88,7 +95,7 @@ export class TeacherDashboardComponent implements OnInit {
 
   goToClass() {
     const scheduleId = this.sessionForm.value.course;
-    this.router.navigate(['/classSession', scheduleId]); // , {queryParams: {sch: scheduleId}, skipLocationChange: true});
+    this.router.navigate(['/classSession', scheduleId]);
   }
 
   // showModal(p: any) {

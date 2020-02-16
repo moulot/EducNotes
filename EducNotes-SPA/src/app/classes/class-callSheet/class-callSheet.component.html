@@ -1,17 +1,12 @@
 <div class="row m-0">
 
-  <div class="col-md-12">
-    <div class="row">
-      <div class="col-md-1">
+  <div class="col-md-12 d-flex">
         <a [routerLink]="['/classSession', schedule.id]">
-          <mdb-icon far icon="arrow-alt-circle-left"></mdb-icon>retour</a>
-      </div>
-      <div class="col-md-11">
+          <i class="i-Back1 text-32 mr-2"></i>
+        </a>
         <p class="text-20 font-weight-400 m-0 pb-1">feuille d'appel - classe {{schedule.className}}. {{schedule.courseName}} de 
           {{schedule.strStartHourMin}} à {{schedule.strEndHourMin}} 
         </p>
-      </div>
-    </div>
   </div>
   
   <div class="col-md-12 mb-1">

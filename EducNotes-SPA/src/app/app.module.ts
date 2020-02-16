@@ -192,7 +192,6 @@ import { CallSheetCardComponent } from './classes/callSheet-card/callSheet-card.
 import { SendSmsComponent } from './admin/sendSms/sendSms.component';
 import { UserAccountComponent } from './users/user-account/user-account.component';
 import { UserAccountResolver } from './_resolvers/user-account-resolver';
-import { UserAccountCardComponent } from './users/user-account-card/user-account-card.component';
 import { SmsTemplateComponent } from './admin/sms-template/sms-template.component';
 import { AddSmsTemplateComponent } from './admin/add-smsTemplate/add-smsTemplate.component';
 import { SmsTemplateHomeResolver } from './_resolvers/sms-template-home-resolver';
@@ -343,7 +342,6 @@ export function tokenGetter() {
       CallSheetCardComponent,
       SendSmsComponent,
       UserAccountComponent,
-      UserAccountCardComponent,
       SmsTemplateComponent,
       AddSmsTemplateComponent,
       AddUserGradesComponent,

@@ -72,9 +72,12 @@
                                 <div class="flex-grow-1">
                                   <p class="m-0"><b>{{eval.courseName}}</b></p>
                                 </div>
-                                <div class="m-0 text-12 text-muted">fait le {{eval.evalDate}}</div>    
+                                <div class="m-0 text-13 text-muted">fait le {{eval.evalDate}}</div>    
                               </div>
                               <div class="m-0 text-14 p-0">{{eval.name}} - {{eval.evalTypeName}}</div>
+                              <div class="float-right">
+                                <a class="text-14 text-primary" [routerLink]="['/AddUserGrades', eval.id]">saisir les notes</a>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -175,7 +178,7 @@
                   <p class="text-muted text-13 m-0">{{eval.evalDate | date: 'dd/MM/yy'}}</p>
                   <p class="text-muted text-13 m-0">{{eval.name}}</p>
                   <p class="text-muted text-13 m-0" *ngIf="eval.graded">note/{{eval.maxGrade}}. coeff:{{eval.coeff}}</p>
-                  <p class="text-muted text-13 m-0">type: {{eval.evalType.name}}</p>
+                  <p class="text-muted text-13 m-0">{{eval.evalType.name}}</p>
                   <!-- <p class="text-muted text-13 m-0" *ngIf="!eval.graded">non notée</p> -->
                   <div class="">
                     <!-- <a *ngIf="eval.evalDateExpired" (click)="enterGrades(eval, userGrades, i)">

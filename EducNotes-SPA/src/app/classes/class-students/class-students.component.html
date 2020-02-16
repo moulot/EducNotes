@@ -1,59 +1,33 @@
 
   <div class="row m-2">
 
-    <div class="col-md-12">
-        <p class="lead">classe {{classRoom.name}} - liste des élèves</p>
-    </div>
-
-    <div class="col-md-5">
-      <input id="search" placeholder="rechercher élèves" [formControl]="searchControl" class="form-control">
-    </div>
-
+  <div class="col-md-12">
+    <p class="lead">classe {{classRoom.name}} - liste des élèves</p>
   </div>
-    
-  <!-- DATA LIST -->
-  <div class="row m-2" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
-  <!-- SINGLE LIST ITEM -->
-  <div *ngFor="let student of filteredStudents | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index" 
-    class="list-item"
-    [ngClass]="{'col-md-12': viewMode === 'list', 'col-md-2': viewMode === 'grid'}"
-    [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}"
-  >
-    <div class="card o-hidden mb-4 d-flex" [ngClass]="{'flex-row': viewMode === 'list', 'flex-column': viewMode === 'grid'}">
-      <div class="list-thumb d-flex">
-        <!-- TUMBNAIL -->
-        <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
-      </div>
-      <div class="flex-grow-1" [ngClass]="{'pl-2 d-flex': viewMode === 'list', 'd-bock': viewMode === 'grid'}">
-        <div class="card-body p-1 align-self-center d-flex flex-column justify-content-start align-items-lg-center"
-          [ngClass]="{'flex-lg-row': viewMode === 'list'}">
-          <!-- OTHER DATA -->
-          <div class="w-100 w-sm-100">
-            <div class="item-title">{{student.lastName}} {{student.firstName}}</div>
-          </div>
-          <!-- <div class="w-10 w-sm-50">
-            <div class="item-title">{{student.age}} ans</div>
-          </div>
-          <div class="w-30 w-sm-75">
-            <div class="item-title">tél: {{student.phoneNumber}}</div>
-            <div class="item-title">email: {{student.email}}</div>
-          </div>
-          <div class="w-30 w-sm-75">
-            <div class="item-title">p: Koffi Anasthase / m: Kamara Cunégonde</div>
-            <div class="item-title">p: 12345678 / m: 87654321</div>
-          </div> -->
-          <!-- <div href="" class="w-35 w-sm-80">
-            <button type="button" (click)="loadUser(student.id)" class="btn btn-outline-primary btn-block">détails</button>
-          </div> -->
-        </div>
-        <div class="align-self-center pl-3 pb-2 pr-3 item-select">
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="md-form form-sm mt-2">
+          <input mdbInput type="text" id="search" [formControl]="searchControl" class="form-control mr-2">
+          <label for="form1" class="">rechercher des élèves</label>
         </div>
       </div>
     </div>
   </div>
-  <!-- PAGINATION CONTROL -->
-  <div class="col-md-12 mt-3" *ngIf="students?.length">
-    <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
+
+  <div class="col-md-2 my-5" *ngFor="let child of filteredStudents">
+    <mdb-card class="testimonial-card">
+      <div class="avatar mx-auto">
+        <img src="{{child.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+      </div>
+      <mdb-card-body class="p-2">
+        <mdb-card-title>
+          <p class="text-15 text-uppercase m-0">{{child.lastName}}</p>
+          <p class="text-15 text-capitalize m-0">{{child.firstName}}</p>
+        </mdb-card-title>
+      </mdb-card-body>
+    </mdb-card>
   </div>
-  </div>
+
+</div>
   

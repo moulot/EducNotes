@@ -98,7 +98,7 @@ export class AddUserGradesComponent implements OnInit {
   }
 
   cancelForm() {
-    Utils.smoothScrollToTop();
+    this.router.navigate(['/grades']);
   }
 
 }

@@ -22,7 +22,6 @@ export class UserAccountComponent implements OnInit {
       const account = data['account'];
       this.parent = account.parent;
       this.selectedSms = account.activeSms;
-      console.log(this.selectedSms);
     });
   }
 
