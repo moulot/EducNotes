@@ -213,6 +213,20 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom(src => src.DueDate.ToShortDateString());
                 });
             CreateMap<PhotoForCreationDto, Fichier>();
+            CreateMap<Absence, AbsenceForCallSheetDto>()
+                .ForMember(dest => dest.strStartDate, opt => {
+                    opt.MapFrom(src => src.StartDate.ToShortDateString());
+                })
+                .ForMember(dest => dest.strEndDate, opt => {
+                    opt.MapFrom(src => src.EndDate.ToShortDateString());
+                })
+                .ForMember(dest => dest.LateInMin, opt => {
+                    opt.MapFrom(src => (src.EndDate - src.StartDate).TotalMinutes);
+                });
+            CreateMap<Session, SessionForCallSheetDto>()
+                .ForMember(dest => dest.strSessionDate, opt => {
+                    opt.MapFrom(src => src.SessionDate.ToShortDateString());
+                });
         }
     }
 }

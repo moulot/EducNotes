@@ -845,17 +845,21 @@ namespace EducNotes.API.Controllers
                 return BadRequest("l'emploi du temps du jour est incohérent.");
 
             // get session by schedule and date
-            var session = await _context.Sessions.FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id &&
-                s.SessionDate.Date == today);
+            var sessionFromRepo = await _context.Sessions.FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id &&
+              s.SessionDate.Date == today);
+            var session = _mapper.Map<SessionForCallSheetDto>(sessionFromRepo);
 
             var studentsFromRepo = await _repo.GetClassStudents(schedule.ClassId);
             var classStudents = _mapper.Map<IEnumerable<UserForCallSheetDto>>(studentsFromRepo);
 
             var sessionSchedule = _mapper.Map<ScheduleToReturnDto>(schedule);
 
-            List<Absence> sessionAbsences = new List<Absence>();
+            IEnumerable<AbsenceForCallSheetDto> sessionAbsences = new List<AbsenceForCallSheetDto>();
             if (session != null)
-                sessionAbsences = await _context.Absences.Where(a => a.SessionId == session.Id).ToListAsync();
+            {
+              var absences = await _context.Absences.Where(a => a.SessionId == session.Id).ToListAsync();
+              sessionAbsences = _mapper.Map<IEnumerable<AbsenceForCallSheetDto>>(absences);
+            }
 
             if (session != null)
             {

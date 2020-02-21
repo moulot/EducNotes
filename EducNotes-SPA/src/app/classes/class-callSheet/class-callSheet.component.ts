@@ -20,22 +20,21 @@ import { fakeAsync } from '@angular/core/testing';
   animations: [SharedAnimations]
 })
 export class ClassCallSheetComponent implements OnInit {
+  absenceType = environment.absenceType;
+  lateType = environment.lateType;
   classRoom: Class;
   searchControl: FormControl = new FormControl();
   schedule: any;
-  session = <Session>{};
+  session: any;
   sessionData: any;
-  viewMode: 'list' | 'grid' = 'grid';
-  allSelected: boolean;
-  page = 1;
-  pageSize = 50;
   students: any = [];
   filteredStudents: any;
-  isAbsent: CallSheet[] = [];
-  absents: number[] = [];
+  callSheet: CallSheet[] = [];
   absences: Absence[] = [];
   sessionAbsents: any = [];
-  callSheetAbsence = environment.callSheetAbsence;
+  touched = -1;
+  nbAbsents = 0;
+  nbLate = 0;
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
     private route: ActivatedRoute, private router: Router) { }
@@ -54,16 +53,35 @@ export class ClassCallSheetComponent implements OnInit {
         const elt = <CallSheet>{};
         elt.id = id;
         elt.absent = false;
-        this.students[i].isAbsent = false;
+        elt.late = false;
+        this.students[i].absent = false;
+        this.students[i].late = false;
 
         if (this.sessionAbsents.length > 0) {
-          if (this.sessionAbsents.findIndex(s => Number(s.userId) === Number(id)) !== -1) {
-            elt.absent = true;
-            this.absents = [...this.absents, id];
-            this.students[i].isAbsent = true;
+          const pos = this.sessionAbsents.findIndex(s => Number(s.userId) === Number(id));
+          if (pos !== -1) {
+            const abs = this.sessionAbsents[pos];
+            if (abs.absenceTypeId === this.absenceType) {
+              // it's an absence
+              this.nbAbsents++;
+              elt.absent = true;
+              elt.late = false;
+              this.students[i].absent = true;
+              this.students[i].late = false;
+            } else if (abs.absenceTypeId === this.lateType) {
+              // it's a late arrival
+              this.nbLate++;
+              elt.absent = false;
+              elt.late = true;
+              this.students[i].absent = false;
+              this.students[i].late = true;
+            }
+            this.students[i].lateDateTime = abs.endDate;
+            this.students[i].lateInMin = abs.lateInMin;
+            this.callSheet = [...this.callSheet, elt];
           }
         }
-        this.isAbsent = [...this.isAbsent, elt];
+        this.callSheet = [...this.callSheet, elt];
       }
       this.filteredStudents = this.students;
     });
@@ -95,38 +113,61 @@ export class ClassCallSheetComponent implements OnInit {
     this.filteredStudents = rows;
   }
 
-  // setAbsences(index, studentId) {
   setAbsences(absenceData) {
     const index = absenceData.index;
     const studentId = absenceData.studentId;
-    this.isAbsent[index].absent = !this.isAbsent[index].absent;
-    const isAbsent = this.isAbsent[index].absent;
-    const id = Number(studentId);
-    const student = this.students.find(s => s.id === studentId);
-
+    const isAbsent = absenceData.isAbsent;
+    const lateInMin = absenceData.lateInMin;
+    this.students[index].lateInMin = lateInMin;
+    // is it a absence or a late arrival?
     if (isAbsent) {
-      student.isAbsent = true;
-      this.absents = [...this.absents, id];
+      this.students[index].absent = isAbsent;
+      this.students[index].late = false;
+      this.nbAbsents++;
     } else {
-      student.isAbsent = false;
-      const pos = this.absents.findIndex((value) => value === id);
-      this.absents.splice(pos, 1);
+      this.students[index].absent = isAbsent;
+      this.students[index].late = true;
+      this.nbLate++;
     }
   }
 
-  validateAbsences() {
+  removeAbsence(studentId) {
+      const pos = this.students.findIndex(elt => elt.id === studentId);
+      this.students[pos].absent = false;
+      this.students[pos].late = false;
+    }
 
-    for (let i = 0; i < this.absents.length; i++) {
-      const newAbsence = <Absence>{};
-      newAbsence.userId = this.absents[i];
-      newAbsence.absenceTypeId = this.callSheetAbsence;
-      newAbsence.sessionId = this.session.id;
-      newAbsence.startDate = this.schedule.startHourMin;
-      newAbsence.endDate = this.schedule.endHourMin;
-      newAbsence.reason = '';
-      const justified = 0;
-      newAbsence.comment = 'absent lors de l\'appel';
-      this.absences = [...this.absences, newAbsence];
+  validateAbsences() {
+    for (let i = 0; i < this.students.length; i++) {
+        const newAbsence = <Absence>{};
+      const abs = this.students[i];
+      if (abs.absent || abs.late) {
+        newAbsence.userId = abs.id;
+        newAbsence.sessionId = this.session.id;
+
+        const sessionDate = this.session.strSessionDate.split('/');
+        const day = sessionDate[0];
+        const month = sessionDate[1];
+        const year = sessionDate[2];
+        const shour = this.schedule.strStartHourMin.split(':')[0];
+        const smin = this.schedule.strStartHourMin.split(':')[1];
+        const ehour = this.schedule.strEndHourMin.split(':')[0];
+        const emin = this.schedule.strEndHourMin.split(':')[1];
+
+        newAbsence.startDate = new Date(year, month - 1, day, shour, smin);
+        if (abs.absent) {
+          newAbsence.absenceTypeId = this.absenceType;
+          newAbsence.endDate = new Date(year, month - 1, day, ehour, emin);
+        } else { // late arrival
+          newAbsence.absenceTypeId = this.lateType;
+          const endLateMin = Number(smin) + Number(abs.lateInMin);
+          newAbsence.endDate = new Date(year, month - 1, day, shour, endLateMin);
+        }
+        newAbsence.reason = '';
+        // const justified = 0;
+        newAbsence.comment = 'absent lors de l\'appel';
+        this.absences = [...this.absences, newAbsence];
+      }
     }
 
     this.classService.saveCallSheet(this.session.id, this.absences).subscribe(() => {

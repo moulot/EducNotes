@@ -1,12 +1,12 @@
 <div class="row m-0">
 
   <div class="col-md-12 d-flex">
-        <a [routerLink]="['/classSession', schedule.id]">
-          <i class="i-Back1 text-32 mr-2"></i>
-        </a>
-        <p class="text-20 font-weight-400 m-0 pb-1">feuille d'appel - classe {{schedule.className}}. {{schedule.courseName}} de 
-          {{schedule.strStartHourMin}} à {{schedule.strEndHourMin}} 
-        </p>
+    <a [routerLink]="['/classSession', schedule.id]">
+      <i class="i-Back1 text-32 mr-2"></i>
+    </a>
+    <p class="text-20 font-weight-400 m-0 pb-1">feuille d'appel - classe {{schedule.className}}. {{schedule.courseName}} de 
+      {{schedule.strStartHourMin}} à {{schedule.strEndHourMin}} 
+    </p>
   </div>
   
   <div class="col-md-12 mb-1">
@@ -14,18 +14,23 @@
       class="p-2 text-nowrap" color="primary" mdbWavesEffect>valider les absences</button>
   </div>
   
-  <div class="col-md-12 text-center mb-1">
-    <div class="p-2 border rounded">
-      <p class="text-20 text-danger m-0">
-        <b *ngIf="absents.length <= 1">{{absents.length}} élève absent</b>
-        <b *ngIf="absents.length > 1">{{absents.length}} élèves absents</b>
-      </p>
+  <div class="col-md-12 mb-1">
+    <div class="p-2 text-center border rounded">
+      <span class="text-18 text-danger m-0">
+        <b *ngIf="nbAbsents <= 1">{{nbAbsents}} élève absent</b>
+        <b *ngIf="nbAbsents > 1">{{nbAbsents}} élèves absents</b>
+      </span>
+      <span class="text-18 text-danger m-0 mx-2">/</span>
+      <span class="text-18 text-danger m-0">
+        <b *ngIf="nbLate <= 1">{{nbLate}} élève en retard</b>
+        <b *ngIf="nbLate > 1">{{nbLate}} élèves en retard</b>
+      </span>
     </div>
   </div>
 
   <div class="col-md-12">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="md-form form-sm mt-2">
           <input mdbInput type="text" id="form1" [formControl]="searchControl" class="form-control mr-2">
           <label for="form1" class="">rechercher des élèves</label>
@@ -36,16 +41,10 @@
 
 </div>
 
-<!-- DATA LIST -->
 <div class="row m-2">
-  <!-- SINGLE LIST ITEM -->
-  <div *ngFor="let student of filteredStudents | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index" 
-    class="col-md-2 my-5" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
-    <app-callSheet-card [student]="student" [index]="i" (setAbsences)="setAbsences($event)"></app-callSheet-card>
+  <div *ngFor="let student of filteredStudents; let i = index" 
+    class="col-md-3 my-5" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+    <app-callSheet-card [student]="student" [index]="i" 
+      (removeAbsence)="removeAbsence($event)" (setAbsences)="setAbsences($event)"></app-callSheet-card>
   </div>
-  <!-- PAGINATION CONTROL -->
-  <div class="col-md-12 mt-3" *ngIf="students?.length">
-    <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
-  </div>
-
 </div>

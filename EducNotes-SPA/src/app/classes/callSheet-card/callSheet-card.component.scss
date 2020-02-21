@@ -1,13 +1,14 @@
-.pic-blured {
+.blured {
     width: 100%;
-    height: 120px;
+    // height: 80px;
     object-fit: cover;
     opacity: 0.3;
 }
 
 .centered {
     position: absolute;
-    top: 61%;
+    top: 51%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
+

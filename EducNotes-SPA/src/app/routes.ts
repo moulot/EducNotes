@@ -104,6 +104,7 @@ import { ThemesListComponent } from './programs/new-theme/themes-list/themes-lis
 import { NewThemeComponent } from './programs/new-theme/new-theme.component';
 import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
 import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
+import { ClassSessionResolver } from './_resolvers/classSession-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -153,7 +154,7 @@ export const appRoutes: Routes = [
             { path: 'studentScheduleP/:id', component: StudentScheduleComponent },
             { path: 'addEval', component: EvalAddFormComponent },
             { path: 'callSheet/:id', component: ClassCallSheetComponent, resolve: { session: CallSheetResolver } },
-            { path: 'classSession/:id', component: ClassSessionComponent, resolve: { session: CallSheetResolver } },
+            { path: 'classSession/:id', component: ClassSessionComponent, resolve: { schedule: ClassSessionResolver } },
             { path: 'inscriptions', component: InscriptionComponent },
             { path: 'inscriptionsList', component: InscriptionsListComponent },
             { path: 'classesPanel', component: ClassesPanelComponent, resolve: { levels: ClassesListResolver } },

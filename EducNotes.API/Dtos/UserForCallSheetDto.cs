@@ -9,6 +9,6 @@ namespace EducNotes.API.Dtos
         public string LastName { get; set; }
         public byte Gender { get; set; }
         public string PhotoUrl { get; set; }
-        public ICollection<PhotosForDetailedDto> Photos { get; set; }
+        // public ICollection<PhotosForDetailedDto> Photos { get; set; }
     }
 }

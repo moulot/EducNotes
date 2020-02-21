@@ -9,7 +9,8 @@ export const environment = {
   teacherTypeId: 2,
   parentTypeId: 3,
   adminTypeId: 4,
-  callSheetAbsence: 3,
+  absenceType: 1,
+  lateType: 2,
   schoolServiceId: 1,
   maxChildNumber: 6,
   byDeadLineTypeId: true

@@ -145,6 +145,7 @@ namespace EducNotes.API.Controllers
             } else {
                 var templateFromRepo = await _repo.GetSmsTemplate(id);
                 _mapper.Map(smsTemplateDto, templateFromRepo);
+                _repo.Update(templateFromRepo);
             }
 
             if (await _repo.SaveAll()) { return Ok(); }

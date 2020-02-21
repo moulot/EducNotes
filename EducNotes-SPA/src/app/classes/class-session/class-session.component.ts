@@ -19,9 +19,7 @@ export class ClassSessionComponent implements OnInit {
 
   ngOnInit() {
     this.route.data.subscribe((data: any) => {
-      const sessionData = data['session'];
-      this.schedule = sessionData.sessionSchedule;
-      this.session = sessionData.session;
+      this.schedule = data['schedule'];
       this.authService.changeCurrentClassId(this.schedule.classId);
     });
   }

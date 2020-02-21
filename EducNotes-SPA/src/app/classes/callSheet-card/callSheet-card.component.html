@@ -1,32 +1,77 @@
-<mdb-flipping-card #cards>
+<mdb-flipping-card #card>
   <!--Front Side-->
-  <a class="rotate-btn" data-card="card-1" (click)="cards.toggle();addAbsent(index, student.id)">
-    <div class="face front tp-box_side tp-box_front">
-      <!--Avatar-->
-      <div class="avatar">
-          <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
-      </div>
-      <!--Content-->
-      <div class="card-body pt-3">
-        <h6>{{student.lastName}} {{student.firstName}}</h6>
-      </div>    
+  <div class="face front tp-box_side tp-box_front">
+    <!--Avatar-->
+    <div class="avatar">
+        <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
     </div>
-  </a>
+    <!--Content-->
+    <div class="card-body pt-0">
+      <div class="text-17 m-0">
+        <span class="text-uppercase mr-1">{{student.lastName}}</span>
+        <span class=" text-capitalize">{{student.firstName}}</span>
+      </div>
+      <div class="row d-flex" style="height: 65px;">
+        <div class="col-6 align-self-center"><a class="text-20 font-weight-450 text-primary" 
+          (click)="card.toggle();addAbsent(index, student.id, true)">absent</a></div>
+        <div class="col-6 align-self-center"><a class="text-20 font-weight-450 text-primary"
+          (click)="card.toggle();flipLate()">retard</a></div>
+      </div>
+    </div>    
+  </div>
   <!--/.Front Side-->
 
   <!--Back Side-->
-  <a class="rotate-btn" data-card="card-1" (click)="cards.toggle();addAbsent(index, student.id)">
-    <div class="back tp-box_side tp-box_back pic-blured" style="padding: 0px;">
+  <div *ngIf="isAbsent">
+    <div class="back tp-box_side tp-box_back blured" style="padding: 0px;">
       <!--Avatar-->
       <div class="avatar">
           <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
       </div>
       <!--Content-->
-      <div class="card-body pt-3">
-        <h6>{{student.lastName}} {{student.firstName}}</h6>
-      </div>
-      <div class="centered"><p class="text-22"><b>absent</b></p></div>
+      <div class="card-body pt-0">
+        <p class="text-17 m-0">{{student.lastName}} {{student.firstName}}</p>
+        <div class="text-20 text-danger"><b>absent</b></div>
+        <div class="text-center">
+          <a class="text-14 text-primary" (click)="card.toggle();cancelAbsent(student.id)">annuler absence</a>
+        </div>
     </div>
-  </a>
+    </div>
+  </div>
+  <div *ngIf="!isAbsent">
+    <div class="back tp-box_side tp-box_back p-0" [ngClass]="lateValidated ? 'blured' : ''">
+      <!--Avatar-->
+      <div class="avatar">
+          <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
+      </div>
+      <!--Content-->
+      <div class="card-body pt-0">
+        <p class="text-17 m-0">{{student.lastName}} {{student.firstName}}</p>
+        <form [formGroup]="lateForm" (ngSubmit)="addAbsent(index, student.id, false)">
+          <div class="row" *ngIf="!lateValidated">
+            <div class="col-12 d-flex align-items-center justify-content-center">
+              <div class="text-15 mr-1">en retard de</div>
+              <div class="md-form md-outline mt-2 m-0" style="width: 75px;">
+                <input mdbInput type="text" class="" id="min" name="minutes" formControlName="minutes" class="form-control">
+                <label for="min">min</label>
+              </div>
+              <div class="md-form m-0">
+                <button type="submit" class="px-2" mdbBtn [disabled]="!lateForm.valid"
+                  size="sm" color="primary" mdbWavesEffect>ok</button>
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="row" *ngIf="lateValidated">
+          <div class="col-12 text-20 text-danger text-center">
+            en retard de {{student.lateInMin}} mn
+          </div>
+        </div>
+        <div class="text-center">
+          <a class="text-14 text-primary" (click)="card.toggle();cancelAbsent(student.id)">annuler retard</a>
+        </div>
+      </div>
+    </div>
+  </div>
   <!--/.Back Side-->
 </mdb-flipping-card>

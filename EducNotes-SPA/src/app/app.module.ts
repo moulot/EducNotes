@@ -212,6 +212,7 @@ import { ClassProgramDataComponent } from './classes/class-program-data/class-pr
 import { TimelineComponent } from './shared/components/timeline/timeline.component';
 import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
 import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
+import { ClassSessionResolver } from './_resolvers/classSession-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -449,6 +450,7 @@ export function tokenGetter() {
       EditSmsTemplateResolver,
       ClassGradesResolver,
       TeacherProgramResolver,
+      ClassSessionResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }
