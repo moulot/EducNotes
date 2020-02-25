@@ -102,17 +102,27 @@ namespace EducNotes.API.Controllers
             return to;
         }
 
-        // [HttpPost("CallBack")]
-        // public async GetCallBackData([FromBody] CallBackDto callBackData)
-        // {
+        [HttpPost("CallBack")]
+        public async Task<IActionResult> GetCallBackData([FromBody] SmsCallBackDto callBackData)
+        {
+          var data = callBackData;
+          string apiMsgId = data.messageId;
+          var sms = await _context.Sms.FirstOrDefaultAsync(s => s.res_ApiMsgId == apiMsgId);
+          if(sms != null)
+          {
+            sms.NbTries = 1;
+            _context.Update(sms);
+            if(await _repo.SaveAll())
+              return NoContent();
+          }
 
-        // }
+          throw new Exception($"saisie des data du callBack a échoué");
+        }
 
         [HttpGet("SmsCategories")]
         public async Task<IActionResult> GetSmsCtegories()
         {
-            var smsCats =  await _context.SmsCategories
-                                    .OrderBy(c => c.Name).ToListAsync();
+            var smsCats =  await _context.SmsCategories.OrderBy(c => c.Name).ToListAsync();
             return Ok(smsCats);
     
         }

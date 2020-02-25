@@ -9,6 +9,7 @@ using EducNotes.API.Models;
 namespace EducNotes.API.Helpers {
     public class AutoMapperProfiles : Profile {
         private readonly DataContext _context;
+        CultureInfo frC = new CultureInfo ("fr-FR");
 
         public AutoMapperProfiles (DataContext context) {
             _context = context;
@@ -76,7 +77,7 @@ namespace EducNotes.API.Helpers {
                 });
             CreateMap<Evaluation, EvalForEditDto>()
                 .ForMember(dest => dest.EvalDate, opt => {
-                    opt.MapFrom(src => src.EvalDate.ToShortDateString());
+                    opt.MapFrom(src => src.EvalDate.ToString("dd/MM/yyyy", frC));
                 })
                 .ForMember(dest => dest.EvalDateExpired, opt => {
                     opt.MapFrom(src => (src.EvalDate.Date <= DateTime.Now.Date));
@@ -105,16 +106,16 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom(src => src.Teacher.LastName + ' ' + src.Teacher.FirstName);
                 })
                 .ForMember(dest => dest.StartHourMin, opt => {
-                    opt.MapFrom(d => d.StartHourMin.ToShortTimeString());
+                    opt.MapFrom(d => d.StartHourMin.ToString("HH:mm", frC));
                 })
                 .ForMember(dest => dest.EndHourMin, opt => {
-                    opt.MapFrom(d => d.EndHourMin.ToShortTimeString());
+                    opt.MapFrom(d => d.EndHourMin.ToString("HH:mm", frC));
                 })
                 .ForMember(dest => dest.Top, opt => {
                     opt.MapFrom(d => d.StartHourMin.CalculateTop());
                 })
                 .ForMember(dest => dest.Height, opt => {
-                    opt.MapFrom(d => d.StartHourMin.CalculateHeight (d.EndHourMin));
+                    opt.MapFrom(d => d.StartHourMin.CalculateHeight(d.EndHourMin));
                 })
                 .ForMember(dest => dest.Color, opt => opt
                     .MapFrom(src => src.Course.Color))
@@ -122,16 +123,16 @@ namespace EducNotes.API.Helpers {
                     .MapFrom(d => d.Class.ClassLevel.Name));
             CreateMap<Schedule, ClassScheduleForTimeTableDto>()
                 .ForMember(dest => dest.StartHourMin, opt => {
-                    opt.MapFrom(d => d.StartHourMin.ToShortTimeString());
+                    opt.MapFrom(d => d.StartHourMin.ToString("HH:mm", frC));
                 })
                 .ForMember(dest => dest.EndHourMin, opt => {
-                    opt.MapFrom(d => d.EndHourMin.ToShortTimeString());
+                    opt.MapFrom(d => d.EndHourMin.ToString("HH:mm", frC));
                 })
                 .ForMember(dest => dest.Top, opt => {
                     opt.MapFrom(d => d.StartHourMin.CalculateTop());
                 })
                 .ForMember(dest => dest.Height, opt => {
-                    opt.MapFrom(d => d.StartHourMin.CalculateHeight (d.EndHourMin));
+                    opt.MapFrom(d => d.StartHourMin.CalculateHeight(d.EndHourMin));
                 })
                 .ForMember(dest => dest.Color, opt => opt
                     .MapFrom(src => src.Course.Color))
@@ -139,10 +140,10 @@ namespace EducNotes.API.Helpers {
                     .MapFrom(d => d.Class.ClassLevel.Name));
             CreateMap<Schedule, ScheduleToReturnDto>()
                 .ForMember(dest => dest.strStartHourMin, opt => {
-                    opt.MapFrom(d => d.StartHourMin.ToShortTimeString());
+                    opt.MapFrom(d => d.StartHourMin.ToString("HH:mm", frC));
                 })
                 .ForMember(dest => dest.strEndHourMin, opt => {
-                    opt.MapFrom(d => d.EndHourMin.ToShortTimeString());
+                    opt.MapFrom(d => d.EndHourMin.ToString("HH:mm", frC));
                 });
             CreateMap<Schedule, SessionsToReturnDto>();
             CreateMap<AgendaForSaveDto, Agenda>();
@@ -154,16 +155,16 @@ namespace EducNotes.API.Helpers {
             CreateMap<AbsenceForSaveDto, Absence>();
             CreateMap<Absence, AbsencesToReturnDto>()
                 .ForMember(dest => dest.StartDate, opt => {
-                    opt.MapFrom(src => src.StartDate.ToShortDateString());
+                    opt.MapFrom(src => src.StartDate.ToString("dd/MM/yyyy", frC));
                 })
                 .ForMember(dest => dest.StartTime, opt => {
-                    opt.MapFrom(src => src.StartDate.ToShortTimeString());
+                    opt.MapFrom(src => src.StartDate.ToString("HH:mm", frC));
                 })
                 .ForMember(dest => dest.EndDate, opt => {
-                    opt.MapFrom(src => src.EndDate.ToShortDateString());
+                    opt.MapFrom(src => src.EndDate.ToString("dd/MM/yyyy", frC));
                 })
                 .ForMember(dest => dest.EndTime, opt => {
-                    opt.MapFrom(src => src.EndDate.ToShortTimeString());
+                    opt.MapFrom(src => src.EndDate.ToString("HH:mm", frC));
                 })
                 .ForMember(dest => dest.AbsenceType, opt => opt
                     .MapFrom(src => src.AbsenceType.Name))
@@ -174,7 +175,7 @@ namespace EducNotes.API.Helpers {
                 });
             CreateMap<UserSanction, UserSanctionsToReturnDto>()
                 .ForMember(dest => dest.SanctionDate, opt => {
-                    opt.MapFrom(src => src.SanctionDate.ToShortDateString());
+                    opt.MapFrom(src => src.SanctionDate.ToString("dd/MM/yyyy", frC));
                 })
                 .ForMember(dest => dest.SanctionName, opt => {
                     opt.MapFrom(src => src.Sanction.Name);
@@ -191,7 +192,7 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom(src => src.Course.Color);
                 })
                 .ForMember(dest => dest.EvalDate, opt => {
-                    opt.MapFrom(src => src.EvalDate.ToString("dd/MM/yy"));
+                    opt.MapFrom(src => src.EvalDate.ToString("dd/MM/yy", frC));
                 });
             CreateMap<ProductDto, Product>();
             CreateMap<DeadLineDto, DeadLine>();
@@ -210,22 +211,22 @@ namespace EducNotes.API.Helpers {
 
                 CreateMap<DeadLine, DealLineDetailsDto>()
                 .ForMember(dest => dest.DueDate, opt => {
-                    opt.MapFrom(src => src.DueDate.ToShortDateString());
+                    opt.MapFrom(src => src.DueDate.ToString("dd/MM/yyyy", frC));
                 });
             CreateMap<PhotoForCreationDto, Fichier>();
             CreateMap<Absence, AbsenceForCallSheetDto>()
                 .ForMember(dest => dest.strStartDate, opt => {
-                    opt.MapFrom(src => src.StartDate.ToShortDateString());
+                    opt.MapFrom(src => src.StartDate.ToString("dd/MM/yyyy", frC));
                 })
                 .ForMember(dest => dest.strEndDate, opt => {
-                    opt.MapFrom(src => src.EndDate.ToShortDateString());
+                    opt.MapFrom(src => src.EndDate.ToString("dd/MM/yyyy", frC));
                 })
                 .ForMember(dest => dest.LateInMin, opt => {
                     opt.MapFrom(src => (src.EndDate - src.StartDate).TotalMinutes);
                 });
             CreateMap<Session, SessionForCallSheetDto>()
                 .ForMember(dest => dest.strSessionDate, opt => {
-                    opt.MapFrom(src => src.SessionDate.ToShortDateString());
+                    opt.MapFrom(src => src.SessionDate.ToString("dd/MM/yyyy", frC));
                 });
         }
     }

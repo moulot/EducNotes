@@ -7,7 +7,7 @@
     <Folder Include="wwwroot\"/>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="IronPdf" Version="2019.8.9"/>
+    <!-- <PackageReference Include="IronPdf" Version="2019.8.9"/> -->
     <PackageReference Include="Microsoft.AspNetCore.App"/>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0"/>
     <PackageReference Include="CloudinaryDotNet" Version="1.8.0"/>

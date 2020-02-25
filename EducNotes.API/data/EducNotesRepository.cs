@@ -29,6 +29,7 @@ namespace EducNotes.API.Data
         string password;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
         int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId, schoolInscTypeId;
+        CultureInfo frC = new CultureInfo ("fr-FR");
 
         public EducNotesRepository(DataContext context, IConfiguration config, IEmailSender emailSender,
             UserManager<User> userManager, IMapper mapper)
@@ -669,7 +670,7 @@ namespace EducNotes.API.Data
                         CourseColor = a.Course.Color,
                         TaskDesc = a.TaskDesc,
                         DateAdded = a.DateAdded.ToLongDateString(),
-                        ShortDateAdded = a.DateAdded.ToShortDateString()
+                        ShortDateAdded = a.DateAdded.ToString("dd/MM/yyyy", frC)
                     });
                 }
 
@@ -1002,7 +1003,7 @@ namespace EducNotes.API.Data
                     var elt = UserEvals[j];
                     if (elt.Grade.IsNumeric())
                     {
-                        var evalDate = elt.Evaluation.EvalDate.ToShortDateString();
+                        var evalDate = elt.Evaluation.EvalDate.ToString("dd/MM/yyyy", frC);
                         var evalType = elt.Evaluation.EvalType.Name;
                         var evalName = elt.Evaluation.Name;
                         double maxGrade = Convert.ToDouble(elt.Evaluation.MaxGrade);
@@ -1155,7 +1156,7 @@ namespace EducNotes.API.Data
                     aid.CourseName = item.Course.Name;
                     aid.CourseAbbrev = item.Course.Abbreviation;
                     aid.CourseColor = item.Course.Color;
-                    aid.strDateAdded = item.DateAdded.ToShortDateString();
+                    aid.strDateAdded = item.DateAdded.ToString("dd/MM/yyyy", frC);
                     aid.TaskDesc = item.TaskDesc;
                     aid.AgendaId = item.Id;
                     aid.Done = item.Done;
@@ -1214,43 +1215,43 @@ namespace EducNotes.API.Data
 
         public List<string> SendBatchSMS(List<Sms> smsData)
         {
-            List<string> result = new List<string>();
-            foreach (var sms in smsData)
-            {
-                Dictionary<string, string> Params = new Dictionary<string, string>();
-                Params.Add("content", sms.Content);
-                Params.Add("to", sms.To);
-                Params.Add("validityPeriod", "1");
+          List<string> result = new List<string>();
+          foreach (var sms in smsData)
+          {
+              Dictionary<string, string> Params = new Dictionary<string, string>();
+              Params.Add("content", sms.Content);
+              Params.Add("to", sms.To);
+              Params.Add("validityPeriod", "1");
 
-                Params["to"] = CreateRecipientList(Params["to"]);
-                string JsonArray = JsonConvert.SerializeObject(Params, Formatting.None);
-                JsonArray = JsonArray.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
-                
-                string Token = _config.GetValue<string>("AppSettings:CLICKATELL_TOKEN");
+              Params["to"] = CreateRecipientList(Params["to"]);
+              string JsonArray = JsonConvert.SerializeObject(Params, Formatting.None);
+              JsonArray = JsonArray.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
+              
+              string Token = _config.GetValue<string>("AppSettings:CLICKATELL_TOKEN");
 
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://platform.clickatell.com/messages");
-                httpWebRequest.ContentType = "application/json";
-                httpWebRequest.Method = "POST";
-                httpWebRequest.Accept = "application/json";
-                httpWebRequest.PreAuthenticate = true;
-                httpWebRequest.Headers.Add("Authorization", Token);
+              ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+              var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://platform.clickatell.com/messages");
+              httpWebRequest.ContentType = "application/json";
+              httpWebRequest.Method = "POST";
+              httpWebRequest.Accept = "application/json";
+              httpWebRequest.PreAuthenticate = true;
+              httpWebRequest.Headers.Add("Authorization", Token);
 
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                {
-                    streamWriter.Write(JsonArray);
-                    streamWriter.Flush();
-                    streamWriter.Close();
-                }
+              using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+              {
+                  streamWriter.Write(JsonArray);
+                  streamWriter.Flush();
+                  streamWriter.Close();
+              }
 
-                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                {
-                    result.Add(streamReader.ReadToEnd());
-                }
-            }
+              var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+              using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+              {
+                  result.Add(streamReader.ReadToEnd());
+              }
+          }
 
-            return result;
+          return result;
         }
 
         public void Clickatell_SendSMS(clickatellParamsDto smsData)
@@ -1274,7 +1275,7 @@ namespace EducNotes.API.Data
             httpWebRequest.PreAuthenticate = true;
             httpWebRequest.Headers.Add("Authorization", Token);
 
-            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            using(var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
                 streamWriter.Write(JsonArray);
                 streamWriter.Flush();
@@ -1298,6 +1299,7 @@ namespace EducNotes.API.Data
                 Sms newSms = new Sms();
                 newSms.To = abs.ParentCellPhone;
                 newSms.ToUserId = abs.ParentId;
+                newSms.validityPeriod = 1;
                 // replace tokens with dynamic data
                 List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
                 newSms.Content = ReplaceTokens(tags, SmsContent);

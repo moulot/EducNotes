@@ -10,7 +10,8 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "build:blue": "ng build --prod --base-href \"http://gull.ui-lib.com/blue/\"",
-    "build:purple": "ng build --prod --base-href \"http://gull.ui-lib.com/purple/\""
+    "build:purple": "ng build --prod --base-href \"http://gull.ui-lib.com/purple/\"",
+    "build-prod": "node --max_old_space_size=5048 ./node_modules/@angular/cli/bin/ng build --prod"
   },
   "private": true,
   "dependencies": {

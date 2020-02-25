@@ -28,6 +28,7 @@ namespace EducNotes.API.Controllers
         private readonly IConfiguration _config;
         int teacherTypeId,parentTypeId,studentTypeId,adminTypeId;
         string password,parentRoleName,memberRoleName,moderatorRoleName,adminRoleName,professorRoleName;
+        CultureInfo frC = new CultureInfo ("fr-FR");
 
         private readonly UserManager<User> _userManager;
 
@@ -298,8 +299,8 @@ namespace EducNotes.API.Controllers
                                             Day = Schedule.Day,
                                             CourseStartHM = Schedule.StartHourMin,
                                             CourseEndHM = Schedule.EndHourMin,
-                                            StartHourMin = Schedule.StartHourMin.ToShortTimeString(),
-                                            EndHourMin = Schedule.EndHourMin.ToShortTimeString()
+                                            StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
+                                            EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
                                         })
                                         .Where(w => w.TeacherId == teacherId && w.Day == todayDay)
                                           //&& w.CourseStartHM.TimeOfDay >= todayHourMin)
@@ -339,8 +340,8 @@ namespace EducNotes.API.Controllers
                                         ClassId = Schedule.ClassId,
                                         ClassName = Schedule.Class.Name,
                                         Day = Schedule.Day,
-                                        StartHourMin = Schedule.StartHourMin.ToShortTimeString(),
-                                        EndHourMin = Schedule.EndHourMin.ToShortTimeString()
+                                        StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
+                                        EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
                                     })
                                     .Where(w => w.TeacherId == teacherId && w.Day == day)
                                     .OrderBy(o => o.StartHourMin)
@@ -364,8 +365,8 @@ namespace EducNotes.API.Controllers
                                         ClassId = Schedule.ClassId,
                                         ClassName = Schedule.Class.Name,
                                         Day = Schedule.Day,
-                                        StartHourMin = Schedule.StartHourMin.ToShortTimeString(),
-                                        EndHourMin = Schedule.EndHourMin.ToShortTimeString()
+                                        StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
+                                        EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
                                     })
                                     .Where(w => w.TeacherId == teacherId)
                                     .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin)
@@ -393,8 +394,8 @@ namespace EducNotes.API.Controllers
             //                             Day = Schedule.Day,
             //                             strDayDate = "",
             //                             DayDate = DateTime.Now.Date,
-            //                             StartHourMin = Schedule.StartHourMin.ToShortTimeString(),
-            //                             EndHourMin = Schedule.EndHourMin.ToShortTimeString()
+            //                             StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
+            //                             EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
             //                         })
             //                         .Where(w => w.TeacherId == teacherId && w.ClassId == classId)
             //                         .ToListAsync();
@@ -421,7 +422,6 @@ namespace EducNotes.API.Controllers
                 
                 SessionForListDto sfld = new SessionForListDto();
                 sfld.DueDate = currentDate;
-                CultureInfo frC = new CultureInfo("fr-FR");
                 var shortDueDate = currentDate.ToString("ddd dd MMM", frC);
                 var longDueDate = currentDate.ToString("dd MMMM yyyy", frC);
                 var dueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
@@ -452,7 +452,7 @@ namespace EducNotes.API.Controllers
                     TeacherId = Convert.ToInt32(session.TeacherId),
                     TeacherName = session.Teacher.LastName + ' ' + session.Teacher.FirstName,
                     CourseId = Convert.ToInt32(session.CourseId),
-                    strDayDate = currentDate.ToShortDateString(),
+                    strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
                     DayDate = currentDate,
                     Day = session.Day,
                     CourseName = session.Course.Name,
@@ -460,8 +460,8 @@ namespace EducNotes.API.Controllers
                     ClassId = Convert.ToInt32(session.ClassId),
                     ClassName = session.Class.Name,
                     Tasks = tasks,
-                    StartHourMin = session.StartHourMin.ToShortTimeString(),
-                    EndHourMin = session.EndHourMin.ToShortTimeString()
+                    StartHourMin = session.StartHourMin.ToString("HH:mm", frC),
+                    EndHourMin = session.EndHourMin.ToString("HH:mm", frC)
                   };
 
                   sfld.AgendaItems.Add(newAgenda);
@@ -475,7 +475,6 @@ namespace EducNotes.API.Controllers
             var nbTasks = new List<int>();
             for (int i = 0; i <= 5; i++) {
                 DateTime dt = monday.AddDays(i);
-                CultureInfo frC = new CultureInfo("fr-FR");
                 var shortdate = dt.ToString("ddd dd MMM", frC);
                 days.Add(shortdate);
                 weekDates.Add(dt.Date);
@@ -512,27 +511,6 @@ namespace EducNotes.API.Controllers
         [HttpGet ("{teacherId}/MovedWeekSessions/{classId}")]
         public async Task<IActionResult> getClassMovedWeekAgenda (int teacherId, int classId, [FromQuery] AgendaParams agendaParams)
         {
-            // var teacherSchedule = await (from courses in _context.ClassCourses
-            //                                 join Schedule in _context.Schedules
-            //                                 on courses.CourseId equals Schedule.CourseId
-            //                                 select new
-            //                                 {
-            //                                     ScheduleId = Schedule.Id,
-            //                                     TeacherId = courses.TeacherId,
-            //                                     TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
-            //                                     CourseId = courses.CourseId,
-            //                                     CourseName = courses.Course.Name,
-            //                                     CourseColor = courses.Course.Color,
-            //                                     ClassId = courses.ClassId,
-            //                                     ClassName = courses.Class.Name,
-            //                                     Day = Schedule.Day,
-            //                                     strDayDate = "",
-            //                                     DayDate = DateTime.Now.Date,
-            //                                     StartHourMin = Schedule.StartHourMin.ToShortTimeString(),
-            //                                     EndHourMin = Schedule.EndHourMin.ToShortTimeString()
-            //                                 })
-            //                                 .Where(w => w.TeacherId == 2 && w.ClassId == classId)
-            //                                 .ToListAsync();
             var teacherSchedule = await _context.Schedules
                                     .Include(i => i.Course)
                                     .Include(i => i.Teacher)
@@ -560,7 +538,6 @@ namespace EducNotes.API.Controllers
                 
                 SessionForListDto sfld = new SessionForListDto();
                 sfld.DueDate = currentDate;
-                CultureInfo frC = new CultureInfo("fr-FR");
                 var shortDueDate = currentDate.ToString("ddd dd MMM", frC);
                 var longDueDate = currentDate.ToString("dd MMMM yyyy", frC);
                 var dueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
@@ -591,7 +568,7 @@ namespace EducNotes.API.Controllers
                     TeacherId = Convert.ToInt32(session.TeacherId),
                     TeacherName =  session.Teacher.LastName + ' ' + session.Teacher.FirstName,
                     CourseId = Convert.ToInt32(session.CourseId),
-                    strDayDate = currentDate.ToShortDateString(),
+                    strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
                     DayDate = currentDate,
                     Day = session.Day,
                     CourseName = session.Course.Name,
@@ -599,8 +576,8 @@ namespace EducNotes.API.Controllers
                     ClassId = Convert.ToInt32(session.ClassId),
                     ClassName = session.Class.Name,
                     Tasks = tasks,
-                    StartHourMin = session.StartHourMin.ToShortTimeString(),
-                    EndHourMin = session.EndHourMin.ToShortTimeString()
+                    StartHourMin = session.StartHourMin.ToString("HH:mm", frC),
+                    EndHourMin = session.EndHourMin.ToString("HH:mm", frC)
                   };
 
                   sfld.AgendaItems.Add(newAgenda);
@@ -615,7 +592,6 @@ namespace EducNotes.API.Controllers
             var nbTasks = new List<int>();
             for (int i = 0; i <= 5; i++) {
                 DateTime dt = monday.AddDays(i);
-                CultureInfo frC = new CultureInfo("fr-FR");
                 var shortdate = dt.ToString("ddd dd MMM", frC);
                 days.Add(shortdate);
                 weekDates.Add(dt);

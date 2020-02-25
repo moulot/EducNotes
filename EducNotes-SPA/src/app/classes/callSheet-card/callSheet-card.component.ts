@@ -62,7 +62,11 @@ export class CallSheetCardComponent implements OnInit {
   }
 
   cancelAbsent(studentId) {
-    this.removeAbsence.emit(studentId);
+    this.lateForm.controls['minutes'].setValue('');
+    const absenceData = <any>{};
+    absenceData.studentId = studentId;
+    absenceData.lateValidated = this.lateValidated;
+    this.removeAbsence.emit(absenceData);
   }
 
 }

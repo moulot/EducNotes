@@ -50,10 +50,10 @@ export class ClassCallSheetComponent implements OnInit {
 
       for (let i = 0; i < this.students.length; i++) {
         const id = this.students[i].id;
-        const elt = <CallSheet>{};
-        elt.id = id;
-        elt.absent = false;
-        elt.late = false;
+        // const elt = <CallSheet>{};
+        // elt.id = id;
+        // elt.absent = false;
+        // elt.late = false;
         this.students[i].absent = false;
         this.students[i].late = false;
 
@@ -64,24 +64,24 @@ export class ClassCallSheetComponent implements OnInit {
             if (abs.absenceTypeId === this.absenceType) {
               // it's an absence
               this.nbAbsents++;
-              elt.absent = true;
-              elt.late = false;
+              // elt.absent = true;
+              // elt.late = false;
               this.students[i].absent = true;
               this.students[i].late = false;
             } else if (abs.absenceTypeId === this.lateType) {
               // it's a late arrival
               this.nbLate++;
-              elt.absent = false;
-              elt.late = true;
+              // elt.absent = false;
+              // elt.late = true;
               this.students[i].absent = false;
               this.students[i].late = true;
             }
             this.students[i].lateDateTime = abs.endDate;
             this.students[i].lateInMin = abs.lateInMin;
-            this.callSheet = [...this.callSheet, elt];
+            // this.callSheet = [...this.callSheet, elt];
           }
         }
-        this.callSheet = [...this.callSheet, elt];
+        // this.callSheet = [...this.callSheet, elt];
       }
       this.filteredStudents = this.students;
     });
@@ -131,21 +131,27 @@ export class ClassCallSheetComponent implements OnInit {
     }
   }
 
-  removeAbsence(studentId) {
+  removeAbsence(absenceData) {
+    const studentId = absenceData.studentId;
+    const lateValidated = absenceData.lateValidated;
       const pos = this.students.findIndex(elt => elt.id === studentId);
       this.students[pos].absent = false;
       this.students[pos].late = false;
+      if (lateValidated) {
+        this.nbLate--;
+      }
     }
 
   validateAbsences() {
     for (let i = 0; i < this.students.length; i++) {
         const newAbsence = <Absence>{};
-      const abs = this.students[i];
-      if (abs.absent || abs.late) {
-        newAbsence.userId = abs.id;
+      const student = this.students[i];
+      if (student.absent || student.late) {
+        newAbsence.userId = student.id;
         newAbsence.sessionId = this.session.id;
 
         const sessionDate = this.session.strSessionDate.split('/');
+        // console.log(sessionDate);
         const day = sessionDate[0];
         const month = sessionDate[1];
         const year = sessionDate[2];
@@ -153,14 +159,15 @@ export class ClassCallSheetComponent implements OnInit {
         const smin = this.schedule.strStartHourMin.split(':')[1];
         const ehour = this.schedule.strEndHourMin.split(':')[0];
         const emin = this.schedule.strEndHourMin.split(':')[1];
+        // console.log(day + '/' + month + '/' + year + '-' + shour + ':' + smin + '-' + ehour + ':' + emin);
 
         newAbsence.startDate = new Date(year, month - 1, day, shour, smin);
-        if (abs.absent) {
+        if (student.absent) {
           newAbsence.absenceTypeId = this.absenceType;
           newAbsence.endDate = new Date(year, month - 1, day, ehour, emin);
         } else { // late arrival
           newAbsence.absenceTypeId = this.lateType;
-          const endLateMin = Number(smin) + Number(abs.lateInMin);
+          const endLateMin = Number(smin) + Number(student.lateInMin);
           newAbsence.endDate = new Date(year, month - 1, day, shour, endLateMin);
         }
         newAbsence.reason = '';
@@ -169,10 +176,10 @@ export class ClassCallSheetComponent implements OnInit {
         this.absences = [...this.absences, newAbsence];
       }
     }
+    // console.log(this.absences);
 
     this.classService.saveCallSheet(this.session.id, this.absences).subscribe(() => {
-      this.alertify.success('classe ' + this.schedule.className + ' - ' + this.schedule.courseName +
-        'de ' + this.schedule.strStartHourMin + ' à ' + this.schedule.strEndHourMin + '. appel Validé');
+      this.alertify.success('l\'appel est enregistré');
     }, error => {
       this.alertify.error(error);
     }, () => {

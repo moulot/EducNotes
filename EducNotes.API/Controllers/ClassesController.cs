@@ -24,8 +24,8 @@ namespace EducNotes.API.Controllers
         private readonly IMapper _mapper;
         private readonly IEducNotesRepository _repo;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
-
         private readonly IConfiguration _config;
+        CultureInfo frC = new CultureInfo ("fr-FR");
 
         public ClassesController(DataContext context, IMapper mapper, IEducNotesRepository repo, IConfiguration config)
         {
@@ -190,7 +190,7 @@ namespace EducNotes.API.Controllers
                 teacherCourse.Email = data.Teacher.Email;
                 teacherCourse.PhotoUrl = ""; //data.Teacher.Photos.FirstOrDefault(p => p.IsMain).Url;
                 teacherCourse.PhoneNumber = data.Teacher.PhoneNumber;
-                teacherCourse.DateOfBirth = data.Teacher.DateOfBirth.ToShortDateString();
+                teacherCourse.DateOfBirth = data.Teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
                 teacherCourse.SeconPhoneNumber = data.Teacher.SecondPhoneNumber;
                 teacherCourse.Course = data.Course;
                 coursesWithTeacher.Add(teacherCourse);
@@ -399,27 +399,27 @@ namespace EducNotes.API.Controllers
             return BadRequest("Aucun agenda trouvé");
         }
 
-        [HttpPost("HtmlToPDF")]
-        public IActionResult ConvertHtmlToPDF([FromBody] PdfDataDto pdfData)
-        {
-            var html = pdfData.Html;
-            // Render any HTML fragment or document to HTML
-            var Renderer = new IronPdf.HtmlToPdf();
-            var PDF = Renderer.RenderHtmlAsPdf(html);
-            var OutputPath = "HtmlToPDF.pdf";
-            PDF.SaveAs(OutputPath);
-            // This neat trick opens our PDF file so we can see the result in our default PDF viewer
-            //System.Diagnostics.Process.Start(OutputPath);
+        // [HttpPost("HtmlToPDF")]
+        // public IActionResult ConvertHtmlToPDF([FromBody] PdfDataDto pdfData)
+        // {
+        //     var html = pdfData.Html;
+        //     // Render any HTML fragment or document to HTML
+        //     var Renderer = new IronPdf.HtmlToPdf();
+        //     var PDF = Renderer.RenderHtmlAsPdf(html);
+        //     var OutputPath = "HtmlToPDF.pdf";
+        //     PDF.SaveAs(OutputPath);
+        //     // This neat trick opens our PDF file so we can see the result in our default PDF viewer
+        //     //System.Diagnostics.Process.Start(OutputPath);
 
-            // Create a PDF from any existing web page
-            var Renderer1 = new IronPdf.HtmlToPdf();
-            var PDF1 = Renderer1.RenderUrlAsPdf("https://ironpdf.com/tutorials/html-to-pdf/#exporting-a-pdf-using-existing-html-url");
-            PDF1.SaveAs("wikipedia.pdf");
-            // This neat trick opens our PDF file so we can see the result
-            //System.Diagnostics.Process.Start("wikipedia.pdf");
+        //     // Create a PDF from any existing web page
+        //     var Renderer1 = new IronPdf.HtmlToPdf();
+        //     var PDF1 = Renderer1.RenderUrlAsPdf("https://ironpdf.com/tutorials/html-to-pdf/#exporting-a-pdf-using-existing-html-url");
+        //     PDF1.SaveAs("wikipedia.pdf");
+        //     // This neat trick opens our PDF file so we can see the result
+        //     //System.Diagnostics.Process.Start("wikipedia.pdf");
 
-            return NoContent();
-        }
+        //     return NoContent();
+        // }
 
         [HttpGet("GetWeekDays")]
         public IActionResult GetWeekDaysByDate([FromQuery] AgendaParams agendaParams)
@@ -826,70 +826,71 @@ namespace EducNotes.API.Controllers
         [HttpGet("SessionData/{scheduleId}")]
         public async Task<IActionResult> GetSessionData(int scheduleId)
         {
-            var schedule = await _context.Schedules
-                .Include(i => i.Class)
-                .Include(i => i.Course)
-                .FirstOrDefaultAsync(s => s.Id == scheduleId); ;
+          var schedule = await _context.Schedules
+                                .Include(i => i.Class)
+                                .Include(i => i.Course)
+                                .FirstOrDefaultAsync(s => s.Id == scheduleId); ;
 
-            //var schedule = _context.Schedules.Where (s => s.Id == scheduleId).FirstOrDefault();
-            if (schedule == null)
-                return BadRequest("problème pour créer la session du cours.");
+          if (schedule == null)
+            return BadRequest("problème pour créer la session du cours.");
 
-            var scheduleDay = schedule.Day;
+          var scheduleDay = schedule.Day;
 
-            var today = DateTime.Now.Date;
-            // monday=1, tue=2, ...
-            var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
+          var today = DateTime.Now.Date;
+          // monday=1, tue=2, ...
+          var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
 
-            if (todayDay != scheduleDay)
-                return BadRequest("l'emploi du temps du jour est incohérent.");
+          if (todayDay != scheduleDay)
+            return BadRequest("l'emploi du temps du jour est incohérent.");
 
-            // get session by schedule and date
-            var sessionFromRepo = await _context.Sessions.FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id &&
-              s.SessionDate.Date == today);
-            var session = _mapper.Map<SessionForCallSheetDto>(sessionFromRepo);
+          // get session by schedule and date
+          var sessionFromRepo = await _context.Sessions.FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id &&
+            s.SessionDate.Date == today);
+          var session = _mapper.Map<SessionForCallSheetDto>(sessionFromRepo);
 
-            var studentsFromRepo = await _repo.GetClassStudents(schedule.ClassId);
-            var classStudents = _mapper.Map<IEnumerable<UserForCallSheetDto>>(studentsFromRepo);
+          var studentsFromRepo = await _repo.GetClassStudents(schedule.ClassId);
+          var classStudents = _mapper.Map<IEnumerable<UserForCallSheetDto>>(studentsFromRepo);
 
-            var sessionSchedule = _mapper.Map<ScheduleToReturnDto>(schedule);
+          var sessionSchedule = _mapper.Map<ScheduleToReturnDto>(schedule);
 
-            IEnumerable<AbsenceForCallSheetDto> sessionAbsences = new List<AbsenceForCallSheetDto>();
-            if (session != null)
+          IEnumerable<AbsenceForCallSheetDto> sessionAbsences = new List<AbsenceForCallSheetDto>();
+          if (session != null)
+          {
+            var absences = await _context.Absences.Where(a => a.SessionId == session.Id).ToListAsync();
+            sessionAbsences = _mapper.Map<IEnumerable<AbsenceForCallSheetDto>>(absences);
+          }
+
+          if (session != null)
+          {
+            return Ok(new
             {
-              var absences = await _context.Absences.Where(a => a.SessionId == session.Id).ToListAsync();
-              sessionAbsences = _mapper.Map<IEnumerable<AbsenceForCallSheetDto>>(absences);
+              session,
+              sessionSchedule,
+              classStudents,
+              sessionAbsences
+            });
+          }
+          else
+          {
+            var newSession = _context.Add(new Session
+            {
+              ScheduleId = schedule.Id,
+              SessionDate = today
+            });
+
+            if (await _repo.SaveAll())
+            {
+              return Ok(new
+              {
+                session = newSession,
+                sessionSchedule,
+                classStudents,
+                sessionAbsences
+              });
             }
 
-            if (session != null)
-            {
-                return Ok(new
-                {
-                    session,
-                    sessionSchedule,
-                    classStudents,
-                    sessionAbsences
-                });
-            }
-            else
-            {
-                var newSession = _context.Add(new Session
-                {
-                    ScheduleId = schedule.Id,
-                    SessionDate = today
-                });
-
-                if (await _repo.SaveAll())
-                    return Ok(new
-                    {
-                        session = newSession,
-                        sessionSchedule,
-                        classStudents,
-                        sessionAbsences
-                    });
-
-                return BadRequest("problème pour récupérer la session");
-            }
+            return BadRequest("problème pour récupérer la session");
+          }
         }
 
         [HttpGet("Schedule/{id}")]
@@ -1064,76 +1065,76 @@ namespace EducNotes.API.Controllers
             //add new absents
             for (int i = 0; i < absences.Length; i++)
             {
-                Absence absence = absences[i];
-                _repo.Add(absence);
+              Absence absence = absences[i];
+              _repo.Add(absence);
 
-                //set absence sms data
-                var session = await _context.Sessions.FirstAsync(s => s.Id == absence.SessionId);
-                var schedule = await _context.Schedules
-                                        .Include(c => c.Class)
-                                        .Include(c => c.Course)
-                                        .FirstAsync(s => s.Id == session.ScheduleId);
+              //set absence sms data
+              var session = await _context.Sessions.FirstAsync(s => s.Id == absence.SessionId);
+              var schedule = await _context.Schedules
+                                      .Include(c => c.Class)
+                                      .Include(c => c.Course)
+                                      .FirstAsync(s => s.Id == session.ScheduleId);
 
-                int childId = absence.UserId;
-                var child = await _context.Users.FirstAsync(u => u.Id == childId);
-                List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
-                foreach (var parentId in parentIds)
+              int childId = absence.UserId;
+              var child = await _context.Users.FirstAsync(u => u.Id == childId);
+              List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
+              foreach (var parentId in parentIds)
+              {
+                // is the parent subscribed to the Absence sms?
+                var userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
+                                    u => u.ParentId == parentId && u.SmsTemplateId == AbsenceSms.Id &&
+                                    u.ChildId == childId);
+                if (userTemplate != null)
                 {
-                    // is the parent subscribed to the Absence sms?
-                    var userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
-                                        u => u.ParentId == parentId && u.SmsTemplateId == AbsenceSms.Id &&
-                                        u.ChildId == childId);
-                    if (userTemplate != null)
-                    {
-                        var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
-                        AbsenceSmsDto asd = new AbsenceSmsDto();
-                        asd.ChildId = childId;
-                        asd.ChildFirstName = child.FirstName;
-                        asd.ChildLastName = child.LastName;
-                        asd.ParentId = parent.Id;
-                        asd.ParentFirstName = parent.FirstName;
-                        asd.ParentLastName = parent.LastName.FirstLetterToUpper();
-                        asd.ParentGender = parent.Gender;
-                        asd.CourseName = schedule.Course.Abbreviation;
-                        asd.SessionDate = session.SessionDate.ToShortDateString();
-                        asd.CourseStartHour = schedule.StartHourMin.ToShortTimeString();
-                        asd.CourseEndHour = schedule.EndHourMin.ToShortTimeString();
-                        asd.ParentCellPhone = parent.PhoneNumber;
-                        absSmsData.Add(asd);
-                    }
+                  var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
+                  AbsenceSmsDto asd = new AbsenceSmsDto();
+                  asd.ChildId = childId;
+                  asd.ChildFirstName = child.FirstName;
+                  asd.ChildLastName = child.LastName;
+                  asd.ParentId = parent.Id;
+                  asd.ParentFirstName = parent.FirstName;
+                  asd.ParentLastName = parent.LastName.FirstLetterToUpper();
+                  asd.ParentGender = parent.Gender;
+                  asd.CourseName = schedule.Course.Abbreviation;
+                  asd.SessionDate = session.SessionDate.ToString("dd/MM/yyyy", frC);
+                  asd.CourseStartHour = schedule.StartHourMin.ToString("HH:mm", frC);
+                  asd.CourseEndHour = schedule.EndHourMin.ToString("HH:mm", frC);
+                  asd.ParentCellPhone = parent.PhoneNumber;
+                  absSmsData.Add(asd);
                 }
+              }
             }
 
             List<Sms> absSms = _repo.SetSmsDataForAbsences(absSmsData, AbsenceSms.Content);
             _context.AddRange(absSms);
 
-            List<string> results = _repo.SendBatchSMS(absSms);
-            for (int i = 0; i < results.Count(); i++)
-            {
-                // result messages from clickatell Api
-                string result = results[i];
-                int pos = result.IndexOf(":") + 1;
-                result = result.Substring(pos);
-                string[] data = result.Split(",");
-                string apiMsgId = (data[0].Split(":"))[1].Replace("\"", "");
-                Boolean accepted = Convert.ToBoolean((data[1].Split(":"))[1].Replace("\"", ""));
-                string to = (data[2].Split(":"))[1].Replace("\"", "");
-                string errorCodeData = (data[3].Split(":"))[1].Replace("\"", "");
-                int errorCode = errorCodeData == "null" ? 0 : Convert.ToInt32(errorCodeData);
-                string error = (data[4].Split(":"))[1].Replace("\"", "");
-                string errorDesc = (data[5].Split(":"))[1].Replace("\"", "");
+            // List<string> results = _repo.SendBatchSMS(absSms);
+            // for (int i = 0; i < results.Count(); i++)
+            // {
+            //     // result messages from clickatell Api
+            //     string result = results[i];
+            //     int pos = result.IndexOf(":") + 1;
+            //     result = result.Substring(pos);
+            //     string[] data = result.Split(",");
+            //     string apiMsgId = (data[0].Split(":"))[1].Replace("\"", "");
+            //     Boolean accepted = Convert.ToBoolean((data[1].Split(":"))[1].Replace("\"", ""));
+            //     string to = (data[2].Split(":"))[1].Replace("\"", "");
+            //     string errorCodeData = (data[3].Split(":"))[1].Replace("\"", "");
+            //     int errorCode = errorCodeData == "null" ? 0 : Convert.ToInt32(errorCodeData);
+            //     string error = (data[4].Split(":"))[1].Replace("\"", "");
+            //     string errorDesc = (data[5].Split(":"))[1].Replace("\"", "");
 
-                Sms sms = absSms[i];
-                sms.res_ApiMsgId = apiMsgId;
-                sms.res_Accepted = accepted;
-                if (errorCode > 0)
-                {
-                    sms.res_ErrorCode = errorCode;
-                    sms.res_Error = error;
-                    sms.res_ErrorDesc = errorDesc;
-                }
-                _repo.Add(sms);
-            }
+            //     Sms sms = absSms[i];
+            //     sms.res_ApiMsgId = apiMsgId;
+            //     sms.res_Accepted = accepted;
+            //     if (errorCode > 0)
+            //     {
+            //         sms.res_ErrorCode = errorCode;
+            //         sms.res_Error = error;
+            //         sms.res_ErrorDesc = errorDesc;
+            //     }
+            //     _repo.Add(sms);
+            // }
 
             if (await _repo.SaveAll())
                 return Ok();
