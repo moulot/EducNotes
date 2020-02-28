@@ -1046,100 +1046,119 @@ namespace EducNotes.API.Controllers
         [HttpPut("SaveCallSheet/{sessionId}")]
         public async Task<IActionResult> SaveCallSheet(int sessionId, [FromBody] Absence[] absences)
         {
-            //delete old absents (update: delete + add)
-            if (sessionId > 0)
+          //delete old absents (update: delete + add)
+          if (sessionId > 0)
+          {
+              List<Absence> oldAbsences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
+              if (oldAbsences.Count() > 0)
+                  _repo.DeleteAll(oldAbsences);
+          }
+
+          // absence Sms data
+          int absenceSmsId = _config.GetValue<int>("AppSettings:AbsenceSms");
+          int lateSmsId = _config.GetValue<int>("AppSettings:LateSms");
+          var AbsenceSms = await _context.SmsTemplates.FirstOrDefaultAsync(s => s.Id == absenceSmsId);
+          var LateSms = await _context.SmsTemplates.FirstOrDefaultAsync(s => s.Id == lateSmsId);
+
+          var ids = absences.Select(u => u.UserId);
+          var parents = _context.UserLinks.Where(u => ids.Contains(u.UserId)).Distinct().ToList();
+          List<AbsenceSmsDto> absSmsData = new List<AbsenceSmsDto>();
+
+          int absTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
+          int lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
+
+          //set absence sms data
+          var sessionFromDB = await _context.Sessions.FirstAsync(s => s.Id == sessionId);
+          var session = _mapper.Map<SessionForCallSheetDto>(sessionFromDB);
+          var scheduleFromDB = await _context.Schedules
+                                  .Include(c => c.Class)
+                                  .Include(c => c.Course)
+                                  .FirstAsync(s => s.Id == session.ScheduleId);
+          var schedule = _mapper.Map<ScheduleToReturnDto>(scheduleFromDB);
+
+          var dateData = session.strSessionDate.Split("/");
+          string day = dateData[0];
+          string month = dateData[1];
+          string year = dateData[2];
+          string hourMin = schedule.strEndHourMin;
+          string deliveryTime = year + "-" + month + "-" + day + "T" + hourMin + ":00";
+
+          //add new absents
+          for (int i = 0; i < absences.Length; i++)
+          {
+            Absence absence = absences[i];
+            _repo.Add(absence);
+
+            int childId = absence.UserId;
+            var child = await _context.Users.FirstAsync(u => u.Id == childId);
+            List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
+            foreach (var parentId in parentIds)
             {
-                List<Absence> oldAbsences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
-                if (oldAbsences.Count() > 0)
-                    _repo.DeleteAll(oldAbsences);
-            }
+              Sms oldSms = await _context.Sms
+                            .FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == parentId &&
+                              s.StudentId == childId && s.StatusFlag == 0);
+              if(oldSms != null)
+                _repo.Delete(oldSms);
 
-            // absence Sms data
-            int smsId = _config.GetValue<int>("AppSettings:AbsenceSms");
-            var AbsenceSms = _context.SmsTemplates.FirstOrDefault(s => s.Id == smsId);
-
-            var ids = absences.Select(u => u.UserId);
-            var parents = _context.UserLinks.Where(u => ids.Contains(u.UserId)).Distinct().ToList();
-            List<AbsenceSmsDto> absSmsData = new List<AbsenceSmsDto>();
-
-            //add new absents
-            for (int i = 0; i < absences.Length; i++)
-            {
-              Absence absence = absences[i];
-              _repo.Add(absence);
-
-              //set absence sms data
-              var session = await _context.Sessions.FirstAsync(s => s.Id == absence.SessionId);
-              var schedule = await _context.Schedules
-                                      .Include(c => c.Class)
-                                      .Include(c => c.Course)
-                                      .FirstAsync(s => s.Id == session.ScheduleId);
-
-              int childId = absence.UserId;
-              var child = await _context.Users.FirstAsync(u => u.Id == childId);
-              List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
-              foreach (var parentId in parentIds)
+              // is the parent subscribed to the Absence/Late sms?
+              var userTemplate = new UserSmsTemplate();
+              if(absence.AbsenceTypeId == absTypeId)
               {
-                // is the parent subscribed to the Absence sms?
-                var userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
-                                    u => u.ParentId == parentId && u.SmsTemplateId == AbsenceSms.Id &&
-                                    u.ChildId == childId);
-                if (userTemplate != null)
-                {
-                  var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
-                  AbsenceSmsDto asd = new AbsenceSmsDto();
-                  asd.ChildId = childId;
-                  asd.ChildFirstName = child.FirstName;
-                  asd.ChildLastName = child.LastName;
-                  asd.ParentId = parent.Id;
-                  asd.ParentFirstName = parent.FirstName;
-                  asd.ParentLastName = parent.LastName.FirstLetterToUpper();
-                  asd.ParentGender = parent.Gender;
-                  asd.CourseName = schedule.Course.Abbreviation;
-                  asd.SessionDate = session.SessionDate.ToString("dd/MM/yyyy", frC);
-                  asd.CourseStartHour = schedule.StartHourMin.ToString("HH:mm", frC);
-                  asd.CourseEndHour = schedule.EndHourMin.ToString("HH:mm", frC);
-                  asd.ParentCellPhone = parent.PhoneNumber;
-                  absSmsData.Add(asd);
-                }
+                userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
+                                  u => u.ParentId == parentId && u.SmsTemplateId == absenceSmsId &&
+                                  u.ChildId == childId);
+              }
+              else
+              {
+                userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
+                                        u => u.ParentId == parentId && u.SmsTemplateId == lateSmsId &&
+                                        u.ChildId == childId);
+              }
+
+              //set sms data
+              if (userTemplate != null)
+              {
+                var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
+                AbsenceSmsDto asd = new AbsenceSmsDto();
+                asd.ChildId = childId;
+                asd.AbsenceTypeId = absence.AbsenceTypeId;
+                asd.ChildFirstName = child.FirstName;
+                asd.ChildLastName = child.LastName;
+                asd.ParentId = parent.Id;
+                asd.ParentFirstName = parent.FirstName;
+                asd.ParentLastName = parent.LastName.FirstLetterToUpper();
+                asd.ParentGender = parent.Gender;
+                asd.CourseName = schedule.CourseAbbrev;
+                asd.SessionDate = session.SessionDate.ToString("dd/MM/yyyy", frC);
+                asd.CourseStartHour = schedule.StartHourMin.ToString("HH:mm", frC);
+                asd.CourseEndHour = schedule.EndHourMin.ToString("HH:mm", frC);
+                asd.ParentCellPhone = parent.PhoneNumber;
+                asd.LateInMin = (absence.EndDate - absence.StartDate).TotalMinutes.ToString();
+                //asd.scheduledDeliveryTime = deliveryTime;
+                absSmsData.Add(asd);
               }
             }
+          }
 
-            List<Sms> absSms = _repo.SetSmsDataForAbsences(absSmsData, AbsenceSms.Content);
-            _context.AddRange(absSms);
+          int currentTeacherId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+          
+          List<Sms> absSms = await _repo.SetSmsDataForAbsences(absSmsData, sessionId, currentTeacherId);
+          _context.AddRange(absSms);
 
-            // List<string> results = _repo.SendBatchSMS(absSms);
-            // for (int i = 0; i < results.Count(); i++)
-            // {
-            //     // result messages from clickatell Api
-            //     string result = results[i];
-            //     int pos = result.IndexOf(":") + 1;
-            //     result = result.Substring(pos);
-            //     string[] data = result.Split(",");
-            //     string apiMsgId = (data[0].Split(":"))[1].Replace("\"", "");
-            //     Boolean accepted = Convert.ToBoolean((data[1].Split(":"))[1].Replace("\"", ""));
-            //     string to = (data[2].Split(":"))[1].Replace("\"", "");
-            //     string errorCodeData = (data[3].Split(":"))[1].Replace("\"", "");
-            //     int errorCode = errorCodeData == "null" ? 0 : Convert.ToInt32(errorCodeData);
-            //     string error = (data[4].Split(":"))[1].Replace("\"", "");
-            //     string errorDesc = (data[5].Split(":"))[1].Replace("\"", "");
+          //did we already add the sms to DB? if yes remove it (updated one is coming...)
+          for (int i = 0; i < absSms.Count(); i++)
+          {
+            Sms smsData = absSms[i];
+            Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == smsData.ToUserId &&
+                                s.StudentId == smsData.StudentId && s.StatusFlag == 0);
+            if(oldSms != null)
+              _repo.Delete(oldSms);
+          }
 
-            //     Sms sms = absSms[i];
-            //     sms.res_ApiMsgId = apiMsgId;
-            //     sms.res_Accepted = accepted;
-            //     if (errorCode > 0)
-            //     {
-            //         sms.res_ErrorCode = errorCode;
-            //         sms.res_Error = error;
-            //         sms.res_ErrorDesc = errorDesc;
-            //     }
-            //     _repo.Add(sms);
-            // }
+          if (await _repo.SaveAll())
+            return Ok();
 
-            if (await _repo.SaveAll())
-                return Ok();
-
-            throw new Exception($"la validation de l'apppel a échoué");
+          throw new Exception($"la validation de l'apppel a échoué");
         }
 
         [HttpGet("absences/{sessionId}")]

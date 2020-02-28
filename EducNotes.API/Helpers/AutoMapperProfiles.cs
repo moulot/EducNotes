@@ -139,6 +139,9 @@ namespace EducNotes.API.Helpers {
                 .ForMember(s => s.ClassLevel, opt => opt
                     .MapFrom(d => d.Class.ClassLevel.Name));
             CreateMap<Schedule, ScheduleToReturnDto>()
+                .ForMember(dest => dest.CourseAbbrev, opt => {
+                    opt.MapFrom(d => d.Course.Abbreviation);
+                })
                 .ForMember(dest => dest.strStartHourMin, opt => {
                     opt.MapFrom(d => d.StartHourMin.ToString("HH:mm", frC));
                 })

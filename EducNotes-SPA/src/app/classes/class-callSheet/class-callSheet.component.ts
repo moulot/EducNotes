@@ -35,12 +35,17 @@ export class ClassCallSheetComponent implements OnInit {
   touched = -1;
   nbAbsents = 0;
   nbLate = 0;
+  // visible = true;
+  // date = new Date();
+  // today = this.date.getDate() + '/' + (this.date.getMonth() + 1) + '/' + this.date.getFullYear();
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
     private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
-
+    // setTimeout(() => {
+    //   this.visible = false;
+    //   }, 3000);
     this.route.data.subscribe((data: any) => {
       this.sessionData = data['session'];
       this.schedule = this.sessionData.sessionSchedule;

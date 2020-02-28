@@ -56,6 +56,13 @@ namespace EducNotes.API.Data
                 context.Add(city);
                 context.SaveChanges();
 
+                var smsTypes = new List<SmsType> {
+                    new SmsType { Name = "Absence" },
+                    new SmsType { Name = "Alerte" },
+                    new SmsType { Name = "Comm" }
+                };
+                context.AddRange(smsTypes);
+
                 var districts = new List<District> {
                     new District { Name = "Cocody", CityId = 1 },
                     new District { Name = "Angré", CityId = 1 },
@@ -66,8 +73,7 @@ namespace EducNotes.API.Data
 
                 var AbsenceTypes = new List<AbsenceType> {
                     new AbsenceType { Name = "Absence" },
-                    new AbsenceType { Name = "Retard" },
-                    new AbsenceType { Name = "Appel" }
+                    new AbsenceType { Name = "Retard" }
                 };
                 context.AddRange(AbsenceTypes);
 

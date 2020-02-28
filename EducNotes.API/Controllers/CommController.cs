@@ -5,10 +5,12 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 using AutoMapper;
 using EducNotes.API.Data;
 using EducNotes.API.Dtos;
 using EducNotes.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -77,40 +79,45 @@ namespace EducNotes.API.Controllers
             httpWebRequest.PreAuthenticate = true;
             httpWebRequest.Headers.Add("Authorization", Token);
 
-            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            using(var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
-                streamWriter.Write(JsonArray);
-                streamWriter.Flush();
-                streamWriter.Close();
+              streamWriter.Write(JsonArray);
+              streamWriter.Flush();
+              streamWriter.Close();
             }
 
             var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
             using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
             {
-                var result = streamReader.ReadToEnd();
-                return Ok(result);
+              var result = streamReader.ReadToEnd();
+              return Ok(result);
             }
         }
 
         //This function converts the recipients list into an array string so it can be parsed correctly by the json array.
         public static string CreateRecipientList(string to)
         {
-            string[] tmp = to.Split(',');
-            to = "[\"";
-            to = to + string.Join("\",\"", tmp);
-            to = to + "\"]";
-            return to;
+          string[] tmp = to.Split(',');
+          to = "[\"";
+          to = to + string.Join("\",\"", tmp);
+          to = to + "\"]";
+          return to;
         }
 
-        [HttpPost("CallBack")]
-        public async Task<IActionResult> GetCallBackData([FromBody] SmsCallBackDto callBackData)
+        [AllowAnonymous]
+        [HttpGet("CallBack")]
+        public async Task<IActionResult> GetCallBackData()
         {
-          var data = callBackData;
-          string apiMsgId = data.messageId;
+          //string url = Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString;
+          //int idx = url.IndexOf('?');
+          //string query = idx >= 0 ? url.Substring(idx) : "";
+          string query = Request.QueryString.ToString();
+          String messageId = HttpUtility.ParseQueryString(query).Get("messageId");
+          string apiMsgId = messageId;
           var sms = await _context.Sms.FirstOrDefaultAsync(s => s.res_ApiMsgId == apiMsgId);
           if(sms != null)
           {
-            sms.NbTries = 1;
+            sms.NbTries = ++sms.NbTries;
             _context.Update(sms);
             if(await _repo.SaveAll())
               return NoContent();
@@ -122,55 +129,54 @@ namespace EducNotes.API.Controllers
         [HttpGet("SmsCategories")]
         public async Task<IActionResult> GetSmsCtegories()
         {
-            var smsCats =  await _context.SmsCategories.OrderBy(c => c.Name).ToListAsync();
-            return Ok(smsCats);
+          var smsCats =  await _context.SmsCategories.OrderBy(c => c.Name).ToListAsync();
+          return Ok(smsCats);
     
         }
 
         [HttpGet("SmsTemplates")]
         public async Task<IActionResult> GetSmsTemplates()
         {
-            var templates = await _context.SmsTemplates
-                                    .Include(i => i.SmsCategory)
-                                    .OrderBy(s => s.Name).ToListAsync();
-            var templatesToReturn = _mapper.Map<IEnumerable<SmsTemplateForListDto>>(templates);
-            return Ok(templatesToReturn);
+          var templates = await _context.SmsTemplates
+                                  .Include(i => i.SmsCategory)
+                                  .OrderBy(s => s.Name).ToListAsync();
+          var templatesToReturn = _mapper.Map<IEnumerable<SmsTemplateForListDto>>(templates);
+          return Ok(templatesToReturn);
         }
 
         [HttpGet("SmsTemplates/{id}")]
         public async Task<IActionResult> GetSmsTemplate(int id)
         {
-            var template = await _context.SmsTemplates.FirstOrDefaultAsync(t => t.Id == id);
-            return Ok(template);
+          var template = await _context.SmsTemplates.FirstOrDefaultAsync(t => t.Id == id);
+          return Ok(template);
         }
 
         [HttpPut("SaveSmsTemplate")]
         public async Task<IActionResult> AddSmsTemplate ([FromBody] SmsTemplateForSaveDto smsTemplateDto)
         {
-            var id = smsTemplateDto.Id;
-            if(id == 0) {
-                SmsTemplate newTemplate = new SmsTemplate();
-                _mapper.Map(smsTemplateDto, newTemplate);
-                _repo.Add(newTemplate);
-            } else {
-                var templateFromRepo = await _repo.GetSmsTemplate(id);
-                _mapper.Map(smsTemplateDto, templateFromRepo);
-                _repo.Update(templateFromRepo);
-            }
+          var id = smsTemplateDto.Id;
+          if(id == 0) {
+              SmsTemplate newTemplate = new SmsTemplate();
+              _mapper.Map(smsTemplateDto, newTemplate);
+              _repo.Add(newTemplate);
+          } else {
+              var templateFromRepo = await _repo.GetSmsTemplate(id);
+              _mapper.Map(smsTemplateDto, templateFromRepo);
+              _repo.Update(templateFromRepo);
+          }
 
-            if (await _repo.SaveAll()) { return Ok(); }
+          if (await _repo.SaveAll()) { return Ok(); }
 
-            // throw new Exception($"Updating/Saving agendaItem failed");
+          // throw new Exception($"Updating/Saving agendaItem failed");
 
-            return BadRequest("ajout du modèle sms a échoué");
-
+          return BadRequest("ajout du modèle sms a échoué");
         }
 
         [HttpGet("Tokens")]
         public async Task<IActionResult> GetTokens()
         {
-            var tokens = await _context.Tokens.OrderBy(t => t.Name).ToListAsync();
-            return Ok(tokens);
+          var tokens = await _context.Tokens.OrderBy(t => t.Name).ToListAsync();
+          return Ok(tokens);
         }
     }
 }

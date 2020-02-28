@@ -1289,21 +1289,48 @@ namespace EducNotes.API.Data
             }
         }
 
-        public List<Sms> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, string SmsContent)
+        public async Task<List<Sms>> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, int sessionId, int teacherId)
         {
             List<Sms> AbsencesSms = new List<Sms>();
             List<Token> tokens = GetTokens();
+            int absenceSmsId = _config.GetValue<int>("AppSettings:AbsenceSms");
+            int lateSmsId = _config.GetValue<int>("AppSettings:LateSms");
+            var AbsenceSms = _context.SmsTemplates.First(s => s.Id == absenceSmsId);
+            var LateSms = _context.SmsTemplates.First(s => s.Id == lateSmsId);
+            int absTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
+            int lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
+            int smsAbsTypeId = _config.GetValue<int>("AppSettings:SmsAbsTypeId");
 
             foreach (var abs in absences)
             {
-                Sms newSms = new Sms();
-                newSms.To = abs.ParentCellPhone;
-                newSms.ToUserId = abs.ParentId;
-                newSms.validityPeriod = 1;
-                // replace tokens with dynamic data
-                List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
-                newSms.Content = ReplaceTokens(tags, SmsContent);
-                AbsencesSms.Add(newSms);
+              //did you already sent the sms?
+              Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == abs.ParentId &&
+                                  s.StudentId == abs.ChildId && s.StatusFlag == 1);
+              if(oldSms != null)
+                continue;
+
+              Sms newSms = new Sms();
+              //newSms.AbsenceTypeId = abs.AbsenceTypeId;
+              newSms.SmsTypeId = smsAbsTypeId;
+              newSms.To = abs.ParentCellPhone;
+              newSms.StudentId = abs.ChildId;
+              newSms.ToUserId = abs.ParentId;
+              newSms.SessionId = sessionId;
+              newSms.validityPeriod = 1;
+              string smsContent;
+              if(abs.AbsenceTypeId == absTypeId)
+              {
+                smsContent = AbsenceSms.Content;
+              }
+              else
+              {
+                smsContent = LateSms.Content;
+              }
+              // replace tokens with dynamic data
+              List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
+              newSms.Content = ReplaceTokens(tags, smsContent);
+              newSms.InsertUserId = teacherId;
+              AbsencesSms.Add(newSms);
             }
 
             return AbsencesSms;
@@ -1358,6 +1385,9 @@ namespace EducNotes.API.Data
                         break;
                     case "<HORAIRE_COURS>":
                         td.Value = absSms.CourseStartHour + " - " + absSms.CourseEndHour;
+                        break;
+                    case "<RETARD_MIN>":
+                        td.Value = absSms.LateInMin;
                         break;
                     default:
                         break;

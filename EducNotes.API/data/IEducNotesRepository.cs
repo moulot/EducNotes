@@ -63,7 +63,7 @@ namespace EducNotes.API.Data
         Task<List<EvaluationForListDto>> GetEvalsToCome(int classId);
         Task<SmsTemplate> GetSmsTemplate(int smsTemplateId);
         void Clickatell_SendSMS(clickatellParamsDto smsData);
-        List<Sms> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, string SmsContent);
+        Task<List<Sms>> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, int sessionId, int teacherId);
         List<string> SendBatchSMS(List<Sms> smsData);
         double GetClassEvalAvg(List<UserEvaluation> classGrades, double maxGrade);
 

@@ -12,9 +12,15 @@ namespace EducNotes.API.Models
     }
 
     public int Id { get; set; }
+    public int SmsTypeId { get; set; }
+    public SmsType SmsType { get; set; }
     public string To { get; set; }
+    public int? StudentId { get; set; }
+    public User Student { get; set; }
     public int ToUserId { get; set; }
     public User ToUser { get; set; }
+    // public int? AbsenceTypeId { get; set; }
+    // public AbsenceType AbsenceType { get; set; }
     public int? SessionId { get; set; }
     public Session Session { get; set; }
     public int? EvaluationId { get; set; }
@@ -23,7 +29,7 @@ namespace EducNotes.API.Models
     public string Content { get; set; }
     public Boolean Binary { get; set; }
     public string ClientMsgId { get; set; }
-    public DateTime scheduledDeliveryTime { get; set; }
+    public string scheduledDeliveryTime { get; set; }
     public string UserDataHeader { get; set; }
     public int validityPeriod { get; set; }
     public string Charset { get; set; }
@@ -40,5 +46,7 @@ namespace EducNotes.API.Models
     public string cb_Status { get; set; }
     public string cb_StatusDesc { get; set; }
     public string cb_TimeStamp { get; set; }
+    public int InsertUserId { get; set; }
+    public User InsertUser { get; set; }
   }
 }

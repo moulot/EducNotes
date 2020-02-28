@@ -79,6 +79,7 @@ namespace EducNotes.API.Data {
   public DbSet<LessonSession> LessonSessions { get; set; }
   public DbSet<Document> Documents { get; set; }
   public DbSet<ClassCourseProgress> ClassCourseProgresses { get; set; }
+  public DbSet<SmsType> SmsTypes { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {
