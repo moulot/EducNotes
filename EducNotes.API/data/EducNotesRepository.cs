@@ -912,66 +912,65 @@ namespace EducNotes.API.Data
 
         public async Task<List<UserEvalsDto>> GetUserGrades(int userId, int classId)
         {
-            //get user courses
-            var userCourses = await (from course in _context.ClassCourses
-                                     join user in _context.Users on course.ClassId equals user.ClassId
-                                     where user.ClassId == classId
-                                     orderby course.Course.Name
-                                     select course.Course).Distinct().ToListAsync();
+          //get user courses
+          var userCourses = await (from course in _context.ClassCourses
+                                    join user in _context.Users on course.ClassId equals user.ClassId
+                                    where user.ClassId == classId
+                                    orderby course.Course.Name
+                                    select course.Course).Distinct().ToListAsync();
 
-            var aclass = await _context.Classes.FirstOrDefaultAsync(c => c.Id == classId);
+          var aclass = await _context.Classes.FirstOrDefaultAsync(c => c.Id == classId);
 
-            List<UserEvalsDto> coursesWithEvals = new List<UserEvalsDto>();
+          List<UserEvalsDto> coursesWithEvals = new List<UserEvalsDto>();
 
-            var periods = await _context.Periods.OrderBy(p => p.StartDate).ToListAsync();
+          var periods = await _context.Periods.OrderBy(p => p.StartDate).ToListAsync();
 
-            //loop on user courses - get data for each course 
-            for (int i = 0; i < userCourses.Count(); i++)
+          //loop on user courses - get data for each course 
+          for (int i = 0; i < userCourses.Count(); i++)
+          {
+            var acourse = userCourses[i];
+
+            //get all evaluations of the selected course and current userId
+            var userEvals = await _context.UserEvaluations
+                                .Include(e => e.Evaluation).ThenInclude(e => e.EvalType)
+                                .OrderBy(o => o.Evaluation.EvalDate)
+                                .Where(e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
+                                  e.Evaluation.CourseId == acourse.Id && e.Evaluation.Graded == true)
+                                .Distinct().ToListAsync();
+
+            // get general Evals data for the current user course
+            UserEvalsDto userEvalsDto = GetUserCourseEvals(userEvals, acourse, aclass);
+
+            // get evals by period for the current user course
+            userEvalsDto.PeriodEvals = new List<PeriodEvalsDto>();
+            foreach (var period in periods)
             {
+              PeriodEvalsDto ped = new PeriodEvalsDto();
+              ped.PeriodId = period.Id;
+              ped.PeriodName = period.Name;
+              ped.PeriodAbbrev = period.Abbrev;
+              ped.Active = period.Active;
 
-                var acourse = userCourses[i];
+              var userPeriodEvals = userEvals.Where(e => e.Evaluation.PeriodId == period.Id).ToList();
+              if (userPeriodEvals.Count() > 0)
+              {
+                UserEvalsDto periodEvals = GetUserCourseEvals(userPeriodEvals, acourse, aclass);
+                ped.UserCourseAvg = periodEvals.UserCourseAvg;
+                ped.ClassCourseAvg = periodEvals.ClassCourseAvg;
+                ped.grades = periodEvals.grades;
+              }
+              else
+              {
+                ped.UserCourseAvg = -1000;
+              }
 
-                //get all evaluations of the selected course and current userId
-                var userEvals = await _context.UserEvaluations
-                                    .Include(e => e.Evaluation).ThenInclude(e => e.EvalType)
-                                    .OrderBy(o => o.Evaluation.EvalDate)
-                                    .Where(e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
-                                       e.Evaluation.CourseId == acourse.Id && e.Evaluation.Graded == true)
-                                    .Distinct().ToListAsync();
-
-                // get general Evals data for the current user course
-                UserEvalsDto userEvalsDto = GetUserCourseEvals(userEvals, acourse, aclass);
-
-                // get evals by period for the current user course
-                userEvalsDto.PeriodEvals = new List<PeriodEvalsDto>();
-                foreach (var period in periods)
-                {
-                    PeriodEvalsDto ped = new PeriodEvalsDto();
-                    ped.PeriodId = period.Id;
-                    ped.PeriodName = period.Name;
-                    ped.PeriodAbbrev = period.Abbrev;
-                    ped.Active = period.Active;
-
-                    var userPeriodEvals = userEvals.Where(e => e.Evaluation.PeriodId == period.Id).ToList();
-                    if (userPeriodEvals.Count() > 0)
-                    {
-                        UserEvalsDto periodEvals = GetUserCourseEvals(userPeriodEvals, acourse, aclass);
-                        ped.UserCourseAvg = periodEvals.UserCourseAvg;
-                        ped.ClassCourseAvg = periodEvals.ClassCourseAvg;
-                        ped.grades = periodEvals.grades;
-                    }
-                    else
-                    {
-                        ped.UserCourseAvg = -1000;
-                    }
-
-                    userEvalsDto.PeriodEvals.Add(ped);
-                }
-
-                coursesWithEvals.Add(userEvalsDto);
+              userEvalsDto.PeriodEvals.Add(ped);
             }
 
-            return coursesWithEvals;
+              coursesWithEvals.Add(userEvalsDto);
+          }
+
+          return coursesWithEvals;
         }
 
         public EvalSmsDto GetUSerSmsEvalData(int ChildId, List<UserEvaluation> ClassEvals)
@@ -1291,64 +1290,49 @@ namespace EducNotes.API.Data
 
         public async Task<List<Sms>> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, int sessionId, int teacherId)
         {
-            List<Sms> AbsencesSms = new List<Sms>();
-            List<Token> tokens = GetTokens();
-            int absenceSmsId = _config.GetValue<int>("AppSettings:AbsenceSms");
-            int lateSmsId = _config.GetValue<int>("AppSettings:LateSms");
-            var AbsenceSms = _context.SmsTemplates.First(s => s.Id == absenceSmsId);
-            var LateSms = _context.SmsTemplates.First(s => s.Id == lateSmsId);
-            int absTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
-            int lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
-            int smsAbsTypeId = _config.GetValue<int>("AppSettings:SmsAbsTypeId");
+          List<Sms> AbsencesSms = new List<Sms>();
+          List<Token> tokens = GetTokens();
+          int absenceSmsId = _config.GetValue<int>("AppSettings:AbsenceSms");
+          int lateSmsId = _config.GetValue<int>("AppSettings:LateSms");
+          var AbsenceSms = await _context.SmsTemplates.FirstAsync(s => s.Id == absenceSmsId);
+          var LateSms = await _context.SmsTemplates.FirstAsync(s => s.Id == lateSmsId);
+          int absTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
+          int lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
+          int smsAbsTypeId = _config.GetValue<int>("AppSettings:SmsAbsTypeId");
 
-            foreach (var abs in absences)
+          foreach (var abs in absences)
+          {
+            //did you already sent the sms?
+            Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == abs.ParentId &&
+                                s.StudentId == abs.ChildId && s.StatusFlag == 1);
+            if(oldSms != null)
+              continue;
+
+            Sms newSms = new Sms();
+            //newSms.AbsenceTypeId = abs.AbsenceTypeId;
+            newSms.SmsTypeId = smsAbsTypeId;
+            newSms.To = abs.ParentCellPhone;
+            newSms.StudentId = abs.ChildId;
+            newSms.ToUserId = abs.ParentId;
+            newSms.SessionId = sessionId;
+            newSms.validityPeriod = 1;
+            string smsContent;
+            if(abs.AbsenceTypeId == absTypeId)
             {
-              //did you already sent the sms?
-              Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == abs.ParentId &&
-                                  s.StudentId == abs.ChildId && s.StatusFlag == 1);
-              if(oldSms != null)
-                continue;
-
-              Sms newSms = new Sms();
-              //newSms.AbsenceTypeId = abs.AbsenceTypeId;
-              newSms.SmsTypeId = smsAbsTypeId;
-              newSms.To = abs.ParentCellPhone;
-              newSms.StudentId = abs.ChildId;
-              newSms.ToUserId = abs.ParentId;
-              newSms.SessionId = sessionId;
-              newSms.validityPeriod = 1;
-              string smsContent;
-              if(abs.AbsenceTypeId == absTypeId)
-              {
-                smsContent = AbsenceSms.Content;
-              }
-              else
-              {
-                smsContent = LateSms.Content;
-              }
-              // replace tokens with dynamic data
-              List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
-              newSms.Content = ReplaceTokens(tags, smsContent);
-              newSms.InsertUserId = teacherId;
-              AbsencesSms.Add(newSms);
+              smsContent = AbsenceSms.Content;
             }
-
-            return AbsencesSms;
-        }
-
-        public string ReplaceTokens(List<TokenDto> tokens, string content)
-        {
-            foreach (var token in tokens)
+            else
             {
-                content = content.Replace(token.TokenString, token.Value);
+              smsContent = LateSms.Content;
             }
-            return content;
-        }
+            // replace tokens with dynamic data
+            List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
+            newSms.Content = ReplaceTokens(tags, smsContent);
+            newSms.InsertUserId = teacherId;
+            AbsencesSms.Add(newSms);
+          }
 
-        public List<Token> GetTokens()
-        {
-            var tokens = _context.Tokens.OrderBy(t => t.Name).ToList();
-            return tokens;
+          return AbsencesSms;
         }
 
         public List<TokenDto> GetTokenAbsenceValues(List<Token> tokens, AbsenceSmsDto absSms)
@@ -1397,6 +1381,120 @@ namespace EducNotes.API.Data
             }
 
             return tokenValues;
+        }
+
+        public async Task<List<Sms>> SetSmsDataForNewGrade(List<EvalSmsDto> grades, string content, int teacherId)
+        {
+          List<Sms> GradesSms = new List<Sms>();
+          List<Token> tokens = GetTokens();
+          int SmsGradeTypeId = _config.GetValue<int>("AppSettings:SmsGradeTypeId");
+
+          foreach (var grade in grades)
+          {
+            var oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.StudentId == grade.ChildId &&
+                                s.ToUserId == grade.ParentId && s.EvaluationId == grade.EvaluationId);
+            if(oldSms == null || grade.ForUpdate)
+            {
+              Sms newSms = new Sms();
+              newSms.EvaluationId = grade.EvaluationId;
+              newSms.SmsTypeId = SmsGradeTypeId;
+              newSms.To = grade.ParentCellPhone;
+              newSms.StudentId = grade.ChildId;
+              newSms.ToUserId = grade.ParentId;
+              newSms.validityPeriod = 1;
+              // replace tokens with dynamic data
+              List<TokenDto> tags = GetTokenGradeValues(tokens, grade, grade.ForUpdate);
+              newSms.Content = ReplaceTokens(tags, content);
+              newSms.InsertUserId = teacherId;
+              GradesSms.Add(newSms);
+            }
+          }
+
+          return GradesSms;
+        }
+
+        public List<TokenDto> GetTokenGradeValues(List<Token> tokens, EvalSmsDto gradeSms, Boolean forUpdate)
+        {
+            List<TokenDto> tokenValues = new List<TokenDto>();
+
+            foreach (var token in tokens)
+            {
+                TokenDto td = new TokenDto();
+                td.TokenString = token.TokenString;
+
+                string grade;
+                if(forUpdate)
+                {
+                  grade = gradeSms.OldEvalGrade.ToString() + "/" + gradeSms.GradedOutOf + " -> " +
+                          gradeSms.EvalGrade.ToString() + "/" + gradeSms.GradedOutOf;
+                }
+                else
+                {
+                    grade = gradeSms.EvalGrade.ToString() + "/" + gradeSms.GradedOutOf;
+                }
+                
+                switch (td.TokenString)
+                {
+                    case "<P_ENFANT>":
+                        td.Value = gradeSms.ChildFirstName;
+                        break;
+                    case "<N_ENFANT>":
+                        td.Value = gradeSms.ChildLastName;
+                        break;
+                    case "<N_PARENT>":
+                        td.Value = gradeSms.ParentLastName;
+                        break;
+                    case "<P_PARENT>":
+                        td.Value = gradeSms.ParentFirstName;
+                        break;
+                    case "<M_MME>":
+                        td.Value = gradeSms.ParentGender == 0 ? "Mme" : "M.";
+                        break;
+                    case "<COURS>":
+                        td.Value = gradeSms.CourseAbbrev;
+                        break;
+                    case "<NOTE_COURS>":
+                        td.Value = grade;
+                        break;
+                    case "<NOTE_COURS_BASSE>":
+                        td.Value = gradeSms.ClassMinGrade.ToString();
+                        break;
+                    case "<NOTE_COURS_HAUTE>":
+                        td.Value = gradeSms.ClassMaxGrade.ToString();
+                        break;
+                    case "<MOY_COURS>":
+                        td.Value = gradeSms.ClassAvg.ToString();
+                        break;
+                    case "<MOY_GLE>":
+                        td.Value = gradeSms.ChildAvg.ToString();
+                        break;
+                    case "<DATE_JOUR>":
+                        td.Value = gradeSms.ForUpdate == true ? gradeSms.CapturedDate + ". modif. de note" : 
+                                                                                        "note du " + gradeSms.CapturedDate;
+                        break;
+                    default:
+                        break;
+                }
+
+                tokenValues.Add(td);
+            }
+
+            return tokenValues;
+        }
+
+        public string ReplaceTokens(List<TokenDto> tokens, string content)
+        {
+            foreach (var token in tokens)
+            {
+                content = content.Replace(token.TokenString, token.Value);
+            }
+            return content;
+        }
+
+        public List<Token> GetTokens()
+        {
+            var tokens = _context.Tokens.OrderBy(t => t.Name).ToList();
+            return tokens;
         }
 
         //This function converts the recipients list into an array string so it can be parsed correctly by the json array.

@@ -49,7 +49,7 @@ namespace EducNotes.API.Data
 
                 foreach (var role in roles)
                 {
-                    roleManager.CreateAsync(role).Wait();
+                  roleManager.CreateAsync(role).Wait();
                 }
 
                 var city = new City { Name = "Abidjan" };
@@ -59,7 +59,8 @@ namespace EducNotes.API.Data
                 var smsTypes = new List<SmsType> {
                     new SmsType { Name = "Absence" },
                     new SmsType { Name = "Alerte" },
-                    new SmsType { Name = "Comm" }
+                    new SmsType { Name = "Comm" },
+                    new SmsType { Name = "Note" }
                 };
                 context.AddRange(smsTypes);
 

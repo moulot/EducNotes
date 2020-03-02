@@ -64,12 +64,9 @@ namespace EducNotes.API.Data
         Task<SmsTemplate> GetSmsTemplate(int smsTemplateId);
         void Clickatell_SendSMS(clickatellParamsDto smsData);
         Task<List<Sms>> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, int sessionId, int teacherId);
+        Task<List<Sms>> SetSmsDataForNewGrade(List<EvalSmsDto> grades, string content, int teacherId);
         List<string> SendBatchSMS(List<Sms> smsData);
         double GetClassEvalAvg(List<UserEvaluation> classGrades, double maxGrade);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
         Task<IEnumerable<ClassType>> GetClassTypes();
         Task<int> AddSelfRegister(User user, string roleName, bool sendLink, int currentUserId);
         Task<List<string>> GetEmails();

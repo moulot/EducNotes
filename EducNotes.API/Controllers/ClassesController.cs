@@ -25,7 +25,7 @@ namespace EducNotes.API.Controllers
         private readonly IEducNotesRepository _repo;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
         private readonly IConfiguration _config;
-        CultureInfo frC = new CultureInfo ("fr-FR");
+        CultureInfo frC = new CultureInfo("fr-FR");
 
         public ClassesController(DataContext context, IMapper mapper, IEducNotesRepository repo, IConfiguration config)
         {
@@ -1094,9 +1094,9 @@ namespace EducNotes.API.Controllers
             List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
             foreach (var parentId in parentIds)
             {
-              Sms oldSms = await _context.Sms
-                            .FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == parentId &&
-                              s.StudentId == childId && s.StatusFlag == 0);
+              //did we already add the sms to DB? if yes remove it (updated one is coming...)
+              Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == parentId &&
+                                  s.StudentId == childId && s.StatusFlag == 0);
               if(oldSms != null)
                 _repo.Delete(oldSms);
 
@@ -1145,20 +1145,10 @@ namespace EducNotes.API.Controllers
           List<Sms> absSms = await _repo.SetSmsDataForAbsences(absSmsData, sessionId, currentTeacherId);
           _context.AddRange(absSms);
 
-          //did we already add the sms to DB? if yes remove it (updated one is coming...)
-          for (int i = 0; i < absSms.Count(); i++)
-          {
-            Sms smsData = absSms[i];
-            Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == smsData.ToUserId &&
-                                s.StudentId == smsData.StudentId && s.StatusFlag == 0);
-            if(oldSms != null)
-              _repo.Delete(oldSms);
-          }
-
           if (await _repo.SaveAll())
             return Ok();
 
-          throw new Exception($"la validation de l'apppel a échoué");
+          throw new Exception($"la saisie de l'apppel a échoué");
         }
 
         [HttpGet("absences/{sessionId}")]

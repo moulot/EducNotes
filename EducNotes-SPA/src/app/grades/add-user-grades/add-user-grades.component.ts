@@ -87,6 +87,7 @@ export class AddUserGradesComponent implements OnInit {
       ue.comment = elt.comment;
       this.userEvals = [...this.userEvals, ue];
     }
+    console.log(this.userEvals);
 
     this.evalService.saveUserGrades(this.userEvals, evalClosed).subscribe(() => {
       this.alertify.success('ajout des notes validé');

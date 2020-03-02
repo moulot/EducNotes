@@ -1,6 +1,15 @@
 <div #classLifeReport class="m-2" *ngIf="!toggleFormAdd">
 
-    <p class="lead">vie scolaire - classe {{selectedClass?.name}}</p>
+  <div class="row mb-2">
+    <div class="col-md-6 d-flex align-items-center">
+      <div class="text-17 font-weight-300">vie scolaire - classe {{selectedClass?.name}}</div>
+    </div>
+    <div class="col-md-6">
+      <button type="button" class="float-right" mdbBtn (click)="toggleForm()" size="sm" color="primary" mdbWavesEffect>
+        saisir évènement de la vie de classe
+      </button>  
+    </div>
+  </div>
 
     <div class="row">
 
@@ -53,12 +62,8 @@
       </div>
 
     </div>
-
-    <button type="button" mdbBtn (click)="toggleForm()" size="sm" color="primary" mdbWavesEffect>
-      saisir évènement de la vie de classe
-    </button>
   
-      <nz-table #absenceTable nzSize="small" [nzPageSize]="5" [nzShowSizeChanger]="false" [nzShowPagination]="true"
+    <nz-table #absenceTable nzSize="small" [nzPageSize]="5" [nzShowSizeChanger]="false" [nzShowPagination]="true"
       [nzFrontPagination]="true" [nzTitle]="title ? 'Absences' : null" nzBordered [nzData]="absencesList">
       <thead>
         <tr>

@@ -139,13 +139,13 @@ export class ClassCallSheetComponent implements OnInit {
   removeAbsence(absenceData) {
     const studentId = absenceData.studentId;
     const lateValidated = absenceData.lateValidated;
-      const pos = this.students.findIndex(elt => elt.id === studentId);
-      this.students[pos].absent = false;
-      this.students[pos].late = false;
-      if (lateValidated) {
-        this.nbLate--;
-      }
+    const pos = this.students.findIndex(elt => elt.id === studentId);
+    this.students[pos].absent = false;
+    this.students[pos].late = false;
+    if (lateValidated) {
+      this.nbLate--;
     }
+  }
 
   validateAbsences() {
     for (let i = 0; i < this.students.length; i++) {
@@ -187,6 +187,7 @@ export class ClassCallSheetComponent implements OnInit {
       this.alertify.success('l\'appel est enregistré');
     }, error => {
       this.alertify.error(error);
+      // console.log(error);
     }, () => {
       this.router.navigate(['/classSession', this.schedule.id]);
     });
