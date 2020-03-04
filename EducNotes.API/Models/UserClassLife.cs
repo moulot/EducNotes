@@ -2,17 +2,15 @@ using System;
 
 namespace EducNotes.API.Models
 {
-  public class Absence
+  public class UserClassLife
   {
     public int Id { get; set; }
     public int UserId { get; set; }
     public User User { get; set; }
+    public int ClassLifeId { get; set; }
+    public ClassLife ClassLife { get; set; }
     public int DoneById { get; set; }
     public User DoneBy { get; set; }
-    public int AbsenceTypeId { get; set; }
-    public AbsenceType AbsenceType { get; set; }
-    public int? SessionId { get; set; }
-    public Session Session { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public Boolean Justified { get; set; }

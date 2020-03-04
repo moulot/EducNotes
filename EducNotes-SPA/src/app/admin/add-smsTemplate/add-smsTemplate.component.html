@@ -9,9 +9,9 @@
 
       <div class="row">
         <div class="col-md-3">
-          <div class="md-form">
+          <div class="md-form mt-0">
             <input mdbInput type="text" id="name" class="form-control" formControlName="name" mdbValidate>
-            <label for="lastName" class="">libellé modèle</label>
+            <label for="name" class="">libellé modèle</label>
           </div>
         </div>
       </div>
@@ -23,13 +23,14 @@
       </div>
 
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
           <div class="md-form">
-            <textarea type="text" id="content" formControlName="content" class="md-textarea form-control" mdbInput></textarea>
+            <textarea type="text" id="content" formControlName="content"
+              class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
             <label for="content">message</label>  
           </div>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-9">
           <p class="text-15 font-weight-450">entrez les tags dans le message du sms pour y inclure des données dynamiques</p>
           <div *ngFor="let token of tokens">
             <label class="text-13 mr-2">{{token.name}}:</label>

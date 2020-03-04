@@ -2,6 +2,7 @@ export interface Absence {
     userName: string;
     id: number;
     userId: number;
+    doneById: number;
     absenceTypeId: number;
     sessionId: number;
     startDate: Date;

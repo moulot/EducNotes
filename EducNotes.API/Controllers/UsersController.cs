@@ -779,17 +779,49 @@ namespace EducNotes.API.Controllers
             throw new Exception($"l'ajout de l'absence a échoué");
         }
 
+        [HttpGet("{userId}/ClassLifeData")]
+        public async Task<IActionResult> GetClassLifeData(int userId)
+        {
+          List<UserClassLifeForListDto> events = new List<UserClassLifeForListDto>();
+
+          var absencesFromDB = await _context.Absences
+                              .Include(i => i.User)
+                              .Include(i => i.DoneBy)
+                              .Include(i => i.AbsenceType)
+                              .Where(a => a.UserId == userId)
+                              .OrderByDescending(o => o.StartDate).ToListAsync();
+
+          var absences = _mapper.Map<IEnumerable<UserClassLifeForListDto>>(absencesFromDB);
+          events.AddRange(absences);
+
+          var lifeEventsFromDB = await _context.UserClassLifes
+                                .Include(i => i.User)
+                                .Include(i => i.DoneBy)
+                                .Include(i => i.ClassLife)
+                                .Where(a => a.User.Id == userId)
+                                .OrderByDescending(a => a.StartDate).ToListAsync();
+
+          var lifeEvents = _mapper.Map<IEnumerable<UserClassLifeForListDto>>(lifeEventsFromDB);
+          events.AddRange(lifeEvents);
+          events = events.OrderByDescending(e => e.StartDate).ToList();
+
+          return Ok(new {
+            classLifeEvents = events
+          });
+        }
+
         [HttpGet("{userId}/LifeData")]
         public async Task<IActionResult> GetStudentLifeData(int userId)
         {
-            var absences = await _context.Absences
+            var absencesFromDB = await _context.Absences
                                 .Include(i => i.User)
+                                .Include(i => i.DoneBy)
                                 .Include(i => i.AbsenceType)
                                 .Where(a => a.UserId == userId)
                                 .OrderByDescending(o => o.StartDate).ToListAsync();
 
             //var nbAbscences = absences.Count();
-            var absencesToReturn = _mapper.Map<IEnumerable<AbsencesToReturnDto>>(absences);
+            var absencesToReturn = _mapper.Map<IEnumerable<AbsencesToReturnDto>>(absencesFromDB);
 
             var sanctions = await _context.UserSanctions
                 .Include(i => i.Sanction)

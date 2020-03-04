@@ -12,6 +12,7 @@ import { Session } from 'src/app/_models/session';
 import { CallSheet } from 'src/app/_models/callSheet';
 import { CardsComponent } from 'src/app/views/ui-kits/cards/cards.component';
 import { fakeAsync } from '@angular/core/testing';
+import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
   selector: 'app-class-callSheet',
@@ -40,7 +41,7 @@ export class ClassCallSheetComponent implements OnInit {
   // today = this.date.getDate() + '/' + (this.date.getMonth() + 1) + '/' + this.date.getFullYear();
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
-    private route: ActivatedRoute, private router: Router) { }
+    private route: ActivatedRoute, private router: Router, private authService: AuthService) { }
 
   ngOnInit() {
     // setTimeout(() => {
@@ -178,6 +179,7 @@ export class ClassCallSheetComponent implements OnInit {
         newAbsence.reason = '';
         // const justified = 0;
         newAbsence.comment = 'absent lors de l\'appel';
+        newAbsence.doneById = this.authService.currentUser.id;
         this.absences = [...this.absences, newAbsence];
       }
     }

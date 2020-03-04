@@ -355,7 +355,7 @@ export function tokenGetter() {
       NewThemeComponent,
       ThemesListComponent,
       ClassProgramDataComponent,
-      TimelineComponent
+      TimelineComponent,
    ],
    imports: [
       FormWizardModule,

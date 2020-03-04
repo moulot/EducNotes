@@ -85,7 +85,7 @@ namespace EducNotes.API.Controllers
                 user.ValidatedCode = true;
                 user.EmailConfirmed = true;
                 if (!emailCOnfirmed)
-                    user.ValidationDate = DateTime.Now;
+                  user.ValidationDate = DateTime.Now;
                 var res = await _userManager.UpdateAsync(user);
 
                 if (res.Succeeded)

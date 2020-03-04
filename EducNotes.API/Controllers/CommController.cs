@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -64,6 +65,8 @@ namespace EducNotes.API.Controllers
             Params.Add("content", smsData.Content);
             Params.Add("to", smsData.To);
             Params.Add("validityPeriod", "1");
+            Params.Add("callback", "3");
+            Params.Add("deliv_ack", "1");
 
             Params["to"] = CreateRecipientList(Params["to"]);
             string JsonArray = JsonConvert.SerializeObject(Params, Formatting.None);
@@ -112,12 +115,31 @@ namespace EducNotes.API.Controllers
           //int idx = url.IndexOf('?');
           //string query = idx >= 0 ? url.Substring(idx) : "";
           string query = Request.QueryString.ToString();
+
+          EmailFormDto email = new EmailFormDto();
+          email.subject = "query call back";
+          email.toEmail = "georges.moulot@albatrostechnologies.com";
+          email.content = query;
+          await _repo.SendEmail(email);
+
           String messageId = HttpUtility.ParseQueryString(query).Get("messageId");
-          string apiMsgId = messageId;
-          var sms = await _context.Sms.FirstOrDefaultAsync(s => s.res_ApiMsgId == apiMsgId);
+          String integrationName = HttpUtility.ParseQueryString(query).Get("integrationName");
+          String clientMsgId = HttpUtility.ParseQueryString(query).Get("clientMessageId");
+          String status = HttpUtility.ParseQueryString(query).Get("status");
+          String statusDesc = HttpUtility.ParseQueryString(query).Get("statusDesc");
+          string timeStamp = HttpUtility.ParseQueryString(query).Get("timeStamp");
+          string statusCode = HttpUtility.ParseQueryString(query).Get("statusCode");
+          string requestId = HttpUtility.ParseQueryString(query).Get("requestId");
+
+          var sms = await _context.Sms.FirstOrDefaultAsync(s => s.res_ApiMsgId == messageId);
           if(sms != null)
           {
-            sms.NbTries = ++sms.NbTries;
+            sms.cb_IntegrationName = integrationName;
+            sms.cb_Status = status;
+            sms.cb_StatusDesc = statusDesc;
+            sms.cb_StatusCode = Convert.ToInt32(statusCode);
+            sms.cb_RequestId = requestId;
+            sms.cb_TimeStamp = timeStamp;
             _context.Update(sms);
             if(await _repo.SaveAll())
               return NoContent();

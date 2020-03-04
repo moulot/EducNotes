@@ -22,7 +22,7 @@ import { AgendaModalComponent } from '../agenda-modal/agenda-modal.component';
 export class AgendaListComponent implements OnInit {
   @ViewChild('agendaForm', {static: false}) agendaForm: NgForm;
   classId: number;
-  selectForm: FormGroup;
+  // selectForm: FormGroup;
   modalSession: any;
   allSessions: any = [];
   selectedSessions: any = [];
@@ -54,9 +54,8 @@ export class AgendaListComponent implements OnInit {
   sessionsByDate = [];
   sessionsByCourse = [];
 
-  constructor(private userService: UserService, private fb: FormBuilder,
-    private classService: ClassService, private authService: AuthService,
-    public alertify: AlertifyService, private modalService: NgbModal) { }
+  constructor(private userService: UserService, private fb: FormBuilder, private classService: ClassService,
+    private authService: AuthService, public alertify: AlertifyService, private modalService: NgbModal) { }
 
   ngOnInit() {
     // this.createSelectForm();
@@ -64,37 +63,37 @@ export class AgendaListComponent implements OnInit {
     this.getTeacherClasses(this.teacher.id);
     this.getTeacherCourses(this.teacher.id);
 
-    this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
-      this.filerData(value);
-    });
+    // this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
+    //   this.filerData(value);
+    // });
 
   }
 
-  filerData(val) {
-    if (val) {
-      val = val.toLowerCase();
-    } else {
-      return this.sessions = [...this.sessions];
-    }
-    const columns = Object.keys(this.sessions[0]);
-    if (!columns.length) {
-      return;
-    }
+  // filerData(val) {
+  //   if (val) {
+  //     val = val.toLowerCase();
+  //   } else {
+  //     return this.sessions = [...this.sessions];
+  //   }
+  //   const columns = Object.keys(this.sessions[0]);
+  //   if (!columns.length) {
+  //     return;
+  //   }
 
-    const rows = this.sessions.filter(function(d) {
-      for (let i = 0; i <= columns.length; i++) {
-        const column = columns[i];
-        if (d[column] && d[column].toString().toLowerCase().indexOf(val) > -1) {
-          return true;
-        }
-      }
-    });
-    this.filteredSessions = rows;
-  }
+  //   const rows = this.sessions.filter(function(d) {
+  //     for (let i = 0; i <= columns.length; i++) {
+  //       const column = columns[i];
+  //       if (d[column] && d[column].toString().toLowerCase().indexOf(val) > -1) {
+  //         return true;
+  //       }
+  //     }
+  //   });
+  //   this.filteredSessions = rows;
+  // }
 
   resetSessions() {
     this.filteredSessions = this.allSessions;
-    this.selectForm.reset();
+    // this.selectForm.reset();
   }
 
   editTasks(session) {

@@ -156,6 +156,48 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom(src => src.SmsCategory.Name);
                 });
             CreateMap<AbsenceForSaveDto, Absence>();
+            CreateMap<UserClassLife, UserClassLifeForListDto>()
+                .ForMember(dest => dest.strStartDate, opt => {
+                    opt.MapFrom(src => src.StartDate.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.StartTime, opt => {
+                    opt.MapFrom(src => src.StartDate.ToString("HH:mm", frC));
+                })
+                .ForMember(dest => dest.strEndDate, opt => {
+                    opt.MapFrom(src => src.EndDate.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.EndTime, opt => {
+                    opt.MapFrom(src => src.EndDate.ToString("HH:mm", frC));
+                })
+                .ForMember(dest => dest.UserName, opt => opt
+                    .MapFrom(src => src.User.LastName + ' ' + src.User.FirstName))
+                .ForMember(dest => dest.DoneByName, opt => opt
+                    .MapFrom(src => src.DoneBy.LastName + ' ' + src.DoneBy.FirstName))
+                .ForMember(dest => dest.Justified, opt => {
+                    opt.MapFrom(src => src.Justified == true ? "OUI" : "NON");
+                });
+            CreateMap<Absence, UserClassLifeForListDto>()
+                .ForMember(dest => dest.StartDate, opt => {
+                    opt.MapFrom(src => src.StartDate.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.StartTime, opt => {
+                    opt.MapFrom(src => src.StartDate.ToString("HH:mm", frC));
+                })
+                .ForMember(dest => dest.EndDate, opt => {
+                    opt.MapFrom(src => src.EndDate.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.EndTime, opt => {
+                    opt.MapFrom(src => src.EndDate.ToString("HH:mm", frC));
+                })
+                .ForMember(dest => dest.ClassLifeType, opt => opt
+                    .MapFrom(src => src.AbsenceType.Name))
+                .ForMember(dest => dest.UserName, opt => opt
+                    .MapFrom(src => src.User.LastName + ' ' + src.User.FirstName))
+                .ForMember(dest => dest.DoneByName, opt => opt
+                    .MapFrom(src => src.DoneBy.LastName + ' ' + src.DoneBy.FirstName))
+                .ForMember(dest => dest.Justified, opt => {
+                    opt.MapFrom(src => src.Justified == true ? "OUI" : "NON");
+                });
             CreateMap<Absence, AbsencesToReturnDto>()
                 .ForMember(dest => dest.StartDate, opt => {
                     opt.MapFrom(src => src.StartDate.ToString("dd/MM/yyyy", frC));

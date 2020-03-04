@@ -45,6 +45,7 @@ namespace EducNotes.API.Models
     public int cb_StatusCode { get; set; }
     public string cb_Status { get; set; }
     public string cb_StatusDesc { get; set; }
+    public string cb_RequestId { get; set; }
     public string cb_TimeStamp { get; set; }
     public int InsertUserId { get; set; }
     public User InsertUser { get; set; }
