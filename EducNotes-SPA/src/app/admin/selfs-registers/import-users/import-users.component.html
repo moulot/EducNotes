@@ -1,0 +1,132 @@
+
+<mdb-card *ngIf="wait" class="animated shake">
+  <mdb-card-body >
+   <h4>Patientez....</h4>
+  </mdb-card-body>
+</mdb-card>
+<mdb-card *ngIf="!wait">
+  <mdb-card-body>
+    <div>
+      <span>choisir d'abord le type de compte avant de pouvoir importer</span>
+      <mdb-select [options]="userTypes" (ngModelChange)="hideDiv()" [(ngModel)]="userTypeId"
+        placeholder="Choisir le type de compte"></mdb-select>
+    </div>
+    <div>
+      <table>
+        <tr>
+          <td valign="bottom">
+            <div class="file-field md-form">
+              <div mdbBtn color="primary" size="sm" class="waves-light" mdbWavesEffect>
+                <span>importer</span>
+                <input type="file" [disabled]="!userTypeId" mdbFileSelect (change)="onFileChange($event)"
+                  accept=".xlsx, .xls">
+              </div>
+            </div>
+          </td>
+          <td >
+            <button mdbBtn size="sm" color="light" class="waves-light mt-0" type="button"
+              (click)="test.toggle();cheichCollaped()" mdbWavesEffect>
+              voir des exemples de fichiers
+            </button>
+          </td>
+          <td>
+            <button mdbBtn size="sm" color="light" class="waves-light mt-0" type="button" (click)="toggleForm.emit()"
+              mdbWavesEffect>
+              retour
+            </button>
+          </td>
+        </tr>
+      </table>
+
+      <!-- <button type="button" size="sm" mdbBtn color="primary" mdbWavesEffect>importer</button> -->
+
+
+      <div class="" mdbCollapse #test="bs-collapse" [isCollapsed]="isCollapsed">
+        <mdb-carousel class="carousel slide carousel-fade" [type]="'carousel-thumbnails'" [animation]="'fade'">
+          <mdb-carousel-item>
+            <img class="d-block w-100" src="../../../../assets/modeles/parent.JPG" alt="First slide">
+          </mdb-carousel-item>
+          <mdb-carousel-item>
+            <img class="d-block w-100" src="../../../../assets/modeles/professeur.JPG"
+              alt="Second slide">
+          </mdb-carousel-item>
+        </mdb-carousel>
+      </div>
+      <div *ngIf="showExport">
+        <div *ngIf="userTypeId === parentTypeId">
+          <p>{{importedUsers.length}} parents importé(s)</p>
+          <table id="tableSortExample" mdbTableScroll scrollY="true" maxHeight="200" mdbTable class="z-depth-1">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Prenom(s)</th>
+                <th>Contact 1</th>
+                <th>Contact 2</th>
+                <th>Email</th>
+                <th>Nombre d'enfant</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let el of importedUsers; let i = index">
+                <td>{{el.lastName}}</td>
+                <td>{{el.firstName}}</td>
+                <td>{{el.phoneNumber}}</td>
+                <td>{{el.secondPhoneNumber}}</td>
+                <td>{{el.email}}</td>
+                <td>{{el.maxChild}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="">
+            <button mdbBtn size="sm" color="default" 
+            (click)="confirm(modalConfirm)">enregistrer</button>
+          </div>
+        </div>
+
+        <div *ngIf="userTypeId === teacherTypeId">
+          <p>{{importedUsers.length}} professeurs importé(s)</p>
+          <table id="tableSortExample" mdbTableScroll scrollY="true" maxHeight="200" mdbTable class="z-depth-1">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Prenom(s)</th>
+                <th>Contact 1</th>
+                <th>Contact 2</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let el of importedUsers; let i = index">
+                <td>{{el.lastName}}</td>
+                <td>{{el.firstName}}</td>
+                <td>{{el.phoneNumber}}</td>
+                <td>{{el.secondPhoneNumber}}</td>
+                <td>{{el.email}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="">
+            <button mdbBtn size="sm" color="default" 
+            (click)="confirm(modalConfirm)">enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mdb-card-body>
+</mdb-card>
+
+<ng-template #modalConfirm let-modal>
+  <div class="modal-header">
+    <button type="button" class="close" aria-label="Close button" aria-describedby="modal-title" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>confirmez-vous cet enregistrement ??</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" size="sm" mdbBtn color="light" (click)="modal.dismiss('cancel')" mdbWavesEffect>annuler</button>
+    <button type="button" size="sm" mdbBtn color="primary" (click)="modal.close('Ok')" mdbWavesEffect>enregistrer</button>
+  
+  </div>
+</ng-template>

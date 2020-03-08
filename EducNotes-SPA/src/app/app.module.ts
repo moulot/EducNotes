@@ -105,7 +105,7 @@ import { EmailConfirmResolver } from './_resolvers/email-confirm.resolver';
 import { ForgotComponent } from './views/sessions/forgot/forgot.component';
 import { UiKitsModule } from './views/ui-kits/ui-kits.module';
 // MDB Angular Pro
-import { StepperModule, ToastModule, WavesModule } from 'ng-uikit-pro-standard';
+import { StepperModule, ToastModule, WavesModule, CarouselModule } from 'ng-uikit-pro-standard';
 import { ResetPasswordComponent } from './registration/reset-password/reset-password.component';
 import { ResetPasswordResolver } from './_resolvers/reset-password.resolver';
 import { EvalAddFormComponent } from './grades/eval-addForm/eval-addForm.component';
@@ -213,6 +213,7 @@ import { TimelineComponent } from './shared/components/timeline/timeline.compone
 import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
 import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
 import { ClassSessionResolver } from './_resolvers/classSession-resolver';
+import { ImportUsersComponent } from './admin/selfs-registers/import-users/import-users.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -356,6 +357,7 @@ export function tokenGetter() {
       ThemesListComponent,
       ClassProgramDataComponent,
       TimelineComponent,
+      ImportUsersComponent
    ],
    imports: [
       FormWizardModule,
@@ -375,7 +377,8 @@ export function tokenGetter() {
       TabsModule.forRoot(),
       ButtonsModule.forRoot(),
       RouterModule.forRoot(appRoutes),
-      ModalModule.forRoot(),
+      // ModalModule.forRoot(),
+      ModalModule,
       NgxGalleryModule,
       FlipModule,
       FileUploadModule,
@@ -395,6 +398,7 @@ export function tokenGetter() {
       UiKitsModule,
       StepperModule,
       WavesModule,
+      CarouselModule,
       ToastModule.forRoot(),
       SharedPipesModule,
       PerfectScrollbarModule,
