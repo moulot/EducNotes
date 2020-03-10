@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AlertifyService } from 'src/app/_services/alertify.service';

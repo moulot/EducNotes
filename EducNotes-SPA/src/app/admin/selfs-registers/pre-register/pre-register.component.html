@@ -1,7 +1,7 @@
-<div class="row justify-content-center align-items-center mt-3"
-  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+<div class="row justify-content-center align-items-center  animated bounceInDown mt-3"
+  >
 
-  <div class="col-md-8">
+  <div class="col-md-8"  *ngIf="!showDiv">
     <mdb-card>
 
         <mdb-card-header class="info-color white-text text-center py-4">
@@ -35,6 +35,7 @@
                   <button type="submit" [disabled]="!registerForm.valid || registerForm.hasError('formNOK')"
                   size="sm" mdbBtn color="light-blue" mdbWavesEffect>valider</button>
                 <button  type="button" size="sm" mdbBtn color="light" mdbWavesEffect class="ml-2" [routerLink]="['/Home']" routerLinkActive="router-link-active"  >annuler</button>
+                <button type="button" size="sm" mdbBtn color="light" mdbWavesEffect (click)="showImportation()">importer</button>
               </div>
           
           </form>
@@ -42,5 +43,9 @@
 
     </mdb-card>
 
+  </div>
+
+  <div class="col-md-10 animated bounceInUp" *ngIf="showDiv">
+    <app-import-users [userTypes]="userTypes" (toggleForm)="showImportation($event)"></app-import-users>
   </div>
 </div>

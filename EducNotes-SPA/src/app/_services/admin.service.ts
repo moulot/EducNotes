@@ -14,7 +14,7 @@ import { DataForEmail } from '../_models/dataForEmail';
 })
 export class AdminService {
   baseUrl = environment.apiUrl;
-  sexe = [{id : 0, name : ' FEMME'}, {id : 1, name : ' HOMME'}];
+  sexe = [{ id: 0, name: ' FEMME' }, { id: 1, name: ' HOMME' }];
 
   constructor(private http: HttpClient, private alertify: AlertifyService) { }
 
@@ -71,8 +71,8 @@ export class AdminService {
     return this.http.post(this.baseUrl + 'admin/SearchUsers', data);
   }
 
-   // métode poour récuperer la liste des types User
-   getUserTypes() {
+  // métode poour récuperer la liste des types User
+  getUserTypes() {
     return this.http.get(this.baseUrl + 'admin/GetUserTypes');
   }
 
@@ -83,14 +83,14 @@ export class AdminService {
     params = params.append('lastName', searchParams.lastName);
     params = params.append('firstName', searchParams.firstName);
 
-    return this.http.get(this.baseUrl + 'admin/SearchInscription', {params});
+    return this.http.get(this.baseUrl + 'admin/SearchInscription', { params });
   }
   studentAffectation(classid, ids, userId) {
-   return this.http.post(this.baseUrl + 'admin/' + classid + '/StudentAffectation', ids);
+    return this.http.post(this.baseUrl + 'admin/' + classid + '/StudentAffectation', ids);
   }
 
   getLastAdded() {
-   return this.http.get(this.baseUrl + 'admin/LastUsersAdded');
+    return this.http.get(this.baseUrl + 'admin/LastUsersAdded');
   }
 
   getLastActivated() {
@@ -119,8 +119,8 @@ export class AdminService {
     return this.http.post(this.baseUrl + 'admin/' + 'AddUser', user);
   }
 
-   // supprimer un professeur
-   deleteTeacher(id: number) {
+  // supprimer un professeur
+  deleteTeacher(id: number) {
     return this.http.post(this.baseUrl + 'admin/' + id + '/DeleteTeacher', {});
   }
 
@@ -153,4 +153,12 @@ export class AdminService {
   sendEmail(dataForEmail: DataForEmail) {
     return this.http.post(this.baseUrl + 'admin/SendBatchEmail', dataForEmail);
   }
+
+  saveImportedUsers(importedUsers, insertUserId) {
+    return this.http.post(this.baseUrl + 'admin/ImportedUsers/' + insertUserId, importedUsers);
+  }
+
+  // saveImportedTeacher(importedParents, insertUserId) {
+  //   return this.http.post(this.baseUrl + 'admin/Importedteachers/' + insertUserId, importedParents);
+  // }
 }

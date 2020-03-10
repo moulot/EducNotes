@@ -24,6 +24,7 @@ export class PreRegisterComponent implements OnInit {
   submitText = 'enregistrer';
   parentTypeId: number;
   teacherTypeId: number;
+  showDiv = false;
 
   constructor(private adminService: AdminService, private alertify: AlertifyService,
     private authService: AuthService, private classService: ClassService, private fb: FormBuilder) { }
@@ -41,6 +42,10 @@ export class PreRegisterComponent implements OnInit {
     this.createRegisterForm();
   }
 
+
+  showImportation() {
+    this.showDiv = !this.showDiv;
+  }
 
   getUserTypes() {
 

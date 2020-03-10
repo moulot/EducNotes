@@ -94,6 +94,7 @@ namespace EducNotes.API.Helpers {
             CreateMap<Photo, PhotoForReturnDto>();
             CreateMap<PhotoForCreationDto, Photo>();
             CreateMap<UserForRegisterDto, User>();
+            CreateMap<ImportUserDto, User>();
             CreateMap<UserFromExelDto, User>();
             CreateMap<MessageForCreationDto, Message>().ReverseMap();
             CreateMap<Message, MessageToReturnDto>()

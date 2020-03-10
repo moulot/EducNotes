@@ -60,7 +60,11 @@ export class SigninComponent implements OnInit {
         this.loading = true;
         this.notConfirmed = false;
         this.authService.login(this.signinForm.value).subscribe(() => {
-            this.router.navigate(['/home']);
+            if(this.authService.redirectUrl) {
+                this.router.navigate([this.authService.redirectUrl]);
+            } else {
+                this.router.navigate(['/home']);
+            }
             this.loading = false;
         }, error => {
             this.alertify.error(error);
