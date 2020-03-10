@@ -1,6 +1,6 @@
 namespace EducNotes.API.Models
 {
-    public class ClassLife
+    public class ClassEvent
     {
         public int Id { get; set; }
         public string Name { get; set; }

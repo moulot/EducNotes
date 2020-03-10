@@ -40,10 +40,10 @@ namespace EducNotes.API.Controllers
             _context = context;
             _repo = repo;
             _mapper = mapper;
-            teacherTypeId =  _config.GetValue<int>("AppSettings:teacherTypeId");
-            parentTypeId =  _config.GetValue<int>("AppSettings:parentTypeId");
-            adminTypeId =  _config.GetValue<int>("AppSettings:adminTypeId");
-            studentTypeId =  _config.GetValue<int>("AppSettings:studentTypeId");
+            teacherTypeId = _config.GetValue<int>("AppSettings:teacherTypeId");
+            parentTypeId = _config.GetValue<int>("AppSettings:parentTypeId");
+            adminTypeId = _config.GetValue<int>("AppSettings:adminTypeId");
+            studentTypeId = _config.GetValue<int>("AppSettings:studentTypeId");
             password = _config.GetValue<String>("AppSettings:defaultPassword");
             parentRoleName = _config.GetValue<String>("AppSettings:parentRoleName");
             memberRoleName = _config.GetValue<String>("AppSettings:memberRoleName");
@@ -62,7 +62,6 @@ namespace EducNotes.API.Controllers
 
         //     userParams.userId = currentUserId;
 
-           
         //     var users = await _repo.GetUsers(userParams);
 
         //     var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
@@ -76,15 +75,14 @@ namespace EducNotes.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
-            var users = await _context.Users
-                                .Include(i => i.Class)
-                                .Include(i => i.UserType)
-                                .Where(u => u.Active == 1 && u.EmailConfirmed == true)
-                                .OrderBy(u => u.LastName).ToListAsync();
+          var users = await _context.Users
+                              .Include(i => i.Class)
+                              .Include(i => i.UserType)
+                              .Where(u => u.Active == 1 && u.EmailConfirmed == true)
+                              .OrderBy(u => u.LastName).ToListAsync();
 
-            var usersToReturn = _mapper.Map<IEnumerable<UserForAutoCompleteDto>>(users);
-
-            return Ok(usersToReturn);
+          var usersToReturn = _mapper.Map<IEnumerable<UserForAutoCompleteDto>>(users);
+          return Ok(usersToReturn);
         }
 
         [Authorize(Policy = "RequireAdminRole")]
@@ -771,18 +769,20 @@ namespace EducNotes.API.Controllers
         [HttpPut("SaveAbsence")]
         public async Task<IActionResult> SaveAbsence([FromBody]Absence absence)
         {
-            _repo.Add(absence);
+          var currPeriod = await _repo.GetPeriodFromDate(absence.StartDate);
+          absence.PeriodId = currPeriod.Id;
+          _repo.Add(absence);
 
-            if(await _repo.SaveAll())
-                return NoContent();
+          if(await _repo.SaveAll())
+              return NoContent();
 
-            throw new Exception($"l'ajout de l'absence a échoué");
+          throw new Exception($"l'ajout de l'absence a échoué");
         }
 
         [HttpGet("{userId}/ClassLifeData")]
         public async Task<IActionResult> GetClassLifeData(int userId)
         {
-          List<UserClassLifeForListDto> events = new List<UserClassLifeForListDto>();
+          List<UserClassEventForListDto> events = new List<UserClassEventForListDto>();
 
           var absencesFromDB = await _context.Absences
                               .Include(i => i.User)
@@ -791,17 +791,17 @@ namespace EducNotes.API.Controllers
                               .Where(a => a.UserId == userId)
                               .OrderByDescending(o => o.StartDate).ToListAsync();
 
-          var absences = _mapper.Map<IEnumerable<UserClassLifeForListDto>>(absencesFromDB);
+          var absences = _mapper.Map<IEnumerable<UserClassEventForListDto>>(absencesFromDB);
           events.AddRange(absences);
 
-          var lifeEventsFromDB = await _context.UserClassLifes
+          var lifeEventsFromDB = await _context.UserClassEvents
                                 .Include(i => i.User)
                                 .Include(i => i.DoneBy)
-                                .Include(i => i.ClassLife)
+                                .Include(i => i.ClassEvent)
                                 .Where(a => a.User.Id == userId)
                                 .OrderByDescending(a => a.StartDate).ToListAsync();
 
-          var lifeEvents = _mapper.Map<IEnumerable<UserClassLifeForListDto>>(lifeEventsFromDB);
+          var lifeEvents = _mapper.Map<IEnumerable<UserClassEventForListDto>>(lifeEventsFromDB);
           events.AddRange(lifeEvents);
           events = events.OrderByDescending(e => e.StartDate).ToList();
 
@@ -859,15 +859,28 @@ namespace EducNotes.API.Controllers
             });
         }
 
+        [HttpPut("SaveClassEvent")]
+        public async Task<IActionResult> SaveClassEvent([FromBody]UserClassEvent userClassLife)
+        {
+          var currPeriod = await _repo.GetPeriodFromDate(userClassLife.StartDate);
+          userClassLife.PeriodId = currPeriod.Id;
+          _repo.Add(userClassLife);
+
+          if(await _repo.SaveAll())
+            return NoContent();
+
+          throw new Exception($"l'ajout de l'évènement a échoué");
+        }
+
         [HttpPut("SaveSanction")]
         public async Task<IActionResult> SaveSanction([FromBody]UserSanction userSanction)
         {
-            _repo.Add(userSanction);
+          _repo.Add(userSanction);
 
-            if(await _repo.SaveAll())
-                return NoContent();
+          if(await _repo.SaveAll())
+            return NoContent();
 
-            throw new Exception($"l'ajout de la sanction à échoué");
+          throw new Exception($"l'ajout de la sanction à échoué");
         }
 
         [HttpPut("SaveReward")]
@@ -1063,7 +1076,6 @@ namespace EducNotes.API.Controllers
              return Ok (await _repo.GetAllCities());
            }
 
-           
            [HttpGet("{id}/GetDistrictsByCityId")]
            public async Task<IActionResult>GetAllGetDistrictsByCityIdCities(int id)
            {

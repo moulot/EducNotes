@@ -153,27 +153,26 @@ namespace EducNotes.API.Controllers
                 if (!user.ValidatedCode)
                     return BadRequest("Compte non validé pour l'instant...");
 
-                var result = await _signInManager
-                .CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
+                var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
                 if (result.Succeeded)
                 {
-                    var appUser = await _userManager.Users.Include(p => p.Photos)
-                        .FirstOrDefaultAsync(u => u.NormalizedUserName ==
-                            userForLoginDto.Username.ToUpper());
+                  var appUser = await _userManager.Users.Include(p => p.Photos)
+                      .FirstOrDefaultAsync(u => u.NormalizedUserName == userForLoginDto.Username.ToUpper());
 
-                    var userToReturn = _mapper.Map<UserForListDto>(appUser);
+                  var userToReturn = _mapper.Map<UserForListDto>(appUser);
 
-                    //get the current period
-                    Period CurrentPeriod = await _context.Periods.Where(p => p.Active == true).FirstOrDefaultAsync();
+                  //get the current period
+                  //Period CurrentPeriod = await _context.Periods.Where(p => p.Active == true).FirstOrDefaultAsync();
+                  Period CurrentPeriod = await _repo.GetPeriodFromDate(DateTime.Now);
 
 
-                    return Ok(new
-                    {
-                        token = await GenerateJwtToken(appUser),
-                        user = userToReturn,
-                        currentPeriod = CurrentPeriod
-                    });
+                  return Ok(new
+                  {
+                      token = await GenerateJwtToken(appUser),
+                      user = userToReturn,
+                      currentPeriod = CurrentPeriod
+                  });
                 }
 
                 return BadRequest("login ou mot de passe incorrecte...");

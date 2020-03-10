@@ -90,14 +90,14 @@
     </div>
     <div class="col-md-12 mb-1">
       <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2">
           <div class="md-form form-sm m-0">
             <mdb-select [options]="justifiedOptions" formControlName="justified" placeholder="justifié?"></mdb-select>
             <div *ngIf="absenceForm.get('justified').errors && absenceForm.get('justified').touched"
               class="text-small text-danger">précisez si justifié</div>
           </div>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-6">
           <div class="md-form form-sm m-0">
             <input mdbInput type="text" id="reason" class="form-control" formControlName="reason" mdbValidate>
             <label for="reason">motif</label>
@@ -105,7 +105,14 @@
               class="text-small text-danger">saisir le motif svp</div>
           </div>
         </div>
+        <div class="col-md-4">
+          <div class="md-form form-sm m-0">
+            <mdb-select [options]="teacherOptions" formControlName="doneBy" placeholder="choisir le professeur"></mdb-select>
+            <div *ngIf="absenceForm.get('doneBy').errors && absenceForm.get('doneBy').touched"
+              class="text-small text-danger">choisir le professeur svp</div>
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="col-md-12 mb-1">

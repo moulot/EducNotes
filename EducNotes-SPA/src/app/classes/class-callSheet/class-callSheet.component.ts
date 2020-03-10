@@ -50,7 +50,9 @@ export class ClassCallSheetComponent implements OnInit {
     this.route.data.subscribe((data: any) => {
       this.sessionData = data['session'];
       this.schedule = this.sessionData.sessionSchedule;
+      // console.log(this.schedule);
       this.session = this.sessionData.session;
+      // console.log(this.session);
       this.sessionAbsents = this.sessionData.sessionAbsences;
       this.students = this.sessionData.classStudents;
 
@@ -168,6 +170,7 @@ export class ClassCallSheetComponent implements OnInit {
         // console.log(day + '/' + month + '/' + year + '-' + shour + ':' + smin + '-' + ehour + ':' + emin);
 
         newAbsence.startDate = new Date(year, month - 1, day, shour, smin);
+        // console.log(newAbsence.startDate);
         if (student.absent) {
           newAbsence.absenceTypeId = this.absenceType;
           newAbsence.endDate = new Date(year, month - 1, day, ehour, emin);
@@ -176,9 +179,9 @@ export class ClassCallSheetComponent implements OnInit {
           const endLateMin = Number(smin) + Number(student.lateInMin);
           newAbsence.endDate = new Date(year, month - 1, day, shour, endLateMin);
         }
-        newAbsence.reason = '';
+        newAbsence.reason = 'absent lors de l\'appel';
         // const justified = 0;
-        newAbsence.comment = 'absent lors de l\'appel';
+        // newAbsence.comment = 'absent lors de l\'appel';
         newAbsence.doneById = this.authService.currentUser.id;
         this.absences = [...this.absences, newAbsence];
       }

@@ -453,59 +453,58 @@ namespace EducNotes.API.Data
             {
                 try
                 {
-                    if (userToCreate.UserTypeId == teacherTypeId)
-                    {
-                        //enregistrement du teacher
-                        var result = await _userManager.CreateAsync(userToCreate, password);
-                        if (result.Succeeded)
-                        {
-                            // enregistrement du RoleTeacher
-                            var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
-                            var appUser = await _userManager.Users
-                                .FirstOrDefaultAsync(u => u.NormalizedUserName == userToCreate.UserName);
-                            _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+                  if (userToCreate.UserTypeId == teacherTypeId)
+                  {
+                      //enregistrement du teacher
+                      var result = await _userManager.CreateAsync(userToCreate, password);
+                      if (result.Succeeded)
+                      {
+                          // enregistrement du RoleTeacher
+                          var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
+                          var appUser = await _userManager.Users
+                              .FirstOrDefaultAsync(u => u.NormalizedUserName == userToCreate.UserName);
+                          _userManager.AddToRoleAsync(appUser, role.Name).Wait();
 
-                            //enregistrement de des cours du professeur
-                            if (userForRegister.CourseIds != null)
-                            {
-                                foreach (var course in userForRegister.CourseIds)
-                                {
-                                    Add(new TeacherCourse { CourseId = course, TeacherId = userToCreate.Id });
-                                }
-                            }
+                          //enregistrement de des cours du professeur
+                          if (userForRegister.CourseIds != null)
+                          {
+                              foreach (var course in userForRegister.CourseIds)
+                              {
+                                  Add(new TeacherCourse { CourseId = course, TeacherId = userToCreate.Id });
+                              }
+                          }
 
-                            // Enregistrement dans la table Email
-                            if (userToCreate.Email != null)
-                            {
-                                var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToCreate.ValidationCode;
+                          // Enregistrement dans la table Email
+                          if (userToCreate.Email != null)
+                          {
+                              var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToCreate.ValidationCode;
 
-                                var emailToSend = new Email
-                                {
-                                    InsertUserId = insertUserId,
-                                    UpdateUserId = userToCreate.Id,
-                                    StatusFlag = 0,
-                                    Subject = "Confirmation de compte",
-                                    ToAddress = userToCreate.Email,
-                                    Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                                    FromAddress = "no-reply@educnotes.com",
-                                    EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
-                                };
-                                Add(emailToSend);
-                            }
-                            if (await SaveAll())
-                            {
-                                // fin de la transaction
-                                identityContextTransaction.Commit();
-                                resultStatus = true;
+                              var emailToSend = new Email
+                              {
+                                  InsertUserId = insertUserId,
+                                  UpdateUserId = userToCreate.Id,
+                                  StatusFlag = 0,
+                                  Subject = "Confirmation de compte",
+                                  ToAddress = userToCreate.Email,
+                                  Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                                  FromAddress = "no-reply@educnotes.com",
+                                  EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
+                              };
+                              Add(emailToSend);
+                          }
+                          if (await SaveAll())
+                          {
+                              // fin de la transaction
+                              identityContextTransaction.Commit();
+                              resultStatus = true;
 
-                            }
-                            else
-                                resultStatus = true;
-                        }
-                        else
-                            resultStatus = false;
-                    }
-
+                          }
+                          else
+                              resultStatus = true;
+                      }
+                      else
+                          resultStatus = false;
+                  }
                 }
                 catch (System.Exception)
                 {
@@ -747,6 +746,11 @@ namespace EducNotes.API.Data
             return await _context.Users.Where(a => a.UserName != null).Select(a => a.UserName).ToListAsync();
         }
 
+        public async Task<List<Period>> GetPeriods()
+        {
+            return await _context.Periods.OrderBy(c => c.Name).ToListAsync();
+        }
+
         public async Task<List<ClassLevel>> GetLevels()
         {
             return await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
@@ -941,6 +945,8 @@ namespace EducNotes.API.Data
             // get general Evals data for the current user course
             UserEvalsDto userEvalsDto = GetUserCourseEvals(userEvals, acourse, aclass);
 
+            Period currPeriod = await GetPeriodFromDate(DateTime.Now);
+
             // get evals by period for the current user course
             userEvalsDto.PeriodEvals = new List<PeriodEvalsDto>();
             foreach (var period in periods)
@@ -949,7 +955,10 @@ namespace EducNotes.API.Data
               ped.PeriodId = period.Id;
               ped.PeriodName = period.Name;
               ped.PeriodAbbrev = period.Abbrev;
-              ped.Active = period.Active;
+              if(currPeriod.Id == period.Id)
+                ped.Active = true;
+              else
+                ped.Active = false;
 
               var userPeriodEvals = userEvals.Where(e => e.Evaluation.PeriodId == period.Id).ToList();
               if (userPeriodEvals.Count() > 0)
@@ -1329,6 +1338,8 @@ namespace EducNotes.API.Data
             List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
             newSms.Content = ReplaceTokens(tags, smsContent);
             newSms.InsertUserId = teacherId;
+            newSms.InsertDate = DateTime.Now;
+            newSms.UpdateDate = DateTime.Now;
             AbsencesSms.Add(newSms);
           }
 
@@ -1406,6 +1417,8 @@ namespace EducNotes.API.Data
               List<TokenDto> tags = GetTokenGradeValues(tokens, grade, grade.ForUpdate);
               newSms.Content = ReplaceTokens(tags, content);
               newSms.InsertUserId = teacherId;
+              newSms.InsertDate = DateTime.Now;
+              newSms.UpdateDate = DateTime.Now;
               GradesSms.Add(newSms);
             }
           }
@@ -1505,6 +1518,21 @@ namespace EducNotes.API.Data
             to = to + string.Join("\",\"", tmp);
             to = to + "\"]";
             return to;
+        }
+
+        public async Task<Period> GetPeriodFromDate(DateTime date)
+        {
+          var shortDate = date.Date;
+          var periods = await _context.Periods.OrderBy(p => p.StartDate).ToListAsync();
+          foreach (var period in periods)
+          {
+            if(shortDate >= period.StartDate && date.Date <= period.EndDate.Date)
+            {
+              return period;
+            }
+          }
+
+          return null;
         }
 
     }

@@ -32,8 +32,8 @@ namespace EducNotes.API.Data {
   public DbSet<Schedule> Schedules { get; set; }
   public DbSet<Absence> Absences { get; set; }
   public DbSet<AbsenceType> AbsenceTypes { get; set; }
-  public DbSet<ClassLife> ClassLifes { get; set; }
-  public DbSet<UserClassLife> UserClassLifes { get; set; }
+  public DbSet<ClassEvent> ClassEvents { get; set; }
+  public DbSet<UserClassEvent> UserClassEvents { get; set; }
   public DbSet<Sanction> Sanctions { get; set; }
   public DbSet<Reward> Rewards { get; set; }
   public DbSet<UserSanction> UserSanctions { get; set; }

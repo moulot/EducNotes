@@ -5,6 +5,7 @@ export interface Absence {
     doneById: number;
     absenceTypeId: number;
     sessionId: number;
+    periodId: number;
     startDate: Date;
     endDate: Date;
     justified: boolean;

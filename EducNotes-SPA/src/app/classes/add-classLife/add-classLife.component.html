@@ -1,0 +1,67 @@
+<div class="row m-2">
+  <div class="col-md-6">
+    <p class="text-17 font-weight-300">classe {{class?.name}} - saisie d'un évènement de la classe</p>
+  </div>
+  <div class="col-md-6">
+    <button type="button" class="float-right" mdbBtn [routerLink]="['/classLife', class?.id]" size="sm" color="primary" mdbWavesEffect>
+      retour à la vie de la classe
+    </button>  
+  </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body py-2">
+        <form [formGroup]="classEventForm" (ngSubmit)="saveClassLife(false)">
+          <div class="row">
+            <div class="col-md-12 mb-1">
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="md-form form-sm m-0">
+                    <mdb-select [options]="classEventOptions" formControlName="event" placeholder="choisir l'évènement"></mdb-select>
+                    <div *ngIf="classEventForm.get('event').errors && classEventForm.get('event').touched" class="text-small text-danger">
+                      choisir une évènement svp
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="md-form form-sm m-0">
+                    <mdb-select [options]="studentOptions" formControlName="student" placeholder="choisir l'élève"></mdb-select>
+                    <div *ngIf="classEventForm.get('student').errors && classEventForm.get('student').touched"
+                      class="text-small text-danger">choisir un élève svp</div>
+                  </div>
+                </div>
+                <div class="col-md-3 mb-1">
+                  <div class="md-form form-sm my-0">
+                    <mdb-date-picker name="eventDate" [options]="myDatePickerOptions" [placeholder]="'choisir la date'"
+                      formControlName="eventDate"></mdb-date-picker>
+                  </div>
+                  <div *ngIf="classEventForm.get('eventDate').errors && classEventForm.get('eventDate').touched"
+                  class="text-small text-danger">saisir la date svp</div>
+            </div>
+              </div>
+            </div>
+            <div class="col-md-12 mb-1">
+              <div class="md-form form-sm mt-0">
+                <input mdbInput type="text" id="sreason" class="form-control" formControlName="reason" mdbValidate>
+                <label for="sreason">motif</label>
+                <div *ngIf="classEventForm.get('reason').errors && classEventForm.get('reason').touched"
+                  class="text-small text-danger">saisir le motif svp</div>
+              </div>
+            </div>
+            <div class="col-md-12 mt-0 mb-1">
+              <div class="md-form form-sm my-0">
+                <textarea type="text" id="scomment" formControlName="comment" class="md-textarea form-control" mdbInput></textarea>
+                <label for="scomment">commentaire</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <button type="submit" mdbBtn size="sm" color="primary" [disabled]="!classEventForm.valid" mdbWavesEffect>valider</button>
+            <button type="button" mdbBtn size="sm" color="primary" (click)="saveClassLife(true)"
+              [disabled]="!classEventForm.valid" mdbWavesEffect>valider et nouveau</button>
+            <button type="button" mdbBtn size="sm" color="primary" (click)="cancel()">annuler</button>
+          </div>              
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

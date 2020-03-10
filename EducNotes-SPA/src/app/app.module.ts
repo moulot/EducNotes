@@ -213,6 +213,7 @@ import { TimelineComponent } from './shared/components/timeline/timeline.compone
 import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
 import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
 import { ClassSessionResolver } from './_resolvers/classSession-resolver';
+import { AddClassLifeComponent } from './classes/add-classLife/add-classLife.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -356,6 +357,7 @@ export function tokenGetter() {
       ThemesListComponent,
       ClassProgramDataComponent,
       TimelineComponent,
+      AddClassLifeComponent
    ],
    imports: [
       FormWizardModule,

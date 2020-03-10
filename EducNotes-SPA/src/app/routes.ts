@@ -105,6 +105,7 @@ import { NewThemeComponent } from './programs/new-theme/new-theme.component';
 import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
 import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
 import { ClassSessionResolver } from './_resolvers/classSession-resolver';
+import { AddClassLifeComponent } from './classes/add-classLife/add-classLife.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -200,7 +201,8 @@ export const appRoutes: Routes = [
           {path: 'teacherProgram', component: TeacherProgramComponent},
           {path: 'classProgram/:courseId', component: ClassProgressComponent, resolve: {program: TeacherProgramResolver}},
           {path: 'themesList', component: ThemesListComponent},
-          {path: 'newTheme', component: NewThemeComponent}
+          {path: 'newTheme', component: NewThemeComponent},
+          {path: 'addClassEvent/:id', component: AddClassLifeComponent}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

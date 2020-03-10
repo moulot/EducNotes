@@ -49,5 +49,7 @@ namespace EducNotes.API.Models
     public string cb_TimeStamp { get; set; }
     public int InsertUserId { get; set; }
     public User InsertUser { get; set; }
+    public DateTime InsertDate { get; set; }
+    public DateTime UpdateDate { get; set; }
   }
 }

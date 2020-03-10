@@ -41,20 +41,20 @@ namespace EducNotes.API.Data
 
         public async Task<Photo> GetMainPhotoForUser(int userId)
         {
-            return await _context.Photos.Where(u => u.UserId == userId)
-                .FirstOrDefaultAsync(p => p.IsMain);
+          return await _context.Photos.Where(u => u.UserId == userId)
+            .FirstOrDefaultAsync(p => p.IsMain);
         }
 
         public async Task<User> GetUser(int id, bool isCurrentUser)
         {
-            var query = _context.Users.Include(p => p.Photos).AsQueryable();
+          var query = _context.Users.Include(p => p.Photos).AsQueryable();
 
-            if (isCurrentUser)
-                query = query.IgnoreQueryFilters();
+          if (isCurrentUser)
+            query = query.IgnoreQueryFilters();
 
-            var user = await query.FirstOrDefaultAsync(u => u.Id == id);
+          var user = await query.FirstOrDefaultAsync(u => u.Id == id);
 
-            return user;
+          return user;
         }
 
         public async Task<PagedList<User>> GetUsers(UserParams userParams)

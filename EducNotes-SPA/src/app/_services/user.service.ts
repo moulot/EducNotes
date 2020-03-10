@@ -9,6 +9,7 @@ import { Message } from '../_models/message';
 import { Absence } from '../_models/absence';
 import { UserSanction } from '../_models/userSanction';
 import { UserReward } from '../_models/userReward';
+import { UserClassEvent } from '../_models/userClassEvent';
 
 @Injectable({
   providedIn: 'root'
@@ -79,6 +80,10 @@ constructor(private http: HttpClient) {}
 
   getStudentLifeData(userId) {
     return this.http.get(this.baseUrl + 'users/' + userId + '/LifeData/');
+  }
+
+  saveClassEvent(userClassEvent: UserClassEvent) {
+    return this.http.put(this.baseUrl + 'users/saveClassEvent', userClassEvent);
   }
 
   saveSanction(userSanction: UserSanction) {

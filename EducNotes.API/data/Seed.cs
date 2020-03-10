@@ -78,6 +78,12 @@ namespace EducNotes.API.Data
                 };
                 context.AddRange(AbsenceTypes);
 
+                var classEvents = new List<ClassEvent> {
+                  new ClassEvent {Name = "sanction"},
+                  new ClassEvent {Name = "compliments"}
+                };
+                context.AddRange(classEvents);
+
                 var inscTypes = new List<InscriptionType> {
                     new InscriptionType { Name = "FromParent" },
                     new InscriptionType { Name = "FromSchool" }

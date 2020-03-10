@@ -7,6 +7,8 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Router } from '@angular/router';
 import { Utils } from 'src/app/shared/utils';
 import { MDBDatePickerComponent, ClockPickerComponent } from 'ng-uikit-pro-standard';
+import { ClassService } from 'src/app/_services/class.service';
+import { Class } from 'src/app/_models/class';
 
 @Component({
   selector: 'app-class-absence',
@@ -21,6 +23,7 @@ export class ClassAbsenceComponent implements OnInit {
   @ViewChild('endDate', { static: true }) endDate: MDBDatePickerComponent;
   @ViewChild('endTime', { static: true }) endTime: ClockPickerComponent;
   @Input() students: User[];
+  @Input() selectedClass: any;
   @Output() toggleForm = new EventEmitter<boolean>();
   @Output() loadAbsences = new EventEmitter<any>();
   absenceForm: FormGroup;
@@ -28,8 +31,10 @@ export class ClassAbsenceComponent implements OnInit {
   studentOptions = [];
   justifiedOptions = [{value: 0, label: 'NON'}, {value: 1, label: 'OUI'}];
   myDatePickerOptions = Utils.myDatePickerOptions;
+  classTeachers: User[];
+  teacherOptions = [];
 
-  constructor(private userService: UserService, private fb: FormBuilder,
+  constructor(private userService: UserService, private fb: FormBuilder, private classService: ClassService,
     private alertify: AlertifyService, private router: Router) { }
 
   ngOnInit() {
@@ -39,6 +44,7 @@ export class ClassAbsenceComponent implements OnInit {
       const element = {value: student.id, label: student.lastName + ' ' + student.firstName};
       this.studentOptions = [...this.studentOptions, element];
     }
+    this.getClassTeachers(this.selectedClass.id);
   }
 
   onSDateChange = (event: { actualDateFormatted: string; }) => {
@@ -64,6 +70,7 @@ export class ClassAbsenceComponent implements OnInit {
   createAbsenceForm() {
     this.absenceForm = this.fb.group({
       student: [null, Validators.required],
+      doneBy: [null, Validators.required],
       startDate: ['', Validators.required],
       startTime: ['', Validators.required],
       endDate: ['', Validators.required],
@@ -71,13 +78,27 @@ export class ClassAbsenceComponent implements OnInit {
       reason: ['', Validators.required],
       justified: [null, Validators.required],
       type: [null, Validators.required],
-      comment: ['', Validators.required]
+      comment: ['']
+    });
+  }
+
+  getClassTeachers(classId) {
+    this.classService.getClassTeachers(classId).subscribe(teachers => {
+      this.classTeachers = teachers;
+      for (let i = 0; i < teachers.length; i++) {
+        const teacher = teachers[i];
+        const element = {value: teacher.id, label: teacher.lastName + ' ' + teacher.firstName};
+        this.teacherOptions = [...this.teacherOptions, element];
+      }
+    }, error => {
+      this.alertify.error(error);
     });
   }
 
   saveAbsence(more: boolean) {
     this.newAbsence.userId = this.absenceForm.value.student;
     this.newAbsence.absenceTypeId = this.absenceForm.value.type;
+    this.newAbsence.doneById = this.absenceForm.value.doneBy;
     const startDateData = this.absenceForm.value.startDate.split('/');
     const startTimeDate = this.absenceForm.value.startTime.split(':');
     this.newAbsence.startDate = new Date(startDateData[2], startDateData[1] - 1,

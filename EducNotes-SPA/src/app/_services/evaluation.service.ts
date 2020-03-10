@@ -18,10 +18,6 @@ export class EvaluationService {
 
   constructor(private http: HttpClient) { }
 
-  getPeriods(): Observable<Period[]> {
-    return this.http.get<Period[]>(this.baseUrl + 'evaluation/Periods');
-  }
-
   getEvalTypes(): Observable<EvalType[]> {
     return this.http.get<EvalType[]>(this.baseUrl + 'evaluation/EvalTypes');
   }

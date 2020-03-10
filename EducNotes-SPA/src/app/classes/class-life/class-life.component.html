@@ -5,99 +5,52 @@
       <div class="text-17 font-weight-300">vie scolaire - classe {{selectedClass?.name}}</div>
     </div>
     <div class="col-md-6">
-      <button type="button" class="float-right" mdbBtn (click)="toggleForm()" size="sm" color="primary" mdbWavesEffect>
+      <button type="button" class="float-right" mdbBtn (click)="goToAddEventPage()" size="sm" color="primary" mdbWavesEffect>
         saisir évènement de la vie de classe
       </button>  
     </div>
   </div>
 
-  <div class="row">
-
-    <div class="col-lg-3 col-md-6 col-sm-6">
-      <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
-        <div class="card-body text-center">
-          <i class="i-Turn-Up" style="color: rgb(81, 211, 81)"></i>
-          <div class="content">
-            <p class="text-muted mt-2 mb-0">tout</p>
-            <p class="text-primary text-24 line-height-1 mb-2">{{nbAbsences + nbSanctions + nbRewards}}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-3 col-md-6 col-sm-6">
-      <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
-        <div class="card-body text-center">
-          <i class="i-Tongue" style="color: green"></i>
-          <div class="content">
-            <p class="text-muted mt-2 mb-0">compliments</p>
-            <p class="text-primary text-24 line-height-1 mb-2">{{nbRewards}}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-3 col-md-6 col-sm-6">
-      <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
-        <div class="card-body text-center">
-          <i class="i-Close" style="color: orange"></i>
-          <div class="content">
-            <p class="text-muted mt-2 mb-0">absences</p>
-            <p class="text-primary text-24 line-height-1 mb-2">{{nbAbsences}}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-3 col-md-6 col-sm-6">
-      <div class="card card-icon-bg card-icon-bg-primary o-hidden mb-4">
-        <div class="card-body text-center">
-          <i class="i-Angry" style="color:red"></i>
-          <div class="content">
-            <p class="text-muted mt-2 mb-0">sanctions</p>
-            <p class="text-primary text-24 line-height-1 mb-2">{{nbSanctions}}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
   <div class="row mb-1">
     <div class="col-md-12">
-      <div class="card">
-        <div class="card-body">
+      <form [formGroup]="eventForm" (ngSubmit)="loadEvents()">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="md-form form-sm m-0">
+              <mdb-select [options]="studentOptions" formControlName="student" placeholder="choisir l'élève"></mdb-select>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="md-form form-sm m-0">
+              <mdb-select [options]="periodOptions" formControlName="period" placeholder="choisir le trimestre"></mdb-select>
+            </div>
+          </div>
+          <div class="col-md-2 pt-2">
+            <div class="md-form form-sm m-0">
+              <button type="submit" mdbBtn size="sm" color="light" block="true" mdbWavesEffect>valider</button>
+            </div>
+          </div>
         </div>
-      </div>
+      </form>
+    </div>
+    <div class="col-md-12">
+      <hr class="m-1">
     </div>
   </div>
+
   <div class="row">
     <div class="col-md-3">
       <div class="card">
-        <div class="card-body">
-          <form [formGroup]="eventForm" (ngSubmit)="loadEvents()">
-            <div class="row">
-              <div class="col-md-12">
-                <mdb-select [options]="studentOptions" formControlName="student" placeholder="catégorie du sms"></mdb-select>
-              </div>
-              <div class="col-md-12">
-                <mdb-select [options]="studentOptions" formControlName="period" placeholder="catégorie du sms"></mdb-select>
-              </div>
-              <div class="col-md-12">
-                <mdb-select [options]="studentOptions" formControlName="eventType" placeholder="catégorie du sms"></mdb-select>
-              </div>
-            </div>
-          </form>
-          <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
-          <p class="text-danger text-15 mt-2 mb-2">clicker sur le 'cours' pour filtrer</p>
+        <div class="card-body pt-2">
+          <p class="text-danger text-15 mt-2 mb-2">cliquer sur un évènement</p>
+          <hr class="mt-1 mb-2">
           <div class="card mb-2" *ngFor="let event of eventsWithNb">
-              <a (click)="showEventItems(event.courseId)" style="cursor: pointer;">
+              <a (click)="showEventItems(event.id)" style="cursor: pointer;">
                 <div class="card-body p-2">
                   <div class="row">
                     <div class="col-md-12 d-flex">
-                      <div class=" mr-2" [ngStyle]="{'background-color': course.courseColor}" style="width: 10px;height: 100%;"></div>
-                      <div class="flex-grow-1 text-17">{{event.courseName}}</div>
-                      <div class="text-17">{{event.nbTasks}}</div>
+                      <div class="flex-grow-1 text-17">{{event.name}}</div>
+                      <div class="text-17">{{event.nbTimes}}</div>
                     </div>
                   </div>
                 </div>
@@ -108,40 +61,94 @@
     </div>
 
     <div class="col-md-9">
+      <!-- <div class="row">
+        <div class="col-lg-3 col-md-6 col-sm-12">
+          <div class="card card-icon-bg card-icon-bg-primary o-hidden my-2">
+            <div class="card-body text-center">
+              <i class="i-Turn-Up" style="color: rgb(81, 211, 81)"></i>
+              <div class="content">
+                <p class="text-muted mt-2 mb-0">tout</p>
+                <p class="text-primary text-24 line-height-1 mb-1">{{nbAbsences + nbSanctions + nbRewards}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12">
+          <div class="card card-icon-bg card-icon-bg-primary o-hidden my-2">
+            <div class="card-body text-center">
+              <i class="i-Tongue" style="color: green"></i>
+              <div class="content">
+                <p class="text-muted mt-2 mb-0">compliments</p>
+                <p class="text-primary text-24 line-height-1 mb-1">{{nbRewards}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12">
+          <div class="card card-icon-bg card-icon-bg-primary o-hidden my-2">
+            <div class="card-body text-center">
+              <i class="i-Close" style="color: orange"></i>
+              <div class="content">
+                <p class="text-muted mt-2 mb-0">absences</p>
+                <p class="text-primary text-24 line-height-1 mb-1">{{nbAbsences}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12">
+          <div class="card card-icon-bg card-icon-bg-primary o-hidden my-2">
+            <div class="card-body text-center">
+              <i class="i-Angry" style="color:red"></i>
+              <div class="content">
+                <p class="text-muted mt-2 mb-0">sanctions</p>
+                <p class="text-primary text-24 line-height-1 mb-1">{{nbSanctions}}</p>
+              </div>
+            </div>
+          </div>
+        </div>            
+      </div> -->
       <div class="card">
-        <div class="card-body">
+        <div class="card-body pt-2">
           <div class="row">
             <div class="col-md-12">
+              <div class="d-flex">
+                <div class="text-15 w300px mr-2">élève</div>
+                <div class="text-15 w150px mr-2">type</div>
+                <div class="text-15 w250px mr-2">date / durée</div>
+                <div class="text-15 w-10 mr-2">justifié?</div>
+                <!-- <div class="text-15 mr-2">motif</div> -->
+              </div>
+              <hr class="mt-2 mb-2">
               <div *ngIf="filteredEvents?.length > 0">
-                <div *ngFor="let item of filteredEvents; let i = index">
-                  <div class="card mb-2">
-                    <div class="card-body">
-                      <div class="card mb-2" *ngFor="let ai of item.agendaItems">
-                        <div class="col-md-12 d-flex">
-                          <div class="mr-2" [ngStyle]="{'background-color': ai.courseColor}" style="width: 10px;height: 100;"></div>
-                          <div class="card-body d-flex p-2">
-                            <div class="flex-grow-1">
-                            <div class="text-15 font-weight-550">{{ai.className}} - {{ai.courseName}}</div>
-                            <div class="d-flex">
-                              <div class="flex-grow-1 text-15">{{ai.startHourMin}} à {{ai.endHourMin}}</div>
-                            </div>
-                            <div class="w-50">
-                              <div *ngIf="ai.tasks !== ''" style="color: #2727f8;">{{ai.tasks}}</div>
-                              <div *ngIf="ai.tasks === ''" style="color: #BA4A00">aucun devoir</div>
-                            </div>
-                            </div>
-                            <!-- <div class="">
-                              <button mdbBtn (click)="editTasks(ai)" color="light" size="sm" mdbWavesEffect>saisir les devoirs</button>
-                            </div> -->
+                <div class="card mb-1" *ngFor="let item of filteredEvents | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index">
+                  <div class="card-body p-0">
+                    <div class="d-flex">
+                      <div class="d-flex div-thumb w50px mr-2">
+                        <img class="" src="{{item.photoUrl || '../../../../../assets/user.png'}}" alt="">
+                      </div>
+                      <div class="flex-grow-1">
+                        <div class="d-flex">
+                          <div class="text-15 w250px my-auto">{{item.userName}}</div>
+                          <div class="text-15 text-lowercase my-auto w150px mr-2">{{item.classEventType}}</div>
+                          <div class="text-15 my-auto w250px mr-2">{{item.strStartDate}}</div>
+                          <div class="text-15 my-auto w-10 mr-2">{{item.justified}}</div>
+                        </div>
+                        <div class="d-flex">
+                          <div style="white-space: nowrap;" class="text-14 text-muted my-auto mr-2"><u>motif</u> : {{item.reason}}</div>
+                          <div class="flex-grow-1" *ngIf="item.comment">
+                            <div class="text-14 text-muted"><u>commentaire</u> : {{item.comment}}</div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+                <div class="col-md-12 mt-3" *ngIf="filteredEvents?.length">
+                  <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
+                </div>        
               </div>
               <div *ngIf="filteredEvents?.length <= 0">
-                <p class="lead m-0">pas de devoir à faire pour cette période...</p>
+                <p class="lead m-0">pas d'évènement à afficher...</p>
               </div>
             </div>
           </div>
@@ -151,7 +158,7 @@
 
   </div>
 
-  <nz-table #absenceTable nzSize="small" [nzPageSize]="5" [nzShowSizeChanger]="false" [nzShowPagination]="true"
+  <!-- <nz-table #absenceTable nzSize="small" [nzPageSize]="5" [nzShowSizeChanger]="false" [nzShowPagination]="true"
     [nzFrontPagination]="true" [nzTitle]="title ? 'Absences' : null" nzBordered [nzData]="absencesList">
     <thead>
       <tr>
@@ -200,13 +207,13 @@
         <td>{{ data.comment }}</td>
       </tr>
     </tbody>
-  </nz-table>
+  </nz-table> -->
 
 </div>
               
   <div #classLifeForm class="row m-2" *ngIf="toggleFormAdd">
     <div class="col-md-9">
-      <div class="lead">Saisie de la vie scolaire</div>
+      <div class="lead">classe {{selectedClass.name}} - saisie d'évènements de vie la scolaire</div>
     </div>
     <div class="col-md-3 float-right">
       <button type="button" mdbBtn (click)="toggleForm()" size="sm" color="primary" mdbWavesEffect>
@@ -218,16 +225,14 @@
       <!-- Nav Tabs -->
       <mdb-tabset #staticTabs [vertical]="true" [buttonClass]="'md-pills pills-primary text-center transparent'" [contentClass]="'card'">
         <mdb-tab heading="absence">
-          <app-class-absence [students]="students" (loadAbsences)="loadAbsences(selectedClass.id)"
-            (toggleForm)="toggleForm($event)"></app-class-absence>
+          <app-class-absence [selectedClass]="selectedClass" [students]="students" (toggleForm)="toggleForm($event)"></app-class-absence>
         </mdb-tab>
         <mdb-tab heading="sanction">
-          <app-class-sanction [students]="students" (loadSanctions)="loadSanctions(selectedClass.id)"
-            (toggleForm)="toggleForm($event)" [selectedClass]="selectedClass"></app-class-sanction>
+          <app-add-classLife (toggleForm)="toggleForm($event)"></app-add-classLife>
         </mdb-tab>
-        <mdb-tab heading="encouragement">
+        <!-- <mdb-tab heading="encouragement">
           saisie ici des recompenses, encouragements
-        </mdb-tab>
+        </mdb-tab> -->
       </mdb-tabset>    
     </div>
   </div>

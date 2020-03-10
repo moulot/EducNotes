@@ -13,6 +13,8 @@ namespace EducNotes.API.Models
     public AbsenceType AbsenceType { get; set; }
     public int? SessionId { get; set; }
     public Session Session { get; set; }
+    public int PeriodId { get; set; }
+    public Period Period { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public Boolean Justified { get; set; }

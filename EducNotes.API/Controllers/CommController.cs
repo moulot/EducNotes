@@ -116,11 +116,11 @@ namespace EducNotes.API.Controllers
           //string query = idx >= 0 ? url.Substring(idx) : "";
           string query = Request.QueryString.ToString();
 
-          EmailFormDto email = new EmailFormDto();
-          email.subject = "query call back";
-          email.toEmail = "georges.moulot@albatrostechnologies.com";
-          email.content = query;
-          await _repo.SendEmail(email);
+          // EmailFormDto email = new EmailFormDto();
+          // email.subject = "query call back";
+          // email.toEmail = "georges.moulot@albatrostechnologies.com";
+          // email.content = query;
+          // await _repo.SendEmail(email);
 
           String messageId = HttpUtility.ParseQueryString(query).Get("messageId");
           String integrationName = HttpUtility.ParseQueryString(query).Get("integrationName");
@@ -134,15 +134,18 @@ namespace EducNotes.API.Controllers
           var sms = await _context.Sms.FirstOrDefaultAsync(s => s.res_ApiMsgId == messageId);
           if(sms != null)
           {
-            sms.cb_IntegrationName = integrationName;
-            sms.cb_Status = status;
-            sms.cb_StatusDesc = statusDesc;
-            sms.cb_StatusCode = Convert.ToInt32(statusCode);
-            sms.cb_RequestId = requestId;
-            sms.cb_TimeStamp = timeStamp;
-            _context.Update(sms);
-            if(await _repo.SaveAll())
-              return NoContent();
+            if(Convert.ToInt64(timeStamp) > Convert.ToInt64(sms.cb_TimeStamp))
+            {
+              sms.cb_IntegrationName = integrationName;
+              sms.cb_Status = status;
+              sms.cb_StatusDesc = statusDesc;
+              sms.cb_StatusCode = Convert.ToInt32(statusCode);
+              sms.cb_RequestId = requestId;
+              sms.cb_TimeStamp = timeStamp;
+              _context.Update(sms);
+              if(await _repo.SaveAll())
+                return NoContent();
+            }
           }
 
           throw new Exception($"saisie des data du callBack a échoué");

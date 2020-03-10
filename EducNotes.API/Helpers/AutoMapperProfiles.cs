@@ -156,7 +156,7 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom(src => src.SmsCategory.Name);
                 });
             CreateMap<AbsenceForSaveDto, Absence>();
-            CreateMap<UserClassLife, UserClassLifeForListDto>()
+            CreateMap<UserClassEvent, UserClassEventForListDto>()
                 .ForMember(dest => dest.strStartDate, opt => {
                     opt.MapFrom(src => src.StartDate.ToString("dd/MM/yyyy", frC));
                 })
@@ -176,7 +176,7 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.Justified, opt => {
                     opt.MapFrom(src => src.Justified == true ? "OUI" : "NON");
                 });
-            CreateMap<Absence, UserClassLifeForListDto>()
+            CreateMap<Absence, UserClassEventForListDto>()
                 .ForMember(dest => dest.StartDate, opt => {
                     opt.MapFrom(src => src.StartDate.ToString("dd/MM/yyyy", frC));
                 })
@@ -189,7 +189,7 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.EndTime, opt => {
                     opt.MapFrom(src => src.EndDate.ToString("HH:mm", frC));
                 })
-                .ForMember(dest => dest.ClassLifeType, opt => opt
+                .ForMember(dest => dest.ClassEventType, opt => opt
                     .MapFrom(src => src.AbsenceType.Name))
                 .ForMember(dest => dest.UserName, opt => opt
                     .MapFrom(src => src.User.LastName + ' ' + src.User.FirstName))
@@ -237,7 +237,7 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom(src => src.Course.Color);
                 })
                 .ForMember(dest => dest.EvalDate, opt => {
-                    opt.MapFrom(src => src.EvalDate.ToString("dd/MM/yy", frC));
+                    opt.MapFrom(src => src.EvalDate.ToString("dd/MM/yyyy", frC));
                 });
             CreateMap<ProductDto, Product>();
             CreateMap<DeadLineDto, DeadLine>();

@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import { Utils } from 'src/app/shared/utils';
 import { MDBModalService, MDBModalRef } from 'ng-uikit-pro-standard';
 import { utils } from 'protractor';
+import { ClassService } from 'src/app/_services/class.service';
 
 @Component({
   selector: 'app-eval-addForm',
@@ -44,7 +45,7 @@ export class EvalAddFormComponent implements OnInit {
   modalRef: MDBModalRef;
 
   constructor(private userService: UserService, private evalService: EvaluationService,
-    private fb: FormBuilder, private authService: AuthService, private router: Router,
+    private fb: FormBuilder, private authService: AuthService, private router: Router, private classService: ClassService,
     public alertify: AlertifyService, private nzModalService: NzModalService, private modalService: MDBModalService) { }
 
   ngOnInit() {
@@ -203,7 +204,7 @@ export class EvalAddFormComponent implements OnInit {
   }
 
   getPeriods() {
-    this.evalService.getPeriods().subscribe((periods: Period[]) => {
+    this.classService.getPeriods().subscribe((periods: Period[]) => {
       this.periods = periods;
       for (let i = 0; i < periods.length; i++) {
         const elt = periods[i];

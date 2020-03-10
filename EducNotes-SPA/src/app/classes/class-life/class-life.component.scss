@@ -1,0 +1,30 @@
+.div-thumb img {
+  height: 50px;
+  object-fit: cover;
+}
+
+.text-hidden {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.w50px {
+  width: 50px;
+}
+
+.w150px {
+  width: 150px;
+}
+
+.w250px {
+  width: 250px;
+}
+
+.w300px {
+  width: 300px;
+}
+
+.w500px {
+  width: 500px;
+}

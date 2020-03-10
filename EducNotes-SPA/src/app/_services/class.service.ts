@@ -9,6 +9,7 @@ import { Class } from '../_models/class';
 import { Absence } from '../_models/absence';
 import { Schedule } from '../_models/schedule';
 import { Theme } from '../_models/theme';
+import { Period } from '../_models/period';
 
 @Injectable({
   providedIn: 'root'
@@ -288,6 +289,18 @@ export class ClassService {
 
   searchThemes(classLevelId: number, courseId: number): Observable<Theme[]> {
     return this.http.get<Theme[]>(this.baseUrl + 'classes/SearchThemesOrLessons/' + classLevelId + '/' + courseId);
+  }
+
+  getPeriods(): Observable<Period[]> {
+    return this.http.get<Period[]>(this.baseUrl + 'classes/Periods');
+  }
+
+  getClassEvents() {
+    return this.http.get(this.baseUrl + 'classes/ClassEvents');
+  }
+
+  getEvents(classId) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/events');
   }
 
 }

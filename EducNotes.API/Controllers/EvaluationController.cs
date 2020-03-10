@@ -45,14 +45,6 @@ namespace EducNotes.API.Controllers
             });
         }
 
-        [HttpGet("Periods")]
-        public async Task<IActionResult> GetPeriods()
-        {
-            var periods = await _context.Periods.OrderBy(o => o.Name).ToListAsync();
-
-            return Ok(periods);
-        }
-
         [HttpGet("EvalTypes")]
         public async Task<IActionResult> GetEvalTypes()
         {
@@ -163,6 +155,8 @@ namespace EducNotes.API.Controllers
             if(courseCoeffSum > 0)
               GeneralAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
 
+            Period currPeriod = await _repo.GetPeriodFromDate(DateTime.Now);
+
             foreach (var period in periods)
             {
               PeriodAvgDto pad = new PeriodAvgDto();
@@ -180,7 +174,10 @@ namespace EducNotes.API.Controllers
               {
                 pad.activated = false;
               }
-              pad.Active = period.Active;
+              if(currPeriod.Id == period.Id)
+                pad.Active = true;
+              else
+                pad.Active = false;
               pad.Avg = -1000;
 
               double periodAvgSum = 0;
