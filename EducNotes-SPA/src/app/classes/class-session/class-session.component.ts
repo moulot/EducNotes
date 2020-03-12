@@ -11,24 +11,23 @@ import { AuthService } from 'src/app/_services/auth.service';
   styleUrls: ['./class-session.component.scss']
 })
 export class ClassSessionComponent implements OnInit {
-  schedule: any;
-  session = <Session>{};
+  session: any;
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
     private route: ActivatedRoute, private router: Router, private authService: AuthService) { }
 
   ngOnInit() {
     this.route.data.subscribe((data: any) => {
-      this.schedule = data['schedule'];
-      this.authService.changeCurrentClassId(this.schedule.classId);
+      this.session = data['session'];
+      this.authService.changeCurrentClassId(this.session.classId);
     });
   }
 
   goToCallSheet() {
-    this.router.navigate(['/callSheet', this.schedule.id]);
+    this.router.navigate(['/callSheet', this.session.id]);
   }
 
   goToProgress() {
-    this.router.navigate(['/classProgram', this.schedule.courseId]);
+    this.router.navigate(['/classProgram', this.session.courseId]);
   }
 }

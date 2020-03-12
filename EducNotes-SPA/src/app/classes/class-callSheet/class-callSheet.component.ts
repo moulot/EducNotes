@@ -8,10 +8,6 @@ import { debounceTime } from 'rxjs/operators';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { Absence } from 'src/app/_models/absence';
 import { environment } from 'src/environments/environment';
-import { Session } from 'src/app/_models/session';
-import { CallSheet } from 'src/app/_models/callSheet';
-import { CardsComponent } from 'src/app/views/ui-kits/cards/cards.component';
-import { fakeAsync } from '@angular/core/testing';
 import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
@@ -25,12 +21,11 @@ export class ClassCallSheetComponent implements OnInit {
   lateType = environment.lateType;
   classRoom: Class;
   searchControl: FormControl = new FormControl();
-  schedule: any;
+  // schedule: any;
   session: any;
   sessionData: any;
   students: any = [];
   filteredStudents: any;
-  callSheet: CallSheet[] = [];
   absences: Absence[] = [];
   sessionAbsents: any = [];
   touched = -1;
@@ -49,49 +44,44 @@ export class ClassCallSheetComponent implements OnInit {
     //   }, 3000);
     this.route.data.subscribe((data: any) => {
       this.sessionData = data['session'];
-      this.schedule = this.sessionData.sessionSchedule;
-      // console.log(this.schedule);
       this.session = this.sessionData.session;
       // console.log(this.session);
       this.sessionAbsents = this.sessionData.sessionAbsences;
+      // console.log(this.sessionAbsents);
+      // this.getStudents(this.session.classId, this.sessionAbsents);
       this.students = this.sessionData.classStudents;
-
-      for (let i = 0; i < this.students.length; i++) {
-        const id = this.students[i].id;
-        // const elt = <CallSheet>{};
-        // elt.id = id;
-        // elt.absent = false;
-        // elt.late = false;
-        this.students[i].absent = false;
-        this.students[i].late = false;
-
-        if (this.sessionAbsents.length > 0) {
+      // console.log('nb students:' + this.students.length);
+      if (this.sessionAbsents.length > 0) {
+        for (let i = 0; i < this.students.length; i++) {
+          const id = this.students[i].id;
+          this.students[i].absent = false;
+          this.students[i].late = false;
           const pos = this.sessionAbsents.findIndex(s => Number(s.userId) === Number(id));
           if (pos !== -1) {
             const abs = this.sessionAbsents[pos];
             if (abs.absenceTypeId === this.absenceType) {
               // it's an absence
               this.nbAbsents++;
-              // elt.absent = true;
-              // elt.late = false;
               this.students[i].absent = true;
               this.students[i].late = false;
             } else if (abs.absenceTypeId === this.lateType) {
               // it's a late arrival
               this.nbLate++;
-              // elt.absent = false;
-              // elt.late = true;
               this.students[i].absent = false;
               this.students[i].late = true;
             }
             this.students[i].lateDateTime = abs.endDate;
             this.students[i].lateInMin = abs.lateInMin;
-            // this.callSheet = [...this.callSheet, elt];
           }
         }
-        // this.callSheet = [...this.callSheet, elt];
+      } else {
+        for (let i = 0; i < this.students.length; i++) {
+          this.students[i].absent = false;
+          this.students[i].late = false;
+        }
       }
       this.filteredStudents = this.students;
+      // console.log(this.students);
     });
 
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
@@ -121,9 +111,48 @@ export class ClassCallSheetComponent implements OnInit {
     this.filteredStudents = rows;
   }
 
+  getStudents(classId, absents) {
+    console.log('in getStudents');
+    this.classService.getCallSheetStudents(classId).subscribe(data => {
+      this.students = data;
+      this.filteredStudents = data;
+      console.log('nb students:' + this.students.length);
+      for (let i = 0; i < this.students.length; i++) {
+        console.log('i:' + i);
+        const id = this.students[i].id;
+        this.students[i].absent = false;
+        this.students[i].late = false;
+        console.log('nb abs: ' + absents.length);
+        if (absents.length > 0) {
+          const pos = absents.findIndex(s => Number(s.userId) === Number(id));
+          console.log('pos: ' + pos);
+          if (pos !== -1) {
+            const abs = absents[pos];
+            if (abs.absenceTypeId === this.absenceType) {
+              // it's an absence
+              this.nbAbsents++;
+              this.students[i].absent = true;
+              this.students[i].late = false;
+            } else if (abs.absenceTypeId === this.lateType) {
+              // it's a late arrival
+              this.nbLate++;
+              this.students[i].absent = false;
+              this.students[i].late = true;
+            }
+            this.students[i].lateDateTime = abs.endDate;
+            this.students[i].lateInMin = abs.lateInMin;
+          }
+        }
+      }
+      this.filteredStudents = this.students;
+      console.log(this.students);
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
   setAbsences(absenceData) {
     const index = absenceData.index;
-    const studentId = absenceData.studentId;
     const isAbsent = absenceData.isAbsent;
     const lateInMin = absenceData.lateInMin;
     this.students[index].lateInMin = lateInMin;
@@ -163,10 +192,10 @@ export class ClassCallSheetComponent implements OnInit {
         const day = sessionDate[0];
         const month = sessionDate[1];
         const year = sessionDate[2];
-        const shour = this.schedule.strStartHourMin.split(':')[0];
-        const smin = this.schedule.strStartHourMin.split(':')[1];
-        const ehour = this.schedule.strEndHourMin.split(':')[0];
-        const emin = this.schedule.strEndHourMin.split(':')[1];
+        const shour = this.session.startHourMin.split(':')[0];
+        const smin = this.session.startHourMin.split(':')[1];
+        const ehour = this.session.endHourMin.split(':')[0];
+        const emin = this.session.endHourMin.split(':')[1];
         // console.log(day + '/' + month + '/' + year + '-' + shour + ':' + smin + '-' + ehour + ':' + emin);
 
         newAbsence.startDate = new Date(year, month - 1, day, shour, smin);
@@ -192,9 +221,8 @@ export class ClassCallSheetComponent implements OnInit {
       this.alertify.success('l\'appel est enregistré');
     }, error => {
       this.alertify.error(error);
-      // console.log(error);
     }, () => {
-      this.router.navigate(['/classSession', this.schedule.id]);
+      this.router.navigate(['/classSession', this.session.scheduleId]);
     });
   }
 

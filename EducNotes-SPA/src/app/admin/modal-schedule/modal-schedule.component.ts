@@ -79,8 +79,11 @@ export class ModalScheduleComponent implements OnInit {
     const form4IsValid = g.controls['item4'].valid;
     const form5IsValid = g.controls['item5'].valid;
     const form6IsValid = g.controls['item6'].valid;
+    const teacherIsValid = g.controls['teacher'].valid;
+    const courseIsValid = g.controls['course'].valid;
 
-    if (!form1IsValid || !form2IsValid || !form3IsValid || !form4IsValid || !form5IsValid || !form6IsValid) {
+    if (!form1IsValid || !form2IsValid || !form3IsValid || !form4IsValid ||
+        !form5IsValid || !form6IsValid || !teacherIsValid || !courseIsValid) {
       return {'formNOK': true};
     }
 
@@ -225,7 +228,6 @@ export class ModalScheduleComponent implements OnInit {
         this.agendaItems = [...this.agendaItems, sch];
         }
     }
-    console.log(this.agendaItems);
     this.activeModal.close(this.agendaItems);
   }
 

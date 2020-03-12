@@ -10,7 +10,7 @@ export class ClassSessionResolver implements Resolve<any> {
     constructor(private classService: ClassService, private router: Router, private alertify: AlertifyService) {}
 
     resolve(route: ActivatedRouteSnapshot): any {
-        return this.classService.getSchedule(route.params['id']).pipe(
+        return this.classService.getSessionFromSchedule(route.params['id']).pipe(
             catchError(() => {
                 this.alertify.error('problème de récupération de données');
                 this.router.navigate(['/home']);

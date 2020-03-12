@@ -161,8 +161,8 @@ import { CourseFormResolver } from './_resolvers/course-form-resolver';
 import { TeacherFormResolver } from './_resolvers/teacher-form-resolver';
 
 import { BroadcastComponent } from './comm/brodcast/broadcast.component';
-import { MDBBootstrapModulesPro } from 'ng-uikit-pro-standard';
-import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
+import { MDBBootstrapModulesPro, MDBSpinningPreloader } from 'ng-uikit-pro-standard';
+// import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
 import { TagInputsComponent } from './views/forms/tag-inputs/tag-inputs.component';
 import { TagInputModule } from 'ngx-chips';
 import { EmailComponent } from './comm/email/email.component';

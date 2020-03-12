@@ -69,8 +69,6 @@ export class ImportUsersComponent implements OnInit {
         }
       }
 
-
-
       if (this.userTypeId === this.parentTypeId) {
         for (let i = 0; i < d.parent.length; i++) {
           const la_ligne = d.parent[i];

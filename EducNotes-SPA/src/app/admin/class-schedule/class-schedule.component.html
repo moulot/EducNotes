@@ -18,20 +18,18 @@
 </div>
 
 <div *ngIf="showTimeline" class="row mb-2">
-
-  <div *ngFor="let i of weekdays" class="card p-0 col-md-2">
+  <div *ngFor="let i of weekdays; let i = index" class="card p-0 col-md-2">
     <div class="card-body p-0 m-0 dayCol">
-      <div class="text-16 text-center">{{weekDays[i]}}</div>
-    </div>
-    <div class="d-flex">
-      <div style="width: 25px">
-        <div style="border-top: 1px solid #cccccc"></div>
-        <div class="hour-div" *ngFor="let i of hourCols; let i = index">{{i + 7}}h</div>
-      </div>
-      <div class="card-body p-0 m-0 dayCol" style="height: 360px; border-top: 1px solid #cccccc">
-        <app-classday-schedule [items]="dayItems[i]"></app-classday-schedule>
+      <div class="text-16 text-center" style="height: 25px;">{{weekDays[i]}}</div>
+      <div class="d-flex">
+        <div *ngIf="i == 0" style="width: 25px">
+          <div style="border-top: 1px solid #cccccc"></div>
+          <div class="hour-div" *ngFor="let i of hourCols; let i = index">{{i + 7}}h</div>
+        </div>
+        <div class="card-body p-0 m-0 dayCol" style="height: 360px; border-top: 1px solid #cccccc">
+          <app-classday-schedule [items]="dayItems[i]" (reloadSchedule)="reloadSchedule()"></app-classday-schedule>
+        </div>
       </div>
     </div>
   </div>
-  
 </div>

@@ -41,40 +41,42 @@
                   <div class="row">
                     <div class="col-md-6 mb-2">
                       <a [routerLink]="['/studentsClass', class.classId]">
-                        <div class="card card-icon m-0 ">
+                        <div class="card m-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                            <i class="i-MaleFemale"></i>
-                            <p class="text-muted mt-2 mb-2">{{class.nbStudents}} élèves</p>
+                            <!-- <i class="i-MaleFemale"></i> -->
+                            <mdb-icon class="lime-text lighten-2" fas icon="users" size="2x"></mdb-icon>
+                            <p class="text-15 text-muted my-1">{{class.nbStudents}} élèves</p>
                           </div>
                         </div>
                       </a>
                     </div>
                     <div class="col-md-6 mb-2">
                       <a [routerLink]="['/agendas', class.classId]">
-                        <div class="card card-icon m-0 ">
+                        <div class="card m-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                            <i class="i-Receipt"></i>
-                            <p class="text-muted mt-2 mb-2">cahier de textes</p>
+                            <!-- <i class="i-Receipt"></i> -->
+                            <mdb-icon class="blue-text lighten-1" far icon="list-alt" size="2x"></mdb-icon>
+                            <p class="text-15 text-muted my-1">cahier de textes</p>
                           </div>
                         </div>
                       </a>
                     </div>
                     <div class="col-md-6 mb-2">
                       <a [routerLink]="['/grades']">
-                        <div class="card card-icon mb-0 ">
+                        <div class="card mb-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                            <i class="i-Pen-5"></i>
-                            <p class="text-muted mt-2 mb-2">notes</p>
+                            <mdb-icon class="deep-orange-text lighten-3" fas icon="pen-alt" size="2x"></mdb-icon>
+                            <p class="text-15 text-muted my-1">notes</p>
                           </div>
                         </div>
                       </a>
                     </div>
                     <div class="col-md-6">
                       <a [routerLink]="['/classLife', class.classId]">
-                        <div class="card card-icon mb-0 ">
+                        <div class="card mb-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                            <i class="i-Conference"></i>
-                          <p class="text-muted mt-2 mb-2">vie scolaire</p>
+                            <mdb-icon class="grey-text lighten-1" fas icon="users" size="2x"></mdb-icon>
+                          <p class="text-15 text-muted my-1">vie scolaire</p>
                         </div>
                       </div>
                       </a>

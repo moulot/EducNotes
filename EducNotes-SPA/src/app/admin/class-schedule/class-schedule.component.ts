@@ -68,6 +68,10 @@ export class ClassScheduleComponent implements OnInit {
     }
   }
 
+  reloadSchedule() {
+    this.loadWeekSchedule(this.classControl.value);
+  }
+
   loadWeekSchedule(classId) {
 
     this.resetSchedule();

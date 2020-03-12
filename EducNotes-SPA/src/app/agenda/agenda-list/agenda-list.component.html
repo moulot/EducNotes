@@ -12,53 +12,6 @@
     </div>
   </div>
 
-  <!-- <div class="col-md-3">
-      <div class="card mb-2">
-          <div class="card-body p-2">
-        <input nz-input class="form-control" placeholder="recherche" [formControl]="searchControl"/>
-      </div>
-    </div>
-  </div> -->
-
-  <!-- <div class="col-md-9">
-    <div class="card mb-2">
-      <div class="card-body p-2">
-        <form [formGroup]="selectForm" (ngSubmit)="selectCourses()">
-          <div class="row">
-          <div class="col-md-2">
-            <nz-select #classSelect nzShowSearch nzPlaceHolder="classe" nzSize="default"
-              formControlName="aclass" nzAllowClear>
-              <nz-option *ngFor="let item of teacherClasses" nzLabel="{{item.className}}"
-                nzValue="{{item.classId}}"></nz-option>
-            </nz-select>
-          </div>
-          <div class="col-md-3">
-            <nz-select #courseSelect nzShowSearch nzAllowClear nzSize="default"
-              formControlName="course" nzPlaceHolder="matière">
-              <nz-option *ngFor="let item of teacherCourses" nzLabel="{{item.name}}"
-                nzValue="{{item.id}}"></nz-option>
-            </nz-select>
-          </div>
-          <div class="col-md-4">
-            <nz-range-picker id="dates" name="dates" nzSize="default"
-              formControlName="dates" nzFormat="dd-MM-yyyy"></nz-range-picker>                  
-          </div>
-          <div class="col-md-3 mt-3 mt-md-0">
-            <div class="d-flex  col-md-12">
-              <div class="col-md-6">
-                <button type="submit" [disabled]="!selectForm.valid" class="btn btn-primary btn-sm btn-block">valider</button>
-              </div>
-              <div class="col-md-6">
-                <button type="button" (click)="resetSessions()" class="btn btn-default btn-sm btn-block">reset</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        </form>
-      </div>
-    </div>
-  </div> -->
-
 </div>
 
 <div class="row">
@@ -69,8 +22,8 @@
   <div class="col-md-9">
     <div *ngIf="showSessionsData">
       <div class="text-center mb-2">
-        <button type="button" mdbBtn class="p-2" (click)="loadMovedWeek(-7)" color="light"
-          mdbWavesEffect><i class="i-Arrow-Left"></i></button>
+        <button type="button" mdbBtn class="p-2" (click)="loadMovedWeek(-7)"
+          color="light" mdbWavesEffect><mdb-icon fas icon="angle-left"></mdb-icon></button>
         <button type="button" mdbBtn (click)="showItemsByDate(weekDates[0])"  class="p-2" color="light" mdbWavesEffect>
           {{weekDays[0]}}
           <span *ngIf="nbDayTasks[0] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[0]}}</span>
@@ -96,7 +49,7 @@
           <span *ngIf="nbDayTasks[5] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[5]}}</span>
         </button>
         <button type="button" mdbBtn class="p-2" (click)="loadMovedWeek(7)" color="light"
-          mdbWavesEffect><i class="i-Arrow-Right"></i></button>
+          mdbWavesEffect><mdb-icon fas icon="angle-right"></mdb-icon></button>
       </div>
     </div>
   </div>

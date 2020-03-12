@@ -67,8 +67,16 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/SessionData/' + scheduleId);
   }
 
-  getSession(scheduleId) {
-    return this.http.get(this.baseUrl + 'classes/Session/' + scheduleId);
+  getSessionFromSchedule(scheduleId) {
+    return this.http.get(this.baseUrl + 'classes/Schedule/' + scheduleId + '/Session');
+  }
+
+  getSession(id) {
+    return this.http.get(this.baseUrl + 'classes/Sessions/' + id);
+  }
+
+  getCallSheetStudents(classId) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/CallSheet/Students');
   }
 
   saveCallSheet(sessionId: number, absences: Absence[]) {
@@ -93,6 +101,10 @@ export class ClassService {
 
   getClassSchedule(classId) {
     return this.http.get(this.baseUrl + 'classes/' + classId + '/Schedule');
+  }
+
+  delCourseFromSchedule(scheduleId) {
+    return this.http.put(this.baseUrl + 'classes/DelCourseFromSchedule/' + scheduleId, {});
   }
 
   getScheduleToday(classId: Number) {

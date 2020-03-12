@@ -1,4 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { ClassService } from 'src/app/_services/class.service';
+import { AlertifyService } from 'src/app/_services/alertify.service';
 
 @Component({
   selector: 'app-classday-schedule',
@@ -7,10 +9,23 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class ClassdayScheduleComponent implements OnInit {
   @Input() items = [];
+  @Output() reloadSchedule = new EventEmitter();
 
-  constructor() { }
+  constructor(private classService: ClassService, private alertify: AlertifyService) { }
 
   ngOnInit() {
+  }
+
+  deleteCourse(scheduleId) {
+    if (confirm('delete really?')) {
+      this.classService.delCourseFromSchedule(scheduleId).subscribe(() => {
+        this.alertify.success('le cours a bien été supprimé');
+      }, error => {
+        this.alertify.error(error);
+      }, () => {
+        this.reloadSchedule.emit();
+      });
+    }
   }
 
 }

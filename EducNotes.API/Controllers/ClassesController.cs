@@ -100,7 +100,7 @@ namespace EducNotes.API.Controllers
         for (int i = 0; i <= 6; i++)
         {
             DateTime dt = monday.AddDays(i);
-            CultureInfo frC = new CultureInfo("fr-FR");
+            //CultureInfo frC = new CultureInfo("fr-FR");
             var shortdate = dt.ToString("ddd dd MMM", frC);
             days.Add(shortdate);
         }
@@ -118,6 +118,20 @@ namespace EducNotes.API.Controllers
         }
 
         return BadRequest("Aucun emploi du temps trouvé");
+    }
+
+    [HttpPut("DelCourseFromSchedule/{scheduleId}")]
+    public async Task<IActionResult> DeleteScheduleItem(int scheduleId)
+    {
+      var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == scheduleId);
+      if(schedule != null)
+      {
+        _repo.Delete(schedule);
+        if(await _repo.SaveAll())
+          return Ok();
+      }
+
+      return BadRequest("problème pour supprimer le cours de l'emploi du temps");
     }
 
     [HttpGet("{classId}/getClassScheduleMovedWeek")]
@@ -921,35 +935,12 @@ namespace EducNotes.API.Controllers
         return BadRequest("impossible d'ajouter ce cours");
     }
 
-    [HttpGet("SessionData/{scheduleId}")]
-    public async Task<IActionResult> GetSessionData(int scheduleId)
+    [HttpGet("SessionData/{sessionId}")]
+    public async Task<IActionResult> GetSessionData(int sessionId)
     {
-      var schedule = await _context.Schedules
-                            .Include(i => i.Class)
-                            .Include(i => i.Course)
-                            .FirstOrDefaultAsync(s => s.Id == scheduleId); ;
-
-      if (schedule == null)
-        return BadRequest("problème pour créer la session du cours.");
-
-      var scheduleDay = schedule.Day;
-
-      var today = DateTime.Now.Date;
-      // monday=1, tue=2, ...
-      var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
-
-      if (todayDay != scheduleDay)
-        return BadRequest("l'emploi du temps du jour est incohérent.");
-
-      // get session by schedule and date
-      var sessionFromRepo = await _context.Sessions.FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id &&
-        s.SessionDate.Date == today);
-      var session = _mapper.Map<SessionForCallSheetDto>(sessionFromRepo);
-
-      var studentsFromRepo = await _repo.GetClassStudents(schedule.ClassId);
-      var classStudents = _mapper.Map<IEnumerable<UserForCallSheetDto>>(studentsFromRepo);
-
-      var sessionSchedule = _mapper.Map<ScheduleToReturnDto>(schedule);
+      // get session
+      var sessionFromRepo = await _context.Sessions.FirstOrDefaultAsync(s => s.Id == sessionId);
+      var session = _mapper.Map<SessionToReturnDto>(sessionFromRepo);
 
       IEnumerable<AbsenceForCallSheetDto> sessionAbsences = new List<AbsenceForCallSheetDto>();
       if (session != null)
@@ -958,38 +949,93 @@ namespace EducNotes.API.Controllers
         sessionAbsences = _mapper.Map<IEnumerable<AbsenceForCallSheetDto>>(absences);
       }
 
-      if (session != null)
-      {
-        return Ok(new
-        {
-          session,
-          sessionSchedule,
-          classStudents,
-          sessionAbsences
-        });
-      }
-      else
-      {
-        var newSession = _context.Add(new Session
-        {
-          ScheduleId = schedule.Id,
-          SessionDate = today
-        });
+      var studentsFromRepo = await _repo.GetClassStudents(session.ClassId);
+      var classStudents = _mapper.Map<IEnumerable<UserForCallSheetDto>>(studentsFromRepo);
 
-        if (await _repo.SaveAll())
-        {
-          return Ok(new
-          {
-            session = newSession,
-            sessionSchedule,
-            classStudents,
-            sessionAbsences
-          });
-        }
-
-        return BadRequest("problème pour récupérer la session");
-      }
+      return Ok(new {
+        session,
+        classStudents,
+        sessionAbsences
+      });
     }
+
+    [HttpGet("{classId}/CallSheet/Students")]
+    public async Task<IActionResult> GetCallSheetStudents(int classId)
+    {
+      var studentsFromRepo = await _repo.GetClassStudents(classId);
+      var classStudents = _mapper.Map<IEnumerable<UserForCallSheetDto>>(studentsFromRepo);
+      return Ok(classStudents);
+    }
+
+    // [HttpGet("SessionData/{scheduleId}")]
+    // public async Task<IActionResult> GetSessionData(int scheduleId)
+    // {
+    //   var schedule = await _context.Schedules
+    //                         .Include(i => i.Class)
+    //                         .Include(i => i.Course)
+    //                         .FirstOrDefaultAsync(s => s.Id == scheduleId);
+
+    //   if (schedule == null)
+    //     return BadRequest("problème pour créer la session du cours.");
+
+    //   var scheduleDay = schedule.Day;
+
+    //   var today = DateTime.Now.Date;
+    //   // monday=1, tue=2, ...
+    //   var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
+
+    //   if (todayDay != scheduleDay)
+    //     return BadRequest("l'emploi du temps du jour est incohérent.");
+
+    //   // get session by schedule and date
+    //   var sessionFromRepo = await _context.Sessions.FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id &&
+    //     s.SessionDate.Date == today);
+    //   var session = _mapper.Map<SessionForCallSheetDto>(sessionFromRepo);
+
+    //   var studentsFromRepo = await _repo.GetClassStudents(schedule.ClassId);
+    //   var classStudents = _mapper.Map<IEnumerable<UserForCallSheetDto>>(studentsFromRepo);
+
+    //   var sessionSchedule = _mapper.Map<ScheduleToReturnDto>(schedule);
+
+    //   IEnumerable<AbsenceForCallSheetDto> sessionAbsences = new List<AbsenceForCallSheetDto>();
+    //   if (session != null)
+    //   {
+    //     var absences = await _context.Absences.Where(a => a.SessionId == session.Id).ToListAsync();
+    //     sessionAbsences = _mapper.Map<IEnumerable<AbsenceForCallSheetDto>>(absences);
+    //   }
+
+    //   if (session != null)
+    //   {
+    //     return Ok(new
+    //     {
+    //       session,
+    //       sessionSchedule,
+    //       classStudents,
+    //       sessionAbsences
+    //     });
+    //   }
+    //   else
+    //   {
+    //     var newSession = _context.Add(new Session
+    //     {
+    //       ScheduleId = schedule.Id,
+    //       SessionDate = today
+    //     });
+
+    //     if (await _repo.SaveAll())
+    //     {
+    //       return Ok(new
+    //       {
+    //         session = newSession,
+    //         sessionSchedule,
+    //         classStudents,
+    //         sessionAbsences
+    //       });
+    //     }
+
+    //     return BadRequest("problème pour récupérer la session");
+    //   }
+    // }
 
     [HttpGet("Schedule/{id}")]
     public async Task<IActionResult> GetSchedule(int id)
@@ -1003,8 +1049,16 @@ namespace EducNotes.API.Controllers
         return Ok(scheduleToReturn);
     }
 
-    [HttpGet("Session/{scheduleId}")]
-    public async Task<IActionResult> GetSession(int scheduleId)
+    [HttpGet("Sessions/{id}")]
+    public async Task<IActionResult> GetSession(int id)
+    {
+      var sessionFromDB = await _context.Sessions.FirstOrDefaultAsync(s => s.Id == id);
+      var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
+      return Ok(session);
+    }
+
+    [HttpGet("Schedule/{scheduleId}/Session")]
+    public async Task<IActionResult> GetSessionFromSchedule(int scheduleId)
     {
         var schedule = _context.Schedules.Where(s => s.Id == scheduleId).FirstOrDefault();
         if (schedule == null)
@@ -1017,28 +1071,38 @@ namespace EducNotes.API.Controllers
         var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
 
         if (todayDay != scheduleDay)
-            return BadRequest("l'emploi du temps du jour est incohérent.");
+          return BadRequest("l'emploi du temps du jour est incohérent.");
 
         // get session by schedule and date
-        var session = await _context.Sessions.FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id &&
-            s.SessionDate.Date == today);
-
-        if (session != null)
+        var sessionFromDB = await _context.Sessions
+                            .Include(i => i.Class)
+                            .Include(i => i.Course)
+                            .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == today);
+        if (sessionFromDB != null)
         {
-            return Ok(session);
+          var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
+          return Ok(session);
         }
         else
         {
-            var newSession = _context.Add(new Session
-            {
-                ScheduleId = schedule.Id,
-                SessionDate = today
-            });
+          var newSession = _context.Add(new Session
+          {
+            ScheduleId = schedule.Id,
+            TeacherId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
+            ClassId = schedule.ClassId,
+            CourseId = schedule.CourseId,
+            StartHourMin = schedule.StartHourMin,
+            EndHourMin = schedule.EndHourMin,
+            SessionDate = today
+          });
 
-            if (await _repo.SaveAll())
-                return Ok(newSession);
+          if (await _repo.SaveAll())
+          {
+            var session = _mapper.Map<SessionToReturnDto>(newSession);
+            return Ok(session);
+          }
 
-            return BadRequest("problème pour récupérer la session");
+          return BadRequest("problème pour récupérer la session");
         }
     }
 
@@ -1147,9 +1211,9 @@ namespace EducNotes.API.Controllers
       //delete old absents (update: delete + add)
       if (sessionId > 0)
       {
-          List<Absence> oldAbsences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
-          if (oldAbsences.Count() > 0)
-              _repo.DeleteAll(oldAbsences);
+        List<Absence> oldAbsences = await _context.Absences.Where(a => a.SessionId == sessionId).ToListAsync();
+        if (oldAbsences.Count() > 0)
+          _repo.DeleteAll(oldAbsences);
       }
 
       // absence Sms data
@@ -1167,18 +1231,18 @@ namespace EducNotes.API.Controllers
 
       //set absence sms data
       var sessionFromDB = await _context.Sessions.FirstAsync(s => s.Id == sessionId);
-      var session = _mapper.Map<SessionForCallSheetDto>(sessionFromDB);
-      var scheduleFromDB = await _context.Schedules
-                              .Include(c => c.Class)
-                              .Include(c => c.Course)
-                              .FirstAsync(s => s.Id == session.ScheduleId);
-      var schedule = _mapper.Map<ScheduleToReturnDto>(scheduleFromDB);
+      var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
+      // var scheduleFromDB = await _context.Schedules
+      //                         .Include(c => c.Class)
+      //                         .Include(c => c.Course)
+      //                         .FirstAsync(s => s.Id == session.ScheduleId);
+      // var schedule = _mapper.Map<ScheduleToReturnDto>(scheduleFromDB);
 
       var dateData = session.strSessionDate.Split("/");
       string day = dateData[0];
       string month = dateData[1];
       string year = dateData[2];
-      string hourMin = schedule.strEndHourMin;
+      string hourMin = session.EndHourMin;
       string deliveryTime = year + "-" + month + "-" + day + "T" + hourMin + ":00";
 
       Period currPeriod = await _repo.GetPeriodFromDate(DateTime.Now);
@@ -1206,8 +1270,8 @@ namespace EducNotes.API.Controllers
           if(absence.AbsenceTypeId == absTypeId)
           {
             userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
-                              u => u.ParentId == parentId && u.SmsTemplateId == absenceSmsId &&
-                              u.ChildId == childId);
+                                  u => u.ParentId == parentId && u.SmsTemplateId == absenceSmsId &&
+                                  u.ChildId == childId);
           }
           else
           {
@@ -1229,10 +1293,10 @@ namespace EducNotes.API.Controllers
             asd.ParentFirstName = parent.FirstName;
             asd.ParentLastName = parent.LastName.FirstLetterToUpper();
             asd.ParentGender = parent.Gender;
-            asd.CourseName = schedule.CourseAbbrev;
+            asd.CourseName = session.CourseAbbrev;
             asd.SessionDate = session.SessionDate.ToString("dd/MM/yyyy", frC);
-            asd.CourseStartHour = schedule.StartHourMin.ToString("HH:mm", frC);
-            asd.CourseEndHour = schedule.EndHourMin.ToString("HH:mm", frC);
+            asd.CourseStartHour = session.StartHourMin;
+            asd.CourseEndHour = session.EndHourMin;
             asd.ParentCellPhone = parent.PhoneNumber;
             asd.LateInMin = (absence.EndDate - absence.StartDate).TotalMinutes.ToString();
             //asd.scheduledDeliveryTime = deliveryTime;

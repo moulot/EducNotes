@@ -26,6 +26,7 @@ namespace EducNotes.API
         public Startup(IConfiguration configuration)
         {
           Configuration = configuration;
+          StaticConfig = configuration;
         }
 
         public IConfiguration Configuration { get; }

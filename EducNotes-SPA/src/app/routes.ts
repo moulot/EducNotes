@@ -154,7 +154,7 @@ export const appRoutes: Routes = [
           { path: 'studentScheduleP/:id', component: StudentScheduleComponent },
           { path: 'addEval', component: EvalAddFormComponent },
           { path: 'callSheet/:id', component: ClassCallSheetComponent, resolve: { session: CallSheetResolver } },
-          { path: 'classSession/:id', component: ClassSessionComponent, resolve: { schedule: ClassSessionResolver } },
+          { path: 'classSession/:id', component: ClassSessionComponent, resolve: { session: ClassSessionResolver } },
           { path: 'inscriptions', component: InscriptionComponent },
           { path: 'inscriptionsList', component: InscriptionsListComponent },
           { path: 'classesPanel', component: ClassesPanelComponent, resolve: { levels: ClassesListResolver } },

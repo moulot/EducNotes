@@ -112,6 +112,9 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.EndHourMin, opt => {
                     opt.MapFrom(d => d.EndHourMin.ToString("HH:mm", frC));
                 })
+                .ForMember(dest => dest.CourseName, opt => {
+                    opt.MapFrom(d => d.Course.Name.Length > 10 ? d.Course.Abbreviation : d.Course.Name);
+                })
                 .ForMember(dest => dest.Top, opt => {
                     opt.MapFrom(d => d.StartHourMin.CalculateTop());
                 })
@@ -149,7 +152,19 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.strEndHourMin, opt => {
                     opt.MapFrom(d => d.EndHourMin.ToString("HH:mm", frC));
                 });
-            CreateMap<Schedule, SessionsToReturnDto>();
+            CreateMap<Session, SessionToReturnDto>()
+                .ForMember(dest => dest.CourseAbbrev, opt => {
+                    opt.MapFrom(d => d.Course.Abbreviation);
+                })
+                .ForMember(dest => dest.strSessionDate, opt => {
+                    opt.MapFrom(d => d.SessionDate.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.StartHourMin, opt => {
+                    opt.MapFrom(d => d.StartHourMin.ToString("HH:mm", frC));
+                })
+                .ForMember(dest => dest.EndHourMin, opt => {
+                    opt.MapFrom(d => d.EndHourMin.ToString("HH:mm", frC));
+                });
             CreateMap<AgendaForSaveDto, Agenda>();
             CreateMap<SmsTemplateForSaveDto, SmsTemplate>(); 
             CreateMap<SmsTemplate, SmsTemplateForListDto>()
