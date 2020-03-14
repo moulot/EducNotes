@@ -9,9 +9,8 @@ import { FormGroup, FormBuilder, NgForm, FormControl } from '@angular/forms';
 })
 export class AgendaModalComponent implements OnInit {
   @Input() session: any;
-  @Output() fct = new EventEmitter();
+  @Output() saveAgenda = new EventEmitter();
   tasksForm: FormGroup;
-  model: any = {'tasks': ''};
 
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) { }
 
@@ -30,9 +29,8 @@ export class AgendaModalComponent implements OnInit {
     if (tasks === null) {
       tasks = session.tasks;
     }
-
     session.tasks = tasks;
-    this.fct.emit(session);
+    this.saveAgenda.emit(session);
     this.activeModal.dismiss();
   }
 

@@ -79,6 +79,7 @@ namespace EducNotes.API.Data
         Task<bool> SaveProductSelection(int userPid, int userId,List<ServiceSelectionDto> products);
         Task<List<Period>> GetPeriods();
         Task<Period> GetPeriodFromDate(DateTime date);
+        Task<Session> GetSessionFromSchedule(int scheduleId, int teacherId, DateTime sessionDate);
 
     }
 }

@@ -252,17 +252,13 @@ export class ModalScheduleComponent implements OnInit {
   getClassTeachers(classId) {
     this.classService.getClassTeachers(classId).subscribe((teachers: User[]) => {
       this.teachers = teachers;
-      this.loadTeacherSelect();
+      for (let i = 0; i < this.teachers.length; i++) {
+        const elt = this.teachers[i];
+        this.teacherOptions = [...this.teacherOptions, {value: elt.id, label: elt.firstName + ' ' + elt.lastName}];
+      }
     }, error => {
       this.alertify.error(error);
     });
-  }
-
-  loadTeacherSelect() {
-    for (let i = 0; i < this.teachers.length; i++) {
-      const elt = this.teachers[i];
-      this.teacherOptions = [...this.teacherOptions, {value: elt.id, label: elt.firstName + ' ' + elt.lastName}];
-    }
   }
 
   loadCourseSelect() {

@@ -66,7 +66,6 @@ export class AgendaListComponent implements OnInit {
     // this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
     //   this.filerData(value);
     // });
-
   }
 
   // filerData(val) {
@@ -106,7 +105,7 @@ export class AgendaListComponent implements OnInit {
     setTimeout(() => {
       const instance = this.ngbModalRef.componentInstance;
       instance.session = session;
-      instance.fct.subscribe((data) => {
+      instance.saveAgenda.subscribe((data) => {
         this.saveAgenda(data);
         if (data.id === 0) {
           const itemIndex = this.coursesWithTasks.findIndex(item => item.courseId === data.courseId);
@@ -119,10 +118,9 @@ export class AgendaListComponent implements OnInit {
 
   saveAgenda(session) {
     this.agendaForSave.id = session.id;
-    this.agendaForSave.scheduleId = session.scheduleId;
+    this.agendaForSave.sessionId = session.sessionId;
     this.agendaForSave.classId = session.classId;
     this.agendaForSave.courseId = session.courseId;
-    this.agendaForSave.dueDate = session.dayDate;
     this.agendaForSave.taskDesc = session.tasks;
 
     return this.classService.saveAgendaItem(this.agendaForSave).subscribe(() => {
@@ -222,11 +220,11 @@ export class AgendaListComponent implements OnInit {
 
   loadMovedWeek(move: number) {
     this.allCourses = true;
+    console.log(this.monday);
     this.agendaParams.dueDate = this.monday;
     this.agendaParams.moveWeek = move;
 
     this.userService.getMovedWeekSessions(this.teacher.id, this.classId, this.agendaParams).subscribe((data: any) => {
-
       this.sessions = data.agendas;
       this.filteredSessions = data.agendas;
       this.allSessions = data.agendas;

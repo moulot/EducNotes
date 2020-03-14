@@ -44,7 +44,7 @@
                         <div class="card m-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
                             <!-- <i class="i-MaleFemale"></i> -->
-                            <mdb-icon class="lime-text lighten-2" fas icon="users" size="2x"></mdb-icon>
+                            <i class="fad fa-users fa-2x" style="--fa-primary-opacity: 1; --fa-primary-color:#795548;--fa-secondary-color:#795548;"></i>
                             <p class="text-15 text-muted my-1">{{class.nbStudents}} élèves</p>
                           </div>
                         </div>
@@ -55,7 +55,7 @@
                         <div class="card m-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
                             <!-- <i class="i-Receipt"></i> -->
-                            <mdb-icon class="blue-text lighten-1" far icon="list-alt" size="2x"></mdb-icon>
+                            <i class="fad fa-calendar-alt fa-2x" style="--fa-secondary-opacity: 0.7; --fa-primary-color: #000; --fa-secondary-color: #919191"></i>
                             <p class="text-15 text-muted my-1">cahier de textes</p>
                           </div>
                         </div>
@@ -65,7 +65,7 @@
                       <a [routerLink]="['/grades']">
                         <div class="card mb-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                            <mdb-icon class="deep-orange-text lighten-3" fas icon="pen-alt" size="2x"></mdb-icon>
+                            <i class="fad fa-pen-alt fa-2x" style="--fa-secondary-opacity: 1; --fa-primary-color: #616161; --fa-secondary-color: #03a9f4"></i>
                             <p class="text-15 text-muted my-1">notes</p>
                           </div>
                         </div>
@@ -75,7 +75,8 @@
                       <a [routerLink]="['/classLife', class.classId]">
                         <div class="card mb-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                            <mdb-icon class="grey-text lighten-1" fas icon="users" size="2x"></mdb-icon>
+                            <!-- <mdb-icon class="grey-text lighten-1" fas icon="users" size="2x"></mdb-icon> -->
+                            <i class="fad fa-users-class fa-2x" style="--fa-primary-opacity: 0.5; --fa-secondary-opacity: 0.7; --fa-primary-color: #795548; --fa-secondary-color:#212121;"></i>
                           <p class="text-15 text-muted my-1">vie scolaire</p>
                         </div>
                       </div>

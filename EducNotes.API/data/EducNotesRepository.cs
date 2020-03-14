@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -268,9 +269,10 @@ namespace EducNotes.API.Data
         public async Task<IEnumerable<Agenda>> GetClassAgenda(int classId, DateTime StartDate, DateTime EndDate)
         {
             return await _context.Agendas
-                        .Include(i => i.Course)
-                        .Where(a => a.ClassId == classId && a.DueDate.Date >= StartDate.Date && a.DueDate.Date <= EndDate.Date)
-                        .OrderBy(o => o.DueDate).ToListAsync();
+                        .Include(i => i.Session.Course)
+                        .Where(a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= StartDate.Date &&
+                          a.Session.SessionDate.Date <= EndDate.Date)
+                        .OrderBy(o => o.Session.SessionDate).ToListAsync();
         }
 
         public async Task<IEnumerable<Agenda>> GetClassAgendaTodayToNDays(int classId, int toNbDays)
@@ -279,9 +281,9 @@ namespace EducNotes.API.Data
             DateTime EndDate = today.AddDays(toNbDays).Date;
 
             return await _context.Agendas
-                .Include(i => i.Course)
-                .Where(a => a.ClassId == classId && a.DueDate.Date >= today && a.DueDate.Date <= EndDate)
-                .OrderBy(o => o.DueDate).ToListAsync();
+                .Include(i => i.Session.Course)
+                .Where(a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= today && a.Session.SessionDate.Date <= EndDate)
+                .OrderBy(o => o.Session.SessionDate).ToListAsync();
         }
 
         public async Task<IEnumerable<User>> GetClassStudents(int classId)
@@ -317,14 +319,58 @@ namespace EducNotes.API.Data
         //             .GroupBy(g => g.DueDate).ToListAsync();
         // }
 
+        public async Task<Session> GetSessionFromSchedule(int scheduleId, int teacherId, DateTime sessionDate)
+        {
+            var schedule = await _context.Schedules.Where(s => s.Id == scheduleId).FirstOrDefaultAsync();
+            var scheduleDay = schedule.Day;
+
+            // var today = DateTime.Now.Date;
+            // // monday=1, tue=2, ...
+            // var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
+
+            // if (todayDay != scheduleDay)
+            //   return BadRequest("l'emploi du temps du jour est incohérent.");
+
+            // get session by schedule and date
+            var sessionFromDB = await _context.Sessions
+                                .Include(i => i.Class)
+                                .Include(i => i.Course)
+                                .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == sessionDate);
+            if (sessionFromDB != null)
+            {
+              return (sessionFromDB);
+            }
+            else
+            {
+              var newSession = new Session {
+                ScheduleId = schedule.Id,
+                TeacherId = teacherId,
+                ClassId = schedule.ClassId,
+                CourseId = schedule.CourseId,
+                StartHourMin = schedule.StartHourMin,
+                EndHourMin = schedule.EndHourMin,
+                SessionDate = sessionDate
+              };
+              _context.Add(newSession);
+
+              if (await SaveAll())
+              {
+                return newSession;
+              }
+
+              return null;
+            }
+        }
+
         public async Task<IEnumerable<Agenda>> GetClassAgenda(int classId)
         {
             return await _context.Agendas
-                .Include(i => i.Class)
-                .Include(i => i.Course)
-                .Where(a => a.ClassId == classId)
-                .OrderBy(o => o.DueDate).ToListAsync();
+                .Include(i => i.Session.Class)
+                .Include(i => i.Session.Course)
+                .Where(a => a.Session.ClassId == classId)
+                .OrderBy(o => o.Session.SessionDate).ToListAsync();
         }
+
         public async Task<IEnumerable<User>> GetStudentsForClass(int classId)
         {
             return await _context.Users
@@ -649,11 +695,11 @@ namespace EducNotes.API.Data
         public IEnumerable<ClassAgendaToReturnDto> GetAgendaListByDueDate(IEnumerable<Agenda> agendaItems)
         {
             //selection de toutes les differentes dates
-            var dueDates = agendaItems.OrderBy(o => o.DueDate).Select(e => e.DueDate).Distinct();
+            var dueDates = agendaItems.OrderBy(o => o.Session.SessionDate).Select(e => e.Session.SessionDate).Distinct();
 
             var agendasToReturn = new List<ClassAgendaToReturnDto>();
             foreach(var currDate in dueDates) {
-                var currentDateAgendas = agendaItems.Where(e => e.DueDate == currDate);
+                var currentDateAgendas = agendaItems.Where(e => e.Session.SessionDate == currDate);
                 var agenda = new ClassAgendaToReturnDto();
                 agenda.dtDueDate = currDate;
                 agenda.DueDate = currDate.ToLongDateString();
@@ -664,9 +710,9 @@ namespace EducNotes.API.Data
                 agenda.Courses = new List<CourseTask>();
                 foreach (var a in currentDateAgendas) {
                     agenda.Courses.Add(new CourseTask {
-                        CourseId = a.Course.Id,
-                        CourseName = a.Course.Name,
-                        CourseColor = a.Course.Color,
+                        CourseId = a.Session.Course.Id,
+                        CourseName = a.Session.Course.Name,
+                        CourseColor = a.Session.Course.Color,
                         TaskDesc = a.TaskDesc,
                         DateAdded = a.DateAdded.ToLongDateString(),
                         ShortDateAdded = a.DateAdded.ToString("dd/MM/yyyy", frC)
@@ -1133,12 +1179,13 @@ namespace EducNotes.API.Data
         public async Task<List<AgendaForListDto>> GetUserClassAgenda(int classId, DateTime startDate, DateTime endDate)
         {
             List<Agenda> classAgenda = await _context.Agendas
-                .Include(i => i.Course)
-                .OrderBy(o => o.DueDate)
-                .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= endDate)
+                .Include(i => i.Session.Course)
+                .OrderBy(o => o.Session.SessionDate)
+                .Where(a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= startDate &&
+                  a.Session.SessionDate <= endDate)
                 .ToListAsync();
 
-            var agendaDates = classAgenda.OrderBy(o => o.DueDate).Select(a => a.DueDate).Distinct().ToList();
+            var agendaDates = classAgenda.OrderBy(o => o.Session.SessionDate).Select(a => a.Session.SessionDate).Distinct().ToList();
 
             List<AgendaForListDto> AgendaList = new List<AgendaForListDto>();
             foreach (var date in agendaDates)
@@ -1156,14 +1203,14 @@ namespace EducNotes.API.Data
 
                 //get agenda tasks Done Status
                 afld.AgendaItems = new List<AgendaItemDto>();
-                var agendaItems = classAgenda.Where(a => a.DueDate.Date == date.Date).ToList();
+                var agendaItems = classAgenda.Where(a => a.Session.SessionDate.Date == date.Date).ToList();
                 foreach (var item in agendaItems)
                 {
                     AgendaItemDto aid = new AgendaItemDto();
-                    aid.CourseId = item.CourseId;
-                    aid.CourseName = item.Course.Name;
-                    aid.CourseAbbrev = item.Course.Abbreviation;
-                    aid.CourseColor = item.Course.Color;
+                    aid.CourseId = item.Session.CourseId;
+                    aid.CourseName = item.Session.Course.Name;
+                    aid.CourseAbbrev = item.Session.Course.Abbreviation;
+                    aid.CourseColor = item.Session.Course.Color;
                     aid.strDateAdded = item.DateAdded.ToString("dd/MM/yyyy", frC);
                     aid.TaskDesc = item.TaskDesc;
                     aid.AgendaId = item.Id;

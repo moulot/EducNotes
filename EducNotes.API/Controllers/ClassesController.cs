@@ -176,9 +176,9 @@ namespace EducNotes.API.Controllers
     public async Task<IActionResult> GetClassTeachers(int classId)
     {
         var teachers = await _context.ClassCourses
-                        .Include(i => i.Teacher)
-                        .Where(t => t.ClassId == classId)
-                        .Select(t => t.Teacher).Distinct().ToListAsync();
+                              .Include(i => i.Teacher)
+                              .Where(t => t.ClassId == classId && t.Teacher != null)
+                              .Select(t => t.Teacher).Distinct().ToListAsync();
 
         var teachersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(teachers);
 
@@ -267,7 +267,7 @@ namespace EducNotes.API.Controllers
         foreach (var course in courses)
         {
             CourseTasksDto ctd = new CourseTasksDto();
-            var nbItems = itemsFromRepo.Where(a => a.CourseId == course.Id).ToList().Count();
+            var nbItems = itemsFromRepo.Where(a => a.Session.CourseId == course.Id).ToList().Count();
             ctd.CourseId = course.Id;
             ctd.CourseName = course.Name;
             ctd.CourseAbbrev = course.Abbreviation;
@@ -371,7 +371,7 @@ namespace EducNotes.API.Controllers
         foreach (var course in courses)
         {
           CourseTasksDto ctd = new CourseTasksDto();
-          var nbItems = itemsFromRepo.Where(a => a.CourseId == course.Id).ToList().Count();
+          var nbItems = itemsFromRepo.Where(a => a.Session.CourseId == course.Id).ToList().Count();
           ctd.CourseId = course.Id;
           ctd.CourseName = course.Name;
           ctd.CourseAbbrev = course.Abbreviation;
@@ -385,7 +385,6 @@ namespace EducNotes.API.Controllers
         for (int i = 0; i <= 5; i++)
         {
           DateTime dt = monday.AddDays(i);
-          CultureInfo frC = new CultureInfo("fr-FR");
           var shortdate = dt.ToString("ddd dd MMM", frC);
           days.Add(shortdate);
 
@@ -618,8 +617,8 @@ namespace EducNotes.API.Controllers
         var courseId = agendaParams.CourseId;
         var dueDate = agendaParams.DueDate;
 
-        var agendaItem = await _context.Agendas.FirstOrDefaultAsync(i => i.ClassId == classId &&
-            i.CourseId == courseId && i.DueDate == dueDate);
+        var agendaItem = await _context.Agendas.FirstOrDefaultAsync(i => i.Session.ClassId == classId &&
+            i.Session.CourseId == courseId && i.Session.SessionDate == dueDate);
 
         //return Ok(agendaItem);
         if (agendaItem != null)
@@ -711,8 +710,8 @@ namespace EducNotes.API.Controllers
             .Select(s => s.Course).ToListAsync();
 
         var classAgenda = await _context.Agendas
-            .OrderBy(o => o.DueDate)
-            .Where(a => a.ClassId == classId && a.DueDate.Date >= startDate && a.DueDate <= EndDate)
+            .OrderBy(o => o.Session.SessionDate)
+            .Where(a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= startDate && a.Session.SessionDate <= EndDate)
             .ToListAsync();
 
         List<CourseWithAgendaDto> coursesWithAgenda = new List<CourseWithAgendaDto>();
@@ -724,7 +723,7 @@ namespace EducNotes.API.Controllers
             cwa.Abbrev = course.Abbreviation;
             cwa.Color = course.Color;
 
-            var items = classAgenda.Where(a => a.CourseId == course.Id).ToList();
+            var items = classAgenda.Where(a => a.Session.CourseId == course.Id).ToList();
             List<AgendaItemDto> agendaItems = new List<AgendaItemDto>();
             foreach (var item in items)
             {
@@ -732,7 +731,7 @@ namespace EducNotes.API.Controllers
 
                 CultureInfo frC = new CultureInfo("fr-FR");
                 var strDateAdded = item.DateAdded.ToString("ddd dd MMM", frC);
-                var strDueDate = item.DueDate.ToString("ddd dd MMM", frC);
+                var strDueDate = item.Session.SessionDate.ToString("ddd dd MMM", frC);
 
                 aid.strDateAdded = strDateAdded;
                 aid.strDueDate = strDueDate;
@@ -801,7 +800,7 @@ namespace EducNotes.API.Controllers
         foreach (var course in courses)
         {
             CourseTasksDto ctd = new CourseTasksDto();
-            var nbItems = classAgenda.Where(a => a.CourseId == course.Id).ToList().Count();
+            var nbItems = classAgenda.Where(a => a.Session.CourseId == course.Id).ToList().Count();
             ctd.CourseId = course.Id;
             ctd.CourseName = course.Name;
             ctd.CourseAbbrev = course.Abbreviation;
@@ -1057,54 +1056,54 @@ namespace EducNotes.API.Controllers
       return Ok(session);
     }
 
-    [HttpGet("Schedule/{scheduleId}/Session")]
-    public async Task<IActionResult> GetSessionFromSchedule(int scheduleId)
-    {
-        var schedule = _context.Schedules.Where(s => s.Id == scheduleId).FirstOrDefault();
-        if (schedule == null)
-            return BadRequest("problème pour créer la session du cours.");
+    // [HttpGet("Schedule/{scheduleId}/Session")]
+    // public async Task<IActionResult> GetSessionFromSchedule(int scheduleId)
+    // {
+    //     var schedule = _context.Schedules.Where(s => s.Id == scheduleId).FirstOrDefault();
+    //     if (schedule == null)
+    //         return BadRequest("problème pour créer la session du cours.");
 
-        var scheduleDay = schedule.Day;
+    //     var scheduleDay = schedule.Day;
 
-        var today = DateTime.Now.Date;
-        // monday=1, tue=2, ...
-        var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
+    //     var today = DateTime.Now.Date;
+    //     // monday=1, tue=2, ...
+    //     var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
 
-        if (todayDay != scheduleDay)
-          return BadRequest("l'emploi du temps du jour est incohérent.");
+    //     if (todayDay != scheduleDay)
+    //       return BadRequest("l'emploi du temps du jour est incohérent.");
 
-        // get session by schedule and date
-        var sessionFromDB = await _context.Sessions
-                            .Include(i => i.Class)
-                            .Include(i => i.Course)
-                            .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == today);
-        if (sessionFromDB != null)
-        {
-          var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
-          return Ok(session);
-        }
-        else
-        {
-          var newSession = _context.Add(new Session
-          {
-            ScheduleId = schedule.Id,
-            TeacherId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
-            ClassId = schedule.ClassId,
-            CourseId = schedule.CourseId,
-            StartHourMin = schedule.StartHourMin,
-            EndHourMin = schedule.EndHourMin,
-            SessionDate = today
-          });
+    //     // get session by schedule and date
+    //     var sessionFromDB = await _context.Sessions
+    //                         .Include(i => i.Class)
+    //                         .Include(i => i.Course)
+    //                         .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == today);
+    //     if (sessionFromDB != null)
+    //     {
+    //       var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
+    //       return Ok(session);
+    //     }
+    //     else
+    //     {
+    //       var newSession = _context.Add(new Session
+    //       {
+    //         ScheduleId = schedule.Id,
+    //         TeacherId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
+    //         ClassId = schedule.ClassId,
+    //         CourseId = schedule.CourseId,
+    //         StartHourMin = schedule.StartHourMin,
+    //         EndHourMin = schedule.EndHourMin,
+    //         SessionDate = today
+    //       });
 
-          if (await _repo.SaveAll())
-          {
-            var session = _mapper.Map<SessionToReturnDto>(newSession);
-            return Ok(session);
-          }
+    //       if (await _repo.SaveAll())
+    //       {
+    //         var session = _mapper.Map<SessionToReturnDto>(newSession);
+    //         return Ok(session);
+    //       }
 
-          return BadRequest("problème pour récupérer la session");
-        }
-    }
+    //       return BadRequest("problème pour récupérer la session");
+    //     }
+    // }
 
     [HttpGet("courses/{courseId}/teacher/{teacherId}/Program")]
     public async Task<IActionResult> ClassesWithProgram(int courseId, int teacherId)

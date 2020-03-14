@@ -52,7 +52,6 @@ export class ClassAgendaComponent implements OnInit {
   loadWeekAgenda(classId) {
 
     this.classService.getClassCurrWeekAgenda(classId).subscribe((res: any) => {
-
       this.classAgendaDays = res.agendaItems;
       this.filteredAgenda = res.agendaItems;
       this.monday = res.firstDayWeek;
