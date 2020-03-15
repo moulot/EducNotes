@@ -21,6 +21,7 @@ export class NavGPanelComponent implements OnInit {
   model: any = {};
   photoUrl: string;
   notifications: any[];
+  acc_name: string;
 
     // editer par mohamed
   constructor(public authService: AuthService, private alertify: AlertifyService,
@@ -74,6 +75,7 @@ export class NavGPanelComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.currentUser;
+    this.acc_name = this.user.firstName.substring(0, 1).toLowerCase() + '. ' + this.user.lastName.toLowerCase();
     this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
   }
 

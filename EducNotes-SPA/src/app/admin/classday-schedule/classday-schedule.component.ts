@@ -9,6 +9,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 })
 export class ClassdayScheduleComponent implements OnInit {
   @Input() items = [];
+  @Input() dayName: string;
   @Output() reloadSchedule = new EventEmitter();
 
   constructor(private classService: ClassService, private alertify: AlertifyService) { }
@@ -16,8 +17,8 @@ export class ClassdayScheduleComponent implements OnInit {
   ngOnInit() {
   }
 
-  deleteCourse(scheduleId) {
-    if (confirm('delete really?')) {
+  deleteCourse(scheduleId, dayName, delInfo) {
+    if (confirm('voulez vous vraiment effacer le cours du ' + dayName + ': ' + delInfo)) {
       this.classService.delCourseFromSchedule(scheduleId).subscribe(() => {
         this.alertify.success('le cours a bien été supprimé');
       }, error => {

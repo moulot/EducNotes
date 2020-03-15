@@ -25,20 +25,31 @@
         <ul class="navbar-nav nav-flex-icons">
           <!-- <i appFullScreen class="i-Full-Screen header-icon d-none d-sm-inline-block" role="button"></i> -->
           <li class="nav-item waves-light" mdbWavesEffect>
-            <a class="nav-link">
-              <i class="fad fa-expand-alt" style="font-size:20px;--fa-primary-color: #000; --fa-secondary-color: #9e9e9e; --fa-secondary-opacity: 1"></i>
+            <a class="nav-link text-17 text-muted" (click)="closeNav()" [routerLink]="['/userAccount']">
+              <i class="fad fa-user-lock mr-1" style="font-size:20px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
             </a>
           </li>
-          <!-- <li class="nav-item waves-light" mdbWavesEffect>
-            <a class="nav-link text-muted"><mdb-icon fab icon="facebook-f"></mdb-icon><mdb-icon far icon="address-book"></mdb-icon></a>
+          <li class="nav-item waves-light" mdbWavesEffect>
+            <a class="nav-link">
+              <i class="fad fa-expand-alt" appFullScreen style="font-size:20px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
+            </a>
           </li>
           <li class="nav-item waves-light" mdbWavesEffect>
-            <a class="nav-link text-muted"><mdb-icon fab icon="twitter"></mdb-icon></a>
+            <a class="nav-link" (click)="logout()">
+              <i class="fad fa-sign-out-alt" style="font-size:25px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
+            </a>
           </li>
           <li class="nav-item waves-light" mdbWavesEffect>
-            <a class="nav-link text-muted"><mdb-icon fab icon="instagram"></mdb-icon></a>
-          </li> -->
-          <li class="nav-item avatar dropdown btn-group" dropdown>
+            <div class="nav-link text-15 text-muted">
+              {{acc_name}}
+            </div>
+          </li>
+          <li class="nav-item  waves-light" mdbWavesEffect>
+            <div class="">
+              <img [src]="photoUrl || '../../../assets/user.png'" alt="" style="width: 35px;" class="rounded-circle z-depth-0">
+            </div>
+          </li>
+          <!-- <li class="nav-item avatar dropdown btn-group" dropdown style="border: 1px solid blue">
             <a dropdownToggle type="button" class="nav-link dropdown-toggle waves-light" mdbWavesEffect>
               <img [src]="photoUrl || '../../../assets/user.png'" alt="" class="img-fluid rounded-circle z-depth-0">
             </a>
@@ -49,7 +60,7 @@
               <a class="dropdown-item waves-light" [routerLink]="['/userAccount']" mdbWavesEffect>mon compte</a>
               <a class="dropdown-item waves-light" (click)="logout()" mdbWavesEffect>se déconnecter</a>
             </div>
-          </li>
+          </li> -->
         </ul>
     </links>
 </mdb-navbar>

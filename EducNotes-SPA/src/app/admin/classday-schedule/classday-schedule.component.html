@@ -1,13 +1,12 @@
 <div class="card" style="position:absolute; width: 100%" *ngFor="let item of items"
   [ngStyle]="{'top': item.top, 'height': item.height}">
-  <div class="card-body p-1" [ngStyle]="{'background-color': item.color}">
-    <div class="float-right">
-    </div>
+  <div class="card-body rounded-lg p-1" [ngStyle]="{'background-color': item.color}">
     <div class="d-flex">
       <p class="flex-grow-1 font-weight-600 text-11 m-0">{{item.courseName | uppercase}}</p>
       <div class="d-flex">
         <div class="text-12 m-0">{{item.startHourMin}} - {{item.endHourMin}}</div>
-        <div class="ml-2"><i class="fa fa-1x fa-trash" (click)="deleteCourse(item.id)" style="cursor: pointer;" aria-hidden="true"></i></div>
+        <div class="ml-2"><i class="fa fa-1x fa-trash" style="cursor: pointer;" aria-hidden="true"
+          (click)="deleteCourse(item.id, dayName, item.delInfo)"></i></div>
       </div>
     </div>
     <p class="text-12 text-capitalize m-0">{{item.teacherName}}</p>

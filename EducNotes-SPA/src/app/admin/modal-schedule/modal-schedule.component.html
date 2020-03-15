@@ -31,7 +31,6 @@
                 <div class="form-group col-md-3 mb-0">
                   <label for="day1">jour du cours</label>
                   <select class="form-control mr-2 mb-0" id="day1" name="day1" formControlName="day1">
-                    <!-- <option selected disabled>jour du cours</option> -->
                     <option *ngFor="let item of daySelect" value="{{item.value}}">{{item.name}}</option>
                   </select>
                 </div>

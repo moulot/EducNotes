@@ -170,7 +170,7 @@ export class ClassService {
   }
 
   getAllClasses() {
-    return this.http.get<any[]>(this.baseUrl + 'classes/GetAllClasses');
+    return this.http.get<any[]>(this.baseUrl + 'classes/AllClasses');
   }
   // recuperer tous les professeurs ainsi que les cours qui leurs sont deja assignés
   getAllTeachersCourses() {

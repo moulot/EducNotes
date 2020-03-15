@@ -391,58 +391,97 @@ namespace EducNotes.API.Controllers
           var agendas = new List<SessionForListDto>();
           for(int i = 0; i < 7; i++)
           {
-              var currentDate = monday.AddDays(i).Date;
-              var day = ((int)currentDate.DayOfWeek == 0) ? 7 : (int)currentDate.DayOfWeek;
-              if(day == 7) { continue; }
-              
-              SessionForListDto sfld = new SessionForListDto();
-              sfld.DueDate = currentDate;
-              sfld.ShortDueDate = currentDate.ToString("ddd dd MMM", frC);
-              sfld.LongDueDate = currentDate.ToString("dd MMMM yyyy", frC);
-              sfld.DueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
-              //get agenda tasks Done Status
-              sfld.AgendaItems = new List<AgendaToReturnDto>();
-              var daySchedule = teacherSchedule.Where(d => d.Day == day && d.ClassId == classId).OrderBy(d => d.StartHourMin);
-              if(daySchedule.Count() == 0) { continue; }
+            var currentDate = monday.AddDays(i).Date;
+            var day = ((int)currentDate.DayOfWeek == 0) ? 7 : (int)currentDate.DayOfWeek;
+            if(day == 7) { continue; }
+            
+            SessionForListDto sfld = new SessionForListDto();
+            sfld.DueDate = currentDate;
+            sfld.ShortDueDate = currentDate.ToString("ddd dd MMM", frC);
+            sfld.LongDueDate = currentDate.ToString("dd MMMM yyyy", frC);
+            sfld.DueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
+            //get agenda tasks Done Status
+            sfld.AgendaItems = new List<AgendaToReturnDto>();
+            
+            //agenda items retrieved from schedule items
+            var daySchedule = teacherSchedule
+                                .Where(d => d.Day == day && d.ClassId == classId)
+                                .OrderBy(d => d.StartHourMin.Hour)
+                                .ThenBy(d => d.StartHourMin.Minute);
 
-              foreach (var scheduleItem in daySchedule)
-              {
-                string startHour = scheduleItem.StartHourMin.ToString("HH:mm", frC);
-                string endHour = scheduleItem.EndHourMin.ToString("HH:mm", frC);
-                var tasks = "";
-                var id = 0;
-                var agenda = await _context.Agendas.SingleOrDefaultAsync(a => a.Session.SessionDate.Date == currentDate &&
-                  a.Session.TeacherId == teacherId && a.Session.ClassId == scheduleItem.ClassId &&
-                  a.Session.StartHourMin.ToString("HH:mm", frC) == startHour &&
-                  a.Session.EndHourMin.ToString("HH:mm", frC) == endHour);
-                if(agenda != null) {
-                  tasks = agenda.TaskDesc;
-                  id = agenda.Id;
-                }
-
-                var session = await _repo.GetSessionFromSchedule(scheduleItem.Id, teacherId, currentDate);
-                var newAgenda = new AgendaToReturnDto {
-                  Id = id,
-                  SessionId = session.Id,
-                  TeacherId = Convert.ToInt32(scheduleItem.TeacherId),
-                  TeacherName = scheduleItem.Teacher.LastName + ' ' + scheduleItem.Teacher.FirstName,
-                  CourseId = Convert.ToInt32(scheduleItem.CourseId),
-                  strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
-                  DayDate = currentDate,
-                  Day = scheduleItem.Day,
-                  CourseName = scheduleItem.Course.Name,
-                  CourseColor = scheduleItem.Course.Color,
-                  ClassId = Convert.ToInt32(scheduleItem.ClassId),
-                  ClassName = scheduleItem.Class.Name,
-                  Tasks = tasks,
-                  StartHourMin = scheduleItem.StartHourMin.ToString("HH:mm", frC),
-                  EndHourMin = scheduleItem.EndHourMin.ToString("HH:mm", frC)
-                };
-
-                sfld.AgendaItems.Add(newAgenda);
+            foreach (var scheduleItem in daySchedule)
+            {
+              string startHour = scheduleItem.StartHourMin.ToString("HH:mm", frC);
+              string endHour = scheduleItem.EndHourMin.ToString("HH:mm", frC);
+              var tasks = "";
+              var id = 0;
+              var agenda = await _context.Agendas.SingleOrDefaultAsync(a => a.Session.SessionDate.Date == currentDate &&
+                a.Session.TeacherId == teacherId && a.Session.ClassId == scheduleItem.ClassId &&
+                a.Session.StartHourMin.ToString("HH:mm", frC) == startHour &&
+                a.Session.EndHourMin.ToString("HH:mm", frC) == endHour);
+              if(agenda != null) {
+                tasks = agenda.TaskDesc;
+                id = agenda.Id;
               }
 
-              agendas.Add(sfld);
+              var session = await _repo.GetSessionFromSchedule(scheduleItem.Id, teacherId, currentDate);
+              var newAgenda = new AgendaToReturnDto {
+                Id = id,
+                SessionId = session.Id,
+                TeacherId = Convert.ToInt32(scheduleItem.TeacherId),
+                TeacherName = scheduleItem.Teacher.LastName + ' ' + scheduleItem.Teacher.FirstName,
+                CourseId = Convert.ToInt32(scheduleItem.CourseId),
+                strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
+                DayDate = currentDate,
+                Day = scheduleItem.Day,
+                CourseName = scheduleItem.Course.Name,
+                CourseColor = scheduleItem.Course.Color,
+                ClassId = Convert.ToInt32(scheduleItem.ClassId),
+                ClassName = scheduleItem.Class.Name,
+                Tasks = tasks,
+                StartHourMin = scheduleItem.StartHourMin.ToString("HH:mm", frC),
+                EndHourMin = scheduleItem.EndHourMin.ToString("HH:mm", frC)
+              };
+
+              sfld.AgendaItems.Add(newAgenda);
+            }
+
+            //retrieve agenda items with lost shceduleId (schedule item has been deleted/updated)
+            var itemsWithNoScheduleId = await _context.Agendas
+                                              .Include(a => a.Session)
+                                              .Where(a => a.Session.SessionDate.Date == currentDate.Date &&
+                                                a.Session.ScheduleId == null)
+                                              .OrderBy(o => o.Session.StartHourMin.Hour)
+                                              .ThenBy(o => o.Session.StartHourMin.Minute)
+                                              .ToListAsync();
+            
+            foreach (var item in itemsWithNoScheduleId)
+            {
+              var itemDayInt = ((int)item.Session.SessionDate.DayOfWeek == 0) ? 7 : (int)currentDate.DayOfWeek;
+              if(day == 7) { continue; }
+
+              var newAgenda = new AgendaToReturnDto {
+                Id = item.Id,
+                SessionId = item.SessionId,
+                TeacherId = Convert.ToInt32(item.Session.TeacherId),
+                TeacherName = item.Session.Teacher.LastName + ' ' + item.Session.Teacher.FirstName,
+                CourseId = Convert.ToInt32(item.Session.CourseId),
+                strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
+                DayDate = currentDate,
+                Day = itemDayInt,
+                CourseName = item.Session.Course.Name,
+                CourseColor = item.Session.Course.Color,
+                ClassId = item.Session.ClassId,
+                ClassName = item.Session.Class.Name,
+                Tasks = item.TaskDesc,
+                StartHourMin = item.Session.StartHourMin.ToString("HH:mm", frC),
+                EndHourMin = item.Session.EndHourMin.ToString("HH:mm", frC)
+              };
+
+              sfld.AgendaItems.Add(newAgenda);
+            }
+
+            agendas.Add(sfld);
           }
 
           var days = new List<string>();
@@ -474,12 +513,17 @@ namespace EducNotes.API.Controllers
               coursesWithTasks.Add(ctd);
           }
 
+          foreach (var item in agendas)
+          {
+            item.AgendaItems = item.AgendaItems.OrderBy(o => o.StartHourMin).ToList();
+          }
+
           return Ok(new {
-              agendas,
-              monday,
-              weekDays = days,
-              weekDates,
-              coursesWithTasks
+            agendas,
+            monday,
+            weekDays = days,
+            weekDates,
+            coursesWithTasks
           });
         }
 

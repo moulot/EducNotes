@@ -16,5 +16,6 @@ namespace EducNotes.API.Dtos
         public string Top { get; set; }
         public string Height { get; set; }
         public string Color { get; set; }
+        public string DelInfo { get; set; }
     }
 }

@@ -99,21 +99,20 @@ namespace EducNotes.API.Controllers
         var days = new List<string>();
         for (int i = 0; i <= 6; i++)
         {
-            DateTime dt = monday.AddDays(i);
-            //CultureInfo frC = new CultureInfo("fr-FR");
-            var shortdate = dt.ToString("ddd dd MMM", frC);
-            days.Add(shortdate);
+          DateTime dt = monday.AddDays(i);
+          var shortdate = dt.ToString("ddd dd MMM", frC);
+          days.Add(shortdate);
         }
 
         if (itemsToReturn != null)
         {
             return Ok(new
             {
-                scheduleItems = itemsToReturn,
-                firstDayWeek = monday,
-                strMonday = monday.ToLongDateString(),
-                strSunday = sunday.ToLongDateString(),
-                weekDays = days
+              scheduleItems = itemsToReturn,
+              firstDayWeek = monday,
+              strMonday = monday.ToLongDateString(),
+              strSunday = sunday.ToLongDateString(),
+              weekDays = days
             });
         }
 
@@ -680,7 +679,7 @@ namespace EducNotes.API.Controllers
         return Ok(await les_cours.ToListAsync());
     }
 
-    [HttpGet("GetAllClasses")]
+    [HttpGet("AllClasses")]
     public async Task<IActionResult> GetAllClasses()
     {
         var les_classes = _context.Classes.Include(e => e.ClassLevel).OrderBy(a => a.Name);
