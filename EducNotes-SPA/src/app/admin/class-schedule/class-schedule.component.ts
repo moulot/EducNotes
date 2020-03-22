@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation } from '@angular/core';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Class } from 'src/app/_models/class';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Schedule } from 'src/app/_models/schedule';
-import { NgbModal, NgbModalRef, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { ModalScheduleComponent } from '../modal-schedule/modal-schedule.component';
 import { Router } from '@angular/router';
+import { MDBModalService, MDBModalRef } from 'ng-uikit-pro-standard';
 
 @Component({
   selector: 'app-class-schedule',
@@ -16,10 +16,9 @@ import { Router } from '@angular/router';
 export class ClassScheduleComponent implements OnInit {
   @ViewChild('classSelect', {static: false}) classSelect: ElementRef;
   classId: number;
-  // classes: Class[];
   scheduleItems: any;
   scheduleForm: FormGroup;
-  ngbModalRef: NgbModalRef;
+  modalRef: MDBModalRef;
   dayItems = [];
   loading: boolean;
   monCourses = [];
@@ -39,19 +38,26 @@ export class ClassScheduleComponent implements OnInit {
   optionsClass: any[] = [];
 
   constructor(private classService: ClassService, public alertify: AlertifyService,
-    private modalService: NgbModal, private router: Router) { }
+    private modalService1: MDBModalService, private router: Router) { }
 
   ngOnInit() {
     this.getClasses();
   }
 
   getClasses() {
-    this.classService.getAllClasses().subscribe((data: Class[]) => {
+    this.classService.getClassesByLevel().subscribe((data: any) => {
       // this.classes = data;
       for (let i = 0; i < data.length; i++) {
-        const elt = data[i];
-        const element = {value: elt.id, label: 'classe ' + elt.name};
-        this.optionsClass = [...this.optionsClass, element];
+        const level = data[i];
+        if (level.classes.length > 0) {
+          const elt = {value: '', label: 'niveau ' + level.levelName, group: true};
+          this.optionsClass = [...this.optionsClass, elt];
+          for (let j = 0; j < level.classes.length; j++) {
+            const aclass = level.classes[j];
+            const elt1 = {value: aclass.id, label: 'classe ' + aclass.name};
+            this.optionsClass = [...this.optionsClass, elt1];
+          }
+        }
       }
     }, error => {
       this.alertify.error(error);
@@ -118,31 +124,32 @@ export class ClassScheduleComponent implements OnInit {
   }
 
   openModal() {
-    const options: NgbModalOptions = {
-      ariaLabelledBy: 'modal-basic-title',
-      size: 'lg',
-      centered: true
+    const modalOptions = {
+      backdrop: true,
+      keyboard: false,
+      focus: true,
+      show: false,
+      scroll: true,
+      ignoreBackdropClick: false,
+      class: 'modal-xl',
+      containerClass: '',
+      animated: true,
+      data: { classId: this.classId }
     };
-    const modalRef = this.modalService.open(ModalScheduleComponent, options);
-    const instance = modalRef.componentInstance;
-    instance.classId = this.classId;
 
-    modalRef.result.then((result) => {
-      if (result) {
-        this.saveSchedules(result);
-      }
-    }, () => {
-
+    this.modalRef = this.modalService1.show(ModalScheduleComponent, modalOptions);
+    this.modalRef.content.saveSchedule.subscribe((data) => {
+      this.saveSchedules(data);
     });
   }
 
   saveSchedules(schedules: Schedule[]) {
 
     this.classService.saveSchedules(schedules).subscribe(() => {
-      this.alertify.successBar('cours de l\'emploi du temps enregistrés');
+      this.alertify.success('cours de l\'emploi du temps enregistrés');
       this.loadWeekSchedule(this.classId);
     }, error => {
-      this.alertify.errorBar(error);
+      this.alertify.error(error);
       this.router.navigate(['/home']);
     });
 

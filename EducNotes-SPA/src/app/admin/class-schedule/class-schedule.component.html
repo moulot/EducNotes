@@ -1,14 +1,15 @@
 <div class="row mb-2">
-  <div class="col-md-12">
-    <p class="text-17">classes - emplois du temps</p>
+  <div class="col-md-12 d-flex">
+    <i class="fad fa-calendar-alt fa-2x mr-2" style="--fa-secondary-opacity: 1; --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
+    <p class="text-20 font-weight-300">classes - emplois du temps</p>
   </div>
   <div class="col-md-3">
-    <mdb-select [options]="optionsClass" [formControl]="classControl"
+    <mdb-select [options]="optionsClass" [formControl]="classControl" [visibleOptions]="10"
       (ngModelChange)="classChanged()" placeholder="choisir la classe"></mdb-select>
   </div>
   <div class="col-md-9">
     <div *ngIf="showTimeline">
-      <button type="button" mdbBtn size="sm" color="primary" (click)="openModal()" mdbWavesEffect>ajouter un cours</button>
+      <button type="button" mdbBtn size="sm" color="primary" (click)="openModal()" mdbWavesEffect>ajouter des cours</button>
     </div>    
   </div>
 </div>

@@ -101,7 +101,7 @@ export class NewThemeComponent implements OnInit {
       this.alertify.success('enregistrement terminé...');
       this.waitDiv = false;
       this.theme = {};
-      this.theme.lessons =[];
+      this.theme.lessons = [];
     }, error => {
       console.log(error);
     });

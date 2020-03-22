@@ -173,6 +173,8 @@
 
   .modal-sm { max-width: $modal-sm; }
 
+  .modal-xl { max-width: $modal-xl; }
+
 }
 
 @include media-breakpoint-up(lg) {

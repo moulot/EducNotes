@@ -43,6 +43,40 @@ namespace EducNotes.API.Helpers
             return age;
         }
 
+        public static string DayIntToName(this int dayInt)
+        {
+          string dayName = "";
+          switch (dayInt)
+          {
+            case 1:
+              dayName = "lundi";
+              break;
+            case 2:
+              dayName = "mardi";
+              break;
+            case 3:
+              dayName = "mercredi";
+              break;
+            case 4:
+              dayName = "jeudi";
+              break;
+            case 5:
+              dayName = "vendredi";
+              break;
+            case 6:
+              dayName = "samedi";
+              break;
+            case 7:
+              dayName = "dimanche";
+              break;
+            default:
+              dayName = "";
+              break;
+          }
+
+          return dayName;
+        }
+
         public static string CalculateTop(this DateTime startHourMin)
         {
             // to be retrieved from appSettings

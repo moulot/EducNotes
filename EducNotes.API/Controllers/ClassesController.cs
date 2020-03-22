@@ -682,9 +682,32 @@ namespace EducNotes.API.Controllers
     [HttpGet("AllClasses")]
     public async Task<IActionResult> GetAllClasses()
     {
-        var les_classes = _context.Classes.Include(e => e.ClassLevel).OrderBy(a => a.Name);
+      var les_classes = _context.Classes.Include(e => e.ClassLevel).OrderBy(a => a.Name);
+      return Ok(await les_classes.ToListAsync());
+    }
 
-        return Ok(await les_classes.ToListAsync());
+    [HttpGet("ClassesByLevel")]
+    public async Task<IActionResult> GetClassesByLevel()
+    {
+      List<ClassByLevelDto> classesByLevel = new List<ClassByLevelDto>();
+      var levels = await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
+      foreach (var level in levels)
+      {
+        ClassByLevelDto cbl = new ClassByLevelDto();
+        cbl.ClassLevelId = level.Id;
+        cbl.LevelName = level.Name;
+
+        cbl.Classes = new List<Class>();
+        var classes = await _context.Classes.Where(c => c.ClassLevelId == level.Id).OrderBy(o => o.Name).ToListAsync();
+        foreach (var aclass in classes)
+        {
+          cbl.Classes.Add(aclass);
+        }
+
+        classesByLevel.Add(cbl);
+      }
+
+      return Ok(classesByLevel);
     }
 
     [HttpGet("{classId}/classCourses")]

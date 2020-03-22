@@ -118,6 +118,14 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'users/' + teacherId + '/Schedule');
   }
 
+  getTeacherScheduleByDay(teacherId) {
+    return this.http.get(this.baseUrl + 'users/' + teacherId + '/ScheduleByDay');
+  }
+
+  getTeacherScheduleByClassByDay(teacherId) {
+    return this.http.get(this.baseUrl + 'users/' + teacherId + '/ScheduleByClassByDay');
+  }
+
   getGradesData(teacherId, periodId) {
     return this.http.get(this.baseUrl + 'users/' + teacherId + '/GradesData/' + periodId);
   }

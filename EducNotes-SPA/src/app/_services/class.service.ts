@@ -169,9 +169,14 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/Agenda/' + agendaId + '/SetTask/' + isDone);
   }
 
+  getClassesByLevel() {
+    return this.http.get(this.baseUrl + 'classes/ClassesByLevel');
+  }
+
   getAllClasses() {
     return this.http.get<any[]>(this.baseUrl + 'classes/AllClasses');
   }
+
   // recuperer tous les professeurs ainsi que les cours qui leurs sont deja assignés
   getAllTeachersCourses() {
     return this.http.get(this.baseUrl + 'classes/GetAllTeachersCourses');

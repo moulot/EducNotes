@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, ɵConsole } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ClassService } from 'src/app/_services/class.service';
@@ -6,7 +6,7 @@ import { UserService } from 'src/app/_services/user.service';
 import { User } from 'src/app/_models/user';
 import { Course } from 'src/app/_models/course';
 import { Schedule } from 'src/app/_models/schedule';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { MDBModalRef } from 'ng-uikit-pro-standard';
 
 @Component({
   selector: 'app-modal-schedule',
@@ -14,21 +14,26 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./modal-schedule.component.scss']
 })
 export class ModalScheduleComponent implements OnInit {
-  @Input() classId: number;
+  @Output() saveSchedule = new EventEmitter();
+  classId: number;
   courses: Course[];
   teachers: User[];
+  scheduleForm: FormGroup;
+  formOk = false;
+  periodConflict = false;
+  teacherSchedule: any;
   timeMask = [/\d/, /\d/, ':', /\d/, /\d/];
   agendaItems: Schedule[] = [];
-  scheduleForm: FormGroup;
   teacherOptions: any = [];
   courseOptions: any = [];
+  courseConflicts: any = [];
   weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-  daySelect = [{'value': 1, 'name': 'lundi'}, {'value': 2, 'name': 'mardi'}, {'value': 3, 'name': 'mercredi'},
-    {'value': 4, 'name': 'jeudi'}, {'value': 5, 'name': 'vendredi'}, {'value': 6, 'name': 'samedi'}];
+  daySelect = [{'value': 1, 'label': 'lundi'}, {'value': 2, 'label': 'mardi'}, {'value': 3, 'label': 'mercredi'},
+    {'value': 4, 'label': 'jeudi'}, {'value': 5, 'label': 'vendredi'}, {'value': 6, 'label': 'samedi'}];
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
     private classService: ClassService, private userService: UserService,
-    public activeModal: NgbActiveModal) { }
+    public activeModal: MDBModalRef) { }
 
   ngOnInit() {
     this.createScheduleForm();
@@ -210,6 +215,74 @@ export class ModalScheduleComponent implements OnInit {
     }
   }
 
+  isConflict(index) {
+    const formIsValid = this.scheduleForm.controls['item' + index].valid;
+    if (formIsValid) {
+      const day = this.scheduleForm.controls['item' + index].get('day' + index).value;
+      const startH = this.scheduleForm.controls['item' + index].get('hourStart' + index).value;
+      const endH = this.scheduleForm.controls['item' + index].get('hourEnd' + index).value;
+      // console.log('before');
+      // console.log(this.courseConflicts);
+      this.resetConflicts(day);
+      // console.log('after');
+      // console.log(this.courseConflicts);
+
+      if (day || startH.length === 5 || endH.length === 5) {
+        const dayIndex = this.teacherSchedule.days.findIndex(elt => elt.day === day);
+        const dayCourses = this.teacherSchedule.days[dayIndex];
+        const dayName = dayCourses.dayName;
+        // console.log(dayCourses.courses);
+        let conflict = false;
+        this.periodConflict = false;
+        for (let i = 0; i < dayCourses.courses.length; i++) {
+          const elt = dayCourses.courses[i];
+          const courseStartH = Number(elt.startH.replace(':', ''));
+          const courseEndH = Number(elt.endH.replace(':', ''));
+          const startHNum = Number(startH.replace(':', ''));
+          const endHNum = Number(endH.replace(':', ''));
+          // console.log('IN LOOP');
+          // console.log(courseStartH + ' - ' + courseEndH + ' --- ' + startHNum + ' - ' + endHNum);
+          if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH && endHNum <= courseEndH) ||
+            (startHNum < courseStartH && endHNum > courseEndH)) {
+            const conflictElt = { day: day, data: 'conflit ligne 1 avec le cours du ' + dayName + '. horaire : ' + elt.startH + ' - ' + elt.endH };
+            this.courseConflicts = [...this.courseConflicts, conflictElt];
+            dayCourses.courses.find(c => c.courseId === elt.courseId).inConflict = true;
+            // console.log(this.courseConflicts);
+            conflict = true;
+            this.periodConflict = true;
+          }
+        }
+        // console.log('final');
+        // console.log(this.courseConflicts);
+        // console.log(this.teacherSchedule);
+        return conflict;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  resetConflicts(day) {
+    const dayCourses = this.teacherSchedule.days.find(c => c.day === day);
+    // console.log('dayCourses');
+    // console.log(dayCourses);
+    for (let i = 0; i < dayCourses.courses.length; i++) {
+      const elt = dayCourses.courses[i];
+      // console.log('course elt');
+      // console.log(elt);
+      elt.inConflict = false;
+    }
+
+    if (this.courseConflicts.length > 0) {
+      for (let k = this.courseConflicts.length - 1; k >= 0 ; k--) {
+        const cc = this.courseConflicts[k];
+        if (cc.day === day) {
+          this.courseConflicts.splice(k, 1);
+        }
+      }
+    }
+  }
+
   saveScheduleItem() {
     for (let i = 1; i <= 6; i++) {
       // is the schedule item line empty?
@@ -226,18 +299,25 @@ export class ModalScheduleComponent implements OnInit {
         sch.startHourMin = hourStart;
         sch.endHourMin = hourEnd;
         this.agendaItems = [...this.agendaItems, sch];
-        }
+      }
     }
-    this.activeModal.close(this.agendaItems);
-  }
-
-  closeModal() {
-    this.activeModal.dismiss();
+    this.saveSchedule.emit(this.agendaItems);
+    this.activeModal.hide();
   }
 
   onTeacherChanged() {
     const teacherId = this.scheduleForm.value.teacher;
     this.getTeacherCourses(teacherId);
+    this.getTeacherSchedule(teacherId);
+  }
+
+  getTeacherSchedule(teacherId) {
+    this.userService.getTeacherScheduleByDay(teacherId).subscribe(data => {
+      this.teacherSchedule = data;
+      // console.log(this.teacherSchedule);
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
   getTeacherCourses(teacherId) {

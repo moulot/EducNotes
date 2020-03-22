@@ -1,0 +1,32 @@
+@media (min-width: 992px) {
+  .modal-xl {
+    max-width: 80%;
+  }
+}
+
+.md-form .prefix ~ select {
+  margin-left: 3rem;
+  width: 92%;
+  width: -webkit-calc(100% - 3rem);
+  width: calc(100% - 3rem);
+ }
+
+ .inpMarginTop {
+  margin-top: 6px;
+ }
+
+
+ .selMarginTop {
+  margin-top: 1px;
+ }
+ 
+ .inConflict {
+   color: #f89f20;
+   font-weight: bold;
+ }
+
+ .alert-div {
+   background-color: #f89f20;
+   color: #ffffff;
+   font-weight: bold;
+ }

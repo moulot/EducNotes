@@ -245,31 +245,137 @@ namespace EducNotes.API.Controllers
         [HttpGet("{parentId}/Children")]
         public async Task<IActionResult> GetChildren(int parentId)
         {
-            var users = await _repo.GetChildren(parentId);
+          var users = await _repo.GetChildren(parentId);
 
-            var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(users);
+          var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(users);
 
-            var startDate = DateTime.Now.Date;
-            var endDate = startDate.AddDays(7).Date;
-            
-            foreach (var user in usersToReturn)
+          var startDate = DateTime.Now.Date;
+          var endDate = startDate.AddDays(7).Date;
+          
+          foreach (var user in usersToReturn)
+          {
+            double courseAvgSum = 0;
+            double courseCoeffSum = 0;
+
+            List<UserEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, user.ClassId);
+
+            foreach (var course in coursesWithEvals)
             {
-                double courseAvgSum = 0;
-                double courseCoeffSum = 0;
-
-                List<UserEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, user.ClassId);
-
-                foreach (var course in coursesWithEvals)
-                {
-                    courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
-                    courseCoeffSum += course.CourseCoeff;
-                }
-                user.Avg =  Math.Round(courseAvgSum / courseCoeffSum, 2);
-
-                user.AgendaItems = await _repo.GetUserClassAgenda(user.ClassId, startDate, endDate);
+              courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
+              courseCoeffSum += course.CourseCoeff;
             }
+            user.Avg =  Math.Round(courseAvgSum / courseCoeffSum, 2);
 
-            return Ok(usersToReturn);
+            user.AgendaItems = await _repo.GetUserClassAgenda(user.ClassId, startDate, endDate);
+          }
+
+          return Ok(usersToReturn);
+        }
+
+        [HttpGet("{teacherId}/ScheduleByDay")]
+        public async Task<IActionResult> GetTeacherScheduleByDay(int teacherId)
+        {
+          var scheduleItems = await _context.Schedules
+                                    .Include(i => i.Teacher)
+                                    .Include(i => i.Class)
+                                    .Include(i => i.Course)
+                                    .Where(s => s.TeacherId == teacherId).ToListAsync();
+          var days = scheduleItems.Select(d => d.Day).Distinct().OrderBy(o => o);
+
+          TeacherScheduleDto teacherSchedule = new TeacherScheduleDto();
+          if(scheduleItems.Count() > 0)
+          {
+            teacherSchedule.TeacherId = teacherId;
+            teacherSchedule.TeacherName = scheduleItems[0].Teacher.LastName + " " + scheduleItems[0].Teacher.FirstName;
+
+            teacherSchedule.Days = new List<ScheduleDayDto>();
+            foreach (var day in days)
+            {
+              ScheduleDayDto sdd = new ScheduleDayDto();
+              sdd.Day = day;
+              sdd.DayName = day.DayIntToName();
+
+              var courses = scheduleItems.Where(s => s.Day == day)
+                                          .OrderBy(o => o.StartHourMin.ToString("HH:mm", frC));
+              sdd.Courses = new List<ScheduleCourseDto>();
+              foreach (var course in courses)
+              {
+                ScheduleCourseDto courseDto = new ScheduleCourseDto();
+                courseDto.CourseId = course.Id;
+                courseDto.CourseName = course.Course.Name;
+                courseDto.ClassId = course.ClassId;
+                courseDto.ClassName = course.Class.Name;
+                courseDto.CourseAbbrev = course.Course.Abbreviation;
+                courseDto.StartHour = course.StartHourMin;
+                courseDto.StartH = course.StartHourMin.ToString("HH:mm", frC);
+                courseDto.EndHour = course.EndHourMin;
+                courseDto.EndH = course.EndHourMin.ToString("HH:mm", frC);
+                courseDto.InConflict = false;
+                sdd.Courses.Add(courseDto);
+              }
+
+              teacherSchedule.Days.Add(sdd);
+            }
+          }
+
+          return Ok(teacherSchedule);
+        }
+
+        [HttpGet("{teacherId}/ScheduleByClassByDay")]
+        public async Task<IActionResult> GetTeacherScheduleByClassByDay(int teacherId)
+        {
+          var scheduleItems = await _context.Schedules
+                                    .Include(i => i.Teacher)
+                                    .Include(i => i.Class)
+                                    .Include(i => i.Course)
+                                    .Where(s => s.TeacherId == teacherId).ToListAsync();
+          var classes = scheduleItems.Select(c => c.Class).Distinct().OrderBy(o => o.Name);
+
+          TeacherScheduleDto teacherSchedule = new TeacherScheduleDto();
+          if(scheduleItems.Count() > 0)
+          {
+            teacherSchedule.TeacherId = teacherId;
+            teacherSchedule.TeacherName = scheduleItems[0].Teacher.LastName + " " + scheduleItems[0].Teacher.FirstName;
+
+            teacherSchedule.Classes = new List<ScheduleClassDto>();
+            foreach (var aclass in classes)
+            {
+              ScheduleClassDto scd = new ScheduleClassDto();
+              scd.ClassId = aclass.Id;
+              scd.ClassName = aclass.Name;
+
+              var days = scheduleItems.Where(s => s.ClassId == aclass.Id).Select(d => d.Day).Distinct().OrderBy(o => o);
+              scd.Days = new List<ScheduleDayDto>();
+              foreach (var day in days)
+              {
+                ScheduleDayDto sdd = new ScheduleDayDto();
+                sdd.Day = day;
+                sdd.DayName = day.DayIntToName();
+
+                var courses = scheduleItems.Where(s => s.ClassId == aclass.Id && s.Day == day)
+                                            .OrderBy(o => o.StartHourMin.ToString("HH:mm", frC));
+                sdd.Courses = new List<ScheduleCourseDto>();
+                foreach (var course in courses)
+                {
+                  ScheduleCourseDto courseDto = new ScheduleCourseDto();
+                  courseDto.CourseId = course.Id;
+                  courseDto.CourseName = course.Course.Name;
+                  courseDto.CourseAbbrev = course.Course.Abbreviation;
+                  courseDto.StartHour = course.StartHourMin;
+                  courseDto.StartH = course.StartHourMin.ToString("HH:mm", frC);
+                  courseDto.EndHour = course.EndHourMin;
+                  courseDto.EndH = course.EndHourMin.ToString("HH:mm", frC);
+                  sdd.Courses.Add(courseDto);
+                }
+
+                scd.Days.Add(sdd);
+              }
+
+              teacherSchedule.Classes.Add(scd);
+            }
+          }
+
+          return Ok(teacherSchedule);
         }
 
         [HttpGet("{teacherId}/NextCourses")]
@@ -352,23 +458,23 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetTeacherSchedule(int teacherId)
         {
             var teacherCourses = await (from courses in _context.ClassCourses
-                                    join Schedule in _context.Schedules
-                                    on courses.CourseId equals Schedule.CourseId
-                                    select new
-                                    {
-                                        TeacherId = courses.TeacherId,
-                                        TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
-                                        CourseId = courses.CourseId,
-                                        CourseName = courses.Course.Name,
-                                        ClassId = Schedule.ClassId,
-                                        ClassName = Schedule.Class.Name,
-                                        Day = Schedule.Day,
-                                        StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
-                                        EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
-                                    })
-                                    .Where(w => w.TeacherId == teacherId)
-                                    .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin)
-                                    .ToListAsync();
+                                        join Schedule in _context.Schedules
+                                        on courses.CourseId equals Schedule.CourseId
+                                        select new
+                                        {
+                                          TeacherId = courses.TeacherId,
+                                          TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
+                                          CourseId = courses.CourseId,
+                                          CourseName = courses.Course.Name,
+                                          ClassId = Schedule.ClassId,
+                                          ClassName = Schedule.Class.Name,
+                                          Day = Schedule.Day,
+                                          StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
+                                          EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
+                                        })
+                                        .Where(w => w.TeacherId == teacherId)
+                                        .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin)
+                                        .ToListAsync();
 
             return Ok(teacherCourses);
         }
