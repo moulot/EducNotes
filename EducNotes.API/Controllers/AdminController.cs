@@ -726,7 +726,7 @@ namespace EducNotes.API.Controllers
         [HttpGet("SearchInscription")]
         public async Task<IActionResult> SearchInscription([FromQuery] InscriptionSearchParams parametre)
         {
-            IEnumerable<Inscription> inscr = new List<Inscription>();
+            List<Inscription> inscrFromDB = new List<Inscription>();
             if (parametre.LastName == null)
                 parametre.LastName = "";
             if (parametre.FirstName == null)
@@ -735,43 +735,38 @@ namespace EducNotes.API.Controllers
 
             if (levelId > 0)
             {
-                // var studentIds =await _context.Inscriptions
-                // .Where(c=>c.ClassLevelId == parametre.LevelId && c.Validated == false)
-                // .Select(u=>u.StudentId)
-                // .ToListAsync();
-                inscr = await _context.Inscriptions
-                  .Include(u => u.User)
-                  .ThenInclude(p => p.Photos)
-                  .Where(u => u.ClassLevelId == levelId && u.Validated == false &&
-                   EF.Functions.Like(u.User.LastName, "%" + parametre.LastName + "%") &&
-                   EF.Functions.Like(u.User.FirstName, "%" + parametre.FirstName + "%"))
-                  .ToListAsync();
+              inscrFromDB = await _context.Inscriptions
+                            .Include(u => u.User).ThenInclude(p => p.Photos)
+                            .Where(u => u.ClassLevelId == levelId && u.Validated == false &&
+                            EF.Functions.Like(u.User.LastName, "%" + parametre.LastName + "%") &&
+                            EF.Functions.Like(u.User.FirstName, "%" + parametre.FirstName + "%"))
+                            .ToListAsync();
             }
             else
             {
-                inscr = await _context.Inscriptions
-                  .Include(u => u.User)
-                  .ThenInclude(p => p.Photos)
-                  .Where(u => u.Validated == false && EF.Functions.Like(u.User.LastName, "%" + parametre.LastName + "%") &&
-                   EF.Functions.Like(u.User.FirstName, "%" + parametre.FirstName + "%"))
-                  .ToListAsync();
+              inscrFromDB = await _context.Inscriptions
+                            .Include(u => u.User)
+                            .ThenInclude(p => p.Photos)
+                            .Where(u => u.Validated == false && EF.Functions.Like(u.User.LastName, "%" + parametre.LastName + "%") &&
+                              EF.Functions.Like(u.User.FirstName, "%" + parametre.FirstName + "%"))
+                            .ToListAsync();
             }
 
-            var res = new List<InscriptionDetailDto>();
-            foreach (var item in inscr)
-            {
-                res.Add(new InscriptionDetailDto
-                {
-                    Id = item.Id,
-                    InsertDate = item.InsertDate,
-                    ClassLevelId = item.ClassLevelId,
-                    UserId = item.UserId,
-                    User = _mapper.Map<UserForDetailedDto>(item.User)
+            // var res = new List<InscriptionDetailDto>();
+            // foreach (var item in inscr)
+            // {
+            //     res.Add(new InscriptionDetailDto
+            //     {
+            //         Id = item.Id,
+            //         InsertDate = item.InsertDate,
+            //         ClassLevelId = item.ClassLevelId,
+            //         UserId = item.UserId,
+            //         User = _mapper.Map<UserForDetailedDto>(item.User)
+            //     });
+            // }
+            var inscr = _mapper.Map<IEnumerable<UserForClassAllocationDto>>(inscrFromDB);
 
-                });
-            }
-
-            return Ok(res);
+            return Ok(inscr);
         }
 
         [HttpPost("ImportTeachers")]

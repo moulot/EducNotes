@@ -7,7 +7,7 @@
   </div>
   <div class="modal-body">
     <div class="row m-2">
-      <div class="card col-md-12 animated shake alert-div" *ngIf="courseConflicts.length > 0">
+      <div class="card col-md-12 animated shake alert-div mb-1" *ngIf="courseConflicts.length > 0">
         <div *ngFor="let conflict of courseConflicts">
           <p class="text-13 m-0 ">{{conflict.data}}</p>
         </div>
@@ -33,7 +33,8 @@
                   <div class="flex-grow-1">
                     <div class="form-row">
                       <div class="col-md-4">
-                        <mdb-select class="selMarginTop" [options]="daySelect" id="day1" name="day1" formControlName="day1" placeholder="jour"></mdb-select>
+                        <mdb-select class="selMarginTop" [options]="daySelect" id="day1" (ngModelChange)="isConflict(1)"
+                          name="day1" [visibleOptions]="7" formControlName="day1" placeholder="jour"></mdb-select>
                       </div>
                       <div class="col-md-4">
                         <div class="md-form form-sm inpMarginTop mb-0">
@@ -71,7 +72,8 @@
                   <div class="flex-grow-1">
                     <div class="form-row">
                       <div class="col-md-4">
-                        <mdb-select class="selMarginTop" [options]="daySelect" id="day2" name="day2" formControlName="day2" placeholder="jour"></mdb-select>
+                        <mdb-select class="selMarginTop" [options]="daySelect" id="day2" name="day2" [visibleOptions]="7"
+                          formControlName="day2" placeholder="jour"></mdb-select>
                       </div>
                       <div class="col-md-4">
                         <div class="md-form form-sm inpMarginTop mb-0">
@@ -106,7 +108,8 @@
                   <div class="flex-grow-1">
                     <div class="form-row">
                       <div class="col-md-4">
-                        <mdb-select class="selMarginTop" [options]="daySelect" id="day3" name="day3" formControlName="day3" placeholder="jour"></mdb-select>
+                        <mdb-select class="selMarginTop" [options]="daySelect" id="day3" name="day3" [visibleOptions]="7"
+                          formControlName="day3" placeholder="jour"></mdb-select>
                       </div>
                       <div class="col-md-4">
                         <div class="md-form form-sm inpMarginTop mb-0">
@@ -141,7 +144,8 @@
                   <div class="flex-grow-1">
                     <div class="form-row">
                       <div class="col-md-4">
-                        <mdb-select class="selMarginTop" [options]="daySelect" id="day4" name="day4" formControlName="day4" placeholder="jour"></mdb-select>
+                        <mdb-select class="selMarginTop" [options]="daySelect" id="day4" name="day4" [visibleOptions]="7"
+                          formControlName="day4" placeholder="jour"></mdb-select>
                       </div>
                       <div class="col-md-4">
                         <div class="md-form form-sm inpMarginTop mb-0">
@@ -176,7 +180,8 @@
                   <div class="flex-grow-1">
                     <div class="form-row">
                       <div class="col-md-4">
-                        <mdb-select class="selMarginTop" [options]="daySelect" id="day5" name="day5" formControlName="day5" placeholder="jour"></mdb-select>
+                        <mdb-select class="selMarginTop" [options]="daySelect" id="day5" name="day5" [visibleOptions]="7"
+                          formControlName="day5" placeholder="jour"></mdb-select>
                       </div>
                       <div class="col-md-4">
                         <div class="md-form form-sm inpMarginTop mb-0">
@@ -203,43 +208,6 @@
                 </div>
               </div>
             
-              <hr class="my-2" style="background-color: #f89f20;">
-
-              <div formGroupName="item6" class="mb-0">
-                <div class="d-flex">
-                  <div class="text-20 mr-2 my-auto">6.</div>
-                  <div class="flex-grow-1">
-                    <div class="form-row">
-                      <div class="col-md-4">
-                        <mdb-select class="selMarginTop" [options]="daySelect" id="day6" name="day6" formControlName="day6" placeholder="jour"></mdb-select>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="md-form form-sm inpMarginTop mb-0">
-                          <input type="text" class="form-control mr-2" mdbInput formControlName="hourStart6" id="hourStart6"
-                            [textMask]="{mask: timeMask}" (keyup)="isConflict(6)">
-                          <label for="hourStart6">heure début</label>
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="md-form form-sm inpMarginTop mb-0">
-                          <input type="text" class="form-control mr-2" mdbInput formControlName="hourEnd6" id="hourEnd6"
-                            [textMask]="{mask: timeMask}" (keyup)="isConflict(1)">
-                          <label for="hourEnd6">heure fin</label>
-                        </div>
-                      </div>
-                      <diV class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item6'].hasError('line6NOK')">
-                        tous les champs doivent être renseignés.
-                      </diV>
-                      <div class="text-danger text-12" *ngIf="scheduleForm.controls['item6'].hasError('line6DatesNOK')">
-                        les heures de cours sont au format : hh:mm
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-    
-              <hr class="my-2" style="background-color: #f89f20;">
-    
             </form>
           </div>
         </div>

@@ -167,7 +167,7 @@
                     </div>
                     <div class="col-md-12"><hr></div>
                     <div class="col-md-12">
-                      <button mdbBtn size="sm" color="primary" (click)="stepper.next()" [disabled]="!parentForm.valid || childNameExist === true" >CONTINUER</button>
+                      <button mdbBtn size="sm" color="primary" (click)="stepper.next()" [disabled]="!parentForm.valid || parentNameExist === true" >CONTINUER</button>
                     </div>
                   </div>
                 </form>
@@ -185,7 +185,7 @@
                   <div class="row">
                     <div class="col-md-12">
                       <div class="alert alert-primary" role="alert">
-                        <p class="text-17 font-weight-400 m-0">vous avez {{maxChild}} enfants préinscris. {{children.length}} enfant(s) sur {{maxChild}} enregistré(s)</p>
+                        <p class="text-17 font-weight-400 m-0">vous avez {{maxChild}} enfants préinscrits. {{children.length}} enfant(s) sur {{maxChild}} enregistré(s)</p>
                       </div>
                     </div>
                     <div class="col-md-12">
@@ -202,7 +202,7 @@
                     </div>
                     <div class="col-md-12"><hr></div>
                     <div class="col-md-12">
-                      <button mdbBtn size="sm" color="primary" (click)="stepper.next(); onStep3Next()">CONTINUER</button>
+                      <button mdbBtn size="sm" color="primary" [disabled]="children.length!==maxChild" (click)="stepper.next(); onStep3Next()">CONTINUER</button>
                       <button mdbBtn size="sm" color="primary" (click)="stepper.previous()">RETOUR</button>
                     </div>
                   </div>

@@ -38,10 +38,12 @@ export class InscriptionsListComponent implements OnInit {
   submitText = 'valider';
   filteredStudents: any[] = [];
   selectedIds: any[] = [];
+  classOptions = [];
   page = 1;
   pageSize = 8;
   className = '';
- userId;
+  userId;
+
   ngOnInit() {
     this.userId = this.authService.decodedToken.nameid;
     this.getLevels();
@@ -80,7 +82,7 @@ export class InscriptionsListComponent implements OnInit {
     }
 
     if (this.selectedIds.length === 0) {
-      this.toastr.error('Veuillez sélectionnez au moins un élève...', 'Erreur de saisie', { timeOut: 3000 });
+      this.alertify.warning('Veuillez sélectionnez au moins un élève...');
     } else {
 
       // debugger;
@@ -90,23 +92,21 @@ export class InscriptionsListComponent implements OnInit {
       const diff = (room.maxStudent - room.totalStudent);
 
       if (diff < this.selectedIds.length) {
-        this.toastr.error('il reste seulement ' + diff + 'place(s) disponible(s) pour cette classe');
+        this.alertify.warning('il reste seulement ' + diff + 'place(s) disponible(s) pour cette classe');
       } else {
-        this.modalService.open(content, { ariaLabelledBy: 'confirmation', centered: true })
-          .result.then((result) => {
-            this.confirmResut = `Closed with: ${result}`;
-            // this.toastr.info('validez', 'Erreur de saisie', { timeOut: 3000 });
-            this.studentAffectation();
-          }, (reason) => {
+        // this.modalService.open(content, { ariaLabelledBy: 'confirmation', centered: true })
+        //   .result.then((result) => {
+        //     this.confirmResut = `Closed with: ${result}`;
+        //     this.studentAffectation();
+        //   }, (reason) => {
 
-            this.confirmResut = `Dismissed with: ${reason}`;
-            this.toastr.info('annuler', 'Erreur de saisie', { timeOut: 3000 });
+        //     this.confirmResut = `Dismissed with: ${reason}`;
+        //     this.toastr.info('annuler', 'Erreur de saisie', { timeOut: 3000 });
 
-          });
+        //   });
+        this.studentAffectation();
       }
-
     }
-
   }
 
   studentAffectation() {
@@ -159,9 +159,16 @@ export class InscriptionsListComponent implements OnInit {
 
         this.classService.getClassesByLevelId(this.searchParams.levelId).subscribe((response: Class[]) => {
           this.classes = response;
+          this.classOptions = [];
+          for (let i = 0; i < this.classes.length; i++) {
+            const elt = this.classes[i];
+            const aclass = {value: elt.id, label: 'classe ' + elt.name + ' (dispo : ' +
+              (Number(elt.maxStudent) - Number(elt.totalStudent)) + ')'};
+            this.classOptions = [...this.classOptions, aclass];
+          }
         });
       } else {
-        this.noResult = 'Aucun élève trouvé...';
+        this.noResult = 'aucun élève trouvé pour le niveau sélectionné. recommencez svp...';
       }
       this.submitText = 'valider';
       this.showListDiv = true;

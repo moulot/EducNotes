@@ -19,7 +19,7 @@ export class ModalScheduleComponent implements OnInit {
   courses: Course[];
   teachers: User[];
   scheduleForm: FormGroup;
-  formOk = false;
+  formTouched = false;
   periodConflict = false;
   teacherSchedule: any;
   timeMask = [/\d/, /\d/, ':', /\d/, /\d/];
@@ -28,8 +28,8 @@ export class ModalScheduleComponent implements OnInit {
   courseOptions: any = [];
   courseConflicts: any = [];
   weekDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-  daySelect = [{'value': 1, 'label': 'lundi'}, {'value': 2, 'label': 'mardi'}, {'value': 3, 'label': 'mercredi'},
-    {'value': 4, 'label': 'jeudi'}, {'value': 5, 'label': 'vendredi'}, {'value': 6, 'label': 'samedi'}];
+  daySelect = [{value: null, label: ''}, {value: 1, label: 'lundi'}, {value: 2, label: 'mardi'}, {value: 3, label: 'mercredi'},
+    {value: 4, label: 'jeudi'}, {value: 5, label: 'vendredi'}, {value: 6, label: 'samedi'}];
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
     private classService: ClassService, private userService: UserService,
@@ -68,12 +68,7 @@ export class ModalScheduleComponent implements OnInit {
         day5: [null],
         hourStart5: [''],
         hourEnd5: ['']
-      }, {validator: this.item5Validator}),
-      item6: this.fb.group({
-        day6: [null],
-        hourStart6: [''],
-        hourEnd6: ['']
-      }, {validator: this.item6Validator})
+      }, {validator: this.item5Validator})
     }, {validator: this.formValidator});
   }
 
@@ -83,12 +78,57 @@ export class ModalScheduleComponent implements OnInit {
     const form3IsValid = g.controls['item3'].valid;
     const form4IsValid = g.controls['item4'].valid;
     const form5IsValid = g.controls['item5'].valid;
-    const form6IsValid = g.controls['item6'].valid;
     const teacherIsValid = g.controls['teacher'].valid;
     const courseIsValid = g.controls['course'].valid;
+    let formTouched = false;
+
+    let item1touched = false;
+    let item2touched = false;
+    let item3touched = false;
+    let item4touched = false;
+    let item5touched = false;
+
+    const day1touched = g.controls['item1'].get('day1').touched;
+    const hourStart1touched = g.controls['item1'].get('hourStart1').touched;
+    const hourEnd1touched = g.controls['item1'].get('hourEnd1').touched;
+    if (day1touched || hourStart1touched || hourEnd1touched) {
+      item1touched = true;
+    }
+
+    const day2touched = g.controls['item2'].get('day2').touched;
+    const hourStart2touched = g.controls['item2'].get('hourStart2').touched;
+    const hourEnd2touched = g.controls['item2'].get('hourEnd2').touched;
+    if (day2touched || hourStart2touched || hourEnd2touched) {
+      item2touched = true;
+    }
+
+    const day3touched = g.controls['item3'].get('day3').touched;
+    const hourStart3touched = g.controls['item3'].get('hourStart3').touched;
+    const hourEnd3touched = g.controls['item3'].get('hourEnd3').touched;
+    if (day3touched || hourStart3touched || hourEnd3touched) {
+      item3touched = true;
+    }
+
+    const day4touched = g.controls['item4'].get('day4').touched;
+    const hourStart4touched = g.controls['item4'].get('hourStart4').touched;
+    const hourEnd4touched = g.controls['item4'].get('hourEnd4').touched;
+    if (day4touched || hourStart4touched || hourEnd4touched) {
+      item4touched = true;
+    }
+
+    const day5touched = g.controls['item5'].get('day5').touched;
+    const hourStart5touched = g.controls['item5'].get('hourStart5').touched;
+    const hourEnd5touched = g.controls['item5'].get('hourEnd5').touched;
+    if (day5touched || hourStart5touched || hourEnd5touched) {
+      item5touched = true;
+    }
+
+    if (item1touched || item2touched || item3touched || item4touched || item5touched) {
+      formTouched = true;
+    }
 
     if (!form1IsValid || !form2IsValid || !form3IsValid || !form4IsValid ||
-        !form5IsValid || !form6IsValid || !teacherIsValid || !courseIsValid) {
+        !form5IsValid || !teacherIsValid || !courseIsValid || !formTouched) {
       return {'formNOK': true};
     }
 
@@ -195,82 +235,68 @@ export class ModalScheduleComponent implements OnInit {
     }
   }
 
-  item6Validator(g: FormGroup) {
-    // line 6
-    const day6 = g.get('day6').value;
-    const hourStart6 = g.get('hourStart6').value;
-    const hourEnd6 = g.get('hourEnd6').value;
-    if (day6 !== null || hourStart6.length > 0 || hourEnd6.length > 0) {
-      if (day6 !== null && hourStart6.length > 0 && hourEnd6.length > 0) {
-        const typedHS6 = hourStart6.replace('_', '');
-        const typedHE6 = hourEnd6.replace('_', '');
-        if (typedHS6.length !== 5 || typedHE6.length !== 5) {
-          return {'line6DatesNOK': true};
-        } else {
-          return null;
-        }
-      } else {
-        return {'line6NOK': true};
-      }
-    }
-  }
-
   isConflict(index) {
     const formIsValid = this.scheduleForm.controls['item' + index].valid;
     if (formIsValid) {
       const day = this.scheduleForm.controls['item' + index].get('day' + index).value;
-      const startH = this.scheduleForm.controls['item' + index].get('hourStart' + index).value;
-      const endH = this.scheduleForm.controls['item' + index].get('hourEnd' + index).value;
-      // console.log('before');
-      // console.log(this.courseConflicts);
-      this.resetConflicts(day);
-      // console.log('after');
-      // console.log(this.courseConflicts);
-
-      if (day || startH.length === 5 || endH.length === 5) {
-        const dayIndex = this.teacherSchedule.days.findIndex(elt => elt.day === day);
-        const dayCourses = this.teacherSchedule.days[dayIndex];
+      const dayIndex = this.teacherSchedule.days.findIndex(elt => elt.day === day);
+      const dayCourses = this.teacherSchedule.days[dayIndex];
+      if (dayCourses) {
+        console.log('in if');
         const dayName = dayCourses.dayName;
-        // console.log(dayCourses.courses);
-        let conflict = false;
-        this.periodConflict = false;
-        for (let i = 0; i < dayCourses.courses.length; i++) {
-          const elt = dayCourses.courses[i];
-          const courseStartH = Number(elt.startH.replace(':', ''));
-          const courseEndH = Number(elt.endH.replace(':', ''));
-          const startHNum = Number(startH.replace(':', ''));
-          const endHNum = Number(endH.replace(':', ''));
-          // console.log('IN LOOP');
-          // console.log(courseStartH + ' - ' + courseEndH + ' --- ' + startHNum + ' - ' + endHNum);
-          if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH && endHNum <= courseEndH) ||
-            (startHNum < courseStartH && endHNum > courseEndH)) {
-            const conflictElt = { day: day, data: 'conflit ligne 1 avec le cours du ' + dayName + '. horaire : ' + elt.startH + ' - ' + elt.endH };
-            this.courseConflicts = [...this.courseConflicts, conflictElt];
-            dayCourses.courses.find(c => c.courseId === elt.courseId).inConflict = true;
-            // console.log(this.courseConflicts);
-            conflict = true;
-            this.periodConflict = true;
-          }
-        }
-        // console.log('final');
+        const startH = this.scheduleForm.controls['item' + index].get('hourStart' + index).value;
+        const endH = this.scheduleForm.controls['item' + index].get('hourEnd' + index).value;
+        // console.log('before');
         // console.log(this.courseConflicts);
-        // console.log(this.teacherSchedule);
-        return conflict;
-      } else {
-        return false;
+        this.resetConflicts(day);
+        // console.log('after');
+        // console.log(this.courseConflicts);
+
+        if (day || startH.length === 5 || endH.length === 5) {
+          // console.log(dayCourses.courses);
+          let conflict = false;
+          this.periodConflict = false;
+          for (let i = 0; i < dayCourses.courses.length; i++) {
+            const elt = dayCourses.courses[i];
+            const courseStartH = Number(elt.startH.replace(':', ''));
+            const courseEndH = Number(elt.endH.replace(':', ''));
+            const startHNum = Number(startH.replace(':', ''));
+            const endHNum = Number(endH.replace(':', ''));
+            // console.log('IN LOOP');
+            // console.log(courseStartH + ' - ' + courseEndH + ' --- ' + startHNum + ' - ' + endHNum);
+            if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH && endHNum <= courseEndH) ||
+              (startHNum < courseStartH && endHNum > courseEndH)) {
+              const conflictElt = { day: day, data: 'conflit ligne 1 avec le cours du ' + dayName + '. horaire : ' + elt.startH + ' - ' + elt.endH };
+              this.courseConflicts = [...this.courseConflicts, conflictElt];
+              dayCourses.courses.find(c => c.courseId === elt.courseId).inConflict = true;
+              // console.log(this.courseConflicts);
+              conflict = true;
+              this.periodConflict = true;
+            }
+          }
+          // console.log('final');
+          // console.log(this.courseConflicts);
+          // console.log(this.teacherSchedule);
+          return conflict;
+        } else {
+          return false;
+        }
       }
     }
+    return false;
   }
 
   resetConflicts(day) {
     const dayCourses = this.teacherSchedule.days.find(c => c.day === day);
-    // console.log('dayCourses');
-    // console.log(dayCourses);
-    for (let i = 0; i < dayCourses.courses.length; i++) {
-      const elt = dayCourses.courses[i];
-      // console.log('course elt');
-      // console.log(elt);
-      elt.inConflict = false;
+    console.log('dayCourses' + day);
+    console.log(dayCourses);
+    if (dayCourses) {
+      for (let i = 0; i < dayCourses.courses.length; i++) {
+        const elt = dayCourses.courses[i];
+        // console.log('course elt');
+        // console.log(elt);
+        elt.inConflict = false;
+      }
     }
 
     if (this.courseConflicts.length > 0) {
@@ -284,7 +310,7 @@ export class ModalScheduleComponent implements OnInit {
   }
 
   saveScheduleItem() {
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 5; i++) {
       // is the schedule item line empty?
       if (this.scheduleForm.controls['item' + i].get('day' + i).value !== null) {
         const sch = <Schedule>{};
@@ -306,6 +332,7 @@ export class ModalScheduleComponent implements OnInit {
   }
 
   onTeacherChanged() {
+    this.courseOptions = [];
     const teacherId = this.scheduleForm.value.teacher;
     this.getTeacherCourses(teacherId);
     this.getTeacherSchedule(teacherId);

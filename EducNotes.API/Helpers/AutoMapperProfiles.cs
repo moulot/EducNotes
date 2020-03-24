@@ -34,6 +34,25 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.PhotoUrl, opt => {
                     opt.MapFrom(src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
                 });
+            CreateMap<Inscription, UserForClassAllocationDto>()
+                .ForMember(dest => dest.LastName, opt => {
+                    opt.MapFrom(src => src.User.LastName);
+                })
+                .ForMember(dest => dest.FirstName, opt => {
+                    opt.MapFrom(d => d.User.FirstName.ToUpper().First() + d.User.FirstName.Substring(1));
+                })
+                .ForMember(dest => dest.Gender, opt => {
+                    opt.MapFrom(d => d.User.Gender);
+                })
+                .ForMember(dest => dest.DateOfBirth, opt => {
+                    opt.MapFrom(src => src.User.DateOfBirth.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.PhotoUrl, opt => {
+                    opt.MapFrom(src => src.User.Photos.FirstOrDefault(p => p.IsMain).Url);
+                })
+                .ForMember(dest => dest.Age, opt => {
+                    opt.MapFrom(d => d.User.DateOfBirth.CalculateAge());
+                });
             CreateMap<User, UserForDetailedDto>()
                 .ForMember(dest => dest.PhotoUrl, opt => {
                     opt.MapFrom(src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
