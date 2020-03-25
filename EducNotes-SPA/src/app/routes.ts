@@ -93,7 +93,7 @@ import { UserAccountComponent } from './users/user-account/user-account.componen
 import { UserAccountResolver } from './_resolvers/user-account-resolver';
 import { SmsTemplateComponent } from './admin/sms-template/sms-template.component';
 import { AddSmsTemplateComponent } from './admin/add-smsTemplate/add-smsTemplate.component';
-import { SmsTemplateHomeResolver } from './_resolvers/sms-template-home-resolver';
+import { SmsTemplateResolver } from './_resolvers/sms-template-resolver';
 import { EditSmsTemplateResolver } from './_resolvers/edit-sms-template-resolver';
 import { AddUserGradesComponent } from './grades/add-user-grades/add-user-grades.component';
 import { ClassGradesResolver } from './_resolvers/class-grades-resolver';
@@ -106,6 +106,10 @@ import { TeacherProgramResolver } from './_resolvers/teacher-program-resolver';
 import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
 import { ClassSessionResolver } from './_resolvers/classSession-resolver';
 import { AddClassLifeComponent } from './classes/add-classLife/add-classLife.component';
+import { EmailTemplateResolver } from './_resolvers/email-template-resolver';
+import { EmailTemplateComponent } from './admin/email-template/email-template.component';
+import { AddEmailTemplateComponent } from './admin/add-emailTemplate/add-emailTemplate.component';
+import { EditEmailTemplateResolver } from './_resolvers/edit-email-template-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -194,9 +198,12 @@ export const appRoutes: Routes = [
           { path: 'createPDF', component: ConvertToPDFComponent },
           {path: 'sendSms', component: SendSmsComponent},
           {path: 'userAccount', component: UserAccountComponent, resolve: { account: UserAccountResolver } },
-          {path: 'SmsTemplates', component: SmsTemplateComponent, resolve: { templates: SmsTemplateHomeResolver} },
+          {path: 'SmsTemplates', component: SmsTemplateComponent, resolve: { templates: SmsTemplateResolver} },
           {path: 'AddSmsTemplate', component: AddSmsTemplateComponent},
           {path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} },
+          {path: 'EmailTemplates', component: EmailTemplateComponent, resolve: { templates: EmailTemplateResolver} },
+          {path: 'AddEmailTemplate', component: AddEmailTemplateComponent},
+          {path: 'EditEmailTemplate/:id', component: AddEmailTemplateComponent, resolve: { template: EditEmailTemplateResolver} },
           {path: 'AddUserGrades/:evalId', component: AddUserGradesComponent, resolve: {data: ClassGradesResolver}},
           {path: 'teacherProgram', component: TeacherProgramComponent},
           {path: 'classProgram/:courseId', component: ClassProgressComponent, resolve: {program: TeacherProgramResolver}},

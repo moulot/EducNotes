@@ -194,7 +194,7 @@ import { UserAccountComponent } from './users/user-account/user-account.componen
 import { UserAccountResolver } from './_resolvers/user-account-resolver';
 import { SmsTemplateComponent } from './admin/sms-template/sms-template.component';
 import { AddSmsTemplateComponent } from './admin/add-smsTemplate/add-smsTemplate.component';
-import { SmsTemplateHomeResolver } from './_resolvers/sms-template-home-resolver';
+import { SmsTemplateResolver } from './_resolvers/sms-template-resolver';
 import { EditSmsTemplateResolver } from './_resolvers/edit-sms-template-resolver';
 import { AddUserGradesComponent } from './grades/add-user-grades/add-user-grades.component';
 import { ClassGradesResolver } from './_resolvers/class-grades-resolver';
@@ -215,6 +215,10 @@ import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-
 import { ClassSessionResolver } from './_resolvers/classSession-resolver';
 import { AddClassLifeComponent } from './classes/add-classLife/add-classLife.component';
 import { ImportUsersComponent } from './admin/selfs-registers/import-users/import-users.component';
+import { EmailTemplateComponent } from './admin/email-template/email-template.component';
+import { EmailTemplateResolver } from './_resolvers/email-template-resolver';
+import { AddEmailTemplateComponent } from './admin/add-emailTemplate/add-emailTemplate.component';
+import { EditEmailTemplateResolver } from './_resolvers/edit-email-template-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -359,7 +363,9 @@ export function tokenGetter() {
       ClassProgramDataComponent,
       TimelineComponent,
       AddClassLifeComponent,
-      ImportUsersComponent
+      ImportUsersComponent,
+      EmailTemplateComponent,
+      AddEmailTemplateComponent
    ],
    imports: [
       FormWizardModule,
@@ -452,11 +458,13 @@ export function tokenGetter() {
       PayableAtListResolver,
       PayableFormResolver,
       UserAccountResolver,
-      SmsTemplateHomeResolver,
+      SmsTemplateResolver,
       EditSmsTemplateResolver,
       ClassGradesResolver,
       TeacherProgramResolver,
       ClassSessionResolver,
+      EmailTemplateResolver,
+      EditEmailTemplateResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

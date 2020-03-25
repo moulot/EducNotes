@@ -6,16 +6,19 @@
   <div class="col-md-12">
     <div class="card">
       <div class="card-body">
-        <div class="card-title">modèles de sms</div>
-        <div *ngFor="let item of smsTemplates">
+        <div class="card-title">modèles d'emails</div>
+        <div *ngFor="let item of emailTemplates">
           <div class="p-2 border rounded my-1">
             <div class="row p-2">
               <div class="col-md-1 text-15 font-weight-450">
-                <a (click)="editSmsTemplate(item.id)" style="text-decoration: underline;">editer</a>
+                <a (click)="editTemplate(item.id)" style="text-decoration: underline;">editer</a>
               </div>
               <div class="col-md-2 text-15 font-weight-450">{{item.name}}</div>
-              <div class="col-md-2 text-15">{{item.smsCategoryName}}</div>
-              <div class="col-md-7 text-15">{{item.content}}</div>
+              <div class="col-md-2 text-15">{{item.emailCategoryName}}</div>
+              <div class="col-md-7 text-15">
+                <div class="text-15">objet : <b>{{item.subject}}</b></div>
+                <div class="text-15">{{item.body}}</div>
+              </div>
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { Sms } from '../_models/sms';
 import { clickatellParams } from '../_models/clickatellParams';
 import { SmsTemplate } from '../_models/smsTemplate';
 import { Observable } from 'rxjs';
+import { EmailTemplate } from '../_models/emailTemplate';
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +22,24 @@ export class CommService {
     return this.http.post(this.baseUrl + 'comm/sendSms', data);
   }
 
+  getEmailCategories() {
+    return this.http.get(this.baseUrl + 'comm/EmailCategories');
+  }
+
   getSmsCategories() {
     return this.http.get(this.baseUrl + 'comm/SmsCategories');
+  }
+
+  getEmailTemplates() {
+    return this.http.get(this.baseUrl + 'comm/EmailTemplates');
+  }
+
+  getEmailTemplateById(id) {
+    return this.http.get(this.baseUrl + 'comm/EmailTemplates/' + id);
+  }
+
+  saveEmailTemplate(emailTemplate: EmailTemplate) {
+    return this.http.put(this.baseUrl + 'comm/SaveEmailTemplate', emailTemplate);
   }
 
   getSmsTemplates() {

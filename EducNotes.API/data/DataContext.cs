@@ -82,6 +82,9 @@ namespace EducNotes.API.Data {
   public DbSet<Document> Documents { get; set; }
   public DbSet<ClassCourseProgress> ClassCourseProgresses { get; set; }
   public DbSet<SmsType> SmsTypes { get; set; }
+  public DbSet<EmailTemplate> EmailTemplates { get; set; }
+  public DbSet<EmailCategory> EmailCategories { get; set; }
+  public DbSet<Setting> Settings { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {

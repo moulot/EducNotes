@@ -61,7 +61,8 @@ namespace EducNotes.API.Data
         Task<List<Course>> GetTeacherCourses(int teacherId);
         Task<List<ClassesWithEvalsDto>> GetTeacherClassesWithEvalsByPeriod(int teacherId, int periodId);
         Task<List<EvaluationForListDto>> GetEvalsToCome(int classId);
-        Task<SmsTemplate> GetSmsTemplate(int smsTemplateId);
+        Task<EmailTemplate> GetEmailTemplate(int id);
+        Task<SmsTemplate> GetSmsTemplate(int id);
         void Clickatell_SendSMS(clickatellParamsDto smsData);
         Task<List<Sms>> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, int sessionId, int teacherId);
         Task<List<Sms>> SetSmsDataForNewGrade(List<EvalSmsDto> grades, string content, int teacherId);

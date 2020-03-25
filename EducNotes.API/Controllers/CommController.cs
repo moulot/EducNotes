@@ -151,12 +151,58 @@ namespace EducNotes.API.Controllers
           throw new Exception($"saisie des data du callBack a échoué");
         }
 
+        [HttpGet("EmailCategories")]
+        public async Task<IActionResult> GetEmailCtegories()
+        {
+          var emailCats =  await _context.EmailCategories.OrderBy(c => c.Name).ToListAsync();
+          return Ok(emailCats);
+    
+        }
+
         [HttpGet("SmsCategories")]
         public async Task<IActionResult> GetSmsCtegories()
         {
           var smsCats =  await _context.SmsCategories.OrderBy(c => c.Name).ToListAsync();
           return Ok(smsCats);
     
+        }
+
+        [HttpGet("EmailTemplates")]
+        public async Task<IActionResult> GetEmailTemplates()
+        {
+          var templates = await _context.EmailTemplates
+                                  .Include(i => i.EmailCategory)
+                                  .OrderBy(s => s.Name).ToListAsync();
+          var templatesToReturn = _mapper.Map<IEnumerable<EmailTemplateForListDto>>(templates);
+          return Ok(templatesToReturn);
+        }
+
+        [HttpGet("EmailTemplates/{id}")]
+        public async Task<IActionResult> GetEmailTemplate(int id)
+        {
+          var template = await _context.EmailTemplates.FirstOrDefaultAsync(t => t.Id == id);
+          return Ok(template);
+        }
+
+        [HttpPut("SaveEmailTemplate")]
+        public async Task<IActionResult> AddEmailTemplate ([FromBody] EmailTemplateForSaveDto emailTemplateDto)
+        {
+          var id = emailTemplateDto.Id;
+          if(id == 0) {
+              EmailTemplate newTemplate = new EmailTemplate();
+              _mapper.Map(emailTemplateDto, newTemplate);
+              _repo.Add(newTemplate);
+          } else {
+              var templateFromRepo = await _repo.GetEmailTemplate(id);
+              _mapper.Map(emailTemplateDto, templateFromRepo);
+              _repo.Update(templateFromRepo);
+          }
+
+          if (await _repo.SaveAll()) { return Ok(); }
+
+          // throw new Exception($"Updating/Saving agendaItem failed");
+
+          return BadRequest("ajout du email modèle a échoué");
         }
 
         [HttpGet("SmsTemplates")]

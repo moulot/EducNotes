@@ -13,7 +13,6 @@ export class EditSmsTemplateResolver implements Resolve<SmsTemplate> {
     resolve(route: ActivatedRouteSnapshot): Observable<SmsTemplate> {
         return this.commService.getSmsTemplateById(route.params['id']).pipe(
             catchError(error => {
-                console.log(error);
                 this.alertify.error('problème de récupération de données');
                 this.router.navigate(['/home']);
                 return of(null);

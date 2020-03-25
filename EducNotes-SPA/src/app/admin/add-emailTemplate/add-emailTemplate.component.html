@@ -1,0 +1,67 @@
+<div class="row m-2">
+
+  <div class="col-md-7">
+    <div class="d-flex mb-1">
+      <i class="fad fa-at fa-2x mr-2" style="--fa-primary-opacity: 1; --fa-secondary-opacity: 1;
+        --fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
+      <div *ngIf="!template" class="text-20 font-weight-400">ajouter un modèle email</div>
+      <div *ngIf="template" class="text-20 font-weight-400">editer le modèle email '{{template.name}}'</div>
+    </div>
+    <form [formGroup]="templateForm" (ngSubmit)="saveTemplate()">
+
+      <div class="row">
+        <div class="col-md-9">
+          <div class="md-form mt-1">
+            <input mdbInput type="text" id="name" class="form-control" formControlName="name" mdbValidate>
+            <label for="name" class="">nom du modèle</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="md-form mt-0">
+            <mdb-select [options]="optionsEmailCategory" formControlName="category" placeholder="catégorie du sms"></mdb-select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="md-form mt-0">
+            <input mdbInput type="text" id="subject" class="form-control" formControlName="subject" mdbValidate>
+            <label for="subject" class="">objet</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="md-form">
+            <textarea type="text" id="body" formControlName="body"
+              class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
+            <label for="body">message</label>  
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <button type="submit" [disabled]="!templateForm.valid" mdbBtn size="sm" class="btnBlue" mdbWavesEffect>valider</button>
+          <button type="button" class="mr-2" mdbBtn size="sm" class="btnOrange" (click)="cancelForm()" mdbWavesEffect>annuler</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="col-md-5">
+      <p class="text-15 text-danger font-weight-300">entrez les tags dans le message du sms pour y inclure des données dynamiques</p>
+      <div *ngFor="let token of tokens">
+        <label class="text-13 mr-2">{{token.name}}:</label>
+        <label class="text-1"><b>{{token.tokenString}}</b></label>
+    </div>
+  </div>
+
+</div>

@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { CommService } from 'src/app/_services/comm.service';
-import { Router, ActivatedRoute } from '@angular/router';
 import { Utils } from 'src/app/shared/utils';
 
 @Component({
-  selector: 'app-sms-template',
-  templateUrl: './sms-template.component.html',
-  styleUrls: ['./sms-template.component.scss']
+  selector: 'app-email-template',
+  templateUrl: './email-template.component.html',
+  styleUrls: ['./email-template.component.scss']
 })
-export class SmsTemplateComponent implements OnInit {
-  smsTemplates: any;
+export class EmailTemplateComponent implements OnInit {
+  emailTemplates: any;
   HeadElts = ['action', 'name', 'catégorie', 'message'];
 
   constructor(private route: ActivatedRoute, private alertify: AlertifyService,
@@ -18,17 +18,17 @@ export class SmsTemplateComponent implements OnInit {
 
   ngOnInit() {
     this.route.data.subscribe(data => {
-      this.smsTemplates = data['templates'];
+      this.emailTemplates = data['templates'];
     });
     Utils.smoothScrollToTop();
   }
 
   addNew() {
-    this.router.navigate(['/AddSmsTemplate']);
+    this.router.navigate(['/AddEmailTemplate']);
   }
 
-  editSmsTemplate(id) {
-    this.router.navigate(['/EditSmsTemplate', id]);
+  editTemplate(id) {
+    this.router.navigate(['/EditEmailTemplate', id]);
   }
 
 }

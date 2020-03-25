@@ -227,9 +227,14 @@ namespace EducNotes.API.Data
             return await _context.Users.FirstOrDefaultAsync(u => u.ValidationCode == code);
         }
 
-        public async Task<SmsTemplate> GetSmsTemplate(int smsTemplateId)
+        public async Task<EmailTemplate> GetEmailTemplate(int id)
         {
-            return await _context.SmsTemplates.FirstOrDefaultAsync(s => s.Id == smsTemplateId);
+            return await _context.EmailTemplates.FirstOrDefaultAsync(s => s.Id == id);
+        }
+
+        public async Task<SmsTemplate> GetSmsTemplate(int id)
+        {
+            return await _context.SmsTemplates.FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public List<int> GetWeekDays(DateTime date)

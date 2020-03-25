@@ -189,10 +189,15 @@ namespace EducNotes.API.Helpers {
                 });
             CreateMap<AgendaForSaveDto, Agenda>();
             CreateMap<SmsTemplateForSaveDto, SmsTemplate>(); 
-            CreateMap<SmsTemplate, SmsTemplateForListDto>()
-                .ForMember(dest => dest.SmsCategoryName, opt => {
-                    opt.MapFrom(src => src.SmsCategory.Name);
-                });
+            CreateMap<SmsTemplate, SmsTemplateForListDto>();
+                // .ForMember(dest => dest.SmsCategoryName, opt => {
+                //     opt.MapFrom(src => src.SmsCategory.Name);
+                // });
+            CreateMap<EmailTemplateForSaveDto, EmailTemplate>(); 
+            CreateMap<EmailTemplate, EmailTemplateForListDto>();
+                // .ForMember(dest => dest.EmailCategoryName, opt => {
+                //     opt.MapFrom(src => src.EmailCategory.Name);
+                // });
             CreateMap<AbsenceForSaveDto, Absence>();
             CreateMap<UserClassEvent, UserClassEventForListDto>()
                 .ForMember(dest => dest.strStartDate, opt => {
