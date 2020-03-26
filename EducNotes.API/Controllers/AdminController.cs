@@ -818,7 +818,7 @@ namespace EducNotes.API.Controllers
 
                 var tdetails = new TeacherForListDto();
                 tdetails.PhoneNumber = teacher.PhoneNumber;
-                tdetails.SeconPhoneNumber = teacher.SecondPhoneNumber;
+                tdetails.SecondPhoneNumber = teacher.SecondPhoneNumber;
                 tdetails.Email = teacher.Email;
                 tdetails.Id = teacher.Id;
                 tdetails.LastName = teacher.LastName;

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Course } from 'src/app/_models/course';
 import { NzMessageService } from 'ng-zorro-antd';
@@ -9,6 +9,7 @@ import { AdminService } from 'src/app/_services/admin.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as XLSX from 'xlsx';
+import { debounceTime } from 'rxjs/operators';
 
 
 @Component({
@@ -30,6 +31,10 @@ export class TeacherManagementComponent implements OnInit {
   selectedTeacher: any;
   teacher: any;
   editModel: any;
+  page = 1;
+  pageSize = 10;
+  searchControl: FormControl = new FormControl();
+  filteredTeachers: any[] = [];
   editionMode = 'add';
   show = 'all';
   drawerTitle: string;
@@ -44,10 +49,34 @@ export class TeacherManagementComponent implements OnInit {
     private route: ActivatedRoute, private nzMessageService: NzMessageService) { }
 
   ngOnInit() {
-
     this.route.data.subscribe(data => {
       this.teachersCourses = data.teachers;
     });
+    this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
+      this.filerData(value);
+    });
+  }
+
+  filerData(val) {
+    if (val) {
+      val = val.toLowerCase();
+    } else {
+      return this.teachersCourses = [...this.teachersCourses];
+    }
+    const columns = Object.keys(this.teachersCourses[0]);
+    if (!columns.length) {
+      return;
+    }
+
+    const rows = this.teachersCourses.filter(function (d) {
+      for (let i = 0; i <= columns.length; i++) {
+        const column = columns[i];
+        if (d[column] && d[column].toString().toLowerCase().indexOf(val) > -1) {
+          return true;
+        }
+      }
+    });
+    this.filteredTeachers = rows;
   }
 
   getTeachers() {

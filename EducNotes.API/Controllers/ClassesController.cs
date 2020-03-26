@@ -204,7 +204,7 @@ namespace EducNotes.API.Controllers
             teacherCourse.PhotoUrl = ""; //data.Teacher.Photos.FirstOrDefault(p => p.IsMain).Url;
             teacherCourse.PhoneNumber = data.Teacher.PhoneNumber;
             teacherCourse.DateOfBirth = data.Teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
-            teacherCourse.SeconPhoneNumber = data.Teacher.SecondPhoneNumber;
+            teacherCourse.SecondPhoneNumber = data.Teacher.SecondPhoneNumber;
             teacherCourse.Course = data.Course;
             coursesWithTeacher.Add(teacherCourse);
         }
@@ -1436,22 +1436,21 @@ namespace EducNotes.API.Controllers
     {
         //recuperation de tous les professeurs ainsi que les cours affectés
         var teachers = await _context.Users
-            .Include(p => p.Photos)
-            .Where(u => u.UserTypeId == teacherTypeId && u.ValidatedCode == true)
-            .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
-
-        CultureInfo frC = new CultureInfo("fr-FR");
+                              .Include(p => p.Photos)
+                              .Where(u => u.UserTypeId == teacherTypeId && u.ValidatedCode == true)
+                              .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
 
         var teachersToReturn = new List<TeacherForListDto>();
         foreach (var teacher in teachers)
         {
             var tdetails = new TeacherForListDto();
             tdetails.PhoneNumber = teacher.PhoneNumber;
-            tdetails.SeconPhoneNumber = teacher.SecondPhoneNumber;
+            tdetails.SecondPhoneNumber = teacher.SecondPhoneNumber;
             tdetails.Email = teacher.Email;
             tdetails.Id = teacher.Id;
             tdetails.LastName = teacher.LastName;
             tdetails.FirstName = teacher.FirstName;
+            tdetails.Gender = teacher.Gender;
             tdetails.DateOfBirth = teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
             tdetails.CourseClasses = new List<TeacherCourseClassesDto>();
             var photo = teacher.Photos.FirstOrDefault(i => i.IsMain == true);

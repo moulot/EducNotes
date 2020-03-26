@@ -1,3 +1,77 @@
+<div class="row m-2">
+
+  <div class="col-md-12">
+    <div class="d-flex">
+      <i class="fad fa-chalkboard-teacher fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <p class="text-17">liste des enseignants</p>
+    </div>
+  </div>
+
+  <div class="col-md-4 mb-3">
+    <div class="md-form form-sm my-1">
+      <input mdbInput type="text" id="search" [formControl]="searchControl" class="form-control">
+      <label for="search">rechercher des enseignants</label>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="row">
+      <div *ngFor="let teacher of teachersCourses | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index"
+              class="col-md-3" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+        <mdb-card class="testimonial-card my-5" style="height: 350px;">
+          <div class="avatar mx-auto">
+            <img src="{{teacher.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+          </div>
+          <mdb-card-body class="p-2">
+            <div class="d-flex justify-content-center">
+              <div *ngIf="teacher.gender === 1">
+                <i class="fad fa-male fa-2x mr-2" style="--fa-primary-opacity: 1;
+                  --fa-secondary-opacity: 1; --fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
+              </div>
+              <div *ngIf="teacher.gender === 0">
+                <i class="fad fa-female fa-2x mr-2" style="--fa-primary-opacity: 1;
+                  --fa-secondary-opacity: 1;--fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
+              </div>
+              <div class="text-15 text-capitalize">{{teacher.lastName}} {{teacher.firstName}}</div>
+            </div>
+            <div class="text-15">{{teacher.email}}</div>
+            <div class="text-15">
+              <span>cell : {{teacher.phoneNumber}}</span>
+              <span *ngIf="teacher.secondPhoneNumber"> / autre : {{teacher.phoneNumber}}</span>
+            </div>
+            <hr class="mt-1 mb-1">
+              <div class="text-14 text-left"><b>cours</b></div>
+              <div *ngIf="teacher.courseClasses.length === 0">aucune affectation effectuée</div>
+              <div *ngIf="teacher.courseClasses.length > 0">
+                <div *ngFor="let course of teacher.courseClasses">
+                  <div class="d-flex">
+                    <div class="text-15 mr-2">{{course.course.name}} :</div>
+                    <div *ngIf="course.classes.length > 0">
+                      <span *ngFor="let class of course.classes" class="text-15 mr-1">{{class.name}},</span>
+                    </div>
+                    <div *ngIf="course.classes.length == 0">pas d'affectation</div>
+                  </div>
+                </div>
+              </div>
+            <hr class="mt-1 mb-3">
+            <div class="mb-2">
+              <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [routerLink]="['/editTeacher',teacher.id]">editer</button>
+              <button mdbBtn class="btnBlue ml-2" size="sm" mdbWavesEffect [routerLink]="['/teacherAssignment',teacher.id]"
+                [disabled]="teacher.courseClasses.length === 0" (click)="assignment(teacher)">affecter</button>
+            </div>
+          </mdb-card-body>
+        </mdb-card>
+      </div>
+      <div class="col-md-12 mt-2" *ngIf="teachersCourses?.length">
+        <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
 <div class="row justify-content-center align-items-center" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
 
   <div class="col-md-10">

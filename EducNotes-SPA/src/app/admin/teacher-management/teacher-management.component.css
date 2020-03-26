@@ -2,3 +2,15 @@
   width: 40px;
   height:  40px;
 }
+
+.btnOrange {
+  color: #192C47;
+  font-weight: bold;
+  background-color: #f89f20;
+ }
+
+.btnBlue {
+  color: #f89f20;
+  font-weight: bold;
+  background-color: #192C47;
+}
