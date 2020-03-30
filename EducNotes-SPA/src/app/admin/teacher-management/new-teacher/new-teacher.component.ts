@@ -123,7 +123,7 @@ export class NewTeacherComponent implements OnInit {
     reader.readAsDataURL(event.target.files[0]);
 
     this.photoFile = file;
-    console.log(this.photoFile);
+    // console.log(this.photoFile);
   }
 
   setCourse(courseId) {

@@ -40,11 +40,10 @@ export class ConfirmEmailComponent implements OnInit {
       this.userNameExist = false;
       this.authService.userNameExist(userName).subscribe((res: boolean) => {
         if (res === true) {
-           this.userNameExist = true;
-           // this.user1Form.valid = false;
+          this.userNameExist = true;
+          // this.user1Form.valid = false;
         }
       });
-
     }
 
     resultMode(val: boolean) {
