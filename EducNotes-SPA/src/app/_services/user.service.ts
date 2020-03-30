@@ -10,6 +10,7 @@ import { Absence } from '../_models/absence';
 import { UserSanction } from '../_models/userSanction';
 import { UserReward } from '../_models/userReward';
 import { UserClassEvent } from '../_models/userClassEvent';
+import { UserForRegister } from '../_models/userForRegister';
 
 @Injectable({
   providedIn: 'root'
@@ -236,13 +237,11 @@ constructor(private http: HttpClient) {}
   getAllTeachers(): Observable<User[]> {
     return this.http.get<User[]>(this.baseUrl + 'users/GetAllTeachers');
   }
-  // enregistrement d'un nouveau teacher
-  saveTeacher(user: User) {
-    return this.http.post(this.baseUrl + 'users/' + 'AddUser', user);
-  }
 
-  // enregistrement d'un nouveau teacher
-  addUser(user: User) {
+  // enregistrement d'un nouvel utilisateur
+  addUser(user: FormData) {
+    const headers = new HttpHeaders();
+    headers.append('Content-Type', 'multipart/form-data');
     return this.http.post(this.baseUrl + 'users/' + 'AddUser', user);
   }
 

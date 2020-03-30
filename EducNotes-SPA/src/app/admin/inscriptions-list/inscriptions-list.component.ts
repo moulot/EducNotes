@@ -185,14 +185,14 @@ export class InscriptionsListComponent implements OnInit {
     if (val) {
       val = val.toLowerCase();
     } else {
-      return this.students = [...this.students];
+      return this.filteredStudents = [...this.students];
     }
     const columns = Object.keys(this.students[0]);
     if (!columns.length) {
       return;
     }
 
-    const rows = this.students.filter(function (d) {
+    const rows = this.students.filter(function(d) {
       for (let i = 0; i <= columns.length; i++) {
         const column = columns[i];
         if (d[column] && d[column].toString().toLowerCase().indexOf(val) > -1) {

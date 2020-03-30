@@ -14,6 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.Globalization;
+using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
 
 namespace EducNotes.API.Controllers
 {
@@ -29,11 +33,12 @@ namespace EducNotes.API.Controllers
         int teacherTypeId,parentTypeId,studentTypeId,adminTypeId;
         string password,parentRoleName,memberRoleName,moderatorRoleName,adminRoleName,professorRoleName;
         CultureInfo frC = new CultureInfo ("fr-FR");
-
+        private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
+        private Cloudinary _cloudinary;
         private readonly UserManager<User> _userManager;
 
         public UsersController(IConfiguration config,DataContext context, IEducNotesRepository repo,
-        UserManager<User> userManager, IMapper mapper)
+        UserManager<User> userManager, IMapper mapper, IOptions<CloudinarySettings> cloudinaryConfig)
         {
             _userManager = userManager;
             _config = config;
@@ -51,6 +56,14 @@ namespace EducNotes.API.Controllers
             adminRoleName = _config.GetValue<String>("AppSettings:adminRoleName");
             professorRoleName = _config.GetValue<String>("AppSettings:professorRoleName");
             
+            _cloudinaryConfig = cloudinaryConfig;
+            Account acc = new Account(
+               _cloudinaryConfig.Value.CloudName,
+               _cloudinaryConfig.Value.ApiKey,
+               _cloudinaryConfig.Value.ApiSecret
+           );
+
+            _cloudinary = new Cloudinary(acc);
         }
 
         // [HttpGet]
@@ -1086,127 +1099,139 @@ namespace EducNotes.API.Controllers
         [HttpPost("{id}/DeleteUserType")]
         public async Task<IActionResult>DeleteUserType(int id)
         {
-        var userType = await _context.UserTypes.FirstAsync(a=>a.Id == id);
-            _repo.Delete(userType);
-            if(await _repo.SaveAll())
+          var userType = await _context.UserTypes.FirstAsync(a=>a.Id == id);
+          _repo.Delete(userType);
+
+          if(await _repo.SaveAll())
             return NoContent();
-            return BadRequest("impossible de supprimer cet élement ");
+
+          return BadRequest("impossible de supprimer cet élement ");
         }
 
-            
+        [HttpPost("{userId}/AddPhoto")]
+        public async Task<IActionResult> AddPhoto(int userId, [FromForm]IFormFile photoFile)
+        {
+          var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
+          var uploadResult = new ImageUploadResult();
 
-            // [HttpPost("AddUser")]
-            // public async Task<IActionResult> AddUser(UserForRegisterDto userForRegisterDto)
-            // {
-        
-            //     var userToCreate = _mapper.Map<User>(userForRegisterDto);
-            //     userToCreate.UserName = userForRegisterDto.Email;
-            // try
-            // {
-            //         await _repo.AddUserPreInscription(Guid.NewGuid(),userToCreate,professorRoleName);
-            //     if(userForRegisterDto.courseIds!=null)
-            //     {
-            //         foreach (var course in userForRegisterDto.courseIds)
-            //         {
-            //             _context.Add( new CourseUser {CourseId = course, TeacherId = userToCreate.Id});
-            //         }
-            //         await _context.SaveChangesAsync();
-            //         var teacherToReturn = new TeacherForListDto(){
-            //         Teacher =  _mapper.Map<UserForListDto>(await _repo.GetUser(userToCreate.Id,false)),
-            //         Courses = await _repo.GetTeacherCoursesAndClasses(userToCreate.Id)
-            //     };
-            //     return Ok(teacherToReturn);
-            //     }
-            //     else
-            //     return Ok(_mapper.Map<UserForListDto>(userToCreate));
-                
-            // }
-            // catch (System.Exception ex)
-            // {
-            //     string mes = ex.Message;
-
-            //     return BadRequest(ex);
-            // }
-
-            
-            // }
-        
-            // [HttpPost("{id}/DeleteTeacher")]
-            // public async Task<IActionResult> DeleteTeacher(int id)
-            // {
-            //     var teacher =await _repo.GetUser(id,false);
-            //     if(teacher.ValidatedCode == true)
-            //     return BadRequest("Désolé ce compte ne peut etre supprimé...");
-            //     var classcourses = await _context.ClassCourses.Where(t=>t.TeacherId==id).ToListAsync();
-            //     if(classcourses.Count()==0)
-            //     {
-            //         //possible de supprimer
-            //         _context.CourseUsers.RemoveRange(_context.CourseUsers.Where(t=>t.TeacherId==id));
-            //         _context.Users.Remove(_context.Users.FirstOrDefault(u=>u.Id==id));
-            //     }
-            //     if(await _repo.SaveAll())
-            //     return Ok("");
-            //     return BadRequest("impossible de supprimer cet utilisateur ");
-
-
-            // }
-
-            [HttpGet("GetAdminUserTypes")]
-            public async Task<IActionResult> GetAdminUserTypes()
+          if (photoFile.Length > 0)
+          {
+            using (var stream = photoFile.OpenReadStream())
             {
-                return Ok(await _context.UserTypes.Where(a=>a.Id >= adminTypeId).OrderBy(a => a.Name).ToListAsync());
+              var uploadParams = new ImageUploadParams()
+              {
+                File = new FileDescription(photoFile.Name, stream),
+                Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+              };
+
+              uploadResult = _cloudinary.Upload(uploadParams);
             }
+          }
 
-            [HttpGet("GetUserByTypeId/{id}")]
-            public async Task<IActionResult> GetUserByTypeId(int id)
-            {
-                var users = await _context.Users.Include(p=>p.Photos).Where(a=>a.UserTypeId == id)
-            .OrderBy(a=>a.LastName).ThenBy(a=>a.FirstName).ToListAsync();
-            var userToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
-            return Ok(userToReturn);
-            }
-           
-           [HttpPost("{id}/updatePerson")]
-           public async Task<IActionResult> updatePerson(int id,UserForRegisterDto model)
-           {
-               var user =await _repo.GetUser(id,false);
-               if(user.Id != id)
-               return BadRequest("impossible d'effectuer la mise a jour");
-               var userToUpdate = _mapper.Map(model, user);
-               if (userToUpdate.ClassId < 1)
-                userToUpdate.ClassId = null;
-               _repo.Update(userToUpdate);
-               if(await _repo.SaveAll())
-               return NoContent();
-               return BadRequest("impossible d'effectuer la mise a jour");
-           }
+          Photo photo = new Photo();
+          photo.Url = uploadResult.Uri.ToString();
+          photo.PublicId = uploadResult.PublicId;
+          photo.UserId = userId;
+          photo.DateAdded = DateTime.Now;
+          if (!user.Photos.Any(u => u.IsMain))
+          {
+            photo.IsMain = true;
+            photo.IsApproved = true;
+          }
+          user.Photos.Add(photo);
 
+          if (await _repo.SaveAll())
+            return Ok();
 
-           [HttpPost("SearchUsers")]
-           public async Task<IActionResult> SearchUsers(UserSearchDto model)
-           {
-               if(model.LastName == null)
-               model.LastName ="";
-               if(model.FirstName == null)
-               model.FirstName ="";
-               var query = from s in _context.Users.Include(a=>a.UserType).Include(a=>a.Photos)
-                    where (EF.Functions.Like(s.LastName, "%"+model.LastName+"%") && EF.Functions.Like(s.LastName, "%"+model.FirstName+"%") )
-                    select s;
-               return Ok(_mapper.Map<IEnumerable<UserForListDto>>(await query.ToListAsync()));
-              
-           }
+          return BadRequest("Could not add the photo");
+        }
 
-           [HttpGet("GetAllCities")]
-           public async Task<IActionResult>GetAllCities()
-           {
-             return Ok (await _repo.GetAllCities());
-           }
+        [HttpPost("AddUser")]
+        public async Task<IActionResult> AddUser([FromForm]UserForRegisterDto user)
+        {
+          var userToCreate = _mapper.Map<User>(user);
+          userToCreate.UserName = user.Email;
+          int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+          bool userOK = await _repo.AddUser(user, userId);
 
-           [HttpGet("{id}/GetDistrictsByCityId")]
-           public async Task<IActionResult>GetAllGetDistrictsByCityIdCities(int id)
-           {
-            return Ok (await _repo.GetAllGetDistrictsByCityIdCities(id));
-           }
+          if(userOK)
+            return Ok();
+          else
+            return BadRequest("problème pour ajouter l'utilisateur");
+        }
 
+        // [HttpPost("{id}/DeleteTeacher")]
+        // public async Task<IActionResult> DeleteTeacher(int id)
+        // {
+        //     var teacher =await _repo.GetUser(id,false);
+        //     if(teacher.ValidatedCode == true)
+        //     return BadRequest("Désolé ce compte ne peut etre supprimé...");
+        //     var classcourses = await _context.ClassCourses.Where(t=>t.TeacherId==id).ToListAsync();
+        //     if(classcourses.Count()==0)
+        //     {
+        //         //possible de supprimer
+        //         _context.CourseUsers.RemoveRange(_context.CourseUsers.Where(t=>t.TeacherId==id));
+        //         _context.Users.Remove(_context.Users.FirstOrDefault(u=>u.Id==id));
+        //     }
+        //     if(await _repo.SaveAll())
+        //     return Ok("");
+        //     return BadRequest("impossible de supprimer cet utilisateur ");
+        // }
+
+        [HttpGet("GetAdminUserTypes")]
+        public async Task<IActionResult> GetAdminUserTypes()
+        {
+            return Ok(await _context.UserTypes.Where(a=>a.Id >= adminTypeId).OrderBy(a => a.Name).ToListAsync());
+        }
+
+        [HttpGet("GetUserByTypeId/{id}")]
+        public async Task<IActionResult> GetUserByTypeId(int id)
+        {
+            var users = await _context.Users.Include(p=>p.Photos).Where(a=>a.UserTypeId == id)
+        .OrderBy(a=>a.LastName).ThenBy(a=>a.FirstName).ToListAsync();
+        var userToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
+        return Ok(userToReturn);
+        }
+
+        [HttpPost("{id}/updatePerson")]
+        public async Task<IActionResult> updatePerson(int id,UserForRegisterDto model)
+        {
+            var user =await _repo.GetUser(id,false);
+            if(user.Id != id)
+            return BadRequest("impossible d'effectuer la mise a jour");
+            var userToUpdate = _mapper.Map(model, user);
+            if (userToUpdate.ClassId < 1)
+            userToUpdate.ClassId = null;
+            _repo.Update(userToUpdate);
+            if(await _repo.SaveAll())
+            return NoContent();
+            return BadRequest("impossible d'effectuer la mise a jour");
+        }
+
+        [HttpPost("SearchUsers")]
+        public async Task<IActionResult> SearchUsers(UserSearchDto model)
+        {
+            if(model.LastName == null)
+            model.LastName ="";
+            if(model.FirstName == null)
+            model.FirstName ="";
+            var query = from s in _context.Users.Include(a=>a.UserType).Include(a=>a.Photos)
+                where (EF.Functions.Like(s.LastName, "%"+model.LastName+"%") && EF.Functions.Like(s.LastName, "%"+model.FirstName+"%") )
+                select s;
+            return Ok(_mapper.Map<IEnumerable<UserForListDto>>(await query.ToListAsync()));
+          
+        }
+
+        [HttpGet("GetAllCities")]
+        public async Task<IActionResult>GetAllCities()
+        {
+          return Ok (await _repo.GetAllCities());
+        }
+
+        [HttpGet("{id}/GetDistrictsByCityId")]
+        public async Task<IActionResult>GetAllGetDistrictsByCityIdCities(int id)
+        {
+        return Ok (await _repo.GetAllGetDistrictsByCityIdCities(id));
+        }
     }
 }

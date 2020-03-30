@@ -61,7 +61,7 @@ export class ClassStudentsComponent implements OnInit {
     if (val) {
       val = val.toLowerCase();
     } else {
-      return this.students = [...this.students];
+      return this.filteredStudents = [...this.students];
     }
     const columns = Object.keys(this.students[0]);
     if (!columns.length) {

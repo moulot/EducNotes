@@ -12,8 +12,6 @@ import { AuthService } from 'src/app/_services/auth.service';
 import { UserService } from 'src/app/_services/user.service';
 import { environment } from 'src/environments/environment';
 
-
-
 @Component({
   selector: 'app-parent-register',
   templateUrl: './parent-register.component.html',
@@ -100,10 +98,6 @@ export class ParentRegisterComponent implements OnInit {
     }
   }
 
-  // VerticalOrHorizontalStepper() {
-  //   return (window.innerWidth < 768);
-  // }
-
     ngOnInit() {
     this.userId = this.parent.id;
     this.createParentsForms();
@@ -189,7 +183,6 @@ export class ParentRegisterComponent implements OnInit {
   }
 
   createChildForm() {
-
     this.childForm = this.fb.group({
       dateOfBirth: [this.editModel.dateOfBirth, Validators.required],
       lastName: [this.editModel.lastName, Validators.required],
@@ -274,7 +267,6 @@ export class ParentRegisterComponent implements OnInit {
     }
 
     this.close();
-
   }
 
   add() {
@@ -362,7 +354,6 @@ export class ParentRegisterComponent implements OnInit {
     reader.readAsDataURL(event.target.files[0]);
     // fin recupération
 
-
     const imageExist = this.selectedFiles.find(t => t.spaCode === 1);
     if (imageExist) {
       // une image existe deja dans le tableau
@@ -372,8 +363,6 @@ export class ParentRegisterComponent implements OnInit {
       const img = { spaCode: 1, image: file };
       this.selectedFiles = [...this.selectedFiles, img];
     }
-
-
   }
 
   childImgResult(event) {
@@ -416,7 +405,6 @@ export class ParentRegisterComponent implements OnInit {
       elt.dateOfBirth = Utils.inputDateDDMMYY(elt.dateOfBirth, '/');
       elt.userTypeId = this.studentTypeId;
     }
-
     usersToSave.children = this.children;
 
     // first Step : Enregistrement des Users
@@ -428,33 +416,31 @@ export class ParentRegisterComponent implements OnInit {
       this.wait = false;
       this.alertify.error(error);
     });
-
   }
 
   savePhotos() {
     let errorCount = 0;
     for (let i = 0; i < this.usersSpaCode.length; i++) {
-      const element = this.usersSpaCode[i];
-      const img = this.selectedFiles.find(c => c.spaCode === element.spaCode);
+      const elt = this.usersSpaCode[i];
+      const img = this.selectedFiles.find(c => c.spaCode === elt.spaCode);
       if (img) {
         // console.log('trouvé : ');
         // mise a jour de la photo
         //  debugger;
         const formData = new FormData();
         formData.append('file', img.image, img.image.name);
-        this.authService.addUserPhoto(element.userId, formData).subscribe(() => {
+        this.authService.addUserPhoto(elt.userId, formData).subscribe(() => {
         }, error => {
           this.alertify.error(error);
           errorCount = errorCount + 1;
         });
       }
-      if (element === this.usersSpaCode[this.usersSpaCode.length - 1]) {
+      if (elt === this.usersSpaCode[this.usersSpaCode.length - 1]) {
       this.showSuccessDiv = true;
 
       }
       // fin de la boucle
     }
-
   }
 
   getParentDistricts() {

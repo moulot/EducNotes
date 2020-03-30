@@ -250,7 +250,6 @@ export class AuthService {
   }
 
   addUserPhoto(userId: number, photo: any) {
-    // return this.http.post(environment.apiUrl + 'users/' + userId + '/photos', photo);
     return this.http.post(this.baseUrl + userId + '/AddPhotoForUser', photo);
   }
 

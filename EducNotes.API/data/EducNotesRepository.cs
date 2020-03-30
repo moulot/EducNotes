@@ -8,13 +8,17 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using AutoMapper;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using EducNotes.API.Dtos;
 using EducNotes.API.Helpers;
 using EducNotes.API.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -26,19 +30,22 @@ namespace EducNotes.API.Data
         private readonly IConfiguration _config;
         private readonly IEmailSender _emailSender;
         private readonly IMapper _mapper;
+        private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private readonly UserManager<User> _userManager;
+        private Cloudinary _cloudinary;
         string password;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
         int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId, schoolInscTypeId;
         CultureInfo frC = new CultureInfo ("fr-FR");
 
         public EducNotesRepository(DataContext context, IConfiguration config, IEmailSender emailSender,
-            UserManager<User> userManager, IMapper mapper)
+            UserManager<User> userManager, IMapper mapper, IOptions<CloudinarySettings> cloudinaryConfig)
         {
             _context = context;
             _config = config;
             _emailSender = emailSender;
             _mapper = mapper;
+            _cloudinaryConfig = cloudinaryConfig;
             _config = config;
             password = _config.GetValue<String>("AppSettings:defaultPassword");
             _userManager = userManager;
@@ -51,6 +58,14 @@ namespace EducNotes.API.Data
             moderatorRoleId = _config.GetValue<int>("AppSettings:moderatorRoleId");
             adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
             teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
+        
+            _cloudinaryConfig = cloudinaryConfig;
+            Account acc = new Account(
+               _cloudinaryConfig.Value.CloudName,
+               _cloudinaryConfig.Value.ApiKey,
+               _cloudinaryConfig.Value.ApiSecret
+           );
+            _cloudinary = new Cloudinary(acc);
         }
 
         public void Add<T>(T entity) where T : class
@@ -490,180 +505,301 @@ namespace EducNotes.API.Data
 
         public async Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId)
         {
+          var userToCreate = _mapper.Map<User>(userForRegister);
+          var code = Guid.NewGuid();
+          userToCreate.UserName = code.ToString();
+          userToCreate.ValidationCode = code.ToString();
+          userToCreate.ValidatedCode = false;
+          userToCreate.EmailConfirmed = false;
+          userToCreate.UserName = code.ToString();
+          bool resultStatus = false;
 
-            var userToCreate = _mapper.Map<User>(userForRegister);
-            var code = Guid.NewGuid();
-            userToCreate.UserName = code.ToString();
-            userToCreate.ValidationCode = code.ToString();
-            userToCreate.ValidatedCode = false;
-            userToCreate.EmailConfirmed = false;
-            userToCreate.UserName = code.ToString();
-            bool resultStatus = false;
-
-            using (var identityContextTransaction = _context.Database.BeginTransaction())
-            {
-                try
+          using (var identityContextTransaction = _context.Database.BeginTransaction())
+          {
+            try
+              {
+                if (userToCreate.UserTypeId == teacherTypeId)
                 {
-                  if (userToCreate.UserTypeId == teacherTypeId)
+                  //enregistrement du teacher
+                  var result = await _userManager.CreateAsync(userToCreate, password);
+                  if (result.Succeeded)
                   {
-                      //enregistrement du teacher
-                      var result = await _userManager.CreateAsync(userToCreate, password);
-                      if (result.Succeeded)
+                      // enregistrement du RoleTeacher
+                      var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
+                      var appUser = await _userManager.Users
+                          .FirstOrDefaultAsync(u => u.NormalizedUserName == userToCreate.UserName);
+                      _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+
+                      //enregistrement de des cours du professeur
+                      if (userForRegister.CourseIds != null)
                       {
-                          // enregistrement du RoleTeacher
-                          var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
-                          var appUser = await _userManager.Users
-                              .FirstOrDefaultAsync(u => u.NormalizedUserName == userToCreate.UserName);
-                          _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+                        foreach(var course in userForRegister.CourseIds)
+                        {
+                          Add(new TeacherCourse { CourseId = course, TeacherId = userToCreate.Id });
+                        }
+                      }
 
-                          //enregistrement de des cours du professeur
-                          if (userForRegister.CourseIds != null)
-                          {
-                              foreach (var course in userForRegister.CourseIds)
-                              {
-                                  Add(new TeacherCourse { CourseId = course, TeacherId = userToCreate.Id });
-                              }
-                          }
+                      // Enregistrement dans la table Email
+                      if (userToCreate.Email != null)
+                      {
+                        var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToCreate.ValidationCode;
 
-                          // Enregistrement dans la table Email
-                          if (userToCreate.Email != null)
-                          {
-                              var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToCreate.ValidationCode;
-
-                              var emailToSend = new Email
-                              {
-                                  InsertUserId = insertUserId,
-                                  UpdateUserId = userToCreate.Id,
-                                  StatusFlag = 0,
-                                  Subject = "Confirmation de compte",
-                                  ToAddress = userToCreate.Email,
-                                  Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                                  FromAddress = "no-reply@educnotes.com",
-                                  EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
-                              };
-                              Add(emailToSend);
-                          }
-                          if (await SaveAll())
-                          {
-                              // fin de la transaction
-                              identityContextTransaction.Commit();
-                              resultStatus = true;
-
-                          }
-                          else
-                              resultStatus = true;
+                        var emailToSend = new Email
+                        {
+                          InsertUserId = insertUserId,
+                          UpdateUserId = userToCreate.Id,
+                          StatusFlag = 0,
+                          Subject = "Confirmation de compte",
+                          ToAddress = userToCreate.Email,
+                          Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                          FromAddress = "no-reply@educnotes.com",
+                          EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
+                        };
+                        Add(emailToSend);
+                      }
+                      if (await SaveAll())
+                      {
+                        // fin de la transaction
+                        identityContextTransaction.Commit();
+                        resultStatus = true;
                       }
                       else
-                          resultStatus = false;
+                        resultStatus = true;
                   }
+                  else
+                    resultStatus = false;
                 }
-                catch (System.Exception)
-                {
-
-                    return resultStatus = false;
-                }
-            }
-            return resultStatus;
+              }
+              catch (System.Exception)
+              {
+                return resultStatus = false;
+              }
+          }
+          return resultStatus;
         }
+
+        public async Task<bool> AddUser(UserForRegisterDto user, int insertUserId)
+        {
+          var userToCreate = _mapper.Map<User>(user);
+          var code = Guid.NewGuid();
+          userToCreate.UserName = code.ToString();
+          userToCreate.ValidationCode = code.ToString();
+          userToCreate.ValidatedCode = false;
+          userToCreate.EmailConfirmed = false;
+          userToCreate.UserName = code.ToString();
+          bool resultStatus = false;
+
+          using (var identityContextTransaction = _context.Database.BeginTransaction())
+          {
+            try
+              {
+                //enregistrement du teacher
+                var result = await _userManager.CreateAsync(userToCreate, password);
+                if (result.Succeeded)
+                {
+                  // enregistrement du RoleTeacher
+                  var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
+                  var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedUserName == userToCreate.UserName);
+                  _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+
+                  //enregistrement des cours du professeur
+                  var ids = user.CourseIds.Split(",");
+                  if (ids.Count() > 0)
+                  {
+                    foreach(var courseId in ids)
+                    {
+                      TeacherCourse tc = new TeacherCourse();
+                      tc.CourseId = Convert.ToInt32(courseId);
+                      tc.TeacherId = appUser.Id;
+                      Add(tc);
+                    }
+                  }
+
+                  //add user photo
+                  if(user.PhotoFile != null)
+                  {
+                    Boolean photoAdded = await AddPhoto(appUser.Id, user.PhotoFile);
+                    if(!photoAdded)
+                    {
+                      identityContextTransaction.Rollback();
+                      resultStatus = false;
+                    }
+                  }
+
+                  // Enregistrement dans la table Email
+                  if(appUser.Email != null)
+                  {
+                    var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToCreate.ValidationCode;
+                    var emailToSend = new Email
+                    {
+                      StatusFlag = 0,
+                      Subject = "Confirmation de compte",
+                      ToAddress = appUser.Email,
+                      Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                      FromAddress = "no-reply@educnotes.com",
+                      EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId"),
+                      InsertUserId = insertUserId,
+                      UpdateUserId = insertUserId,
+                    };
+                    Add(emailToSend);
+                  }
+                  if(await SaveAll())
+                  {
+                    // fin de la transaction
+                    identityContextTransaction.Commit();
+                    resultStatus = true;
+                  }
+                  else
+                    resultStatus = true;
+                }
+                else
+                {
+                  identityContextTransaction.Rollback();
+                  resultStatus = false;
+                }
+              }
+              catch (System.Exception)
+              {
+                identityContextTransaction.Rollback();
+                return resultStatus = false;
+              }
+          }
+          return resultStatus;
+        }
+
+        public async Task<bool> AddPhoto(int userId, IFormFile photoFile)
+        {
+          var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
+          var uploadResult = new ImageUploadResult();
+
+          if (photoFile.Length > 0)
+          {
+            using (var stream = photoFile.OpenReadStream())
+            {
+              var uploadParams = new ImageUploadParams()
+              {
+                File = new FileDescription(photoFile.Name, stream),
+                Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+              };
+
+              uploadResult = _cloudinary.Upload(uploadParams);
+            }
+          }
+
+          Photo photo = new Photo();
+          photo.Url = uploadResult.Uri.ToString();
+          photo.PublicId = uploadResult.PublicId;
+          photo.UserId = userId;
+          photo.DateAdded = DateTime.Now;
+          if (!user.Photos.Any(u => u.IsMain))
+          {
+            photo.IsMain = true;
+            photo.IsApproved = true;
+          }
+          user.Photos.Add(photo);
+
+          if (await SaveAll())
+            return true;
+
+          return false;
+        }
+
         public async Task<Course> GetCourse(int Id)
         {
-            return await _context.Courses.FirstOrDefaultAsync(c => c.Id == Id);
+          return await _context.Courses.FirstOrDefaultAsync(c => c.Id == Id);
         }
         public async Task<bool> SendResetPasswordLink(User user, string code)
         {
-            var emailform = new EmailFormDto
-            {
-               // toEmail = email,
-                subject = "Réinitialisation de mot passe ",
-                //content ="Votre code de validation: "+ "<b>"+code.ToString()+"</b>"
-                content = ResetPasswordContent(code)
-            };
+          var emailform = new EmailFormDto
+          {
+            // toEmail = email,
+            subject = "Réinitialisation de mot passe ",
+            //content ="Votre code de validation: "+ "<b>"+code.ToString()+"</b>"
+            content = ResetPasswordContent(code)
+          };
 
-                var callbackUrl = _config.GetValue<String>("AppSettings:DefaultResetPasswordLink") + code;
-                            var email = new Email
-                            {
+          var callbackUrl = _config.GetValue<String>("AppSettings:DefaultResetPasswordLink") + code;
+          var email = new Email
+          {
+            InsertUserId = user.Id,
+            UpdateUserId =  user.Id,
+            StatusFlag = 0,
+            Subject = "Réinitialisation de mot passe ",
+            ToAddress = user.Email,
+            Body = $"veuillez cliquer sur le lien suivant pour réinitiliser votre mot de passe : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+            FromAddress = "no-reply@educnotes.com",
+            EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
+          };
+          Add(email);
 
-                                InsertUserId = user.Id,
-                                UpdateUserId =  user.Id,
-                                StatusFlag = 0,
-                                Subject = "Réinitialisation de mot passe ",
-                                ToAddress = user.Email,
-                                Body = $"veuillez cliquer sur le lien suivant pour réinitiliser votre mot de passe : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                                FromAddress = "no-reply@educnotes.com",
-                                EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
-                            };
-                            Add(email);
-
-            try
-            {
-                var res = await SendEmail(emailform);
-                return true;
-            }
-            catch (System.Exception)
-            {
-                return false;
-            }
-
+          try
+          {
+            var res = await SendEmail(emailform);
+            return true;
+          }
+          catch (System.Exception)
+          {
+            return false;
+          }
         }
 
         public async Task<bool> SendEmail(EmailFormDto emailFormDto)
         {
-            try
-            {
-                await _emailSender.SendEmailAsync(emailFormDto.toEmail, emailFormDto.subject, emailFormDto.content);
-                return true;
-            }
-            catch (System.Exception)
-            {
-                return false;
-            }
+          try
+          {
+            await _emailSender.SendEmailAsync(emailFormDto.toEmail, emailFormDto.subject, emailFormDto.content);
+            return true;
+          }
+          catch (System.Exception)
+          {
+            return false;
+          }
         }
 
         private string ResetPasswordContent(string code)
         {
-            return "<b>EducNotes</b> a bien enrgistré votre demande de réinitialisation de mot de passe !<br>" +
-                "Vous pouvez utiliser le lien suivant pour réinitialiser votre mot de passe: <br>" +
-                " <a href=" + _config.GetValue<String>("AppSettings:DefaultResetPasswordLink") + code + "/>cliquer ici</a><br>" +
-                "Si vous n'utilisez pas ce lien dans les 3 heures, il expirera." +
-                "Pour obtenir un nouveau lien de réinitialisation de mot de passe, visitez" +
-                " <a href=" + _config.GetValue<String>("AppSettings:DefaultforgotPasswordLink") + "/>réinitialiser son mot de passe</a>.<br>" +
-                "Merci,";
-
+          return "<b>EducNotes</b> a bien enrgistré votre demande de réinitialisation de mot de passe !<br>" +
+              "Vous pouvez utiliser le lien suivant pour réinitialiser votre mot de passe: <br>" +
+              " <a href=" + _config.GetValue<String>("AppSettings:DefaultResetPasswordLink") + code + "/>cliquer ici</a><br>" +
+              "Si vous n'utilisez pas ce lien dans les 3 heures, il expirera." +
+              "Pour obtenir un nouveau lien de réinitialisation de mot de passe, visitez" +
+              " <a href=" + _config.GetValue<String>("AppSettings:DefaultforgotPasswordLink") + "/>réinitialiser son mot de passe</a>.<br>" +
+              "Merci,";
         }
+
         public bool SendSms(List<string> phoneNumbers, string content)
         {
-            try
+          try
+          {
+            foreach (var phonrNumber in phoneNumbers)
             {
-                foreach (var phonrNumber in phoneNumbers)
-                {
-                    //envoi sms clickatell :  using restSharp
-                    var curl = "https://platform.clickatell.com/messages/http/" +
-                        "send?apiKey=7z94hfu_RnWsCNW-XgDOxw==&to=" + phonrNumber + "&content=" + content;
-                    var client = new RestClient(curl);
-                    var request = new RestRequest(Method.GET);
-                    request.AddHeader("content-type", "application/x-www-form-urlencoded");
-                    request.AddHeader("cache-control", "no-cache");
-                    request.AddHeader("header1", "headerval");
-                    request.AddParameter("application/x-www-form-urlencoded", "bodykey=bodyval", ParameterType.RequestBody);
-                    IRestResponse response = client.Execute(request);
-                }
-                return true;
+              //envoi sms clickatell :  using restSharp
+              var curl = "https://platform.clickatell.com/messages/http/" +
+                  "send?apiKey=7z94hfu_RnWsCNW-XgDOxw==&to=" + phonrNumber + "&content=" + content;
+              var client = new RestClient(curl);
+              var request = new RestRequest(Method.GET);
+              request.AddHeader("content-type", "application/x-www-form-urlencoded");
+              request.AddHeader("cache-control", "no-cache");
+              request.AddHeader("header1", "headerval");
+              request.AddParameter("application/x-www-form-urlencoded", "bodykey=bodyval", ParameterType.RequestBody);
+              IRestResponse response = client.Execute(request);
             }
-            catch (System.Exception)
-            {
-
-                return false;
-            }
+            return true;
+          }
+          catch (System.Exception)
+          {
+            return false;
+          }
         }
 
         public async Task<IEnumerable<City>> GetAllCities()
         {
-            return (await _context.Cities.OrderBy(c => c.Name).ToListAsync());
+          return (await _context.Cities.OrderBy(c => c.Name).ToListAsync());
         }
 
         public async Task<IEnumerable<District>> GetAllGetDistrictsByCityIdCities(int id)
         {
-            return (await _context.Districts.Where(c => c.CityId == id).OrderBy(c => c.Name).ToListAsync());
+          return (await _context.Districts.Where(c => c.CityId == id).OrderBy(c => c.Name).ToListAsync());
         }
 
         public void AddInscription(int levelId, int userId)

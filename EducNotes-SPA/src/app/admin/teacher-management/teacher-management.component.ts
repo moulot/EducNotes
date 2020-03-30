@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Course } from 'src/app/_models/course';
-import { NzMessageService } from 'ng-zorro-antd';
 import { ClassService } from 'src/app/_services/class.service';
 import { environment } from 'src/environments/environment';
 import { AdminService } from 'src/app/_services/admin.service';
@@ -10,7 +9,6 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as XLSX from 'xlsx';
 import { debounceTime } from 'rxjs/operators';
-
 
 @Component({
   selector: 'app-teacher-management',
@@ -46,11 +44,12 @@ export class TeacherManagementComponent implements OnInit {
 
   constructor(private adminService: AdminService, private fb: FormBuilder,
     private classService: ClassService, private router: Router, private alertify: AlertifyService,
-    private route: ActivatedRoute, private nzMessageService: NzMessageService) { }
+    private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.route.data.subscribe(data => {
       this.teachersCourses = data.teachers;
+      this.filteredTeachers = data.teachers;
     });
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
       this.filerData(value);
@@ -61,14 +60,14 @@ export class TeacherManagementComponent implements OnInit {
     if (val) {
       val = val.toLowerCase();
     } else {
-      return this.teachersCourses = [...this.teachersCourses];
+      return this.filteredTeachers = [...this.teachersCourses];
     }
     const columns = Object.keys(this.teachersCourses[0]);
     if (!columns.length) {
       return;
     }
 
-    const rows = this.teachersCourses.filter(function (d) {
+    const rows = this.teachersCourses.filter(function(d) {
       for (let i = 0; i <= columns.length; i++) {
         const column = columns[i];
         if (d[column] && d[column].toString().toLowerCase().indexOf(val) > -1) {
@@ -82,12 +81,12 @@ export class TeacherManagementComponent implements OnInit {
   getTeachers() {
     this.classService.getAllTeachersCourses().subscribe((res: any[]) => {
       this.teachersCourses = res;
+      this.filteredTeachers = res;
+      console.log(this.filteredTeachers);
     }, error => {
       console.log(error);
     });
   }
-
-
 
   assignment(params: any) {
     let courses = [];
@@ -109,7 +108,6 @@ export class TeacherManagementComponent implements OnInit {
     this.show = 'affect';
   }
 
-
   saveImport() {
     this.adminService.importTeachersFile(this.exportedTeachers).subscribe(() => {
       this.alertify.success('enregistrement terminé...');
@@ -118,9 +116,7 @@ export class TeacherManagementComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
     });
-
   }
-
 
   onFileChange(ev) {
     let workBook = null;
@@ -178,7 +174,6 @@ export class TeacherManagementComponent implements OnInit {
     };
     reader.readAsBinaryString(file);
   }
-
 
   setDownload(data) {
     // this.willDownload = true;

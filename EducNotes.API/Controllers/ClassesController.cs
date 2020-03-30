@@ -1467,9 +1467,9 @@ namespace EducNotes.API.Controllers
                 cdetails.Course = cours.Course;
                 cdetails.Classes = new List<Class>();
                 var classes = _context.ClassCourses.Include(c => c.Class)
-                    .Where(t => t.TeacherId == teacher.Id && t.CourseId == cours.CourseId && t.ClassId != null).ToList();
+                  .Where(t => t.TeacherId == teacher.Id && t.CourseId == cours.CourseId && t.ClassId != null).ToList();
                 if (classes != null & classes.Count() > 0)
-                    cdetails.Classes = classes.Select(c => c.Class).ToList();
+                  cdetails.Classes = classes.Select(c => c.Class).ToList();
                 tdetails.CourseClasses.Add(cdetails);
             }
             teachersToReturn.Add(tdetails);

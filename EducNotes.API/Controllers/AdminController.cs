@@ -314,10 +314,10 @@ namespace EducNotes.API.Controllers
         [HttpPost("{insertUserId}/AddUser")]
         public async Task<IActionResult> AddUser(int insertUserId, UserForRegisterDto userForRegisterDto)
         {
-            if (await _repo.AddUserPreInscription(userForRegisterDto, insertUserId))
-                return Ok();
+          if (await _repo.AddUserPreInscription(userForRegisterDto, insertUserId))
+            return Ok();
 
-            return BadRequest("impossible de termier l'enregistrement");
+          return BadRequest("impossible de termier l'enregistrement");
         }
 
         [HttpGet("ClassLevelDetails")]

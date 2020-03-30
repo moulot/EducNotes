@@ -41,36 +41,35 @@ namespace EducNotes.API.Controllers
         int parentIsncrTypeId, schoolInscrTypeId;
 
         public AuthController(IConfiguration config, IMapper mapper, IEducNotesRepository repo,
-            UserManager<User> userManager, SignInManager<User> signInManager, DataContext context,
-            IOptions<CloudinarySettings> cloudinaryConfig)
+          UserManager<User> userManager, SignInManager<User> signInManager, DataContext context,
+          IOptions<CloudinarySettings> cloudinaryConfig)
         {
-            _context = context;
-            _repo = repo;
-            _config = config;
-            _mapper = mapper;
-            _userManager = userManager;
-            _signInManager = signInManager;
-            teacherTypeId = _config.GetValue<int>("AppSettings:teacherTypeId");
-            parentTypeId = _config.GetValue<int>("AppSettings:parentTypeId");
-            adminTypeId = _config.GetValue<int>("AppSettings:adminTypeId");
-            studentTypeId = _config.GetValue<int>("AppSettings:studentTypeId");
-            parentRoleId = _config.GetValue<int>("AppSettings:parentRoleId");
-            memberRoleId = _config.GetValue<int>("AppSettings:memberRoleId");
-            moderatorRoleId = _config.GetValue<int>("AppSettings:moderatorRoleId");
-            adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
-            teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
-            parentIsncrTypeId = _config.GetValue<int>("AppSettings:parentInscTypeId");
-            schoolInscrTypeId = _config.GetValue<int>("AppSettings:schoolInscTypeId");
+          _context = context;
+          _repo = repo;
+          _config = config;
+          _mapper = mapper;
+          _userManager = userManager;
+          _signInManager = signInManager;
+          teacherTypeId = _config.GetValue<int>("AppSettings:teacherTypeId");
+          parentTypeId = _config.GetValue<int>("AppSettings:parentTypeId");
+          adminTypeId = _config.GetValue<int>("AppSettings:adminTypeId");
+          studentTypeId = _config.GetValue<int>("AppSettings:studentTypeId");
+          parentRoleId = _config.GetValue<int>("AppSettings:parentRoleId");
+          memberRoleId = _config.GetValue<int>("AppSettings:memberRoleId");
+          moderatorRoleId = _config.GetValue<int>("AppSettings:moderatorRoleId");
+          adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
+          teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
+          parentIsncrTypeId = _config.GetValue<int>("AppSettings:parentInscTypeId");
+          schoolInscrTypeId = _config.GetValue<int>("AppSettings:schoolInscTypeId");
 
+          _cloudinaryConfig = cloudinaryConfig;
+          Account acc = new Account(
+              _cloudinaryConfig.Value.CloudName,
+              _cloudinaryConfig.Value.ApiKey,
+              _cloudinaryConfig.Value.ApiSecret
+          );
 
-            _cloudinaryConfig = cloudinaryConfig;
-            Account acc = new Account(
-               _cloudinaryConfig.Value.CloudName,
-               _cloudinaryConfig.Value.ApiKey,
-               _cloudinaryConfig.Value.ApiSecret
-           );
-
-            _cloudinary = new Cloudinary(acc);
+          _cloudinary = new Cloudinary(acc);
         }
 
         [HttpPost("{id}/setPassword/{password}")] // edition du mot de passe apres validation du code
@@ -360,13 +359,8 @@ namespace EducNotes.API.Controllers
 
             }
             return BadRequest("Compte introuvable");
-
-
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////MOHAMED KABORE ///////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // [HttpGet("GetEmails")] 
         // public async Task<IActionResult> GetEmails()
         // {
@@ -385,7 +379,6 @@ namespace EducNotes.API.Controllers
             return Ok(await _repo.GetAllCities());
         }
 
-
         [HttpGet("GetLevels")]
         public async Task<IActionResult> GetLevels()
         {
@@ -398,58 +391,56 @@ namespace EducNotes.API.Controllers
             return Ok(await _repo.GetAllGetDistrictsByCityIdCities(id));
         }
 
-    
-
-        [HttpPost("{parentId}/ParentSelfPreinscription")] // enregistrement de préinscription : pere, mere et enfants
+        // enregistrement de préinscription : pere, mere et enfants
+        [HttpPost("{parentId}/ParentSelfPreinscription")]
         public async Task<IActionResult> ParentSelfPreinscription(int parentId, [FromBody]ParentSefRegisterDto model)
         {
-            // récuperation de tous les users
-            var usersToUpdate = new List<UserForUpdateDto>();
-            usersToUpdate.Add(model.parent);
-            int total = 0;
-            foreach (var children in model.children)
-            {
-                usersToUpdate.Add(children);
-                total += total + children.Products.Sum(x => Convert.ToInt32(x.Price));
-            }
-            var userscode = await _repo.ParentSelfInscription(parentId, usersToUpdate);
+          // récuperation de tous les users
+          var usersToUpdate = new List<UserForUpdateDto>();
+          usersToUpdate.Add(model.parent);
+          int total = 0;
+          foreach (var children in model.children)
+          {
+            usersToUpdate.Add(children);
+            total += total + children.Products.Sum(x => Convert.ToInt32(x.Price));
+          }
+          var userscode = await _repo.ParentSelfInscription(parentId, usersToUpdate);
 
-            // enregistrement des services séléctionnés
+          // enregistrement des services séléctionnés
 
-            foreach (var child in model.children)
-            {
-                int childId = userscode.FirstOrDefault(s => s.SpaCode == child.SpaCode).UserId;
-                var newOrder = new Order
+          foreach (var child in model.children)
+          {
+              int childId = userscode.FirstOrDefault(s => s.SpaCode == child.SpaCode).UserId;
+              var newOrder = new Order
+              {
+                TotalHT = total,
+                TotalTTC = total,
+                Discount = 0,
+                TVA = 0,
+                UserPId = parentId,
+                UserId = childId
+              };
+              _repo.Add(newOrder);
+
+              foreach (var prod in child.Products)
+              {
+                var newOrderLine = new OrderLine
                 {
-                    TotalHT = total,
-                    TotalTTC = total,
-                    Discount = 0,
-                    TVA = 0,
-                    UserPId = parentId,
-                    UserId = childId
+                  OrderId = newOrder.Id,
+                  ProductId = prod.Id,
+                  AmountHT = prod.Price,
+                  AmountTTC = prod.Price,
+                  Discount = 0,
+                  Qty = 1,
+                  TVA = 0
                 };
-                _repo.Add(newOrder);
+                _repo.Add(newOrderLine);
+              }
+          }
+          if (await _repo.SaveAll())
+            return Ok(userscode);
 
-                foreach (var prod in child.Products)
-                {
-                    var newOrderLine = new OrderLine
-                    {
-                        OrderId = newOrder.Id,
-                        ProductId = prod.Id,
-                        AmountHT = prod.Price,
-                        AmountTTC = prod.Price,
-                        Discount = 0,
-                        Qty = 1,
-                        TVA = 0
-
-                    };
-                    _repo.Add(newOrderLine);
-                }
-            }
-            if (await _repo.SaveAll())
-                return Ok(userscode);
-
-            return BadRequest();
+          return BadRequest();
         }
 
 
@@ -539,94 +530,85 @@ namespace EducNotes.API.Controllers
             return NotFound();
         }
 
-
         [HttpPost("{userId}/AddPhotoForUser")]
-        public async Task<IActionResult> AddPhotoForUser(int userId,
-           [FromForm]PhotoForCreationDto photoForCreationDto)
+        public async Task<IActionResult> AddPhotoForUser(int userId, [FromForm]PhotoForCreationDto photoForCreationDto)
         {
+          var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
+          user.TempData = 2;
+          var file = photoForCreationDto.File;
+          var uploadResult = new ImageUploadResult();
 
-            var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId); ;
-            user.TempData = 2;
-
-            var file = photoForCreationDto.File;
-
-            var uploadResult = new ImageUploadResult();
-
-            if (file.Length > 0)
+          if (file.Length > 0)
+          {
+            using (var stream = file.OpenReadStream())
             {
-                using (var stream = file.OpenReadStream())
-                {
-                    var uploadParams = new ImageUploadParams()
-                    {
-                        File = new FileDescription(file.Name, stream),
-                        Transformation = new Transformation()
-                            .Width(500).Height(500).Crop("fill").Gravity("face")
-                    };
+              var uploadParams = new ImageUploadParams()
+              {
+                File = new FileDescription(file.Name, stream),
+                Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+              };
 
-                    uploadResult = _cloudinary.Upload(uploadParams);
-                }
+              uploadResult = _cloudinary.Upload(uploadParams);
             }
+          }
 
-            photoForCreationDto.Url = uploadResult.Uri.ToString();
-            photoForCreationDto.PublicId = uploadResult.PublicId;
+          photoForCreationDto.Url = uploadResult.Uri.ToString();
+          photoForCreationDto.PublicId = uploadResult.PublicId;
 
+          var photo = _mapper.Map<Photo>(photoForCreationDto);
 
-            var photo = _mapper.Map<Photo>(photoForCreationDto);
+          if (!user.Photos.Any(u => u.IsMain))
+          {
+            photo.IsMain = true;
+            photo.IsApproved = true;
+          }
+          user.Photos.Add(photo);
 
-            if (!user.Photos.Any(u => u.IsMain))
-            {
-                photo.IsMain = true;
-                photo.IsApproved = true;
-            }
+          if (await _repo.SaveAll())
+            return Ok();
 
-
-            user.Photos.Add(photo);
-
-            if (await _repo.SaveAll())
-                return Ok();
-
-            return BadRequest("Could not add the photo");
+          return BadRequest("Could not add the photo");
         }
 
         [HttpGet("GetClassLvelProducts/{classLevelId}")]
         public async Task<IActionResult> GetProducts(int classLevelId)
         {
-            var prods = new List<Product>();
-            var prods_for_levels = await _context.ClassLevelProducts
-                                        .Where(c => c.ClassLevelId == classLevelId)
-                                        .ToListAsync();
-            var ids = prods_for_levels.Select(p => p.ProductId);
+          var prods = new List<Product>();
+          var prods_for_levels = await _context.ClassLevelProducts
+                                      .Where(c => c.ClassLevelId == classLevelId)
+                                      .ToListAsync();
+          var ids = prods_for_levels.Select(p => p.ProductId);
 
-            if (prods_for_levels != null)
-                prods = await _context.Products.Include(p => p.Periodicity).Where(p => p.IsRequired == true || !ids.Contains(p.Id)).ToListAsync();
-            else
-                prods = await _context.Products.Include(p => p.Periodicity).Where(p => p.IsRequired == true).ToListAsync();
+          if (prods_for_levels != null)
+            prods = await _context.Products.Include(p => p.Periodicity).Where(p => p.IsRequired == true || !ids.Contains(p.Id)).ToListAsync();
+          else
+            prods = await _context.Products.Include(p => p.Periodicity).Where(p => p.IsRequired == true).ToListAsync();
 
-            var prodsToReturn = new List<ServiceDetailsDto>();
-            foreach (var prod in prods)
+          var prodsToReturn = new List<ServiceDetailsDto>();
+          foreach (var prod in prods)
+          {
+            var produit = new ServiceDetailsDto
             {
-                var produit = new ServiceDetailsDto
-                {
-                    Id = prod.Id,
-                    Price = Convert.ToDecimal(prod.Price),
-                    Details = prod.Name + " : " + prod.Price.ToString(),
-                    IsRequired = prod.IsRequired
-                };
-                if (prod.IsByLevel)
-                {
-                    var selectedLevelProd = prods_for_levels.FirstOrDefault(p => p.ProductId == prod.Id);
-                    // produit.Details += prods_for_levels.FirstOrDefault(p => p.ProductId == prod.Id).Price.ToString();
-                    produit.Details += selectedLevelProd.Price.ToString();
-                    produit.Price += selectedLevelProd.Price;
-                }
-                if (prod.IsPeriodic)
-                    produit.Details += " par période (" + prod.Periodicity.Name + ")";
-                else
-                    produit.Details += " par échéances";
-                prodsToReturn.Add(produit);
+              Id = prod.Id,
+              Price = Convert.ToDecimal(prod.Price),
+              Details = prod.Name + " : " + prod.Price.ToString(),
+              IsRequired = prod.IsRequired
+            };
+            if (prod.IsByLevel)
+            {
+              var selectedLevelProd = prods_for_levels.FirstOrDefault(p => p.ProductId == prod.Id);
+              // produit.Details += prods_for_levels.FirstOrDefault(p => p.ProductId == prod.Id).Price.ToString();
+              produit.Details += selectedLevelProd.Price.ToString();
+              produit.Price += selectedLevelProd.Price;
             }
+            if (prod.IsPeriodic)
+              produit.Details += " par période (" + prod.Periodicity.Name + ")";
+            else
+              produit.Details += " par échéances";
+            prodsToReturn.Add(produit);
+          }
 
-            return Ok(prodsToReturn);
+          return Ok(prodsToReturn);
         }
 
         [HttpGet("GetClasses")]
