@@ -219,6 +219,7 @@ import { EmailTemplateComponent } from './admin/email-template/email-template.co
 import { EmailTemplateResolver } from './_resolvers/email-template-resolver';
 import { AddEmailTemplateComponent } from './admin/add-emailTemplate/add-emailTemplate.component';
 import { EditEmailTemplateResolver } from './_resolvers/edit-email-template-resolver';
+import { EditTeacherResolver } from './_resolvers/edit-teacher-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -465,6 +466,7 @@ export function tokenGetter() {
       ClassSessionResolver,
       EmailTemplateResolver,
       EditEmailTemplateResolver,
+      EditTeacherResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

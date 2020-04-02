@@ -1,8 +1,12 @@
 <div class="row m-2">
   <div class="col-md-12">
-    <div class="d-flex">
+    <div *ngIf="!editionMode" class="d-flex">
       <i class="fad fa-user-plus fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
       <p class="text-17">ajout d'un enseignant</p>
+    </div>
+    <div *ngIf="editionMode" class="d-flex mb-2">
+      <i class="fad fa-user-plus fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <div class="text-17">édition de l'enseignant <span class="text-capitalize">{{teacher.lastName}} {{teacher.firstName}}</span></div>
     </div>
   </div>
 
@@ -67,8 +71,8 @@
                   <div class="md-form mt-1 mb-0">
                     <i class="fad fa-birthday-cake prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
                       --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <input type="text" class="form-control" id="dateOfBirth" formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}" mdbInput>
-                    <label for="dateofBirth">date de naissance</label>
+                    <input mdbInput type="text" id="dateOfBirth" class="form-control" formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}">
+                    <label for="dateOfBirth">date de naissance</label>
                   </div>
                   <div *ngIf="teacherForm.get('dateOfBirth').errors && teacherForm.get('dateOfBirth').touched" class="text-small text-danger">
                     la date de naissance est obligatoire
@@ -78,7 +82,7 @@
                   <div class="md-form mt-1 mb-0">
                     <i class="fad fa-at prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
                       --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <input mdbInput type="text" id="email" class="form-control" formControlName="email" mdbValidate>
+                    <input mdbInput type="text" id="email" class="form-control" formControlName="email">
                     <label for="email" class="">email</label>
                   </div>
                 </div>
@@ -88,7 +92,7 @@
                   <div class="md-form mt-1 mb-0">
                     <i class="fad fa-mobile-alt prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
                       --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <input mdbInput type="text" id="cell" class="form-control" formControlName="cell" [textMask]="{mask: phoneMask}" mdbValidate>
+                    <input mdbInput type="text" id="cell" class="form-control" formControlName="cell" [textMask]="{mask: phoneMask}">
                     <label for="cell" class="">portable</label>
                   </div>
                 </div>
@@ -96,7 +100,7 @@
                   <div class="md-form mt-1 mb-0">
                     <i class="fad fa-phone-alt prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
                       --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <input mdbInput type="text" id="phone2" class="form-control" formControlName="phone2" [textMask]="{mask: phoneMask}" mdbValidate>
+                    <input mdbInput type="text" id="phone2" class="form-control" formControlName="phone2" [textMask]="{mask: phoneMask}">
                     <label for="phone2" class="">autre</label>
                   </div>
                 </div>
@@ -108,19 +112,24 @@
                 <b>cours du professeur</b>
               </div>
               <div class="row">
-                <div class="col-md-3 my-2" *ngFor="let course of courses;let i = index">
-                  <label class="switch switch-primary">
-                    <input type="checkbox" id="course+i" formControlName="courseId" (change)="setCourse(course.id)">
-                    <span class="slider"></span><span class="text-15 text-muted">{{course.name}}</span>
-                  </label>
+                <div class="col-md-3 my-2" formArrayName="courses" *ngFor="let course of teacherForm.get('courses')['controls']; let i = index;">
+                  <div [formGroupName]="i">
+                    <div class="switch logo-switch">
+                    <label>
+                      <input type="checkbox" formControlName="active">
+                      <span class="slider"></span>
+                      <span class="text-15 text-muted">{{course.value.name}}</span>
+                    </label>
+                    </div>
+                  </div>
                 </div>
-                <input type="hidden" id="courseIds" formControlName="courseIds" name="courseIds">
               </div>
               <hr class="my-1" style="background-color: #f89f20;">
               <div class="float-right">
                 <button type="submit" mdbBtn class="btnBlue ml-2" size="sm" mdbWavesEffect
                   [disabled]="!teacherForm.valid">ajouter</button>
-                <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>annuler</button>
+                  <!-- <button type="button" (click)="resetValues()" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>reset</button> -->
+                  <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>annuler</button>
               </div>
             </div>
           </div>
@@ -129,87 +138,3 @@
     </div>
   </div>
 </div>
-
-
-
-
-<!-- <div class="row justify-content-center align-items-center mt-3"
-  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
-  <div class="col-md-8">
-    <div class="card">
-      <form nz-form [formGroup]="teacherForm" (ngSubmit)="addTeacher()" class="mt-2">
-        <nz-form-item>
-          <nz-form-label [nzSm]="6" [nzXs]="24">Nom </nz-form-label>
-          <nz-form-control [nzSm]="14" [nzXs]="24">
-            <input nz-input placeholder="entrer le nom" formControlName="lastName" id="clastName">
-          </nz-form-control>
-        </nz-form-item>
-        <nz-form-item>
-          <nz-form-label [nzSm]="6" [nzXs]="24">Prénom</nz-form-label>
-          <nz-form-control [nzSm]="14" [nzXs]="24">
-            <input nz-input placeholder="entrer le prénom" formControlName="firstName" id="cfirstName">
-          </nz-form-control>
-        </nz-form-item>
-        <nz-form-item>
-          <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="dateOfBirth">Date de naissance</nz-form-label>
-          <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="teacherForm.controls['dateOfBirth']">
-            <input class="form-control" id="datenaiss" placeholder="date de naissance" formControlName="dateOfBirth"
-              name="datenaiss" [textMask]="{mask: birthDateMask}">
-          </nz-form-control>
-        </nz-form-item>
-        <nz-form-item>
-          <nz-form-label [nzSm]="6" [nzXs]="24">Email</nz-form-label>
-          <nz-form-control [nzSm]="14" [nzXs]="24" [nzValidateStatus]="teacherForm.controls['email']">
-            <nz-input-group nzAddOnBefore="@">
-              <input type="text" nz-input placeholder="email" formControlName="email" id="cemail">
-              <nz-form-explain *ngIf="teacherForm.get('email').touched && teacherForm.get('email').errors">Entrer un
-                email valide!</nz-form-explain>
-            </nz-input-group>
-          </nz-form-control>
-        </nz-form-item>
-        <nz-form-item>
-          <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="phoneNumber">Contact Principal</nz-form-label>
-          <nz-form-control [nzValidateStatus]="teacherForm.controls['phoneNumber']" [nzSm]="14" [nzXs]="24">
-            <input nz-input placeholder="numero principal" formControlName="phoneNumber" id="cphoneNumber"
-              [textMask]="{mask: phoneMask}" minlength="8">
-            <nz-form-explain *ngIf="teacherForm.get('phoneNumber').touched && teacherForm.get('phoneNumber').errors">
-              Entrer un numéro de téléphone valide s'il vous plait!</nz-form-explain>
-          </nz-form-control>
-        </nz-form-item>
-        <nz-form-item>
-          <nz-form-label [nzSm]="6" [nzXs]="24">Deuxieme Contact</nz-form-label>
-          <nz-form-control [nzValidateStatus]="teacherForm.controls['secondPhoneNumber']" [nzSm]="14" [nzXs]="24">
-            <input nz-input placeholder="autre numero" formControlName="secondPhoneNumber" id="sphoneNumber"
-              [textMask]="{mask: phoneMask}" minlength="8">
-            <nz-form-explain
-              *ngIf="teacherForm.get('secondPhoneNumber').touched && teacherForm.get('secondPhoneNumber').errors">numero
-              nom valide!</nz-form-explain>
-          </nz-form-control>
-        </nz-form-item>
-        <nz-form-item>
-
-          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="suffixe">Choisir ses cours</nz-form-label>
-          <nz-form-control [nzSm]="14" [nzXs]="24">
-            <nz-select style="width: 100%" formControlName="courseIds" [nzSize]="'default'" nzMode="tags"
-              nzPlaceHolder="Choisir ses cours">
-              <nz-option *ngFor="let course of courses" [nzLabel]="course.name" [nzValue]="course.id"></nz-option>
-            </nz-select>
-          </nz-form-control>
-
-        </nz-form-item>
-        <nz-form-item>
-          <nz-form-control [nzSpan]="14" [nzOffset]="6">
-            <button mdbBtn color="info" size="sm" mdbWavesEffect type="submit"
-              [disabled]="!teacherForm.valid || submitText!='enregistrer'"><span>{{submitText}}</span></button>
-            <button type="button" [routerLink]="['/teachers']" routerLinkActive="router-link-active" mdbBtn
-              color="light" size="sm" mdbWavesEffect class="ml-2"><span>annuler</span></button>
-          </nz-form-control>
-
-        </nz-form-item>
-      </form>
-    </div>
-
-  </div>
-
-
-</div> -->

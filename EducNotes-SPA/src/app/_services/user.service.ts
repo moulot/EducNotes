@@ -99,6 +99,10 @@ constructor(private http: HttpClient) {}
     return this.http.get<User>(this.baseUrl + 'users/' + id);
   }
 
+  getTeacherWithCourses(teacherId) {
+    return this.http.get(this.baseUrl + 'users/' + teacherId + '/teacherWithCourses');
+  }
+
   getParentAccount(id): any {
     return this.http.get(this.baseUrl + 'users/Account/' + id);
   }
@@ -240,8 +244,6 @@ constructor(private http: HttpClient) {}
 
   // enregistrement d'un nouvel utilisateur
   addUser(user: FormData) {
-    const headers = new HttpHeaders();
-    headers.append('Content-Type', 'multipart/form-data');
     return this.http.post(this.baseUrl + 'users/' + 'AddUser', user);
   }
 

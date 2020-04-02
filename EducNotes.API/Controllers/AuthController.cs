@@ -332,7 +332,7 @@ namespace EducNotes.API.Controllers
                 else
                     return Ok(new
                     {
-                        user = _mapper.Map<UserForDetailedDto>(user)
+                      user = _mapper.Map<UserForDetailedDto>(user)
                     });
 
             }

@@ -1,10 +1,14 @@
 <div class="row m-2">
 
-  <div class="col-md-12">
+  <div class="col-md-10">
     <div class="d-flex">
       <i class="fad fa-chalkboard-teacher fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-      <p class="text-17">liste des enseignants</p>
-    </div>
+      <p class="text-17 flex-grow-1">liste des enseignants</p>
+      <div>
+        <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']"
+          routerLinkActive="router-link-active">ajouter un enseignant</button>
+      </div>
+  </div>
   </div>
 
   <div class="col-md-12">
@@ -16,10 +20,10 @@
         </div>
       </div>
       <div class="col-md-6">
-        <div class="float-right">
+        <!-- <div class="float-right">
           <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']"
             routerLinkActive="router-link-active">ajouter un enseignant</button>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -30,7 +34,19 @@
         <div class="d-flex">
           <img class="avatar-lg rounded-lg mr-3" src="{{teacher.photoUrl || '../../assets/user.png'}}" alt="">
           <div class="flex-grow-1">
-            <div class="text-20 text-capitalize">{{teacher.lastName}} {{teacher.firstName}}</div>
+            <div class="d-flex align-content-center">
+              <div *ngIf="teacher.gender === 1">
+                <i class="fad fa-male fa-2x mr-2" style="--fa-primary-opacity: 1;
+                  --fa-secondary-opacity: 1; --fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
+              </div>
+              <div *ngIf="teacher.gender === 0">
+                <i class="fad fa-female fa-2x mr-2" style="--fa-primary-opacity: 1;
+                  --fa-secondary-opacity: 1;--fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
+              </div>
+              <div class="text-20 text-capitalize">
+                {{teacher.lastName}} {{teacher.firstName}}
+              </div>
+            </div>
             <div class="text-15 text-muted">
               <i class="fad fa-mobile-alt mr-1" style="--fa-primary-opacity: 1;
               --fa-secondary-opacity: 1; --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>{{teacher.phoneNumber}}

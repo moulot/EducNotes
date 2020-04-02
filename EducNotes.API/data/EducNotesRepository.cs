@@ -578,85 +578,144 @@ namespace EducNotes.API.Data
           return resultStatus;
         }
 
-        public async Task<bool> AddUser(UserForRegisterDto user, int insertUserId)
+        public async Task<bool> AddUser(TeacherForEditDto user, int insertUserId)
         {
-          var userToCreate = _mapper.Map<User>(user);
-          var code = Guid.NewGuid();
-          userToCreate.UserName = code.ToString();
-          userToCreate.ValidationCode = code.ToString();
-          userToCreate.ValidatedCode = false;
-          userToCreate.EmailConfirmed = false;
-          userToCreate.UserName = code.ToString();
           bool resultStatus = false;
 
           using (var identityContextTransaction = _context.Database.BeginTransaction())
           {
             try
               {
-                //enregistrement du teacher
-                var result = await _userManager.CreateAsync(userToCreate, password);
-                if (result.Succeeded)
+                User appUser = new User();
+                //is it a new user
+                if(user.Id == 0)
                 {
-                  // enregistrement du RoleTeacher
-                  var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
-                  var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedUserName == userToCreate.UserName);
-                  _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+                  var userToSave = _mapper.Map<User>(user);
+                  var code = Guid.NewGuid();
+                  userToSave.UserName = code.ToString();
+                  userToSave.ValidationCode = code.ToString();
+                  userToSave.ValidatedCode = false;
+                  userToSave.EmailConfirmed = false;
+                  userToSave.UserName = code.ToString();
 
-                  //enregistrement des cours du professeur
-                  var ids = user.CourseIds.Split(",");
-                  if (ids.Count() > 0)
+                  var result = await _userManager.CreateAsync(userToSave, password);
+                  if (result.Succeeded)
                   {
-                    foreach(var courseId in ids)
+                    // enregistrement du RoleTeacher
+                    var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
+                    appUser = await _userManager.Users
+                                    .Include(i => i.Photos)
+                                    .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
+                    _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+
+                    // send the mail to update userName/pwd - add to Email table
+                    if(appUser.Email != null)
                     {
-                      TeacherCourse tc = new TeacherCourse();
-                      tc.CourseId = Convert.ToInt32(courseId);
-                      tc.TeacherId = appUser.Id;
-                      Add(tc);
+                      var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToSave.ValidationCode;
+                      var emailToSend = new Email
+                      {
+                        StatusFlag = 0,
+                        Subject = "Confirmation de compte",
+                        ToAddress = appUser.Email,
+                        Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                        FromAddress = "no-reply@educnotes.com",
+                        EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId"),
+                        InsertUserId = insertUserId,
+                        UpdateUserId = insertUserId,
+                      };
+                      Add(emailToSend);
                     }
                   }
-
-                  //add user photo
-                  if(user.PhotoFile != null)
-                  {
-                    Boolean photoAdded = await AddPhoto(appUser.Id, user.PhotoFile);
-                    if(!photoAdded)
-                    {
-                      identityContextTransaction.Rollback();
-                      resultStatus = false;
-                    }
-                  }
-
-                  // Enregistrement dans la table Email
-                  if(appUser.Email != null)
-                  {
-                    var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToCreate.ValidationCode;
-                    var emailToSend = new Email
-                    {
-                      StatusFlag = 0,
-                      Subject = "Confirmation de compte",
-                      ToAddress = appUser.Email,
-                      Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                      FromAddress = "no-reply@educnotes.com",
-                      EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId"),
-                      InsertUserId = insertUserId,
-                      UpdateUserId = insertUserId,
-                    };
-                    Add(emailToSend);
-                  }
-                  if(await SaveAll())
-                  {
-                    // fin de la transaction
-                    identityContextTransaction.Commit();
-                    resultStatus = true;
-                  }
-                  else
-                    resultStatus = true;
                 }
                 else
                 {
-                  identityContextTransaction.Rollback();
-                  resultStatus = false;
+                  appUser = await _context.Users
+                                  .Include(i => i.Photos)
+                                  .FirstOrDefaultAsync(u => u.Id == user.Id);
+                  appUser.LastName = user.LastName;
+                  appUser.FirstName = user.FirstName;
+                  appUser.Gender = user.Gender;
+                  appUser.DateOfBirth = user.DateOfBirth;
+                  appUser.PhoneNumber = user.PhoneNumber;
+                  appUser.SecondPhoneNumber = user.SecondPhoneNumber;
+                  appUser.Email = user.Email;
+                  Update(appUser);
+
+                  // delete previous teacher courses
+                  List<TeacherCourse> prevCourses = await _context.TeacherCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
+                  DeleteAll(prevCourses);
                 }
+
+                // add new selected courses
+                var ids = user.CourseIds.Split(",");
+                if (ids.Count() > 0)
+                {
+                  foreach(var courseId in ids)
+                  {
+                    TeacherCourse tc = new TeacherCourse();
+                    tc.CourseId = Convert.ToInt32(courseId);
+                    tc.TeacherId = appUser.Id;
+                    Add(tc);
+                  }
+                }
+
+                //add user photo
+                var photoFile = user.PhotoFile;
+                if(photoFile != null)
+                {
+                  if (photoFile.Length > 0)
+                  {
+                    var uploadResult = new ImageUploadResult();
+                    // var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
+                    using (var stream = photoFile.OpenReadStream())
+                    {
+                      var uploadParams = new ImageUploadParams()
+                      {
+                        File = new FileDescription(photoFile.Name, stream),
+                        Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+                      };
+
+                      uploadResult = _cloudinary.Upload(uploadParams);
+                      if(uploadResult.StatusCode == HttpStatusCode.OK)
+                      {
+                        Photo photo = new Photo();
+                        photo.Url = uploadResult.Uri.ToString();
+                        photo.PublicId = uploadResult.PublicId;
+                        photo.UserId = appUser.Id;
+                        photo.DateAdded = DateTime.Now;
+                        if (appUser.Photos.Any(u => u.IsMain))
+                        {
+                          var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                          oldPhoto.IsMain = false;
+                          Update(oldPhoto);
+                        }
+                        photo.IsMain = true;
+                        photo.IsApproved = true;
+                        Add(photo);
+                      }
+                    }
+                  }
+                  // Boolean photoAdded = await AddPhoto(appUser.Id, user.PhotoFile);
+                  // if(!photoAdded)
+                  // {
+                  //   identityContextTransaction.Rollback();
+                  //   resultStatus = false;
+                  // }
+                }
+                else
+                {
+                  resultStatus = true;
+                }
+
+                if(await SaveAll())
+                {
+                  // fin de la transaction
+                  identityContextTransaction.Commit();
+                  resultStatus = true;
+                }
+                else
+                  resultStatus = false;
+
               }
               catch (System.Exception)
               {
@@ -669,11 +728,10 @@ namespace EducNotes.API.Data
 
         public async Task<bool> AddPhoto(int userId, IFormFile photoFile)
         {
-          var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
-          var uploadResult = new ImageUploadResult();
-
           if (photoFile.Length > 0)
           {
+            var uploadResult = new ImageUploadResult();
+            var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
             using (var stream = photoFile.OpenReadStream())
             {
               var uploadParams = new ImageUploadParams()
@@ -683,25 +741,31 @@ namespace EducNotes.API.Data
               };
 
               uploadResult = _cloudinary.Upload(uploadParams);
+              if(uploadResult.StatusCode == HttpStatusCode.OK)
+              {
+                Photo photo = new Photo();
+                photo.Url = uploadResult.Uri.ToString();
+                photo.PublicId = uploadResult.PublicId;
+                photo.UserId = userId;
+                photo.DateAdded = DateTime.Now;
+                if (user.Photos.Any(u => u.IsMain))
+                {
+                  var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                  oldPhoto.IsMain = false;
+                  Update(oldPhoto);
+                }
+                photo.IsMain = true;
+                photo.IsApproved = true;
+                Add(photo);
+
+                if (await SaveAll())
+                  return true;
+                else
+                  return false;
+              }
             }
           }
-
-          Photo photo = new Photo();
-          photo.Url = uploadResult.Uri.ToString();
-          photo.PublicId = uploadResult.PublicId;
-          photo.UserId = userId;
-          photo.DateAdded = DateTime.Now;
-          if (!user.Photos.Any(u => u.IsMain))
-          {
-            photo.IsMain = true;
-            photo.IsApproved = true;
-          }
-          user.Photos.Add(photo);
-
-          if (await SaveAll())
-            return true;
-
-          return false;
+          return true;
         }
 
         public async Task<Course> GetCourse(int Id)

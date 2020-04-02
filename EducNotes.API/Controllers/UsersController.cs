@@ -787,6 +787,98 @@ namespace EducNotes.API.Controllers
             return Ok(courses);
         }
 
+        [HttpGet("{teacherId}/teacherWithCourses")]
+        public async Task<IActionResult> GetTeacherWithCourses(int teacherId)
+        {
+          var teacherFromDB = await _context.Users
+                                    .Include(i => i.Photos)
+                                    .FirstOrDefaultAsync(u => u.Id == teacherId);
+          TeacherForEditDto teacher = _mapper.Map<TeacherForEditDto>(teacherFromDB);
+
+          var courses = await _repo.GetTeacherCourses(teacherId);
+          string listCourses = "";
+          foreach (var course in courses)
+          {
+            if(listCourses == "")
+            {
+              listCourses = course.Id.ToString();
+            }
+            else
+            {
+              listCourses = "," + course.Id.ToString();
+            }
+          }
+          teacher.CourseIds = listCourses;
+
+          return Ok(teacher);
+        }
+
+        [HttpPost("{id}/course/{courseId}/level/{levelId}/AddClasses")]
+        public async Task<IActionResult> AddClasses(int id, int courseId, int levelId, [FromBody] List<int> classIds)
+        {
+          // delete previous classes selection for the teacher
+          var prevClasses = await _context.ClassCourses
+                                    .Include(c => c.Class)
+                                    .Where(c => c.CourseId == courseId && c.Class.ClassLevelId == levelId)
+                                    .ToListAsync();
+          
+          if(prevClasses.Count() > 0)
+          {
+            _repo.DeleteAll(prevClasses);
+          }
+
+          // add new classes selection
+          foreach (var classId in classIds)
+          {
+            ClassCourse cc = new ClassCourse();
+            cc.TeacherId = id;
+            cc.ClassId = classId;
+            cc.CourseId = courseId;
+            _repo.Add(cc);
+          }
+
+          // // récupération des classIds
+          // var cids = classcourses.Select(c => c.ClassId).Distinct().ToList();
+
+          // //add new affection (new lines in DB)
+          // foreach (var item in classIds.Except(cids))
+          // {
+          //   ClassCourse classCourse = new ClassCourse
+          //   {
+          //     CourseId = courseId,
+          //     ClassId = item,
+          //     TeacherId = id
+          //   };
+          //   _context.Add(classCourse);
+          //   dataToBeSaved = true;
+          // }
+
+          // //set teacher for existing class/course
+          // foreach(var item in classIds)
+          // {
+          //     var cc = classcourses.FirstOrDefault(c => c.ClassId == item && c.TeacherId == null);
+          //     if (cc != null)
+          //     {
+          //       cc.TeacherId = id;
+          //       dataToBeSaved = true;
+          //     }
+          // }
+
+          // //remove teacher from class/course as it's unselected
+          // var u = classcourses.Where(t => t.TeacherId == id).Select(c => c.ClassId);
+          // foreach(var item in u.Except(classIds))
+          // {
+          //   var cc = classcourses.FirstOrDefault(c => c.ClassId == item);
+          //   cc.TeacherId = null;
+          //   dataToBeSaved = true;
+          // }
+
+          if(await _repo.SaveAll())
+            return Ok();
+
+          return BadRequest("problème pour affecter les classes");
+        }
+
         [HttpGet("{teacherId}/Classes")]
         public async Task<IActionResult> GetTeacherClasses(int teacherId)
         {
@@ -1147,10 +1239,8 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPost("AddUser")]
-        public async Task<IActionResult> AddUser([FromForm]UserForRegisterDto user)
+        public async Task<IActionResult> AddUser([FromForm]TeacherForEditDto user)
         {
-          var userToCreate = _mapper.Map<User>(user);
-          userToCreate.UserName = user.Email;
           int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
           bool userOK = await _repo.AddUser(user, userId);
 
@@ -1159,24 +1249,6 @@ namespace EducNotes.API.Controllers
           else
             return BadRequest("problème pour ajouter l'utilisateur");
         }
-
-        // [HttpPost("{id}/DeleteTeacher")]
-        // public async Task<IActionResult> DeleteTeacher(int id)
-        // {
-        //     var teacher =await _repo.GetUser(id,false);
-        //     if(teacher.ValidatedCode == true)
-        //     return BadRequest("Désolé ce compte ne peut etre supprimé...");
-        //     var classcourses = await _context.ClassCourses.Where(t=>t.TeacherId==id).ToListAsync();
-        //     if(classcourses.Count()==0)
-        //     {
-        //         //possible de supprimer
-        //         _context.CourseUsers.RemoveRange(_context.CourseUsers.Where(t=>t.TeacherId==id));
-        //         _context.Users.Remove(_context.Users.FirstOrDefault(u=>u.Id==id));
-        //     }
-        //     if(await _repo.SaveAll())
-        //     return Ok("");
-        //     return BadRequest("impossible de supprimer cet utilisateur ");
-        // }
 
         [HttpGet("GetAdminUserTypes")]
         public async Task<IActionResult> GetAdminUserTypes()

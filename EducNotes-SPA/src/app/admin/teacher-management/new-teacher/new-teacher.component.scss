@@ -13,3 +13,10 @@
 .inpMarginTop {
   margin-top: 5px;
  }
+
+.switch.logo-switch label input[type=checkbox]:checked + .lever {
+  background-color: #689DF6;
+}
+.switch.logo-switch label input[type=checkbox]:checked + .lever:after {
+  background-color: #f89f20;
+}

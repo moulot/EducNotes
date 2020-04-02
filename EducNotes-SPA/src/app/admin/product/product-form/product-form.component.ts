@@ -40,8 +40,8 @@ export class ProductFormComponent implements OnInit {
   schoolServicetypeId = environment.schoolServiceId;
   myDatePickerOptions = Utils.myDatePickerOptions;
   requirementOptions = [
-{value : false, label: 'NON'},
-{value : true, label: 'OUI'}
+    {value : false, label: 'NON'},
+    {value : true, label: 'OUI'}
   ];
 
 

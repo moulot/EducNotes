@@ -113,14 +113,21 @@ namespace EducNotes.API.Helpers {
             CreateMap<Photo, PhotoForReturnDto>();
             CreateMap<PhotoForCreationDto, Photo>();
             CreateMap<UserForRegisterDto, User>();
+            CreateMap<TeacherForEditDto, User>();
+            CreateMap<User, TeacherForEditDto>()
+                .ForMember(u => u.PhotoUrl, opt => opt
+                    .MapFrom(u => u.Photos.FirstOrDefault (p => p.IsMain).Url))
+                .ForMember(dest => dest.strDateOfBirth, opt => {
+                    opt.MapFrom(d => d.DateOfBirth.ToString("dd/MM/yyyy", frC));
+                });
             CreateMap<ImportUserDto, User>();
             CreateMap<UserFromExelDto, User>();
             CreateMap<MessageForCreationDto, Message>().ReverseMap();
             CreateMap<Message, MessageToReturnDto>()
                 .ForMember(m => m.SenderPhotoUrl, opt => opt
-                    .MapFrom(u => u.Sender.Photos.FirstOrDefault (p => p.IsMain).Url))
+                    .MapFrom(u => u.Sender.Photos.FirstOrDefault(p => p.IsMain).Url))
                 .ForMember(m => m.RecipientPhotoUrl, opt => opt
-                    .MapFrom(u => u.Recipient.Photos.FirstOrDefault (p => p.IsMain).Url));
+                    .MapFrom(u => u.Recipient.Photos.FirstOrDefault(p => p.IsMain).Url));
             CreateMap<Schedule, ScheduleForTimeTableDto>()
                 .ForMember(dest => dest.TeacherName, opt => {
                     opt.MapFrom(src => src.Teacher.LastName + ' ' + src.Teacher.FirstName);

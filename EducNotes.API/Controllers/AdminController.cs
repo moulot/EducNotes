@@ -34,6 +34,8 @@ namespace EducNotes.API.Controllers
         string password;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
         int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId, schoolInscTypeId;
+        CultureInfo frC = new CultureInfo("fr-FR");
+
 
         public AdminController(DataContext context, UserManager<User> userManager, IConfiguration config,
           IEducNotesRepository repo, IOptions<CloudinarySettings> cloudinaryConfig, IMapper mapper)
@@ -810,32 +812,25 @@ namespace EducNotes.API.Controllers
         [HttpGet("GetTeacher/{teacherId}")]
         public async Task<IActionResult> GetTeacher(int teacherId)
         {
-            //recuperation du professeur professeurs ainsi que tous ses cours
-            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Id == teacherId);
-            if (teacher != null)
-            {
-                CultureInfo frC = new CultureInfo("fr-FR");
-
-                var tdetails = new TeacherForListDto();
-                tdetails.PhoneNumber = teacher.PhoneNumber;
-                tdetails.SecondPhoneNumber = teacher.SecondPhoneNumber;
-                tdetails.Email = teacher.Email;
-                tdetails.Id = teacher.Id;
-                tdetails.LastName = teacher.LastName;
-                tdetails.FirstName = teacher.FirstName;
-                tdetails.DateOfBirth = teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
-                tdetails.Courses = await _context.TeacherCourses.
-                Where(t => t.TeacherId == teacherId)
-                  .Select(c => c.Course)
-                  .ToListAsync();
-                tdetails.classIds = await _context.ClassCourses.Where(t => t.TeacherId == teacherId)
-                  .Select(t => t.ClassId)
-                  .Distinct()
-                  .ToListAsync();
-                return Ok(tdetails);
-            }
-            return BadRequest("impossible de trouver l'utilisateur");
-
+          //recuperation du professeur professeurs ainsi que tous ses cours
+          var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Id == teacherId);
+          if (teacher != null)
+          {
+            var tdetails = new TeacherForListDto();
+            tdetails.PhoneNumber = teacher.PhoneNumber;
+            tdetails.SecondPhoneNumber = teacher.SecondPhoneNumber;
+            tdetails.Email = teacher.Email;
+            tdetails.Id = teacher.Id;
+            tdetails.LastName = teacher.LastName;
+            tdetails.FirstName = teacher.FirstName;
+            tdetails.DateOfBirth = teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
+            tdetails.Courses = await _context.TeacherCourses.
+                                      Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToListAsync();
+            tdetails.classIds = await _context.ClassCourses.Where(t => t.TeacherId == teacherId)
+                                      .Select(t => t.ClassId).Distinct().ToListAsync();
+            return Ok(tdetails);
+          }
+          return BadRequest("impossible de trouver l'utilisateur");
         }
 
         [HttpPost("ImportedUsers/{insertUserId}")]
