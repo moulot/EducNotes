@@ -637,13 +637,16 @@ namespace EducNotes.API.Data
                 }
                 else
                 {
-                  appUser = await _context.Users
-                                  .Include(i => i.Photos)
-                                  .FirstOrDefaultAsync(u => u.Id == user.Id);
+                  appUser = await _context.Users.Include(i => i.Photos).FirstOrDefaultAsync(u => u.Id == user.Id);
                   appUser.LastName = user.LastName;
                   appUser.FirstName = user.FirstName;
                   appUser.Gender = user.Gender;
-                  appUser.DateOfBirth = user.DateOfBirth;
+                  var dateArray = user.strDateOfBirth.Split("/");
+                  int year = Convert.ToInt32(dateArray[2]);
+                  int month = Convert.ToInt32(dateArray[1]);
+                  int day = Convert.ToInt32(dateArray[0]);
+                  DateTime birthDay = new DateTime(year, month, day);
+                  appUser.DateOfBirth = birthDay;//user.DateOfBirth;
                   appUser.PhoneNumber = user.PhoneNumber;
                   appUser.SecondPhoneNumber = user.SecondPhoneNumber;
                   appUser.Email = user.Email;

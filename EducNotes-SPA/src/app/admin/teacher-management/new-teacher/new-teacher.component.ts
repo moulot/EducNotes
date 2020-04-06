@@ -60,19 +60,19 @@ export class NewTeacherComponent implements OnInit {
       this.classService.getAllCourses().subscribe(data => {
         this.courses = data;
         const assigned = this.teacher.classesAssigned;
-        console.log(assigned);
         const ids = this.teacher.courseIds.split(',');
         for (let i = 0; i < this.courses.length; i++) {
           const elt = this.courses[i];
           let selected = false;
-          if (ids.findIndex((value) => value === elt.id.toString()) !== -1) {
-            selected = true;
-          }
           let courseAssigned = false;
-          const courseClass = assigned.find(c => c.id === elt.id);
-          console.log(courseClass);
-          if (courseClass) {
-            courseAssigned = courseClass.classesAssigned;
+          if (assigned) {
+            if (ids.findIndex((value) => value === elt.id.toString()) !== -1) {
+              selected = true;
+            }
+            const courseClass = assigned.find(c => c.id === elt.id);
+            if (courseClass) {
+              courseAssigned = courseClass.classesAssigned;
+            }
           }
           this.addCourseItem(elt.id, elt.name, selected, courseAssigned);
         }
@@ -170,7 +170,7 @@ export class NewTeacherComponent implements OnInit {
     formData.append('lastName', this.teacherForm.value.lastName);
     formData.append('firstName', this.teacherForm.value.firstName);
     formData.append('gender', this.teacherForm.value.gender);
-    formData.append('dateOfBirth', this.teacherForm.value.dateOfBirth);
+    formData.append('strDateOfBirth', this.teacherForm.value.dateOfBirth);
     formData.append('email', this.teacherForm.value.email);
     formData.append('phoneNumber', this.teacherForm.value.cell);
     formData.append('secondPhoneNumber', this.teacherForm.value.phone2);
