@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 
 namespace EducNotes.API.Dtos
@@ -20,5 +21,6 @@ namespace EducNotes.API.Dtos
     public string PhotoUrl { get; set; }
     public IFormFile PhotoFile { get; set; }
     public string CourseIds { get; set; }
+    public List<CourseDto> ClassesAssigned { get; set; }
   }
 }

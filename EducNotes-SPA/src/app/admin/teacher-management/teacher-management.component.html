@@ -5,8 +5,10 @@
       <i class="fad fa-chalkboard-teacher fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
       <p class="text-17 flex-grow-1">liste des enseignants</p>
       <div>
-        <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']"
-          routerLinkActive="router-link-active">ajouter un enseignant</button>
+        <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']" routerLinkActive="router-link-active">
+          <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+          ajouter un enseignant
+        </button>
       </div>
   </div>
   </div>
@@ -73,9 +75,17 @@
                 </div>
               </div>
               <div>
-                <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [routerLink]="['/editTeacher',teacher.id]">editer</button>
-                <button mdbBtn class="btnBlue ml-2" size="sm" mdbWavesEffect [routerLink]="['/teacherAssignment',teacher.id]"
-                  [disabled]="teacher.courseClasses.length === 0" (click)="assignment(teacher)">affecter</button>
+                <button mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect [routerLink]="['/editTeacher',teacher.id]">
+                  <i class="fad fa-user-edit fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                  editer
+                </button>
+                <button mdbBtn class="btnWhiteO ml-2" size="sm" mdbWavesEffect [routerLink]="['/teacherAssignment',teacher.id]"
+                  [disabled]="teacher.courseClasses.length === 0" (click)="assignment(teacher)">
+                  <i class="fad fa-users-class fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                  affecter
+                </button>
             </div>
             </div>
           </div>

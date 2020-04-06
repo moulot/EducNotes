@@ -113,6 +113,9 @@ namespace EducNotes.API.Helpers {
             CreateMap<Photo, PhotoForReturnDto>();
             CreateMap<PhotoForCreationDto, Photo>();
             CreateMap<UserForRegisterDto, User>();
+            CreateMap<User, TeacherInfoDto>()
+                .ForMember(u => u.PhotoUrl, opt => opt
+                  .MapFrom(u => u.Photos.FirstOrDefault (p => p.IsMain).Url));
             CreateMap<TeacherForEditDto, User>();
             CreateMap<User, TeacherForEditDto>()
                 .ForMember(u => u.PhotoUrl, opt => opt

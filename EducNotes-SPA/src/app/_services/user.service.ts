@@ -247,6 +247,10 @@ constructor(private http: HttpClient) {}
     return this.http.post(this.baseUrl + 'users/' + 'AddUser', user);
   }
 
+  getAssignedClasses(teacherId) {
+    return this.http.get(this.baseUrl + 'users/' + teacherId + '/AssignedClasses');
+  }
+
   getUserByTypeId(id: number) {
     return this.http.get(this.baseUrl + 'users/' + 'GetUserByTypeId/' + id);
   }

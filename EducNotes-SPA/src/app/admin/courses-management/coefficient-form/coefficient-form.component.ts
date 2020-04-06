@@ -68,7 +68,7 @@ export class CoefficientFormComponent implements OnInit {
   }
 
   getLevels() {
-    this.classService.getLevels().subscribe((res: any[]) => {
+    this.classService.getLevelsWithClasses().subscribe((res: any[]) => {
       for (let i = 0; i < res.length; i++) {
         const element = { value: res[i].id, label: res[i].name };
         this.levels = [...this.levels, element];

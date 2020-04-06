@@ -65,7 +65,6 @@ export class PreRegisterComponent implements OnInit {
   }
 
   getCourses() {
-
     if (this.courses.length === 0) {
       this.classService.getAllCourses().subscribe((res: any[]) => {
         for (let i = 0; i < res.length; i++) {
@@ -74,7 +73,6 @@ export class PreRegisterComponent implements OnInit {
         }
       });
     }
-
   }
 
   createRegisterForm() {

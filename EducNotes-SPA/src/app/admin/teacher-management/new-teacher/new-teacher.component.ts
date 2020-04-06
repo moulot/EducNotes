@@ -23,7 +23,7 @@ export class NewTeacherComponent implements OnInit {
   courses: Course[] = [];
   teacherForm: FormGroup;
   teacherTypeId = environment.teacherTypeId;
-  teacher = <TeacherForEdit>{};
+  teacher: any; // = <TeacherForEdit>{};
   userId: number;
   editModel: any;
   editionMode = false;
@@ -59,6 +59,8 @@ export class NewTeacherComponent implements OnInit {
     if (this.courses.length === 0) {
       this.classService.getAllCourses().subscribe(data => {
         this.courses = data;
+        const assigned = this.teacher.classesAssigned;
+        console.log(assigned);
         const ids = this.teacher.courseIds.split(',');
         for (let i = 0; i < this.courses.length; i++) {
           const elt = this.courses[i];
@@ -66,7 +68,13 @@ export class NewTeacherComponent implements OnInit {
           if (ids.findIndex((value) => value === elt.id.toString()) !== -1) {
             selected = true;
           }
-          this.addCourseItem(elt.id, elt.name, selected);
+          let courseAssigned = false;
+          const courseClass = assigned.find(c => c.id === elt.id);
+          console.log(courseClass);
+          if (courseClass) {
+            courseAssigned = courseClass.classesAssigned;
+          }
+          this.addCourseItem(elt.id, elt.name, selected, courseAssigned);
         }
       }, error => {
         this.alertify.error(error);
@@ -88,17 +96,18 @@ export class NewTeacherComponent implements OnInit {
     });
   }
 
-  createCourseItem(id, name, active): FormGroup {
+  addCourseItem(id, name, active, assigned): void {
+    const courses = this.teacherForm.get('courses') as FormArray;
+    courses.push(this.createCourseItem(id, name, active, assigned));
+  }
+
+  createCourseItem(id, name, active, assigned): FormGroup {
     return this.fb.group({
       courseId: id,
       name: name,
-      active: active
+      active: active,
+      classAssigned: assigned
     });
-  }
-
-  addCourseItem(id, name, active): void {
-    const courses = this.teacherForm.get('courses') as FormArray;
-    courses.push(this.createCourseItem(id, name, active));
   }
 
   initValues() {
@@ -148,7 +157,7 @@ export class NewTeacherComponent implements OnInit {
         if (ids === '') {
           ids = elt.courseId.toString();
         } else {
-          ids = ',' + elt.courseId.toString();
+          ids += ',' + elt.courseId.toString();
         }
       }
     }

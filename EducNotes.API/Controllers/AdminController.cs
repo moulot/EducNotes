@@ -824,8 +824,8 @@ namespace EducNotes.API.Controllers
             tdetails.LastName = teacher.LastName;
             tdetails.FirstName = teacher.FirstName;
             tdetails.DateOfBirth = teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
-            tdetails.Courses = await _context.TeacherCourses.
-                                      Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToListAsync();
+            tdetails.Courses = await _context.TeacherCourses
+                                      .Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToListAsync();
             tdetails.classIds = await _context.ClassCourses.Where(t => t.TeacherId == teacherId)
                                       .Select(t => t.ClassId).Distinct().ToListAsync();
             return Ok(tdetails);

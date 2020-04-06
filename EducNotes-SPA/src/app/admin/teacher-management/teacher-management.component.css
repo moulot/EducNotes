@@ -15,8 +15,14 @@
   background-color: #192C47;
 }
 
-/* .btnBlue {
+.btnWhite {
   color: #192C47;
   font-weight: bold;
   background-color: #ffffff;
-} */
+}
+
+.btnWhiteO {
+  color: #f89f20;
+  font-weight: bold;
+  background-color: #ffffff;
+}

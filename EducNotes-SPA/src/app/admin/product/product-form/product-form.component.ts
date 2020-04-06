@@ -283,7 +283,7 @@ export class ProductFormComponent implements OnInit {
   }
 
   getLevels() {
-    this.classService.getLevels().subscribe((res) => {
+    this.classService.getLevelsWithClasses().subscribe((res) => {
       this.levels = res;
     });
   }

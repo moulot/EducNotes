@@ -797,6 +797,7 @@ namespace EducNotes.API.Controllers
 
           var courses = await _repo.GetTeacherCourses(teacherId);
           string listCourses = "";
+          teacher.ClassesAssigned = new List<CourseDto>();
           foreach (var course in courses)
           {
             if(listCourses == "")
@@ -805,12 +806,79 @@ namespace EducNotes.API.Controllers
             }
             else
             {
-              listCourses = "," + course.Id.ToString();
+              listCourses += "," + course.Id.ToString();
             }
+
+            CourseDto cd = new CourseDto();
+            cd.Id = course.Id;
+            cd.Name = course.Name;
+            cd.ClassesAssigned = false;
+            // does this course has classes assigned to it?
+            var classesAssigned = await _context.ClassCourses
+              .Where(c => c.TeacherId == teacherId && c.CourseId == course.Id).ToListAsync();
+            if(classesAssigned.Count() > 0)
+            {
+              cd.ClassesAssigned = true;
+            }
+            teacher.ClassesAssigned.Add(cd);
           }
+          
           teacher.CourseIds = listCourses;
 
           return Ok(teacher);
+        }
+
+        [HttpGet("{teacherId}/AssignedClasses")]
+        public async Task<IActionResult> GetAssignedClasses(int teacherId)
+        {
+          //get teacher with all his classes
+          var teacherFromDB = await _context.Users.FirstOrDefaultAsync(u => u.Id == teacherId);
+          var teacher = _mapper.Map<User>(teacherFromDB);
+          if (teacherFromDB != null)
+          {
+            List<AssignedClassesDto> classes = new List<AssignedClassesDto>();
+            var courses = await _context.TeacherCourses.Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToListAsync();
+            foreach (var course in courses)
+            {
+              AssignedClassesDto acd = new AssignedClassesDto();
+              acd.CourseId = course.Id;
+              acd.CourseName = course.Name;
+
+              acd.Levels = new List<LevelWithClassesDto>();
+              var levels = await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
+              foreach (var level in levels)
+              {
+                LevelWithClassesDto lwcd = new LevelWithClassesDto();
+
+                var selectedIds = await _context.ClassCourses.Where(c => c.TeacherId == teacherId && c.CourseId == course.Id &&
+                                          c.Class.ClassLevelId == level.Id).Select(t => t.ClassId).Distinct().ToListAsync();
+                var classesLevel = await _repo.GetClassesByLevelId(level.Id);
+                if(classesLevel.Count() > 0)
+                {
+                  lwcd.LevelId = level.Id;
+                  lwcd.LevelName = level.Name;
+                  lwcd.Classes = new List<ClassIdAndNameDto>();
+                  foreach (var aclass in classesLevel)
+                  {
+                    ClassIdAndNameDto cd = new ClassIdAndNameDto();
+                    cd.ClassId = aclass.Id;
+                    cd.ClassName = aclass.Name;
+                    cd.Active = selectedIds.IndexOf(aclass.Id) != -1 ? true : false;
+                    lwcd.Classes.Add(cd);
+                  }
+                  acd.Levels.Add(lwcd);
+                }
+              }
+              classes.Add(acd);
+            }
+
+            return Ok(new {
+              classes,
+              teacher
+            });
+          }
+
+          return BadRequest("l'enseignant est introuvable!");
         }
 
         [HttpPost("{id}/course/{courseId}/level/{levelId}/AddClasses")]

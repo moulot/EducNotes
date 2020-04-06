@@ -223,6 +223,14 @@ namespace EducNotes.API.Data
             return await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
         }
 
+        public async Task<List<Class>> GetClassesByLevelId(int levelId)
+        {
+          return await _context.Classes
+                        .Where(c => c.ClassLevelId == levelId)
+                        .OrderBy(o => o.Name)
+                        .ToListAsync();
+        }
+
         public async Task<IEnumerable<Schedule>> GetScheduleDay(int classId, int day)
         {
             return await _context.Schedules

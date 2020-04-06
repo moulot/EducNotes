@@ -1,26 +1,66 @@
-<div  class="row m-2" [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
+<div  class="row m-2 animated zoomInDown" >
   <div class="col-md-12">
-    <div class="text-17 font-weight-300">enseignant <b class="text-capitalize">{{teacher.lastName}} {{teacher.firstName}}</b> - affectation des classes</div>
-    <hr>
-    <form [formGroup]="Form" (ngSubmit)="assignment()">
-      <div class="col-md-3">
-        <mdb-select [options]="courseOptions" placeholder="choisir le cours" (ngModelChange)="changeCourse()"
-          name="course" formControlName="course"></mdb-select>
+    <div class="text-17 font-weight-300">
+      <div class="d-flex align-content-center">
+        <i class="fad fa-users-class fa-2x mr-2" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <p class="text-17 mr-1">affectation des classes pour</p>
+        <p class="text-17 text-capitalize">{{teacher.lastName}} {{teacher.firstName}}</p>
       </div>
-      <div class="col-md-3">
-        <mdb-select [options]="levelOptions" placeholder="choisir le niveau" (ngModelChange)="getClasses()"
-          name="level" formControlName="level"></mdb-select>
+    </div>
+  </div>
+  <div class="col-md-12"><hr class="mt-1 mb-2"></div>
+  <div class="col-md-12">
+    <form [formGroup]="teacherForm" (ngSubmit)="assignment()">
+      <div class="row">
+        <div class="col-md-6" formArrayName="courses" *ngFor="let course of teacherForm.get('courses')['controls']; let i = index;">
+          <div [formGroupName]="i">
+            <div class="card mb-2">
+              <div class="card-body p-2">
+                <div class="d-flex align-content-center">
+                  <i class="fad fa-books fa-2x mr-2" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                    --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
+                  <div class="text-17 text-capitalize">{{course.value.courseName}}</div>
+                </div>
+                <hr class="mt-1 mb-2" style="background-color: #f89f20;">
+                <div class="row">
+                  <div class="col-md-12" formArrayName="levels" *ngFor="let level of course.get('levels')['controls']; let j = index">
+                    <div [formGroupName]="j">
+                      <div class="row">
+                        <div class="col-md-3">
+                          <div class="text-15 my-2">niveau {{level.value.levelName}}</div>
+                        </div>
+                        <div class="col-md-9 my-auto">
+                          <div class="row">
+                            <div class="col-sm-3 pr-0" formArrayName="classes"
+                              *ngFor="let class of level.get('classes')['controls']; let k = index">
+                              <div [formGroupName]="k">
+                                <div class="switch logo-switch">
+                                  <label>
+                                    <input type="checkbox" formControlName="active">
+                                    <span class="slider"></span>
+                                    <span class="text-12 text-muted">{{class.value.className}}</span>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-12"><hr class="my-1"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="col-md-3">
-        <mdb-select [options]="classOptions" [multiple]="true" placeholder="choisir les classes"
-          name="classes" formControlName="classes"></mdb-select>
-      </div>
-      <div class="col-md-6"><hr class="mb-1"></div>
-      <div class="col-md-6">
-        <button type="submit" [disabled]="classIds.length === 0" mdbBtn color="primary" size="sm" mdbWavesEffect>valider</button>
-        <button type="button" [routerLink]="['/teachers']" mdbBtn color="primary" size="sm" mdbWavesEffect >annuler</button>
+      <div class="col-md-12"><hr class="my-2"></div>
+      <div class="col-md-12 float-right">
+        <button type="submit" [disabled]="false" mdbBtn class="btnBlue" size="sm" mdbWavesEffect>valider</button>
+        <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect >annuler</button>
       </div>
     </form>
   </div>
-
 </div>

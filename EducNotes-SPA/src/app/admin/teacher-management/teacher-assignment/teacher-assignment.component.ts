@@ -4,6 +4,7 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
   selector: 'app-teacher-assignment',
@@ -20,103 +21,98 @@ export class TeacherAssignmentComponent implements OnInit {
   courseId = 0;
   levelId = 0;
   classes: any;
-  Form: FormGroup;
+  teacherForm: FormGroup;
   items: FormArray;
   courseOptions: any = [];
   levelOptions: any = [];
   classOptions: any = [];
-  arrayClasses: {
-    id: number;
-    name: string;
-  }[] = [];
 
-  constructor(private classService: ClassService, private alertify: AlertifyService,
+  constructor(private classService: ClassService, private alertify: AlertifyService, private authService: AuthService,
     private route: ActivatedRoute, private fb: FormBuilder, private router: Router) { }
 
   ngOnInit() {
+    this.createForm();
     this.route.data.subscribe(data => {
-      this.teacher = data.teacher;
-      this.courses = this.teacher.courses;
-      this.selectedClassIds = this.teacher.classIds;
-      this.createForm(this.selectedClassIds);
-
-      for (let i = 0; i < this.courses.length; i++) {
-        const elt = this.courses[i];
-        this.courseOptions = [...this.courseOptions, {value: elt.id, label: elt.name}];
-      }
+      const teacherData = data['teacher'];
+      this.courses = teacherData.classes;
+      this.teacher = teacherData.teacher;
+      this.addCourseItems();
     });
-    this.getLevels();
 
-    this.Form.get('classes').valueChanges.subscribe( (value) => {
-      this.classIds = value;
+    this.getLevels();
+  }
+
+  createForm() {
+    this.teacherForm = this.fb.group({
+      courses: this.fb.array([])
     });
   }
 
-  createForm(classSelected) {
-    this.Form = this.fb.group({
-      course: ['', Validators.required],
-      level: ['', Validators.required],
-      classes: [classSelected]
+  addCourseItems(): void {
+    const courses = this.teacherForm.get('courses') as FormArray;
+    this.courses.forEach(x => {
+      courses.push(this.fb.group({
+        courseId: x.courseId,
+        courseName: x.courseName,
+        levels: this.addLevelItems(x.levels)
+      }));
     });
+  }
+
+  addLevelItems(x) {
+    const arr = new FormArray([]);
+    x.forEach(y => {
+      arr.push(this.fb.group({
+        levelId: y.levelId,
+        levelName: y.levelName,
+        classes: this.addClassItems(y.classes)
+      }));
+    });
+    return arr;
+  }
+
+  addClassItems(x) {
+    const arr = new FormArray([]);
+    x.forEach(y => {
+      arr.push(this.fb.group({
+        classId: y.classId,
+        className: y.className,
+        active: y.active
+      }));
+    });
+    return arr;
   }
 
   minSelectedCheckboxes() {
     return this.classIds.length > 0;
   }
 
-  get classArray() {
-    return this.Form.get('classArray') as FormArray;
-  }
-
   getLevels() {
-    this.classService.getLevels().subscribe((res) => {
-      this.levels = res;
+    this.classService.getLevels().subscribe(data => {
+      this.levels = data;
       for (let i = 0; i < this.levels.length; i++) {
         const elt = this.levels[i];
         this.levelOptions = [...this.levelOptions, {value: elt.id, label: elt.name}];
       }
-    }, error => {
-      console.log(error);
     });
-  }
-
-  getClasses(): void {
-    this.levelId = this.Form.value.level;
-
-    this.classService.getClassesByLevelId(this.levelId).subscribe((classes: any[]) => {
-      this.classes = classes;
-      this.classOptions = [];
-      for (let i = 0; i < this.classes.length; i++) {
-        const elt = this.classes[i];
-        this.classOptions = [...this.classOptions, {label: 'classe ' + elt.name, value: elt.id}];
-      }
-
-      // recupération  des classes en fonction du niveau, de cours et du prof
-      this.classIds = [];
-      this.classService.teacherClassCoursByLevel(this.teacher.id, this.levelId, this.courseId).subscribe((data: any[]) => {
-        for (let i = 0; i < data.length; i++) {
-          this.classIds = [...this.classIds, data[i].classId];
-        }
-        this.Form.controls['classes'].setValue(this.classIds);
-      });
-    });
-  }
-
-  changeCourse(): void {
-    this.levelId = 0;
-    this.courseId = this.Form.value.course;
-    this.classes = [];
   }
 
   assignment() {
-    this.classIds = this.Form.value.classes;
-    // console.log(this.teacher.id + ' ' + this.courseId + ' ' + this.levelId + ' ' + this.classIds);
-    this.classService.saveTeacherAffectation(this.teacher.id, this.courseId, this.levelId, this.classIds).subscribe(response => {
-      this.alertify.success('affectation terminée...');
+    const courses = this.teacherForm.value.courses;
+    // console.log(courses);
+    this.classService.assignClasses(this.teacher.id, courses).subscribe(() => {
+      this.alertify.success('affectation des classes enregistrée');
       this.router.navigate(['/teachers']);
     }, error => {
       this.alertify.error(error);
     });
+    // this.classIds = this.teacherForm.value.classes;
+    // this.classService.saveTeacherAffectation(this.teacher.id, this.courseId, this.levelId, this.classIds).subscribe(() => {
+    //   this.alertify.success('affectation terminée...');
+    //   this.router.navigate(['/teachers']);
+    // }, error => {
+    //   this.alertify.error(error);
+    // });
   }
 
 }

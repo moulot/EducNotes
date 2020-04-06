@@ -674,9 +674,8 @@ namespace EducNotes.API.Controllers
     [HttpGet("GetAllCourses")]
     public async Task<IActionResult> GetAllCourses()
     {
-        var les_cours = _context.Courses.OrderBy(a => a.Name);
-
-        return Ok(await les_cours.ToListAsync());
+        var courses = await _context.Courses.OrderBy(a => a.Name).ToListAsync();
+        return Ok(courses);
     }
 
     [HttpGet("AllClasses")]
@@ -698,7 +697,8 @@ namespace EducNotes.API.Controllers
         cbl.LevelName = level.Name;
 
         cbl.Classes = new List<Class>();
-        var classes = await _context.Classes.Where(c => c.ClassLevelId == level.Id).OrderBy(o => o.Name).ToListAsync();
+        //var classes = await _context.Classes.Where(c => c.ClassLevelId == level.Id).OrderBy(o => o.Name).ToListAsync();
+        var classes = await _repo.GetClassesByLevelId(level.Id);
         foreach (var aclass in classes)
         {
           cbl.Classes.Add(aclass);
@@ -858,14 +858,18 @@ namespace EducNotes.API.Controllers
 
     }
 
-    [HttpGet("GetLevels")]
+    [HttpGet("ClassLevels")]
     public async Task<IActionResult> GetLevels()
     {
-        // return Ok(await _context.ClassLevels.OrderBy(e => e.Name).ToListAsync());
+      var levels = await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
+      return Ok(levels);
+    }
+
+    [HttpGet("LevelsWithClasses")]
+    public async Task<IActionResult> GetLevelsWithClasses()
+    {
         var levels = await _context.ClassLevels
-            // .Include(i=>i.Inscriptions) 
             .Include(c => c.Classes)
-            // .ThenInclude(c=>c.Students)
             .OrderBy(a => a.DsplSeq)
             .ToListAsync();
         var dataToReturn = new List<ClassLevelDetailDto>();
@@ -1347,19 +1351,24 @@ namespace EducNotes.API.Controllers
     [HttpGet("GetAllCoursesDetails")]
     public async Task<IActionResult> GetAllCoursesDetails()
     {
-        var data = new List<CoursesDetailsDto>();
-        var allCourses = await _context.Courses.OrderBy(c => c.Name).ToListAsync();
-        foreach (var cours in allCourses)
-        {
-            var c = new CoursesDetailsDto { Id = cours.Id, Name = cours.Name, Abbreviation = cours.Abbreviation, Color = cours.Color };
-            c.TeachersNumber = await _context.ClassCourses.Where(a => a.CourseId == cours.Id && a.TeacherId != null).Distinct().CountAsync();
-            List<int> classIds = await _context.ClassCourses.Where(a => a.CourseId == cours.Id).Select(a => a.ClassId).ToListAsync();
-            c.ClassesNumber = classIds.Count();
-            c.StudentsNumber = await _context.Users.Where(a => classIds.Contains(Convert.ToInt32(a.ClassId))).CountAsync();
-            data.Add(c);
-        }
+      var data = new List<CoursesDetailsDto>();
+      var allCourses = await _context.Courses.OrderBy(c => c.Name).ToListAsync();
+      foreach (var cours in allCourses)
+      {
+        var c = new CoursesDetailsDto {
+          Id = cours.Id,
+          Name = cours.Name,
+          Abbreviation = cours.Abbreviation,
+          Color = cours.Color
+        };
+        c.TeachersNumber = await _context.ClassCourses.Where(a => a.CourseId == cours.Id).Distinct().CountAsync();
+        List<int> classIds = await _context.ClassCourses.Where(a => a.CourseId == cours.Id).Select(a => a.ClassId).ToListAsync();
+        c.ClassesNumber = classIds.Count();
+        c.StudentsNumber = await _context.Users.Where(a => classIds.Contains(Convert.ToInt32(a.ClassId))).CountAsync();
+        data.Add(c);
+      }
 
-        return Ok(data);
+      return Ok(data);
     }
 
     [HttpGet("GetClassTypes")]
@@ -1467,7 +1476,7 @@ namespace EducNotes.API.Controllers
                 cdetails.Course = cours.Course;
                 cdetails.Classes = new List<Class>();
                 var classes = _context.ClassCourses.Include(c => c.Class)
-                  .Where(t => t.TeacherId == teacher.Id && t.CourseId == cours.CourseId && t.ClassId != null).ToList();
+                  .Where(t => t.TeacherId == teacher.Id && t.CourseId == cours.CourseId).ToList();
                 if (classes != null & classes.Count() > 0)
                   cdetails.Classes = classes.Select(c => c.Class).ToList();
                 tdetails.CourseClasses.Add(cdetails);
@@ -1526,6 +1535,57 @@ namespace EducNotes.API.Controllers
         return BadRequest("impossible de terminer l'action");
       }
       return BadRequest("veuillez selectionner au moins un cours");
+    }
+
+    [HttpPost("{teacherId}/AssignClasses")]
+    public async Task<IActionResult> AssignClasses(int teacherId, [FromBody] List<AssignedClassesDto> courses)
+    {
+      Boolean dataToBeSaved = false;
+
+      foreach (var course in courses) 
+      {
+        foreach (var level in course.Levels)
+        {
+          //delete previous classes selection
+          List<ClassCourse> prevClasses = await _context.ClassCourses
+                                          .Include(c => c.Class)
+                                          .Where(c => c.CourseId == course.CourseId && c.Class.ClassLevelId == level.LevelId)
+                                          .ToListAsync();
+          if(prevClasses.Count() > 0)
+          {
+            _repo.DeleteAll(prevClasses);
+            dataToBeSaved = true;
+          }
+
+         // add new classes selection
+          List<ClassCourse> newSelection = new List<ClassCourse>();
+          foreach (var aclass in level.Classes)
+          {
+            if(aclass.Active == true)
+            {
+              ClassCourse classCourse = new ClassCourse()
+              {
+                ClassId = aclass.ClassId,
+                CourseId = course.CourseId,
+                TeacherId = teacherId
+              };
+              //newSelection.Add(classCourse);
+              _repo.Add(classCourse);
+              dataToBeSaved = true;
+            }
+          }
+          //_context.AddRange(newSelection);
+         }
+      }
+
+      if(dataToBeSaved && await _repo.SaveAll())
+      {
+        return Ok();
+      }
+      else
+      {
+        return NoContent();
+      }
     }
 
     [HttpPost("{id}/{courseId}/{levelId}/SaveTeacherAffectation")]

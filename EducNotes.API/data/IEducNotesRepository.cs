@@ -81,6 +81,7 @@ namespace EducNotes.API.Data
         Task<List<Period>> GetPeriods();
         Task<Period> GetPeriodFromDate(DateTime date);
         Task<Session> GetSessionFromSchedule(int scheduleId, int teacherId, DateTime sessionDate);
+        Task<List<Class>> GetClassesByLevelId(int levelId);
 
     }
 }
