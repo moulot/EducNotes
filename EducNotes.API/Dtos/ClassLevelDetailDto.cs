@@ -10,7 +10,7 @@ namespace EducNotes.API.Dtos
         public int TotalEnrolled { get; set; }
         public int TotalStudents { get; set; }
         public int TotalClasses { get; set; }
-        public List<Class> Classes { get; set; }
+        public List<ClassDetailDto> Classes { get; set; }
         public int TotalValdated { get; set; }
         public int AvailableClasses { get; set; }
         public int AvailablePlaces { get; set; }

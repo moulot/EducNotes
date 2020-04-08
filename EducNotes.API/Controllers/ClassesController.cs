@@ -876,21 +876,26 @@ namespace EducNotes.API.Controllers
 
         foreach (var item in levels)
         {
-            var res = new ClassLevelDetailDto();
-            res.Id = item.Id;
-            res.Name = item.Name;
-            res.TotalClasses = item.Classes.Count();
+          var res = new ClassLevelDetailDto();
+          res.Id = item.Id;
+          res.Name = item.Name;
+          res.TotalClasses = item.Classes.Count();
+          res.TotalEnrolled = item.Inscriptions.Count();
+          res.Classes = new List<ClassDetailDto>();
+          foreach (var c in item.Classes)
+          {
+            res.TotalStudents+=c.Students.Count();
+            //add class data
+            ClassDetailDto cdd = new ClassDetailDto();
+            cdd.Id = c.Id;
+            cdd.Name = c.Name;
+            cdd.MaxStudent = c.MaxStudent;
+            cdd.TotalStudents = c.Students.Count();
+            res.Classes.Add(cdd);
+          }
 
-            // res.TotalEnrolled = item.Inscriptions.Count();
-            // res.TotalStudents = 0;
-            // foreach (var c in item.Classes)
-            // {
-            //     res.TotalStudents+=c.Students.Count();
-            // }
-
-            res.Classes = item.Classes.ToList();
-
-            dataToReturn.Add(res);
+          //res.Classes = item.Classes.ToList();
+          dataToReturn.Add(res);
         }
 
         return Ok(dataToReturn);
@@ -917,19 +922,16 @@ namespace EducNotes.API.Controllers
         return Ok(classLevels);
     }
 
-    [HttpGet("{classLevelId}/SearchClassesByLevel")]
-    public async Task<IActionResult> SearchClassesByLevel(int classLevelId)
+    [HttpGet("{classLevelId}/ClassesByLevelId")]
+    public async Task<IActionResult> ClassesByLevelId(int classLevelId)
     {
+      var classes = await _context.Classes
+                          .Include(s => s.Students)
+                          .Where(c => c.ClassLevelId == classLevelId)
+                          .ToListAsync();
 
-        var classes = await _context.Classes
-            .Include(s => s.Students)
-            .Where(c => c.ClassLevelId == classLevelId)
-            .ToListAsync();
-
-        var classesToReturn = _mapper.Map<IEnumerable<ClassDetailDto>>(classes);
-
-        return Ok(classesToReturn);
-
+      var classesToReturn = _mapper.Map<IEnumerable<ClassDetailDto>>(classes);
+      return Ok(classesToReturn);
     }
 
     [HttpPost("{classId}/DeleteClass")]

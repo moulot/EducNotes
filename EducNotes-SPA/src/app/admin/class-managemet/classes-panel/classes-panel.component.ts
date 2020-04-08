@@ -11,52 +11,51 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
   animations: [SharedAnimations]
 })
 export class ClassesPanelComponent implements OnInit {
+  levels: any[];
+  lev: any [] = [];
+  // addNew = false;
 
   constructor(private adminService: AdminService, private route: ActivatedRoute,
     private alertify: AlertifyService) {}
 
-  levels: any[];
-  lev: any [] = [];
-  addNew = false;
    ngOnInit() {
-        this.route.data.subscribe(data => {
-          this.levels = data.levels;
-        });
-        for (let index = 0; index < this.levels.length; index++) {
-          const element: any = {
-            id: this.levels[index].id,
-            name: this.levels[index].name
-          };
-          this.lev = [...this.lev, element];
-        }
-    }
-    newClass() {
-      this.addNew = !this.addNew;
-    }
-
-    getlevels() {
-      this.levels = [];
-      this.adminService.getClassLevelsDetails().subscribe((res: any[]) => {
-        this.levels = res ;
-        for (let index = 0; index < this.levels.length; index++) {
-          const element: any = {
-            id: this.levels[index].id,
-            name: this.levels[index].name
-          };
-          this.lev = [...this.lev, element];
-        }
-      }, error => {
-        console.log(error);
-      }) ;
-    }
-
-    resultMode(val: boolean) {
-      if (val) {
-        this.getlevels();
+      this.route.data.subscribe(data => {
+        this.levels = data.levels;
+      });
+      for (let index = 0; index < this.levels.length; index++) {
+        const element: any = {
+          id: this.levels[index].id,
+          name: this.levels[index].name
+        };
+        this.lev = [...this.lev, element];
       }
-      this.addNew = !this.addNew;
+  }
 
+  newClass() {
+    // this.addNew = !this.addNew;
+  }
+
+  getlevels() {
+    this.levels = [];
+    this.adminService.getClassLevelsDetails().subscribe((res: any[]) => {
+      this.levels = res ;
+      for (let index = 0; index < this.levels.length; index++) {
+        const element: any = {
+          id: this.levels[index].id,
+          name: this.levels[index].name
+        };
+        this.lev = [...this.lev, element];
+      }
+    }, error => {
+      console.log(error);
+    }) ;
+  }
+
+  resultMode(val: boolean) {
+    if (val) {
+      this.getlevels();
     }
-
+    // this.addNew = !this.addNew;
+  }
 
 }

@@ -26,3 +26,10 @@
   font-weight: bold;
   background-color: #ffffff;
 }
+
+.o-hidden {
+  text-overflow: ellipsis;
+  overflow: hidden; 
+  width: 225px; 
+  white-space: nowrap;
+}

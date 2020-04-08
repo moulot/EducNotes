@@ -20,9 +20,16 @@
   margin-top: 5px;
  }
 
-.switch.logo-switch label input[type=checkbox]:checked + .lever {
-  background-color: #689DF6;
-}
-.switch.logo-switch label input[type=checkbox]:checked + .lever:after {
+.switch.logo-switch label input[type=checkbox]:checked + .slider {
   background-color: #f89f20;
+}
+.switch.logo-switch label input[type=checkbox]:checked + .slider:after {
+  background-color: #f89f20;
+}
+
+.switch.warning-switch label input[type=checkbox]:checked + .lever {
+  background-color: #FFA339;
+}
+.switch.warning-switch label input[type=checkbox]:checked + .lever:after {
+  background-color: #F80;
 }
