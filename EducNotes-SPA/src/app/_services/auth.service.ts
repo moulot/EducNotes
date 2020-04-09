@@ -84,7 +84,12 @@ export class AuthService {
     this.currentClassId = null;
     this.changeCurrentChild(this.newUser);
     this.alertify.info('vous êtes déconnecté');
-    this.router.navigate(['/signin']);
+    if (this.redirectUrl) {
+      this.router.navigate(['/signin']);
+      // this.router.navigate([this.redirectUrl]);
+    } else {
+      this.router.navigate(['/signin']);
+    }
   }
 
   register(user: User) {

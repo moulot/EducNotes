@@ -1768,28 +1768,42 @@ namespace EducNotes.API.Controllers
       return BadRequest("impossible de faire l'ajout");
     }
 
-    [HttpGet("SearchThemesOrLessons/{classLevelId}/{courseId}")]
-    public async Task<IActionResult> SearchThemesOrLessons(int classLevelId, int courseId)
+    [HttpGet("ClassLevelCourseThemes/{classlevelId}/{courseId}")]
+    public async Task<IActionResult> ClassLevelCourseThemes(int classlevelId, int courseId )
     {
-      // ClassWithThemesDto cwtd = new ClassWithThemesDto();
-      // List<ClassWithThemesDto> classesWithProgram = new List<ClassWithThemesDto>();
-      var themesToReturn = new List<Theme>();
-      themesToReturn = await _context.Themes
-                          .Include(a => a.Lessons)
-                          .ThenInclude(a => a.LessonContents)
-                          .Where(t => t.ClassLevelId == classLevelId && t.CourseId == courseId)
-                          .ToListAsync();
+      var themes =await _repo.ClassLevelCourseThemes(classlevelId, courseId);
+      if(themes.Count()>0)
+          return Ok( new{type = "byTheme", themes = themes});
 
-      //Progeam from Lessons (when lessons don't come from themes)
-      var LessonsFromDB = await _context.Lessons
-                                .Include(a => a.LessonContents)
-                                .Where(t => t.ClassLevelId == classLevelId && t.CourseId == courseId)
-                                .ToListAsync();
-      var tt = new Theme { Id = 0, Lessons = LessonsFromDB };
-      themesToReturn.Add(tt);
-
-      return Ok(themesToReturn);
+      var lessons  = await _repo.ClassLevelCourseLessons(classlevelId, courseId);
+      if(lessons.Count()>0)
+      return Ok( new{type = "byLesson", lessons = lessons});
+      else
+       return Ok();
     }
+
+    // [HttpGet("SearchThemesOrLessons/{classLevelId}/{courseId}")]
+    // public async Task<IActionResult> SearchThemesOrLessons(int classLevelId, int courseId)
+    // {
+    //   // ClassWithThemesDto cwtd = new ClassWithThemesDto();
+    //   // List<ClassWithThemesDto> classesWithProgram = new List<ClassWithThemesDto>();
+    //   var themesToReturn = new List<Theme>();
+    //   themesToReturn = await _context.Themes
+    //                       .Include(a => a.Lessons)
+    //                       .ThenInclude(a => a.LessonContents)
+    //                       .Where(t => t.ClassLevelId == classLevelId && t.CourseId == courseId)
+    //                       .ToListAsync();
+
+    //   //Progeam from Lessons (when lessons don't come from themes)
+    //   var LessonsFromDB = await _context.Lessons
+    //                             .Include(a => a.LessonContents)
+    //                             .Where(t => t.ClassLevelId == classLevelId && t.CourseId == courseId)
+    //                             .ToListAsync();
+    //   var tt = new Theme { Id = 0, Lessons = LessonsFromDB };
+    //   themesToReturn.Add(tt);
+
+    //   return Ok(themesToReturn);
+    // }
 
     [HttpGet("Periods")]
     public async Task<IActionResult> GetPeriods()

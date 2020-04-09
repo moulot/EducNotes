@@ -83,5 +83,9 @@ namespace EducNotes.API.Data
         Task<Session> GetSessionFromSchedule(int scheduleId, int teacherId, DateTime sessionDate);
         Task<List<Class>> GetClassesByLevelId(int levelId);
 
+        Task<IEnumerable<Theme>> ClassLevelCourseThemes(int classLevelId, int courseId);
+        Task<IEnumerable<Lesson>> ClassLevelCourseLessons(int classLevelId, int courseId);
+
+
     }
 }

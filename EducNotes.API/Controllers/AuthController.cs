@@ -623,46 +623,46 @@ namespace EducNotes.API.Controllers
 
 
 
-        [HttpPost("AddFile")]
-        public async Task<IActionResult> AddFile([FromForm]PhotoForCreationDto photoForCreationDto)
-        {
+        // [HttpPost("AddFile")]
+        // public async Task<IActionResult> AddFile([FromForm]PhotoForCreationDto photoForCreationDto)
+        // {
 
 
-            var file = photoForCreationDto.File;
+        //     var file = photoForCreationDto.File;
 
-            var uploadResult = new ImageUploadResult();
+        //     var uploadResult = new ImageUploadResult();
 
-            if (file.Length > 0)
-            {
-                using (var stream = file.OpenReadStream())
-                {
-                    var uploadParams = new ImageUploadParams()
-                    {
-                        File = new FileDescription(file.Name, stream)
-                    };
+        //     if (file.Length > 0)
+        //     {
+        //         using (var stream = file.OpenReadStream())
+        //         {
+        //             var uploadParams = new ImageUploadParams()
+        //             {
+        //                 File = new FileDescription(file.Name, stream)
+        //             };
 
-                    uploadResult = _cloudinary.Upload(uploadParams);
-                }
-            }
+        //             uploadResult = _cloudinary.Upload(uploadParams);
+        //         }
+        //     }
 
-            photoForCreationDto.Url = uploadResult.Uri.ToString();
-            photoForCreationDto.PublicId = uploadResult.PublicId;
+        //     photoForCreationDto.Url = uploadResult.Uri.ToString();
+        //     photoForCreationDto.PublicId = uploadResult.PublicId;
 
 
-            var fichier = _mapper.Map<Fichier>(photoForCreationDto);
-            fichier.Description = photoForCreationDto.File.FileName;
-            _repo.Add(fichier);
+        //     var fichier = _mapper.Map<Fichier>(photoForCreationDto);
+        //     fichier.Description = photoForCreationDto.File.FileName;
+        //     _repo.Add(fichier);
 
-            if (await _repo.SaveAll())
-                return Ok();
+        //     if (await _repo.SaveAll())
+        //         return Ok();
 
-            return BadRequest("Could not add the photo");
-        }
+        //     return BadRequest("Could not add the photo");
+        // }
 
-        [HttpGet("GetAllFiles")]
-        public async Task<IActionResult> GetAllFiles()
-        {
-            return Ok(await _context.Fichiers.ToListAsync());
-        }
+        // [HttpGet("GetAllFiles")]
+        // public async Task<IActionResult> GetAllFiles()
+        // {
+        //     return Ok(await _context.Fichiers.ToListAsync());
+        // }
     }
 }
