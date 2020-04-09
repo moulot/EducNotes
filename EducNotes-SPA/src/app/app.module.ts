@@ -222,6 +222,8 @@ import { AddEmailTemplateComponent } from './admin/add-emailTemplate/add-emailTe
 import { EditEmailTemplateResolver } from './_resolvers/edit-email-template-resolver';
 import { EditTeacherResolver } from './_resolvers/edit-teacher-resolver';
 import { CourseShowingComponent } from './classes/course-showing/course-showing.component';
+import { ClassCardComponent } from './admin/class-managemet/class-card/class-card.component';
+import { BtnBackDirective } from './_directives/btnBack.directive';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -249,6 +251,7 @@ export function tokenGetter() {
       // AdminPanelComponent,
       HasRoleDirective,
       FullScreenDirective,
+      BtnBackDirective,
       UserManagementComponent,
       PhotoManagementComponent,
       RolesModalComponent,
@@ -369,7 +372,8 @@ export function tokenGetter() {
       ImportUsersComponent,
       EmailTemplateComponent,
       AddEmailTemplateComponent,
-      CourseShowingComponent
+      CourseShowingComponent,
+      ClassCardComponent
    ],
    imports: [
       FormWizardModule,

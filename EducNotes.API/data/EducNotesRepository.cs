@@ -757,7 +757,7 @@ namespace EducNotes.API.Data
                     if (uploadResult.StatusCode == HttpStatusCode.OK)
                     {
                         Photo photo = new Photo();
-                        photo.Url = uploadResult.Uri.ToString();
+                        photo.Url = uploadResult.SecureUri.ToString();
                         photo.PublicId = uploadResult.PublicId;
                         photo.UserId = userId;
                         photo.DateAdded = DateTime.Now;

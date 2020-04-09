@@ -17,6 +17,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.IO;
+using System.Net;
+using System.Text;
 
 namespace EducNotes.API.Controllers
 {
@@ -279,9 +284,6 @@ namespace EducNotes.API.Controllers
             throw new Exception($"l'ajout des infos de l'établissement a échoué");
         }
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
         [HttpPost("{classId}/StudentAffectation")]
         public async Task<IActionResult> StudentAffectation(int classId, List<StudentPostingDto> model, int userId)
         {
@@ -382,10 +384,10 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetClassLevels()
         {
             var levels = await _context.ClassLevels
-              .Include(i => i.Inscriptions)
-              .Include(c => c.Classes).ThenInclude(c => c.Students)
-              .OrderBy(a => a.DsplSeq)
-              .ToListAsync();
+                                .Include(i => i.Inscriptions)
+                                .Include(c => c.Classes).ThenInclude(c => c.Students)
+                                .OrderBy(a => a.DsplSeq)
+                                .ToListAsync();
 
             var dataToReturn = new List<ClassLevelDetailDto>();
             foreach (var item in levels)
@@ -393,17 +395,23 @@ namespace EducNotes.API.Controllers
                 var res = new ClassLevelDetailDto();
                 res.Id = item.Id;
                 res.Name = item.Name;
-
                 res.TotalEnrolled = item.Inscriptions.Count();
                 res.TotalStudents = 0;
+                res.Classes = new List<ClassDetailDto>();
                 foreach (var c in item.Classes)
                 {
-                    res.TotalStudents += c.Students.Count();
+                  res.TotalStudents += c.Students.Count();
+                  //add class data
+                  ClassDetailDto cdd = new ClassDetailDto();
+                  cdd.Id = c.Id;
+                  cdd.Name = c.Name;
+                  cdd.MaxStudent = c.MaxStudent;
+                  cdd.TotalStudents = c.Students.Count();
+                  res.Classes.Add(cdd);
                 }
 
-                res.Classes = item.Classes.ToList();
+                //res.Classes = item.Classes.ToList();
                 dataToReturn.Add(res);
-
             }
             return Ok(dataToReturn);
         }
@@ -603,13 +611,60 @@ namespace EducNotes.API.Controllers
 
             _context.Add(newEmail);
 
+            var apiKey = _config.GetValue<string>("AppSettings:SENDGRID_APIKEY");
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress("no-reply@educnotes.com");
+            var subject = "first email with attached file from EducNotes";
+            var to = new EmailAddress("georges.moulot@albatrostechnologies.com");
+            var body = "hmmmmm... getting ready for the covid-19 battle!";
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, body, "");
+            //var bytes = System.IO.File.ReadAllBytes("");
+            // msg.AddAttachment("moulot.jpg", file);
+            // var response = await client.SendEmailAsync(msg);
+            //var req = System.Net.WebRequest.Create("https://res.cloudinary.com/educnotes/image/upload/v1578173397/d2zw9ozmtxgtaqrtvbss.jpg");
+            // WebClient wc = new WebClient();
+            // using (Stream stream = wc.OpenRead("http://res.cloudinary.com/educnotes/image/upload/v1578173397/d2zw9ozmtxgtaqrtvbss.jpg"))
+            // {
+            //   await msg.AddAttachmentAsync("pic.jpg", stream);
+            //   var response = await client.SendEmailAsync(msg);
+            // }
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("http://res.cloudinary.com/educnotes/image/upload/v1578173397/e4m74eppwjyv2eei88d6.jpg");
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (var contentStream = httpResponse.GetResponseStream())
+            {
+              var contentLength = 230400;
+              var streamBytes = new byte[contentLength];
+              var output = new StringBuilder();
+              int bytesRead = 0;
+              do
+              {
+                // read one block from the input stream
+                bytesRead = contentStream.Read(streamBytes, 0, streamBytes.Length);
+                if(bytesRead > 0)
+                {
+                  // encode the base64 string
+                  string base64String = Convert.ToBase64String(streamBytes, 0, bytesRead);
+                  output.Append(base64String);
+                }
+              } while (bytesRead > 0);
+
+              // await contentStream.ReadAsync(streamBytes, 0, contentLength);
+              // var base64Content = Convert.ToBase64String(streamBytes);
+
+              msg.AddAttachment("pic.jpg", output.ToString(), "image/jpeg");
+
+              //await msg.AddAttachmentAsync("pic.jpg", stream);
+              var response = await client.SendEmailAsync(msg);
+            }
+
+
             if (await _repo.SaveAll())
             {
-                return NoContent();
+              return NoContent();
             }
             else
             {
-                return BadRequest("problème pour envoyer l\' email");
+              return BadRequest("problème pour envoyer l\' email");
             }
         }
 

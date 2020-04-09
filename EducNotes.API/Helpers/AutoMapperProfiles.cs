@@ -87,7 +87,7 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom(src => src.UserType.Name);
                 });
             CreateMap<Class, ClassDetailDto>()
-                .ForMember(dest => dest.TotalStudent, opt => {
+                .ForMember(dest => dest.TotalStudents, opt => {
                     opt.MapFrom(src => src.Students.Count());
                 });
             CreateMap<Evaluation, EvalsForEditDto>()

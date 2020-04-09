@@ -259,7 +259,7 @@ export class ClassService {
   }
 
   getClassesByLevelId(id: number) {
-    return this.http.get(this.baseUrl + 'classes/' + id + '/SearchClassesByLevel');
+    return this.http.get(this.baseUrl + 'classes/' + id + '/ClassesByLevelId');
   }
 
   getClassLevelsWithClasses(ids: number[]) {

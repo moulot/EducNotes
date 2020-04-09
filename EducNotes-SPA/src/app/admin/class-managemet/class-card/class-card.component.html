@@ -1,0 +1,50 @@
+<mdb-flipping-card #card>
+  <div class="face front card tp-box_side tp-box_front">
+    <div class="content">
+      <h4 class="text-center">niveau {{level.name}}</h4>
+      <hr class="my-1" style="background-color: #f89f20;">
+      <div class="text-center">
+        <span class="text-15 text-muted">classes</span>
+        <h4 class="m-0">{{level.classes.length}}</h4>
+      </div>
+      <div class="text-center">
+        <span class="text-15 text-muted">effectif</span>
+        <h4 class="m-0">{{level.totalStudents}}</h4>
+      </div>
+      <div *ngIf="level.classes.length > 0" class="text-center">
+        <button class="" size="sm" mdbBtn class="btnWhiteO" mdbWavesEffect (click)="card.toggle()" routerLinkActive="router-link-active" >details</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="face back card tp-box_side tp-box_back p-0">
+    <div class="content">
+      <div class="d-flex">        
+        <h4 class="flex-grow-1 text-center">niveau {{level.name}}</h4>
+        <div>
+          <a (click)="card.toggle()">
+            <i class="fad fa-undo-alt fa-2x" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          </a>
+        </div>
+      </div>
+      <hr class="my-1" style="background-color: #f89f20;">
+      <div class="text-13 text-danger pl-1">liste des élèves: clicker sur le nom</div>
+      <div class="d-flex text-center">
+        <div class="text-13 w-33 text-muted">classe</div>
+        <div class="text-13 w-33 text-muted">effectif</div>
+        <div class="text-13 w-33 text-muted">max élèves</div>
+      </div>
+      <div *ngFor="let class of level.classes">
+        <div class="d-flex text-center">
+          <div class="text-14 w-33">
+            <a [routerLink]="['/studentsClass', class.id]">{{class.name}}</a>
+          </div>
+          <div class="text-14 w-33">{{class.totalStudents}}</div>
+          <div class="text-14 w-33">{{class.maxStudent}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mdb-flipping-card>
+

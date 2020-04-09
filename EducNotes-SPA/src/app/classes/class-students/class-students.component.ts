@@ -6,6 +6,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute } from '@angular/router';
 import { Class } from 'src/app/_models/class';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-class-students',
@@ -24,7 +25,7 @@ export class ClassStudentsComponent implements OnInit {
   filteredStudents;
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
-    private route: ActivatedRoute) { }
+    private route: ActivatedRoute, private location: Location) { }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -55,6 +56,10 @@ export class ClassStudentsComponent implements OnInit {
 
   loadUser() {
 
+  }
+
+  backClicked() {
+    this.location.back();
   }
 
   filerData(val) {

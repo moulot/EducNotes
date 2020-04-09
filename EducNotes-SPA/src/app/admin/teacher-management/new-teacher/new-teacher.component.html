@@ -124,7 +124,7 @@
                       </div>
                     </div>
                     <div *ngIf="!course.value.classAssigned">
-                      <div class="switch logo-switch">
+                      <div class="switch">
                         <label>
                           <input type="checkbox" formControlName="active">
                           <span class="slider"></span>
@@ -136,16 +136,28 @@
                 </div>
               </div>
               <hr class="my-1" style="background-color: #f89f20;">
-              <div class="float-right">
-                <button type="submit" mdbBtn class="btnBlue ml-2" size="sm" mdbWavesEffect
-                  [disabled]="!teacherForm.valid">
-                  <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                    --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
-                  <span *ngIf="!editionMode">ajouter</span>
-                  <span *ngIf="editionMode">editer</span>
-                </button>
-                  <!-- <button type="button" (click)="resetValues()" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>reset</button> -->
-                  <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>annuler</button>
+              <div class="row">
+                <div class="col-md-7">
+                  <div class="d-flex">
+                    <div class="mr-2 my-auto">
+                      <div style="width: 15px; height: 15px; background-color: #f89f20;"></div>
+                    </div>
+                    <div class="text-13">désactivé: des classes sont attribuées à ce cours</div>
+                  </div>
+                </div>
+                <div class="col-md-5 float-right">
+                  <div class="float-right">
+                    <button type="submit" mdbBtn class="btnBlue ml-2" size="sm" mdbWavesEffect
+                      [disabled]="!teacherForm.valid">
+                      <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                        --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                      <span *ngIf="!editionMode">ajouter</span>
+                      <span *ngIf="editionMode">editer</span>
+                    </button>
+                    <!-- <button type="button" (click)="resetValues()" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>reset</button> -->
+                    <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>annuler</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
