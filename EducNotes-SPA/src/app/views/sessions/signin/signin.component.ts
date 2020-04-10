@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router, RouteConfigLoadStart, ResolveStart, RouteConfigLoadEnd, ResolveEnd } from '@angular/router';
+import { Router, RouteConfigLoadStart, ResolveStart, RouteConfigLoadEnd, ResolveEnd, ActivatedRouteSnapshot, ActivatedRoute } from '@angular/router';
 import { User } from 'src/app/_models/user';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { AuthService } from 'src/app/_services/auth.service';
@@ -27,7 +27,7 @@ export class SigninComponent implements OnInit {
     formValid: boolean;
 
     constructor(private authService: AuthService, private router: Router, private fb: FormBuilder,
-        private alertify: AlertifyService) { }
+        private route: ActivatedRoute, private alertify: AlertifyService) { }
 
     ngOnInit() {
 
@@ -60,8 +60,10 @@ export class SigninComponent implements OnInit {
         this.loading = true;
         this.notConfirmed = false;
         this.authService.login(this.signinForm.value).subscribe(() => {
-            if(this.authService.redirectUrl) {
-                this.router.navigate([this.authService.redirectUrl]);
+            if (this.authService.redirectUrl) {
+                const r = this.authService.redirectUrl;
+                this.authService.redirectUrl = '';
+                this.router.navigate([r]);
             } else {
                 this.router.navigate(['/home']);
             }

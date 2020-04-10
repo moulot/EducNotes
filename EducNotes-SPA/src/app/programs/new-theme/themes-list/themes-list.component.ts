@@ -4,6 +4,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { LessonContent } from 'src/app/_models/lesson-content';
 import { Theme } from 'src/app/_models/theme';
+import { Lesson } from 'src/app/_models/lesson';
 
 @Component({
   selector: 'app-themes-list',
@@ -12,9 +13,12 @@ import { Theme } from 'src/app/_models/theme';
 })
 export class ThemesListComponent implements OnInit {
   levels: any = [];
+  type: string;
   courses: any = [];
   // they can be a simple lesson whitout theme
   themes: Theme[];
+  lessons: Lesson[];
+
   theme: any = {};
   searchForm: FormGroup;
   noResult = '';
@@ -57,16 +61,21 @@ export class ThemesListComponent implements OnInit {
   searchTheme() {
     this.searchDiv = true;
     this.themes = [];
+    this.lessons = [];
     this.noResult = '';
     const params = this.searchForm.value;
-    this.classService.searchThemes(params.classLevelId, params.courseId).subscribe((res: Theme[]) => {
-      if (res.length > 0) {
-         this.themes = res;
-         } else {
-           this.noResult = 'aucun enregistrement trouvé...';
-         }
-
-      console.log(res);
+    this.classService.searchThemes(params.classLevelId, params.courseId).subscribe((res: any) => {
+      if (res) {
+        if (res.type === 'byTheme') {
+          this.type = 'byTheme';
+          this.themes = res.themes;
+        } else if (res.type === 'byLesson') {
+          this.type = 'byLesson';
+          this.lessons = res.lessons;
+        }
+      } else {
+        this.noResult = 'Aucun résultat trouvé...';
+      }
     }, error => {
       console.log(error);
     });

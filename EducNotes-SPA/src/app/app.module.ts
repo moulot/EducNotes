@@ -10,6 +10,7 @@ import { NgxGalleryModule } from 'ngx-gallery';
 import { FileUploadModule } from 'ng2-file-upload';
 import { TimeAgoPipe } from 'time-ago-pipe';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { NgxEditorModule } from 'ngx-editor';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
@@ -220,6 +221,7 @@ import { EmailTemplateResolver } from './_resolvers/email-template-resolver';
 import { AddEmailTemplateComponent } from './admin/add-emailTemplate/add-emailTemplate.component';
 import { EditEmailTemplateResolver } from './_resolvers/edit-email-template-resolver';
 import { EditTeacherResolver } from './_resolvers/edit-teacher-resolver';
+import { CourseShowingComponent } from './classes/course-showing/course-showing.component';
 import { ClassCardComponent } from './admin/class-managemet/class-card/class-card.component';
 import { BtnBackDirective } from './_directives/btnBack.directive';
 import { CourseCardComponent } from './admin/class-managemet/course-card/course-card.component';
@@ -372,13 +374,14 @@ export function tokenGetter() {
       EmailTemplateComponent,
       AddEmailTemplateComponent,
       ClassCardComponent,
-      CourseCardComponent
+      CourseCardComponent,
+      CourseShowingComponent
    ],
    imports: [
       FormWizardModule,
       SharedModule,
       HttpClientModule,
-      InMemoryWebApiModule.forRoot(InMemoryDataService, {passThruUnknownUrl: true}),
+      InMemoryWebApiModule.forRoot(InMemoryDataService, { passThruUnknownUrl: true }),
       AppRoutingModule,
       BrowserModule,
       BrowserAnimationsModule,
@@ -422,7 +425,8 @@ export function tokenGetter() {
       SharedComponentsModule,
       AppFormsModule,
       MDBBootstrapModulesPro.forRoot(),
-      TagInputModule
+      TagInputModule,
+      NgxEditorModule
    ],
    providers: [
       AuthService,

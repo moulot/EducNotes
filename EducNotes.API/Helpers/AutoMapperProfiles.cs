@@ -311,7 +311,7 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.DueDate, opt => {
                     opt.MapFrom(src => src.DueDate.ToString("dd/MM/yyyy", frC));
                 });
-            CreateMap<PhotoForCreationDto, Fichier>();
+            // CreateMap<PhotoForCreationDto, Fichier>();
             CreateMap<Absence, AbsenceForCallSheetDto>()
                 .ForMember(dest => dest.strStartDate, opt => {
                     opt.MapFrom(src => src.StartDate.ToString("dd/MM/yyyy", frC));

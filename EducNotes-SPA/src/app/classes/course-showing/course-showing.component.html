@@ -1,0 +1,110 @@
+<div class="container animated zoomInDown z-depth-1">
+  <!-- <div [innerHTML]="title"></div> -->
+
+  <mdb-stepper #stepper  [vertical]="false" class="animated slideInUp">
+    <mdb-step name="Infos principales du cours" [stepForm]="searchForm" class="step1">
+      <div class="col-md-12">
+        <mdb-card>
+          <mdb-card-body>
+            <form [formGroup]="searchForm" style="color: #757575;" (ngSubmit)="searchTheme()">
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="md-form form-sm m-0">
+                    <mdb-select [options]="levels" (ngModelChange)="searchTheme()" placeholder="Choisir le niveau"
+                      label="niveau d'etude" formControlName="classLevelId"></mdb-select>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="md-form form-sm m-0">
+                    <mdb-select [options]="courses" (ngModelChange)="searchTheme()" placeholder="Choisir le cours"
+                      label="choisir le cours" formControlName="courseId"></mdb-select>
+                  </div>
+                </div>
+    
+                <div class="col-md-3" *ngIf="themesSelect.length>0 || lessonsSelect.length>0">
+                  <div class="md-form form-sm m-0" *ngIf="lessonsSelect.length>0">
+                    <mdb-select [options]="lessonsSelect" [multiple]="true" [highlightFirst]="false"
+                      placeholder="choisir le ou les chapitres" label="choisir le ou les chapitres"
+                      formControlName="lessonContentIds"></mdb-select>
+                  </div>
+    
+                  <div class="md-form form-sm m-0" *ngIf="themesSelect.length>0">
+                    <mdb-select [options]="themesSelect" [multiple]="true" [highlightFirst]="false"
+                      placeholder="choisir le ou les chapitres" label="choisir le ou les chapitres"
+                      formControlName="lessonContentIds"></mdb-select>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="md-form form-sm m-0">
+                    <button mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect (click)="stepper.next()"
+                    [disabled]="searchForm.value.classLevelId && !searchForm.value.courseId">
+                    suivant
+                    <i class="fa fa-chevron-right fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                  --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                    
+                </button>
+                  </div>
+                </div>
+                
+    
+                <div class="col-md-12" *ngIf="noResult">
+                  {{noResult}}
+                </div>
+              </div>
+            </form>
+          </mdb-card-body>
+        </mdb-card>
+        <mdb-card class="mt-1">
+          <mdb-card-body>
+    
+            <mdb-card-title class="text-center">
+              <h4>Présentation du cours</h4>
+            </mdb-card-title>
+            <form>
+              <div class="file-field md-form m-0">
+                <div mdbBtn  class="btnWhiteO" size="sm" class="waves-light" mdbWavesEffect>
+                  <span>choisir une vidéo</span>
+                  <input type="file" accept='video/*' mdbFileSelect (change)="getVideoResult($event)">
+                </div>
+                <span *ngIf="mainVideo">{{mainVideo.name}}</span>
+              </div>
+              <div class="file-field md-form m-0">
+                <div mdbBtn  class="btnWhiteO"  size="sm" class="waves-light" mdbWavesEffect>
+                  <span>choisir un pdf</span>
+                  <input type="file" accept='application/pdf' mdbFileSelect (change)="getMainPdfResult($event)">
+                </div>
+                <span *ngIf="mainPdf">{{mainPdf.name}}</span>
+              </div>
+            </form>
+            <app-ngx-editor [translate]="true" [minHeight]="'300'" [placeholder]="'Entrer le comentaire ici'">
+            </app-ngx-editor>
+          </mdb-card-body>
+        </mdb-card>
+      </div>
+    </mdb-step>
+    <mdb-step name="inscription" label="infos des parents"  class="step2">
+      <mdb-card>
+        <mdb-card-body>
+          <mdb-card-title>
+            <h4 class="text-center">Pièces jointes Facultatives</h4> <hr>
+          </mdb-card-title>
+          <p>Veuillez selectionner les fichiers ou pièces jointes annexes du cours</p>
+          <div class="file-field md-form m-0">
+            <div mdbBtn  class="btnWhiteO"  size="sm" class="waves-light" mdbWavesEffect>
+              <span>choisir un des fichiers</span>
+              <input type="file"  multiple mdbFileSelect (change)="getOtherFilesResult($event)">
+            </div>
+            <!-- <span *ngIf="mainPdf">{{mainPdf.name}}</span> -->
+          </div>
+          <div *ngIf="otherFilesName">
+            {{otherFilesName.length}} fichier(s) ajouté(s)
+            <p *ngFor="let fileName of otherFilesName">{{fileName}}</p>
+          </div>
+        </mdb-card-body>
+      </mdb-card>
+    </mdb-step>
+    <mdb-step name="inscription" label="infos des parents" [stepForm]="searchForm" class="step1">
+    </mdb-step>
+  </mdb-stepper>
+  
+</div>

@@ -312,8 +312,8 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/courses/' + courseId + '/teacher/' + teacherId + '/Program');
   }
 
-  searchThemes(classLevelId: number, courseId: number): Observable<Theme[]> {
-    return this.http.get<Theme[]>(this.baseUrl + 'classes/SearchThemesOrLessons/' + classLevelId + '/' + courseId);
+  searchThemes(classLevelId: number, courseId: number){
+    return this.http.get(this.baseUrl + 'classes/ClassLevelCourseThemes/' + classLevelId + '/' + courseId);
   }
 
   getPeriods(): Observable<Period[]> {
