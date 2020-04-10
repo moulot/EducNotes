@@ -250,7 +250,7 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'classes/' + courseId + '/UpdateCourse/' + courseName, {});
   }
 
-  addNewCourse(course: any) {
+  addCourse(course: any) {
     return this.http.post(this.baseUrl + 'classes/AddCourse', course);
   }
 

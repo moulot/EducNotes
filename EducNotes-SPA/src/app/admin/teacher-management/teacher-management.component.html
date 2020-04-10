@@ -45,9 +45,11 @@
   <div class="col-md-12">
     <div class="card mb-2" *ngFor="let teacher of filteredTeachers">
       <div class="card-body p-2">
-        <div class="d-flex">
-          <img class="avatar-lg rounded-lg mr-3" src="{{teacher.photoUrl || '../../assets/user.png'}}" alt="">
-          <div class="flex-grow-1">
+        <div class="row">
+          <div class="col-md-1 mb-1">
+            <img class="avatar-lg rounded-lg mr-3" src="{{teacher.photoUrl || '../../assets/user.png'}}" alt="">
+          </div>
+          <div class="col-md-11">
             <div class="row">
               <div class="col-md-12">
                 <div class="d-flex align-content-center">
@@ -106,7 +108,7 @@
         <div class="d-none d-md-block">
           <div class="d-flex align-items-end">
             <div class="flex-grow-1">
-              <div class="text-17"><b>cours donnés par l'enseignant</b></div>
+              <div class="text-17"><b>cours de l'enseignant</b></div>
               <div class="text-17 text-danger" *ngIf="teacher.courseClasses.length == 0">aucun cours pour {{teacher.lastName}} {{teacher.firstName}}</div>
               <div *ngIf="teacher.courseClasses.length > 0">
                 <div *ngFor="let course of teacher.courseClasses">
@@ -138,7 +140,7 @@
         <div class="d-md-none">
           <div class="row">
             <div class="col-md-12">
-              <div class="text-17"><b>cours</b></div>
+              <div class="text-17"><b>cours de l'enseignant</b></div>
               <div class="text-17 text-danger" *ngIf="teacher.courseClasses.length == 0">aucun cours pour {{teacher.lastName}} {{teacher.firstName}}</div>
               <div *ngIf="teacher.courseClasses.length > 0">
                 <div *ngFor="let course of teacher.courseClasses">
