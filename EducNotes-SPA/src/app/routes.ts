@@ -112,6 +112,7 @@ import { AddEmailTemplateComponent } from './admin/add-emailTemplate/add-emailTe
 import { EditEmailTemplateResolver } from './_resolvers/edit-email-template-resolver';
 import { EditTeacherResolver } from './_resolvers/edit-teacher-resolver';
 import { CourseShowingComponent } from './classes/course-showing/course-showing.component';
+import { ClassStudentsAssignmentComponent } from './classes/class-students-assignment/class-students-assignment.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -171,6 +172,7 @@ export const appRoutes: Routes = [
           { path: 'teacherAssignment/:id', component: TeacherAssignmentComponent, resolve: { teacher: TeacherFormResolver } },
           { path: 'courses', component: CoursesPanelComponent, resolve: { courses: CoursesListResolver } },
           { path: 'addCourse', component: NewCourseComponent },
+          { path: 'classAssignment', component: ClassStudentsAssignmentComponent },
           { path: 'courseShowing', component: CourseShowingComponent },
           { path: 'editCourse/:id', component: NewCourseComponent, resolve: { course: CourseFormResolver } },
           { path: 'editTeacher/:id', component: NewTeacherComponent, resolve: { teacher: EditTeacherResolver } },

@@ -328,4 +328,8 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/' + classId + '/events');
   }
 
+  classStudentsAssignment(classId: number, studentsList) {
+    return this.http.post(this.baseUrl + 'classes/classStudentsAssignment/' + classId , studentsList);
+  }
+
 }

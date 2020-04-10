@@ -224,6 +224,7 @@ import { EditTeacherResolver } from './_resolvers/edit-teacher-resolver';
 import { CourseShowingComponent } from './classes/course-showing/course-showing.component';
 import { ClassCardComponent } from './admin/class-managemet/class-card/class-card.component';
 import { BtnBackDirective } from './_directives/btnBack.directive';
+import { ClassStudentsAssignmentComponent } from './classes/class-students-assignment/class-students-assignment.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -373,7 +374,8 @@ export function tokenGetter() {
       EmailTemplateComponent,
       AddEmailTemplateComponent,
       CourseShowingComponent,
-      ClassCardComponent
+      ClassCardComponent,
+      ClassStudentsAssignmentComponent
    ],
    imports: [
       FormWizardModule,

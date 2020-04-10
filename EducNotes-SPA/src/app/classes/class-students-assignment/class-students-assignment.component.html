@@ -1,0 +1,166 @@
+<mdb-card class="animated shake" *ngIf="waitDiv">
+  <mdb-card-body>
+    <b>veuillez patienter....</b>
+
+  </mdb-card-body>
+</mdb-card>
+
+<div class="container animated zoomInDown" *ngIf="!waitDiv">
+  <div class="card mb-4 col-md-12 col-lg-12">
+    <div class=" p-0">
+      <span class="text-center">Veuillez importer la liste des élèves à partir du lien ci-dessous</span>
+      <hr>
+      <div class="file-field md-form">
+        <div mdbBtn color="primary" size="sm" class="waves-light" mdbWavesEffect>
+          <span>importer</span>
+          <input type="file" mdbFileSelect (change)="onFileChange($event)" accept=".xlsx, .xls">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="showImport" class="animated bounceInUp">
+    <mdb-card>
+      <mdb-card-body>
+        <form [formGroup]="searchForm">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="md-form form-sm m-0">
+                <mdb-select [options]="levels" placeholder="Choisir le niveau" label="niveau d'etude"
+                  (ngModelChange)="getClasses()" formControlName="classLevelId"></mdb-select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="md-form form-sm m-0">
+                <mdb-select [options]="classes" placeholder="Choisir la classe" label="choisir la classe"
+                  formControlName="classId"></mdb-select>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="md-form form-sm m-0">
+                <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [disabled]="!searchForm.valid"
+                  (click)="basicModal.show();getSelectedClassName()">
+                  <i class="fa fa-floppy-o fa-1x mr-1"
+                    style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                  enregistrer
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+      </mdb-card-body>
+    </mdb-card>
+    <span class="text-center font-weight-bold">{{importedStudents.length}} élèves trouvé(s)</span>
+    <table class="table table-sm table-striped z-depth-1">
+      <thead>
+        <tr>
+          <th>
+            <div class="switch">
+              <label>
+                tout chocher
+                <input type="checkbox" (change)="selectAll()">
+                <span class="lever"></span>
+              </label>
+            </div>
+          </th>
+          <th>nom élève</th>
+          <th>prenom(s) élève</th>
+          <th>matricule</th>
+          <th>contact(s) élève</th>
+          <th>email élève</th>
+          <th>nom du parent</th>
+          <th>prenom(s) parent</th>
+          <th>contact(s) parent</th>
+          <th>email parent</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of importedStudents, let i = index">
+          <td style="text-align: left;">
+            <div class="switch">
+              <label>
+                <input type="checkbox" [(ngModel)]="student.sendEmail">
+                <span class="lever"></span>
+              </label>
+            </div>
+          </td>
+          <td>
+            {{student.lastName}}
+            <span *ngIf="!student.lastName" class="font-weight-bold font-italic text-danger">N/A</span>
+          </td>
+          <td>
+            {{student.firstName}}
+            <span *ngIf="!student.firstName" class="font-weight-bold font-italic text-danger">N/A</span>
+          </td>
+          <td>
+            {{student.idnum}}
+            <span *ngIf="!student.idnum" class="font-weight-bold font-italic text-danger">N/A</span>
+          </td>
+          <td>
+            {{student.phoneNumber}} <span *ngIf="student.secondPhoneNumber"> / {{student.secondPhoneNumber}}</span>
+            <span *ngIf="!student.phoneNumber && !student.secondPhoneNumber"
+              class="font-weight-bold font-italic">N/A</span>
+          </td>
+          <td>
+            {{student.email}}
+            <span *ngIf="!student.email" class="font-weight-bold font-italic text-danger">N/A</span>
+          </td>
+
+
+          <td>
+            {{student.parent.lastName}}
+            <span *ngIf="!student.parent.lastName" class="font-weight-bold font-italic text-danger">N/A</span>
+          </td>
+          <td>
+            {{student.parent.firstName}}
+            <span *ngIf="!student.parent.firstName" class="font-weight-bold font-italic text-danger">N/A</span>
+          </td>
+          <td>
+            {{student.parent.phoneNumber}} <span *ngIf="student.parent.secondPhoneNumber"> /
+              {{student.parent.secondPhoneNumber}}</span>
+            <span *ngIf="!student.parent.phoneNumber && !student.parent.secondPhoneNumber"
+              class="font-weight-bold font-italic">N/A</span>
+          </td>
+          <td>
+            {{student.parent.email}}
+            <span *ngIf="!student.parent.email" class="font-weight-bold font-italic text-danger">N/A</span>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+
+<div mdbModal #basicModal="mdbModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myBasicModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close pull-right" aria-label="Close" (click)="basicModal.hide()">
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title w-100" id="myModalLabel">VERIFICATION</h4>
+      </div>
+      <div class="modal-body">
+        <b>confirmez-vous l'enregistrement de ses {{importedStudents.length}} élèves la classe de {{className}} ?</b>
+      </div>
+      <div class="modal-footer">
+        <button mdbBtn class="btnWhiteO ml-2" size="sm" mdbWavesEffect (click)="basicModal.hide()">
+          <i class="fa-1x mr-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+          annuler
+        </button>
+        <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [disabled]="!searchForm.valid"
+          (click)="basicModal.hide();save()">
+          <i class="fa-1x mr-1"
+            style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+          enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
