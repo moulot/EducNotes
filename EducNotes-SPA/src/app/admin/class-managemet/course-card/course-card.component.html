@@ -1,0 +1,79 @@
+<mdb-flipping-card #card>
+  <div class="face front card tp-box_side tp-box_front">
+  <div class="card-up" [ngStyle]="{'background-color': course.color}" style="height: 25px;
+    border-top-left-radius: 10px;border-top-right-radius: 10px">
+  </div>
+  <div class="content">
+      <div class="text-20 text-center text-capitalize">{{course.name}}</div>
+      <hr class="mt-1 mb-0" style="background-color: #f89f20;">
+      <!-- <div [ngStyle]="{'background-color': course.color}" class="m-0" style="height: 15px;"></div> -->
+      <div class="row mt-3">
+        <div class="col-5">
+          <div class="text-15 text-muted">abbrév.</div>
+        </div>
+        <div class="col-7">
+          <div class="text-18">{{course.abbreviation}}</div>
+        </div>
+        <div class="col-5">
+          <div class="text-15 text-muted">enseignants</div>
+        </div>
+        <div class="col-7">
+          <div class="text-18">{{course.teachersNumber}}</div>
+        </div>
+        <div class="col-5">
+          <div class="text-15 text-muted">classes</div>
+        </div>
+        <div class="col-7">
+          <div class="text-18">{{course.classesNumber}}</div>
+        </div>
+        <div class="col-5">
+          <div class="text-15 text-muted">élèves</div>
+        </div>
+        <div class="col-7">
+          <div class="text-18">{{course.studentsNumber}}</div>
+        </div>
+      </div>
+      <div class="text-center">
+        <button class="" size="sm" mdbBtn class="btnWhiteO" mdbWavesEffect (click)="showEditForm(course);card.toggle()">editer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="face back card tp-box_side tp-box_back p-0">
+    <div class="content">
+      <div class="d-flex">        
+        <div class="text-20 flex-grow-1">{{course.name}}</div>
+        <div>
+          <a (click)="card.toggle()">
+            <i class="fad fa-undo-alt fa-2x" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          </a>
+        </div>
+      </div>
+      <hr class="my-1" style="background-color: #f89f20;">
+      <form [formGroup]="courseForm" style="color: #757575;" (ngSubmit)="addCourse();card.toggle()">
+        <div formArrayName="course" *ngFor="let course of courseForm.get('course')['controls']; let i = index;">
+          <div [formGroupName]="i">
+            <div class="md-form form-sm mt-2 mb-1">
+              <input mdbInput type="text" id="name" class="form-control" formControlName="name">
+              <label for="name">nom</label>
+            </div>
+            <div class="md-form form-sm mt-1 mb-1">
+              <input mdbInput type="text" id="abbreviation" class="form-control" formControlName="abbrev">
+              <label for="name" class="">abreviation</label>
+            </div>
+            <div class="md-form form-sm mt-1 mb-1">
+              <mdb-select [options]="colorOptions" formControlName="color" [visibleOptions]="7"  placeholder="couleur du cours"></mdb-select>
+            </div>
+          </div>
+        </div>
+        <div class="tex-center">
+          <div class="d-flex">
+            <button type="submit" [disabled]="!courseForm.valid" mdbBtn class="btnBlue" size="sm" mdbWavesEffect>editer</button>
+            <button type="button" mdbBtn class="btnOrange" size="sm" mdbWavesEffect (click)="resetValues()">annuler</button>
+          </div>
+        </div>
+    </form>
+    </div>
+  </div>
+</mdb-flipping-card>

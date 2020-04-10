@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row animated zoomInUp">
   <div class="col-md-12 d-flex">
     <div>
       <a appBtnBack>
@@ -6,12 +6,69 @@
           --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
       </a>
     </div>
-    <p class="lead">ajout d'une classe</p>
+    <div class="lead">ajout de classes par niveau</div>
   </div>
-  <div class="col-md-12"><hr class="my-1" style="background-color: #f89f20;"</div>
+  <div class="col-md-12 mb-2"><hr class="my-2" style="background-color: #f89f20;"></div>
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-body">
+        <div class="col-md-12">
+          <form [formGroup]="classForm" (ngSubmit)="save()">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="md-form m-0">
+                  <mdb-select [options]="levels" formControlName="levelId" placeholder="niveau des classes">
+                  </mdb-select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="md-form m-0">
+                  <mdb-select [options]="classTypes" formControlName="classTypeId" placeholder="type des classes">
+                  </mdb-select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="md-form m-0">
+                  <input mdbInput type="text" id="name" class="form-control" formControlName="name">
+                  <label for="name" class="">nom des classes (avant le suffixe)</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="md-form m-0">
+                  <mdb-select [options]="suffixes" formControlName="suffixe" placeholder="suffixe des classes">
+                  </mdb-select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="md-form m-0">
+                  <input mdbInput type="number" id="number" class="form-control" formControlName="number" min="1" max="10">
+                  <label for="number" class="">nombre de classe à créer</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="md-form m-0">
+                  <input mdbInput type="number" id="maxStudent" class="form-control" formControlName="maxStudent" min="1" max="100">
+                  <label for="maxStudent" class="">nombre max d'élèves</label>
+                </div>
+              </div>
+              <div class="col-md-12"><hr class="my-2"></div>
+              <div class="col-md-12">
+                <div class="float-right">
+                  <button type="submit" [disabled]="!classForm.valid || submitText!='enregistrer'" mdbBtn
+                  class="btnBlue" size="sm" mdbWavesEffect>enregistrer</button>
+                  <button type="button" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
+                    [routerLink]="['/classesPanel']" routerLinkActive="router-link-active">annuler</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="row  mt-1 row justify-content-center align-items-center animated zoomInUp">
+<!-- <div class="row  mt-1 row justify-content-center align-items-center animated zoomInUp">
 
     <div class="col-md-6">
             <form class="text-center" style="color: #757575;"  [formGroup]="classForm" (ngSubmit)="save()">
@@ -57,4 +114,4 @@
 
             </form>
     </div>
-</div>
+</div> -->

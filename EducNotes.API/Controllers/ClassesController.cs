@@ -944,22 +944,38 @@ namespace EducNotes.API.Controllers
     }
 
     [HttpPost("AddCourse")]
-    public async Task<IActionResult> AddCourse([FromBody] CourseDto newCourseDto)
+    public async Task<IActionResult> AddCourse([FromBody] CourseDto courseDto)
     {
-        var course = new Course { Name = newCourseDto.Name, Abbreviation = newCourseDto.Abbreviation, Color = newCourseDto.Color };
+      int id = courseDto.Id;
+      if(id == 0)
+      {
+        var course = new Course {
+          Name = courseDto.Name,
+          Abbreviation = courseDto.Abbreviation,
+          Color = courseDto.Color
+        };
         _repo.Add(course);
-        // foreach (var item in courseDto.classLevelIds)
-        // {
-        //     var classes = await _context.Classes.Where(a=>a.ClassLevelId == Convert.ToInt32(item)).Select(a=>a.Id).ToListAsync();
-        //     foreach (var classId in classes)
-        //     {
-        //       _repo.Add(new ClassCourse {CourseId = course.Id,ClassId = classId});
-        //     }
-        // }
-        if (await _repo.SaveAll())
-            return Ok();
+      }
+      else
+      {
+        var course = await _context.Courses.FirstAsync(c => c.Id == id);
+        course.Name = courseDto.Name;
+        course.Abbreviation = courseDto.Abbreviation;
+        course.Color = courseDto.Color;
+        _repo.Update(course);
+      }
+      // foreach (var item in courseDto.classLevelIds)
+      // {
+      //     var classes = await _context.Classes.Where(a=>a.ClassLevelId == Convert.ToInt32(item)).Select(a=>a.Id).ToListAsync();
+      //     foreach (var classId in classes)
+      //     {
+      //       _repo.Add(new ClassCourse {CourseId = course.Id,ClassId = classId});
+      //     }
+      // }
+      if (await _repo.SaveAll())
+          return Ok();
 
-        return BadRequest("impossible d'ajouter ce cours");
+      return BadRequest("problème pour ajouter ce cours");
     }
 
     [HttpGet("SessionData/{sessionId}")]

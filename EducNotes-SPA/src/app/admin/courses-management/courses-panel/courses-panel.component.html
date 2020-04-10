@@ -1,87 +1,42 @@
- <div class="row">
+<div class="row animated zoomInDown">
 
-  <div class="col-md-12">
-    <p class="lead ">admin - liste des cours</p>
-  </div>
-    
-  <div class="col-md-12" *ngIf="show === 'all'" [@animate]="{value:'*',params:{delay: 300+'ms', y:'80px'}}">    
-    <div class="card mb-4">
-      <div class="card-body p-0">
-
-        <div class="card-title border-bottom d-flex align-items-center m-0 p-3">
-          <button class="btn btn-outline-primary btn-sm" [routerLink]="['/addCourse']" routerLinkActive="router-link-active" >ajouter un cours</button>
-          <span class="flex-grow-1"></span>
-        </div>
-
-        <div *ngFor="let course of courses" class="d-flex border-bottom  p-3">
-          <div class="flex-grow-1">
-            <span class="text-small text-muted">couleur</span>
-            <h5 class="m-0">
-              <div [ngStyle]="{'background-color': course.color}" class="m-0 mr-5"><span>&nbsp;</span></div>
-            </h5>
-          </div>
-          <div class="flex-grow-1">
-            <span class="text-small text-muted">nom</span>
-            <h6 class="m-0">{{course.name}}</h6>
-          </div>
-          <div class="flex-grow-1">
-            <span class="text-small text-muted">abbrév.</span>
-            <h6 class="m-0">{{course.abbreviation}}</h6>
-          </div>
-          <div class="flex-grow-1">
-            <span class="text-small text-muted">nb enseignants</span>
-            <h6 class="m-0">{{course.teachersNumber}}</h6>
-          </div>
-          <div class="flex-grow-1">
-            <span class="text-small text-muted">nb classes</span>
-            <h6 class="m-0">{{course.classesNumber}}</h6>
-          </div>
-          <div class="flex-grow-1">
-            <span class="text-small text-muted">nb élèves</span>
-            <h6 class="m-0">{{course.studentsNumber}}</h6>
-          </div>
-          <div class="flex-grow-1">
-            <h6 class="m-0 mt-1">
-              <button [routerLink]="['/editCourse', course.id]" routerLinkActive="router-link-active"
-                class="btn btn-outline-primary btn-sm">modifier</button>
-            </h6>
-          </div>
-        </div>
-
+  <div class="col-md-12 d-none d-md-block">
+    <div class="d-flex">
+      <i class="fad fa-books fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <p class="text-17 flex-grow-1">liste des cours</p>
+      <div>
+        <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [routerLink]="['/addCourse']" routerLinkActive="router-link-active">
+          <i class="fal fa-books fa-1x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+          ajouter un cours
+        </button>
       </div>
     </div>
   </div>
-  
-</div>
-
-<!--Grid row-->
-<div class="row">
-
-  <!--Grid column-->
-  <div class="col-md-6">
-
-    <!--Card-->
-    <mdb-card class="testimonial-card">
-      <!--Bacground color-->
-      <div class="card-up aqua-gradient" style="height: 25px;">
+  <div class="col-md-12 d-md-none">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="d-flex">
+          <i class="fad fa-books fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          <p class="text-17 flex-grow-1">liste des cours</p>
+        </div>
       </div>
-
-      <mdb-card-body>
-        <!--Name-->
-        <mdb-card-title>
-          <h4>Martha Smith</h4>
-        </mdb-card-title>
-        <hr>
-        <!--Quotation-->
-        <p>
-          <mdb-icon fas icon="quote-left"></mdb-icon> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos,
-          adipisci</p>
-      </mdb-card-body>
-    </mdb-card>
-    <!--/.Card-->
-
+      <div class="col-md-12">
+        <div class="">
+          <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [routerLink]="['/addCourse']" routerLinkActive="router-link-active">
+            <i class="fal fa-books fa-1x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+            ajouter un cours
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
-  <!--Grid column-->
+
+  <div class="col-md-12 mt-2">
+    <div class="row">
+      <div *ngFor="let course of courses" class="col-md-3 mb-2">
+        <app-course-card [course]="course" (saveCourse)="saveCourse($event)"></app-course-card>
+      </div>
+    </div>
+  </div>
 
 </div>
-<!--Grid row-->

@@ -13,77 +13,69 @@ import { ActivatedRoute, Router } from '@angular/router';
   animations :  [SharedAnimations]
 })
 
-
 export class NewCourseComponent implements OnInit {
-  // levels;
-  courseModel: Course;
+  course: Course;
   courseForm: FormGroup;
-  submitText = 'enregistrer';
-  color = '';
-  courseId;
-  formMode = 'add';
-  model;
-
+  colorOptions = [];
+  defaultColors: string[] = [
+    '#ffffff',
+    '#000105',
+    '#3e6158',
+    '#3f7a89',
+    '#96c582',
+    '#b7d5c4',
+    '#bcd6e7',
+    '#7c90c1',
+    '#9d8594',
+    '#dad0d8',
+    '#4b4fce',
+    '#4e0a77',
+    '#a367b5',
+    '#ee3e6d',
+    '#d63d62',
+    '#c6a670',
+    '#f46600',
+    '#cf0500',
+    '#efabbd',
+    '#8e0622',
+    '#f0b89a',
+    '#f0ca68',
+    '#62382f',
+    '#c97545',
+    '#c1800b'
+  ];
 
   constructor(private fb: FormBuilder, private classService: ClassService,
-     private router: Router, private alertify: AlertifyService, private route: ActivatedRoute) { }
+    private router: Router, private alertify: AlertifyService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.route.data.subscribe(data => {
-      if (data.course) {
-         this.model = data.course;
-             this.courseId = data.course.id;
-          this.formMode = 'edit';
-     } else {
-       this.initParams();
-     }
-   });
-
     this.createCourseForm();
-    this.color = this.model.color;
-   // this.createCourseForm();
-  }
-
-  initParams() {
-    this.model = {
-      name : '',
-      abbreviation : '',
-      color : ''
-    };
+    this.setColorSelect();
   }
 
   createCourseForm() {
     this.courseForm = this.fb.group({
-      name: [this.model.name, Validators.required],
-      abbreviation: [this.model.abbreviation],
-      color: [this.model.color]
+      id: [0],
+      name: ['', Validators.required],
+      abbrev: [''],
+      color: ['', Validators.required]
     });
   }
 
-  setColor() {
-    this.courseForm.patchValue({color: this.color});
+  setColorSelect() {
+    for (let i = 0; i < this.defaultColors.length; i++) {
+      const elt = this.defaultColors[i];
+      this.colorOptions = [...this.colorOptions, {value: elt, label: elt}];
+    }
   }
 
-  save() {
-
-      if (this.formMode === 'add') {
-        this.classService.addNewCourse(this.courseForm.value).subscribe(() => {
-          this.alertify.success('cours enregistrée...');
-          this.router.navigate(['/courses']);
-        }, error => {
-          console.log(error);
-        });
-      } else {
-        this.classService.updatCourse(this.courseId, this.courseForm.value).subscribe(() => {
-          this.alertify.success('cours enregistrée...');
-          this.router.navigate(['/courses']);
-
-        }, error => {
-          console.log(error);
-        });
-      }
-
-    }
-
+  addCourse() {
+    this.classService.addCourse(this.courseForm.value).subscribe(() => {
+      this.alertify.success('le cours est bien enregistré...');
+      this.router.navigate(['/courses']);
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
 
 }

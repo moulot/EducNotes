@@ -1,33 +1,40 @@
 <div class="row  mt-1 justify-content-center align-items-center animated zoomInUp">
 
+  <div class="col-md-12">
+    <div class="d-flex">
+      <i class="fad fa-books fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <p class="text-17 flex-grow-1">ajouter un cours</p>
+    </div>
+  </div>
+  <div class="col-md-12"><hr class="mt-1 mb-3" style="background-color: #f89f20;"></div>
+
   <div class="col-md-6">
-    <form [formGroup]="courseForm" style="color: #757575;" (ngSubmit)="save()">
+    <form [formGroup]="courseForm" (ngSubmit)="addCourse()">
 
       <mdb-card>
         <mdb-card-body class="px-lg-5 pt-0">
           <div class="md-form">
             <input mdbInput type="text" id="name" class="form-control" formControlName="name">
-            <label for="name" class="">Nom</label>
+            <label for="name" class="">nom</label>
+            <div *ngIf="courseForm.get('name').errors && courseForm.get('name').touched"
+              class="text-small text-danger">saisir le nom du cours svp</div>
           </div>
-
           <div class="md-form">
-            <input mdbInput type="text" id="abbreviation" class="form-control" formControlName="abbreviation">
-            <label for="name" class="">Abreviation</label>
+            <input mdbInput type="text" id="abbrev" class="form-control" formControlName="abbrev">
+            <label for="abbrev" class="">abreviation</label>
           </div>
-
           <div class="md-form">
-            <input mdbInput type="text" id="color" class="form-control" formControlName="color" [(colorPicker)]="color" [style.background]="color"
-            (colorPickerChange)="setColor()">
-            <label for="color" class="">Choisir la couleur</label>
+            <mdb-select [options]="colorOptions" formControlName="color"[appendToBody]="true" [visibleOptions]="7"  placeholder="couleur du cours"></mdb-select>
+            <div *ngIf="courseForm.get('color').errors && courseForm.get('color').touched"
+              class="text-small text-danger">saisir la couleur du cours svp</div>
           </div>
-
+          <hr class="my-2" style="background-color: #f89f20;">
           <div class="md-form">
-            <button type="submit" [disabled]="!courseForm.valid || submitText!='enregistrer'" mdbBtn
-            color="info" size="sm" mdbWavesEffect><span>{{submitText}}</span></button>
-        <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
-            [routerLink]="['/courses']" routerLinkActive="router-link-active">annuler</button>
+            <div class="d-flex text-center">
+              <button type="submit" [disabled]="!courseForm.valid" mdbBtn class="btnBlue" size="sm" mdbWavesEffect>enregistrer</button>
+              <button type="button" mdbBtn class="btnOrange" size="sm" mdbWavesEffect [routerLink]="['/courses']">annuler</button>
+            </div>
           </div>
-
         </mdb-card-body>
       </mdb-card>
     </form>

@@ -22,32 +22,35 @@ export class CoursesPanelComponent implements OnInit {
  show = 'all';
  willDownload = false;
 
-ngOnInit() {
+  ngOnInit() {
     this.route.data.subscribe(data => {
-       this.courses = data.courses;
+      this.courses = data.courses;
     });
-    }
+  }
 
-    getCourses() {
-      this.courses = [];
-      this.classService.getAllCoursesDetails().subscribe((res: any[]) => {
-        this.courses = res;
-      });
-    }
-    newCourse() {
-      this.show = 'add';
-    }
+  getCourses() {
+    this.courses = [];
+    this.classService.getAllCoursesDetails().subscribe((res: any[]) => {
+      this.courses = res;
+    });
+  }
 
-    edit(course: Course) {
-      this.course = course;
-      this.show = 'edit';
-    }
-
-    resultMode(val: boolean) {
-      if (val) {
-       this.getCourses();
-      }
-      this.show = 'all';
-    }
+  saveCourse(data) {
+    const course = {
+      id: data.id,
+      name: data.name,
+      abbrev: data.abbrev,
+      color: data.color
+    };
+    this.classService.addCourse(course).subscribe(() => {
+      this.alertify.success('le cours a été bien enregistré...');
+      const index = this.courses.findIndex(c => c.id === course.id);
+      this.courses[index].name = course.name;
+      this.courses[index].abbreviation = course.abbrev;
+      this.courses[index].color = course.color;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
 
 }
