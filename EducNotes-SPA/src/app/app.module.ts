@@ -224,6 +224,7 @@ import { EditTeacherResolver } from './_resolvers/edit-teacher-resolver';
 import { CourseShowingComponent } from './classes/course-showing/course-showing.component';
 import { ClassCardComponent } from './admin/class-managemet/class-card/class-card.component';
 import { BtnBackDirective } from './_directives/btnBack.directive';
+import { ClassStudentsAssignmentComponent } from './classes/class-students-assignment/class-students-assignment.component';
 import { CourseCardComponent } from './admin/class-managemet/course-card/course-card.component';
 
 // the second parameter 'fr' is optional
@@ -373,8 +374,9 @@ export function tokenGetter() {
       ImportUsersComponent,
       EmailTemplateComponent,
       AddEmailTemplateComponent,
+      CourseShowingComponent,
+      ClassStudentsAssignmentComponent,
       ClassCardComponent,
-      CourseCardComponent,
       CourseShowingComponent
    ],
    imports: [

@@ -39,6 +39,7 @@ namespace EducNotes.API.Models
         public City City { get; set; }
         public byte TempData { get; set; }
         public byte Active { get; set; }
+        public string Idnum { get; set; }
         public DateTime? ResetPasswordDate { get; set; }
         public DateTime? ForgotPasswordDate { get; set; }
         public ICollection<Photo> Photos { get; set; }

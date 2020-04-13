@@ -124,6 +124,7 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom(d => d.DateOfBirth.ToString("dd/MM/yyyy", frC));
                 });
             CreateMap<ImportUserDto, User>();
+            CreateMap<QuickStudentAssignmentDto, User>();
             CreateMap<UserFromExelDto, User>();
             CreateMap<MessageForCreationDto, Message>().ReverseMap();
             CreateMap<Message, MessageToReturnDto>()
