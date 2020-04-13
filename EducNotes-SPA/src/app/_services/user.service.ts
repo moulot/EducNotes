@@ -151,8 +151,12 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'users/' + teacherId + '/NextCourses');
   }
 
-  getTeacherSessions(teacherId, classId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/Sessions/' + classId);
+  getTeacherCurrWeekSessions(teacherId, classId) {
+    return this.http.get(this.baseUrl + 'users/' + teacherId + '/CurrWeekSessions/' + classId);
+  }
+
+  getTeacherSessionsFromToday(teacherId, classId) {
+    return this.http.get(this.baseUrl + 'users/' + teacherId + '/SessionsFromToday/' + classId);
   }
 
   getMovedWeekSessions(teacherId, classId, agendaParams) {
@@ -160,7 +164,6 @@ constructor(private http: HttpClient) {}
     let params = new HttpParams();
     params = params.append('dueDate', agendaParams.dueDate);
     params = params.append('moveWeek', agendaParams.moveWeek);
-    console.log(agendaParams.dueDate);
 
     return this.http.get(this.baseUrl + 'users/' + teacherId + '/MovedWeekSessions/' + classId, { params });
   }

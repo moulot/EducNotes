@@ -492,7 +492,7 @@ namespace EducNotes.API.Controllers
             return Ok(teacherCourses);
         }
 
-        [HttpGet("{teacherId}/Sessions/{classId}")]
+        [HttpGet("{teacherId}/CurrWeekSessions/{classId}")]
         public async Task<IActionResult> GetTeacherSessions(int teacherId, int classId)
         {
           var teacherSchedule = await _context.Schedules
@@ -646,6 +646,162 @@ namespace EducNotes.API.Controllers
           });
         }
 
+        [HttpGet("{teacherId}/SessionsFromToday/{classId}")]
+        public async Task<IActionResult> GetTeacherSessionsFromToday(int teacherId, int classId)
+        {
+          var teacherSchedule = await _context.Schedules
+                                  .Include(i => i.Course)
+                                  .Include(i => i.Teacher)
+                                  .Include(i => i.Class)
+                                  .Where(s => s.TeacherId == teacherId && s.ClassId == classId)
+                                  .ToListAsync();
+
+          var today = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+          var dayInt = (int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
+          if(dayInt == 7)
+            today = today.AddDays(1);
+          // var monday = today.AddDays(1 - dayInt);
+          // var saturday = monday.AddDays(5);
+
+          var agendas = new List<SessionForListDto>();
+          for(int i = 0; i < 7; i++)
+          {
+            var currentDate = today.AddDays(i).Date;
+            var day = ((int)currentDate.DayOfWeek == 0) ? 7 : (int)currentDate.DayOfWeek;
+            if(day == 7) { continue; }
+            
+            SessionForListDto sfld = new SessionForListDto();
+            sfld.DueDate = currentDate;
+            sfld.ShortDueDate = currentDate.ToString("ddd dd MMM", frC);
+            sfld.LongDueDate = currentDate.ToString("dd MMMM yyyy", frC);
+            sfld.DueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
+            //get agenda tasks Done Status
+            sfld.AgendaItems = new List<AgendaToReturnDto>();
+            
+            //agenda items retrieved from schedule items
+            var daySchedule = teacherSchedule
+                                .Where(d => d.Day == day && d.ClassId == classId)
+                                .OrderBy(d => d.StartHourMin.Hour)
+                                .ThenBy(d => d.StartHourMin.Minute);
+
+            foreach (var scheduleItem in daySchedule)
+            {
+              string startHour = scheduleItem.StartHourMin.ToString("HH:mm", frC);
+              string endHour = scheduleItem.EndHourMin.ToString("HH:mm", frC);
+              var tasks = "";
+              var id = 0;
+              var agenda = await _context.Agendas.SingleOrDefaultAsync(a => a.Session.SessionDate.Date == currentDate &&
+                a.Session.TeacherId == teacherId && a.Session.ClassId == scheduleItem.ClassId &&
+                a.Session.StartHourMin.ToString("HH:mm", frC) == startHour &&
+                a.Session.EndHourMin.ToString("HH:mm", frC) == endHour);
+              if(agenda != null) {
+                tasks = agenda.TaskDesc;
+                id = agenda.Id;
+              }
+
+              var session = await _repo.GetSessionFromSchedule(scheduleItem.Id, teacherId, currentDate);
+              var newAgenda = new AgendaToReturnDto {
+                Id = id,
+                SessionId = session.Id,
+                TeacherId = Convert.ToInt32(scheduleItem.TeacherId),
+                TeacherName = scheduleItem.Teacher.LastName + ' ' + scheduleItem.Teacher.FirstName,
+                CourseId = Convert.ToInt32(scheduleItem.CourseId),
+                strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
+                DayDate = currentDate,
+                Day = scheduleItem.Day,
+                CourseName = scheduleItem.Course.Name,
+                CourseColor = scheduleItem.Course.Color,
+                ClassId = Convert.ToInt32(scheduleItem.ClassId),
+                ClassName = scheduleItem.Class.Name,
+                Tasks = tasks,
+                StartHourMin = scheduleItem.StartHourMin.ToString("HH:mm", frC),
+                EndHourMin = scheduleItem.EndHourMin.ToString("HH:mm", frC)
+              };
+
+              sfld.AgendaItems.Add(newAgenda);
+            }
+
+            //retrieve agenda items with lost shceduleId (schedule item has been deleted/updated)
+            var itemsWithNoScheduleId = await _context.Agendas
+                                              .Include(a => a.Session)
+                                              .Where(a => a.Session.SessionDate.Date == currentDate.Date &&
+                                                a.Session.ScheduleId == null)
+                                              .OrderBy(o => o.Session.StartHourMin.Hour)
+                                              .ThenBy(o => o.Session.StartHourMin.Minute)
+                                              .ToListAsync();
+            
+            foreach (var item in itemsWithNoScheduleId)
+            {
+              var itemDayInt = ((int)item.Session.SessionDate.DayOfWeek == 0) ? 7 : (int)currentDate.DayOfWeek;
+              if(day == 7) { continue; }
+
+              var newAgenda = new AgendaToReturnDto {
+                Id = item.Id,
+                SessionId = item.SessionId,
+                TeacherId = Convert.ToInt32(item.Session.TeacherId),
+                TeacherName = item.Session.Teacher.LastName + ' ' + item.Session.Teacher.FirstName,
+                CourseId = Convert.ToInt32(item.Session.CourseId),
+                strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
+                DayDate = currentDate,
+                Day = itemDayInt,
+                CourseName = item.Session.Course.Name,
+                CourseColor = item.Session.Course.Color,
+                ClassId = item.Session.ClassId,
+                ClassName = item.Session.Class.Name,
+                Tasks = item.TaskDesc,
+                StartHourMin = item.Session.StartHourMin.ToString("HH:mm", frC),
+                EndHourMin = item.Session.EndHourMin.ToString("HH:mm", frC)
+              };
+
+              sfld.AgendaItems.Add(newAgenda);
+            }
+
+            agendas.Add(sfld);
+          }
+
+          var days = new List<string>();
+          var weekDates = new List<DateTime>();
+          var nbTasks = new List<int>();
+          for (int i = 0; i <= 5; i++) {
+              DateTime dt = today.AddDays(i);
+              var shortdate = dt.ToString("ddd dd MMM", frC);
+              days.Add(shortdate);
+              weekDates.Add(dt.Date);
+          }
+
+          var itemsFromRepo = await _repo.GetClassAgenda(classId, today, today.AddDays(5));
+          var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
+
+          var classCourses = await _context.ClassCourses
+              .Where(c => c.ClassId == classId && c.TeacherId == teacherId)
+              .Select(s => s.Course).ToListAsync();
+
+          List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto>();
+          foreach(var course in classCourses) {
+              CourseTasksDto ctd = new CourseTasksDto();
+              var nbItems = itemsFromRepo.Where(a => a.Session.CourseId == course.Id).ToList().Count();
+              ctd.CourseId = course.Id;
+              ctd.CourseName = course.Name;
+              ctd.CourseAbbrev = course.Abbreviation;
+              ctd.CourseColor = course.Color;
+              ctd.NbTasks = nbItems;
+              coursesWithTasks.Add(ctd);
+          }
+
+          foreach (var item in agendas)
+          {
+            item.AgendaItems = item.AgendaItems.OrderBy(o => o.StartHourMin).ToList();
+          }
+
+          return Ok(new {
+            agendas,
+            today,
+            weekDays = days,
+            weekDates,
+            coursesWithTasks
+          });
+        }
+
         [HttpGet ("{teacherId}/MovedWeekSessions/{classId}")]
         public async Task<IActionResult> getClassMovedWeekAgenda (int teacherId, int classId, [FromQuery] AgendaParams agendaParams)
         {
@@ -662,15 +818,17 @@ namespace EducNotes.API.Controllers
             var dateDay = (int)date.DayOfWeek;
 
             var dayInt = dateDay == 0 ? 7 : dateDay;
-            DateTime monday = date.AddDays(1 - dayInt);
-            var saturday = monday.AddDays(5);
+            if(dayInt == 7)
+              date = date.AddDays(1);
+            // DateTime monday = date.AddDays(1 - dayInt);
+            // var saturday = monday.AddDays(5);
 
             var agendas = new List<SessionForListDto>();
 
             // cahier de textes - periode de sessions des cours du professeur
             for(int i = 0; i < 7; i++)
             {
-                var currentDate = monday.AddDays(i);
+                var currentDate = date.AddDays(i);
                 var day = ((int)currentDate.DayOfWeek == 0) ? 7 : (int)currentDate.DayOfWeek;
                 if(day == 7) { continue; }
                 
@@ -728,13 +886,13 @@ namespace EducNotes.API.Controllers
             var weekDates = new List<DateTime>();
             var nbTasks = new List<int>();
             for (int i = 0; i <= 5; i++) {
-                DateTime dt = monday.AddDays(i);
+                DateTime dt = date.AddDays(i);
                 var shortdate = dt.ToString("ddd dd MMM", frC);
                 days.Add(shortdate);
                 weekDates.Add(dt);
             }
 
-            var itemsFromRepo = await _repo.GetClassAgenda(classId, monday, saturday);
+            var itemsFromRepo = await _repo.GetClassAgenda(classId, date, date.AddDays(5));
             var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
             var classCourses = await _context.ClassCourses
@@ -756,7 +914,7 @@ namespace EducNotes.API.Controllers
             if (itemsFromRepo != null) {
                 return Ok(new {
                     agendas,
-                    monday,
+                    date,
                     weekDays = days,
                     weekDates,
                     coursesWithTasks

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormGroup, FormBuilder, NgForm, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, NgForm, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-agenda-modal',
@@ -12,7 +12,7 @@ export class AgendaModalComponent implements OnInit {
   @Output() saveAgenda = new EventEmitter();
   tasksForm: FormGroup;
 
-  constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) { }
+  constructor(public activeModal: NgbActiveModal) { }
 
   ngOnInit() {
     this.createTaskForm();
@@ -25,12 +25,12 @@ export class AgendaModalComponent implements OnInit {
   }
 
   updateAgenda(session) {
-    let tasks = this.tasksForm.value.tasks;
-    if (tasks === null) {
-      tasks = session.tasks;
+    const tasks = this.tasksForm.value.tasks;
+    console.log(tasks);
+    if (tasks !== null) {
+      session.tasks = tasks;
+      this.saveAgenda.emit(session);
     }
-    session.tasks = tasks;
-    this.saveAgenda.emit(session);
     this.activeModal.dismiss();
   }
 

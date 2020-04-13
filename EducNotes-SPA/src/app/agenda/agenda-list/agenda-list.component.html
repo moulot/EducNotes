@@ -1,17 +1,12 @@
 <div class="row">
-
-  <div class="col-md-12">
-    <div class="row mb-1">
-      <div class="col-md-10">
-        <div class="card-title m-0">cahier de textes</div>
-        <p class="text-small text-muted">saisie des devoirs des diffrentes classes et matières</p>
-      </div>
-      <div class="col-md-2">
-        <!-- <button type="button" class="btn btn-primary btn-block">btn des vues</button> -->
-      </div>
+  <div class="col-md-12 d-flex">
+    <div class="row">
+      <i class="fad fa-book-open fa-2x mr-2" style="--fa-secondary-opacity: 0.7;--fa-primary-color: #192C47;
+        --fa-secondary-color: #f89f20"></i>
+      <div class="text-17">cahiers de textes</div>
     </div>
+    <!-- <p class="text-small text-muted">saisie des devoirs des diffrentes classes et matières</p> -->
   </div>
-
 </div>
 
 <div class="row">
@@ -22,33 +17,33 @@
   <div class="col-md-9">
     <div *ngIf="showSessionsData">
       <div class="text-center mb-2">
-        <button type="button" mdbBtn class="p-2" (click)="loadMovedWeek(-7)"
-          color="light" mdbWavesEffect><mdb-icon fas icon="angle-left"></mdb-icon></button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[0])"  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="loadMovedWeek(-7)"
+          class="btnWhiteB p-2" mdbWavesEffect><mdb-icon fas icon="angle-left"></mdb-icon></button>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[0])"  class="btnWhiteB p-2" mdbWavesEffect>
           {{weekDays[0]}}
           <span *ngIf="nbDayTasks[0] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[0]}}</span>
         </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[1])"  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[1])"  class="btnWhiteB p-2" mdbWavesEffect>
           {{weekDays[1]}}
           <span *ngIf="nbDayTasks[1] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[1]}}</span>
         </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[2])"  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[2])"  class="btnWhiteB p-2" mdbWavesEffect>
           {{weekDays[2]}}
           <span *ngIf="nbDayTasks[2] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[2]}}</span>
         </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[3])"  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[3])"  class="btnWhiteB p-2" mdbWavesEffect>
           {{weekDays[3]}}
           <span *ngIf="nbDayTasks[3] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[3]}}</span>
         </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[4])"  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[4])"  class="btnWhiteB p-2" mdbWavesEffect>
           {{weekDays[4]}}
           <span *ngIf="nbDayTasks[4] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[4]}}</span>
         </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[5])"  class="p-2" color="light" mdbWavesEffect>
+        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[5])"  class="btnWhiteB p-2" mdbWavesEffect>
           {{weekDays[5]}}
           <span *ngIf="nbDayTasks[5] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[5]}}</span>
         </button>
-        <button type="button" mdbBtn class="p-2" (click)="loadMovedWeek(7)" color="light"
+        <button type="button" mdbBtn (click)="loadMovedWeek(7)" class="btnWhiteB p-2"
           mdbWavesEffect><mdb-icon fas icon="angle-right"></mdb-icon></button>
       </div>
     </div>
@@ -72,30 +67,19 @@
           <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
           <p class="text-danger text-15 mt-2 mb-2">clicker sur le cours pour filtrer</p>
           <div class="card mb-2" *ngFor="let course of coursesWithTasks">
-            <!-- <div *ngIf="course.nbTasks > 0"> -->
-              <a (click)="showCourseItems(course.courseId)" style="cursor: pointer;">
-                <div class="card-body p-2">
-                  <div class="row">
-                    <div class="col-md-12 d-flex">
-                      <div class=" mr-2" [ngStyle]="{'background-color': course.courseColor}" style="width: 10px;height: 100%;"></div>
-                      <div class="flex-grow-1 text-17">{{course.courseName}}</div>
-                      <div class="text-17">{{course.nbTasks}}</div>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            <!-- </div> -->
-            <!-- <div *ngIf="course.nbTasks <= 0">
+            <div class="card-up" [ngStyle]="{'background-color': course.courseColor}" style="height: 10px;
+              border-top-left-radius: 10px;border-top-right-radius: 10px">
+            </div>            
+            <a (click)="showCourseItems(course.courseId)" style="cursor: pointer;">
               <div class="card-body p-2">
                 <div class="row">
                   <div class="col-md-12 d-flex">
-                    <div class=" mr-2" [ngStyle]="{'background-color': course.courseColor}" style="width: 10px;height: 100%;"></div>
                     <div class="flex-grow-1 text-17">{{course.courseName}}</div>
                     <div class="text-17">{{course.nbTasks}}</div>
                   </div>
                 </div>
               </div>
-            </div> -->
+            </a>
           </div>
         </div>
       </div>
@@ -108,29 +92,28 @@
           <div *ngIf="filteredSessions?.length > 0">
             <div *ngFor="let item of filteredSessions; let i = index">
               <div class="card mb-2">
-                <div class="card-body">
-                  <div class="card-title">
-                    <div class="text-17 font-weight-400">à remettre le {{item.longDueDate}}</div>
-                    <!-- <div class="ml-2">
-                      <mdb-badge pill="true" class="badge-pill p-1" primary="true">{{item.nbItems}}</mdb-badge>
-                    </div> -->
-                  </div>
+                <div class="card-body p-3">
+                  <div class="text-17 font-weight-400 mb-2">à remettre le {{item.longDueDate}}</div>
                   <div class="card mb-2" *ngFor="let ai of item.agendaItems">
-                    <div class="col-md-12 d-flex">
-                      <div class="mr-2" [ngStyle]="{'background-color': ai.courseColor}" style="width: 10px;height: 100;"></div>
-                      <div class="card-body d-flex p-2">
-                        <div class="flex-grow-1">
-                        <div class="text-15 font-weight-550">{{ai.className}} - {{ai.courseName}}</div>
-                        <div class="d-flex">
-                          <div class="flex-grow-1 text-15">{{ai.startHourMin}} à {{ai.endHourMin}}</div>
-                        </div>
-                        <div class="w-50">
-                          <div *ngIf="ai.tasks !== ''" style="color: #2727f8;">{{ai.tasks}}</div>
-                          <div *ngIf="ai.tasks === ''" style="color: #BA4A00">aucun devoir</div>
-                        </div>
-                        </div>
-                        <div class="">
-                          <button mdbBtn (click)="editTasks(ai)" color="light" size="sm" mdbWavesEffect>saisir les devoirs</button>
+                    <div class="card-up" [ngStyle]="{'background-color': ai.courseColor}" style="height: 10px;
+                      border-top-left-radius: 10px;border-top-right-radius: 10px">
+                    </div>            
+                    <div class="col-md-12">
+                      <div class="card-body p-2">
+                        <div class="row">
+                          <div class="col-md-9 pl-0">
+                            <div class="text-15 font-weight-550">{{ai.className}} - {{ai.courseName}}</div>
+                            <div class="">
+                              <div class="flex-grow-1 text-15">{{ai.startHourMin}} à {{ai.endHourMin}}</div>
+                            </div>
+                            <div class="">
+                              <div *ngIf="ai.tasks !== ''" style="color: #2727f8;">{{ai.tasks}}</div>
+                              <div *ngIf="ai.tasks === ''" style="color: #BA4A00;">aucun devoir</div>
+                            </div>
+                          </div>
+                          <div class="col-md-3 p-0">
+                            <button mdbBtn (click)="editTasks(ai)" block="true" class="btnWhiteO mt-1" size="sm" mdbWavesEffect>saisir les devoirs</button>
+                          </div>
                         </div>
                       </div>
                     </div>
