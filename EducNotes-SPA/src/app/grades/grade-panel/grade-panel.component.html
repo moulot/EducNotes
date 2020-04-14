@@ -1,16 +1,13 @@
 <div class="row">
 
-  <div class="col-md-12">
-    <div class="d-flex">
-      <div class="flex-grow-1">
-        <div class="lead text-15 m-0 pb-2">tableau des notes</div>
-        <!-- <p class="text-13 text-muted">notes des élèves par classe, par type et par période</p> -->
-      </div>
-      <div class="d-md-none">
-        <button mdbBtn type="button" [routerLink]="['/addEval']" color="primary"
-          size="sm" mdbWavesEffect>nouvelle evaluation</button>
-      </div>
-    </div>
+  <div class="col-md-12 d-flex mb-2">
+    <i class="fad fa-pen-alt fa-2x mr-2" style="--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+      --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
+    <div class="text-17">tableau des notes</div>
+  </div>
+  <div class="col-md-12 d-md-none mb-2">
+    <button mdbBtn type="button" [routerLink]="['/addEval']" class="btnBlue"
+    block="true" size="sm" mdbWavesEffect>nouvelle evaluation</button>
   </div>
 
   <div class="col-md-12">
@@ -27,12 +24,12 @@
             <mdb-select [options]="optionsPeriod" formControlName="period" name="period" placeholder="période"></mdb-select>
           </div>
           <div class="col-md-3">
-            <button type="submit" [disabled]="!notesForm.valid" mdbBtn color="light" size="sm" mdbWavesEffect>valider</button>
-            <button type="button" (click)="cancelNotesFrom()" mdbBtn color="light" size="sm" mdbWavesEffect>annuler</button>
+            <button type="submit" [disabled]="!notesForm.valid" mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect>valider</button>
+            <button type="button" (click)="cancelNotesFrom()" mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect>annuler</button>
           </div>
           <div class="col-md-3">
             <div class="text-right d-none d-md-block">
-              <button mdbBtn type="button" [routerLink]="['/addEval']" color="primary"
+              <button mdbBtn type="button" [routerLink]="['/addEval']" class="btnBlue"
                 size="sm" mdbWavesEffect>nouvelle evaluation</button>
             </div>      
           </div>
@@ -59,14 +56,16 @@
               <div style="border-top: solid 1px #cccccc;"></div>
 
               <div *ngFor="let class of evalsToBeGraded">
-                <p class="text-20 font-weight-450 m-0">classe {{class.className}}</p>
+                <p class="text-17 font-weight-400 m-0">classe {{class.className}}</p>
                 <div *ngIf="class.evals.length > 0">
                   <div *ngFor="let eval of class.evals">
                     <div class="card mb-2">
+                      <div class="card-up" [ngStyle]="{'background-color': eval.courseColor}" style="height: 10px;
+                        border-top-left-radius: 10px;border-top-right-radius: 10px">
+                      </div>
                       <div class="card-body p-2">
                         <div class="row">
                           <div class="col-md-12 d-flex">
-                            <div class="box-course mr-2" [ngStyle]="{'background-color': eval.courseColor}" style="width: 10px;height: 100%;"></div>
                             <div class="flex-grow-1">
                               <div class="d-flex">
                                 <div class="flex-grow-1">
@@ -105,14 +104,16 @@
               <div style="border-top: solid 1px #cccccc;"></div>
 
               <div *ngFor="let class of evalsToCome">
-                <p class="text-20 font-weight-450 m-0">classe {{class.className}}</p>
+                <p class="text-17 font-weight-400 m-0">classe {{class.className}}</p>
                 <div *ngIf="class.evals.length > 0">
                   <div *ngFor="let eval of class.evals">
                     <div class="card mb-2">
+                      <div class="card-up" [ngStyle]="{'background-color': eval.courseColor}" style="height: 10px;
+                        border-top-left-radius: 10px;border-top-right-radius: 10px">
+                      </div>
                       <div class="card-body p-2">
                         <div class="row">
                           <div class="col-md-12 d-flex">
-                            <div class="box-course mr-2" [ngStyle]="{'background-color': eval.courseColor}" style="width: 10px;height: 100%;"></div>
                             <div class="flex-grow-1">
                               <div class="d-flex">
                                 <div class="flex-grow-1">
@@ -131,7 +132,7 @@
                 <div *ngIf="class.evals.length == 0">
                   <div class="card mb-2">
                     <div class="card-body p-2">
-                      <p class="lead m-0">pas d'évaluation à venir</p>
+                      <p class="text-15 m-0">pas d'évaluation à venir</p>
                     </div>
                   </div>
                 </div>

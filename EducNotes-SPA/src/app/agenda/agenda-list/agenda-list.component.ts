@@ -31,11 +31,6 @@ export class AgendaListComponent implements OnInit {
   model: any = {};
   color_width = '50px';
   ngbModalRef: NgbModalRef;
-  searchControl: FormControl = new FormControl();
-  viewMode: 'list' | 'grid' = 'list';
-  allSelected: boolean;
-  page = 1;
-  pageSize = 8;
   sessions: any[] = [];
   filteredSessions;
   optionsClass: any[] = [];
@@ -137,6 +132,7 @@ export class AgendaListComponent implements OnInit {
   showAllCourses() {
     if (this.allCourses === true) {
       this.filteredSessions = this.allSessions;
+      this.setCoursesWithTasks(this.filteredSessions);
     }
   }
 
@@ -162,7 +158,6 @@ export class AgendaListComponent implements OnInit {
           return item;
         }
       }).filter(item => !!item);
-      console.log(result);
       if (result.length > 0) {
         const filteredElt = {
           'dueDate': elt.dueDate,
@@ -176,6 +171,7 @@ export class AgendaListComponent implements OnInit {
         this.sessionsByCourse = [...this.sessionsByDate, filteredElt];
       }
     }
+    this.setCoursesWithTasks(this.filteredSessions);
   }
 
   showItemsByDate(selectedDate) {
@@ -185,6 +181,27 @@ export class AgendaListComponent implements OnInit {
 
     const sessionsDay = this.allSessions.find(item => item.dueDate === selectedDate);
     this.filteredSessions = [...this.filteredSessions, sessionsDay];
+    this.setCoursesWithTasks(this.filteredSessions);
+  }
+
+  setCoursesWithTasks(sessions) {
+    for (let i = 0; i < this.coursesWithTasks.length; i++) {
+      const elt = this.coursesWithTasks[i];
+      this.coursesWithTasks[i].nbTasks = 0;
+      const courseId = elt.courseId;
+      let nbTasks = 0;
+      for (let j = 0; j < sessions.length; j++) {
+        const session = sessions[j];
+        const items = session.agendaItems;
+        for (let k = 0; k < items.length; k++) {
+          const item = items[k];
+          if (item.courseId === courseId && item.id > 0) {
+            nbTasks++;
+          }
+        }
+        this.coursesWithTasks.find(c => c.courseId === courseId).nbTasks = nbTasks;
+      }
+    }
   }
 
   loadMovedWeek(move: number) {

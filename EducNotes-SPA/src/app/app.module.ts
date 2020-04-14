@@ -377,7 +377,8 @@ export function tokenGetter() {
       CourseShowingComponent,
       ClassStudentsAssignmentComponent,
       ClassCardComponent,
-      CourseShowingComponent
+      CourseShowingComponent,
+      CourseCardComponent
    ],
    imports: [
       FormWizardModule,

@@ -660,8 +660,6 @@ namespace EducNotes.API.Controllers
           var dayInt = (int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
           if(dayInt == 7)
             today = today.AddDays(1);
-          // var monday = today.AddDays(1 - dayInt);
-          // var saturday = monday.AddDays(5);
 
           var agendas = new List<SessionForListDto>();
           for(int i = 0; i < 7; i++)
@@ -762,14 +760,16 @@ namespace EducNotes.API.Controllers
           var days = new List<string>();
           var weekDates = new List<DateTime>();
           var nbTasks = new List<int>();
-          for (int i = 0; i <= 5; i++) {
+          for (int i = 0; i < 7; i++) {
               DateTime dt = today.AddDays(i);
+              var day = ((int)dt.DayOfWeek == 0) ? 7 : (int)dt.DayOfWeek;
+              if(day == 7) { continue; }
               var shortdate = dt.ToString("ddd dd MMM", frC);
               days.Add(shortdate);
               weekDates.Add(dt.Date);
           }
 
-          var itemsFromRepo = await _repo.GetClassAgenda(classId, today, today.AddDays(5));
+          var itemsFromRepo = await _repo.GetClassAgenda(classId, today, today.AddDays(6));
           var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
           var classCourses = await _context.ClassCourses
@@ -820,8 +820,6 @@ namespace EducNotes.API.Controllers
             var dayInt = dateDay == 0 ? 7 : dateDay;
             if(dayInt == 7)
               date = date.AddDays(1);
-            // DateTime monday = date.AddDays(1 - dayInt);
-            // var saturday = monday.AddDays(5);
 
             var agendas = new List<SessionForListDto>();
 
@@ -885,15 +883,17 @@ namespace EducNotes.API.Controllers
             var days = new List<string>();
             var weekDates = new List<DateTime>();
             var nbTasks = new List<int>();
-            for (int i = 0; i <= 5; i++) {
+            for (int i = 0; i < 7; i++) {
                 DateTime dt = date.AddDays(i);
+                var day = ((int)dt.DayOfWeek == 0) ? 7 : (int)dt.DayOfWeek;
+                if(day == 7) { continue; }
                 var shortdate = dt.ToString("ddd dd MMM", frC);
                 days.Add(shortdate);
                 weekDates.Add(dt);
             }
 
-            var itemsFromRepo = await _repo.GetClassAgenda(classId, date, date.AddDays(5));
-            var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
+            var itemsFromRepo = await _repo.GetClassAgenda(classId, date, date.AddDays(6));
+            //var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
             var classCourses = await _context.ClassCourses
                 .Where(c => c.ClassId == classId && c.TeacherId == teacherId)

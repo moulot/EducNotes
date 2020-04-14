@@ -26,7 +26,6 @@ export class AgendaModalComponent implements OnInit {
 
   updateAgenda(session) {
     const tasks = this.tasksForm.value.tasks;
-    console.log(tasks);
     if (tasks !== null) {
       session.tasks = tasks;
       this.saveAgenda.emit(session);
