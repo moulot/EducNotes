@@ -332,4 +332,8 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'classes/classStudentsAssignment/' + classId , studentsList);
   }
 
+  addCourseShowing(courseShowing: FormData) {
+    return this.http.post(this.baseUrl + 'classes/courseShowing', courseShowing);
+  }
+
 }

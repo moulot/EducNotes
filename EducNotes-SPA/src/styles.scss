@@ -1,9 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
-@import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+@import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 // @import '../node_modules/font-awesome/css/font-awesome.min.css';
-@import '../node_modules/ngx-bootstrap/datepicker/bs-datepicker.css';
-@import '../node_modules/@fortawesome/fontawesome-pro/css/all.min.css';
-@import '../node_modules/ng-zorro-antd/ng-zorro-antd.css';
+@import "../node_modules/ngx-bootstrap/datepicker/bs-datepicker.css";
+@import "../node_modules/@fortawesome/fontawesome-pro/css/all.min.css";
+@import "../node_modules/ng-zorro-antd/ng-zorro-antd.css";
 
 @import "~ng-uikit-pro-standard/assets/scss/core/colors";
 @import "~ng-uikit-pro-standard/assets/scss/core/variables";
@@ -39,7 +39,7 @@
 // #wrapper {
 //   width: 95%;
 //   margin: auto;
-// } 
+// }
 // #wrapper .container {
 //   max-width: 100%; display: block;
 // }
@@ -49,39 +49,39 @@
 //     padding: 10px;
 //     border-radius: 4px;
 //   }
-  
+
 //   .nav-tabs > li.open, .member-tabset > .nav-tabs > li:hover {
 //     border-bottom: 4px solid #fbcdcf;
 //   }
-  
+
 //   .member-tabset > .nav-tabs > li.open > a, .member-tabset > .nav-tabs > li:hover > a {
 //     border: 0;
 //     background: none !important;
 //     color: #333333;
 //   }
-  
+
 //   .member-tabset > .nav-tabs > li.open > a > i, .member-tabset > .nav-tabs > li:hover > a > i {
 //     color: #a6a6a6;
 //   }
-  
+
 //   .member-tabset > .nav-tabs > li.open .dropdown-menu, .member-tabset > .nav-tabs > li:hover .dropdown-menu {
 //     margin-top: 0px;
 //   }
-  
+
 //   .member-tabset > .nav-tabs > li.active {
 //     border-bottom: 4px solid #E95420;
 //     position: relative;
 //   }
-  
+
 //   .member-tabset > .nav-tabs > li.active > a {
 //     border: 0 !important;
 //     color: #333333;
 //   }
-  
+
 //   .member-tabset > .nav-tabs > li.active > a > i {
 //     color: #404040;
 //   }
-  
+
 //   .member-tabset > .tab-content {
 //     margin-top: -3px;
 //     background-color: #fff;
@@ -89,3 +89,58 @@
 //     border-top: 1px solid #eee;
 //     padding: 15px 0;
 //   }
+
+.md-form input[type="text"]:focus {
+  box-shadow: 0 1px 0 0 #f89f20 !important;
+
+  border-bottom: 1px solid #f89f20 !important;
+}
+
+.md-form input[type="password"]:focus {
+  box-shadow: 0 1px 0 0 #f89f20 !important;
+
+  border-bottom: 1px solid #f89f20 !important;
+}
+
+.md-form textarea[type="text"]:focus:not([readonly]) + label {
+  color: #f89f20 !important;
+}
+.md-form textarea[type="text"]:focus:not([readonly]) {
+  box-shadow: 0 1px 0 0 #f89f20 !important;
+  border-bottom: 1px solid #f89f20 !important;
+}
+.md-form input[type='text']:focus:not([readonly]) + label {
+    color: #f89f20 !important;
+  }
+  .md-form input[type='password']:focus:not([readonly]) + label {
+    color: #f89f20 !important;
+  }
+
+  .monimg{
+    width: 40px;
+    height:  40px;
+  }
+  
+  .btnOrange {
+    color: #192C47!important;
+    font-weight: bold;
+    background-color: #f89f20!important;
+   }
+  
+  .btnBlue {
+    color: #f89f20!important;
+    font-weight: bold;
+    background-color: #192C47!important;
+  }
+  
+  .btnWhite {
+    color: #192C47!important;
+    font-weight: bold;
+    background-color: #ffffff!important;
+  }
+  
+  .btnWhiteO {
+    color: #f89f20!important;
+    font-weight: bold;
+    background-color: #ffffff!important;
+  }
