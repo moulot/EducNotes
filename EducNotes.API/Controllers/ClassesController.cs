@@ -1090,54 +1090,54 @@ namespace EducNotes.API.Controllers
             return Ok(session);
         }
 
-        // [HttpGet("Schedule/{scheduleId}/Session")]
-        // public async Task<IActionResult> GetSessionFromSchedule(int scheduleId)
-        // {
-        //     var schedule = _context.Schedules.Where(s => s.Id == scheduleId).FirstOrDefault();
-        //     if (schedule == null)
-        //         return BadRequest("problème pour créer la session du cours.");
+        [HttpGet("Schedule/{scheduleId}/Session")]
+        public async Task<IActionResult> GetSessionFromSchedule(int scheduleId)
+        {
+            var schedule = _context.Schedules.Where(s => s.Id == scheduleId).FirstOrDefault();
+            if (schedule == null)
+                return BadRequest("problème pour créer la session du cours.");
 
-        //     var scheduleDay = schedule.Day;
+            var scheduleDay = schedule.Day;
 
-        //     var today = DateTime.Now.Date;
-        //     // monday=1, tue=2, ...
-        //     var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
+            var today = DateTime.Now.Date;
+            // monday=1, tue=2, ...
+            var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
 
-        //     if (todayDay != scheduleDay)
-        //       return BadRequest("l'emploi du temps du jour est incohérent.");
+            if (todayDay != scheduleDay)
+              return BadRequest("l'emploi du temps du jour est incohérent.");
 
-        //     // get session by schedule and date
-        //     var sessionFromDB = await _context.Sessions
-        //                         .Include(i => i.Class)
-        //                         .Include(i => i.Course)
-        //                         .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == today);
-        //     if (sessionFromDB != null)
-        //     {
-        //       var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
-        //       return Ok(session);
-        //     }
-        //     else
-        //     {
-        //       var newSession = _context.Add(new Session
-        //       {
-        //         ScheduleId = schedule.Id,
-        //         TeacherId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
-        //         ClassId = schedule.ClassId,
-        //         CourseId = schedule.CourseId,
-        //         StartHourMin = schedule.StartHourMin,
-        //         EndHourMin = schedule.EndHourMin,
-        //         SessionDate = today
-        //       });
+            // get session by schedule and date
+            var sessionFromDB = await _context.Sessions
+                                .Include(i => i.Class)
+                                .Include(i => i.Course)
+                                .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == today);
+            if (sessionFromDB != null)
+            {
+              var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
+              return Ok(session);
+            }
+            else
+            {
+              var newSession = _context.Add(new Session
+              {
+                ScheduleId = schedule.Id,
+                TeacherId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
+                ClassId = schedule.ClassId,
+                CourseId = schedule.CourseId,
+                StartHourMin = schedule.StartHourMin,
+                EndHourMin = schedule.EndHourMin,
+                SessionDate = today
+              });
 
-        //       if (await _repo.SaveAll())
-        //       {
-        //         var session = _mapper.Map<SessionToReturnDto>(newSession);
-        //         return Ok(session);
-        //       }
+              if (await _repo.SaveAll())
+              {
+                var session = _mapper.Map<SessionToReturnDto>(newSession);
+                return Ok(session);
+              }
 
-        //       return BadRequest("problème pour récupérer la session");
-        //     }
-        // }
+              return BadRequest("problème pour récupérer la session");
+            }
+        }
 
         [HttpGet("courses/{courseId}/teacher/{teacherId}/Program")]
         public async Task<IActionResult> ClassesWithProgram(int courseId, int teacherId)

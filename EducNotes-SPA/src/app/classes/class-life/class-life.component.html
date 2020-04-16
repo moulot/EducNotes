@@ -1,12 +1,14 @@
-<div #classLifeReport class="m-2" *ngIf="!toggleFormAdd">
+<div #classLifeReport class="" *ngIf="!toggleFormAdd">
 
   <div class="row mb-2">
-    <div class="col-md-6 d-flex align-items-center">
+    <div class="col-md-10 d-flex mb-2">
+      <i class="fad fa-users-class fa-2x mr-2" style="--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+        --fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
       <div class="text-17 font-weight-300">vie scolaire - classe {{selectedClass?.name}}</div>
     </div>
-    <div class="col-md-6">
-      <button type="button" class="float-right" mdbBtn (click)="goToAddEventPage()" size="sm" color="primary" mdbWavesEffect>
-        saisir évènement de la vie de classe
+    <div class="col-md-2">
+      <button type="button" class="float-right btnBlue" block="true" mdbBtn (click)="goToAddEventPage()" size="sm" mdbWavesEffect>
+        nouvel evenement
       </button>  
     </div>
   </div>
@@ -27,7 +29,7 @@
           </div>
           <div class="col-md-2 pt-2">
             <div class="md-form form-sm m-0">
-              <button type="submit" mdbBtn size="sm" color="light" block="true" mdbWavesEffect>valider</button>
+              <button type="submit" mdbBtn size="sm" class="btnWhiteO" block="true" mdbWavesEffect>valider</button>
             </div>
           </div>
         </div>
@@ -61,52 +63,6 @@
     </div>
 
     <div class="col-md-9">
-      <!-- <div class="row">
-        <div class="col-lg-3 col-md-6 col-sm-12">
-          <div class="card card-icon-bg card-icon-bg-primary o-hidden my-2">
-            <div class="card-body text-center">
-              <i class="i-Turn-Up" style="color: rgb(81, 211, 81)"></i>
-              <div class="content">
-                <p class="text-muted mt-2 mb-0">tout</p>
-                <p class="text-primary text-24 line-height-1 mb-1">{{nbAbsences + nbSanctions + nbRewards}}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-6 col-sm-12">
-          <div class="card card-icon-bg card-icon-bg-primary o-hidden my-2">
-            <div class="card-body text-center">
-              <i class="i-Tongue" style="color: green"></i>
-              <div class="content">
-                <p class="text-muted mt-2 mb-0">compliments</p>
-                <p class="text-primary text-24 line-height-1 mb-1">{{nbRewards}}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-6 col-sm-12">
-          <div class="card card-icon-bg card-icon-bg-primary o-hidden my-2">
-            <div class="card-body text-center">
-              <i class="i-Close" style="color: orange"></i>
-              <div class="content">
-                <p class="text-muted mt-2 mb-0">absences</p>
-                <p class="text-primary text-24 line-height-1 mb-1">{{nbAbsences}}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-6 col-sm-12">
-          <div class="card card-icon-bg card-icon-bg-primary o-hidden my-2">
-            <div class="card-body text-center">
-              <i class="i-Angry" style="color:red"></i>
-              <div class="content">
-                <p class="text-muted mt-2 mb-0">sanctions</p>
-                <p class="text-primary text-24 line-height-1 mb-1">{{nbSanctions}}</p>
-              </div>
-            </div>
-          </div>
-        </div>            
-      </div> -->
       <div class="card">
         <div class="card-body pt-2">
           <div class="row">
@@ -116,7 +72,6 @@
                 <div class="text-15 w150px mr-2">type</div>
                 <div class="text-15 w250px mr-2">date / durée</div>
                 <div class="text-15 w-10 mr-2">justifié?</div>
-                <!-- <div class="text-15 mr-2">motif</div> -->
               </div>
               <hr class="mt-2 mb-2">
               <div *ngIf="filteredEvents?.length > 0">

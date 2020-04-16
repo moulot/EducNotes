@@ -170,8 +170,8 @@ export class GradePanelComponent implements OnInit {
       this.evals = data.evals;
       this.userGrades = data.userGrades;
       this.filteredUserGrades = data.userGrades;
-      console.log(this.filteredUserGrades);
-      console.log(this.evals);
+      // console.log(this.filteredUserGrades);
+      // console.log(this.evals);
     }, error => {
       this.alertify.error(error);
     }, () => {

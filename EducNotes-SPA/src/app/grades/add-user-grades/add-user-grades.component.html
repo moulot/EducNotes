@@ -53,23 +53,54 @@
       <div class="row d-md-none">
         <div class="col-md-12">
           <div *ngFor="let student of filteredUserGrades; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
-            <div class="card my-1">
+            <!-- <div class="card my-5">
               <div class="card-body p-0 d-flex">
                 <div class="div-thumb-block">
                   <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
                 </div>
                 <div class="flex-grow-1">
-                  <div class="ml-1 my-1" style="width: 30%;">
+                  <div class="ml-1 my-1" style="width: 40%;">
                     <input type="text" placeholder="note/{{eval.maxGrade}}" id="sm-note + {{i}}" class="form-control form-control-sm"
                       [(ngModel)]="student.grade" name="sm-note + {{i}}">
                   </div>
-                  <div class="mb-1 ml-1" style="width: 98%;">
+                  <div class="mb-1 ml-1" style="width: 95%;">
                     <input  type="text" placeholder="commentaire" id="sm-comment + {{i}}" class="form-control form-control-sm"
                       [(ngModel)]="student.comment" name="sm-comment + {{i}}">
                   </div>
                 </div>
               </div>
               <div class="text-15 ml-1 mb-1 text-capitalize">{{student.studentName}}</div>
+            </div> -->
+            <div class="row">
+              <mdb-card class="col-md-12 testimonial-card my-5">
+                <div class="avatar mx-auto">
+                  <img src="{{student.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+                </div>
+                <mdb-card-body class="p-2">
+                  <mdb-card-title>
+                    {{student.studentName}}
+                    <hr class="my-1" style="background-color: 1px solid #f89f20;">
+                  </mdb-card-title>
+                  <div class="md-form form-sm">
+                    <input mdbInput type="text" id="sm-note + {{i}}" class="form-control form-control-sm"
+                      [(ngModel)]="student.grade" name="sm-note + {{i}}">
+                    <label for="sm-note + {{i}}" class="">note/{{eval.maxGrade}}</label>
+                  </div>
+                  <div class="md-form form-sm">
+                    <input mdbInput type="text" id="sm-comment + {{i}}" class="form-control form-control-sm"
+                      [(ngModel)]="student.comment" name="sm-comment + {{i}}">
+                    <label for="sm-comment + {{i}}" class="">commentaire</label>
+                  </div>
+                  <!-- <div class="ml-1 my-1" style="width: 40%;">
+                    <input type="text" placeholder="note/{{eval.maxGrade}}" id="sm-note + {{i}}" class="form-control form-control-sm"
+                      [(ngModel)]="student.grade" name="sm-note + {{i}}">
+                  </div>
+                  <div class="mb-1 ml-1" style="width: 95%;">
+                    <input  type="text" placeholder="commentaire" id="sm-comment + {{i}}" class="form-control form-control-sm"
+                      [(ngModel)]="student.comment" name="sm-comment + {{i}}">
+                  </div> -->
+                </mdb-card-body>
+              </mdb-card>
             </div>
           </div>
         </div>

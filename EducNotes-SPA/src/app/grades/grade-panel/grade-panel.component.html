@@ -41,19 +41,18 @@
 </div>
 
 <div class="row" *ngIf="!showTable">
-
   <div class="col-md-12">
     <div class="card mb-2">
       <div class="card-body">
         <div class="row">
-
           <div class="col-md-6 mb-2">
             <div class="p-2 border rounded">
               <div>
                 <h4 class="text-18 mb-1">évaluations à noter</h4>
                 <p class="text-small text-muted">notes à renseigner pour ces évaluations</p>
               </div>
-              <div style="border-top: solid 1px #cccccc;"></div>
+
+              <hr class="my-1">
 
               <div *ngFor="let class of evalsToBeGraded">
                 <p class="text-17 font-weight-400 m-0">classe {{class.className}}</p>
@@ -94,14 +93,14 @@
               </div>
             </div>
           </div>
-
           <div class="col-md-6 mb-2">
             <div class="p-2 border rounded">
               <div>
                 <h4 class="text-18 mb-1">évaluations à venir</h4>
                 <p class="text-small text-muted">évaluations programmées par le professeur</p>
               </div>
-              <div style="border-top: solid 1px #cccccc;"></div>
+
+              <hr class="my-1">
 
               <div *ngFor="let class of evalsToCome">
                 <p class="text-17 font-weight-400 m-0">classe {{class.className}}</p>
@@ -140,12 +139,10 @@
 
             </div>
           </div>
-
         </div>
       </div>
     </div>
   </div>
-
 </div>
 
 
@@ -155,18 +152,16 @@
 
     <div *ngIf="evals.length > 0">
 
-      <div class="row mt-2">
-
+      <div class="row my-2">
         <div class="col-md-4">
           <div class="md-form m-0">
             <input mdbInput type="text" id="search" class="form-control" [formControl]="searchControl" mdbValidate>
             <label for="search" class="">recherche élève</label>
           </div>
         </div>
-
       </div>
 
-      <!--HEADER-->
+      <!--HEADER LG-->
       <div class="row d-none d-md-block">
         <div class="col-md-12">
           <div class="card">
@@ -189,6 +184,32 @@
                       <label class="font-weight-450 m-0 primary-lighter-hover">editer</label>
                     </a>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--HEADER SM-->
+      <div class="row d-md-none">
+        <div class="col-md-12 mb-4">
+          <div class="card">
+            <div class="card-body p-2">
+              <div class="text-15">évaluations</div>
+              <hr class="my-1" style="background-color: #f89f20;">
+              <div *ngFor="let eval of evals, index as i">
+                <div>
+                  <p class="text-muted text-15 m-0">{{eval.evalDate | date: 'dd/MM/yy'}}</p>
+                  <p class="text-muted text-15 m-0">{{eval.name}}</p>
+                  <p class="text-muted text-15 m-0" *ngIf="eval.graded">note/{{eval.maxGrade}}. coeff:{{eval.coeff}}</p>
+                  <p class="text-muted text-15 m-0">{{eval.evalType.name}}</p>
+                  <div class="">
+                    <a *ngIf="eval.evalDateExpired" [routerLink]="['/AddUserGrades', eval.id]">
+                      <label class="font-weight-450 m-0 primary-lighter-hover">editer</label>
+                    </a>
+                  </div>
+                  <hr class="my-1">
                 </div>
               </div>
             </div>
@@ -222,7 +243,7 @@
 
       <!-- DATA LIST SM -->
       <div class="row d-md-none">
-        <div class="col-md-12">
+        <!-- <div class="col-md-12">
           <div *ngFor="let student of filteredUserGrades; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
             <div class="card my-1">
               <div class="card-body p-0 d-flex">
@@ -252,6 +273,39 @@
               </div>
             </div>
           </div>
+        </div> -->
+        <div class="col-md-12 my-5" *ngFor="let student of filteredUserGrades">
+          <mdb-card class="testimonial-card">
+            <div class="avatar mx-auto">
+              <img src="{{student.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+            </div>
+            <mdb-card-body class="p-2">
+              <mdb-card-title>
+                <p class="text-15 text-uppercase m-0">{{student.studentName}}</p>
+                <hr class="my-1" style="background-color: #f89f20;">
+              </mdb-card-title>
+              <div class="" *ngFor="let grade of student.grades, index as i">
+                <div class="d-flex">
+                  <div class="w-60 text-left">
+                    <div class="text-14">{{evals[i].evalDate | date: 'dd/MM/yy'}}</div>
+                    <div class="text-14">{{evals[i].name}}</div>
+                    <div class="text-14">{{evals[i].evalType.name}}</div>
+                  </div>
+                  <div class="px-2 d-flex flex-wrap align-content-center">:</div>
+                  <div class="flex-grow-1 d-flex flex-wrap align-content-center justify-content-center">
+                    <div *ngIf="grade > -1000">
+                      <div *ngIf="grade >= evals[i].maxGrade/2"
+                        class="text-15 font-weight-450">{{grade}}/{{evals[i].maxGrade}}</div>
+                      <div *ngIf="grade < evals[i].maxGrade/2"
+                        class="text-15 text-danger font-weight-450">{{grade}}/{{evals[i].maxGrade}}</div>
+                    </div>
+                    <div *ngIf="grade === -1000 || grade === ''">N/D</div>
+                  </div>
+                </div>
+                <hr class="my-1">
+              </div>
+            </mdb-card-body>
+          </mdb-card>
         </div>
       </div>
 
