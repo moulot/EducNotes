@@ -10,12 +10,14 @@
       <div class="form-group">
         <textarea formControlName="tasks" name="tasks" class="form-control" [value]="session?.tasks" id="tasks"
           style="resize: none" rows="3"></textarea>
+          <div *ngIf="tasksForm.get('tasks').errors && tasksForm.get('tasks').touched"
+            class="text-small text-danger">saisir les devoirs svp</div>
       </div>
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" mdbBtn color="primary" (click)="activeModal.dismiss()"
+    <button type="button" mdbBtn class="btnOrange" (click)="activeModal.dismiss()"
       size="sm" mdbWavesEffect>annuler</button>
-    <button type="button" mdbBtn color="primary" size="sm" (click)="updateAgenda(session)">enregistrer les devoirs à faire</button>
+    <button type="button" mdbBtn class="btnBlue" size="sm" (click)="updateAgenda(session)">enregistrer</button>
   </div>
 </div>

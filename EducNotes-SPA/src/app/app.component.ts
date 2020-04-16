@@ -36,7 +36,7 @@ export class AppComponent implements OnInit {
 
 
   setTimeout() {
-    this.userActivity = setTimeout(() => this.userInactive.next(undefined), 900000); // soit 15 minutes d'inactiviter
+    this.userActivity = setTimeout(() => this.userInactive.next(undefined), 900000); // soit 15 minutes d'inactivité
   }
 
   @HostListener('window:mousemove') refreshUserState() {

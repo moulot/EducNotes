@@ -9,7 +9,6 @@ import { Agenda } from 'src/app/_models/agenda';
 import { NgForm, FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { ClassService } from 'src/app/_services/class.service';
 import { CourseUser } from 'src/app/_models/courseUser';
-import { debounceTime } from 'rxjs/operators';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AgendaModalComponent } from '../agenda-modal/agenda-modal.component';
 
@@ -22,7 +21,6 @@ import { AgendaModalComponent } from '../agenda-modal/agenda-modal.component';
 export class AgendaListComponent implements OnInit {
   @ViewChild('agendaForm', {static: false}) agendaForm: NgForm;
   classId: number;
-  // selectForm: FormGroup;
   modalSession: any;
   allSessions: any = [];
   selectedSessions: any = [];
@@ -33,11 +31,6 @@ export class AgendaListComponent implements OnInit {
   model: any = {};
   color_width = '50px';
   ngbModalRef: NgbModalRef;
-  searchControl: FormControl = new FormControl();
-  viewMode: 'list' | 'grid' = 'list';
-  allSelected: boolean;
-  page = 1;
-  pageSize = 8;
   sessions: any[] = [];
   filteredSessions;
   optionsClass: any[] = [];
@@ -50,7 +43,7 @@ export class AgendaListComponent implements OnInit {
   classControl = new FormControl();
   showSessionsData = false;
   agendaParams: any = {};
-  monday: Date;
+  startDate: Date;
   sessionsByDate = [];
   sessionsByCourse = [];
 
@@ -58,41 +51,13 @@ export class AgendaListComponent implements OnInit {
     private authService: AuthService, public alertify: AlertifyService, private modalService: NgbModal) { }
 
   ngOnInit() {
-    // this.createSelectForm();
     this.teacher = this.authService.currentUser;
     this.getTeacherClasses(this.teacher.id);
     this.getTeacherCourses(this.teacher.id);
-
-    // this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
-    //   this.filerData(value);
-    // });
   }
-
-  // filerData(val) {
-  //   if (val) {
-  //     val = val.toLowerCase();
-  //   } else {
-  //     return this.sessions = [...this.sessions];
-  //   }
-  //   const columns = Object.keys(this.sessions[0]);
-  //   if (!columns.length) {
-  //     return;
-  //   }
-
-  //   const rows = this.sessions.filter(function(d) {
-  //     for (let i = 0; i <= columns.length; i++) {
-  //       const column = columns[i];
-  //       if (d[column] && d[column].toString().toLowerCase().indexOf(val) > -1) {
-  //         return true;
-  //       }
-  //     }
-  //   });
-  //   this.filteredSessions = rows;
-  // }
 
   resetSessions() {
     this.filteredSessions = this.allSessions;
-    // this.selectForm.reset();
   }
 
   editTasks(session) {
@@ -131,11 +96,10 @@ export class AgendaListComponent implements OnInit {
   }
 
   getTeacherSessions(teacherId, classId) {
-    this.userService.getTeacherSessions(teacherId, classId).subscribe((data: any) => {
-      // this.sessions = data.agendas;
+    this.userService.getTeacherSessionsFromToday(teacherId, classId).subscribe((data: any) => {
       this.filteredSessions = data.agendas;
       this.allSessions = data.agendas;
-      this.monday = data.monday;
+      this.startDate = data.today;
       this.weekDays = data.weekDays;
       this.weekDates = data.weekDates;
       this.coursesWithTasks = data.coursesWithTasks;
@@ -168,6 +132,7 @@ export class AgendaListComponent implements OnInit {
   showAllCourses() {
     if (this.allCourses === true) {
       this.filteredSessions = this.allSessions;
+      this.setCoursesWithTasks(this.filteredSessions);
     }
   }
 
@@ -193,7 +158,6 @@ export class AgendaListComponent implements OnInit {
           return item;
         }
       }).filter(item => !!item);
-      console.log(result);
       if (result.length > 0) {
         const filteredElt = {
           'dueDate': elt.dueDate,
@@ -207,6 +171,7 @@ export class AgendaListComponent implements OnInit {
         this.sessionsByCourse = [...this.sessionsByDate, filteredElt];
       }
     }
+    this.setCoursesWithTasks(this.filteredSessions);
   }
 
   showItemsByDate(selectedDate) {
@@ -216,19 +181,39 @@ export class AgendaListComponent implements OnInit {
 
     const sessionsDay = this.allSessions.find(item => item.dueDate === selectedDate);
     this.filteredSessions = [...this.filteredSessions, sessionsDay];
+    this.setCoursesWithTasks(this.filteredSessions);
+  }
+
+  setCoursesWithTasks(sessions) {
+    for (let i = 0; i < this.coursesWithTasks.length; i++) {
+      const elt = this.coursesWithTasks[i];
+      this.coursesWithTasks[i].nbTasks = 0;
+      const courseId = elt.courseId;
+      let nbTasks = 0;
+      for (let j = 0; j < sessions.length; j++) {
+        const session = sessions[j];
+        const items = session.agendaItems;
+        for (let k = 0; k < items.length; k++) {
+          const item = items[k];
+          if (item.courseId === courseId && item.id > 0) {
+            nbTasks++;
+          }
+        }
+        this.coursesWithTasks.find(c => c.courseId === courseId).nbTasks = nbTasks;
+      }
+    }
   }
 
   loadMovedWeek(move: number) {
     this.allCourses = true;
-    console.log(this.monday);
-    this.agendaParams.dueDate = this.monday;
+    this.agendaParams.dueDate = this.startDate;
     this.agendaParams.moveWeek = move;
 
     this.userService.getMovedWeekSessions(this.teacher.id, this.classId, this.agendaParams).subscribe((data: any) => {
       this.sessions = data.agendas;
       this.filteredSessions = data.agendas;
       this.allSessions = data.agendas;
-      this.monday = data.monday;
+      this.startDate = data.date;
       this.weekDays = data.weekDays;
       this.weekDates = data.weekDates;
       this.coursesWithTasks = data.coursesWithTasks;
