@@ -1816,8 +1816,147 @@ namespace EducNotes.API.Data
         public async Task<IEnumerable<Lesson>> ClassLevelCourseLessons(int classLevelId, int courseId)
         {
             var lessons = await _context.Lessons.Include(a => a.LessonContents)
-                                             .Where(a => a.ClassLevelId == classLevelId && a.CourseId == courseId).ToListAsync();
+                                .Where(a => a.ClassLevelId == classLevelId && a.CourseId == courseId).ToListAsync();
             return lessons;
         }
+
+        public async Task<int> CreateLessonDoc(CourseShowingDto courseShowingDto)
+        {
+            var lessDoc = new LessonDoc
+            {
+                TeacherId = Convert.ToInt32(courseShowingDto.TeacherId)
+            };
+            if(courseShowingDto.CourseComment!=null)
+            lessDoc.Comment = courseShowingDto.CourseComment;
+            Add(lessDoc);
+
+
+            if (courseShowingDto.MainVideo!=null)
+            {
+                var uploadResult = new VideoUploadResult();
+                using (var stream = courseShowingDto.MainVideo.OpenReadStream())
+                {
+                    var uploadParams = new VideoUploadParams()
+                    {
+                        File = new FileDescription(courseShowingDto.MainVideo.Name, stream)
+
+                    };
+
+                    uploadResult = _cloudinary.Upload(uploadParams);
+                    if (uploadResult.StatusCode == HttpStatusCode.OK)
+                    {
+                        var MainDoc = new Document
+                        {
+                            DocTypeId = _config.GetValue<int>("AppSettings:mainDocTypes"),
+                            PublicId = uploadResult.PublicId,
+                            Url = uploadResult.Uri.ToString(),
+                            FileTypeId = 1
+                        };
+                        Add(MainDoc);
+                        var lessDocDoc = new LessonDocDocument
+                        {
+                            LessonDocId = lessDoc.Id,
+                            DocumentId = MainDoc.Id
+                        };
+                        Add(lessDocDoc);
+                    }
+                   
+                }
+            }
+
+            if (courseShowingDto.MainPdf!=null)
+            {
+                var uploadResult = new ImageUploadResult();
+                using (var stream = courseShowingDto.MainPdf.OpenReadStream())
+                {
+                    var uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(courseShowingDto.MainPdf.Name, stream)
+
+                    };
+
+                    uploadResult = _cloudinary.Upload(uploadParams);
+                    if (uploadResult.StatusCode == HttpStatusCode.OK)
+                    {
+                        int docTypeId =  _config.GetValue<int>("AppSettings:mainDocTypes");
+                        var MainDoc = new Document
+                        {
+                            DocTypeId = docTypeId,
+                            PublicId = uploadResult.PublicId,
+                            Url = uploadResult.Uri.ToString(),
+                            FileTypeId = 1
+                        };
+                        Add(MainDoc);
+                        var lessDocDoc = new LessonDocDocument
+                        {
+                            LessonDocId = lessDoc.Id,
+                            DocumentId = MainDoc.Id
+                        };
+                        Add(lessDocDoc);
+                    }
+                    else
+                        return 0;
+                }
+            }
+
+            // ajouts des autres fichiers
+            foreach (var otherFile in courseShowingDto.OtherFiles)
+            {
+                
+                    var uploadResult = new ImageUploadResult();
+                    using (var stream = otherFile.OpenReadStream())
+                    {
+                        var uploadParams = new ImageUploadParams()
+                        {
+                            File = new FileDescription(otherFile.Name, stream)
+
+                        };
+
+                        uploadResult = _cloudinary.Upload(uploadParams);
+                        if (uploadResult.StatusCode == HttpStatusCode.OK)
+                        {
+                            var otherDoc = new Document
+                            {
+                                DocTypeId = _config.GetValue<int>("AppSettings:otherDocTypes"),
+                                PublicId = uploadResult.PublicId,
+                                Url = uploadResult.Uri.ToString(),
+                                FileTypeId = 1
+
+                            };
+                            Add(otherDoc);
+
+                            var lessDocDoc = new LessonDocDocument
+                            {
+                                LessonDocId = lessDoc.Id,
+                                DocumentId = otherDoc.Id
+                            };
+                            Add(lessDocDoc);
+                        }
+                        
+                    }
+            }
+
+            var ids = courseShowingDto.LessonContentIds.Split(",");
+            if (ids.Count() > 0)
+            {
+                foreach (var lessonsContentId in ids)
+                {
+                    var lessonContenDoc = new LessonContentDoc
+                    {
+                        LessonDocId = lessDoc.Id,
+                        LessonContentId = Convert.ToInt32(lessonsContentId)
+                    };
+                    Add(lessonContenDoc);
+                }
+            }
+            if (await SaveAll())
+                return lessDoc.Id;
+
+            return 0;
+
+
+        }
+
+
     }
 }

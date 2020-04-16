@@ -87,6 +87,9 @@ namespace EducNotes.API.Data {
   public DbSet<Setting> Settings { get; set; }
   public DbSet<LessonDoc> LessonDocs { get; set; }
   public DbSet<LessonDocDocument> LessonDocDocuments { get; set; }
+  public DbSet<LessonContentDoc> LessonContentDocs { get; set; }
+  public DbSet<DocType> DocTypes { get; set; }
+  public DbSet<FileType> FileTypes { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {

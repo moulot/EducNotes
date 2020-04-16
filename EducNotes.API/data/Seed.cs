@@ -11,7 +11,25 @@ namespace EducNotes.API.Data
     {
         public static void SeedUsers(DataContext context, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
-          if (!userManager.Users.Any())
+             if (!context.FileTypes.Any())
+            {
+                var fileTypes = new List<FileType>(){
+                new FileType {Name="FILE TYPE 1"},
+                  new FileType  {Name="FILE TYPE 2"}
+                };
+                context.AddRange(fileTypes);
+                context.SaveChanges();
+            }
+            if (!context.DocTypes.Any())
+            {
+                var docTypes = new List<DocType>(){
+                new DocType {Name="fichier principal"},
+                  new DocType  {Name="Autre fichier"}
+                };
+                context.AddRange(docTypes);
+                context.SaveChanges();
+            }
+            if (!userManager.Users.Any())
             {
                 // var userData = System.IO.File.ReadAllText("Data/UserSeedData.json");
                 // var users = JsonConvert.DeserializeObject<List<User>>(userData);
@@ -49,7 +67,7 @@ namespace EducNotes.API.Data
 
                 foreach (var role in roles)
                 {
-                  roleManager.CreateAsync(role).Wait();
+                    roleManager.CreateAsync(role).Wait();
                 }
 
                 var city = new City { Name = "Abidjan" };

@@ -1866,13 +1866,23 @@ namespace EducNotes.API.Controllers
                     // identityContextTransaction.Commit();
                     isItOk = true;
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 // identityContextTransaction.Rollback();
                 isItOk = false;
             }
             if (isItOk)
                 return Ok();
+
+            return BadRequest();
+        }
+
+        [HttpPost("courseShowing")]
+        public async Task<IActionResult> courseShowing([FromForm]CourseShowingDto courseShowingDto)
+        {
+            int res = await _repo.CreateLessonDoc(courseShowingDto);
+            if(res>0)
+            return Ok();
 
             return BadRequest();
         }
