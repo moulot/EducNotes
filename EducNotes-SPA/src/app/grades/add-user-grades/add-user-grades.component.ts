@@ -38,8 +38,6 @@ export class AddUserGradesComponent implements OnInit {
       this.filteredUserGrades = this.userGrades;
       this.newUserGrades = this.userGrades;
       this.closed = this.eval.closed;
-      console.log(this.eval);
-      console.log(this.userGrades);
     });
 
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
@@ -87,7 +85,6 @@ export class AddUserGradesComponent implements OnInit {
       ue.comment = elt.comment;
       this.userEvals = [...this.userEvals, ue];
     }
-    console.log(this.userEvals);
 
     this.evalService.saveUserGrades(this.userEvals, evalClosed).subscribe(() => {
       this.alertify.success('ajout des notes validé');

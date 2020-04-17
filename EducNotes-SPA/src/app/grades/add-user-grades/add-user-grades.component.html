@@ -81,12 +81,12 @@
                     {{student.studentName}}
                     <hr class="my-1" style="background-color: 1px solid #f89f20;">
                   </mdb-card-title>
-                  <div class="md-form form-sm">
+                  <div class="md-form">
                     <input mdbInput type="text" id="sm-note + {{i}}" class="form-control form-control-sm"
                       [(ngModel)]="student.grade" name="sm-note + {{i}}">
                     <label for="sm-note + {{i}}" class="">note/{{eval.maxGrade}}</label>
                   </div>
-                  <div class="md-form form-sm">
+                  <div class="md-form">
                     <input mdbInput type="text" id="sm-comment + {{i}}" class="form-control form-control-sm"
                       [(ngModel)]="student.comment" name="sm-comment + {{i}}">
                     <label for="sm-comment + {{i}}" class="">commentaire</label>
