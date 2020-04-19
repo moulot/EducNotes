@@ -54,14 +54,16 @@ namespace EducNotes.API.Controllers
         [HttpGet("{classId}/schedule/today")]
         public async Task<IActionResult> GetScheduleToday(int classId)
         {
-            // monday=1, tue=2, ...
-            var today = ((int)DateTime.Now.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
+          // monday=1, tue=2, ...
+          var today = ((int)DateTime.Now.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
 
-            //if saturday or sunday goes to monday schedule
-            if (today == 6 || today == 7)
-                today = 1;
+          //if saturday or sunday goes to monday schedule
+          if (today == 6 || today == 7)
+            today = 1;
 
-            return Ok(await _repo.GetScheduleDay(classId, today));
+          var coursesFromRepo = await _repo.GetScheduleDay(classId, today);
+          var courses = _mapper.Map<IEnumerable<ScheduleForTimeTableDto>>(coursesFromRepo);
+          return Ok(courses);
         }
 
         [HttpGet("{classId}/schedule/{day}")]
@@ -85,7 +87,6 @@ namespace EducNotes.API.Controllers
                 return Unauthorized();
 
             var coursesToReturn = _mapper.Map<IEnumerable<ScheduleForTimeTableDto>>(courses);
-
             return Ok(coursesToReturn);
         }
 
@@ -951,20 +952,28 @@ namespace EducNotes.API.Controllers
         [HttpPost("AddCourse")]
         public async Task<IActionResult> AddCourse([FromBody] CourseDto newCourseDto)
         {
-            var course = new Course { Name = newCourseDto.Name, Abbreviation = newCourseDto.Abbreviation, Color = newCourseDto.Color };
+          int id = newCourseDto.Id;
+          if(id == 0)
+          {
+            var course = new Course {
+              Name = newCourseDto.Name,
+              Abbreviation = newCourseDto.Abbreviation,
+              Color = newCourseDto.Color
+            };
             _repo.Add(course);
-            // foreach (var item in courseDto.classLevelIds)
-            // {
-            //     var classes = await _context.Classes.Where(a=>a.ClassLevelId == Convert.ToInt32(item)).Select(a=>a.Id).ToListAsync();
-            //     foreach (var classId in classes)
-            //     {
-            //       _repo.Add(new ClassCourse {CourseId = course.Id,ClassId = classId});
-            //     }
-            // }
-            if (await _repo.SaveAll())
-                return Ok();
+          }
+          else
+          {
+            var course = await _context.Courses.FirstAsync(c => c.Id == id);
+            course.Name = newCourseDto.Name;
+            course.Abbreviation = newCourseDto.Abbreviation;
+            course.Color = newCourseDto.Color;
+            _repo.Update(course);
+          }
+          if (await _repo.SaveAll())
+              return Ok();
 
-            return BadRequest("impossible d'ajouter ce cours");
+          return BadRequest("impossible d'ajouter ce cours");
         }
 
         [HttpGet("SessionData/{sessionId}")]

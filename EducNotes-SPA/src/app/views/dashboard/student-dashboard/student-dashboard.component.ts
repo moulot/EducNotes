@@ -20,6 +20,7 @@ export class StudentDashboardComponent implements OnInit {
   strFirstDay: string;
   strLastDay: string;
   agendaItems: any;
+  scheduleDay: any;
   evalsToCome: any;
   nbDayTasks = [];
   weekDays = [];
@@ -39,6 +40,7 @@ export class StudentDashboardComponent implements OnInit {
   previous: string;
   previous1: string;
   showUsersList = false;
+  hourCols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -78,6 +80,7 @@ export class StudentDashboardComponent implements OnInit {
       this.getAgenda(this.student.classId, this.toNbDays);
       this.getEvalsToCome(this.student.classId);
       this.getCoursesWithEvals(this.student.id, this.student.classId);
+      this.getScheduleDay(this.student.classId);
       this.showChildrenList = false;
     }, error => {
       this.alertify.error(error);
@@ -112,6 +115,14 @@ export class StudentDashboardComponent implements OnInit {
     this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
       this.userCourses = data.coursesWithEvals;
       this.studentAvg = data.studentAvg;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getScheduleDay(classId) {
+    this.classService.getScheduleToday(classId).subscribe(data => {
+      this.scheduleDay = data;
     }, error => {
       this.alertify.error(error);
     });

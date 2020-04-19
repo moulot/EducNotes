@@ -1531,5 +1531,61 @@ namespace EducNotes.API.Controllers
         {
         return Ok (await _repo.GetAllGetDistrictsByCityIdCities(id));
         }
+
+        [HttpGet("{userId}/events")]
+        public async Task<IActionResult> GetUserEvents(int userId)
+        {
+          List<EventDto> events = new List<EventDto>();
+          var user = await _context.Users.FirstAsync(u => u.Id == userId);
+
+          //events dedicated to user
+          var userEvents = await _context.Events
+                                  .Where(e => e.UserId == user.Id && e.EventDate.Date >= DateTime.Now.Date)
+                                  .ToListAsync();
+          foreach (var item in userEvents)
+          {
+            EventDto eventDto= new EventDto();
+            eventDto.EventDate = item.EventDate;
+            eventDto.strEventDate = item.EventDate.ToString("dd/MM/yyyy", frC);
+            eventDto.Title = item.Title;
+            eventDto.Desc = item.Desc;
+            events.Add(eventDto);
+          }
+
+          //children events for the parent
+          int parentType = _config.GetValue<int>("AppSettings:parentTypeId");
+          if(userId == parentType)
+          {
+            var children = await _repo.GetChildren(userId);
+            //List<int?> classIds = children.Select(c => c.ClassId).Distinct().ToList();
+            foreach (var child in children)
+            {
+              if(child.ClassId != null)
+              {
+                var items = await _context.Events
+                                    .Include(i => i.Class)
+                                    .Where(e => e.ClassId == child.ClassId && e.EventDate.Date >= DateTime.Now.Date)
+                                    .ToListAsync();
+                foreach (var aevent in items)
+                {
+                  EventDto eventDto= new EventDto();
+                  eventDto.EventDate = aevent.EventDate;
+                  eventDto.strEventDate = aevent.EventDate.ToString("dd/MM/yyyy", frC);
+                  eventDto.Title = aevent.Title;
+                  eventDto.Desc = aevent.Desc;
+                  eventDto.ChildFirstName = child.FirstName;
+                  eventDto.ChildLastName = child.LastName;
+                  eventDto.ChildInitials = child.LastName.ToUpper().Substring(0, 1) +
+                                                          child.FirstName.ToUpper().Substring(0, 1);
+                  eventDto.ClassName = child.Class.Name;
+                  events.Add(eventDto);
+                }
+              }
+            }
+          }
+
+          events = events.OrderBy(o => o.EventDate).ToList();
+          return Ok(events);
+        }
     }
 }

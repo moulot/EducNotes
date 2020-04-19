@@ -41,27 +41,27 @@
                 <span class="slider"></span>
               </label>
             </div>
-            <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
+            <hr class="my-1">
             <div class="d-flex align-items-center">
               <button type="button" mdbBtn size="sm" class="p-2" (click)="movePeriod(-7)" color="primary"
-                mdbWavesEffect><i class="i-Arrow-Left"></i></button>
+                mdbWavesEffect><i class="fal fa-angle-left fa-2x"></i></button>
               <p class="flex-grow-1 text-center text-15 m-0">{{strStartDate}} - {{strEndDate}}</p>
               <button type="button" mdbBtn size="sm" class="p-2" (click)="movePeriod(7)" color="primary"
-                mdbWavesEffect><i class="i-Arrow-Right"></i></button>
+                mdbWavesEffect><i class="fal fa-angle-right fa-2x"></i></button>
             </div>
-            <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
+            <hr class="my-1">
             <p class="text-danger text-15 mt-2 mb-2">clicker sur le cours pour filtrer</p>
             <div class="card mb-2" *ngFor="let course of coursesWithTasks">
+              <div class="card-up" [ngStyle]="{'background-color': course.courseColor}" style="height: 10px;
+                border-top-left-radius: 10px;border-top-right-radius: 10px">
+              </div>            
               <div *ngIf="course.nbTasks > 0">
                 <a (click)="showCourseItems(course.courseId)" style="cursor: pointer;">
                   <div class="card-body p-2">
                     <div class="row">
                       <div class="col-md-12 d-flex">
-                        <div class=" mr-2" [ngStyle]="{'background-color': course.courseColor}"
-                          style="width: 10px;height: 100%;"></div>
                         <div class="flex-grow-1 text-17">{{course.courseName}}</div>
                         <div class="text-17">{{course.nbTasks}}</div>
-                        <!-- <div><mdb-badge pill="true" class="badge-pill" primary="true">{{course.nbTasks}}</mdb-badge></div> -->
                       </div>
                     </div>
                   </div>
@@ -71,11 +71,8 @@
                 <div class="card-body p-2">
                   <div class="row">
                     <div class="col-md-12 d-flex">
-                      <div class=" mr-2" [ngStyle]="{'background-color': course.courseColor}"
-                        style="width: 10px;height: 100%;"></div>
                       <div class="flex-grow-1 text-17">{{course.courseName}}</div>
                       <div class="text-17">{{course.nbTasks}}</div>
-                      <!-- <div><mdb-badge pill="true" class="badge-pill" primary="true">{{course.nbTasks}}</mdb-badge></div> -->
                     </div>
                   </div>
                 </div>
@@ -101,10 +98,12 @@
                       </div>
                     </div>
                     <div class="card mb-2" *ngFor="let ai of item.agendaItems; let j = index">
+                      <div class="card-up" [ngStyle]="{'background-color': ai.courseColor}" style="height: 10px;
+                        border-top-left-radius: 10px;border-top-right-radius: 10px">
+                      </div>
                       <div class="card-body p-2">
                         <div class="row">
                           <div class="col-md-12 d-flex">
-                            <div class="mr-2" [ngStyle]="{'background-color': ai.courseColor}" style="width: 10px;height: 100%;"></div>
                             <div class="flex-grow-1">
                               <div class="d-flex">
                                 <div class="flex-grow-1 text-17">{{ai.courseName}}</div>

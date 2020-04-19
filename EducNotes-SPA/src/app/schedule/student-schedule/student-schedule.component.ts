@@ -78,9 +78,7 @@ export class StudentScheduleComponent implements OnInit {
 
     this.resetSchedule();
     this.classService.getClassSchedule(classId).subscribe((data: any) => {
-
       this.scheduleItems = data.scheduleItems;
-
       // add courses on the schedule
       for (let i = 1; i <= 7; i++) {
         const filtered = this.scheduleItems.filter(items => items.day === i);

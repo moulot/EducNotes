@@ -39,14 +39,14 @@ export class CoursesPanelComponent implements OnInit {
     const course = {
       id: data.id,
       name: data.name,
-      abbrev: data.abbrev,
+      abbreviation: data.abbrev,
       color: data.color
     };
     this.classService.addCourse(course).subscribe(() => {
       this.alertify.success('le cours a été bien enregistré...');
       const index = this.courses.findIndex(c => c.id === course.id);
       this.courses[index].name = course.name;
-      this.courses[index].abbreviation = course.abbrev;
+      this.courses[index].abbreviation = course.abbreviation;
       this.courses[index].color = course.color;
     }, error => {
       this.alertify.error(error);

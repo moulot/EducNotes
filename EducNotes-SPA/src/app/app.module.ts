@@ -226,6 +226,7 @@ import { ClassCardComponent } from './admin/class-managemet/class-card/class-car
 import { BtnBackDirective } from './_directives/btnBack.directive';
 import { ClassStudentsAssignmentComponent } from './classes/class-students-assignment/class-students-assignment.component';
 import { CourseCardComponent } from './admin/class-managemet/course-card/course-card.component';
+import { DayScheduleComponent } from './views/dashboard/day-schedule/day-schedule.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -378,7 +379,8 @@ export function tokenGetter() {
       ClassStudentsAssignmentComponent,
       ClassCardComponent,
       CourseShowingComponent,
-      CourseCardComponent
+      CourseCardComponent,
+      DayScheduleComponent
    ],
    imports: [
       FormWizardModule,

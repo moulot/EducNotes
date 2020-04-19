@@ -1,31 +1,49 @@
 <div class="row">
-  <div class="col-md-6 my-5" *ngFor="let child of children; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+  <div class="col-md-3 my-5" *ngFor="let child of children; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
     <mdb-card class="testimonial-card">
       <div class="avatar mx-auto">
         <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" class="rounded-circle">
       </div>
       <mdb-card-body class="text-left p-2">
-          <p class="text-center text-20 font-weight-400 m-0">{{child.lastName}} {{child.firstName}} - {{child.className}}</p>
-          <div><hr class="my-1"></div>
-          <div class="pl-2">
-            <div><a class="text-15 text-muted">moyenne : {{child.avg}}/20</a></div>
-            <label class="text-muted text-15 mb-0 mr-1">devoirs maison : </label>
-            <span *ngFor="let item of child.agendaItems">
-              <ng-template #hoverItems>
-                <p *ngFor="let ai of item.agendaItems; let i = index" class="text-13 m-0"><b>{{i+1}}.
-                    {{ai.courseName}}</b>. {{ai.taskDesc}}</p>
-              </ng-template>
-              <a [mdbPopover]="hoverItems" placement="top" triggers="hover"
-                class=" text-15 mr-3">{{item.dueDateAbbrev}}</a>
-            </span>
-            <div class="mb-0">
-              <label class=" text-muted text-15 mr-1">absences : </label>
+          <div class="text-center text-16 text-capitalize font-weight-400 m-0">{{child.lastName}} {{child.firstName}}</div>
+          <div class="text-center text-14 font-weight-400 m-0">classe {{child.className}}</div>
+          <div><hr class="my-1" style="background-color: #f89f20;"></div>
+          <div class="row">
+            <div class="col-md-12">
+              <i class="fad fa-scrubber fa-1x mr-2" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+              <a class="text-15"><span class="text-muted text-13">moyenne</span> : {{child.avg}} / 20</a>
+            </div>
+            <div class="col-md-12 text-muted text-13">
+              <i class="fad fa-scrubber fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+              devoirs de maison
+            </div>
+            <div class="col-md-12 ml-4" *ngIf="child.agendaItems.length > 0">
+              <span *ngFor="let item of child.agendaItems">
+                <ng-template #hoverItems>
+                  <p *ngFor="let ai of item.agendaItems; let i = index" class="text-13 m-0"><b>{{i+1}}.
+                      {{ai.courseName}}</b>. {{ai.taskDesc}}</p>
+                </ng-template>
+                <a [mdbPopover]="hoverItems" placement="top" triggers="hover"
+                  class=" text-13 mr-2"><u>{{item.dueDateAbbrev}}</u></a>
+              </span>
+            </div>
+            <div class="col-md-12 ml-4 text-danger" *ngIf="child.agendaItems.length == 0">pas de devoirs</div>
+            <div class="col-md-12 mb-0">
+              <i class="fad fa-scrubber fa-1x mr-2" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+              <label class=" text-muted text-13 mr-1">absences : </label>
               <a class=" text-15 mr-1" href="">1</a>
-              <label class=" text-muted text-15 mr-1">retards : </label>
+              <label class=" text-muted text-13 mr-1">retards : </label>
               <a class=" text-15 mr-1" href="">3</a>
             </div>
           </div>
-          <div class="text-center"><a (click)="goToChildPage(child)" class="text-17 text-primary">sélectionner {{child.firstName}}</a></div>
+          <div class="col-md-12 text-small text-danger p-0">détails : pointez/clicker sur les infos</div>
+          <div><hr class="mt-2 mb-2" style="background-color: #f89f20;"></div>
+          <div class="col-md-12 text-center mt-2">
+            <a (click)="goToChildPage(child)" class="text-17 text-primary">sélectionner {{child.firstName}}</a>
+          </div>
       </mdb-card-body>
     </mdb-card>
   </div>

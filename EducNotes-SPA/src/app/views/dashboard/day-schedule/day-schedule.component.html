@@ -1,0 +1,10 @@
+<div class="card" style="position:absolute; width: 100%" *ngFor="let item of items"
+  [ngStyle]="{'top': item.top, 'height': item.height}">
+  <div class="card-body rounded-lg p-1" [ngStyle]="{'background-color': item.color}">
+    <div class="d-flex">
+      <div class="flex-grow-1 font-weight-500 text-12 m-0">{{item.courseName | uppercase}}</div>
+      <div class="text-12 m-0">{{item.startHourMin}} - {{item.endHourMin}}</div>
+    </div>
+    <div class="text-12 text-capitalize m-0">{{item.teacherName}}</div>
+  </div>
+</div>

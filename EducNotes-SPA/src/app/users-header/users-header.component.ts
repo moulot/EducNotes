@@ -21,8 +21,7 @@ export class UsersHeaderComponent implements OnInit {
   childrenOptions = [];
   parent: User;
 
-  constructor(private userService: UserService, private alertify: AlertifyService,
-    private router: Router, private authService: AuthService) { }
+  constructor(private userService: UserService, private authService: AuthService) { }
 
   ngOnInit() {
     this.parent = this.authService.currentUser;

@@ -307,4 +307,8 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'users/' + id + '/GetDistrictsByCityId');
   }
 
+  getEvents(userId) {
+    return this.http.get(this.baseUrl + 'users/' + userId + '/events');
+  }
+
 }

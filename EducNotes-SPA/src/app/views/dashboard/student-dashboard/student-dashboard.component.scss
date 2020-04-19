@@ -35,4 +35,16 @@
     border-radius: 10px;
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
     background-color: #4285F4; }
+
+    .hour-div {
+      border-right: #cccccc 1px solid;
+      border-bottom: #cccccc 1px solid;
+      line-height: 60px;
+      text-align: center;
+    }
   
+    .dayCol {
+      position: relative;
+      padding: 0px
+    }
+    
