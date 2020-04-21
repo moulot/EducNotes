@@ -86,6 +86,7 @@ namespace EducNotes.API.Data
         Task<IEnumerable<Theme>> ClassLevelCourseThemes(int classLevelId, int courseId);
         Task<IEnumerable<Lesson>> ClassLevelCourseLessons(int classLevelId, int courseId);
         Task<int> CreateLessonDoc(CourseShowingDto courseShowingDto);
+        Task<bool> SendCourseShowingLink(int lessonDocId);
 
 
     }

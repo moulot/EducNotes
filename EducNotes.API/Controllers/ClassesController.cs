@@ -1890,8 +1890,11 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> courseShowing([FromForm]CourseShowingDto courseShowingDto)
         {
             int res = await _repo.CreateLessonDoc(courseShowingDto);
-            if(res>0)
+            if(res>0){
+                // envoi du lien aux élèves et au aux parents d'eleves
+                await _repo.SendCourseShowingLink(res);
             return Ok();
+            }
 
             return BadRequest();
         }
