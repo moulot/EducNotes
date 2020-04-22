@@ -1826,12 +1826,12 @@ namespace EducNotes.API.Data
             {
                 TeacherId = Convert.ToInt32(courseShowingDto.TeacherId)
             };
-            if(courseShowingDto.CourseComment!=null)
-            lessDoc.Comment = courseShowingDto.CourseComment;
+            if (courseShowingDto.CourseComment != null)
+                lessDoc.Comment = courseShowingDto.CourseComment;
             Add(lessDoc);
 
 
-            if (courseShowingDto.MainVideo!=null)
+            if (courseShowingDto.MainVideo != null)
             {
                 var uploadResult = new VideoUploadResult();
                 using (var stream = courseShowingDto.MainVideo.OpenReadStream())
@@ -1860,11 +1860,11 @@ namespace EducNotes.API.Data
                         };
                         Add(lessDocDoc);
                     }
-                   
+
                 }
             }
 
-            if (courseShowingDto.MainPdf!=null)
+            if (courseShowingDto.MainPdf != null)
             {
                 var uploadResult = new ImageUploadResult();
                 using (var stream = courseShowingDto.MainPdf.OpenReadStream())
@@ -1878,7 +1878,7 @@ namespace EducNotes.API.Data
                     uploadResult = _cloudinary.Upload(uploadParams);
                     if (uploadResult.StatusCode == HttpStatusCode.OK)
                     {
-                        int docTypeId =  _config.GetValue<int>("AppSettings:mainDocTypes");
+                        int docTypeId = _config.GetValue<int>("AppSettings:mainDocTypes");
                         var MainDoc = new Document
                         {
                             DocTypeId = docTypeId,
@@ -1902,38 +1902,38 @@ namespace EducNotes.API.Data
             // ajouts des autres fichiers
             foreach (var otherFile in courseShowingDto.OtherFiles)
             {
-                
-                    var uploadResult = new ImageUploadResult();
-                    using (var stream = otherFile.OpenReadStream())
+
+                var uploadResult = new ImageUploadResult();
+                using (var stream = otherFile.OpenReadStream())
+                {
+                    var uploadParams = new ImageUploadParams()
                     {
-                        var uploadParams = new ImageUploadParams()
+                        File = new FileDescription(otherFile.Name, stream)
+
+                    };
+
+                    uploadResult = _cloudinary.Upload(uploadParams);
+                    if (uploadResult.StatusCode == HttpStatusCode.OK)
+                    {
+                        var otherDoc = new Document
                         {
-                            File = new FileDescription(otherFile.Name, stream)
+                            DocTypeId = _config.GetValue<int>("AppSettings:otherDocTypes"),
+                            PublicId = uploadResult.PublicId,
+                            Url = uploadResult.Uri.ToString(),
+                            FileTypeId = 1
 
                         };
+                        Add(otherDoc);
 
-                        uploadResult = _cloudinary.Upload(uploadParams);
-                        if (uploadResult.StatusCode == HttpStatusCode.OK)
+                        var lessDocDoc = new LessonDocDocument
                         {
-                            var otherDoc = new Document
-                            {
-                                DocTypeId = _config.GetValue<int>("AppSettings:otherDocTypes"),
-                                PublicId = uploadResult.PublicId,
-                                Url = uploadResult.Uri.ToString(),
-                                FileTypeId = 1
-
-                            };
-                            Add(otherDoc);
-
-                            var lessDocDoc = new LessonDocDocument
-                            {
-                                LessonDocId = lessDoc.Id,
-                                DocumentId = otherDoc.Id
-                            };
-                            Add(lessDocDoc);
-                        }
-                        
+                            LessonDocId = lessDoc.Id,
+                            DocumentId = otherDoc.Id
+                        };
+                        Add(lessDocDoc);
                     }
+
+                }
             }
 
             var ids = courseShowingDto.LessonContentIds.Split(",");
@@ -1957,6 +1957,82 @@ namespace EducNotes.API.Data
 
         }
 
+        public async Task<bool> SendCourseShowingLink(int lessonDocId)
+        {
+            var callbackUrl = _config.GetValue<String>("AppSettings:DefaultCourseShowingLink") + lessonDocId;
 
+            var lessonContent = await _context.LessonContentDocs.Include(a => a.LessonDoc)
+                                                                .Include(a => a.LessonContent)
+                                                                .ThenInclude(a => a.Lesson)
+                                                                .ThenInclude(a => a.Theme)
+                                                                .FirstOrDefaultAsync(a => a.LessonDocId == lessonDocId);
+            if (lessonContent != null)
+            {
+                string courseName = "";
+                var classLevelId = 0;// pour le niveau
+                int teacherId = lessonContent.LessonDoc.TeacherId;
+                if (lessonContent.LessonContent.Lesson.ClassLevelId != null)
+                {
+                    classLevelId = Convert.ToInt32(lessonContent.LessonContent.Lesson.ClassLevelId);
+                    courseName = (await _context.Courses.FirstOrDefaultAsync(a => a.Id == lessonContent.LessonContent.Lesson.CourseId)).Name;
+                }
+                else
+                {
+                    classLevelId = Convert.ToInt32(lessonContent.LessonContent.Lesson.Theme.ClassLevelId);
+                    courseName = (await _context.Courses.FirstOrDefaultAsync(a => a.Id == lessonContent.LessonContent.Lesson.Theme.CourseId)).Name;
+                }
+
+                var teacherClasses = await GetTeacherClasses(teacherId);
+                var current_classLevelClassIds = teacherClasses.Where(a => a.ClassLevelId == classLevelId).Select(a => a.ClassId);
+                foreach (var classId in current_classLevelClassIds)
+                {
+                    var students = await GetClassStudents(classId);
+                    foreach (var student in students)
+                    {
+                        var parent = await GetParent(student.Id);
+                        if (parent != null && parent.Email != null && parent.EmailConfirmed)
+                        {
+                            var parentEmail = new Email
+                            {
+                                EmailTypeId = 1,
+                                ToAddress = parent.Email,
+                                Subject = "<b> Bonjour, un conténu de cours de <b>" + courseName + "<b> vient d'etre ajouté pour enfant "
+                                + student.LastName + " " + student.FirstName,
+                                Body = $"veuillez cliquer sur le lien suivant pour acceder au contenu : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                                InsertUserId = teacherId,
+                                UpdateUserId = teacherId
+                            };
+                            Add(parentEmail);
+                        }
+
+                        if (student.Email != null && student.EmailConfirmed)
+                        {
+                            var studentEmail = new Email
+                            {
+                                EmailTypeId = 1,
+                                ToAddress = parent.Email,
+                                Subject = "<b> Bonjour, un conténu de cours de <b>" + courseName + "<b> vient d'etre ajouté."
+                                + student.LastName + " " + student.FirstName,
+                                Body = $"veuillez cliquer sur le lien suivant pour acceder au contenu : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                                InsertUserId = teacherId,
+                                UpdateUserId = teacherId
+                            };
+                            Add(studentEmail);
+
+                        }
+                    }
+
+                    if(await SaveAll())
+                    return true;
+                    else
+                    return false;
+                }
+
+            }
+            return false;
+
+
+
+        }
     }
 }
