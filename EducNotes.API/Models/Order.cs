@@ -15,8 +15,9 @@ namespace EducNotes.API.Models {
         public Address ShippingAddress { get; set; }
         public Address BillingAddress { get; set; }
         public decimal TotalHT { get; set; }
-        public decimal TotalTTC { get; set; }
         public int Discount { get; set; }
+        public decimal AmountHT { get; set; }
+        public decimal AmountTTC { get; set; }
         public int TVA { get; set; }
         public int UserId { get; set; }
         public User User { get; set; }

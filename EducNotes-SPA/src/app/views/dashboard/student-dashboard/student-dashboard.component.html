@@ -1,5 +1,5 @@
 <div class="mb-2" *ngIf="showUsersList && !showChildrenList">
-  <app-users-header [student]="student" (getUser)="getUser($event)"></app-users-header>
+  <app-users-header [student]="currentChild" (getUser)="getUser($event)"></app-users-header>
 </div>
 
 <div class="row">
@@ -14,6 +14,8 @@
       <div class="col-md-3 mb-2">
         <div class="card">
           <div class="card-body p-2">
+            <div class="text-15 text-center">cours du jour</div>
+            <hr class="my-1" style="background-color: #f89f20;">
             <div class="d-flex">
               <div class="mr-1" style="width: 25px">
                 <div style="border-top: 1px solid #cccccc"></div>
@@ -127,28 +129,22 @@
                 </div>
               </div>
               <div class="col-md-12">
-                <div class="row">
-                  <div class="col-md-12 mb-2">
-                    <div class="border rounded-lg p-2">
-                      <div class="row mb-2">
-                        <div class="col-md-7 text-15">notes</div>
-                        <div class="col-md-5">
-                          <button type="button" mdbBtn size="sm" block="true" [routerLink]="['/studentGrades', student?.id]"
-                            class="btnWhiteO" mdbWavesEffect>détails</button>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div *ngFor="let course of userCourses" class="col-md-4">
-                          <div class="border rounded-lg mb-1 p-2 text-center">
-                            <p class="text-muted text-15 my-2">{{course.courseAbbrev}}</p>
-                            <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000"
-                              class="text-primary text-danger text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                            <p *ngIf="course.userCourseAvg >= 10"
-                              class="text-primary text-success text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                            <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</p>
-                          </div>
-                        </div>
-                      </div>
+                <div class="border rounded-lg p-2">
+                  <div class="row mb-2">
+                    <div class="col-md-7 text-15">notes</div>
+                    <div class="col-md-5">
+                      <button type="button" mdbBtn size="sm" block="true" [routerLink]="['/studentGrades', student?.id]"
+                        class="btnWhiteO" mdbWavesEffect>détails</button>
+                    </div>
+                  </div>
+                  <div class="row mx-1">
+                    <div *ngFor="let course of userCourses" class="col-md-4 border rounded-lg p-1 mb-2 text-center">
+                      <p class="text-muted text-15 my-1">{{course.courseAbbrev}}</p>
+                      <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000"
+                        class="text-primary text-danger text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                      <p *ngIf="course.userCourseAvg >= 10"
+                        class="text-primary text-success text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                      <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</p>
                     </div>
                   </div>
                 </div>
@@ -185,7 +181,7 @@
   </div>
 
   <div class="col-md-3" *ngIf="!showChildrenList">
-    <app-timeline></app-timeline>
+    <app-timeline [events]="events" [isParentConnected]="isParentConnected"></app-timeline>
   </div>
 
 </div>

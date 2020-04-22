@@ -37,9 +37,11 @@ export class StudentAgendaComponent implements OnInit {
   strStartDate: string;
   strEndDate: string;
   agendaParams: any = {};
+  events: any;
   model: any = [];
   showChildrenList = false;
   parent: User;
+  currentChild: User;
   children: User[];
   isParentConnected = false;
   url = '/studentAgendaP';
@@ -49,21 +51,25 @@ export class StudentAgendaComponent implements OnInit {
     private userService: UserService) { }
 
   ngOnInit() {
-
     this.route.params.subscribe(params => {
       this.userIdFromRoute = params['id'];
     });
-
-    // is the parent connected?
-    if (Number(this.userIdFromRoute) === 0) {
-      this.showChildrenList = true;
-      this.parent = this.authService.currentUser;
-      this.getChildren(this.parent.id);
-    } else {
+    if (this.authService.studentLoggedIn()) {
       this.showChildrenList = false;
-      this.getUser(this.userIdFromRoute);
+      this.getUser(this.authService.currentUser.id);
+    } else {
+      this.isParentConnected = true;
+      this.parent = this.authService.currentUser;
+      // this.showUsersList = true;
+      this.authService.currentChild.subscribe(child => this.currentChild = child);
+      if (this.currentChild.id === 0) {
+        this.showChildrenList = true;
+        this.getChildren(this.parent.id);
+      } else {
+        this.showChildrenList = false;
+        this.getUser(this.currentChild.id);
+      }
     }
-
   }
 
   getChildren(parentId: number) {
@@ -77,7 +83,6 @@ export class StudentAgendaComponent implements OnInit {
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
-      console.log('getuser -agenda');
       const loggedUser = this.authService.currentUser;
       if (loggedUser.id !== this.student.id) {
         this.isParentConnected = true;
@@ -94,6 +99,7 @@ export class StudentAgendaComponent implements OnInit {
       this.agendaParams.nbDays = this.nbDays;
       this.agendaParams.isMovingPeriod = false;
       this.getClassAgendaByDate(this.student.classId, this.agendaParams);
+      this.getEvents();
       this.showChildrenList = false;
     }, error => {
       this.alertify.error(error);
@@ -162,6 +168,20 @@ export class StudentAgendaComponent implements OnInit {
   setCourseTask(index, agendaId) {
     this.classService.classAgendaSetDone(agendaId, this.model[index]).subscribe(() => {
       this.alertify.success('le devoir a bien été mis à jour');
+    });
+  }
+
+  getEvents() {
+    let userId = 0;
+    if (this.isParentConnected === true) {
+      userId = this.parent.id;
+    } else {
+      userId = this.student.id;
+    }
+    this.userService.getEvents(userId).subscribe(data => {
+      this.events = data;
+    }, error => {
+      this.alertify.error(error);
     });
   }
 

@@ -41,6 +41,7 @@ export class StudentDashboardComponent implements OnInit {
   previous1: string;
   showUsersList = false;
   hourCols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  events: any;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -53,11 +54,11 @@ export class StudentDashboardComponent implements OnInit {
       this.getUser(this.authService.currentUser.id);
     } else {
       this.isParentConnected = true;
+      this.parent = this.authService.currentUser;
       this.showUsersList = true;
       this.authService.currentChild.subscribe(child => this.currentChild = child);
       if (this.currentChild.id === 0) {
         this.showChildrenList = true;
-        this.parent = this.authService.currentUser;
         this.getChildren(this.parent.id);
       } else {
         this.showChildrenList = false;
@@ -81,6 +82,7 @@ export class StudentDashboardComponent implements OnInit {
       this.getEvalsToCome(this.student.classId);
       this.getCoursesWithEvals(this.student.id, this.student.classId);
       this.getScheduleDay(this.student.classId);
+      this.getEvents();
       this.showChildrenList = false;
     }, error => {
       this.alertify.error(error);
@@ -130,6 +132,20 @@ export class StudentDashboardComponent implements OnInit {
 
   parentLoggedIn() {
     return this.authService.parentLoggedIn();
+  }
+
+  getEvents() {
+    let userId = 0;
+    if (this.isParentConnected === true) {
+      userId = this.parent.id;
+    } else {
+      userId = this.student.id;
+    }
+    this.userService.getEvents(userId).subscribe(data => {
+      this.events = data;
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
 }

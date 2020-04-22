@@ -1028,9 +1028,8 @@ namespace EducNotes.API.Data
         {
             var user = await _context.Users.FirstOrDefaultAsync(e => e.UserName == userName.ToLower());
             if (user != null)
-                return true;
-            return
-            false;
+              return true;
+            return false;
         }
 
         public async Task sendOk(int userTypeId, int userId)
@@ -1463,7 +1462,7 @@ namespace EducNotes.API.Data
             var newOrder = new Order
             {
                 TotalHT = total,
-                TotalTTC = total,
+                AmountTTC = total,
                 Discount = 0,
                 TVA = 0,
                 UserPId = userPid,

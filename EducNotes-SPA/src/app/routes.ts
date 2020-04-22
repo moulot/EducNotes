@@ -113,6 +113,7 @@ import { EditEmailTemplateResolver } from './_resolvers/edit-email-template-reso
 import { EditTeacherResolver } from './_resolvers/edit-teacher-resolver';
 import { CourseShowingComponent } from './classes/course-showing/course-showing.component';
 import { ClassStudentsAssignmentComponent } from './classes/class-students-assignment/class-students-assignment.component';
+import { TuitionPanelComponent } from './admin/tuition/tuition-panel/tuition-panel.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -179,7 +180,7 @@ export const appRoutes: Routes = [
           { path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve: { classes: LevelClassesResolver } },
           { path: 'studentGrades/:id', component: GradeStudentComponent}, // , resolve: { student: StudentResolver } },
           { path: 'studentGradesP/:id', component: GradeStudentComponent},
-          { path: 'school', component: SchoolComponent, resolve: { school: SchoolResolver } },
+          { path: 'tuition', component: TuitionPanelComponent },
           { path: 'productsList', component: ProductsListComponent, resolve: { products: ProductsListResolver } },
           { path: 'createProduct', component: ProductFormComponent },
           { path: 'editProduct/:id', component: ProductFormComponent, resolve: { product: ProductFormResolver } },

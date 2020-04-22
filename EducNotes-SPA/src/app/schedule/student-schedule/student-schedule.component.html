@@ -101,7 +101,7 @@
         <div class="hour-div" *ngFor="let j of hourCols; let i = index">{{j + 7}}h</div>
       </div>
       <div class="card-body p-0 m-0 dayCol" style="height: 360px; border-top: 1px solid #cccccc">
-        <app-classday-schedule [items]="dayItems[i]"></app-classday-schedule>
+        <app-day-schedule [items]="dayItems[i]"></app-day-schedule>
       </div>
     </div>
   </div>

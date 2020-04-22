@@ -1553,11 +1553,9 @@ namespace EducNotes.API.Controllers
           }
 
           //children events for the parent
-          int parentType = _config.GetValue<int>("AppSettings:parentTypeId");
-          if(userId == parentType)
+          if(user.UserTypeId == parentTypeId)
           {
             var children = await _repo.GetChildren(userId);
-            //List<int?> classIds = children.Select(c => c.ClassId).Distinct().ToList();
             foreach (var child in children)
             {
               if(child.ClassId != null)
@@ -1580,6 +1578,32 @@ namespace EducNotes.API.Controllers
                   eventDto.ClassName = child.Class.Name;
                   events.Add(eventDto);
                 }
+              }
+            }
+          }
+
+          //student (child) events
+          if(user.UserTypeId == studentTypeId)
+          {
+            if(user.ClassId != null)
+            {
+              var items = await _context.Events
+                                  .Include(i => i.Class)
+                                  .Where(e => e.ClassId == user.ClassId && e.EventDate.Date >= DateTime.Now.Date)
+                                  .ToListAsync();
+              foreach (var aevent in items)
+              {
+                EventDto eventDto= new EventDto();
+                eventDto.EventDate = aevent.EventDate;
+                eventDto.strEventDate = aevent.EventDate.ToString("dd/MM/yyyy", frC);
+                eventDto.Title = aevent.Title;
+                eventDto.Desc = aevent.Desc;
+                // eventDto.ChildFirstName = child.FirstName;
+                // eventDto.ChildLastName = child.LastName;
+                // eventDto.ChildInitials = child.LastName.ToUpper().Substring(0, 1) +
+                //                                         child.FirstName.ToUpper().Substring(0, 1);
+                // eventDto.ClassName = child.Class.Name;
+                events.Add(eventDto);
               }
             }
           }

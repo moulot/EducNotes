@@ -414,7 +414,7 @@ namespace EducNotes.API.Controllers
               var newOrder = new Order
               {
                 TotalHT = total,
-                TotalTTC = total,
+                AmountTTC = total,
                 Discount = 0,
                 TVA = 0,
                 UserPId = parentId,
