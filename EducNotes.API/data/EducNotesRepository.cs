@@ -1399,144 +1399,106 @@ namespace EducNotes.API.Data
 
         public async Task<List<AgendaForListDto>> GetUserClassAgenda(int classId, DateTime startDate, DateTime endDate)
         {
-            List<Agenda> classAgenda = await _context.Agendas
-                .Include(i => i.Session.Course)
-                .OrderBy(o => o.Session.SessionDate)
-                .Where(a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= startDate &&
-                  a.Session.SessionDate <= endDate)
-                .ToListAsync();
+          List<Agenda> classAgenda = await _context.Agendas
+              .Include(i => i.Session.Course)
+              .OrderBy(o => o.Session.SessionDate)
+              .Where(a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= startDate &&
+                a.Session.SessionDate <= endDate)
+              .ToListAsync();
 
-            var agendaDates = classAgenda.OrderBy(o => o.Session.SessionDate).Select(a => a.Session.SessionDate).Distinct().ToList();
+          var agendaDates = classAgenda.OrderBy(o => o.Session.SessionDate).Select(a => a.Session.SessionDate).Distinct().ToList();
 
-            List<AgendaForListDto> AgendaList = new List<AgendaForListDto>();
-            foreach (var date in agendaDates)
+          List<AgendaForListDto> AgendaList = new List<AgendaForListDto>();
+          foreach (var date in agendaDates)
+          {
+            AgendaForListDto afld = new AgendaForListDto();
+            afld.DueDate = date;
+            //CultureInfo frC = new CultureInfo("fr-FR");
+            var shortDueDate = date.ToString("ddd dd MMM");
+            var longDueDate = date.ToString("dd MMMM yyyy");
+            var dueDateAbbrev = date.ToString("ddd dd").Replace(".", "");
+
+            afld.ShortDueDate = shortDueDate;
+            afld.LongDueDate = longDueDate;
+            afld.DueDateAbbrev = dueDateAbbrev;
+
+            //get agenda tasks Done Status
+            afld.AgendaItems = new List<AgendaItemDto>();
+            var agendaItems = classAgenda.Where(a => a.Session.SessionDate.Date == date.Date).ToList();
+            foreach (var item in agendaItems)
             {
-                AgendaForListDto afld = new AgendaForListDto();
-                afld.DueDate = date;
-                //CultureInfo frC = new CultureInfo("fr-FR");
-                var shortDueDate = date.ToString("ddd dd MMM");
-                var longDueDate = date.ToString("dd MMMM yyyy");
-                var dueDateAbbrev = date.ToString("ddd dd").Replace(".", "");
-
-                afld.ShortDueDate = shortDueDate;
-                afld.LongDueDate = longDueDate;
-                afld.DueDateAbbrev = dueDateAbbrev;
-
-                //get agenda tasks Done Status
-                afld.AgendaItems = new List<AgendaItemDto>();
-                var agendaItems = classAgenda.Where(a => a.Session.SessionDate.Date == date.Date).ToList();
-                foreach (var item in agendaItems)
-                {
-                    AgendaItemDto aid = new AgendaItemDto();
-                    aid.CourseId = item.Session.CourseId;
-                    aid.CourseName = item.Session.Course.Name;
-                    aid.CourseAbbrev = item.Session.Course.Abbreviation;
-                    aid.CourseColor = item.Session.Course.Color;
-                    aid.strDateAdded = item.DateAdded.ToString("dd/MM/yyyy", frC);
-                    aid.TaskDesc = item.TaskDesc;
-                    aid.AgendaId = item.Id;
-                    aid.Done = item.Done;
-                    afld.AgendaItems.Add(aid);
-                }
-                afld.NbItems = agendaItems.Count();
-
-                AgendaList.Add(afld);
+              AgendaItemDto aid = new AgendaItemDto();
+              aid.CourseId = item.Session.CourseId;
+              aid.CourseName = item.Session.Course.Name;
+              aid.CourseAbbrev = item.Session.Course.Abbreviation;
+              aid.CourseColor = item.Session.Course.Color;
+              aid.strDateAdded = item.DateAdded.ToString("dd/MM/yyyy", frC);
+              aid.TaskDesc = item.TaskDesc;
+              aid.AgendaId = item.Id;
+              aid.Done = item.Done;
+              afld.AgendaItems.Add(aid);
             }
+            afld.NbItems = agendaItems.Count();
 
-            return AgendaList;
+            AgendaList.Add(afld);
+          }
+
+          return AgendaList;
         }
 
         public async Task<int> GetAssignedChildrenCount(int parentId)
         {
-            var userIds = await _context.UserLinks
-                                .Where(u => u.UserPId == parentId)
-                                .Select(s => s.UserId).ToListAsync();
+          var userIds = await _context.UserLinks
+                              .Where(u => u.UserPId == parentId)
+                              .Select(s => s.UserId).ToListAsync();
 
-            return userIds.Count();
+          return userIds.Count();
         }
 
         public async Task<bool> SaveProductSelection(int userPid, int userId, List<ServiceSelectionDto> products)
         {
-            // insertion dans la table order 
-            int total = products.Sum(x => Convert.ToInt32(x.Price));
-            var newOrder = new Order
+          // insertion dans la table order 
+          int total = products.Sum(x => Convert.ToInt32(x.Price));
+          var newOrder = new Order
+          {
+            TotalHT = total,
+            AmountTTC = total,
+            Discount = 0,
+            TVA = 0,
+            ParentId = userPid,
+            ChildId = userId
+          };
+          _context.Add(newOrder);
+
+          foreach (var prod in products)
+          {
+            var newOrderLine = new OrderLine
             {
-                TotalHT = total,
-                AmountTTC = total,
-                Discount = 0,
-                TVA = 0,
-                UserPId = userPid,
-                UserId = userId
+              OrderId = newOrder.Id,
+              ProductId = prod.Id,
+              AmountHT = prod.Price,
+              AmountTTC = prod.Price,
+              Discount = 0,
+              Qty = 1,
+              TVA = 0
             };
-            _context.Add(newOrder);
+            _context.Add(newOrderLine);
+          }
 
-            foreach (var prod in products)
-            {
-                var newOrderLine = new OrderLine
-                {
-                    OrderId = newOrder.Id,
-                    ProductId = prod.Id,
-                    AmountHT = prod.Price,
-                    AmountTTC = prod.Price,
-                    Discount = 0,
-                    Qty = 1,
-                    TVA = 0
+          if (await _context.SaveChangesAsync() > 0)
+            return true;
 
-                };
-                _context.Add(newOrderLine);
-            }
-            if (await _context.SaveChangesAsync() > 0)
-                return true;
-
-            return false;
+          return false;
         }
 
         public List<string> SendBatchSMS(List<Sms> smsData)
         {
-            List<string> result = new List<string>();
-            foreach (var sms in smsData)
-            {
-                Dictionary<string, string> Params = new Dictionary<string, string>();
-                Params.Add("content", sms.Content);
-                Params.Add("to", sms.To);
-                Params.Add("validityPeriod", "1");
-
-                Params["to"] = CreateRecipientList(Params["to"]);
-                string JsonArray = JsonConvert.SerializeObject(Params, Formatting.None);
-                JsonArray = JsonArray.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
-
-                string Token = _config.GetValue<string>("AppSettings:CLICKATELL_TOKEN");
-
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://platform.clickatell.com/messages");
-                httpWebRequest.ContentType = "application/json";
-                httpWebRequest.Method = "POST";
-                httpWebRequest.Accept = "application/json";
-                httpWebRequest.PreAuthenticate = true;
-                httpWebRequest.Headers.Add("Authorization", Token);
-
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                {
-                    streamWriter.Write(JsonArray);
-                    streamWriter.Flush();
-                    streamWriter.Close();
-                }
-
-                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                {
-                    result.Add(streamReader.ReadToEnd());
-                }
-            }
-
-            return result;
-        }
-
-        public void Clickatell_SendSMS(clickatellParamsDto smsData)
-        {
+          List<string> result = new List<string>();
+          foreach (var sms in smsData)
+          {
             Dictionary<string, string> Params = new Dictionary<string, string>();
-            Params.Add("content", smsData.Content);
-            Params.Add("to", smsData.To);
+            Params.Add("content", sms.Content);
+            Params.Add("to", sms.To);
             Params.Add("validityPeriod", "1");
 
             Params["to"] = CreateRecipientList(Params["to"]);
@@ -1555,16 +1517,54 @@ namespace EducNotes.API.Data
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
-                streamWriter.Write(JsonArray);
-                streamWriter.Flush();
-                streamWriter.Close();
+              streamWriter.Write(JsonArray);
+              streamWriter.Flush();
+              streamWriter.Close();
             }
 
             var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
             using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
             {
-                var result = streamReader.ReadToEnd();
+              result.Add(streamReader.ReadToEnd());
             }
+          }
+
+          return result;
+        }
+
+        public void Clickatell_SendSMS(clickatellParamsDto smsData)
+        {
+          Dictionary<string, string> Params = new Dictionary<string, string>();
+          Params.Add("content", smsData.Content);
+          Params.Add("to", smsData.To);
+          Params.Add("validityPeriod", "1");
+
+          Params["to"] = CreateRecipientList(Params["to"]);
+          string JsonArray = JsonConvert.SerializeObject(Params, Formatting.None);
+          JsonArray = JsonArray.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
+
+          string Token = _config.GetValue<string>("AppSettings:CLICKATELL_TOKEN");
+
+          ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+          var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://platform.clickatell.com/messages");
+          httpWebRequest.ContentType = "application/json";
+          httpWebRequest.Method = "POST";
+          httpWebRequest.Accept = "application/json";
+          httpWebRequest.PreAuthenticate = true;
+          httpWebRequest.Headers.Add("Authorization", Token);
+
+          using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+          {
+              streamWriter.Write(JsonArray);
+              streamWriter.Flush();
+              streamWriter.Close();
+          }
+
+          var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+          using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+          {
+              var result = streamReader.ReadToEnd();
+          }
         }
 
         public async Task<List<Sms>> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, int sessionId, int teacherId)
@@ -1805,7 +1805,6 @@ namespace EducNotes.API.Data
             return null;
         }
 
-
         public async Task<IEnumerable<Theme>> ClassLevelCourseThemes(int classLevelId, int courseId)
         {
             var themes = await _context.Themes.Include(a => a.Lessons).ThenInclude(a => a.LessonContents)
@@ -1954,7 +1953,6 @@ namespace EducNotes.API.Data
 
             return 0;
 
-
         }
 
         public async Task<bool> SendCourseShowingLink(int lessonDocId)
@@ -2031,8 +2029,19 @@ namespace EducNotes.API.Data
             }
             return false;
 
-
-
         }
+
+        public async Task<IEnumerable<Setting>> GetSettings(int userId)
+        {
+          var settings = await _context.Settings.OrderBy(s => s.Name).ToListAsync();
+          return settings;
+        }
+
+        // public async Task<IEnumerable<EducationLevel>> GetEducationLevels()
+        // {
+        //   var educLevels = await _context
+        //   return educLevels;
+        // }
+
     }
 }

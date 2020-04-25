@@ -8,6 +8,8 @@ import { User } from '../_models/user';
 import { Period } from '../_models/period';
 import { Router } from '@angular/router';
 import { AlertifyService } from './alertify.service';
+import { Setting } from '../_models/setting';
+import { settings } from 'cluster';
 
 
 @Injectable({
@@ -23,6 +25,7 @@ export class AuthService {
   jwtHelper = new JwtHelperService();
   decodedToken: any;
   currentUser: User;
+  settings: any;
   newUser = <User>{ id: 0 };
   currentPeriod: Period;
 
@@ -58,12 +61,14 @@ export class AuthService {
           if (user) {
             localStorage.setItem('token', user.token);
             localStorage.setItem('user', JSON.stringify(user.user));
+            localStorage.setItem('settings', JSON.stringify(user.settings));
             localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
             localStorage.setItem('currentChild', JSON.stringify(this.newUser));
             localStorage.setItem('currentClassId', '0');
             this.decodedToken = this.jwtHelper.decodeToken(user.token);
             this.currentUser = user.user;
             this.currentPeriod = user.currentPeriod;
+            this.settings = user.settings;
             this.changeCurrentChild(this.newUser);
             this.changeCurrentClassId(0);
             this.changeUserPhoto(this.currentUser.photoUrl);
@@ -75,11 +80,13 @@ export class AuthService {
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('settings');
     localStorage.removeItem('currentPeriod');
     localStorage.removeItem('currentChild');
     localStorage.removeItem('currentClassId');
     this.decodedToken = null;
     this.currentUser = null;
+    this.settings = null;
     this.currentPeriod = null;
     this.currentClassId = null;
     this.changeCurrentChild(this.newUser);

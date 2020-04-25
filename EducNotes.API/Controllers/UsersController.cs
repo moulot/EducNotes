@@ -1611,5 +1611,6 @@ namespace EducNotes.API.Controllers
           events = events.OrderBy(o => o.EventDate).ToList();
           return Ok(events);
         }
+
     }
 }

@@ -144,40 +144,41 @@ namespace EducNotes.API.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
+          // verification de l'existence du userName 
+          if (await _repo.UserNameExist(userForLoginDto.Username.ToLower()))
+          {
+            var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
+            if (!user.ValidatedCode)
+                return BadRequest("Compte non validé pour l'instant...");
 
-            // verification de l'existence du userName 
-            if (await _repo.UserNameExist(userForLoginDto.Username.ToLower()))
+            var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
+
+            if (result.Succeeded)
             {
-                var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
-                if (!user.ValidatedCode)
-                    return BadRequest("Compte non validé pour l'instant...");
+              var appUser = await _userManager.Users.Include(p => p.Photos)
+                  .FirstOrDefaultAsync(u => u.NormalizedUserName == userForLoginDto.Username.ToUpper());
 
-                var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
+              var userToReturn = _mapper.Map<UserForListDto>(appUser);
 
-                if (result.Succeeded)
-                {
-                  var appUser = await _userManager.Users.Include(p => p.Photos)
-                      .FirstOrDefaultAsync(u => u.NormalizedUserName == userForLoginDto.Username.ToUpper());
+              //get the current period
+              //Period CurrentPeriod = await _context.Periods.Where(p => p.Active == true).FirstOrDefaultAsync();
+              Period CurrentPeriod = await _repo.GetPeriodFromDate(DateTime.Now);
 
-                  var userToReturn = _mapper.Map<UserForListDto>(appUser);
+              //get school settings
+              var settings = await _repo.GetSettings(user.Id);
 
-                  //get the current period
-                  //Period CurrentPeriod = await _context.Periods.Where(p => p.Active == true).FirstOrDefaultAsync();
-                  Period CurrentPeriod = await _repo.GetPeriodFromDate(DateTime.Now);
-
-
-                  return Ok(new
-                  {
-                      token = await GenerateJwtToken(appUser),
-                      user = userToReturn,
-                      currentPeriod = CurrentPeriod
-                  });
-                }
-
-                return BadRequest("login ou mot de passe incorrecte...");
+              return Ok(new
+              {
+                token = await GenerateJwtToken(appUser),
+                user = userToReturn,
+                currentPeriod = CurrentPeriod,
+                settings
+              });
             }
-            return BadRequest("login ou mot de passe incorrecte...");
 
+            return BadRequest("login ou mot de passe incorrecte...");
+          }
+          return BadRequest("login ou mot de passe incorrecte...");
         }
 
         private async Task<string> GenerateJwtToken(User user)
@@ -417,8 +418,8 @@ namespace EducNotes.API.Controllers
                 AmountTTC = total,
                 Discount = 0,
                 TVA = 0,
-                UserPId = parentId,
-                UserId = childId
+                ParentId = parentId,
+                ChildId = childId
               };
               _repo.Add(newOrder);
 
@@ -442,8 +443,6 @@ namespace EducNotes.API.Controllers
 
           return BadRequest();
         }
-
-
 
         [HttpPost("{id}/TeacherSelfPreinscription")] // enregistrement de préinscription : professeur
         public async Task<IActionResult> TeacherSelfPreinscription(int id, [FromBody]UserForUpdateDto userToUpdate)
@@ -616,12 +615,6 @@ namespace EducNotes.API.Controllers
         {
             return Ok(await _context.Classes.ToListAsync());
         }
-
-
-
-
-
-
 
         // [HttpPost("AddFile")]
         // public async Task<IActionResult> AddFile([FromForm]PhotoForCreationDto photoForCreationDto)

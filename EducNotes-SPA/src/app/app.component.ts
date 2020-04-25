@@ -8,6 +8,7 @@ import { NavigationService } from './shared/services/navigation.service';
 import { Subject } from 'rxjs';
 import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
 import { RouterStateSnapshot, Router } from '@angular/router';
+import { Setting } from './_models/setting';
 
 @Component({
   selector: 'app-root',
@@ -47,6 +48,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     const token = localStorage.getItem('token');
     const user: User = JSON.parse(localStorage.getItem('user'));
+    const settings: Setting[] = JSON.parse(localStorage.getItem('settings'));
     const currentPeriod: Period = JSON.parse(localStorage.getItem('currentPeriod'));
     const currentChild: User = JSON.parse(localStorage.getItem('currentChild'));
     const currentClassId = localStorage.getItem('currentClassId');
@@ -55,6 +57,7 @@ export class AppComponent implements OnInit {
     }
     if (user) {
       this.authService.currentUser = user;
+      this.authService.settings = settings;
       this.authService.currentPeriod = currentPeriod;
       this.authService.changeCurrentChild(currentChild);
       this.authService.changeUserPhoto(user.photoUrl);

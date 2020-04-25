@@ -185,6 +185,28 @@ namespace EducNotes.API.Data
                 // };
                 // context.AddRange(feeTypes);
 
+                var educLevels = new List<EducationLevel> {
+                  new EducationLevel { Name = "primaire "},
+                  new EducationLevel { Name = "secondaire "}
+                };
+                context.AddRange(educLevels);
+
+                var schools = new List<School> {
+                  new School {Name = "maternelle"},
+                  new School {Name = "élémentaire"},
+                  new School {Name = "collège"},
+                  new School {Name = "lycée"}
+                };
+                context.AddRange(schools);
+
+                var cycles = new List<Cycle> {
+                  new Cycle { Name = "cycle 1"},
+                  new Cycle { Name = "cycle 2"},
+                  new Cycle { Name = "cycle 3"},
+                  new Cycle { Name = "cycle 4"}
+                };
+                context.AddRange(cycles);
+
                 var evalTypes = new List<EvalType> {
                     new EvalType { Name = "devoir maison" },
                     new EvalType { Name = "oral" },

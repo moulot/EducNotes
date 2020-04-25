@@ -146,7 +146,7 @@ export class AdminService {
     return this.http.put(this.baseUrl + 'admin/saveSchool', school);
   }
 
-  sendBradcast(dataForBroadcast: DataForBroadcast) {
+  sendBroadcast(dataForBroadcast: DataForBroadcast) {
     return this.http.post(this.baseUrl + 'admin/Broadcast', dataForBroadcast);
   }
 

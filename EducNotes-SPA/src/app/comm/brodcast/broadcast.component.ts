@@ -5,7 +5,6 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { AdminService } from 'src/app/_services/admin.service';
 import { Email } from 'src/app/_models/email';
-import { DataForEmail } from 'src/app/_models/dataForEmail';
 import { ClassLevel } from 'src/app/_models/classLevel';
 import { UserService } from 'src/app/_services/user.service';
 import { DataForBroadcast } from 'src/app/_models/dataForBroadcast';
@@ -76,7 +75,7 @@ export class BroadcastComponent implements OnInit {
     dataForEmails.classLevelIds = classLevelIds;
     dataForEmails.classIds = classIds;
 
-    this.adminService.sendBradcast(dataForEmails).subscribe(() => {
+    this.adminService.sendBroadcast(dataForEmails).subscribe(() => {
       this.alertify.successBar('messages envoyés.');
     }, error => {
       this.alertify.errorBar('problème avec l\'envoi des emails');
@@ -111,9 +110,7 @@ export class BroadcastComponent implements OnInit {
     this.classOptions = [];
 
     if (clevelIds !== null && clevelIds.length !== 0) {
-
       if (clevelIds.length > 0) {
-
         this.showClass = true;
         this.classService.getClassLevelsWithClasses(clevelIds).subscribe((data: ClassLevel[]) => {
           for (let i = 0; i < data.length; i++) {
@@ -133,13 +130,10 @@ export class BroadcastComponent implements OnInit {
               }
             }
           }
-
         }, error => {
           this.alertify.error(error);
         });
-
       }
-
     } else {
 
       this.showClass = false;

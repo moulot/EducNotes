@@ -46,9 +46,8 @@ namespace EducNotes.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetClass(int Id)
         {
-            var theclass = await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
-
-            return Ok(theclass);
+          var theclass = await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
+          return Ok(theclass);
         }
 
         [HttpGet("{classId}/schedule/today")]
@@ -874,58 +873,56 @@ namespace EducNotes.API.Controllers
         [HttpGet("LevelsWithClasses")]
         public async Task<IActionResult> GetLevelsWithClasses()
         {
-            var levels = await _context.ClassLevels
-                .Include(c => c.Classes)
-                .OrderBy(a => a.DsplSeq)
-                .ToListAsync();
-            var dataToReturn = new List<ClassLevelDetailDto>();
+          var levels = await _context.ClassLevels
+                              .Include(c => c.Classes)
+                              .OrderBy(a => a.DsplSeq)
+                              .ToListAsync();
+          var dataToReturn = new List<ClassLevelDetailDto>();
 
-            foreach (var item in levels)
+          foreach (var item in levels)
+          {
+            var res = new ClassLevelDetailDto();
+            res.Id = item.Id;
+            res.Name = item.Name;
+            res.TotalClasses = item.Classes.Count();
+            res.TotalEnrolled = item.Inscriptions.Count();
+            res.Classes = new List<ClassDetailDto>();
+            foreach (var c in item.Classes)
             {
-                var res = new ClassLevelDetailDto();
-                res.Id = item.Id;
-                res.Name = item.Name;
-                res.TotalClasses = item.Classes.Count();
-                res.TotalEnrolled = item.Inscriptions.Count();
-                res.Classes = new List<ClassDetailDto>();
-                foreach (var c in item.Classes)
-                {
-                    res.TotalStudents += c.Students.Count();
-                    //add class data
-                    ClassDetailDto cdd = new ClassDetailDto();
-                    cdd.Id = c.Id;
-                    cdd.Name = c.Name;
-                    cdd.MaxStudent = c.MaxStudent;
-                    cdd.TotalStudents = c.Students.Count();
-                    res.Classes.Add(cdd);
-                }
-
-                //res.Classes = item.Classes.ToList();
-                dataToReturn.Add(res);
+              res.TotalStudents += c.Students.Count();
+              //add class data
+              ClassDetailDto cdd = new ClassDetailDto();
+              cdd.Id = c.Id;
+              cdd.Name = c.Name;
+              cdd.MaxStudent = c.MaxStudent;
+              cdd.TotalStudents = c.Students.Count();
+              res.Classes.Add(cdd);
             }
 
-            return Ok(dataToReturn);
+            dataToReturn.Add(res);
+          }
+
+          return Ok(dataToReturn);
         }
 
         [HttpPost("ClassLevelsWithClasses")]
         public async Task<IActionResult> GetClassLevelWithClasses(List<int> CLIds)
         {
-            var classLevels = await _context.ClassLevels
-                .Where(c => CLIds.Contains(c.Id)).ToListAsync();
+          var classLevels = await _context.ClassLevels.Where(c => CLIds.Contains(c.Id)).ToListAsync();
 
-            foreach (var cl in classLevels)
+          foreach (var cl in classLevels)
+          {
+            cl.Classes = await _context.Classes
+                                .OrderBy(c => c.Name)
+                                .Where(c => c.ClassLevelId == cl.Id).ToListAsync();
+
+            foreach (var aclass in cl.Classes)
             {
-                cl.Classes = await _context.Classes
-                    .OrderBy(c => c.Name)
-                    .Where(c => c.ClassLevelId == cl.Id).ToListAsync();
-
-                foreach (var aclass in cl.Classes)
-                {
-                    aclass.Students = await _context.Users.Where(u => u.ClassId == aclass.Id).ToListAsync();
-                }
+              aclass.Students = await _context.Users.Where(u => u.ClassId == aclass.Id).ToListAsync();
             }
+          }
 
-            return Ok(classLevels);
+          return Ok(classLevels);
         }
 
         [HttpGet("{classLevelId}/ClassesByLevelId")]
