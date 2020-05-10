@@ -874,7 +874,7 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetLevelsWithClasses()
         {
           var levels = await _context.ClassLevels
-                              .Include(c => c.Classes)
+                              .Include(c => c.Classes).ThenInclude(i => i.Students)
                               .OrderBy(a => a.DsplSeq)
                               .ToListAsync();
           var dataToReturn = new List<ClassLevelDetailDto>();
@@ -885,7 +885,7 @@ namespace EducNotes.API.Controllers
             res.Id = item.Id;
             res.Name = item.Name;
             res.TotalClasses = item.Classes.Count();
-            res.TotalEnrolled = item.Inscriptions.Count();
+            //res.TotalEnrolled = item.Inscriptions.Count();
             res.Classes = new List<ClassDetailDto>();
             foreach (var c in item.Classes)
             {
@@ -894,6 +894,10 @@ namespace EducNotes.API.Controllers
               ClassDetailDto cdd = new ClassDetailDto();
               cdd.Id = c.Id;
               cdd.Name = c.Name;
+              cdd.ClassLevelId = item.Id;
+              cdd.CycleId = Convert.ToInt32(item.CycleId);
+              cdd.EducationLevelId = Convert.ToInt32(item.EducationLevelId);
+              cdd.SchoolId = Convert.ToInt32(item.SchoolId);
               cdd.MaxStudent = c.MaxStudent;
               cdd.TotalStudents = c.Students.Count();
               res.Classes.Add(cdd);
@@ -1298,49 +1302,49 @@ namespace EducNotes.API.Controllers
                 List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
                 foreach (var parentId in parentIds)
                 {
-                    //did we already add the sms to DB? if yes remove it (updated one is coming...)
-                    Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == parentId &&
-                                        s.StudentId == childId && s.StatusFlag == 0);
-                    if (oldSms != null)
-                        _repo.Delete(oldSms);
+                  //did we already add the sms to DB? if yes remove it (updated one is coming...)
+                  Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == parentId &&
+                                      s.StudentId == childId && s.StatusFlag == 0);
+                  if (oldSms != null)
+                      _repo.Delete(oldSms);
 
-                    // is the parent subscribed to the Absence/Late sms?
-                    var userTemplate = new UserSmsTemplate();
-                    if (absence.AbsenceTypeId == absTypeId)
-                    {
-                        userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
-                                              u => u.ParentId == parentId && u.SmsTemplateId == absenceSmsId &&
+                  // is the parent subscribed to the Absence/Late sms?
+                  var userTemplate = new UserSmsTemplate();
+                  if (absence.AbsenceTypeId == absTypeId)
+                  {
+                      userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
+                                            u => u.ParentId == parentId && u.SmsTemplateId == absenceSmsId &&
+                                            u.ChildId == childId);
+                  }
+                  else
+                  {
+                      userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
+                                              u => u.ParentId == parentId && u.SmsTemplateId == lateSmsId &&
                                               u.ChildId == childId);
-                    }
-                    else
-                    {
-                        userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
-                                                u => u.ParentId == parentId && u.SmsTemplateId == lateSmsId &&
-                                                u.ChildId == childId);
-                    }
+                  }
 
-                    //set sms data
-                    if (userTemplate != null)
-                    {
-                        var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
-                        AbsenceSmsDto asd = new AbsenceSmsDto();
-                        asd.ChildId = childId;
-                        asd.AbsenceTypeId = absence.AbsenceTypeId;
-                        asd.ChildFirstName = child.FirstName;
-                        asd.ChildLastName = child.LastName;
-                        asd.ParentId = parent.Id;
-                        asd.ParentFirstName = parent.FirstName;
-                        asd.ParentLastName = parent.LastName.FirstLetterToUpper();
-                        asd.ParentGender = parent.Gender;
-                        asd.CourseName = session.CourseAbbrev;
-                        asd.SessionDate = session.SessionDate.ToString("dd/MM/yyyy", frC);
-                        asd.CourseStartHour = session.StartHourMin;
-                        asd.CourseEndHour = session.EndHourMin;
-                        asd.ParentCellPhone = parent.PhoneNumber;
-                        asd.LateInMin = (absence.EndDate - absence.StartDate).TotalMinutes.ToString();
-                        //asd.scheduledDeliveryTime = deliveryTime;
-                        absSmsData.Add(asd);
-                    }
+                  //set sms data
+                  if (userTemplate != null)
+                  {
+                    var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
+                    AbsenceSmsDto asd = new AbsenceSmsDto();
+                    asd.ChildId = childId;
+                    asd.AbsenceTypeId = absence.AbsenceTypeId;
+                    asd.ChildFirstName = child.FirstName;
+                    asd.ChildLastName = child.LastName;
+                    asd.ParentId = parent.Id;
+                    asd.ParentFirstName = parent.FirstName;
+                    asd.ParentLastName = parent.LastName.FirstLetterToUpper();
+                    asd.ParentGender = parent.Gender;
+                    asd.CourseName = session.CourseAbbrev;
+                    asd.SessionDate = session.SessionDate.ToString("dd/MM/yyyy", frC);
+                    asd.CourseStartHour = session.StartHourMin;
+                    asd.CourseEndHour = session.EndHourMin;
+                    asd.ParentCellPhone = parent.PhoneNumber;
+                    asd.LateInMin = (absence.EndDate - absence.StartDate).TotalMinutes.ToString();
+                    //asd.scheduledDeliveryTime = deliveryTime;
+                    absSmsData.Add(asd);
+                  }
                 }
             }
 

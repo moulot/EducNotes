@@ -1116,9 +1116,9 @@ namespace EducNotes.API.Controllers
                                     on courses.ClassId equals classes.Id
                                     where courses.TeacherId == teacherId
                                     select new {
-                                        ClassId = classes.Id,
-                                        ClassName = classes.Name,
-                                        NbStudents = _context.Users.Where(u => u.ClassId == classes.Id).Count()
+                                      ClassId = classes.Id,
+                                      ClassName = classes.Name,
+                                      NbStudents = _context.Users.Where(u => u.ClassId == classes.Id).Count()
                                     })
                                     .OrderBy(o => o.ClassName)
                                     .Distinct().ToListAsync();

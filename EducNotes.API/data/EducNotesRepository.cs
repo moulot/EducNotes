@@ -1581,36 +1581,36 @@ namespace EducNotes.API.Data
 
             foreach (var abs in absences)
             {
-                //did you already sent the sms?
-                Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == abs.ParentId &&
-                                    s.StudentId == abs.ChildId && s.StatusFlag == 1);
-                if (oldSms != null)
-                    continue;
+              //did you already sent the sms?
+              Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == abs.ParentId &&
+                                  s.StudentId == abs.ChildId && s.StatusFlag == 1);
+              if (oldSms != null)
+                continue;
 
-                Sms newSms = new Sms();
-                //newSms.AbsenceTypeId = abs.AbsenceTypeId;
-                newSms.SmsTypeId = smsAbsTypeId;
-                newSms.To = abs.ParentCellPhone;
-                newSms.StudentId = abs.ChildId;
-                newSms.ToUserId = abs.ParentId;
-                newSms.SessionId = sessionId;
-                newSms.validityPeriod = 1;
-                string smsContent;
-                if (abs.AbsenceTypeId == absTypeId)
-                {
-                    smsContent = AbsenceSms.Content;
-                }
-                else
-                {
-                    smsContent = LateSms.Content;
-                }
-                // replace tokens with dynamic data
-                List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
-                newSms.Content = ReplaceTokens(tags, smsContent);
-                newSms.InsertUserId = teacherId;
-                newSms.InsertDate = DateTime.Now;
-                newSms.UpdateDate = DateTime.Now;
-                AbsencesSms.Add(newSms);
+              Sms newSms = new Sms();
+              //newSms.AbsenceTypeId = abs.AbsenceTypeId;
+              newSms.SmsTypeId = smsAbsTypeId;
+              newSms.To = abs.ParentCellPhone;
+              newSms.StudentId = abs.ChildId;
+              newSms.ToUserId = abs.ParentId;
+              newSms.SessionId = sessionId;
+              newSms.validityPeriod = 1;
+              string smsContent;
+              if (abs.AbsenceTypeId == absTypeId)
+              {
+                smsContent = AbsenceSms.Content;
+              }
+              else
+              {
+                smsContent = LateSms.Content;
+              }
+              // replace tokens with dynamic data
+              List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
+              newSms.Content = ReplaceTokens(tags, smsContent);
+              newSms.InsertUserId = teacherId;
+              newSms.InsertDate = DateTime.Now;
+              newSms.UpdateDate = DateTime.Now;
+              AbsencesSms.Add(newSms);
             }
 
             return AbsencesSms;
@@ -1618,50 +1618,131 @@ namespace EducNotes.API.Data
 
         public List<TokenDto> GetTokenAbsenceValues(List<Token> tokens, AbsenceSmsDto absSms)
         {
-            List<TokenDto> tokenValues = new List<TokenDto>();
+          List<TokenDto> tokenValues = new List<TokenDto>();
 
-            foreach (var token in tokens)
+          foreach (var token in tokens)
+          {
+              TokenDto td = new TokenDto();
+              td.TokenString = token.TokenString;
+
+              switch (td.TokenString)
+              {
+                  case "<P_ENFANT>":
+                      td.Value = absSms.ChildFirstName;
+                      break;
+                  case "<N_ENFANT>":
+                      td.Value = absSms.ChildLastName;
+                      break;
+                  case "<N_PARENT>":
+                      td.Value = absSms.ParentLastName;
+                      break;
+                  case "<P_PARENT>":
+                      td.Value = absSms.ParentFirstName;
+                      break;
+                  case "<M_MME>":
+                      td.Value = absSms.ParentGender == 0 ? "Mme" : "M.";
+                      break;
+                  case "<COURS>":
+                      td.Value = absSms.CourseName;
+                      break;
+                  case "<DATE_COURS>":
+                      td.Value = absSms.SessionDate;
+                      break;
+                  case "<HORAIRE_COURS>":
+                      td.Value = absSms.CourseStartHour + " - " + absSms.CourseEndHour;
+                      break;
+                  case "<RETARD_MIN>":
+                      td.Value = absSms.LateInMin;
+                      break;
+                  default:
+                      break;
+              }
+
+              tokenValues.Add(td);
+          }
+
+          return tokenValues;
+        }
+
+        public List<Email> SetEmailDataForRegistration(List<RegistrationEmailDto> emailData, string content, string RegDeadLine)
+        {
+          List<Email> RegEmails = new List<Email>();
+          List<Token> tokens = GetTokens();
+
+          foreach (var data in emailData)
+          {
+            Email newEmail = new Email();
+            newEmail.EmailTypeId = 1;
+            newEmail.ToAddress = data.ParentEmail;
+            newEmail.FromAddress = "no-reply@educnotes.com";
+            newEmail.Subject = data.EmailSubject;
+            List<TokenDto> tags = GetRegistrationTokenValues(tokens, data, RegDeadLine);
+            newEmail.Body = ReplaceTokens(tags, content);
+            newEmail.InsertUserId = 1;
+            newEmail.InsertDate = DateTime.Now;
+            newEmail.UpdateUserId = 1;
+            newEmail.UpdateDate = DateTime.Now;
+            RegEmails.Add(newEmail);
+          }
+
+          return RegEmails;
+        }
+
+        public List<TokenDto> GetRegistrationTokenValues(List<Token> tokens, RegistrationEmailDto regEmail, string RegDeadLine)
+        {
+          List<TokenDto> tokenValues = new List<TokenDto>();
+
+          //set children registration data
+          string childrenInfos = "";
+          byte num = 1;
+          foreach(var child in regEmail.Children)
+          {
+            childrenInfos += "<div><br></><div><span style=\"font-size: 1rem;\">" + num + ". <b>" + child.LastName + " " + 
+            child.FirstName + ".</b></span><b style=\"font-size: 1rem;\"> classe " + child.NextClass + 
+            "</b><span style=\"font-size: 1rem;\">" + ".</span></div><div><ul><li><span style=\"font-size: 1rem;\">" +
+            "frais de scolarité pour l'année : " + child.TuitionAmount + " F CFA</span>" + "</li><li>" +
+            "<span style=\"font-size: 1rem;\">frais d'inscription : " + child.RegistrationFee + " F CFA</span></li><li>" +
+            "<span style=\"font-size: 1rem;\">acompte (" + child.DueAmountPct + ")&nbsp; : " + child.DueAmount +
+            " F CFA</span></li></ul>montant total dû pour " + child.FirstName + " : <u>" + child.TotalDueForChild + " F CFA</u></div>";
+            num++;
+          }
+
+          foreach (var token in tokens)
+          {
+            TokenDto td = new TokenDto();
+            td.TokenString = token.TokenString;
+
+            switch (td.TokenString)
             {
-                TokenDto td = new TokenDto();
-                td.TokenString = token.TokenString;
-
-                switch (td.TokenString)
-                {
-                    case "<P_ENFANT>":
-                        td.Value = absSms.ChildFirstName;
-                        break;
-                    case "<N_ENFANT>":
-                        td.Value = absSms.ChildLastName;
-                        break;
-                    case "<N_PARENT>":
-                        td.Value = absSms.ParentLastName;
-                        break;
-                    case "<P_PARENT>":
-                        td.Value = absSms.ParentFirstName;
-                        break;
-                    case "<M_MME>":
-                        td.Value = absSms.ParentGender == 0 ? "Mme" : "M.";
-                        break;
-                    case "<COURS>":
-                        td.Value = absSms.CourseName;
-                        break;
-                    case "<DATE_COURS>":
-                        td.Value = absSms.SessionDate;
-                        break;
-                    case "<HORAIRE_COURS>":
-                        td.Value = absSms.CourseStartHour + " - " + absSms.CourseEndHour;
-                        break;
-                    case "<RETARD_MIN>":
-                        td.Value = absSms.LateInMin;
-                        break;
-                    default:
-                        break;
-                }
-
-                tokenValues.Add(td);
+              case "<N_PARENT>":
+                td.Value = regEmail.ParentLastName;
+                break;
+              case "<P_PARENT>":
+                td.Value = regEmail.ParentFirstName;
+                break;
+              case "<M_MME>":
+                td.Value = regEmail.ParentGender == 0 ? "Mme" : "M.";
+                break;
+              case "<DATE_LIMITE_INSCR>":
+                td.Value = RegDeadLine;
+                break;
+              case "<TOTAL_FRAIS>":
+                td.Value = regEmail.TotalAmount;
+                break;
+              case "<DATE_LIMITE_FRAIS>":
+                td.Value = regEmail.DueDate;
+                break;
+              case "<INFOS_INSCR_ENFANTS>":
+                td.Value = childrenInfos;
+                break;
+              default:
+                break;
             }
 
-            return tokenValues;
+            tokenValues.Add(td);
+          }
+
+          return tokenValues;
         }
 
         public async Task<List<Sms>> SetSmsDataForNewGrade(List<EvalSmsDto> grades, string content, int teacherId)
@@ -1767,17 +1848,17 @@ namespace EducNotes.API.Data
 
         public string ReplaceTokens(List<TokenDto> tokens, string content)
         {
-            foreach (var token in tokens)
-            {
-                content = content.Replace(token.TokenString, token.Value);
-            }
-            return content;
+          foreach (var token in tokens)
+          {
+            content = content.Replace(token.TokenString, token.Value);
+          }
+          return content;
         }
 
         public List<Token> GetTokens()
         {
-            var tokens = _context.Tokens.OrderBy(t => t.Name).ToList();
-            return tokens;
+          var tokens = _context.Tokens.OrderBy(t => t.Name).ToList();
+          return tokens;
         }
 
         //This function converts the recipients list into an array string so it can be parsed correctly by the json array.
@@ -2037,11 +2118,119 @@ namespace EducNotes.API.Data
           return settings;
         }
 
-        // public async Task<IEnumerable<EducationLevel>> GetEducationLevels()
-        // {
-        //   var educLevels = await _context
-        //   return educLevels;
-        // }
+        public async Task<IEnumerable<EducationLevelDto>> GetEducationLevels()
+        {
+          var educLevelsFromDB = await _context.EducationLevels.OrderBy(s => s.Name).ToListAsync();
 
+          List<EducationLevelDto> educLevels = new List<EducationLevelDto>();
+          foreach (var educLevel in educLevelsFromDB)
+          {
+            EducationLevelDto eld = new EducationLevelDto();
+            eld.Id = educLevel.Id;
+            eld.Name = educLevel.Name;
+
+            var classLevels = await _context.ClassLevels
+                                      .Where(cl => cl.EducationLevelId == educLevel.Id)
+                                      .OrderBy(o => o.DsplSeq)
+                                      .ToListAsync();
+            eld.Classes = new List<ClassDetailDto>();
+            foreach (var cl in classLevels)
+            {
+              var classes = await _context.Classes
+                                    .Include(i => i.Students)
+                                    .Where(c => c.ClassLevelId == cl.Id).ToListAsync();
+              foreach (var aclass in classes)
+              {
+                ClassDetailDto cdd = new ClassDetailDto();
+                cdd.Id = aclass.Id;
+                cdd.Name = aclass.Name;
+                cdd.ClassLevelId = cl.Id;
+                cdd.CycleId = Convert.ToInt32(cl.CycleId);
+                cdd.EducationLevelId = Convert.ToInt32(cl.EducationLevelId);
+                cdd.SchoolId = Convert.ToInt32(cl.SchoolId);
+                cdd.TotalStudents = aclass.Students.Count();
+                eld.Classes.Add(cdd);
+              }
+            }
+            educLevels.Add(eld);
+          }
+          return educLevels;
+        }
+
+        public async Task<IEnumerable<SchoolDto>> GetSchools()
+        {
+          var schoolsFromDB = await _context.Schools.OrderBy(s => s.DsplSeq).ToListAsync();
+
+          List<SchoolDto> schools = new List<SchoolDto>();
+          foreach (var school in schoolsFromDB)
+          {
+            SchoolDto sd = new SchoolDto();
+            sd.Id = school.Id;
+            sd.Name = school.Name;
+
+            var classLevels = await _context.ClassLevels
+                                    .Where(cl => cl.SchoolId == school.Id)
+                                    .OrderBy(o => o.DsplSeq)
+                                    .ToListAsync();
+            sd.Classes = new List<ClassDetailDto>();
+            foreach (var cl in classLevels)
+            {
+              var classes = await _context.Classes
+                                    .Include(i => i.Students)
+                                    .Where(c => c.ClassLevelId == cl.Id).ToListAsync();
+              foreach (var aclass in classes)
+              {
+                ClassDetailDto cdd = new ClassDetailDto();
+                cdd.Id = aclass.Id;
+                cdd.Name = aclass.Name;
+                cdd.ClassLevelId = cl.Id;
+                cdd.CycleId = Convert.ToInt32(cl.CycleId);
+                cdd.EducationLevelId = Convert.ToInt32(cl.EducationLevelId);
+                cdd.SchoolId = Convert.ToInt32(cl.SchoolId);
+                sd.Classes.Add(cdd);
+              }
+            }
+            schools.Add(sd);
+          }
+          return schools;
+        }
+
+        public async Task<IEnumerable<CycleDto>> GetCycles()
+        {
+          var cyclesFromDB = await _context.Cycles.OrderBy(s => s.Name).ToListAsync();
+
+          List<CycleDto> cycles = new List<CycleDto>();
+          foreach (var cycle in cyclesFromDB)
+          {
+            CycleDto cd = new CycleDto();
+            cd.Id = cycle.Id;
+            cd.Name = cycle.Name;
+
+            var classLevels = await _context.ClassLevels
+                                      .Where(cl => cl.EducationLevelId == cycle.Id)
+                                      .OrderBy(o => o.DsplSeq)
+                                      .ToListAsync();
+            cd.Classes = new List<ClassDetailDto>();
+            foreach (var cl in classLevels)
+            {
+              var classes = await _context.Classes
+                                    .Include(i => i.Students)
+                                    .Where(c => c.ClassLevelId == cl.Id).ToListAsync();
+              foreach (var aclass in classes)
+              {
+                ClassDetailDto cdd = new ClassDetailDto();
+                cdd.Id = aclass.Id;
+                cdd.Name = aclass.Name;
+                cdd.ClassLevelId = cl.Id;
+                cdd.CycleId = Convert.ToInt32(cl.CycleId);
+                cdd.EducationLevelId = Convert.ToInt32(cl.EducationLevelId);
+                cdd.SchoolId = Convert.ToInt32(cl.SchoolId);
+                cd.Classes.Add(cdd);
+              }
+            }
+            cycles.Add(cd);
+          }
+          return cycles;
+        }
     }
 }

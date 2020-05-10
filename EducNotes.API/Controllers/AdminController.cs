@@ -19,7 +19,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using System.IO;
 using System.Net;
 using System.Text;
 
@@ -39,6 +38,8 @@ namespace EducNotes.API.Controllers
         string password;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
         int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId, schoolInscTypeId;
+        int registrationEmailId, tuitionFeeId;
+        byte lastClassLevelSeq;
         CultureInfo frC = new CultureInfo("fr-FR");
 
 
@@ -62,6 +63,9 @@ namespace EducNotes.API.Controllers
             adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
             teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
             schoolInscTypeId = _config.GetValue<int>("AppSettings:schoolInscTypeId");
+            registrationEmailId = _config.GetValue<int>("AppSettings:registrationEmailId");
+            tuitionFeeId = _config.GetValue<int>("AppSettings:tuitionFeeId");
+            lastClassLevelSeq = _config.GetValue<byte>("AppSettings:lastClassLevelSeq");
 
             Account acc = new Account(
               _cloudinaryConfig.Value.CloudName,
@@ -668,75 +672,111 @@ namespace EducNotes.API.Controllers
             }
         }
 
-        [HttpPost("Broadcast")]
-        public async Task<IActionResult> Broadcast(DataForBroadcastDto dataForEmailDto)
+        [HttpGet("EmailTemplatesData")]
+        public async Task<IActionResult> GetEmailTemplatesData()
         {
-            List<int> userTypeIds = dataForEmailDto.UserTypeIds;
-            List<int> classLevelIds = dataForEmailDto.ClassLevelIds;
-            List<int> classIds = dataForEmailDto.ClassIds;
-            string body = dataForEmailDto.Body;
-            string subject = dataForEmailDto.Subject;
+          var emailTemplates = await _context.EmailTemplates
+                                  .Include(i => i.EmailCategory)
+                                  .OrderBy(o => o.Name).ToListAsync();
+
+          List<EmailBroadcastDataDto> templates = new List<EmailBroadcastDataDto>();
+          foreach (var tpl in emailTemplates)
+          {
+            EmailBroadcastDataDto ebdd = new EmailBroadcastDataDto();
+            ebdd.Id = tpl.Id;
+            ebdd.Name = tpl.Name;
+            ebdd.Subject = tpl.Subject;
+            ebdd.EmailCategoryName = tpl.EmailCategory.Name;
+            templates.Add(ebdd);
+          }
+          return Ok(templates);
+        }
+
+        [HttpPost("EmailBroadcast")]
+        public async Task<IActionResult> EmailBroadcast(DataForBroadcastDto dataForEmailDto)
+        {
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            List<int> userTypeIds = dataForEmailDto.UserTypeIds;
+            List<int> classLevelIds = new List<int>(); //dataForEmailDto.ClassLevelIds;
+            List<int> classIds = dataForEmailDto.ClassIds;
+            int templateId = dataForEmailDto.EmailTemplateId;
+            string subject = "";
+            string body = "";
 
             List<string> recipientEmails = new List<string>();
 
             var users = new List<User>();
             foreach (var ut in userTypeIds)
             {
-                if (ut == studentTypeId || ut == parentTypeId)
+              if (ut == studentTypeId || ut == parentTypeId)
+              {
+                if (users.Count() == 0)
                 {
-                    if (users.Count() == 0)
-                    {
-                        users = await _context.Users
-                          .Where(u => classIds.Contains(Convert.ToInt32(u.ClassId)) && u.Active == 1 &&
-                           u.UserTypeId == studentTypeId && u.EmailConfirmed == true)
-                          .ToListAsync();
-                    }
-
-                    if (ut == studentTypeId)
-                    {
-                        foreach (var user in users)
-                        {
-                            if (!string.IsNullOrEmpty(user.Email))
-                                recipientEmails.Add(user.Email);
-                        }
-                    }
-
-                    if (ut == parentTypeId)
-                    {
-                        var ids = users.Select(u => u.Id);
-                        var parents = _context.UserLinks
-                          .Where(u => ids.Contains(u.UserId)).Select(u => u.UserP).Distinct();
-
-                        foreach (var user in parents)
-                        {
-                            if (!string.IsNullOrEmpty(user.Email))
-                                recipientEmails.Add(user.Email);
-                        }
-                    }
+                  users = await _context.Users
+                    .Where(u => classIds.Contains(Convert.ToInt32(u.ClassId)) && u.Active == 1 &&
+                      u.UserTypeId == studentTypeId && u.EmailConfirmed == true)
+                    .ToListAsync();
                 }
 
-                if (ut == teacherTypeId)
+                if (ut == studentTypeId)
                 {
-                    var teachers = await _context.ClassCourses
-                      .Where(t => classLevelIds.Contains(t.Class.ClassLevelId) && t.Teacher.Active == 1 &&
-                       t.Teacher.UserTypeId == teacherTypeId && t.Teacher.EmailConfirmed == true)
-                      .Select(t => t.Teacher)
-                      .Distinct()
-                      .ToListAsync();
-
-                    foreach (var user in teachers)
-                    {
-                        if (!string.IsNullOrEmpty(user.Email))
-                            recipientEmails.Add(user.Email);
-                    }
+                  foreach (var user in users)
+                  {
+                    if (!string.IsNullOrEmpty(user.Email))
+                      recipientEmails.Add(user.Email);
+                  }
                 }
+
+                if (ut == parentTypeId)
+                {
+                  var ids = users.Select(u => u.Id);
+                  var parents = _context.UserLinks.Where(u => ids.Contains(u.UserId)).Select(u => u.UserP).Distinct();
+
+                  foreach (var user in parents)
+                  {
+                    if (!string.IsNullOrEmpty(user.Email))
+                      recipientEmails.Add(user.Email);
+                  }
+                }
+              }
+
+              if (ut == teacherTypeId)
+              {
+                var teachers = await _context.ClassCourses
+                  .Where(t => classIds.Contains(t.ClassId) && t.Teacher.Active == 1 &&
+                    t.Teacher.UserTypeId == teacherTypeId && t.Teacher.EmailConfirmed == true)
+                  .Select(t => t.Teacher)
+                  .Distinct()
+                  .ToListAsync();
+
+                foreach (var user in teachers)
+                {
+                  if (!string.IsNullOrEmpty(user.Email))
+                    recipientEmails.Add(user.Email);
+                }
+              }
             }
 
-            List<Email> emailsToBeSent = new List<Email>();
-            //save emails to Emails table
-            foreach (var email in recipientEmails)
+            List<Setting> settings = await _context.Settings.ToListAsync();
+            var schoolName = settings.First(s => s.Name.ToLower() == "schoolname");
+
+            //did we select a template?
+            if(templateId != 0)
             {
+              subject = schoolName + " - inscription pour l'année scolaire prochaine";
+              var template = await _context.EmailTemplates.FirstAsync(t => t.Id == templateId);
+
+              return NoContent();
+            }
+            else
+            {
+              body = dataForEmailDto.Body;
+              subject = dataForEmailDto.Subject;
+
+              List<Email> emailsToBeSent = new List<Email>();
+              //save emails to Emails table
+              foreach (var email in recipientEmails)
+              {
                 Email newEmail = new Email();
                 newEmail.EmailTypeId = 1;
                 newEmail.FromAddress = "no-reply@educnotes.com";
@@ -749,35 +789,126 @@ namespace EducNotes.API.Controllers
                 newEmail.UpdateUserId = currentUserId;
                 newEmail.UpdateDate = DateTime.Now;
                 emailsToBeSent.Add(newEmail);
-            }
-            _context.AddRange(emailsToBeSent);
+              }
+              _context.AddRange(emailsToBeSent);
 
-            if (await _repo.SaveAll())
-            {
+              if (await _repo.SaveAll())
+              {
                 return NoContent();
-            }
-            else
-            {
+              }
+              else
+              {
                 return BadRequest("problème pour envoyer les emails");
+              }
             }
+        }
+
+        [HttpGet("EmailBroadCastData")]
+        public async Task<IActionResult> GetEmailBroadCastData()
+        {
+          var schools = await _repo.GetSchools();
+          var cycles = await _repo.GetCycles();
+          var educLevels = await _repo.GetEducationLevels();
+          return Ok( new {
+            schools,
+            cycles,
+            educLevels
+          });
+        }
+
+        [HttpPost("EmailRegistration")]
+        public async Task<IActionResult> SendEmailRegistration()
+        {
+          List<User> parents = await _context.Users
+                  .Where(u => u.UserTypeId == parentTypeId && u.Active == 1 && u.EmailConfirmed == true)
+                  .ToListAsync();
+
+          List<Setting> settings = await _context.Settings.ToListAsync();
+          var schoolName = settings.First(s => s.Name.ToLower() == "schoolname").Value;
+          var smsActive = settings.First(s => s.Name.ToLower() == "sendregsms").Value;
+          decimal RegistrationFee = Convert.ToDecimal(settings.First(s => s.Name.ToLower() == "registrationfee").Value);
+          string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
+
+          Boolean sendSmsToo = smsActive == "1" ? true : false;
+
+          List<RegistrationEmailDto> EmailData = new List<RegistrationEmailDto>();
+          foreach (var parent in parents)
+          {
+            RegistrationEmailDto red = new RegistrationEmailDto();
+            red.ParentLastName = parent.LastName;
+            red.ParentFirstName = parent.FirstName;
+            red.ParentEmail = parent.Email;
+            red.ParentCellPhone = parent.PhoneNumber;
+            red.ParentGender = parent.Gender;
+            red.EmailSubject = schoolName + " - inscription pour l'année scolaire prochaine";
+            var deadLines = await _context.ProductDeadLines
+                                .FirstAsync(p => p.ProductId == tuitionFeeId && p.Seq == 1);
+            red.DueDate = deadLines.DueDate.ToString("dd/MM/yyyy", frC);
+
+            red.Children = new List<ChildRegistrationDto>();
+            var children = await _context.UserLinks
+                            .Where(u => u.UserPId == parent.Id && u.User.Active == 1 && u.User.ValidatedCode == true)
+                            .Select(u => u.User)
+                            .Include(i => i.Class).ThenInclude(i => i.ClassLevel)
+                            .Distinct().ToListAsync();
+            decimal totalAmount = 0;
+            foreach (var child in children)
+            {
+              int nextClass = child.Class.ClassLevel.DsplSeq + 1;
+              //did we reached the last level (terminale)?
+              if(nextClass > lastClassLevelSeq)
+                continue;
+              var nextClassLevel = await _context.ClassLevels.FirstAsync(c => c.DsplSeq == nextClass);
+              ChildRegistrationDto crd = new ChildRegistrationDto();
+              crd.LastName = child.LastName;
+              crd.FirstName = child.FirstName;
+              crd.NextClass = nextClassLevel.Name;
+              crd.RegistrationFee = RegistrationFee.ToString("N0") + "FCFA";
+              var classProduct = await _context.ClassLevelProducts
+                                  .FirstAsync(c => c.ClassLevelId == nextClassLevel.Id && c.ProductId == tuitionFeeId);
+              crd.TuitionAmount = classProduct.Price.ToString("N0");
+              decimal tuitionFee = Convert.ToDecimal(classProduct.Price);
+              decimal DPPct = deadLines.Percentage;
+              decimal DownPayment = DPPct * tuitionFee;
+              crd.DueAmountPct = (DPPct * 100).ToString("N0") + "%";
+              crd.DueAmount = DownPayment.ToString("N0");
+              crd.TotalDueForChild = (RegistrationFee + DownPayment).ToString("N0");
+              red.Children.Add(crd);
+
+              totalAmount += DownPayment + RegistrationFee;
+            }
+            red.TotalAmount = totalAmount.ToString("N0");
+
+            EmailData.Add(red);
+          }
+
+          var template = await _context.EmailTemplates.FirstAsync(t => t.Id == registrationEmailId);
+          List<Email> RegEmails = _repo.SetEmailDataForRegistration(EmailData, template.Body, RegDeadLine);
+          _context.AddRange(RegEmails);
+          if(await _repo.SaveAll())
+            return Ok(new{
+              nbEmailsSent = RegEmails.Count()
+            });
+
+          return BadRequest("problème pour envoyer les emails");
         }
 
         [HttpGet("UsersRecap")]
         public async Task<IActionResult> UsersRecap()
         {
-            var dataToReturn = new List<UsersRecapDto>();
-            var userTypes = await _context.UserTypes.Include(u => u.Users).ToListAsync();
-            foreach (var item in userTypes)
-            {
-                dataToReturn.Add(new UsersRecapDto
-                {
-                    UserTypeId = item.Id,
-                    UserTypeName = item.Name,
-                    TotalAccount = item.Users.Count(),
-                    TotalActive = item.Users.Where(u => u.EmailConfirmed == true).Count()
-                });
-            }
-            return Ok(dataToReturn);
+          var dataToReturn = new List<UsersRecapDto>();
+          var userTypes = await _context.UserTypes.Include(u => u.Users).ToListAsync();
+          foreach (var item in userTypes)
+          {
+              dataToReturn.Add(new UsersRecapDto
+              {
+                  UserTypeId = item.Id,
+                  UserTypeName = item.Name,
+                  TotalAccount = item.Users.Count(),
+                  TotalActive = item.Users.Where(u => u.EmailConfirmed == true).Count()
+              });
+          }
+          return Ok(dataToReturn);
         }
 
         [HttpGet("SearchInscription")]

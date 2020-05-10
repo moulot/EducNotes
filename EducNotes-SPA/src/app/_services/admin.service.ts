@@ -146,8 +146,8 @@ export class AdminService {
     return this.http.put(this.baseUrl + 'admin/saveSchool', school);
   }
 
-  sendBroadcast(dataForBroadcast: DataForBroadcast) {
-    return this.http.post(this.baseUrl + 'admin/Broadcast', dataForBroadcast);
+  sendEmailBroadcast(dataForBroadcast: DataForBroadcast) {
+    return this.http.post(this.baseUrl + 'admin/EmailBroadcast', dataForBroadcast);
   }
 
   sendEmail(dataForEmail: DataForEmail) {
@@ -156,6 +156,18 @@ export class AdminService {
 
   saveImportedUsers(importedUsers, insertUserId) {
     return this.http.post(this.baseUrl + 'admin/ImportedUsers/' + insertUserId, importedUsers);
+  }
+
+  getEmailBroadCastData() {
+    return this.http.get(this.baseUrl + 'admin/EmailBroadCastData');
+  }
+
+  getEmailTemplatesData() {
+    return this.http.get(this.baseUrl + 'admin/EmailTemplatesData');
+  }
+
+  sendEmailRegistration() {
+    return this.http.post(this.baseUrl + 'admin/EmailRegistration', {});
   }
 
   // saveImportedTeacher(importedParents, insertUserId) {

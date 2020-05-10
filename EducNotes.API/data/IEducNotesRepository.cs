@@ -88,9 +88,10 @@ namespace EducNotes.API.Data
         Task<int> CreateLessonDoc(CourseShowingDto courseShowingDto);
         Task<bool> SendCourseShowingLink(int lessonDocId);
         Task<IEnumerable<Setting>> GetSettings(int userId);
-        // Task<IEnumerable<EducationLevel>> GetEducationLevels();
-        // Task<IEnumerable<School>> GetSchools();
-        // Task<IEnumerable<Cycle>> GetCycles();
+        Task<IEnumerable<EducationLevelDto>> GetEducationLevels();
+        Task<IEnumerable<SchoolDto>> GetSchools();
+        Task<IEnumerable<CycleDto>> GetCycles();
+        List<Email> SetEmailDataForRegistration(List<RegistrationEmailDto> emailData, string content, string RegDeadLine);
 
 
     }

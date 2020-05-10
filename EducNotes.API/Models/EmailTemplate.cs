@@ -1,3 +1,5 @@
+using System;
+
 namespace EducNotes.API.Models
 {
   public class EmailTemplate
@@ -8,5 +10,6 @@ namespace EducNotes.API.Models
     public string Body { get; set; }
     public int EmailCategoryId { get; set; }
     public EmailCategory EmailCategory { get; set; }
+    public Boolean Internal { get; set; }
   }
 }

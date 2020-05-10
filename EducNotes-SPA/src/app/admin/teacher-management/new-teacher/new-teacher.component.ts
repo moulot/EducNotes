@@ -1,7 +1,7 @@
-import { Component, OnInit,  EventEmitter, Input, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ClassService } from 'src/app/_services/class.service';
 import { Course } from 'src/app/_models/course';
-import { Validators, FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
+import { Validators, FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { AdminService } from 'src/app/_services/admin.service';
 import { environment } from 'src/environments/environment';
 import { AlertifyService } from 'src/app/_services/alertify.service';
@@ -10,7 +10,6 @@ import { Utils } from 'src/app/shared/utils';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/_services/auth.service';
 import { UserService } from 'src/app/_services/user.service';
-import { TeacherForEdit } from 'src/app/_models/teacherForEdit';
 
 @Component({
   selector: 'app-new-teacher',
@@ -126,7 +125,7 @@ export class NewTeacherComponent implements OnInit {
       photoFile: null,
       courseIds: '',
       active: 1
-        };
+    };
   }
 
   resetValues() {

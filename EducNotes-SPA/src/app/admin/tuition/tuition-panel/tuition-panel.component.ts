@@ -12,6 +12,7 @@ export class TuitionPanelComponent implements OnInit {
   settings: Setting[];
   regDate: Date;
   regActive = false;
+  nbTuitionPays: number;
 
   constructor(private authService: AuthService) { }
 
@@ -23,6 +24,11 @@ export class TuitionPanelComponent implements OnInit {
     if (today >= this.regDate) {
       this.regActive = true;
     }
+    this.nbTuitionPays = Number(this.settings.find(s => s.name === 'NbTuitionPayments').value);
+  }
+
+  counter(i: number) {
+    return new Array(i);
   }
 
 }

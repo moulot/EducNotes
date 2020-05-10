@@ -7,31 +7,8 @@
   <div [@animate]="{value:'*', params:{delay: 300+'ms', y:'80px'}}" class="col-lg-12 col-md-12">
     <form [formGroup]="emailForm" (ngSubmit)="sendEmail()">
       <div class="row">
-
-        <div class="col-md-2">
-          <div class="card">
-            <div class="card-body">
-              
-              <div class="mb-2">
-                <mdb-select [options]="userTypeOptions" [multiple]="true" formControlName="userType" placeholder="destinataire..."></mdb-select>
-                <div class="text-danger text-12" *ngIf="emailForm.controls['userType'].invalid &&
-                  (emailForm.controls['userType'].touched || emailForm.controls['userType'].dirty)">les destinataires sont obligatoires</div>
-              </div>
-              <div class="mb-2">
-                <mdb-select [options]="classLevelOptions" [multiple]="true" formControlName="classLevel" (ngModelChange)="getClasses($event)"
-                  placeholder="niveau classe..."></mdb-select>
-                <div class="text-danger text-12" *ngIf="emailForm.controls['classLevel'].invalid &&
-                  (emailForm.controls['classLevel'].touched || emailForm.controls['classLevel'].dirty)">le niveau de la classe est obligatoire</div>
-              </div>
-              <div class="">
-                <mdb-select [options]="classOptions" formControlName="class" [multiple]="true" placeholder="classes..."></mdb-select>
-              </div>
-
-            </div>
-          </div>        
-        </div>
         
-        <div class="col-md-10">
+        <div class="col-md-12">
           <div class="row">
 
             <div class="col-md-12 mb-2">
@@ -40,55 +17,53 @@
                   <div class="text-15 text-muted">destinataires...</div>
                   <hr class="my-1" style="background-color: #f89f20;">
                   <div class="row">
-                    <div class="col-md-2"><mdb-checkbox>tous les parents</mdb-checkbox></div>
-                    <div class="col-md-2"><mdb-checkbox>tous les élèves</mdb-checkbox></div>
-                    <div class="col-md-2"><mdb-checkbox>tous les profs</mdb-checkbox></div>
-                    <div class="col-md-2"><mdb-checkbox>tous les employés</mdb-checkbox></div>
+                    <div formArrayName="userTypes" *ngFor="let ut of emailForm.get('userTypes')['controls'];
+                      let i = index;" class="col-md-2">
+                      <div [formGroupName]="i">
+                        <mdb-checkbox formControlName="active">{{ut.value.name}}</mdb-checkbox>
+                      </div>
+                    </div>
                   </div>
                   <div class="text-15 text-muted mt-2">groupes...</div>
                   <hr class="my-1" style="background-color: #f89f20;">
                   <div class="row">
                     <div class="col-md-2"><b>niveau education</b></div>
-                    <div class="col-md-2"><mdb-checkbox>primaire</mdb-checkbox></div>
-                    <div class="col-md-2"><mdb-checkbox>secondaire</mdb-checkbox></div>
+                    <div formArrayName="educLevels" *ngFor="let el of emailForm.get('educLevels')['controls'];
+                      let i = index;" class="col-md-2">
+                      <div [formGroupName]="i">
+                        <mdb-checkbox (change)="educLevelSelect(el.value)" formControlName="active">{{el.value.name}}</mdb-checkbox>
+                      </div>
+                    </div>
                   </div>
                   <hr class="my-1">
                   <div class="row">
                     <div class="col-md-2"><b>écoles</b></div>
-                    <div class="col-md-2"><mdb-checkbox>maternelle</mdb-checkbox></div>
-                    <div class="col-md-2"><mdb-checkbox>élémentaire</mdb-checkbox></div>
-                    <div class="col-md-2"><mdb-checkbox>collège</mdb-checkbox></div>
-                    <div class="col-md-2"><mdb-checkbox>lycée</mdb-checkbox></div>
+                    <div formArrayName="schools" *ngFor="let school of emailForm.get('schools')['controls'];
+                      let i = index;" class="col-md-2">
+                      <div [formGroupName]="i">
+                        <mdb-checkbox (change)="schoolSelect(school.value)" formControlName="active">{{school.value.name}}</mdb-checkbox>
+                      </div>
+                    </div>
                   </div>
                   <hr class="my-1">
                   <div class="row">
                     <div class="col-md-2"><b>cycles</b></div>
-                    <div class="col-md-2"><mdb-checkbox>cycle 1</mdb-checkbox></div>
-                    <div class="col-md-2"><mdb-checkbox>cycle 2</mdb-checkbox></div>
-                    <div class="col-md-2"><mdb-checkbox>cycle 3</mdb-checkbox></div>
-                    <div class="col-md-2"><mdb-checkbox>cycle 4</mdb-checkbox></div>
+                    <div formArrayName="cycles" *ngFor="let cycle of emailForm.get('cycles')['controls'];
+                      let i = index;" class="col-md-2">
+                      <div [formGroupName]="i">
+                        <mdb-checkbox (change)="cycleSelect(cycle.value)" formControlName="active">{{cycle.value.name}}</mdb-checkbox>
+                      </div>
+                    </div>
                   </div>
                   <hr class="my-1">
                   <div class="row">
                     <div class="col-md-2"><b>niveau classe</b></div>
                     <div class="col-md-10">
                       <div class="row">
-                        <div class="col-md-2"><mdb-checkbox>TPS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>PS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>MS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>GS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CP1</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CP2</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CE1</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CE2</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>TPS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>PS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>MS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>GS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CP1</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CP2</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CE1</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CE2</mdb-checkbox></div>
+                        <div formArrayName="classLevels" *ngFor="let cl of emailForm.get('classLevels')['controls'];
+                          let i = index;" class="col-md-2">
+                          <div [formGroupName]="i"><mdb-checkbox formControlName="active">{{cl.value.name}}</mdb-checkbox></div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -97,22 +72,12 @@
                     <div class="col-md-2"><b>classes</b></div>
                     <div class="col-md-10">
                       <div class="row">
-                        <div class="col-md-2"><mdb-checkbox>TPS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>PS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>MS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>GS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CP1</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CP2</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CE1</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CE2</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>TPS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>PS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>MS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>GS</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CP1</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CP2</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CE1</mdb-checkbox></div>
-                        <div class="col-md-2"><mdb-checkbox>CE2</mdb-checkbox></div>
+                        <div formArrayName="classes" *ngFor="let class of emailForm.get('classes')['controls'];
+                          let i = index;" class="col-md-2">
+                          <div [formGroupName]="i">
+                            <mdb-checkbox formControlName="active">{{class.value.name}}</mdb-checkbox>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -123,24 +88,49 @@
             <div class="col-md-12">
               <div class="card">
                 <div class="card-body">
-                  
-                  <div class="mb-2">
-                    <button type="submit" size="sm" mdbBtn color="primary" mdbWavesEffect [disabled]="!emailForm.valid || showWarning"
-                      class="btn btn-block">envoyer email</button>
-                  </div>
-                  
-                  <div class="mb-2">
-                    <div class="form-group shadow-textarea">
-                      <textarea class="form-control z-depth-1" id="subject" formControlName="subject" rows="1" placeholder="objet..."></textarea>
+                  <div class="row">                                      
+                    <div class="col-md-12">
+                      <div class="border rounded-lg p-2 mb-2">
+                        <div class="row">
+                          <div class="col-md-12 mb-2 pl-0">
+                            <div class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" id="absence" value="1"
+                                (change)="selectBody()" formControlName="type" name="type" [checked]="true" mdbInput>
+                              <label class="form-check-label pl-4" for="absence">template</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" id="late" value="2"
+                                (change)="selectBody()" formControlName="type" name="type" mdbInput>
+                              <label class="form-check-label pl-4" for="late">texte libre</label>
+                            </div>
+                            <!-- <div *ngIf="absenceForm.get('type').errors && absenceForm.get('type').touched"
+                              class="text-small text-danger">choisir le type</div> -->
+                          </div>
+                          <div class="col-md-7 mb-2">
+                            <div class="form-group shadow-textarea">
+                              <textarea class="form-control z-depth-1" id="subject" formControlName="subject"
+                                rows="1" placeholder="objet du email..."></textarea>
+                            </div>
+                          </div>      
+                          <div *ngIf="bodyType == 1" class="col-md-7 mb-3">
+                            <mdb-select [options]="templateOptions" formControlName="template"
+                              (ngModelChange)="setTemplateData()"  placeholder="choisir le modèle d'email"></mdb-select>
+                          </div>
+                          <div *ngIf="bodyType == 2" class="col-md-12">
+                            <div class="form-group shadow-textarea">
+                              <textarea class="form-control z-depth-1" id="body" formControlName="body"
+                                rows="10" placeholder="message du email..."></textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div>
-                    <div class="form-group shadow-textarea">
-                      <textarea class="form-control z-depth-1" id="body" formControlName="body" rows="10" placeholder="message..."></textarea>
+  
+                    <div class="col-md-12 mb-2">
+                      <button type="submit" size="sm" mdbBtn color="primary" mdbWavesEffect [disabled]="!emailForm.valid || showWarning"
+                        class="btn btn-block">envoyer email</button>
                     </div>
-                  </div>
-
+                  </div>                  
                 </div>
               </div>
             </div>

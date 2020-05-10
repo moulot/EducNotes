@@ -21,8 +21,6 @@ namespace EducNotes.API.Data {
   public DbSet<Bank> Banks { get; set; }
   public DbSet<BankAccount> BankAccounts { get; set; }
   public DbSet<CashDesk> CashDesks { get; set; }
-  // public DbSet<Fee> Fees { get; set; }
-  // public DbSet<FeeType> FeeTypes { get; set; }
   public DbSet<FinOp> FinOps { get; set; }
   public DbSet<PaymentType> PaymentTypes { get; set; }
   public DbSet<UserEvaluation> UserEvaluations { get; set; }
@@ -89,6 +87,9 @@ namespace EducNotes.API.Data {
   public DbSet<LessonContentDoc> LessonContentDocs { get; set; }
   public DbSet<DocType> DocTypes { get; set; }
   public DbSet<FileType> FileTypes { get; set; }
+  public DbSet<EducationLevel> EducationLevels { get; set; }
+  public DbSet<Cycle> Cycles { get; set; }
+  public DbSet<School> Schools { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {
