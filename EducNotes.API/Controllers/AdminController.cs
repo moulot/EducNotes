@@ -38,7 +38,7 @@ namespace EducNotes.API.Controllers
         string password;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
         int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId, schoolInscTypeId;
-        int registrationEmailId, tuitionFeeId;
+        int registrationEmailId, tuitionId, nextYearTuitionId;
         byte lastClassLevelSeq;
         CultureInfo frC = new CultureInfo("fr-FR");
 
@@ -64,7 +64,8 @@ namespace EducNotes.API.Controllers
             teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
             schoolInscTypeId = _config.GetValue<int>("AppSettings:schoolInscTypeId");
             registrationEmailId = _config.GetValue<int>("AppSettings:registrationEmailId");
-            tuitionFeeId = _config.GetValue<int>("AppSettings:tuitionFeeId");
+            tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
+            nextYearTuitionId = _config.GetValue<int>("AppSettings:nextYearTuitionId");
             lastClassLevelSeq = _config.GetValue<byte>("AppSettings:lastClassLevelSeq");
 
             Account acc = new Account(
@@ -816,8 +817,8 @@ namespace EducNotes.API.Controllers
           });
         }
 
-        [HttpPost("EmailRegistration")]
-        public async Task<IActionResult> SendEmailRegistration()
+        [HttpPost("EmailRegistration/{RegTypeId}")]
+        public async Task<IActionResult> SendEmailRegistration(int RegTypeId)
         {
           List<User> parents = await _context.Users
                   .Where(u => u.UserTypeId == parentTypeId && u.Active == 1 && u.EmailConfirmed == true)
@@ -826,14 +827,27 @@ namespace EducNotes.API.Controllers
           List<Setting> settings = await _context.Settings.ToListAsync();
           var schoolName = settings.First(s => s.Name.ToLower() == "schoolname").Value;
           var smsActive = settings.First(s => s.Name.ToLower() == "sendregsms").Value;
-          decimal RegistrationFee = Convert.ToDecimal(settings.First(s => s.Name.ToLower() == "registrationfee").Value);
+          decimal RegistrationFee = Convert.ToDecimal(settings.First(s => s.Name.ToLower() == "regfee").Value);
           string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
 
           Boolean sendSmsToo = smsActive == "1" ? true : false;
 
+          var deadlines = await _context.ProductDeadLines.FirstAsync(p => p.ProductId == RegTypeId && p.Seq == 1);
           List<RegistrationEmailDto> EmailData = new List<RegistrationEmailDto>();
           foreach (var parent in parents)
           {
+            //do we already have a in-process registration for parent's children?
+            if(RegTypeId == tuitionId)
+            {
+              if(parent.RegCreated == true)
+                continue;
+            }
+            else
+            {
+              if(parent.NextRegCreated == true)
+                continue;
+            }
+
             RegistrationEmailDto red = new RegistrationEmailDto();
             red.ParentLastName = parent.LastName;
             red.ParentFirstName = parent.FirstName;
@@ -841,9 +855,16 @@ namespace EducNotes.API.Controllers
             red.ParentCellPhone = parent.PhoneNumber;
             red.ParentGender = parent.Gender;
             red.EmailSubject = schoolName + " - inscription pour l'année scolaire prochaine";
-            var deadLines = await _context.ProductDeadLines
-                                .FirstAsync(p => p.ProductId == tuitionFeeId && p.Seq == 1);
-            red.DueDate = deadLines.DueDate.ToString("dd/MM/yyyy", frC);
+            red.DueDate = deadlines.DueDate.ToString("dd/MM/yyyy", frC);
+
+            //create the corresponding order for the children registration/inscription
+            Order order = new Order();
+            order.OrderDate = DateTime.Now;
+            order.OrderLabel = "ré-inscription";
+            order.ParentId = parent.Id;
+            _repo.Add(order);
+            if(!await _repo.SaveAll())
+              return BadRequest("problème pour ajouter la scolarité");
 
             red.Children = new List<ChildRegistrationDto>();
             var children = await _context.UserLinks
@@ -865,32 +886,111 @@ namespace EducNotes.API.Controllers
               crd.NextClass = nextClassLevel.Name;
               crd.RegistrationFee = RegistrationFee.ToString("N0") + "FCFA";
               var classProduct = await _context.ClassLevelProducts
-                                  .FirstAsync(c => c.ClassLevelId == nextClassLevel.Id && c.ProductId == tuitionFeeId);
+                                  .FirstAsync(c => c.ClassLevelId == nextClassLevel.Id && c.ProductId == RegTypeId);
               crd.TuitionAmount = classProduct.Price.ToString("N0");
               decimal tuitionFee = Convert.ToDecimal(classProduct.Price);
-              decimal DPPct = deadLines.Percentage;
+              decimal DPPct = deadlines.Percentage;
               decimal DownPayment = DPPct * tuitionFee;
               crd.DueAmountPct = (DPPct * 100).ToString("N0") + "%";
               crd.DueAmount = DownPayment.ToString("N0");
               crd.TotalDueForChild = (RegistrationFee + DownPayment).ToString("N0");
               red.Children.Add(crd);
 
+              //add the order line for the child
+              OrderLine orderLine = new OrderLine();
+              orderLine.OrderId = order.Id;
+              orderLine.OrderLineLabel = "scolarité classe de " + nextClassLevel.Name + " de " + 
+                child.LastName + " " + child.FirstName;
+              orderLine.ProductId = RegTypeId;
+              orderLine.Qty = 1;
+              orderLine.UnitPrice = classProduct.Price;
+              orderLine.TotalHT = orderLine.Qty * orderLine.UnitPrice;
+              orderLine.AmountHT = orderLine.TotalHT;
+              orderLine.TVA = 0;
+              orderLine.TVAAmount = orderLine.TVA * orderLine.AmountHT;
+              orderLine.AmountTTC = orderLine.AmountHT + orderLine.TVAAmount;
+              orderLine.ChildId = child.Id;
+              _repo.Add(orderLine);
+              if(!await _repo.SaveAll())
+                return BadRequest("problème pour ajouter la scolarité");
+
+              OrderLineDeadline orderDeadline = new OrderLineDeadline();
+              orderDeadline.OrderLineId = orderLine.Id;
+              orderDeadline.Amount = DownPayment;
+              orderDeadline.DueDate = deadlines.DueDate;
+              _repo.Add(orderDeadline);
+
+              if(RegTypeId == tuitionId)
+              {
+                if(child.RegCreated == false)
+                {
+                  child.RegCreated = true;
+                  _repo.Update(child);
+
+                  if(parent.RegCreated == false)
+                  {
+                    parent.RegCreated = true;
+                    _repo.Update(parent);
+                  }
+                }
+              }
+              else
+              {
+                if(child.NextRegCreated == false)
+                {
+                  child.NextRegCreated = true;
+                  _repo.Update(child);
+
+                  if(parent.RegCreated == false)
+                  {
+                    parent.RegCreated = true;
+                    _repo.Update(parent);
+                  }                
+                }
+              }
+
+              order.TotalHT += orderLine.TotalHT;
+              order.Discount += orderLine.Discount;
+              order.AmountHT += orderLine.AmountHT;
+              order.TVAAmount += orderLine.TVAAmount;
+              order.AmountTTC += orderLine.AmountTTC;
+
               totalAmount += DownPayment + RegistrationFee;
             }
+
+            _repo.Update(order);
+
+            //add data for order history
+            OrderHistory orderHistory = new OrderHistory();
+            orderHistory.OrderId = order.Id;
+            orderHistory.OpDate = order.OrderDate;
+            orderHistory.Action = "UPD";
+            orderHistory.OldAmount = 0;
+            orderHistory.NewAmount = order.AmountTTC;
+            orderHistory.Delta = orderHistory.NewAmount - orderHistory.OldAmount;
+            _repo.Add(orderHistory);
+            
             red.TotalAmount = totalAmount.ToString("N0");
 
             EmailData.Add(red);
           }
 
-          var template = await _context.EmailTemplates.FirstAsync(t => t.Id == registrationEmailId);
-          List<Email> RegEmails = _repo.SetEmailDataForRegistration(EmailData, template.Body, RegDeadLine);
-          _context.AddRange(RegEmails);
-          if(await _repo.SaveAll())
-            return Ok(new{
-              nbEmailsSent = RegEmails.Count()
-            });
+          if(EmailData.Count() > 0)
+          {
+            var template = await _context.EmailTemplates.FirstAsync(t => t.Id == registrationEmailId);
+            List<Email> RegEmails = _repo.SetEmailDataForRegistration(EmailData, template.Body, RegDeadLine);
+            _context.AddRange(RegEmails);
+            if(await _repo.SaveAll())
+              return Ok(new{
+                nbEmailsSent = RegEmails.Count()
+              });
+          }
+          else
+          {
+            return Ok();
+          }
 
-          return BadRequest("problème pour envoyer les emails");
+          return BadRequest("problème pour créer les inscriptions et envoyer les emails");
         }
 
         [HttpGet("UsersRecap")]

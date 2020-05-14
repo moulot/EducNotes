@@ -42,12 +42,9 @@ export class UserAccountComponent implements OnInit {
         this.selectedSms.splice(smsFound , 1);
       }
     }
-    console.log(this.selectedSms);
   }
 
   saveUserSMS() {
-    console.log(this.selectedSms);
-    console.log(this.parent.id);
     this.userService.saveUserSms(this.parent.id, this.selectedSms).subscribe(() => {
       Utils.smoothScrollToTop();
       this.alertify.success('le choix des sms est validé');

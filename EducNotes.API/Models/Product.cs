@@ -3,12 +3,14 @@ namespace EducNotes.API.Models {
         public Product()
         {
             IsRequired = false;
+            IsPaidCash = true;
         }
         public int Id { get; set; }
         public string Name { get; set; }
         public string Comment { get; set; }
         public int ProductTypeId { get; set; }
         public decimal? Price { get; set; }
+        public bool IsPaidCash { get; set; }
         public bool IsByLevel { get; set; }
         public bool IsPeriodic { get; set; }
         public ProductType ProductType { get; set; }

@@ -1,4 +1,4 @@
-<div class="row m-2">
+<div class="row">
   <div class="col-md-12">
     <div class="row">
       <div class="col-md-1">
@@ -16,9 +16,9 @@
   </div>
 </div>
 
-<div class="row m-2">
-  <div class="col-md-12 m-1" style="border-top: #cccccc 1px solid;"></div>
-  <div class="col-md-12 text-20 font-weight-300 mt-0 mb-3">mes enfants</div>
+<div class="row">
+  <div class="col-md-12 text-20 font-weight-300">mes enfants</div>
+  <div class="col-md-12 mb-3"><hr class="my-1" style="background-color: #f89f20;"></div>
   <div class="col-md-2 my-5" *ngFor="let child of parent.children">
     <mdb-card class="testimonial-card">
       <!--Avatar-->
@@ -37,11 +37,14 @@
   </div>
 </div>
 
-<div class="row m-2">
-  <div class="col-md-12 m-1" style="border-top: #cccccc 1px solid;"></div>
-  <div class="col-md-12">
-    <div class="col-md-12"><p class=" text-20 font-weight-300 mt-0 mb-3">mes sms à recevoir</p></div>
-  </div>
+<div class="row">
+  <div class="col-md-12 text-20 font-weight-300">scolarité</div>
+  <div class="col-md-12 mb-3"><hr class="my-1" style="background-color: #f89f20;"></div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 text-20 font-weight-300">mes sms à recevoir</div>
+  <div class="col-md-12 mb-3"><hr class="my-1" style="background-color: #f89f20;"></div>
   <div class="col-md-12">
     <app-child-sms-card [children]="parent.children" (setSmsChoice)="setSmsChoice($event)"
     (saveUserSMS)="saveUserSMS()"></app-child-sms-card>

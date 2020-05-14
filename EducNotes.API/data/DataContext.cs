@@ -67,7 +67,9 @@ namespace EducNotes.API.Data {
   public DbSet<Country> Countries { get; set; }
   public DbSet<Address> Addresses { get; set; }
   public DbSet<Order> Orders { get; set; }
+  public DbSet<OrderHistory> OrderHistories { get; set; }
   public DbSet<OrderLine> OrderLines { get; set; }
+  public DbSet<OrderLineDeadline> OderLineDeadlines { get; set; }
   public DbSet<ProductDeadLine> ProductDeadLines { get; set; }
   public DbSet<PayableAt> PayableAts { get; set; }
   public DbSet<Periodicity> Periodicities { get; set; }

@@ -21,6 +21,8 @@ namespace EducNotes.API.Models
         public string Body { get; set; }
         public DateTime TimeToSend { get; set; }
         public byte StatusFlag { get; set; }
+        public int? OrderId { get; set; }
+        public Order Order { get; set; }
         public DateTime InsertDate { get; set; }
         public int InsertUserId { get; set; }
         public User InsertUser { get; set; }

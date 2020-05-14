@@ -9,6 +9,8 @@ namespace EducNotes.API.Models
         public User()
         {
             Active = 1;
+            RegCreated = false;
+            NextRegCreated = false;
         }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -38,6 +40,8 @@ namespace EducNotes.API.Models
         public int? CityId { get; set; }
         public City City { get; set; }
         public byte TempData { get; set; }
+        public Boolean RegCreated { get; set; }
+        public Boolean NextRegCreated { get; set; }
         public byte Active { get; set; }
         public string Idnum { get; set; }
         public DateTime? ResetPasswordDate { get; set; }

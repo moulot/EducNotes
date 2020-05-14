@@ -109,16 +109,7 @@ namespace EducNotes.API.Controllers
         [HttpGet("CallBack")]
         public async Task<IActionResult> GetCallBackData()
         {
-          //string url = Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString;
-          //int idx = url.IndexOf('?');
-          //string query = idx >= 0 ? url.Substring(idx) : "";
           string query = Request.QueryString.ToString();
-
-          // EmailFormDto email = new EmailFormDto();
-          // email.subject = "query call back";
-          // email.toEmail = "georges.moulot@albatrostechnologies.com";
-          // email.content = query;
-          // await _repo.SendEmail(email);
 
           String messageId = HttpUtility.ParseQueryString(query).Get("messageId");
           String integrationName = HttpUtility.ParseQueryString(query).Get("integrationName");
