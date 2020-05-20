@@ -9,5 +9,12 @@ export const environment = {
   lateType: 2,
   schoolServiceId: 1,
   maxChildNumber: 6,
-  byDeadLineTypeId: true
+  byDeadLineTypeId: true,
+  orderCreated: 0,
+  orderValidated: 1,
+  orderExpired: 2,
+  orderCancelled: 3,
+  orderPaid: 4,
+  orderOverdue: 5,
+  orderCompleted: 6
 };

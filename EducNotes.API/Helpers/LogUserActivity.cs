@@ -14,7 +14,7 @@ namespace EducNotes.API.Helpers
       var resultContext = await next();
 
       var userId = int.Parse(resultContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-      var repo = resultContext.HttpContext.RequestServices.GetService<IDatingRepository>();
+      var repo = resultContext.HttpContext.RequestServices.GetService<IEducNotesRepository>();
       var user = await repo.GetUser(userId, true);
       user.LastActive = DateTime.Now;
       await repo.SaveAll();

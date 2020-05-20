@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from 'src/app/_services/admin.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { environment } from 'src/environments/environment';
 import { ClassService } from 'src/app/_services/class.service';

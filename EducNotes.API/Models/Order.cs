@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using EducNotes.API.Dtos;
 
 namespace EducNotes.API.Models {
   public class Order {
@@ -13,6 +14,8 @@ namespace EducNotes.API.Models {
       AmountTTC = 0;
       TVA = 0;
       TVAAmount = 0;
+      isReg = false;
+      isNextReg = false;
     }
 
     public enum StatusEnum
@@ -27,6 +30,7 @@ namespace EducNotes.API.Models {
     }
 
     public int Id { get; set; }
+    public int OrderNum { get; set; }
     public string OrderLabel { get; set; }
     public DateTime OrderDate { get; set; }
     public int? ShippingAddressId { get; set; }
@@ -44,6 +48,8 @@ namespace EducNotes.API.Models {
     public int? ParentId { get; set; }
     public User Parent { get; set; }
     public byte Status { get; set; }
-    public ICollection<OrderLine> OrderLines { get; set; }
+    public Boolean isReg { get; set; }
+    public Boolean isNextReg { get; set; }
+    public List<OrderLine> Lines { get; set; }
   }
 }

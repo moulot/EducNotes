@@ -16,33 +16,72 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-12 text-20 font-weight-300">mes enfants</div>
-  <div class="col-md-12 mb-3"><hr class="my-1" style="background-color: #f89f20;"></div>
-  <div class="col-md-2 my-5" *ngFor="let child of parent.children">
-    <mdb-card class="testimonial-card">
-      <!--Avatar-->
-      <div class="avatar mx-auto">
-        <img src="{{child.child.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+<div class="card mb-2">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-12 text-20 font-weight-300">mes enfants</div>
+      <div class="col-md-12 mb-3"><hr class="my-1" style="background-color: #f89f20;"></div>
+      <div class="col-md-2 my-5" *ngFor="let child of parent.children">
+        <mdb-card class="testimonial-card">
+          <!--Avatar-->
+          <div class="avatar mx-auto">
+            <img src="{{child.child.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+          </div>
+        
+          <mdb-card-body class="p-2">
+            <!--Name-->
+            <mdb-card-title>
+              <p class="text-15 m-0">{{child.child.lastName}} {{child.firstName}}</p>
+              <p class="text-15 m-0">classe {{child.child.className}}</p>
+            </mdb-card-title>
+          </mdb-card-body>
+        </mdb-card>
       </div>
-    
-      <mdb-card-body class="p-2">
-        <!--Name-->
-        <mdb-card-title>
-          <p class="text-15 m-0">{{child.child.lastName}} {{child.firstName}}</p>
-          <p class="text-15 m-0">classe {{child.child.className}}</p>
-        </mdb-card-title>
-      </mdb-card-body>
-    </mdb-card>
+    </div>
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-12 text-20 font-weight-300">scolarité</div>
-  <div class="col-md-12 mb-3"><hr class="my-1" style="background-color: #f89f20;"></div>
+<div class="card">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-12 text-20 font-weight-300">frais de scolarité</div>
+      <div class="col-md-12 mb-1"><hr class="my-1" style="background-color: #f89f20;"></div>
+      <div *ngIf="registration.status == orderCreated" class="col-md-12">
+        <div class="alert alert-success" role="alert">
+          <div class="text-17">inscription</div>
+          <hr class="my-1">
+          <div *ngIf="regNbChild == 1" class="text-15">vous avez un enfant pré-inscrit pour l'année prochaine </div>
+          <div *ngIf="regNbChild > 1" class="text-15">vous avez {{regNbChild}} enfants pré-inscrits pour l'année prochaine </div>
+          <div class="text-15">valider les inscriptions en cochant les enfants que vous voulez incrire</div>
+        </div>
+        <form [formGroup]="regForm" (ngSubmit)="validateReg()">
+          <div formArrayName="lines" *ngFor="let line of regForm.get('lines')['controls']; let i = index;">
+            <div [formGroupName]="i" class="border rounded-lg p-2 my-1">
+              <mdb-checkbox class="d-none d-md-block" formControlName="selected">
+                <div class="text-15">
+                  <span class="text-capitalize"><b>{{line.value.firstName}}</b></span>. classe de {{line.value.className}}.
+                  frais de scolarité : {{line.value.amountTTC}}
+                </div>
+              </mdb-checkbox>
+              <div class="d-md-none d-flex align-items-center">
+                <mdb-checkbox formControlName="selected"></mdb-checkbox>
+                <div class="text-15">
+                  <div class="text-capitalize"><b>{{line.value.firstName}}</b></div>
+                  <div>classe de {{line.value.className}}</div>
+                  <div>scolarité : {{line.value.amountTTC}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="submit" [disabled]="regForm.hasError('formNOK')" mdbBtn
+            class="btnBlue" size="sm" mdbWavesEffect>valider les inscriptions</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="row">
+<div class="row mt-3">
   <div class="col-md-12 text-20 font-weight-300">mes sms à recevoir</div>
   <div class="col-md-12 mb-3"><hr class="my-1" style="background-color: #f89f20;"></div>
   <div class="col-md-12">

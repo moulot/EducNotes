@@ -327,6 +327,47 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.strSessionDate, opt => {
                     opt.MapFrom(src => src.SessionDate.ToString("dd/MM/yyyy", frC));
                 });
+            CreateMap<OrderLine, OrderLineDto>()
+                .ForMember(dest => dest.ProductName, opt => {
+                    opt.MapFrom(src => src.Product.Name);
+                })
+                .ForMember(dest => dest.ChildLastName, opt => {
+                    opt.MapFrom(src => src.Child.LastName);
+                })
+                .ForMember(dest => dest.ChildFirstName, opt => {
+                    opt.MapFrom(src => src.Child.FirstName);
+                })
+                .ForMember(dest => dest.ChildClassName, opt => {
+                    opt.MapFrom(src => (src.Child.Class.Name));
+                })
+                .ForMember(dest => dest.strAmountTTC, opt => {
+                  opt.MapFrom(src => src.AmountHT.ToString("N0") + " F");
+                });
+            CreateMap<Order, OrderDto>()
+                .ForMember(dest => dest.strOrderDate, opt => {
+                  opt.MapFrom(src => src.OrderDate.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.ChildLastName, opt => {
+                  opt.MapFrom(src => src.Child.LastName);
+                })
+                .ForMember(dest => dest.ChildFirstName, opt => {
+                  opt.MapFrom(src => src.Child.FirstName);
+                })
+                .ForMember(dest => dest.ChildClassName, opt => {
+                  opt.MapFrom(src => (src.Child.Class.Name));
+                })
+                .ForMember(dest => dest.ParentLastName, opt => {
+                  opt.MapFrom(src => (src.Parent.LastName));
+                })
+                .ForMember(dest => dest.ParentFirstName, opt => {
+                  opt.MapFrom(src => (src.Parent.FirstName));
+                })
+                .ForMember(dest => dest.ParentCell, opt => {
+                  opt.MapFrom(src => (src.Parent.PhoneNumber));
+                })
+                .ForMember(dest => dest.ParentEmail, opt => {
+                  opt.MapFrom(src => (src.Parent.Email));
+                });
         }
     }
 }

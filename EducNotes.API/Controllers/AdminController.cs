@@ -865,6 +865,11 @@ namespace EducNotes.API.Controllers
             _repo.Add(order);
             if(!await _repo.SaveAll())
               return BadRequest("problème pour ajouter la scolarité");
+            order.OrderNum = Helpers.Utils.GetOrderNumber(order.Id);
+            if(RegTypeId == tuitionId)
+              order.isReg = true;
+            if(RegTypeId == nextYearTuitionId)
+            order.isNextReg = true;
 
             red.Children = new List<ChildRegistrationDto>();
             var children = await _context.UserLinks

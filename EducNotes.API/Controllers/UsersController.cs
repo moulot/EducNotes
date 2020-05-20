@@ -36,6 +36,8 @@ namespace EducNotes.API.Controllers
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private Cloudinary _cloudinary;
         private readonly UserManager<User> _userManager;
+        int tuitionId, nextYearTuitionId;
+
 
         public UsersController(IConfiguration config,DataContext context, IEducNotesRepository repo,
         UserManager<User> userManager, IMapper mapper, IOptions<CloudinarySettings> cloudinaryConfig)
@@ -55,7 +57,9 @@ namespace EducNotes.API.Controllers
             moderatorRoleName = _config.GetValue<String>("AppSettings:moderatorRoleName");
             adminRoleName = _config.GetValue<String>("AppSettings:adminRoleName");
             professorRoleName = _config.GetValue<String>("AppSettings:professorRoleName");
-            
+            tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
+            nextYearTuitionId = _config.GetValue<int>("AppSettings:nextYearTuitionId");
+
             _cloudinaryConfig = cloudinaryConfig;
             Account acc = new Account(
                _cloudinaryConfig.Value.CloudName,
@@ -120,84 +124,112 @@ namespace EducNotes.API.Controllers
         [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(int id)
         {
-            var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
-            
-            var user = await _repo.GetUser(id, isCurrentUser);
-
-            var userToReturn = _mapper.Map<UserForDetailedDto>(user);
-
-            return Ok(userToReturn);
+          var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
+          var user = await _repo.GetUser(id, isCurrentUser);
+          var userToReturn = _mapper.Map<UserForDetailedDto>(user);
+          return Ok(userToReturn);
         }
 
         [HttpGet("Account/{id}")]
         public async Task<IActionResult> GetUserAccount(int id)
         {
-            var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
-            
-            var user = await _repo.GetUser(id, isCurrentUser);
-            var parent = _mapper.Map<UserForAccountDto>(user);
+          var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
+          
+          var user = await _repo.GetUser(id, isCurrentUser);
+          var parent = _mapper.Map<UserForAccountDto>(user);
 
-            var ChildrenFromRepo = await _repo.GetChildren(id);
-            var children = _mapper.Map<IEnumerable<ChildForAccountDto>>(ChildrenFromRepo);
+          var ChildrenFromRepo = await _repo.GetChildren(id);
+          var children = _mapper.Map<IEnumerable<ChildForAccountDto>>(ChildrenFromRepo);
 
-            var categories = await _context.SmsCategories.OrderBy(s => s.Name).ToListAsync();
-            var smsTemplates = await _context.SmsTemplates.OrderBy(s => s.Name).ToListAsync();
+          var categories = await _context.SmsCategories.OrderBy(s => s.Name).ToListAsync();
+          var smsTemplates = await _context.SmsTemplates.OrderBy(s => s.Name).ToListAsync();
 
-            parent.Children = new List<ChildSmsDto>();
-            List<ChildSmsDto> childrenSms = new List<ChildSmsDto>();
-            List<SmsDataDto> activeSms = new List<SmsDataDto>();
-            foreach (var child in children)
+          parent.Children = new List<ChildSmsDto>();
+          List<ChildSmsDto> childrenSms = new List<ChildSmsDto>();
+          List<SmsDataDto> activeSms = new List<SmsDataDto>();
+          foreach (var child in children)
+          {
+            ChildSmsDto childWithSms = new ChildSmsDto();
+            childWithSms.Child = child;
+            childWithSms.SmsByCategory = new List<SmsByCategoryDto>();
+
+            var userSms = await _context.UserSmsTemplates
+                            .Where(s => s.ChildId == child.Id && s.ParentId == parent.Id).ToListAsync();
+
+            List<SmsByCategoryDto> SmsByCategory = new List<SmsByCategoryDto>();
+            foreach (var cat in categories)
             {
-                ChildSmsDto childWithSms = new ChildSmsDto();
-                childWithSms.Child = child;
-                childWithSms.SmsByCategory = new List<SmsByCategoryDto>();
+                SmsByCategoryDto sbcd = new SmsByCategoryDto();
+                sbcd.CategoryId = cat.Id;
+                sbcd.CategoryName = cat.Name;
+                sbcd.Sms = new List<UserSmsTemplateDto>();
 
-                var userSms = await _context.UserSmsTemplates
-                                .Where(s => s.ChildId == child.Id && s.ParentId == parent.Id).ToListAsync();
-
-                List<SmsByCategoryDto> SmsByCategory = new List<SmsByCategoryDto>();
-                foreach (var cat in categories)
+                var SmsByCat = smsTemplates.FindAll(s => s.SmsCategoryId == cat.Id).OrderBy(s => s.Name);
+                if(SmsByCat.Count() > 0)
                 {
-                    SmsByCategoryDto sbcd = new SmsByCategoryDto();
-                    sbcd.CategoryId = cat.Id;
-                    sbcd.CategoryName = cat.Name;
-                    sbcd.Sms = new List<UserSmsTemplateDto>();
-
-                    var SmsByCat = smsTemplates.FindAll(s => s.SmsCategoryId == cat.Id).OrderBy(s => s.Name);
-                    if(SmsByCat.Count() > 0)
+                    SmsDataDto sdd = new SmsDataDto();
+                    foreach (var item in SmsByCat)
                     {
-                        SmsDataDto sdd = new SmsDataDto();
-                        foreach (var item in SmsByCat)
+                        UserSmsTemplateDto ustd = new UserSmsTemplateDto();
+                        
+                        ustd.ChildId = child.Id;
+                        ustd.ParentId = parent.Id;
+                        ustd.SmsTemplateId = item.Id;
+                        ustd.SmsName = item.Name;
+                        ustd.Content = item.Content;
+                        ustd.SmsCategoryId = item.SmsCategoryId;
+                        ustd.Active = userSms.FirstOrDefault(u => u.SmsTemplateId == item.Id) != null ? true : false;
+                        sbcd.Sms.Add(ustd);
+
+                        if(ustd.Active)
                         {
-                            UserSmsTemplateDto ustd = new UserSmsTemplateDto();
-                            
-                            ustd.ChildId = child.Id;
-                            ustd.ParentId = parent.Id;
-                            ustd.SmsTemplateId = item.Id;
-                            ustd.SmsName = item.Name;
-                            ustd.Content = item.Content;
-                            ustd.SmsCategoryId = item.SmsCategoryId;
-                            ustd.Active = userSms.FirstOrDefault(u => u.SmsTemplateId == item.Id) != null ? true : false;
-                            sbcd.Sms.Add(ustd);
-
-                            if(ustd.Active)
-                            {
-                                sdd.ChildId = child.Id;
-                                sdd.SmsId = item.Id;
-                                activeSms.Add(sdd);
-                            }
+                            sdd.ChildId = child.Id;
+                            sdd.SmsId = item.Id;
+                            activeSms.Add(sdd);
                         }
-                        SmsByCategory.Add(sbcd);
-                        childWithSms.SmsByCategory.Add(sbcd);
                     }
+                    SmsByCategory.Add(sbcd);
+                    childWithSms.SmsByCategory.Add(sbcd);
                 }
-                parent.Children.Add(childWithSms);
             }
+            parent.Children.Add(childWithSms);
+          }
 
-            return Ok(new{
-                parent,
-                activeSms
-            });
+          //get children registrations (current and next year)
+          var order = await _context.Orders
+                                .FirstOrDefaultAsync(o => o.ParentId == user.Id && o.isReg == true);
+          if(order != null)
+          {
+            OrderDto pOrder = _mapper.Map<OrderDto>(order);
+            parent.Registration = pOrder;
+            var linesFromDB = await _context.OrderLines
+                              .Include(i => i.Product)
+                              .Include(i => i.Child).ThenInclude(i => i.Class)
+                              .Where(o => o.OrderId == parent.Registration.Id).ToListAsync();
+            var pOrderlines = _mapper.Map<List<OrderLineDto>>(linesFromDB);
+            parent.Registration.Lines = new List<OrderLineDto>();
+            parent.Registration.Lines = pOrderlines;
+          }
+
+          var nextOrder = await _context.Orders
+                          .FirstOrDefaultAsync(o => o.ParentId == user.Id && o.isNextReg == true);
+          if(parent.NextRegistration != null)
+          {
+            OrderDto pnextOrder = _mapper.Map<OrderDto>(order);
+            parent.NextRegistration = pnextOrder;
+            var nextLinesFromDB = await _context.OrderLines
+                                  .Include(i => i.Product)
+                                  .Include(i => i.Child).ThenInclude(i => i.Class)
+                                  .Where(o => o.OrderId == parent.NextRegistration.Id).ToListAsync();
+            var pnextOrderlines = _mapper.Map<List<OrderLineDto>>(nextLinesFromDB);
+            parent.NextRegistration.Lines = new List<OrderLineDto>();
+            parent.NextRegistration.Lines = pnextOrderlines;
+          }
+
+          return Ok(new{
+              parent,
+              activeSms
+          });
         }
 
         [HttpPut("{id}/saveSMS")]
@@ -1610,6 +1642,31 @@ namespace EducNotes.API.Controllers
 
           events = events.OrderBy(o => o.EventDate).ToList();
           return Ok(events);
+        }
+
+        [HttpPost("ValidateRegistration")]
+        public async Task<IActionResult> ValidateRegistration(OrderToValidateDto orderToValidate)
+        {
+          var orderId = orderToValidate.OrderId;
+          var linesToValidate = orderToValidate.Orderlines;
+          var order = await _context.Orders.FirstAsync(o => o.Id == orderId);
+          order.Lines = await _context.OrderLines.Where(o => o.OrderId == orderId).ToListAsync();
+          
+          order.Status = Convert.ToByte(Order.StatusEnum.ValidatedByClient);
+
+          foreach (var ltv in linesToValidate)
+          {
+            var line = order.Lines.First(o => o.Id == ltv.OrderlineId);
+            line.Cancelled = ltv.Cancelled;
+            _repo.Update(line);
+          }
+
+          _repo.Update(order);
+
+          if(await _repo.SaveAll())
+            return Ok();
+
+          return BadRequest("problème pour valider l'inscription");
         }
 
     }

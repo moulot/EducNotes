@@ -246,14 +246,9 @@ export class ModalScheduleComponent implements OnInit {
         const dayName = dayCourses.dayName;
         const startH = this.scheduleForm.controls['item' + index].get('hourStart' + index).value;
         const endH = this.scheduleForm.controls['item' + index].get('hourEnd' + index).value;
-        // console.log('before');
-        // console.log(this.courseConflicts);
         this.resetConflicts(day);
-        // console.log('after');
-        // console.log(this.courseConflicts);
 
         if (day || startH.length === 5 || endH.length === 5) {
-          // console.log(dayCourses.courses);
           let conflict = false;
           this.periodConflict = false;
           for (let i = 0; i < dayCourses.courses.length; i++) {
@@ -262,21 +257,15 @@ export class ModalScheduleComponent implements OnInit {
             const courseEndH = Number(elt.endH.replace(':', ''));
             const startHNum = Number(startH.replace(':', ''));
             const endHNum = Number(endH.replace(':', ''));
-            // console.log('IN LOOP');
-            // console.log(courseStartH + ' - ' + courseEndH + ' --- ' + startHNum + ' - ' + endHNum);
             if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH && endHNum <= courseEndH) ||
               (startHNum < courseStartH && endHNum > courseEndH)) {
               const conflictElt = { day: day, data: 'conflit ligne 1 avec le cours du ' + dayName + '. horaire : ' + elt.startH + ' - ' + elt.endH };
               this.courseConflicts = [...this.courseConflicts, conflictElt];
               dayCourses.courses.find(c => c.courseId === elt.courseId).inConflict = true;
-              // console.log(this.courseConflicts);
               conflict = true;
               this.periodConflict = true;
             }
           }
-          // console.log('final');
-          // console.log(this.courseConflicts);
-          // console.log(this.teacherSchedule);
           return conflict;
         } else {
           return false;
@@ -288,13 +277,9 @@ export class ModalScheduleComponent implements OnInit {
 
   resetConflicts(day) {
     const dayCourses = this.teacherSchedule.days.find(c => c.day === day);
-    console.log('dayCourses' + day);
-    console.log(dayCourses);
     if (dayCourses) {
       for (let i = 0; i < dayCourses.courses.length; i++) {
         const elt = dayCourses.courses[i];
-        // console.log('course elt');
-        // console.log(elt);
         elt.inConflict = false;
       }
     }
@@ -341,7 +326,6 @@ export class ModalScheduleComponent implements OnInit {
   getTeacherSchedule(teacherId) {
     this.userService.getTeacherScheduleByDay(teacherId).subscribe(data => {
       this.teacherSchedule = data;
-      // console.log(this.teacherSchedule);
     }, error => {
       this.alertify.error(error);
     });

@@ -1,3 +1,5 @@
+using System;
+
 namespace EducNotes.API.Models
 {
   public class OrderLine
@@ -8,6 +10,7 @@ namespace EducNotes.API.Models
       Discount = 0;
       TVA = 0;
       Status = 0;
+      Cancelled = false;
     }
 
     public enum StatusEnum
@@ -34,5 +37,6 @@ namespace EducNotes.API.Models
     public int? ChildId { get; set; }
     public User Child { get; set; }
     public byte Status { get; set; }
+    public Boolean Cancelled { get; set; }
   }
 }
