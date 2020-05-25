@@ -44,7 +44,6 @@ export class AddEmailTemplateComponent implements OnInit {
   }
 
   createTemplateForm() {
-
     this.templateForm = this.fb.group({
       name: [this.name, Validators.required],
       category: [this.categoryId, Validators.required],

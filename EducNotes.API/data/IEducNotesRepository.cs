@@ -92,6 +92,7 @@ namespace EducNotes.API.Data
         Task<IEnumerable<SchoolDto>> GetSchools();
         Task<IEnumerable<CycleDto>> GetCycles();
         List<Email> SetEmailDataForRegistration(List<RegistrationEmailDto> emailData, string content, string RegDeadLine);
+        Task<Order> GetOrder(int id);
 
 
     }

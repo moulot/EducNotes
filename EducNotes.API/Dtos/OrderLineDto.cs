@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using EducNotes.API.Models;
 
 namespace EducNotes.API.Dtos
 {
@@ -7,6 +9,8 @@ namespace EducNotes.API.Dtos
     public int Id { get; set; }
     public int OrderId { get; set; }
     public string OrderLineLabel { get; set; }
+    public DateTime Deadline { get; set; }
+    public string strDeadline { get; set; }
     public string ProductName { get; set; }
     public int Qty { get; set; }
     public decimal UnitPrice { get; set; }
@@ -21,5 +25,6 @@ namespace EducNotes.API.Dtos
     public string ChildLastName { get; set; }
     public string ChildClassName { get; set; }
     public Boolean Cancelled { get; set; }
+    public List<OrderLineDeadline> Payments { get; set; }
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../_models/user';
 import { PaginatedResult } from '../_models/pagination';
@@ -10,7 +10,7 @@ import { Absence } from '../_models/absence';
 import { UserSanction } from '../_models/userSanction';
 import { UserReward } from '../_models/userReward';
 import { UserClassEvent } from '../_models/userClassEvent';
-import { UserForRegister } from '../_models/userForRegister';
+import { OrderToValidate } from '../_models/orderToValidate';
 
 @Injectable({
   providedIn: 'root'
@@ -289,6 +289,7 @@ constructor(private http: HttpClient) {}
   deleteUSerType(id: number) {
     return this.http.post(this.baseUrl + 'users/' + id + '/DeleteUserType',  {});
    }
+
    updatePerson(id: number, user: any) {
     return this.http.post(this.baseUrl + 'users/' + id + '/updatePerson', user);
   }
@@ -311,4 +312,7 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'users/' + userId + '/events');
   }
 
+  validateRegistration(order: OrderToValidate) {
+    return this.http.post(this.baseUrl + 'users/ValidateRegistration', order);
+  }
 }

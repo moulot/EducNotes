@@ -8,9 +8,6 @@ import { User } from '../_models/user';
 import { Period } from '../_models/period';
 import { Router } from '@angular/router';
 import { AlertifyService } from './alertify.service';
-import { Setting } from '../_models/setting';
-import { settings } from 'cluster';
-
 
 @Injectable({
   providedIn: 'root'

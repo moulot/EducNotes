@@ -228,6 +228,10 @@ import { ClassStudentsAssignmentComponent } from './classes/class-students-assig
 import { CourseCardComponent } from './admin/class-managemet/course-card/course-card.component';
 import { DayScheduleComponent } from './views/dashboard/day-schedule/day-schedule.component';
 import { TuitionPanelComponent } from './admin/tuition/tuition-panel/tuition-panel.component';
+import { CheckoutComponent } from './tuition/checkout/checkout.component';
+import { CheckoutResolver } from './_resolvers/checkout-resolver';
+import { OrderService } from './_services/order.service';
+import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/new-tuition.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -382,7 +386,9 @@ export function tokenGetter() {
       CourseShowingComponent,
       CourseCardComponent,
       DayScheduleComponent,
-      TuitionPanelComponent
+      TuitionPanelComponent,
+      CheckoutComponent,
+      NewTuitionComponent
    ],
    imports: [
       FormWizardModule,
@@ -484,6 +490,8 @@ export function tokenGetter() {
       EmailTemplateResolver,
       EditEmailTemplateResolver,
       EditTeacherResolver,
+      CheckoutResolver,
+      OrderService,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

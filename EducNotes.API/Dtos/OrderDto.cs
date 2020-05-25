@@ -10,6 +10,10 @@ namespace EducNotes.API.Dtos
     public string OrderLabel { get; set; }
     public DateTime OrderDate { get; set; }
     public string strOrderDate { get; set; }
+    public DateTime Deadline { get; set; }
+    public string strDeadline { get; set; }
+    public DateTime Validity { get; set; }
+    public string strValidity { get; set; }
     public int? ShippingAddressId { get; set; }
     public int? BillingAddressId { get; set; }
     public decimal TotalHT { get; set; }
@@ -18,6 +22,7 @@ namespace EducNotes.API.Dtos
     public decimal TVA { get; set; }
     public decimal TVAAmount { get; set; }
     public decimal AmountTTC { get; set; }
+    public string strAmountTTC { get; set; }
     public string ChildLastName { get; set; }
     public string ChildFirstName { get; set; }
     public string ChildClassName { get; set; }

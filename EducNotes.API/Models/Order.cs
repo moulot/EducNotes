@@ -33,6 +33,8 @@ namespace EducNotes.API.Models {
     public int OrderNum { get; set; }
     public string OrderLabel { get; set; }
     public DateTime OrderDate { get; set; }
+    public DateTime Deadline { get; set; }
+    public DateTime Validity { get; set; }
     public int? ShippingAddressId { get; set; }
     public Address ShippingAddress { get; set; }
     public int? BillingAddressId { get; set; }

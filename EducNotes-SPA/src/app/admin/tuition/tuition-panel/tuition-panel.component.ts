@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/_services/auth.service';
 import { Setting } from 'src/app/_models/setting';
 import { Utils } from 'src/app/shared/utils';
+import { OrderService } from 'src/app/_services/order.service';
 
 @Component({
   selector: 'app-tuition-panel',
@@ -13,8 +14,9 @@ export class TuitionPanelComponent implements OnInit {
   regDate: Date;
   regActive = false;
   nbTuitionPays: number;
+  tuitionBalance: string;
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private orderService: OrderService) { }
 
   ngOnInit() {
     this.settings = this.authService.settings;
@@ -25,6 +27,9 @@ export class TuitionPanelComponent implements OnInit {
       this.regActive = true;
     }
     this.nbTuitionPays = Number(this.settings.find(s => s.name === 'NbTuitionPayments').value);
+    this.orderService.getTuitionData().subscribe((data: any) => {
+      this.tuitionBalance = data.openBalance;
+    })
   }
 
   counter(i: number) {

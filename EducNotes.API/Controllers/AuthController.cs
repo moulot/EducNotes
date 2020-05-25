@@ -19,7 +19,6 @@ using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
 using EducNotes.API.Helpers;
 using Microsoft.Extensions.Options;
-//using RestSharp;
 
 namespace EducNotes.API.Controllers
 {

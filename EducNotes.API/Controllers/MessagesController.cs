@@ -7,7 +7,6 @@ using EducNotes.API.Data;
 using EducNotes.API.Dtos;
 using EducNotes.API.Helpers;
 using EducNotes.API.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EducNotes.API.Controllers

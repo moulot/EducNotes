@@ -1,0 +1,124 @@
+<form [formGroup]="tuitionForm" (ngSubmit)="saveTuition()">
+  <div class="row">
+
+    <div class="col-md-12 mb-2">
+      <div class="card">
+        <div class="card-body p-2">
+          <div class="text-17">infos parents</div>
+          <hr class="my-2" style="background-color: #f89f20;">
+          <div mdbCollapse [isCollapsed]="false" #parent="bs-collapse">
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <div class="border rounded-lg p-2">
+                  <div class="text-16 mb-2"><b>le père</b></div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="md-form mt-1">
+                        <input mdbInput type="text" id="fLastName" class="form-control" formControlName="fLastName" mdbValidate>
+                        <label for="fLastName" class="">nom</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="md-form mt-1">
+                        <input mdbInput type="text" id="fFirstName" class="form-control" formControlName="fFirstName" mdbValidate>
+                        <label for="fFirstName" class="">prénom</label>
+                      </div>          
+                    </div>
+                    <div class="col-md-4">
+                      <div class="md-form mt-1">
+                        <input mdbInput type="text" id="fCell" class="form-control" formControlName="fCell" mdbValidate>
+                        <label for="fCell" class="">mobile</label>
+                      </div>
+                    </div>
+                    <div class="col-md-8">
+                      <div class="md-form mt-1">
+                        <input mdbInput type="text" id="fEmail" class="form-control" formControlName="fEmail" mdbValidate>
+                          <label for="fEmail" class="">email</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-2">
+                <div class="border rounded-lg p-2">
+                  <div class="text-16 mb-2"><b>la mère</b></div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="md-form mt-1">
+                        <input mdbInput type="text" id="mLastName" class="form-control" formControlName="mLastName" mdbValidate>
+                        <label for="mLastName" class="">nom</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="md-form mt-1">
+                        <input mdbInput type="text" id="mFirstName" class="form-control" formControlName="mFirstName" mdbValidate>
+                        <label for="mFirstName" class="">prénom</label>
+                      </div>          
+                    </div>
+                    <div class="col-md-4">
+                      <div class="md-form mt-1">
+                        <input mdbInput type="text" id="mCell" class="form-control" formControlName="mCell" mdbValidate>
+                        <label for="mCell" class="">mobile</label>
+                      </div>
+                    </div>
+                    <div class="col-md-8">
+                      <div class="md-form mt-1">
+                        <input mdbInput type="text" id="mEmail" class="form-control" formControlName="mEmail" mdbValidate>
+                        <label for="mEmail" class="">email</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr class="mt-2 mb-1">
+          </div>
+          <div class="float-right">
+            <button type="button" mdbBtn class="btnWhiteO" (click)="parent.toggle()" size="sm" mdbWavesEffect>suivant</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-2">
+      <div class="card">
+        <div class="card-body p-2">
+          <div class="text-17">infos enfants</div>
+          <hr class="my-2" style="background-color: #f89f20;">
+          <div mdbCollapse [isCollapsed]="false" #enfants="bs-collapse">
+            <div class="row">
+              <div class="col-md-12 mb-2">
+                <button type="button" mdbBtn class="btnWhiteB mb-2" size="sm" mdbWavesEffect>ajouter un enfant</button>
+                <div class="border rounded-lg p-2">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="md-form mt-1">
+                        <input mdbInput type="text" id="fLastName" class="form-control" formControlName="fLastName" mdbValidate>
+                        <label for="fLastName" class="">nom</label>
+                      </div>
+                    </div>
+                    <div class="col-md-5">
+                      <div class="md-form mt-1">
+                        <input mdbInput type="text" id="fFirstName" class="form-control" formControlName="fFirstName" mdbValidate>
+                        <label for="fFirstName" class="">prénom</label>
+                      </div>          
+                    </div>
+                    <div class="col-md-3">
+                      <div class="md-form mt-1">
+                      </div>          
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr class="mt-2 mb-1">
+          </div>
+          <div class="float-right">
+            <button type="button" mdbBtn class="btnWhiteO" (click)="enfants.toggle()" size="sm" mdbWavesEffect>suivant</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</form>

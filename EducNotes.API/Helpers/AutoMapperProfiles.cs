@@ -347,6 +347,12 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.strOrderDate, opt => {
                   opt.MapFrom(src => src.OrderDate.ToString("dd/MM/yyyy", frC));
                 })
+                .ForMember(dest => dest.strDeadline, opt => {
+                  opt.MapFrom(src => src.Deadline.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.strValidity, opt => {
+                  opt.MapFrom(src => src.Validity.ToString("dd/MM/yyyy", frC));
+                })
                 .ForMember(dest => dest.ChildLastName, opt => {
                   opt.MapFrom(src => src.Child.LastName);
                 })

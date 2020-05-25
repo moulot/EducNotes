@@ -46,6 +46,7 @@
     <div class="row">
       <div class="col-md-12 text-20 font-weight-300">frais de scolarité</div>
       <div class="col-md-12 mb-1"><hr class="my-1" style="background-color: #f89f20;"></div>
+
       <div *ngIf="registration.status == orderCreated" class="col-md-12">
         <div class="alert alert-success" role="alert">
           <div class="text-17">inscription</div>
@@ -77,6 +78,47 @@
             class="btnBlue" size="sm" mdbWavesEffect>valider les inscriptions</button>
         </form>
       </div>
+
+      <div *ngIf="registration.status == orderValidated" class="col-md-12">
+        <div class="alert alert-success" role="alert">
+          <div class="text-17">inscription - <b>fin des inscriptions le {{registration.strDeadline}}</b></div>
+          <hr class="my-1">
+          <div *ngIf="regNbChild == 1" class="text-15">vous avez confirmé l'inscription d'un enfant.</div>
+          <div *ngIf="regNbChild > 1" class="text-15">vous avez confirmé l'inscription de {{regNbChild}} enfants.</div>
+          <div class="text-15">votre inscription est <u>valide jusqu'au {{registration.strValidity}}</u>. Payez l'acompte avant cette date pour garantir la place de vos enfants</div>
+        </div>
+        <div *ngFor="let line of registration.lines; let i = index;">
+          <div class="border rounded-lg p-2 my-1">
+            <div class="text-15 d-none d-md-block">
+              <span class="text-capitalize"><b>{{line.childFirstName}}</b></span>. classe de {{line.childClassName}}.
+              frais de scolarité : {{line.strAmountTTC}}
+              <div class="text-15 my-1">
+                <hr class="my-1" style="background-color: #f89f20;">
+                montant dû :
+                acompte({{feeDetails[i].pct}}%) : {{feeDetails[i].amnt | number:'':'fr-FR'}} F.
+                frais inscription : {{feeDetails[i].tuitionfee | number:'':'fr-FR'}} F.
+                <i><b>total : {{feeDetails[i].total | number:'':'fr-FR'}} F</b></i>.
+                </div>
+            </div>
+            <div class="d-md-none d-flex align-items-center">
+              <div class="text-15">
+                <div class="text-capitalize"><b>{{line.childFirstName}}</b></div>
+                <div>classe de {{line.childClassName}}</div>
+                <div>scolarité : {{line.strAmountTTC}}</div>
+                <hr class="my-1" style="background-color: #f89f20;">
+                <div class="text-15"><b>montant dû</b></div>
+                <div class="text-15">acpte({{feeDetails[i].pct}}%) : {{feeDetails[i].amnt | number:'':'fr-FR'}} F.</div>
+                <div class="text-15">frais inscr. : {{feeDetails[i].tuitionfee | number:'':'fr-FR'}} F.</div>
+                <div class="text-15"><i><b>total : {{feeDetails[i].total | number:'':'fr-FR'}} F</b></i>.</div>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-18 my-1">montant total dû: <b>{{downPayment | number:'':'fr-FR'}} F</b>.</div>
+        <button type="button" [routerLink]="['/checkout',registration.id]" mdbBtn
+          class="btnBlue" size="sm" mdbWavesEffect>procéder au paiement</button>
+    </div>
+
     </div>
   </div>
 </div>

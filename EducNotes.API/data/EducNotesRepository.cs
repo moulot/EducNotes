@@ -2231,5 +2231,15 @@ namespace EducNotes.API.Data
           }
           return cycles;
         }
+
+        public async Task<Order> GetOrder(int id)
+        {
+          var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
+          if(order != null)
+          {
+            order.Lines = await _context.OrderLines.Where(o => o.OrderId == order.Id).ToListAsync();
+          }
+          return order;
+        }
     }
 }

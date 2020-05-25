@@ -114,6 +114,9 @@ import { EditTeacherResolver } from './_resolvers/edit-teacher-resolver';
 import { CourseShowingComponent } from './classes/course-showing/course-showing.component';
 import { ClassStudentsAssignmentComponent } from './classes/class-students-assignment/class-students-assignment.component';
 import { TuitionPanelComponent } from './admin/tuition/tuition-panel/tuition-panel.component';
+import { CheckoutComponent } from './tuition/checkout/checkout.component';
+import { CheckoutResolver } from './_resolvers/checkout-resolver';
+import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/new-tuition.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -214,7 +217,9 @@ export const appRoutes: Routes = [
           {path: 'classProgram/:courseId', component: ClassProgressComponent, resolve: {program: TeacherProgramResolver}},
           {path: 'themesList', component: ThemesListComponent},
           {path: 'newTheme', component: NewThemeComponent},
-          {path: 'addClassEvent/:id', component: AddClassLifeComponent}
+          {path: 'addClassEvent/:id', component: AddClassLifeComponent},
+          {path: 'checkout/:id', component: CheckoutComponent, resolve: {order: CheckoutResolver}},
+          {path: 'newTuition', component: NewTuitionComponent}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

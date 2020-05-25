@@ -20,16 +20,23 @@ export class UserAccountComponent implements OnInit {
   registration: any;
   nextRegistration: any;
   orderCreated = environment.orderCreated;
+  orderValidated = environment.orderValidated;
   regForm: FormGroup;
   settings: any;
   regNbChild: number;
-
+  daysToValidateReg: number;
+  regFee: number;
+  downPayment: any;
+  feeDetails: any[] = [];
 
   constructor(private alertify: AlertifyService, private route: ActivatedRoute,
     private fb: FormBuilder, private userService: UserService, private authService: AuthService) { }
 
   ngOnInit() {
     this.settings = this.authService.settings;
+    this.daysToValidateReg = this.settings.find(s => s.name === 'DaysToValidateReg').value;
+    this.regFee = this.settings.find(s => s.name === 'RegFee').value;
+    // this.downPayment = Number(this.regFee);
     this.createRegForm();
     this.route.data.subscribe((data: any) => {
       const account = data['account'];
@@ -39,7 +46,9 @@ export class UserAccountComponent implements OnInit {
       for (let i = 0; i < this.registration.lines.length; i++) {
         const elt = this.registration.lines[i];
         this.addLineItem(elt.id, elt.childLastName, elt.childFirstName, elt.childClassName, elt.strAmountTTC);
+        this.downPayment = this.downPayment + Number(elt.amountTTC);
       }
+      this.setDuePayment(this.registration.lines);
       this.regNbChild = this.registration.lines.length;
       this.nextRegistration = this.parent.nextRegistration;
     });
@@ -82,6 +91,13 @@ export class UserAccountComponent implements OnInit {
     });
   }
 
+  orderRemoveLines() {
+    const lines = this.regForm.get('lines') as FormArray;
+    while (lines.length > 0) {
+      lines.removeAt(0);
+    }
+  }
+
   setSmsChoice(data) {
     const childId = data.childId;
     const smsId = data.smsId;
@@ -112,7 +128,7 @@ export class UserAccountComponent implements OnInit {
 
   validateReg() {
     const order = <OrderToValidate>{};
-    order.orderlineIds = [];
+    let ids: OrderlineToValidate[] = [];
     order.orderId = this.registration.id;
     for (let i = 0; i < this.regForm.value.lines.length; i++) {
       const elt = this.regForm.value.lines[i];
@@ -120,9 +136,35 @@ export class UserAccountComponent implements OnInit {
       if (elt.selected === true) {
         cancelled = false;
       }
-      order.orderlineIds = [...order.orderlineIds, {orderlineId: elt.lineId, cancelled: cancelled}];
+      ids = [...ids, {orderlineId: elt.lineId, cancelled: cancelled}];
     }
-    console.log(order);
+    order.orderlineIds = ids;
+    this.userService.validateRegistration(order).subscribe(updatedOrder => {
+      this.registration = updatedOrder;
+      this.orderRemoveLines();
+      for (let i = 0; i < this.registration.lines.length; i++) {
+        const elt = this.registration.lines[i];
+        this.addLineItem(elt.id, elt.childLastName, elt.childFirstName, elt.childClassName, elt.strAmountTTC);
+      }
+      this.setDuePayment(this.registration.lines);
+      this.regNbChild = this.registration.lines.length;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  setDuePayment(lines) {
+    this.downPayment = 0;
+    for (let i = 0; i < lines.length; i++) {
+      const elt = lines[i];
+      const payment = elt.payments.find(p => p.seq === 1);
+      const firstDP = payment.amount;
+      this.downPayment = Number(this.downPayment) + Number(this.regFee) + Number(firstDP);
+      const total = Number(this.regFee) + Number(firstDP);
+      const childfee = {child: elt.childFirstName, pct: payment.percent, amnt: firstDP,
+        tuitionfee: this.regFee, total: total};
+      this.feeDetails = [...this.feeDetails, childfee];
+    }
   }
 
 }

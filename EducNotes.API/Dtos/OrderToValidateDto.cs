@@ -5,6 +5,6 @@ namespace EducNotes.API.Dtos
   public class OrderToValidateDto
   {
     public int OrderId { get; set; }
-    public List<OrderlineToValidateDto> Orderlines { get; set; }
+    public List<OrderlineToValidateDto> OrderlineIds { get; set; }
   }
 }

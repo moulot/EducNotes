@@ -832,7 +832,11 @@ namespace EducNotes.API.Controllers
 
           Boolean sendSmsToo = smsActive == "1" ? true : false;
 
-          var deadlines = await _context.ProductDeadLines.FirstAsync(p => p.ProductId == RegTypeId && p.Seq == 1);
+          var deadlines = await _context.ProductDeadLines
+                          .OrderBy(o => o.DueDate)
+                          .Where(p => p.ProductId == RegTypeId).ToListAsync();
+
+          var firstDeadline = deadlines.First(d => d.Seq == 1);
           List<RegistrationEmailDto> EmailData = new List<RegistrationEmailDto>();
           foreach (var parent in parents)
           {
@@ -855,11 +859,15 @@ namespace EducNotes.API.Controllers
             red.ParentCellPhone = parent.PhoneNumber;
             red.ParentGender = parent.Gender;
             red.EmailSubject = schoolName + " - inscription pour l'année scolaire prochaine";
-            red.DueDate = deadlines.DueDate.ToString("dd/MM/yyyy", frC);
+            red.DueDate = firstDeadline.DueDate.ToString("dd/MM/yyyy", frC);
+
+            int daysToValidate = Convert.ToInt32((settings.First(s => s.Name == "DaysToValidateReg")).Value);
 
             //create the corresponding order for the children registration/inscription
             Order order = new Order();
             order.OrderDate = DateTime.Now;
+            order.Deadline = Convert.ToDateTime(settings.First(s => s.Name == "RegistrationDeadLine").Value);
+            order.Validity = order.OrderDate.AddDays(daysToValidate);
             order.OrderLabel = "ré-inscription";
             order.ParentId = parent.Id;
             _repo.Add(order);
@@ -890,12 +898,14 @@ namespace EducNotes.API.Controllers
               crd.FirstName = child.FirstName;
               crd.NextClass = nextClassLevel.Name;
               crd.RegistrationFee = RegistrationFee.ToString("N0") + "FCFA";
+
               var classProduct = await _context.ClassLevelProducts
                                   .FirstAsync(c => c.ClassLevelId == nextClassLevel.Id && c.ProductId == RegTypeId);
-              crd.TuitionAmount = classProduct.Price.ToString("N0");
               decimal tuitionFee = Convert.ToDecimal(classProduct.Price);
-              decimal DPPct = deadlines.Percentage;
+              decimal DPPct = firstDeadline.Percentage;
               decimal DownPayment = DPPct * tuitionFee;
+
+              crd.TuitionAmount = classProduct.Price.ToString("N0");
               crd.DueAmountPct = (DPPct * 100).ToString("N0") + "%";
               crd.DueAmount = DownPayment.ToString("N0");
               crd.TotalDueForChild = (RegistrationFee + DownPayment).ToString("N0");
@@ -919,11 +929,20 @@ namespace EducNotes.API.Controllers
               if(!await _repo.SaveAll())
                 return BadRequest("problème pour ajouter la scolarité");
 
-              OrderLineDeadline orderDeadline = new OrderLineDeadline();
-              orderDeadline.OrderLineId = orderLine.Id;
-              orderDeadline.Amount = DownPayment;
-              orderDeadline.DueDate = deadlines.DueDate;
-              _repo.Add(orderDeadline);
+              byte seq = 1;
+              foreach (var deadline in deadlines)
+              {
+                decimal Pct = deadline.Percentage;
+                decimal Payment = Pct * tuitionFee;
+                OrderLineDeadline orderDeadline = new OrderLineDeadline();
+                orderDeadline.OrderLineId = orderLine.Id;
+                orderDeadline.Percent = Pct * 100;
+                orderDeadline.Amount = Payment;
+                orderDeadline.DueDate = deadline.DueDate;
+                orderDeadline.Seq = seq;
+                _repo.Add(orderDeadline);
+                seq++;
+              }
 
               if(RegTypeId == tuitionId)
               {
@@ -965,16 +984,6 @@ namespace EducNotes.API.Controllers
 
             _repo.Update(order);
 
-            //add data for order history
-            OrderHistory orderHistory = new OrderHistory();
-            orderHistory.OrderId = order.Id;
-            orderHistory.OpDate = order.OrderDate;
-            orderHistory.Action = "UPD";
-            orderHistory.OldAmount = 0;
-            orderHistory.NewAmount = order.AmountTTC;
-            orderHistory.Delta = orderHistory.NewAmount - orderHistory.OldAmount;
-            _repo.Add(orderHistory);
-            
             red.TotalAmount = totalAmount.ToString("N0");
 
             EmailData.Add(red);

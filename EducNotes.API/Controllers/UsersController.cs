@@ -196,8 +196,7 @@ namespace EducNotes.API.Controllers
           }
 
           //get children registrations (current and next year)
-          var order = await _context.Orders
-                                .FirstOrDefaultAsync(o => o.ParentId == user.Id && o.isReg == true);
+          var order = await _context.Orders.FirstOrDefaultAsync(o => o.ParentId == user.Id && o.isReg == true);
           if(order != null)
           {
             OrderDto pOrder = _mapper.Map<OrderDto>(order);
@@ -205,17 +204,22 @@ namespace EducNotes.API.Controllers
             var linesFromDB = await _context.OrderLines
                               .Include(i => i.Product)
                               .Include(i => i.Child).ThenInclude(i => i.Class)
-                              .Where(o => o.OrderId == parent.Registration.Id).ToListAsync();
+                              .Where(o => o.OrderId == parent.Registration.Id && o.Cancelled == false).ToListAsync();
             var pOrderlines = _mapper.Map<List<OrderLineDto>>(linesFromDB);
+            for (int i = 0; i < pOrderlines.Count(); i++)
+            {
+              var line = pOrderlines[i];
+              line.Payments = await _context.OrderLineDeadlines.Where(d => d.OrderLineId == line.Id).ToListAsync();
+            }
+
             parent.Registration.Lines = new List<OrderLineDto>();
             parent.Registration.Lines = pOrderlines;
           }
 
-          var nextOrder = await _context.Orders
-                          .FirstOrDefaultAsync(o => o.ParentId == user.Id && o.isNextReg == true);
+          var nextOrder = await _context.Orders.FirstOrDefaultAsync(o => o.ParentId == user.Id && o.isNextReg == true);
           if(parent.NextRegistration != null)
           {
-            OrderDto pnextOrder = _mapper.Map<OrderDto>(order);
+            OrderDto pnextOrder = _mapper.Map<OrderDto>(nextOrder);
             parent.NextRegistration = pnextOrder;
             var nextLinesFromDB = await _context.OrderLines
                                   .Include(i => i.Product)
@@ -227,8 +231,8 @@ namespace EducNotes.API.Controllers
           }
 
           return Ok(new{
-              parent,
-              activeSms
+            parent,
+            activeSms
           });
         }
 
@@ -1648,23 +1652,66 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> ValidateRegistration(OrderToValidateDto orderToValidate)
         {
           var orderId = orderToValidate.OrderId;
-          var linesToValidate = orderToValidate.Orderlines;
+          var linesToValidate = orderToValidate.OrderlineIds;
           var order = await _context.Orders.FirstAsync(o => o.Id == orderId);
-          order.Lines = await _context.OrderLines.Where(o => o.OrderId == orderId).ToListAsync();
+          order.Lines = await _context.OrderLines
+                        .Include(i => i.Child).ThenInclude(i => i.Class)
+                        .Include(i => i.Product)
+                        .Where(o => o.OrderId == orderId).ToListAsync();
           
-          order.Status = Convert.ToByte(Order.StatusEnum.ValidatedByClient);
-
-          foreach (var ltv in linesToValidate)
+          order.TotalHT = 0;
+          order.Discount = 0;
+          order.AmountHT = 0;
+          order.TVAAmount = 0;
+          order.AmountTTC = 0;
+          OrderDto updatedOrder = new OrderDto();
+          List<OrderLineDto> updlines = new List<OrderLineDto>();
+          foreach(var ltv in linesToValidate)
           {
             var line = order.Lines.First(o => o.Id == ltv.OrderlineId);
             line.Cancelled = ltv.Cancelled;
             _repo.Update(line);
-          }
 
+            if(line.Cancelled == false)
+            {
+              var lineDto = _mapper.Map<OrderLineDto>(line);
+              lineDto.Payments = new List<OrderLineDeadline>();
+              lineDto.Payments = await _context.OrderLineDeadlines.Where(d => d.OrderLineId == line.Id).ToListAsync();
+              updlines.Add(lineDto);
+
+              order.TotalHT += line.TotalHT;
+              order.Discount += line.Discount;
+              order.AmountHT += line.AmountHT;
+              order.TVAAmount += line.TVAAmount;
+              order.AmountTTC += line.AmountTTC;
+            }
+          }
+          order.Status = Convert.ToByte(Order.StatusEnum.ValidatedByClient);
           _repo.Update(order);
+          updatedOrder = _mapper.Map<OrderDto>(order);
+
+          updatedOrder.Lines = updlines;
+
+          //add data for order history
+          OrderHistory orderHistory = new OrderHistory();
+          orderHistory.OrderId = order.Id;
+          orderHistory.OpDate = order.OrderDate;
+          orderHistory.Action = "UPD";
+          orderHistory.OldAmount = 0;
+          orderHistory.NewAmount = order.AmountTTC;
+          orderHistory.Delta = orderHistory.NewAmount - orderHistory.OldAmount;
+          _repo.Add(orderHistory);
+
+          // var orderlines = updatedOrder.Lines.Where(o => o.Cancelled == false).ToList();
+          // updatedOrder.Lines.Clear();
+          // foreach (var line in orderlines)
+          // {
+          //   OrderLineDto old = _mapper.Map<OrderLineDto>(line);
+          //   updatedOrder.Lines.Add(old);
+          // }
 
           if(await _repo.SaveAll())
-            return Ok();
+            return Ok(updatedOrder);
 
           return BadRequest("problème pour valider l'inscription");
         }
