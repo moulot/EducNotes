@@ -27,7 +27,7 @@ export class TuitionPanelComponent implements OnInit {
       this.regActive = true;
     }
     this.nbTuitionPays = Number(this.settings.find(s => s.name === 'NbTuitionPayments').value);
-    this.orderService.getTuitionData().subscribe((data: any) => {
+    this.orderService.getBalanceData().subscribe((data: any) => {
       this.tuitionBalance = data.openBalance;
     })
   }

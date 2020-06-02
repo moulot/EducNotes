@@ -374,6 +374,10 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.ParentEmail, opt => {
                   opt.MapFrom(src => (src.Parent.Email));
                 });
+            CreateMap<OrderLineDeadline, OrderLineDeadlineDto>()
+                .ForMember(dest => dest.strDueDate, opt => {
+                  opt.MapFrom(src => src.DueDate.ToString("dd/MM/yyyy", frC));
+                });
         }
     }
 }

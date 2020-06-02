@@ -1,6 +1,8 @@
 export const environment = {
   production: true,
   apiUrl: 'api/',
+  tuitionId: 1,
+  nextYearTuitionId: 2,
   studentTypeId: 1,
   teacherTypeId: 2,
   parentTypeId: 3,

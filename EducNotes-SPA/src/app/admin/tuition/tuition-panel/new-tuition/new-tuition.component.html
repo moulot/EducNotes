@@ -1,12 +1,16 @@
 <form [formGroup]="tuitionForm" (ngSubmit)="saveTuition()">
   <div class="row">
+    <div class="col-md-12 d-flex">
+      <i class="fad fa-user-plus fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <div class="text-19">nouvelle inscription</div>
+    </div>
+    <div class="col-md-12"><hr class="my-2" style="background-color: #f89f20;"></div>
 
     <div class="col-md-12 mb-2">
       <div class="card">
         <div class="card-body p-2">
-          <div class="text-17">infos parents</div>
-          <hr class="my-2" style="background-color: #f89f20;">
-          <div mdbCollapse [isCollapsed]="false" #parent="bs-collapse">
+          <div class="text-18 text-muted">infos parents</div>
+          <div mdbCollapse [isCollapsed]="false" #parents="bs-collapse">
             <div class="row">
               <div class="col-md-6 mb-2">
                 <div class="border rounded-lg p-2">
@@ -71,54 +75,196 @@
                 </div>
               </div>
             </div>
-            <hr class="mt-2 mb-1">
+            <div class="float-right">
+              <button type="button" mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect (click)="openDiv(1)">suivant</button>
+            </div>
           </div>
-          <div class="float-right">
-            <button type="button" mdbBtn class="btnWhiteO" (click)="parent.toggle()" size="sm" mdbWavesEffect>suivant</button>
+          <div mdbCollapse #sumparents="bs-collapse">
+            <div class="row">
+              <div class="col-md-10">
+                <div class="row">
+                  <div class="col-md-12">
+                    <b class="text-15">père</b>. <span class="text-typed-cptlize mr-2">{{tuitionForm.value.fLastName}}</span>
+                    <span class="text-typed-cptlize">{{tuitionForm.value.fFirstName}}</span>.
+                    <span class="text-typed">{{tuitionForm.value.fCell}}</span> / <span class="text-typed">{{tuitionForm.value.fEmail}}</span>
+                  </div>
+                  <div class="col-md-12">
+                    <b class="text-15">mère</b>. <span class="text-typed-cptlize mr-2">{{tuitionForm.value.mLastName}}</span>
+                    <span class="text-typed-cptlize">{{tuitionForm.value.mFirstName}}</span>.
+                    <span class="text-typed">{{tuitionForm.value.mCell}}</span> / <span class="text-typed">{{tuitionForm.value.mEmail}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="float-right">
+                  <button type="button" mdbBtn class="btnWhiteO"  size="sm" mdbWavesEffect (click)="openDiv(0)">modifier</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="col-md-12 mb-2">
+    <div *ngIf="childDivOn" class="col-md-12 mb-2">
       <div class="card">
         <div class="card-body p-2">
-          <div class="text-17">infos enfants</div>
-          <hr class="my-2" style="background-color: #f89f20;">
-          <div mdbCollapse [isCollapsed]="false" #enfants="bs-collapse">
+          <div class="text-18 text-muted">infos enfants</div>
+          <div mdbCollapse [isCollapsed]="false" #children="bs-collapse">
             <div class="row">
               <div class="col-md-12 mb-2">
-                <button type="button" mdbBtn class="btnWhiteB mb-2" size="sm" mdbWavesEffect>ajouter un enfant</button>
-                <div class="border rounded-lg p-2">
-                  <div class="row">
-                    <div class="col-md-4">
-                      <div class="md-form mt-1">
-                        <input mdbInput type="text" id="fLastName" class="form-control" formControlName="fLastName" mdbValidate>
-                        <label for="fLastName" class="">nom</label>
+                <button type="button" mdbBtn class="btnWhiteO mb-2" (click)="addChild()" size="sm" mdbWavesEffect>ajouter un enfant</button>
+                <div class="mb-2" formArrayName="children" *ngFor="let child of tuitionForm.get('children')['controls']; let i = index;">
+                  <div class="border rounded-lg p-2" [formGroupName]="i">
+                    <div class="row">
+                      <div class="col-md-12 text-right pr-1 d-md-none">
+                        <a *ngIf="nbChildren > 1" (click)="removeChildItem(i)">
+                          <i class="fad fa-trash-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;
+                            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                        </a>
                       </div>
+                      <div class="col-md-2">
+                        <div class="md-form mt-1 mb-0">
+                          <input mdbInput type="text" id="fLastName" class="form-control" formControlName="lname" mdbValidate>
+                          <label for="fLastName" class="">nom</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="md-form mt-1 mb-0">
+                          <input mdbInput type="text" id="fFirstName" class="form-control" formControlName="fname" mdbValidate>
+                          <label for="fFirstName" class="">prénom</label>
+                        </div>          
+                      </div>
+                      <div class="col-md-2">
+                        <div class="md-form mt-1 mb-0">
+                          <input mdbInput type="text" id="dob" class="form-control" formControlName="dob" mdbValidate>
+                          <label for="dob" class="">date de naissance</label>
+                        </div>          
+                      </div>
+                      <div class="col-md-2">
+                        <div class="md-form my-0">
+                          <mdb-select [options]="sexOptions" formControlName="sex" placeholder="sexe"></mdb-select>
+                        </div>
+                      </div>
+                      <div class="col-md-2">
+                        <div class="md-form my-0">
+                          <mdb-select [options]="levelOptions" (ngModelChange)="setClassLevel($event, i)"
+                            formControlName="classlevel" placeholder="classe"></mdb-select>
+                        </div>
+                      </div>
+                      <div class="col-md-1 text-center d-none d-md-block my-auto">
+                        <a *ngIf="nbChildren > 1" (click)="removeChildItem(i)">
+                          <i class="fad fa-trash-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;
+                            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                        </a>
                     </div>
-                    <div class="col-md-5">
-                      <div class="md-form mt-1">
-                        <input mdbInput type="text" id="fFirstName" class="form-control" formControlName="fFirstName" mdbValidate>
-                        <label for="fFirstName" class="">prénom</label>
-                      </div>          
-                    </div>
-                    <div class="col-md-3">
-                      <div class="md-form mt-1">
-                      </div>          
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <hr class="mt-2 mb-1">
+            <div class="float-right">
+              <a mdbPageScroll href="#co">
+                <button type="button" mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect (click)="openDiv(2)">suivant</button>
+              </a>
+            </div>
           </div>
-          <div class="float-right">
-            <button type="button" mdbBtn class="btnWhiteO" (click)="enfants.toggle()" size="sm" mdbWavesEffect>suivant</button>
+          <div mdbCollapse #sumchildren="bs-collapse">
+            <div class="row">
+              <div class="col-md-10">
+                <div formArrayName="children" *ngFor="let child of tuitionForm.get('children')['controls']; let i = index;">
+                  <div class="" [formGroupName]="i">
+                    <b class="text-15">{{i+1}}</b>. <span class="text-17 mr-2">{{child.value.lname}}</span>
+                    <span class="text-typed-cptlize">{{child.value.fname}}</span>.
+                    <span class="text-typed"> classe {{classnames[i]}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2 float-right">
+                <div class="float-right">
+                  <button type="button" mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect (click)="openDiv(1)">modifier</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
+    <div id="co"></div>
+    <div *ngIf="checkoutDivOn" class="col-md-12 mb-2">
+      <div class="card">
+        <div class="card-body p-2">
+          <div class="text-18 text-muted">frais inscription</div>
+          <div mdbCollapse [isCollapsed]="false" #checkout="bs-collapse">
+            <div class="row">
+              <div class="col-md-6">
+                <div formArrayName="children" *ngFor="let child of tuitionForm.get('children')['controls']; let i = index;">
+                  <div class="row mb-2">
+                    <div class="col-md-12">
+                      <div class="border rounded-lg p-2">
+                        <div class="row">
+                          <div class="col-md-6 mb-1">
+                            <span class="mr-2 text-16 font-weight-bold text-capitalize">
+                              {{i+1}}. {{child.value.lname}} {{child.value.fname}}. classe {{classnames[i]}}.
+                            </span> 
+                          </div>
+                          <div class="col-md-6">
+                            <div class="text-16 text-right">frais de scolarité : {{tuitionFee[i] | number: '1.0-0': 'fr-FR'}} F</div>
+                          </div>
+                        </div>
+                        <hr class="my-1">
+                        <div class="row">
+                          <div class="col-md-8 text-16 text-right pr-0">frais d'inscription</div>
+                          <div class="col-md-1 text-16 text-right">:</div>
+                          <div class="col-md-3 text-16 text-right">{{regFee | number: '1.0-0': 'fr-FR'}} F</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-8 text-16 text-right pr-0">acompte scolarité (50%)</div>
+                          <div class="col-md-1 text-16 text-right">:</div>
+                          <div class="col-md-3 text-16 text-right">{{downPayment[i] | number: '1.0-0': 'fr-FR'}} F</div>
+                        </div>
+                        <hr class="my-1">
+                        <div class="row">
+                          <div class="col-md-12 text-16 text-right">
+                            montant total dû pour {{child.value.fname}} : <b>{{downPayment[i] + regFee | number: '1.0-0': 'fr-FR'}} F</b>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="border rounded-lg p-2">
+                  <div class="text-17">
+                    montant total à payer au plus tard le XX/XX/XXXX : <span class="font-weight-bold">{{amountDue | number: '1.0-0': 'fr-FR'}} F</span>
+                  </div>
+                  <hr class="my-1">
+                  <div>
+                    <div class="text-16 my-2">modes de paiement disponibles</div>
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="border rounded-lg p-2 text-right">MOBILE MONEY</div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="border rounded-lg p-2">ESPECES</div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="border rounded-lg p-2">CHEQUE / VIREMENT</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <button type="button" mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect>enregistrer l'inscription</button>
+                  <button type="button" mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect>procéder au payment</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </form>

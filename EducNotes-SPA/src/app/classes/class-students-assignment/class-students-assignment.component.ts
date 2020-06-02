@@ -16,7 +16,6 @@ export class ClassStudentsAssignmentComponent implements OnInit {
   levels: any = [];
   classes: any = [];
   searchForm: FormGroup;
-
   importedStudents: any = [];
   showImport = false;
   studentTypeId = environment.studentTypeId;
@@ -30,8 +29,6 @@ export class ClassStudentsAssignmentComponent implements OnInit {
   ngOnInit() {
     this.getLevels();
     this.createSearchForm();
-
-
   }
 
   createSearchForm() {

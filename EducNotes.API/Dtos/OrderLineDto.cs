@@ -11,6 +11,7 @@ namespace EducNotes.API.Dtos
     public string OrderLineLabel { get; set; }
     public DateTime Deadline { get; set; }
     public string strDeadline { get; set; }
+    public int ProductId { get; set; }
     public string ProductName { get; set; }
     public int Qty { get; set; }
     public decimal UnitPrice { get; set; }
@@ -21,10 +22,12 @@ namespace EducNotes.API.Dtos
     public decimal TVAAmount { get; set; }
     public decimal AmountTTC { get; set; }
     public string strAmountTTC { get; set; }
+    public int ChildId { get; set; }
     public string ChildFirstName { get; set; }
     public string ChildLastName { get; set; }
+    public int ChildClassId { get; set; }
     public string ChildClassName { get; set; }
     public Boolean Cancelled { get; set; }
-    public List<OrderLineDeadline> Payments { get; set; }
+    public List<OrderLineDeadlineDto> Payments { get; set; }
   }
 }

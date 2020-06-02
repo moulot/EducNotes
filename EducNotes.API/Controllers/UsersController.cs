@@ -209,7 +209,8 @@ namespace EducNotes.API.Controllers
             for (int i = 0; i < pOrderlines.Count(); i++)
             {
               var line = pOrderlines[i];
-              line.Payments = await _context.OrderLineDeadlines.Where(d => d.OrderLineId == line.Id).ToListAsync();
+              var payments =  await _context.OrderLineDeadlines.Where(d => d.OrderLineId == line.Id).ToListAsync();
+              line.Payments = _mapper.Map<List<OrderLineDeadlineDto>>(payments);
             }
 
             parent.Registration.Lines = new List<OrderLineDto>();
@@ -1675,8 +1676,9 @@ namespace EducNotes.API.Controllers
             if(line.Cancelled == false)
             {
               var lineDto = _mapper.Map<OrderLineDto>(line);
-              lineDto.Payments = new List<OrderLineDeadline>();
-              lineDto.Payments = await _context.OrderLineDeadlines.Where(d => d.OrderLineId == line.Id).ToListAsync();
+              lineDto.Payments = new List<OrderLineDeadlineDto>();
+              var payments = await _context.OrderLineDeadlines.Where(d => d.OrderLineId == line.Id).ToListAsync();
+              lineDto.Payments = _mapper.Map<List<OrderLineDeadlineDto>>(payments);
               updlines.Add(lineDto);
 
               order.TotalHT += line.TotalHT;

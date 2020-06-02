@@ -6,6 +6,7 @@ using EducNotes.API.Data;
 using EducNotes.API.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace EducNotes.API.Controllers
 {
@@ -17,11 +18,35 @@ namespace EducNotes.API.Controllers
     private readonly IMapper _mapper;
     private readonly DataContext _context;
 
-    public OrdersController(IEducNotesRepository repo, IMapper mapper, DataContext context)
+    public IConfiguration _config { get; }
+
+    public OrdersController(IEducNotesRepository repo, IMapper mapper, DataContext context,
+     IConfiguration config)
     {
       _repo = repo;
       _mapper = mapper;
       _context = context;
+      _config = config;
+    }
+
+    [HttpGet("tuitionOrderData")]
+    public async Task<IActionResult> GetTuitionOrderData()
+    {
+      // tuition product ids
+      int tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
+      int nextYearTuitionId = _config.GetValue<int>("AppSettings:nextTuitionId");
+
+      var deadlines = await _context.ProductDeadLines
+                      .OrderBy(o => o.DueDate)
+                      .Where(p => p.ProductId == tuitionId || p.ProductId == nextYearTuitionId).ToListAsync();
+
+      var classProducts = await _context.ClassLevelProducts
+                          .Where(c => c.ProductId == tuitionId || c.ProductId == nextYearTuitionId).ToListAsync();
+
+      return Ok(new {
+        deadlines,
+        classProducts
+      });
     }
 
     [HttpGet("{id}", Name = "GetOrder")]
@@ -32,7 +57,7 @@ namespace EducNotes.API.Controllers
       return Ok(order);
     }
 
-    [HttpGet("tuitionData")]
+    [HttpGet("balanceData")]
     public async Task<IActionResult> GetTuitionData()
     {
       var today = DateTime.Now.Date;

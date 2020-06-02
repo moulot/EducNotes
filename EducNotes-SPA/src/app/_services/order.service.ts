@@ -17,7 +17,11 @@ export class OrderService {
     return this.http.get(this.baseUrl + id);
   }
 
+  getBalanceData() {
+    return this.http.get(this.baseUrl + 'balanceData');
+  }
+
   getTuitionData() {
-    return this.http.get(this.baseUrl + 'tuitionData');
+    return this.http.get(this.baseUrl + 'tuitionOrderData');
   }
 }

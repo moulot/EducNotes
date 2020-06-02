@@ -30,7 +30,8 @@ export class ImportUsersComponent implements OnInit {
   isCollapsed = true;
   currentUserId;
 
-  constructor(private authService: AuthService, private alertify: AlertifyService, private modalService: NgbModal, private classService: ClassService, private adminService: AdminService) { }
+  constructor(private authService: AuthService, private alertify: AlertifyService, private modalService: NgbModal, 
+    private classService: ClassService, private adminService: AdminService) { }
 
   ngOnInit() {
     this.currentUserId = this.authService.currentUser.id;

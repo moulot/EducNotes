@@ -139,7 +139,6 @@ export class PreInscriptionComponent implements OnInit {
   //  this.submitForm();
   }
 
-
   confirm(element: any): void {
     this.children.splice(this.children.findIndex(p => p.id === element.id), 1);
 
@@ -156,24 +155,14 @@ export class PreInscriptionComponent implements OnInit {
   save(id: number) {
     this.submitText = 'patienter...';
     this.alertify.confirm('Enregistrer ces information ?', () => {
-          const data: any = {};
-          data.father = this.father;
-          data.mother = this.mother;
-          data.children = this.children;
-          this.adminService.savePreinscription(this.authService.decodedToken.nameid, data).subscribe(() => {
-     this.submitText = 'enregistrer';
-    this.createParentsForms();
-    this.alertify.success('enregistrement terminé...');
-    this.showDetails = false;
-    this.father = null;
-    this.mother = null;
-    this.children = [];
-
-          }, error => {
-    this.submitText = 'enregistrer';
-    this.alertify.error(error);
-
-          });
+      const data: any = {};
+      data.father = this.father;
+      data.mother = this.mother;
+      data.children = this.children;
+      this.adminService.savePreinscription(this.authService.decodedToken.nameid, data).subscribe(() => {}, error => {
+        this.submitText = 'enregistrer';
+        this.alertify.error(error);
+      });
     });
   }
   emailsVerification() {

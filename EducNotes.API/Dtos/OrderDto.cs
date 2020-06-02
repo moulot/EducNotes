@@ -23,9 +23,12 @@ namespace EducNotes.API.Dtos
     public decimal TVAAmount { get; set; }
     public decimal AmountTTC { get; set; }
     public string strAmountTTC { get; set; }
+    public int ChildId { get; set; }
     public string ChildLastName { get; set; }
     public string ChildFirstName { get; set; }
+    public int ChildClassId { get; set; }
     public string ChildClassName { get; set; }
+    public int ParentId { get; set; }
     public string ParentLastName { get; set; }
     public string ParentFirstName { get; set; }
     public string ParentCell { get; set; }

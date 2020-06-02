@@ -833,8 +833,8 @@ namespace EducNotes.API.Controllers
           Boolean sendSmsToo = smsActive == "1" ? true : false;
 
           var deadlines = await _context.ProductDeadLines
-                          .OrderBy(o => o.DueDate)
-                          .Where(p => p.ProductId == RegTypeId).ToListAsync();
+                                .OrderBy(o => o.DueDate)
+                                .Where(p => p.ProductId == RegTypeId).ToListAsync();
 
           var firstDeadline = deadlines.First(d => d.Seq == 1);
           List<RegistrationEmailDto> EmailData = new List<RegistrationEmailDto>();

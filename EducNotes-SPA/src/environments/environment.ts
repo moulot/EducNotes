@@ -5,6 +5,8 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:5000/api/',
+  tuitionId: 1,
+  nextYearTuitionId: 2,
   studentTypeId: 1,
   teacherTypeId: 2,
   parentTypeId: 3,
