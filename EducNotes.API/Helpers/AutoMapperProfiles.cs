@@ -362,17 +362,29 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.ChildClassName, opt => {
                   opt.MapFrom(src => (src.Child.Class.Name));
                 })
-                .ForMember(dest => dest.ParentLastName, opt => {
-                  opt.MapFrom(src => (src.Parent.LastName));
+                .ForMember(dest => dest.FatherLastName, opt => {
+                  opt.MapFrom(src => (src.Father.LastName));
                 })
-                .ForMember(dest => dest.ParentFirstName, opt => {
-                  opt.MapFrom(src => (src.Parent.FirstName));
+                .ForMember(dest => dest.FatherFirstName, opt => {
+                  opt.MapFrom(src => (src.Father.FirstName));
                 })
-                .ForMember(dest => dest.ParentCell, opt => {
-                  opt.MapFrom(src => (src.Parent.PhoneNumber));
+                .ForMember(dest => dest.FatherCell, opt => {
+                  opt.MapFrom(src => (src.Father.PhoneNumber));
                 })
-                .ForMember(dest => dest.ParentEmail, opt => {
-                  opt.MapFrom(src => (src.Parent.Email));
+                .ForMember(dest => dest.FatherEmail, opt => {
+                  opt.MapFrom(src => (src.Father.Email));
+                })
+                .ForMember(dest => dest.MotherLastName, opt => {
+                  opt.MapFrom(src => (src.Mother.LastName));
+                })
+                .ForMember(dest => dest.MotherFirstName, opt => {
+                  opt.MapFrom(src => (src.Mother.FirstName));
+                })
+                .ForMember(dest => dest.MotherCell, opt => {
+                  opt.MapFrom(src => (src.Mother.PhoneNumber));
+                })
+                .ForMember(dest => dest.MotherEmail, opt => {
+                  opt.MapFrom(src => (src.Mother.Email));
                 });
             CreateMap<OrderLineDeadline, OrderLineDeadlineDto>()
                 .ForMember(dest => dest.strDueDate, opt => {

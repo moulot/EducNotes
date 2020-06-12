@@ -57,6 +57,7 @@ namespace EducNotes.API
           builder.AddRoleValidator<RoleValidator<Role>>();
           builder.AddRoleManager<RoleManager<Role>>();
           builder.AddSignInManager<SignInManager<User>>();
+          builder.AddDefaultTokenProviders();
 
           services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(Options => {

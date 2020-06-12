@@ -42,17 +42,14 @@ export class PreRegisterComponent implements OnInit {
     this.createRegisterForm();
   }
 
-
   showImportation() {
     this.showDiv = !this.showDiv;
   }
 
   getUserTypes() {
 
-
     if (this.userTypes.length === 0) {
       this.adminService.getUserTypes().subscribe((res: any[]) => {
-
         for (let i = 0; i < res.length; i++) {
           const element = { value: res[i].id, label: res[i].name };
           if (Number(element.value) === this.teacherTypeId || Number(element.value) === this.parentTypeId) {
@@ -61,7 +58,6 @@ export class PreRegisterComponent implements OnInit {
         }
       });
     }
-
   }
 
   getCourses() {
@@ -93,7 +89,6 @@ export class PreRegisterComponent implements OnInit {
         return { 'formNOK': true };
       } else {
         return false;
-
       }
     }
     return { 'formNOK': true };

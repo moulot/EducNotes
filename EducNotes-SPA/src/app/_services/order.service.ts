@@ -3,6 +3,7 @@ import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { AlertifyService } from './alertify.service';
 import { Router } from '@angular/router';
+import { TuitionData } from '../_models/tuitionData';
 
 @Injectable({
   providedIn: 'root'
@@ -23,5 +24,9 @@ export class OrderService {
 
   getTuitionData() {
     return this.http.get(this.baseUrl + 'tuitionOrderData');
+  }
+
+  addNewTuition(tuition: TuitionData) {
+    return this.http.post(this.baseUrl + 'NewTuition', tuition);
   }
 }

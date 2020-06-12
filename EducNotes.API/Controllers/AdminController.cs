@@ -505,8 +505,7 @@ namespace EducNotes.API.Controllers
         [HttpPost("{currentUserId}/SendRegisterEmail")]
         public async Task<IActionResult> SendRegisterEmail(int currentUserId, SelfRegisterDto model)
         {
-
-            if (model.UserTypeId == teacherTypeId)
+          if (model.UserTypeId == teacherTypeId)
             {
                 var TeacherRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
 
@@ -538,7 +537,7 @@ namespace EducNotes.API.Controllers
 
             }
 
-            if (model.UserTypeId == parentTypeId)
+          if (model.UserTypeId == parentTypeId)
             {
                 var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentTypeId);
                 string code = Guid.NewGuid().ToString();
@@ -581,10 +580,10 @@ namespace EducNotes.API.Controllers
                     return BadRequest("impossible d'ajouter ce compte");
             }
 
-            if (await _repo.SaveAll())
-                return NoContent();
+          if (await _repo.SaveAll())
+            return NoContent();
 
-            return BadRequest();
+          return BadRequest();
         }
 
         [HttpPost("SendEmail")]
@@ -869,7 +868,10 @@ namespace EducNotes.API.Controllers
             order.Deadline = Convert.ToDateTime(settings.First(s => s.Name == "RegistrationDeadLine").Value);
             order.Validity = order.OrderDate.AddDays(daysToValidate);
             order.OrderLabel = "ré-inscription";
-            order.ParentId = parent.Id;
+            if(parent.Gender == 0)
+              order.MotherId = parent.Id;
+            else
+              order.FatherId = parent.Id;
             _repo.Add(order);
             if(!await _repo.SaveAll())
               return BadRequest("problème pour ajouter la scolarité");
@@ -917,10 +919,11 @@ namespace EducNotes.API.Controllers
               orderLine.OrderLineLabel = "scolarité classe de " + nextClassLevel.Name + " de " + 
                 child.LastName + " " + child.FirstName;
               orderLine.ProductId = RegTypeId;
+              orderLine.ProductFee = RegistrationFee;
               orderLine.Qty = 1;
               orderLine.UnitPrice = classProduct.Price;
-              orderLine.TotalHT = orderLine.Qty * orderLine.UnitPrice;
-              orderLine.AmountHT = orderLine.TotalHT;
+              orderLine.TotalHT = orderLine.Qty * orderLine.UnitPrice + orderLine.ProductFee;
+              orderLine.AmountHT = orderLine.TotalHT - orderLine.Discount;
               orderLine.TVA = 0;
               orderLine.TVAAmount = orderLine.TVA * orderLine.AmountHT;
               orderLine.AmountTTC = orderLine.AmountHT + orderLine.TVAAmount;

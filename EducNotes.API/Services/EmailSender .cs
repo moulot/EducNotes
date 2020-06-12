@@ -13,8 +13,8 @@ namespace EducNotes.API.Services
 
         public EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor, IConfiguration config)
         {
-            Options = optionsAccessor.Value;
-            _config = config;
+          Options = optionsAccessor.Value;
+          _config = config;
         }
 
         public AuthMessageSenderOptions Options { get; } //set only via Secret Manager

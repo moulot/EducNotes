@@ -47,8 +47,10 @@ namespace EducNotes.API.Models {
     public decimal AmountTTC { get; set; }
     public int? ChildId { get; set; }
     public User Child { get; set; }
-    public int? ParentId { get; set; }
-    public User Parent { get; set; }
+    public int? FatherId { get; set; }
+    public User Father { get; set; }
+    public int? MotherId { get; set; }
+    public User Mother { get; set; }
     public byte Status { get; set; }
     public Boolean isReg { get; set; }
     public Boolean isNextReg { get; set; }

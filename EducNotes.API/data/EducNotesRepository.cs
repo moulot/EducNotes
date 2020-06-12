@@ -956,51 +956,50 @@ namespace EducNotes.API.Data
 
         public async Task<int> AddSelfRegister(User user, string roleName, bool sendLink, int currentUserId)
         {
-            var userIdToReturn = 0;
-            user.Created = DateTime.Now;
-            using (var identityContextTransaction = _context.Database.BeginTransaction())
+          var userIdToReturn = 0;
+          user.Created = DateTime.Now;
+          using (var identityContextTransaction = _context.Database.BeginTransaction())
+          {
+            try
             {
-                try
-                {
-                    var result = await _userManager.CreateAsync(user, password);
+              var result = await _userManager.CreateAsync(user, password);
+              if (result.Succeeded)
+              {
+                  var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedUserName == user.UserName);
+                  userIdToReturn = appUser.Id;
 
-                    if (result.Succeeded)
-                    {
-                        var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedUserName == user.UserName);
-                        userIdToReturn = appUser.Id;
+                  _userManager.AddToRoleAsync(appUser, roleName).Wait();
+                  if (sendLink)
+                  {
+                      // envoi du lien
+                      var callbackUrl = _config.GetValue<String>("AppSettings:DefaultSelRegisterLink") + appUser.ValidationCode;
+                      var email = new Email
+                      {
 
-                        _userManager.AddToRoleAsync(appUser, roleName).Wait();
-                        if (sendLink)
-                        {
-                            // envoi du lien
-                            var callbackUrl = _config.GetValue<String>("AppSettings:DefaultSelRegisterLink") + appUser.ValidationCode;
-                            var email = new Email
-                            {
+                          InsertUserId = currentUserId,
+                          UpdateUserId = appUser.Id,
+                          StatusFlag = 0,
+                          Subject = "Confirmation de compte",
+                          ToAddress = appUser.Email,
+                          Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                          FromAddress = "no-reply@educnotes.com",
+                          EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
+                      };
+                      Add(email);
+                      await SaveAll();
+                  }
+              }
 
-                                InsertUserId = currentUserId,
-                                UpdateUserId = appUser.Id,
-                                StatusFlag = 0,
-                                Subject = "Confirmation de compte",
-                                ToAddress = appUser.Email,
-                                Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                                FromAddress = "no-reply@educnotes.com",
-                                EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
-                            };
-                            Add(email);
-                            await SaveAll();
-                        }
-                    }
-
-                    identityContextTransaction.Commit();
-                }
-                catch (System.Exception)
-                {
-                    identityContextTransaction.Rollback();
-                    userIdToReturn = 0;
-                }
+              identityContextTransaction.Commit();
             }
+            catch (System.Exception)
+            {
+              identityContextTransaction.Rollback();
+              userIdToReturn = 0;
+            }
+          }
 
-            return userIdToReturn;
+          return userIdToReturn;
         }
 
         public async Task<List<string>> GetEmails()
@@ -1080,7 +1079,6 @@ namespace EducNotes.API.Data
                 {
                     foreach (var user in userToUpdate)
                     {
-
                         if (user.UserTypeId == parentTypeId)
                         {
                             var parentFromRepo = await GetUser(parentId, true);
@@ -1464,7 +1462,8 @@ namespace EducNotes.API.Data
             AmountTTC = total,
             Discount = 0,
             TVA = 0,
-            ParentId = userPid,
+            // TO BE COPED ON THE NEW REGISTRATION PAGE
+            FatherId = userPid,
             ChildId = userId
           };
           _context.Add(newOrder);

@@ -28,11 +28,16 @@ namespace EducNotes.API.Dtos
     public string ChildFirstName { get; set; }
     public int ChildClassId { get; set; }
     public string ChildClassName { get; set; }
-    public int ParentId { get; set; }
-    public string ParentLastName { get; set; }
-    public string ParentFirstName { get; set; }
-    public string ParentCell { get; set; }
-    public string ParentEmail { get; set; }
+    public int FatherId { get; set; }
+    public string FatherLastName { get; set; }
+    public string FatherFirstName { get; set; }
+    public string FatherCell { get; set; }
+    public string FatherEmail { get; set; }
+    public int MotherId { get; set; }
+    public string MotherLastName { get; set; }
+    public string MotherFirstName { get; set; }
+    public string MotherCell { get; set; }
+    public string MotherEmail { get; set; }
     public byte Status { get; set; }
     public Boolean isReg { get; set; }
     public Boolean isNextReg { get; set; }

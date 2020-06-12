@@ -196,7 +196,11 @@ namespace EducNotes.API.Controllers
           }
 
           //get children registrations (current and next year)
-          var order = await _context.Orders.FirstOrDefaultAsync(o => o.ParentId == user.Id && o.isReg == true);
+          Order order = new Order();
+          if(user.Gender == 0)
+            order = await _context.Orders.FirstOrDefaultAsync(o => o.MotherId == user.Id && o.isReg == true);
+          else
+            order = await _context.Orders.FirstOrDefaultAsync(o => o.FatherId == user.Id && o.isReg == true);
           if(order != null)
           {
             OrderDto pOrder = _mapper.Map<OrderDto>(order);
@@ -217,7 +221,11 @@ namespace EducNotes.API.Controllers
             parent.Registration.Lines = pOrderlines;
           }
 
-          var nextOrder = await _context.Orders.FirstOrDefaultAsync(o => o.ParentId == user.Id && o.isNextReg == true);
+          Order nextOrder = new Order();
+          if(user.Gender == 0)
+            nextOrder = await _context.Orders.FirstOrDefaultAsync(o => o.MotherId == user.Id && o.isNextReg == true);
+          else
+            nextOrder = await _context.Orders.FirstOrDefaultAsync(o => o.FatherId == user.Id && o.isNextReg == true);
           if(parent.NextRegistration != null)
           {
             OrderDto pnextOrder = _mapper.Map<OrderDto>(nextOrder);

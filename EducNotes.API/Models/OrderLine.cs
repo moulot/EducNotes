@@ -15,6 +15,7 @@ namespace EducNotes.API.Models
 
     public enum StatusEnum
     {
+      ProductFee = 0,
       Created = 0,
       Shipped = 1,
       Completed = 2
@@ -26,6 +27,7 @@ namespace EducNotes.API.Models
     public string OrderLineLabel { get; set; }
     public int ProductId { get; set; }
     public Product Product { get; set; }
+    public decimal ProductFee { get; set; }
     public int Qty { get; set; }
     public decimal UnitPrice { get; set; }
     public decimal TotalHT { get; set; }

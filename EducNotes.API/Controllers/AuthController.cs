@@ -417,7 +417,8 @@ namespace EducNotes.API.Controllers
                 AmountTTC = total,
                 Discount = 0,
                 TVA = 0,
-                ParentId = parentId,
+                //TO BE COPED CAREFULLY ON THE NEW REGISTRATION PAGE
+                FatherId = parentId,
                 ChildId = childId
               };
               _repo.Add(newOrder);

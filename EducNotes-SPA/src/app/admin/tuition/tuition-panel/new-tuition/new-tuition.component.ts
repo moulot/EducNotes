@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ClassService } from 'src/app/_services/class.service';
@@ -7,6 +7,11 @@ import { OrderService } from 'src/app/_services/order.service';
 import { AuthService } from 'src/app/_services/auth.service';
 import { Setting } from 'src/app/_models/setting';
 import { environment } from 'src/environments/environment.prod';
+import { Utils } from 'src/app/shared/utils';
+import { Observable } from 'rxjs';
+import { TuitionData } from 'src/app/_models/tuitionData';
+import { TuitionChildData } from 'src/app/_models/tuitionChildData';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-tuition',
@@ -37,17 +42,26 @@ export class NewTuitionComponent implements OnInit {
   dpPct: number;
   downPayment: number[] = [];
   tuitionId = environment.tuitionId;
+  birthDateMask = Utils.birthDateMask;
+  phoneMask = Utils.phoneMask;
+  today: string;
+  tuitionValidity: string;
+  daysToValidateReg: any;
+  orderAmount: number;
+  totalRegFee: number;
 
-  constructor(private fb: FormBuilder, private alertify: AlertifyService, private authService: AuthService,
-    private classService: ClassService, private orderService: OrderService) { }
+  constructor(private fb: FormBuilder, private alertify: AlertifyService, private router: Router,
+    private authService: AuthService, private classService: ClassService,
+    private orderService: OrderService) { }
 
   ngOnInit() {
     this.settings = this.authService.settings;
     this.regFee = Number(this.settings.find(s => s.name === 'RegFee').value);
     this.regDeadline = this.settings.find(s => s.name === 'RegistrationDeadLine').value;
+    this.daysToValidateReg = this.settings.find(s => s.name === 'DaysToValidateReg').value;
     this.createTuitionForm();
-    this.addChildItem('moulot', 'sandrine', null, '', 10);
-    this.addChildItem('moulot', 'inna', null, '', 3);
+    this.addChildItem('moulot', 'sandrine', 10, '31/06/2006', 0);
+    this.addChildItem('moulot', 'inna', 3, '14/06/2011', 0);
     this.getClassLevels();
     this.getTuitionData();
   }
@@ -56,9 +70,10 @@ export class NewTuitionComponent implements OnInit {
     this.orderService.getTuitionData().subscribe((data: any) => {
       const deadlines = data.deadlines;
       this.deadline = deadlines.find(d => d.productId === this.tuitionId && d.seq === 1);
-      console.log(this.deadline);
       this.dpPct = this.deadline.percentage;
       this.classProducts = data.classProducts;
+      this.today = data.today;
+      this.tuitionValidity = data.tuitionValidity;
     }, error => {
       this.alertify.error(error);
     });
@@ -79,34 +94,103 @@ export class NewTuitionComponent implements OnInit {
 
   createTuitionForm() {
     this.tuitionForm = this.fb.group({
-      fLastName: ['moulot'],
-      fFirstName: ['georges'],
-      fEmail: ['georges.moulot@albatrostechnologies.com'],
-      fCell: ['07.10.44.46'],
-      mLastName: ['moulot'],
-      mFirstName: ['Jacqueline'],
-      mEmail: ['jacqueline.moulot@manager.com'],
-      mCell: ['12345678'],
+      fLastName: ['moulot', Validators.required],
+      fFirstName: ['georges', Validators.required],
+      fEmail: ['georges.moulot@albatrostechnologies.com', Validators.required],
+      fCell: ['07.10.44.46', Validators.required],
+      fSendEmail: [false],
+      mLastName: ['moulot', Validators.required],
+      mFirstName: ['Jacqueline', Validators.required],
+      mEmail: ['jacqueline.moulot@manager.com', Validators.required],
+      mCell: ['12345678', Validators.required],
+      mSendEmail: [false],
       children: this.fb.array([])
-    });
+    }, {validator: this.formValidator});
   }
 
-  addChildItem(lname, fname, classlevel, dob, sex): void {
+  formValidator(g: FormGroup) {
+    const children = g.get('children') as FormArray;
+    let childerror = false;
+    for (let i = 0; i < children.length; i++) {
+      const elt = children.controls[i];
+      if (elt.value.lname === '' || elt.value.fname === '' || elt.value.classlevelId === null || elt.value.dob === '' ||
+        elt.value.sex === null) {
+        childerror = true;
+        break;
+      }
+    }
+
+    let parenterror = false;
+    const flname = g.get('fLastName').value;
+    const ffname = g.get('fFirstName').value;
+    const fcell = g.get('fCell').value;
+    const femail = g.get('fEmail').value;
+    const mlname = g.get('mLastName').value;
+    const mfname = g.get('mFirstName').value;
+    const mcell = g.get('mCell').value;
+    const memail = g.get('mEmail').value;
+    const fsendemail = g.get('fSendEmail').value;
+    const msendemail = g.get('mSendEmail').value;
+    if (flname === '' && ffname === '' && fcell === '' && femail === '' && mlname === ''
+      && mfname === '' && mcell === '' && memail === '' && fsendemail === false && msendemail === false) {
+      parenterror = true;
+    }
+
+    // is the father OK?
+    let fathererror = false;
+    if (flname !== '' || ffname !== '' || fcell !== '' || femail !== '') {
+      if (flname === '' || ffname === '' || fcell === '' || femail === '') {
+        fathererror = true;
+        parenterror = true;
+      }
+    }
+
+    // is the mother OK?
+    let mothererror = false;
+    if (mlname !== '' || mfname !== '' || mcell !== '' || memail !== '') {
+      if (mlname === '' || mfname === '' || mcell === '' || memail === '') {
+        mothererror = true;
+        parenterror = true;
+      }
+    }
+
+    // did we select at least one parent to cope with the registration?
+    let emailerror = false;
+    if (fsendemail === false && msendemail === false) {
+      emailerror = true;
+      parenterror = true;
+    }
+
+    if (childerror === false && parenterror === true) {
+      return {'childNOK': false, 'parentNOK': true, 'formNOK': true,
+        'fatherNOK': fathererror, 'motherNOK': mothererror, 'sendemailNOK': emailerror};
+    } else if (childerror === true && parenterror === false) {
+      return {'childNOK': true, 'parentNOK': false, 'formNOK': true,
+        'fatherNOK': fathererror, 'motherNOK': mothererror, 'sendemailNOK': emailerror};
+    } else if (childerror === true && parenterror === true) {
+      return {'childNOK': true, 'parentNOK': true, 'formNOK': true,
+        'fatherNOK': fathererror, 'motherNOK': mothererror, 'sendemailNOK': emailerror};
+    }
+
+    return null;
+  }
+
+  addChildItem(lname, fname, classlevelId, dob, sex): void {
     const children = this.tuitionForm.get('children') as FormArray;
-    children.push(this.createChildItem(lname, fname, classlevel, dob, sex));
+    children.push(this.createChildItem(lname, fname, classlevelId, dob, sex));
     this.nbChildren++;
     this.classnames = [...this.classnames, ''];
     this.tuitionFee = [...this.tuitionFee, 0];
     this.downPayment = [...this.downPayment, 0];
   }
 
-  createChildItem(lname, fname, classlevel, dob, sex): FormGroup {
+  createChildItem(lname, fname, classlevelId, dob, sex): FormGroup {
     return this.fb.group({
-      lname: lname,
-      fname: fname,
-      classlevel: classlevel,
-      dob: dob,
-      sex: sex
+      lname: [lname, Validators.required],
+      fname: [fname, Validators.required],
+      classlevelId: [classlevelId, Validators.required],
+      dob: [dob, Validators.required],
+      sex: [sex, Validators.required]
     });
   }
 
@@ -118,6 +202,7 @@ export class NewTuitionComponent implements OnInit {
     this.tuitionFee.splice(index, 1);
     this.downPayment.splice(index, 1);
     this.setAmountDue();
+    this.setOrderAmount();
   }
 
   addChild() {
@@ -130,10 +215,8 @@ export class NewTuitionComponent implements OnInit {
         this.parentsDiv.show();
         this.sumparentsDiv.hide();
         Promise.resolve().then(() => {
-          // debugger;
           this.childrenDiv.hide();
           this.sumchildrenDiv.show();
-          // this.checkoutDiv.hide();
           this.checkoutDivOn = false;
         });
         break;
@@ -144,7 +227,6 @@ export class NewTuitionComponent implements OnInit {
         Promise.resolve().then(() => {
           this.childrenDiv.show();
           this.sumchildrenDiv.hide();
-          // this.checkoutDiv.hide();
           this.checkoutDivOn = false;
         });
         break;
@@ -171,18 +253,64 @@ export class NewTuitionComponent implements OnInit {
     const dp = this.dpPct * price;
     this.downPayment[index] = dp;
     this.setAmountDue();
+    this.setOrderAmount();
   }
 
   setAmountDue() {
     this.amountDue = 0;
-    for (let i = 0; i < this.tuitionFee.length; i++) {
+    for (let i = 0; i < this.downPayment.length; i++) {
       const dp = this.downPayment[i];
       this.amountDue = this.amountDue + Number(dp) + this.regFee;
     }
   }
 
-  saveTuition() {
+  setOrderAmount() {
+    this.orderAmount = 0;
+    this.totalRegFee = 0;
+    for (let i = 0; i < this.tuitionFee.length; i++) {
+      const fee = this.tuitionFee[i];
+      this.orderAmount = this.orderAmount + Number(fee) + this.regFee;
+      this.totalRegFee = this.totalRegFee + this.regFee;
+    }
+  }
 
+  saveTuition() {
+    const tuitionData = <TuitionData>{};
+    tuitionData.fLastName = this.tuitionForm.value.fLastName;
+    tuitionData.fFirstName = this.tuitionForm.value.fFirstName;
+    tuitionData.fCell = this.tuitionForm.value.fCell;
+    tuitionData.fEmail = this.tuitionForm.value.fEmail;
+    tuitionData.fSendEmail = this.tuitionForm.value.fSendEmail;
+    tuitionData.mLastName = this.tuitionForm.value.mLastName;
+    tuitionData.mFirstName = this.tuitionForm.value.mFirstName;
+    tuitionData.mCell = this.tuitionForm.value.mCell;
+    tuitionData.mEmail = this.tuitionForm.value.mEmail;
+    tuitionData.mSendEmail = this.tuitionForm.value.mSendEmail;
+    tuitionData.orderAmount = this.orderAmount;
+    tuitionData.dueAmount = this.amountDue;
+    tuitionData.deadline = Utils.inputDateDDMMYY(this.regDeadline, '/');
+    tuitionData.validity = Utils.inputDateDDMMYY(this.tuitionValidity, '/');
+    tuitionData.children = [];
+    for (let i = 0; i < this.tuitionForm.value.children.length; i++) {
+      const elt = this.tuitionForm.value.children[i];
+      const child = <TuitionChildData>{};
+      child.lastName = elt.lname;
+      child.firstName = elt.fname;
+      child.classlevelId = elt.classlevelId;
+      child.dateOfBirth = Utils.inputDateDDMMYY(elt.dob, '/');
+      child.sex = elt.sex;
+      child.tuitionFee = this.tuitionFee[i];
+      child.regFee = this.regFee;
+      child.downPayment = this.downPayment[i];
+      tuitionData.children = [...tuitionData.children, child];
+    }
+
+    this.orderService.addNewTuition(tuitionData).subscribe(() => {
+      this.router.navigate(['/tuition']);
+      this.alertify.success('l\'inscription a bien été enregistré');
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
 }
