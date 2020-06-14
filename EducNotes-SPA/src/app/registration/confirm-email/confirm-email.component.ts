@@ -34,13 +34,20 @@ export class ConfirmEmailComponent implements OnInit {
     // });
 
     const id: string = this.route.snapshot.queryParamMap.get('id');
+    const orderid: string = this.route.snapshot.queryParamMap.get('orderid');
     const token: string = this.route.snapshot.queryParamMap.get('token');
-    const confirmEmail = <ConfirmEmail>{};
-    confirmEmail.userId = id;
-    confirmEmail.token = token;
-    this.accountService.confirmEmail(confirmEmail).subscribe((emailOK: boolean) => {
-      this.emailOK = emailOK;
-      console.log(this.emailOK);
+    if (id !== null && token !== null) {
+      const confirmEmail = <ConfirmEmail>{};
+      confirmEmail.userId = id;
+      confirmEmail.token = token;
+      this.validateEmail(confirmEmail);
+    }
+  }
+
+  validateEmail(confirmEmail: ConfirmEmail) {
+    this.accountService.confirmEmail(confirmEmail).subscribe((data: any) => {
+      this.emailOK = data.emailOK;
+      this.user = data.user;
     }, error => {
       this.alertify.error(error);
       console.log(error);

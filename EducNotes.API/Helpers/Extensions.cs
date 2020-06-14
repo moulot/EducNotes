@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -143,16 +144,53 @@ namespace EducNotes.API.Helpers
           }
         }
 
-
-        public static string FirstLetterToUpper(this string str)
+        public static string FirstLetterToUpper(this string s)
         {
-          if (str == null)
-            return null;
+          if (string.IsNullOrEmpty(s))
+          {
+            return string.Empty;
+          }
 
-          if (str.Length > 1)
-            return char.ToUpper(str[0]) + str.Substring(1).ToLower();
+          char[] a = s.ToCharArray();
+          a[0] = char.ToUpper(a[0]);
+          return new string(a);
+        }
 
-          return str.ToUpper();
+        // public static string FirstLetterToUpper(this string str)
+        // {
+        //   if (str == null)
+        //     return null;
+
+        //   if (str.Length > 1)
+        //     return char.ToUpper(str[0]) + str.Substring(1).ToLower();
+
+        //   return str.ToUpper();
+        // }
+
+        public static string UppercaseWords(this string value)
+        {
+            char[] array = value.ToCharArray();
+            // Handle the first letter in the string.
+            if (array.Length >= 1)
+            {
+                if (char.IsLower(array[0]))
+                {
+                    array[0] = char.ToUpper(array[0]);
+                }
+            }
+            // Scan through the letters, checking for spaces.
+            // ... Uppercase the lowercase letters following spaces.
+            for (int i = 1; i < array.Length; i++)
+            {
+                if (array[i - 1] == ' ')
+                {
+                    if (char.IsLower(array[i]))
+                    {
+                        array[i] = char.ToUpper(array[i]);
+                    }
+                }
+            }
+            return new string(array);
         }
 
         public static string To5Digits(this string data)
@@ -202,5 +240,28 @@ namespace EducNotes.API.Helpers
 
           return idnum;
         }
+
+        //email validation
+        public static bool EmailValid(this string email)
+        {
+          string pattern = @"^[a-z][a-z|0-9|]*([_][a-z|0-9]+)*([.][a-z|0-9]+([_][a-z|0-9]+)*)?@[a-z][a-z|0-9|]*\.([a-z][a-z|0-9]*(\.[a-z][a-z|0-9]*)?)$";
+          pattern = @"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$";
+          System.Text.RegularExpressions.Match match = Regex.Match(email.Trim(), pattern, RegexOptions.IgnoreCase);
+          if (match.Success)
+            return true;
+          else
+            return false;
+        }
+
+        public static int GetOrderNumber(this int orderId)
+        {
+          var today = DateTime.Now;
+          string year = today.Year.ToString().Substring(2);
+          string month = today.Month.ToString().Length == 1 ? "0" + today.Month.ToString() : today.Month.ToString();
+          string day = today.Day.ToString().Length == 1 ? "0" +  today.Day.ToString() : today.Day.ToString();
+          var data = year + month + day + orderId.ToString();
+          return Convert.ToInt32(data);
+        }
+
     }
 }

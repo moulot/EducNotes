@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace EducNotes.API.Models
 {
@@ -40,5 +41,6 @@ namespace EducNotes.API.Models
     public User Child { get; set; }
     public byte Status { get; set; }
     public Boolean Cancelled { get; set; }
+    public List<OrderLineDeadline> Deadlines { get; set; }
   }
 }

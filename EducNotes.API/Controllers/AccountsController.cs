@@ -50,9 +50,6 @@ namespace EducNotes.API.Controllers
     [HttpPost("ConfirmEmail")]
     public async Task<IActionResult> ConfirmEmail(confirmEmailDto confirmEmailDto)
     {
-      // string query = Request.QueryString.ToString();
-      // String userId = HttpUtility.ParseQueryString(query).Get("id");
-      // String token = HttpUtility.ParseQueryString(query).Get("token");
       string userId = confirmEmailDto.UserId;
       string token = confirmEmailDto.Token;
 
@@ -65,7 +62,10 @@ namespace EducNotes.API.Controllers
         success = true;
       }
 
-      return Ok(success);
+      return Ok(new {
+        success,
+        user
+      });
     }
 
   }

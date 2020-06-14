@@ -233,6 +233,7 @@ import { CheckoutResolver } from './_resolvers/checkout-resolver';
 import { OrderService } from './_services/order.service';
 import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/new-tuition.component';
 import { AccountService } from './_services/account.service';
+import { ContactUsComponent } from './contactus/contact-us/contact-us.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -389,7 +390,8 @@ export function tokenGetter() {
       DayScheduleComponent,
       TuitionPanelComponent,
       CheckoutComponent,
-      NewTuitionComponent
+      NewTuitionComponent,
+      ContactUsComponent
    ],
    imports: [
       FormWizardModule,

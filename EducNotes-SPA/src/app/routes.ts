@@ -117,12 +117,14 @@ import { TuitionPanelComponent } from './admin/tuition/tuition-panel/tuition-pan
 import { CheckoutComponent } from './tuition/checkout/checkout.component';
 import { CheckoutResolver } from './_resolvers/checkout-resolver';
 import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/new-tuition.component';
+import { ContactUsComponent } from './contactus/contact-us/contact-us.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
     { path: 'imgCropper', component: AppImgCropperComponent },
     { path: 'signIn', component: SigninComponent },
-    { path: 'confirmEmail/:code', component: ConfirmEmailComponent, resolve: { user: EmailConfirmResolver } },
+    {path: 'confirmEmail', component: ConfirmEmailComponent},
+    // { path: 'confirmEmail/:code', component: ConfirmEmailComponent, resolve: { user: EmailConfirmResolver } },
     { path: 'resetPassword/:code', component: ResetPasswordComponent, resolve: { user: ResetPasswordResolver } },
     { path: 'selfRegister/:code', component: SelfRegisterComponent, resolve: { user: EmailConfirmResolver } },
 
@@ -220,7 +222,7 @@ export const appRoutes: Routes = [
           {path: 'addClassEvent/:id', component: AddClassLifeComponent},
           {path: 'checkout/:id', component: CheckoutComponent, resolve: {order: CheckoutResolver}},
           {path: 'newTuition', component: NewTuitionComponent},
-          {path: 'confirmEmail', component: ConfirmEmailComponent}
+          {path: 'contactus', component: ContactUsComponent}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

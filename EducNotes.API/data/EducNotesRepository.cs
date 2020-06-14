@@ -1671,6 +1671,7 @@ namespace EducNotes.API.Data
           {
             Email newEmail = new Email();
             newEmail.EmailTypeId = 1;
+            newEmail.OrderId = data.OrderId;
             newEmail.ToAddress = data.ParentEmail;
             newEmail.FromAddress = "no-reply@educnotes.com";
             newEmail.Subject = data.EmailSubject;
@@ -1695,13 +1696,15 @@ namespace EducNotes.API.Data
           byte num = 1;
           foreach(var child in regEmail.Children)
           {
-            childrenInfos += "<div><br></><div><span style=\"font-size: 1rem;\">" + num + ". <b>" + child.LastName + " " + 
-            child.FirstName + ".</b></span><b style=\"font-size: 1rem;\"> classe " + child.NextClass + 
+            string childFirstName = child.FirstName.FirstLetterToUpper();
+            string childLastName = child.LastName.FirstLetterToUpper();
+            childrenInfos += "<div><br></><div><span style=\"font-size: 1rem;\">" + num + ". <b>" + childLastName + " " + 
+            childFirstName + ".</b></span><b style=\"font-size: 1rem;\"> classe " + child.NextClass + 
             "</b><span style=\"font-size: 1rem;\">" + ".</span></div><div><ul><li><span style=\"font-size: 1rem;\">" +
             "frais de scolarité pour l'année : " + child.TuitionAmount + " F CFA</span>" + "</li><li>" +
             "<span style=\"font-size: 1rem;\">frais d'inscription : " + child.RegistrationFee + " F CFA</span></li><li>" +
             "<span style=\"font-size: 1rem;\">acompte (" + child.DueAmountPct + ")&nbsp; : " + child.DueAmount +
-            " F CFA</span></li></ul>montant total dû pour " + child.FirstName + " : <u>" + child.TotalDueForChild + " F CFA</u></div>";
+            " F CFA</span></li></ul>montant total dû pour " + childFirstName + " : <u>" + child.TotalDueForChild + " F CFA</u></div>";
             num++;
           }
 
@@ -1712,11 +1715,14 @@ namespace EducNotes.API.Data
 
             switch (td.TokenString)
             {
+              case "<USER_ID>":
+                td.Value = regEmail.ParentId.ToString();
+                break;
               case "<N_PARENT>":
-                td.Value = regEmail.ParentLastName;
+                td.Value = regEmail.ParentLastName.FirstLetterToUpper();
                 break;
               case "<P_PARENT>":
-                td.Value = regEmail.ParentFirstName;
+                td.Value = regEmail.ParentFirstName.FirstLetterToUpper();
                 break;
               case "<M_MME>":
                 td.Value = regEmail.ParentGender == 0 ? "Mme" : "M.";
@@ -1732,6 +1738,15 @@ namespace EducNotes.API.Data
                 break;
               case "<INFOS_INSCR_ENFANTS>":
                 td.Value = childrenInfos;
+                break;
+              case "<ORDER_ID>":
+                td.Value = regEmail.OrderId.ToString();
+                break;
+              case "<ORDER_NUM>":
+                td.Value = regEmail.OrderNum.ToString();
+                break;
+              case "<TOKEN>":
+                td.Value = regEmail.Token;
                 break;
               default:
                 break;
@@ -2237,6 +2252,10 @@ namespace EducNotes.API.Data
           if(order != null)
           {
             order.Lines = await _context.OrderLines.Where(o => o.OrderId == order.Id).ToListAsync();
+            foreach (var line in order.Lines)
+            {
+              line.Deadlines = await _context.OrderLineDeadlines.Where(d => d.OrderLineId == line.Id).ToListAsync();
+            }
           }
           return order;
         }

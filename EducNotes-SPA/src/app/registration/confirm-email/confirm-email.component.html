@@ -1,64 +1,30 @@
-<div class="row">
-  <div *ngIf="emailOK">VOTRE EMAIL EST CONFIRME</div>
-  <div *ngIf="!emailOK">PB POUR LA CONFIRMATION DE VOTRE EMAIL</div>
+<div *ngIf="!user">
+  <div class="text-25 text-center mt-2 text-muted">CONFIRMATION DE EMAIL</div>
+  <div class="text-center p-4">
+    <i class="fad fa-exclamation-triangle fa-6x" style="--fa-secondary-opacity: 1;
+      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+  </div>
+  <div class="text-20">
+    <div>Bonjour,</div>
+    <div>Pour valider votre email et votre compte vous devez clicker sur le lien reçu dans le email que nous vous avons envoyé. merci</div>
+    <div class="my-3">Pour des informations complémentaires vous pouvez nous contacter au :</div>
+    <div class="mb-3 pl-3"> téléphone :<b>12.34.56.78</b></div>
+    <div class="mb-3 pl-3"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
+  </div>
 </div>
 
-<!-- <div class="row justify-content-center align-items-center mt-1"
-  [@animate]="{value:'*',params:{delay: 500+'ms', y:'50px'}}">
-  <div class="col-md-6">
+<div *ngIf="user && !emailOK">
+  <p *ngIf="user" class="text-17">Bonjour
+     <span  *ngIf="user.gender == 0">Mme</span>
+     <span  *ngIf="user.gender == 1">Mr</span>
+     {{user.lastName | titlecase}},
+  </p>
+  <div class="text-15">Nous n'avons pas pu valider votre email. recommencez svp.</div>
+  <div class="text-15">Si le problème persiste veuillez nous contacter au :</div>
+  <div class="text-17"> téléphone :<b>12.34.56.78</b></div>
+  <div class="text-17"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
+</div>
 
-    <div class="card">
-      <ngb-alert class="alert-card alert-title m-1" [dismissible]='false'>
-        <h5>
-          <p>Presque terminé <b>{{user.firstName}}.</b></p>
-        </h5>
-        <p class="card-title">Veuillez saisir votre login et mot de passe</p>
-      </ngb-alert>
+<div *ngIf="emailOK" class="row">
 
-      <div class="card-body">
-        <p class="card-title mt-1">Entrer votre nom d'utilisateur et de mot de passe</p>
-        <form nz-form [formGroup]="loginForm" (ngSubmit)="submitForm()">
-          <nz-form-item>
-            <nz-form-control>
-              <input nz-input type="text" id="username" placeholder="not utilisateur" formControlName="userName"
-                (blur)="userNameVerification()">
-              <nz-form-explain class="text-danger" *ngIf="userNameExist">ce nom d'utilisateur existe déjà
-              </nz-form-explain>
-            </nz-form-control>
-          </nz-form-item>
-
-          <nz-form-item>
-            <nz-form-control>
-              <input nz-input type="password" id="password" placeholder="mot de passe" formControlName="password"
-                (ngModelChange)="updateConfirmValidator()" minlength="4">
-              <nz-form-explain *ngIf="loginForm.get('password').dirty && loginForm.get('password').errors">Entrer votre
-                mot de passe s'il vous plait</nz-form-explain>
-            </nz-form-control>
-          </nz-form-item>
-
-          <nz-form-item>
-            <nz-form-control>
-              <input nz-input type="password" placeholder="confirmer le mot de passe" formControlName="checkPassword"
-                id="checkPassword" minlength="4">
-              <nz-form-explain *ngIf="loginForm.get('checkPassword').dirty && loginForm.get('checkPassword').errors">
-                <ng-container *ngIf="loginForm.get('checkPassword').hasError('required')">
-                  Please confirm your password!
-                </ng-container>
-                <ng-container *ngIf="loginForm.get('checkPassword').hasError('confirm')">
-                  Les deux mots de passe que vous entrez sont differents !
-                </ng-container>
-              </nz-form-explain>
-            </nz-form-control>
-          </nz-form-item>
-
-          <nz-form-item nz-row style="margin-bottom:8px;">
-            <nz-form-control [nzSpan]="14" [nzOffset]="6">
-              <button class="btn btn-primary btn-block"
-                [disabled]="!loginForm.valid || userNameExist">enregistrer</button>
-            </nz-form-control>
-          </nz-form-item>
-        </form>
-      </div>
-    </div>
-  </div>
-</div> -->
+</div>
