@@ -1,9 +1,12 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using System.Web;
 using AutoMapper;
 using EducNotes.API.Data;
+using EducNotes.API.Dtos;
 using EducNotes.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -43,11 +46,18 @@ namespace EducNotes.API.Controllers
       password = _config.GetValue<String>("AppSettings:defaultPassword");
     }
 
-    [HttpGet("ConfirmEmail/{userId}/{token}")]
-    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    [AllowAnonymous]
+    [HttpPost("ConfirmEmail")]
+    public async Task<IActionResult> ConfirmEmail(confirmEmailDto confirmEmailDto)
     {
+      // string query = Request.QueryString.ToString();
+      // String userId = HttpUtility.ParseQueryString(query).Get("id");
+      // String token = HttpUtility.ParseQueryString(query).Get("token");
+      string userId = confirmEmailDto.UserId;
+      string token = confirmEmailDto.Token;
+
       var user = await _userManager.FindByIdAsync(userId);
-      var result = await _userManager.ConfirmEmailAsync(user,token);
+      var result = await _userManager.ConfirmEmailAsync(user, token);
 
       Boolean success = false;
       if(result.Succeeded)

@@ -10,11 +10,13 @@ namespace EducNotes.API.Dtos
     public string FCell { get; set; }
     public string FEmail { get; set; }
     public Boolean FSendEmail { get; set; }
+    public Boolean FActive { get; set; }
     public string MLastName { get; set; }
     public string MFirstName { get; set; }
     public string MCell { get; set; }
     public string MEmail { get; set; }
     public Boolean MSendEmail { get; set; }
+    public Boolean MActive { get; set; }
     public decimal OrderAmount { get; set; }
     public decimal DueAmount { get; set; }
     public DateTime Deadline { get; set; }

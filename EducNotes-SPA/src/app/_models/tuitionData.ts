@@ -6,11 +6,13 @@ export interface TuitionData {
   fCell: string;
   fEmail: string;
   fSendEmail: boolean;
+  fActive: boolean;
   mLastName: string;
   mFirstName: string;
   mCell: string;
   mEmail: string;
   mSendEmail: boolean;
+  mActive: boolean;
   orderAmount: number;
   dueAmount: number;
   deadline: Date;

@@ -1,4 +1,9 @@
-<div class="row justify-content-center align-items-center mt-1"
+<div class="row">
+  <div *ngIf="emailOK">VOTRE EMAIL EST CONFIRME</div>
+  <div *ngIf="!emailOK">PB POUR LA CONFIRMATION DE VOTRE EMAIL</div>
+</div>
+
+<!-- <div class="row justify-content-center align-items-center mt-1"
   [@animate]="{value:'*',params:{delay: 500+'ms', y:'50px'}}">
   <div class="col-md-6">
 
@@ -56,4 +61,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->

@@ -4,7 +4,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { User } from '../_models/user';
 import { Period } from '../_models/period';
 import { Observable } from 'rxjs';
-import { AlertifyService } from './alertify.service';
 import { Establishment } from '../_models/establishment';
 import { DataForBroadcast } from '../_models/dataForBroadcast';
 import { DataForEmail } from '../_models/dataForEmail';
@@ -16,7 +15,7 @@ export class AdminService {
   baseUrl = environment.apiUrl;
   sexe = [{ id: 0, name: ' FEMME' }, { id: 1, name: ' HOMME' }];
 
-  constructor(private http: HttpClient, private alertify: AlertifyService) { }
+  constructor(private http: HttpClient) { }
 
   updateUserRoles(user: User, roles: {}) {
     return this.http.post(this.baseUrl + 'admin/editRoles/' + user.userName, roles);

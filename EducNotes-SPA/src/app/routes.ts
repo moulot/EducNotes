@@ -219,7 +219,8 @@ export const appRoutes: Routes = [
           {path: 'newTheme', component: NewThemeComponent},
           {path: 'addClassEvent/:id', component: AddClassLifeComponent},
           {path: 'checkout/:id', component: CheckoutComponent, resolve: {order: CheckoutResolver}},
-          {path: 'newTuition', component: NewTuitionComponent}
+          {path: 'newTuition', component: NewTuitionComponent},
+          {path: 'confirmEmail', component: ConfirmEmailComponent}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

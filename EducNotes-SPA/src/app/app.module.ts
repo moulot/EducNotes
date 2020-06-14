@@ -232,6 +232,7 @@ import { CheckoutComponent } from './tuition/checkout/checkout.component';
 import { CheckoutResolver } from './_resolvers/checkout-resolver';
 import { OrderService } from './_services/order.service';
 import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/new-tuition.component';
+import { AccountService } from './_services/account.service';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -492,6 +493,7 @@ export function tokenGetter() {
       EditTeacherResolver,
       CheckoutResolver,
       OrderService,
+      AccountService,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

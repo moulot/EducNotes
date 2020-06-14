@@ -29,7 +29,7 @@ export class TuitionPanelComponent implements OnInit {
     this.nbTuitionPays = Number(this.settings.find(s => s.name === 'NbTuitionPayments').value);
     this.orderService.getBalanceData().subscribe((data: any) => {
       this.tuitionBalance = data.openBalance;
-    })
+    });
   }
 
   counter(i: number) {

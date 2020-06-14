@@ -8,7 +8,6 @@ import { AuthService } from 'src/app/_services/auth.service';
 import { Setting } from 'src/app/_models/setting';
 import { environment } from 'src/environments/environment.prod';
 import { Utils } from 'src/app/shared/utils';
-import { Observable } from 'rxjs';
 import { TuitionData } from 'src/app/_models/tuitionData';
 import { TuitionChildData } from 'src/app/_models/tuitionChildData';
 import { Router } from '@angular/router';
@@ -55,11 +54,11 @@ export class NewTuitionComponent implements OnInit {
     private orderService: OrderService) { }
 
   ngOnInit() {
+    this.createTuitionForm();
     this.settings = this.authService.settings;
     this.regFee = Number(this.settings.find(s => s.name === 'RegFee').value);
     this.regDeadline = this.settings.find(s => s.name === 'RegistrationDeadLine').value;
     this.daysToValidateReg = this.settings.find(s => s.name === 'DaysToValidateReg').value;
-    this.createTuitionForm();
     this.addChildItem('moulot', 'sandrine', 10, '31/06/2006', 0);
     this.addChildItem('moulot', 'inna', 3, '14/06/2011', 0);
     this.getClassLevels();
@@ -96,13 +95,13 @@ export class NewTuitionComponent implements OnInit {
     this.tuitionForm = this.fb.group({
       fLastName: ['moulot', Validators.required],
       fFirstName: ['georges', Validators.required],
-      fEmail: ['georges.moulot@albatrostechnologies.com', Validators.required],
-      fCell: ['07.10.44.46', Validators.required],
+      fEmail: ['gmoulot@hotmail.com', Validators.required],
+      fCell: ['12345678', Validators.required],
       fSendEmail: [false],
       mLastName: ['moulot', Validators.required],
-      mFirstName: ['Jacqueline', Validators.required],
-      mEmail: ['jacqueline.moulot@manager.com', Validators.required],
-      mCell: ['12345678', Validators.required],
+      mFirstName: ['jacqueline', Validators.required],
+      mEmail: ['jm@hotmail.com', Validators.required],
+      mCell: ['34566554', Validators.required],
       mSendEmail: [false],
       children: this.fb.array([])
     }, {validator: this.formValidator});
@@ -281,11 +280,13 @@ export class NewTuitionComponent implements OnInit {
     tuitionData.fCell = this.tuitionForm.value.fCell;
     tuitionData.fEmail = this.tuitionForm.value.fEmail;
     tuitionData.fSendEmail = this.tuitionForm.value.fSendEmail;
+    tuitionData.fActive = this.tuitionForm.hasError('fathererror') === true ? false : true;
     tuitionData.mLastName = this.tuitionForm.value.mLastName;
     tuitionData.mFirstName = this.tuitionForm.value.mFirstName;
     tuitionData.mCell = this.tuitionForm.value.mCell;
     tuitionData.mEmail = this.tuitionForm.value.mEmail;
     tuitionData.mSendEmail = this.tuitionForm.value.mSendEmail;
+    tuitionData.mActive = this.tuitionForm.hasError('mothererror') === true ? false : true;
     tuitionData.orderAmount = this.orderAmount;
     tuitionData.dueAmount = this.amountDue;
     tuitionData.deadline = Utils.inputDateDDMMYY(this.regDeadline, '/');
