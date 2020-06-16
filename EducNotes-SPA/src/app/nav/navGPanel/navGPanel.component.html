@@ -4,62 +4,67 @@
             <img src="../../../assets/images/logo_sm.png" alt="">
         </div>
     </mdb-navbar-brand>
-    <links>
-        <ul class="navbar-nav mr-auto">
-            <div *ngIf="parentLoggedIn()">
-                <app-nav-parent (closeNav)="closeNav()"></app-nav-parent>
-            </div>        
+    <links *ngIf="!loggedIn()">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item waves-light pl-3 text-25">Educ'Notes</li>
+      </ul>        
+    </links>
+    <links *ngIf="loggedIn()">
+      <ul class="navbar-nav mr-auto">
+        <div *ngIf="parentLoggedIn()">
+          <app-nav-parent (closeNav)="closeNav()"></app-nav-parent>
+        </div>        
+        
+        <div *ngIf="studentLoggedIn()">
+          <app-nav-student (closeNav)="closeNav()"></app-nav-student>
+        </div>        
+        
+        <div *ngIf="teacherLoggedIn()">
+          <app-nav-teacher (closeNav)="closeNav()"></app-nav-teacher>
+        </div>        
             
-            <div *ngIf="studentLoggedIn()">
-                <app-nav-student (closeNav)="closeNav()"></app-nav-student>
+        <div *ngIf="adminLoggedIn()">
+          <app-nav-admin (closeNav)="closeNav()"></app-nav-admin>
+        </div>
+      </ul>
+      <ul class="navbar-nav nav-flex-icons">
+        <li class="nav-item waves-light" mdbWavesEffect>
+          <a class="nav-link text-17 text-muted" (click)="closeNav()" [routerLink]="['/userAccount']">
+            <i class="fad fa-user-lock mr-1" style="font-size:20px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
+          </a>
+        </li>
+        <li class="nav-item waves-light" mdbWavesEffect>
+          <a class="nav-link">
+            <i class="fad fa-expand-alt" appFullScreen style="font-size:20px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
+          </a>
+        </li>
+        <li class="nav-item waves-light" mdbWavesEffect>
+          <a class="nav-link" (click)="logout()">
+            <i class="fad fa-sign-out-alt" style="font-size:25px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
+          </a>
+        </li>
+        <li class="nav-item waves-light" mdbWavesEffect>
+          <div class="nav-link text-15 text-muted">
+            {{acc_name}}
+          </div>
+        </li>
+        <li class="nav-item  waves-light" mdbWavesEffect>
+          <div class="">
+            <img [src]="photoUrl || '../../../assets/user.png'" alt="" style="width: 35px;" class="rounded-circle z-depth-0">
+          </div>
+        </li>
+        <!-- <li class="nav-item avatar dropdown btn-group" dropdown style="border: 1px solid blue">
+          <a dropdownToggle type="button" class="nav-link dropdown-toggle waves-light" mdbWavesEffect>
+            <img [src]="photoUrl || '../../../assets/user.png'" alt="" class="img-fluid rounded-circle z-depth-0">
+          </a>
+          <div class="dropdown-menu dropdown-menu-right dropdown dropdown-primary" role="menu">
+            <div class="dropdown-header">
+              <i class="i-Lock-User mr-1"></i><label class="text-capitalize">{{user.firstName}} {{user.lastName}}</label>
             </div>        
-            
-            <div *ngIf="teacherLoggedIn()">
-                <app-nav-teacher (closeNav)="closeNav()"></app-nav-teacher>
-            </div>        
-                
-            <div *ngIf="adminLoggedIn()">
-                <app-nav-admin (closeNav)="closeNav()"></app-nav-admin>
-            </div>
-        </ul>
-        <ul class="navbar-nav nav-flex-icons">
-          <li class="nav-item waves-light" mdbWavesEffect>
-            <a class="nav-link text-17 text-muted" (click)="closeNav()" [routerLink]="['/userAccount']">
-              <i class="fad fa-user-lock mr-1" style="font-size:20px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
-            </a>
-          </li>
-          <li class="nav-item waves-light" mdbWavesEffect>
-            <a class="nav-link">
-              <i class="fad fa-expand-alt" appFullScreen style="font-size:20px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
-            </a>
-          </li>
-          <li class="nav-item waves-light" mdbWavesEffect>
-            <a class="nav-link" (click)="logout()">
-              <i class="fad fa-sign-out-alt" style="font-size:25px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
-            </a>
-          </li>
-          <li class="nav-item waves-light" mdbWavesEffect>
-            <div class="nav-link text-15 text-muted">
-              {{acc_name}}
-            </div>
-          </li>
-          <li class="nav-item  waves-light" mdbWavesEffect>
-            <div class="">
-              <img [src]="photoUrl || '../../../assets/user.png'" alt="" style="width: 35px;" class="rounded-circle z-depth-0">
-            </div>
-          </li>
-          <!-- <li class="nav-item avatar dropdown btn-group" dropdown style="border: 1px solid blue">
-            <a dropdownToggle type="button" class="nav-link dropdown-toggle waves-light" mdbWavesEffect>
-              <img [src]="photoUrl || '../../../assets/user.png'" alt="" class="img-fluid rounded-circle z-depth-0">
-            </a>
-            <div class="dropdown-menu dropdown-menu-right dropdown dropdown-primary" role="menu">
-              <div class="dropdown-header">
-                <i class="i-Lock-User mr-1"></i><label class="text-capitalize">{{user.firstName}} {{user.lastName}}</label>
-              </div>        
-              <a class="dropdown-item waves-light" [routerLink]="['/userAccount']" mdbWavesEffect>mon compte</a>
-              <a class="dropdown-item waves-light" (click)="logout()" mdbWavesEffect>se déconnecter</a>
-            </div>
-          </li> -->
-        </ul>
+            <a class="dropdown-item waves-light" [routerLink]="['/userAccount']" mdbWavesEffect>mon compte</a>
+            <a class="dropdown-item waves-light" (click)="logout()" mdbWavesEffect>se déconnecter</a>
+          </div>
+        </li> -->
+      </ul>
     </links>
 </mdb-navbar>

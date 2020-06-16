@@ -124,6 +124,7 @@ export const appRoutes: Routes = [
     { path: 'imgCropper', component: AppImgCropperComponent },
     { path: 'signIn', component: SigninComponent },
     {path: 'confirmEmail', component: ConfirmEmailComponent},
+    {path: 'contactus', component: ContactUsComponent},
     // { path: 'confirmEmail/:code', component: ConfirmEmailComponent, resolve: { user: EmailConfirmResolver } },
     { path: 'resetPassword/:code', component: ResetPasswordComponent, resolve: { user: ResetPasswordResolver } },
     { path: 'selfRegister/:code', component: SelfRegisterComponent, resolve: { user: EmailConfirmResolver } },
@@ -221,8 +222,7 @@ export const appRoutes: Routes = [
           {path: 'newTheme', component: NewThemeComponent},
           {path: 'addClassEvent/:id', component: AddClassLifeComponent},
           {path: 'checkout/:id', component: CheckoutComponent, resolve: {order: CheckoutResolver}},
-          {path: 'newTuition', component: NewTuitionComponent},
-          {path: 'contactus', component: ContactUsComponent}
+          {path: 'newTuition', component: NewTuitionComponent}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

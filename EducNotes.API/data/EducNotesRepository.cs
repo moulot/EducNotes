@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Web;
 using AutoMapper;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -32,7 +33,7 @@ namespace EducNotes.API.Data
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private readonly UserManager<User> _userManager;
         private Cloudinary _cloudinary;
-        string password;
+        string password, baseUrl;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
         int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId, schoolInscTypeId;
         CultureInfo frC = new CultureInfo("fr-FR");
@@ -57,6 +58,7 @@ namespace EducNotes.API.Data
             moderatorRoleId = _config.GetValue<int>("AppSettings:moderatorRoleId");
             adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
             teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
+            baseUrl = _config.GetValue<String>("AppSettings:DefaultLink");
 
             _cloudinaryConfig = cloudinaryConfig;
             Account acc = new Account(
@@ -1713,10 +1715,13 @@ namespace EducNotes.API.Data
             TokenDto td = new TokenDto();
             td.TokenString = token.TokenString;
 
+            string parentId = regEmail.ParentId.ToString();
+            string orderid = regEmail.OrderId.ToString();
+
             switch (td.TokenString)
             {
               case "<USER_ID>":
-                td.Value = regEmail.ParentId.ToString();
+                td.Value = parentId;
                 break;
               case "<N_PARENT>":
                 td.Value = regEmail.ParentLastName.FirstLetterToUpper();
@@ -1740,13 +1745,63 @@ namespace EducNotes.API.Data
                 td.Value = childrenInfos;
                 break;
               case "<ORDER_ID>":
-                td.Value = regEmail.OrderId.ToString();
+                td.Value = orderid;
                 break;
               case "<ORDER_NUM>":
                 td.Value = regEmail.OrderNum.ToString();
                 break;
               case "<TOKEN>":
                 td.Value = regEmail.Token;
+                break;
+              case "<BASE_URL>":
+                td.Value = string.Format("{0}/confirmEmail?id={1}&orderid={2}&token={3}", "localhost:4200",
+                  parentId, orderid, HttpUtility.UrlEncode(regEmail.Token));
+                break;
+              default:
+                break;
+            }
+
+            tokenValues.Add(td);
+          }
+
+          return tokenValues;
+        }
+
+        public Email SetEmailForAccountUpdated(string subject, string content, string lastName, byte gender, string parentEmail)
+        {
+          var schoolName = _context.Settings.First(s => s.Name == "SchoolName").Value;
+          List<Token> tokens = GetTokens();
+
+          Email newEmail = new Email();
+          newEmail.EmailTypeId = 1;
+          newEmail.ToAddress = parentEmail;
+          newEmail.FromAddress = "no-reply@educnotes.com";
+          newEmail.Subject = subject.Replace("<NOM_ECOLE>", schoolName);
+          List<TokenDto> tags = GetAccountUpdatedTokenValues(tokens, lastName, gender);
+          newEmail.Body = ReplaceTokens(tags, content);
+          newEmail.InsertUserId = 1;
+          newEmail.InsertDate = DateTime.Now;
+          newEmail.UpdateUserId = 1;
+          newEmail.UpdateDate = DateTime.Now;
+
+          return newEmail;
+        }
+
+        public List<TokenDto> GetAccountUpdatedTokenValues(List<Token> tokens, string lastName, byte gender)
+        {
+          List<TokenDto> tokenValues = new List<TokenDto>();
+
+          foreach (var token in tokens)
+          {
+            TokenDto td = new TokenDto();
+            td.TokenString = token.TokenString;
+            switch (td.TokenString)
+            {
+              case "<N_PARENT>":
+                td.Value = lastName;
+                break;
+              case "<M_MME>":
+                td.Value = gender == 0 ? "Mme" : "M.";
                 break;
               default:
                 break;

@@ -52,18 +52,20 @@ namespace EducNotes.API.Controllers
     {
       string userId = confirmEmailDto.UserId;
       string token = confirmEmailDto.Token;
+      Boolean success = false;
 
       var user = await _userManager.FindByIdAsync(userId);
-      var result = await _userManager.ConfirmEmailAsync(user, token);
-
-      Boolean success = false;
-      if(result.Succeeded)
+      if(user != null)
       {
-        success = true;
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+        if(result.Succeeded)
+        {
+          success = true;
+        }
       }
 
       return Ok(new {
-        success,
+        emailOK = success,
         user
       });
     }

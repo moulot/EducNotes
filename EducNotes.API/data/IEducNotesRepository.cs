@@ -75,14 +75,12 @@ namespace EducNotes.API.Data
         Task<List<ClassLevel>> GetLevels();
         Task sendOk(int userTypeId, int userId);
         Task<List<UserSpaCodeDto>> ParentSelfInscription(int parentId, List<UserForUpdateDto> userToUpdate);
-
         Task<int> GetAssignedChildrenCount(int parentId);
         Task<bool> SaveProductSelection(int userPid, int userId,List<ServiceSelectionDto> products);
         Task<List<Period>> GetPeriods();
         Task<Period> GetPeriodFromDate(DateTime date);
         Task<Session> GetSessionFromSchedule(int scheduleId, int teacherId, DateTime sessionDate);
         Task<List<Class>> GetClassesByLevelId(int levelId);
-
         Task<IEnumerable<Theme>> ClassLevelCourseThemes(int classLevelId, int courseId);
         Task<IEnumerable<Lesson>> ClassLevelCourseLessons(int classLevelId, int courseId);
         Task<int> CreateLessonDoc(CourseShowingDto courseShowingDto);
@@ -93,6 +91,8 @@ namespace EducNotes.API.Data
         Task<IEnumerable<CycleDto>> GetCycles();
         List<Email> SetEmailDataForRegistration(List<RegistrationEmailDto> emailData, string content, string RegDeadLine);
         Task<Order> GetOrder(int id);
+        Email SetEmailForAccountUpdated(string subject, string content, string lastName, byte gender, string parentEmail);
+
 
 
     }

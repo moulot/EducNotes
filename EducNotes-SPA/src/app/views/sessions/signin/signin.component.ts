@@ -30,26 +30,24 @@ export class SigninComponent implements OnInit {
         private route: ActivatedRoute, private alertify: AlertifyService) { }
 
     ngOnInit() {
+      if (this.loggedIn()) {
+        this.router.navigate(['/home']);
+      } else {
+        this.router.events.subscribe(event => {
+          if (event instanceof RouteConfigLoadStart || event instanceof ResolveStart) {
+            this.loadingText = 'Loading Dashboard Module...';
+            this.loading = true;
+          }
+          if (event instanceof RouteConfigLoadEnd || event instanceof ResolveEnd) {
+            this.loading = false;
+          }
+        });
 
-        if (this.loggedIn()) {
-            this.router.navigate(['/home']);
-        } else {
-            this.router.events.subscribe(event => {
-                if (event instanceof RouteConfigLoadStart || event instanceof ResolveStart) {
-                    this.loadingText = 'Loading Dashboard Module...';
-
-                    this.loading = true;
-                }
-                if (event instanceof RouteConfigLoadEnd || event instanceof ResolveEnd) {
-                    this.loading = false;
-                }
-            });
-
-            this.signinForm = this.fb.group({
-                username: ['', Validators.required],
-                password: ['', Validators.required]
-            });
-        }
+        this.signinForm = this.fb.group({
+          username: ['', Validators.required],
+          password: ['', Validators.required]
+        });
+      }
     }
 
     loggedIn() {

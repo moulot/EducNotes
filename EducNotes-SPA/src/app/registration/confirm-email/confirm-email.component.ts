@@ -7,6 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AccountService } from 'src/app/_services/account.service';
 import { ConfirmEmail } from 'src/app/_models/confirmEmail';
+import { Utils } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-confirm-email',
@@ -16,9 +17,10 @@ import { ConfirmEmail } from 'src/app/_models/confirmEmail';
 })
 export class ConfirmEmailComponent implements OnInit {
   user: User;
-  loginForm: FormGroup;
+  userForm: FormGroup;
   userNameExist = false;
   emailOK = false;
+  phoneMask = Utils.phoneMask;
 
   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
     private alertify: AlertifyService,  private router: Router, private accountService: AccountService) { }
@@ -27,11 +29,7 @@ export class ConfirmEmailComponent implements OnInit {
     // this.route.data.subscribe(data => {
     //   this.user = data['user'].user;
     // });
-    // this.loginForm = this.fb.group({
-    //   userName         : [ null, [ Validators.required ] ],
-    //   password         : [ null, [ Validators.required ] ],
-    //   checkPassword    : [ null, [ Validators.required, this.confirmationValidator ] ],
-    // });
+    this.createUserForm();
 
     const id: string = this.route.snapshot.queryParamMap.get('id');
     const orderid: string = this.route.snapshot.queryParamMap.get('orderid');
@@ -44,10 +42,28 @@ export class ConfirmEmailComponent implements OnInit {
     }
   }
 
+  createUserForm() {
+    this.userForm = this.fb.group({
+      lastName: ['', Validators.required],
+      firstName: ['', Validators.required],
+      email: ['', Validators.required],
+      userName: ['', Validators.required],
+      cell: ['', Validators.required],
+      pwd: ['', Validators.required],
+      checkpwd: ['', [ Validators.required, this.confirmationValidator ] ]
+    });
+  }
+
+  initialValues() {
+    this.userForm.setValue({lastName: this.user.lastName, firstName: this.user.firstName, email: this.user.email,
+      userName: '', cell: this.user.phoneNumber, pwd: '', checkpwd: ''});
+  }
+
   validateEmail(confirmEmail: ConfirmEmail) {
     this.accountService.confirmEmail(confirmEmail).subscribe((data: any) => {
       this.emailOK = data.emailOK;
       this.user = data.user;
+      this.initialValues();
     }, error => {
       this.alertify.error(error);
       console.log(error);
@@ -55,7 +71,7 @@ export class ConfirmEmailComponent implements OnInit {
   }
 
   userNameVerification() {
-    const userName = this.loginForm.value.userName;
+    const userName = this.userForm.value.userName;
     this.userNameExist = false;
     this.authService.userNameExist(userName).subscribe((res: boolean) => {
       if (res === true) {
@@ -77,22 +93,25 @@ export class ConfirmEmailComponent implements OnInit {
   confirmationValidator = (control: FormControl): { [ s: string ]: boolean } => {
     if (!control.value) {
       return { required: true };
-    } else if (control.value !== this.loginForm.controls.password.value) {
+    } else if (control.value !== this.userForm.controls.pwd.value) {
       return { confirm: true, error: true };
     }
   }
 
   updateConfirmValidator(): void {
     /** wait for refresh value */
-    Promise.resolve().then(() => this.loginForm.controls.checkPassword.updateValueAndValidity());
+    Promise.resolve().then(() => this.userForm.controls.checkPassword.updateValueAndValidity());
   }
 
   submitForm(): void {
-    this.authService.setUserLoginPassword(this.user.id, this.loginForm.value).subscribe(() => {
-      // this.passwordSetingResult.emit(true);
+    this.authService.setUserLoginPassword(this.user.id, this.userForm.value).subscribe(() => {
       this.router.navigate(['home']);
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  updateUser() {
+
   }
 }

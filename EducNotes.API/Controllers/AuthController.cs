@@ -37,7 +37,7 @@ namespace EducNotes.API.Controllers
         private Cloudinary _cloudinary;
         int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
-        int parentIsncrTypeId, schoolInscrTypeId;
+        int parentIsncrTypeId, schoolInscrTypeId, updateAccountEmailId;
 
         public AuthController(IConfiguration config, IMapper mapper, IEducNotesRepository repo,
           UserManager<User> userManager, SignInManager<User> signInManager, DataContext context,
@@ -60,6 +60,7 @@ namespace EducNotes.API.Controllers
           teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
           parentIsncrTypeId = _config.GetValue<int>("AppSettings:parentInscTypeId");
           schoolInscrTypeId = _config.GetValue<int>("AppSettings:schoolInscTypeId");
+          updateAccountEmailId = _config.GetValue<int>("AppSettings:updateAccountEmailId");
 
           _cloudinaryConfig = cloudinaryConfig;
           Account acc = new Account(
@@ -492,41 +493,35 @@ namespace EducNotes.API.Controllers
             return Ok(await _repo.UserNameExist(userName));
         }
 
-
-        [HttpPost("{id}/setLoginPassword")] // edition du mot de passe apres validation du code
+        [HttpPost("{id}/setLoginPassword")]
         public async Task<IActionResult> setLoginPassword(int id, LoginFormDto loginForDto)
         {
-            var user = await _repo.GetUser(id, false);
-            if (user != null)
+          var user = await _repo.GetUser(id, false);
+          if (user != null)
+          {
+            var newPassword = _userManager.PasswordHasher.HashPassword(user, loginForDto.Pwd);
+            user.UserName = loginForDto.UserName.ToLower();
+            user.NormalizedUserName = loginForDto.UserName.ToUpper();
+            user.PasswordHash = newPassword;
+            user.ValidatedCode = true;
+            //user.EmailConfirmed = true;
+            user.ValidationDate = DateTime.Now;
+            var res = await _userManager.UpdateAsync(user);
+            if (res.Succeeded)
             {
-                var newPassword = _userManager.PasswordHasher.HashPassword(user, loginForDto.Password);
-                user.UserName = loginForDto.UserName.ToLower();
-                user.NormalizedUserName = loginForDto.UserName.ToUpper();
-                user.PasswordHash = newPassword;
-                user.ValidatedCode = true;
-                user.EmailConfirmed = true;
-                user.ValidationDate = DateTime.Now;
-                var res = await _userManager.UpdateAsync(user);
-
-                if (res.Succeeded)
-                {
-
-                    var mail = new EmailFormDto();
-                    mail.subject = "Compte confirmé";
-                    mail.content = "<b> " + user.LastName + " " + user.FirstName + "</b>, votre compte a bien été enregistré";
-                    mail.toEmail = user.Email;
-                    await _repo.SendEmail(mail);
-                    var userToReturn = _mapper.Map<UserForListDto>(user);
-                    return Ok(new
-                    {
-                        token = await GenerateJwtToken(user),
-                        user = userToReturn
-
-                    });
-                }
-                return BadRequest("impossible de terminé l'action");
+              var template = await _context.EmailTemplates.FirstAsync(t => t.Id == updateAccountEmailId);
+              var email = new Email();
+              email = _repo.SetEmailForAccountUpdated(template.Subject, template.Body, user.LastName, user.Gender, user.Email);
+              _context.Add(email);
+              if(await _repo.SaveAll())
+              {
+                return Ok();
+              }
             }
-            return NotFound();
+            return BadRequest("problème pour mettre à jour les données");
+          }
+
+          return NotFound();
         }
 
         [HttpPost("{userId}/AddPhotoForUser")]
