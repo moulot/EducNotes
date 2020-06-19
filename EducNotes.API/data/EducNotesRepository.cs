@@ -129,13 +129,12 @@ namespace EducNotes.API.Data
 
         public async Task<IEnumerable<User>> GetChildren(int parentId)
         {
-            var userIds = _context.UserLinks.Where(u => u.UserPId == parentId).Select(s => s.UserId);
-
-            return await _context.Users
-                .Include(i => i.Photos)
-                .Include(i => i.Class)
-                .Include(i => i.UserType)
-                .Where(u => userIds.Contains(u.Id) && u.ValidatedCode == true).ToListAsync();
+          var userIds = await _context.UserLinks.Where(u => u.UserPId == parentId).Select(s => s.UserId).ToListAsync();
+          return await _context.Users
+              .Include(i => i.Photos)
+              .Include(i => i.Class)
+              .Include(i => i.UserType)
+              .Where(u => userIds.Contains(u.Id)).ToListAsync();
         }
 
         public async Task<User> GetParent(int ChildId)

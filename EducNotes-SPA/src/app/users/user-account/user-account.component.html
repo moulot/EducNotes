@@ -8,10 +8,17 @@
         <p class="text-20 text-muted font-weight-500 text-capitalize p-0 m-0">{{parent.lastName}} {{parent.firstName}}</p>
         <p class="text-15 text-primary p-0 mx-1 my-0">{{parent.email}}</p>
         <div class="p-0 m-0">
-          <label class="text-15 text-primary p-0 mx-1">{{parent.phoneNumber}}</label>
-          <label *ngIf="parent.secondPhoneNumber.length > 0" class="text-15 text-primary p-0 mx-1">/ {{parent.secondPhoneNumber}}</label>
+          <label class="text-15 text-primary p-0 mx-1">tél: {{parent.phoneNumber}}</label>
+          <label *ngIf="parent.secondPhoneNumber" class="text-15 text-primary p-0 mx-1"> / {{parent.secondPhoneNumber}}</label>
         </div>
       </div>
+    </div>
+  </div>
+  <div *ngIf="ChildToBeConfirmed == 0" class="col-md-12">
+    <div class="alert alert-warning text-18" role="alert">
+      veuillez finaliser et confirmer le compte de vos enfants.
+      <button type="button" mdbBtn [routerLink]="['/EditChildren']" size="sm"
+        class="btnBlue" mdbWavesEffect>mettre à jour les infos enfants</button>
     </div>
   </div>
 </div>
@@ -23,16 +30,18 @@
       <div class="col-md-12 mb-3"><hr class="my-1" style="background-color: #f89f20;"></div>
       <div class="col-md-2 my-5" *ngFor="let child of parent.children">
         <mdb-card class="testimonial-card">
-          <!--Avatar-->
           <div class="avatar mx-auto">
             <img src="{{child.child.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
           </div>
-        
+
           <mdb-card-body class="p-2">
-            <!--Name-->
             <mdb-card-title>
-              <p class="text-15 m-0">{{child.child.lastName}} {{child.firstName}}</p>
-              <p class="text-15 m-0">classe {{child.child.className}}</p>
+              <p class="text-15 m-0">{{child.child.lastName | titlecase}} {{child.child.firstName | titlecase}}</p>
+              <p *ngIf="child.child.className" class="text-15 m-0">classe {{child.child.className}}</p>
+              <p *ngIf="!child.child.className" class="text-15 m-0">classe {{child.child.classLevelName}}</p>
+              <div *ngIf="!child.child.emailConfirmed">
+                <div class="text-danger text-15"><b>enfant non confirmé</b></div>
+              </div>
             </mdb-card-title>
           </mdb-card-body>
         </mdb-card>
@@ -90,8 +99,11 @@
         <div *ngFor="let line of registration.lines; let i = index;">
           <div class="border rounded-lg p-2 my-1">
             <div class="text-15 d-none d-md-block">
-              <span class="text-capitalize"><b>{{line.childFirstName}}</b></span>. classe de {{line.childClassName}}.
-              frais de scolarité : {{line.strAmountTTC}}
+              <span class="text-capitalize">
+                <b>{{line.childFirstName}}</b></span>. classe de 
+                  <span *ngIf="line.childClassName">{{line.childClassName}}.</span> 
+                  <span *ngIf="!line.childClassName">{{line.classLevelName}}.</span> 
+                  frais de scolarité : {{line.strAmountTTC}}
               <div class="text-15 my-1">
                 <hr class="my-1" style="background-color: #f89f20;">
                 montant dû :

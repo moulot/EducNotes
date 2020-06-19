@@ -118,6 +118,7 @@ import { CheckoutComponent } from './tuition/checkout/checkout.component';
 import { CheckoutResolver } from './_resolvers/checkout-resolver';
 import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/new-tuition.component';
 import { ContactUsComponent } from './contactus/contact-us/contact-us.component';
+import { EditChildrenComponent } from './users/edit-children/edit-children.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -207,22 +208,23 @@ export const appRoutes: Routes = [
           { path: 'createPayable', component: PayableFormComponent },
           { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }},
           { path: 'createPDF', component: ConvertToPDFComponent },
-          {path: 'sendSms', component: SendSmsComponent},
-          {path: 'userAccount', component: UserAccountComponent, resolve: { account: UserAccountResolver } },
-          {path: 'SmsTemplates', component: SmsTemplateComponent, resolve: { templates: SmsTemplateResolver} },
-          {path: 'AddSmsTemplate', component: AddSmsTemplateComponent},
-          {path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} },
-          {path: 'EmailTemplates', component: EmailTemplateComponent, resolve: { templates: EmailTemplateResolver} },
-          {path: 'AddEmailTemplate', component: AddEmailTemplateComponent},
-          {path: 'EditEmailTemplate/:id', component: AddEmailTemplateComponent, resolve: { template: EditEmailTemplateResolver} },
-          {path: 'AddUserGrades/:evalId', component: AddUserGradesComponent, resolve: {data: ClassGradesResolver}},
-          {path: 'teacherProgram', component: TeacherProgramComponent},
-          {path: 'classProgram/:courseId', component: ClassProgressComponent, resolve: {program: TeacherProgramResolver}},
-          {path: 'themesList', component: ThemesListComponent},
-          {path: 'newTheme', component: NewThemeComponent},
-          {path: 'addClassEvent/:id', component: AddClassLifeComponent},
-          {path: 'checkout/:id', component: CheckoutComponent, resolve: {order: CheckoutResolver}},
-          {path: 'newTuition', component: NewTuitionComponent}
+          { path: 'sendSms', component: SendSmsComponent},
+          { path: 'userAccount/:id', component: UserAccountComponent, resolve: { account: UserAccountResolver } },
+          { path: 'SmsTemplates', component: SmsTemplateComponent, resolve: { templates: SmsTemplateResolver} },
+          { path: 'AddSmsTemplate', component: AddSmsTemplateComponent},
+          { path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} },
+          { path: 'EmailTemplates', component: EmailTemplateComponent, resolve: { templates: EmailTemplateResolver} },
+          { path: 'AddEmailTemplate', component: AddEmailTemplateComponent},
+          { path: 'EditEmailTemplate/:id', component: AddEmailTemplateComponent, resolve: { template: EditEmailTemplateResolver} },
+          { path: 'AddUserGrades/:evalId', component: AddUserGradesComponent, resolve: {data: ClassGradesResolver}},
+          { path: 'teacherProgram', component: TeacherProgramComponent},
+          { path: 'classProgram/:courseId', component: ClassProgressComponent, resolve: {program: TeacherProgramResolver}},
+          { path: 'themesList', component: ThemesListComponent},
+          { path: 'newTheme', component: NewThemeComponent},
+          { path: 'addClassEvent/:id', component: AddClassLifeComponent},
+          { path: 'checkout/:id', component: CheckoutComponent, resolve: {order: CheckoutResolver}},
+          { path: 'newTuition', component: NewTuitionComponent},
+          { path: 'EditChildren', component: EditChildrenComponent}
         ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

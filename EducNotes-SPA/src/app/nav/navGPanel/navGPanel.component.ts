@@ -91,28 +91,40 @@ export class NavGPanelComponent implements OnInit {
     this.authService.logout();
   }
 
-  goToAccount() {
-    this.router.navigate(['/userAccount']);
-  }
+  // goToAccount() {
+  //   this.router.navigate(['/userAccount']);
+  // }
 
   loggedIn() {
     return this.authService.loggedIn();
   }
 
   parentLoggedIn() {
-    return this.authService.parentLoggedIn();
+    if (this.loggedIn()) {
+      return this.authService.parentLoggedIn();
+    }
+    return false;
   }
 
   studentLoggedIn() {
-    return this.authService.studentLoggedIn();
+    if (this.loggedIn()) {
+      return this.authService.studentLoggedIn();
+    }
+    return false;
   }
 
   teacherLoggedIn() {
-    return this.authService.teacherLoggedIn();
+    if (this.loggedIn()) {
+      return this.authService.teacherLoggedIn();
+    }
+    return false;
   }
 
   adminLoggedIn() {
-    return this.authService.adminLoggedIn();
+    if (this.loggedIn()) {
+      return this.authService.adminLoggedIn();
+    }
+    return false;
   }
 
 }

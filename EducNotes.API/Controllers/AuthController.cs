@@ -281,46 +281,43 @@ namespace EducNotes.API.Controllers
 
         }
 
-        [HttpGet("emailValidation/{code}")]
-        public async Task<IActionResult> emailValidation(string code)
-        {
+        // [HttpGet("emailValidation/{code}")]
+        // public async Task<IActionResult> emailValidation(string code)
+        // {
 
-            // int id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var user = await _repo.GetUserByCode(code);
+        //     // int id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+        //     var user = await _repo.GetUserByCode(code);
 
-            if (user != null)
-            {
-                if (user.EmailConfirmed == true)
-                    return BadRequest("cet compte a déja été confirmé...");
-                int maxChild = 0;
-                if (user.UserTypeId == _config.GetValue<int>("AppSettings:parentTypeId") && user.ValidationCode == user.ValidationCode)
-                {
-                    maxChild = await _repo.GetAssignedChildrenCount(user.Id);
+        //     if (user != null)
+        //     {
+        //         if (user.EmailConfirmed == true)
+        //             return BadRequest("cet compte a déja été confirmé...");
+        //         int maxChild = 0;
+        //         if (user.UserTypeId == _config.GetValue<int>("AppSettings:parentTypeId") && user.ValidationCode == user.ValidationCode)
+        //         {
+        //             maxChild = await _repo.GetAssignedChildrenCount(user.Id);
 
-                    return Ok(new
-                    {
-                        user = _mapper.Map<UserForDetailedDto>(user),
-                        maxChild = maxChild
-                    });
-                }
+        //             return Ok(new
+        //             {
+        //                 user = _mapper.Map<UserForDetailedDto>(user),
+        //                 maxChild = maxChild
+        //             });
+        //         }
 
-                else if (user.UserTypeId == _config.GetValue<int>("AppSettings:TeacherTypeId") && user.UserName == user.ValidationCode)
-                {
-                    return Ok(new
-                    {
-                        user = _mapper.Map<UserForDetailedDto>(user)
-                    });
-                }
-                else
-                    return BadRequest("ce lien n'existe pas");
+        //         else if (user.UserTypeId == _config.GetValue<int>("AppSettings:TeacherTypeId") && user.UserName == user.ValidationCode)
+        //         {
+        //           return Ok(new
+        //           {
+        //               user = _mapper.Map<UserForDetailedDto>(user)
+        //           });
+        //         }
+        //         else
+        //           return BadRequest("ce lien n'existe pas");
+        //     }
 
+        //     return BadRequest("ce lien ,'existe pas");
 
-
-            }
-
-            return BadRequest("ce lien ,'existe pas");
-
-        }
+        // }
 
         [HttpGet("ResetPassword/{code}")]
         public async Task<IActionResult> ResetPassword(string code)
@@ -494,14 +491,14 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPost("{id}/setLoginPassword")]
-        public async Task<IActionResult> setLoginPassword(int id, LoginFormDto loginForDto)
+        public async Task<IActionResult> setLoginPassword(int id, UserDataToUpdateDto userData)
         {
           var user = await _repo.GetUser(id, false);
           if (user != null)
           {
-            var newPassword = _userManager.PasswordHasher.HashPassword(user, loginForDto.Pwd);
-            user.UserName = loginForDto.UserName.ToLower();
-            user.NormalizedUserName = loginForDto.UserName.ToUpper();
+            var newPassword = _userManager.PasswordHasher.HashPassword(user, userData.Pwd);
+            user.UserName = userData.UserName.ToLower();
+            user.NormalizedUserName = userData.UserName.ToUpper();
             user.PasswordHash = newPassword;
             user.ValidatedCode = true;
             //user.EmailConfirmed = true;
@@ -513,9 +510,14 @@ namespace EducNotes.API.Controllers
               var email = new Email();
               email = _repo.SetEmailForAccountUpdated(template.Subject, template.Body, user.LastName, user.Gender, user.Email);
               _context.Add(email);
+
+              var userToReturn = _mapper.Map<UserForListDto>(user);
               if(await _repo.SaveAll())
               {
-                return Ok();
+                return Ok(new {
+                  token = await GenerateJwtToken(user),
+                  user = userToReturn
+                });
               }
             }
             return BadRequest("problème pour mettre à jour les données");

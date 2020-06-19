@@ -149,6 +149,7 @@ namespace EducNotes.API.Controllers
           List<TuitionChildDataDto> childTuitions = newTuition.Children;
           List<ChildRegistrationDto> children = new List<ChildRegistrationDto>();
           List<OrderLine> lines = new List<OrderLine>();
+          List<User> ChildList = new List<User>();
           foreach (var child in childTuitions)
           {
             User user = new User();
@@ -165,6 +166,9 @@ namespace EducNotes.API.Controllers
               identityContextTransaction.Rollback();
               return BadRequest("erreur lors de l'ajout de l'inscription.");
             }
+            user.IdNum = user.Id.ToString().To5Digits();
+            _repo.Update(user);
+            ChildList.Add(user);
 
             var nextClassLevel = await _context.ClassLevels.FirstAsync(c => c.Id == child.ClassLevelId);
             var classProduct = await _context.ClassLevelProducts
@@ -179,6 +183,7 @@ namespace EducNotes.API.Controllers
             line.ProductId = tuitionId;
             line.ProductFee = child.RegFee;
             line.ChildId = user.Id;
+            line.ClassLevelId = nextClassLevel.Id;
             line.Qty = 1;
             line.UnitPrice = child.TuitionFee;
             line.TotalHT = line.Qty * line.UnitPrice + line.ProductFee;
@@ -207,7 +212,6 @@ namespace EducNotes.API.Controllers
             crd.FirstName = child.FirstName;
             crd.NextClass = nextClassLevel.Name;
             crd.RegistrationFee = child.RegFee.ToString("N0");
-
             crd.TuitionAmount = classProduct.Price.ToString("N0");
             crd.DueAmountPct = (DPPct * 100).ToString("N0") + "%";
             crd.DueAmount = DownPayment.ToString("N0");
@@ -238,7 +242,17 @@ namespace EducNotes.API.Controllers
             }
             if(result.Succeeded)
             {
+              father.IdNum = father.Id.ToString().To5Digits();
               fathercode = await _userManager.GenerateEmailConfirmationTokenAsync(father);
+              _repo.Update(father);
+
+              foreach (var child in ChildList)
+              {
+                UserLink ul = new UserLink();
+                ul.UserId = child.Id;
+                ul.UserPId = father.Id;
+                _repo.Add(ul);
+              }
             }
 
             order.FatherId = father.Id;
@@ -286,7 +300,17 @@ namespace EducNotes.API.Controllers
             }
             if(result.Succeeded)
             {
+              mother.IdNum = mother.Id.ToString().To5Digits();
               mothercode = await _userManager.GenerateEmailConfirmationTokenAsync(mother);
+              _repo.Update(mother);
+
+              foreach (var child in ChildList)
+              {
+                UserLink ul = new UserLink();
+                ul.UserId = child.Id;
+                ul.UserPId = mother.Id;
+                _repo.Add(ul);
+              }
             }
 
             order.MotherId = mother.Id;

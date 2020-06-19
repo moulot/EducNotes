@@ -70,6 +70,12 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.Age, opt => {
                     opt.MapFrom(d => d.DateOfBirth.CalculateAge());
                 })
+                .ForMember(dest => dest.PhoneNumber, opt => {
+                    opt.MapFrom(d => d.PhoneNumber.FormatPhoneNumber());
+                })
+                .ForMember(dest => dest.SecondPhoneNumber, opt => {
+                    opt.MapFrom(d => d.SecondPhoneNumber.FormatPhoneNumber());
+                })
                 .ForMember(dest => dest.UserTypeName, opt => {
                     opt.MapFrom(src => src.UserType.Name);
                 });
@@ -337,8 +343,11 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.ChildFirstName, opt => {
                     opt.MapFrom(src => src.Child.FirstName);
                 })
+                .ForMember(dest => dest.ClassLevelName, opt => {
+                    opt.MapFrom(src => src.ClassLevel.Name);
+                })
                 .ForMember(dest => dest.ChildClassName, opt => {
-                    opt.MapFrom(src => (src.Child.Class.Name));
+                    opt.MapFrom(src => src.Child.Class.Name);
                 })
                 .ForMember(dest => dest.strAmountTTC, opt => {
                   opt.MapFrom(src => src.AmountHT.ToString("N0") + " F");

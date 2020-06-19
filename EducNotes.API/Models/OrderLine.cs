@@ -26,6 +26,8 @@ namespace EducNotes.API.Models
     public int OrderId { get; set; }
     public Order Order { get; set; }
     public string OrderLineLabel { get; set; }
+    public int? ClassLevelId { get; set; }
+    public ClassLevel ClassLevel { get; set; }
     public int ProductId { get; set; }
     public Product Product { get; set; }
     public decimal ProductFee { get; set; }

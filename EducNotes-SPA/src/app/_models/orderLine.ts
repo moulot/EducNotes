@@ -20,6 +20,7 @@ export interface OrderLine {
    childId: number;
    childFirstName: string;
    childLastName: string;
+   classLevelId: number;
    childClassId: number;
    childClassName: string;
    cancelled: boolean;

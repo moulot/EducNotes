@@ -2,6 +2,7 @@ import { Photo } from './photo';
 
 export interface User {
   id: number;
+  idNum: string;
   userName: string;
   firstName: string;
   lastName: string;

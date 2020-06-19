@@ -103,15 +103,12 @@ export class ConfirmEmailComponent implements OnInit {
     Promise.resolve().then(() => this.userForm.controls.checkPassword.updateValueAndValidity());
   }
 
-  submitForm(): void {
+  updateUser(): void {
     this.authService.setUserLoginPassword(this.user.id, this.userForm.value).subscribe(() => {
-      this.router.navigate(['home']);
+      this.router.navigate(['userAccount', this.user.id]);
     }, error => {
       this.alertify.error(error);
     });
   }
 
-  updateUser() {
-
-  }
 }

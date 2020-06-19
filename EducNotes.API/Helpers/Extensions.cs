@@ -213,7 +213,7 @@ namespace EducNotes.API.Helpers
           return data;
         }
         
-        public static string FormatPhoneNumber(string phone)
+        public static string FormatPhoneNumber(this string phone)
         {
           if (phone.Length == 8)
           {

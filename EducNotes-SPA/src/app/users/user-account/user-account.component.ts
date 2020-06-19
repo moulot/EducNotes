@@ -28,6 +28,7 @@ export class UserAccountComponent implements OnInit {
   regFee: number;
   downPayment: any;
   feeDetails: any[] = [];
+  ChildToBeConfirmed = 0;
 
   constructor(private alertify: AlertifyService, private route: ActivatedRoute,
     private fb: FormBuilder, private userService: UserService, private authService: AuthService) { }
@@ -43,9 +44,16 @@ export class UserAccountComponent implements OnInit {
       this.parent = account.parent;
       this.selectedSms = account.activeSms;
       this.registration = this.parent.registration;
+      // children to be updated and confirmed
+      for (let i = 0; i < this.parent.children.length; i++) {
+        const elt = this.parent.children[i];
+        if (elt.child.emailConfirmed) {
+          this.ChildToBeConfirmed += 1;
+        }
+      }
       for (let i = 0; i < this.registration.lines.length; i++) {
         const elt = this.registration.lines[i];
-        this.addLineItem(elt.id, elt.childLastName, elt.childFirstName, elt.childClassName, elt.strAmountTTC);
+        this.addLineItem(elt.id, elt.childLastName, elt.childFirstName, elt.classLevelName, elt.childClassName, elt.strAmountTTC);
         this.downPayment = this.downPayment + Number(elt.amountTTC);
       }
       this.setDuePayment(this.registration.lines);
@@ -75,16 +83,17 @@ export class UserAccountComponent implements OnInit {
     }
   }
 
-  addLineItem(id, lastName, firstName, className, amountTTC): void {
+  addLineItem(id, lastName, firstName, levelName, className, amountTTC): void {
     const lines = this.regForm.get('lines') as FormArray;
-    lines.push(this.createLineItem(id, lastName, firstName, className, amountTTC, false));
+    lines.push(this.createLineItem(id, lastName, firstName, levelName, className, amountTTC, false));
   }
 
-  createLineItem(id, lastName, firstName, className, amountTTC, selected): FormGroup {
+  createLineItem(id, lastName, firstName, levelName, className, amountTTC, selected): FormGroup {
     return this.fb.group({
       lineId: id,
       lastName: lastName,
       firstName: firstName,
+      levelName: levelName,
       className: className,
       amountTTC: amountTTC,
       selected: selected
@@ -144,7 +153,7 @@ export class UserAccountComponent implements OnInit {
       this.orderRemoveLines();
       for (let i = 0; i < this.registration.lines.length; i++) {
         const elt = this.registration.lines[i];
-        this.addLineItem(elt.id, elt.childLastName, elt.childFirstName, elt.childClassName, elt.strAmountTTC);
+        this.addLineItem(elt.id, elt.childLastName, elt.childFirstName, elt.classLevelName, elt.childClassName, elt.strAmountTTC);
       }
       this.setDuePayment(this.registration.lines);
       this.regNbChild = this.registration.lines.length;

@@ -8,10 +8,11 @@ namespace EducNotes.API.Models
     {
         public User()
         {
-            Active = 1;
-            RegCreated = false;
-            NextRegCreated = false;
+          Active = 1;
+          RegCreated = false;
+          NextRegCreated = false;
         }
+        public string IdNum { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int UserTypeId { get; set; }
@@ -43,7 +44,6 @@ namespace EducNotes.API.Models
         public Boolean RegCreated { get; set; }
         public Boolean NextRegCreated { get; set; }
         public byte Active { get; set; }
-        public string Idnum { get; set; }
         public DateTime? ResetPasswordDate { get; set; }
         public DateTime? ForgotPasswordDate { get; set; }
         public ICollection<Photo> Photos { get; set; }

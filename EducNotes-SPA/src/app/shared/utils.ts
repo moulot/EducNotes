@@ -111,4 +111,11 @@ export class Utils {
   static isNumber(value: string | number): boolean {
     return ((value != null) && (value !== '') && !isNaN(Number(value.toString())));
   }
+
+  static formatPhoneNumber(num: string) {
+    if (num.length !== 8) {
+      return num;
+    }
+    return num.substr(0, 1) + '.' + num.substr(2, 1) + num.substr(4, 1) + '.' + num.substr(6, 1);
+  }
 }

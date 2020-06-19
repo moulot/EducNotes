@@ -25,6 +25,7 @@ namespace EducNotes.API.Dtos
     public int ChildId { get; set; }
     public string ChildFirstName { get; set; }
     public string ChildLastName { get; set; }
+    public string ClassLevelName { get; set; }
     public int ChildClassId { get; set; }
     public string ChildClassName { get; set; }
     public Boolean Cancelled { get; set; }

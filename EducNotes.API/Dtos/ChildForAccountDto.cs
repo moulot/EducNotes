@@ -8,7 +8,9 @@ namespace EducNotes.API.Dtos
         public string UserName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public Boolean EmailConfirmed { get; set; }
         public string Email { get; set; }
+        public string ClassLevelName { get; set; }
         public int ClassId { get; set; }
         public string ClassName { get; set; }
         public byte Gender { get; set; }

@@ -234,6 +234,7 @@ import { OrderService } from './_services/order.service';
 import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/new-tuition.component';
 import { AccountService } from './_services/account.service';
 import { ContactUsComponent } from './contactus/contact-us/contact-us.component';
+import { EditChildrenComponent } from './users/edit-children/edit-children.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -391,7 +392,8 @@ export function tokenGetter() {
       TuitionPanelComponent,
       CheckoutComponent,
       NewTuitionComponent,
-      ContactUsComponent
+      ContactUsComponent,
+      EditChildrenComponent
    ],
    imports: [
       FormWizardModule,
