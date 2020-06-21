@@ -17,7 +17,7 @@
   <div *ngIf="ChildToBeConfirmed == 0" class="col-md-12">
     <div class="alert alert-warning text-18" role="alert">
       veuillez finaliser et confirmer le compte de vos enfants.
-      <button type="button" mdbBtn [routerLink]="['/EditChildren']" size="sm"
+      <button type="button" mdbBtn [routerLink]="['/editChildren', parent.id]" size="sm"
         class="btnBlue" mdbWavesEffect>mettre à jour les infos enfants</button>
     </div>
   </div>

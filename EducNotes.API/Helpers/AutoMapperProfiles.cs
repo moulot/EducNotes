@@ -60,6 +60,12 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.Age, opt => {
                     opt.MapFrom(d => d.DateOfBirth.CalculateAge());
                 })
+                .ForMember(dest => dest.ClassLevelId, opt => {
+                    opt.MapFrom(src => src.Class.ClassLevelId);
+                })
+                .ForMember(dest => dest.strDateOfBirth, opt => {
+                    opt.MapFrom(d => d.DateOfBirth.ToString("dd/MM/yyyy", frC));
+                })
                 .ForMember(dest => dest.ClassName, opt => {
                     opt.MapFrom(src => src.Class.Name);
                 });
@@ -85,6 +91,9 @@ namespace EducNotes.API.Helpers {
                 })
                 .ForMember(dest => dest.Age, opt => {
                     opt.MapFrom(d => d.DateOfBirth.CalculateAge());
+                })
+                .ForMember(dest => dest.strDateOfBirth, opt => {
+                    opt.MapFrom(d => d.DateOfBirth.ToString("dd/MM/yyyy", frC));
                 })
                 .ForMember(dest => dest.ClassName, opt => {
                     opt.MapFrom(src => src.Class.Name);

@@ -235,6 +235,7 @@ import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/n
 import { AccountService } from './_services/account.service';
 import { ContactUsComponent } from './contactus/contact-us/contact-us.component';
 import { EditChildrenComponent } from './users/edit-children/edit-children.component';
+import { EditChildrenResolver } from './_resolvers/edit-children-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -496,6 +497,7 @@ export function tokenGetter() {
       EditEmailTemplateResolver,
       EditTeacherResolver,
       CheckoutResolver,
+      EditChildrenResolver,
       OrderService,
       AccountService,
       { provide: NZ_I18N, useValue: fr_FR }

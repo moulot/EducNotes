@@ -306,6 +306,28 @@ namespace EducNotes.API.Controllers
             return Ok(data);
         }
 
+        [HttpGet("{parentId}/AccountChildren")]
+        public async Task<IActionResult> GetAccountChildren(int parentId)
+        {
+          // MANAGEMENT OF TUITION AND NEXT YEAR TUITION TO BE TREATED!!!!!!!!!!!!!!
+          var order = await _context.Orders.FirstAsync(o => o.isReg == true && (o.MotherId == parentId || o.FatherId == parentId));
+          var usersFromDB = await _context.OrderLines
+                              .Include(i => i.Child)
+                              .Include(i => i.ClassLevel)
+                              .Where(o => o.OrderId == order.Id).ToListAsync();
+          List<UserForDetailedDto> children = new List<UserForDetailedDto>();
+          for (int i = 0; i < usersFromDB.Count(); i++)
+          {
+            var user = usersFromDB[i];
+            UserForDetailedDto child = new UserForDetailedDto();
+            child = _mapper.Map<UserForDetailedDto>(user.Child);
+            child.ClassLevelId = Convert.ToInt32(user.ClassLevelId);
+            child.ClassLevelName = user.ClassLevel.Name;
+            children.Add(child);
+          }
+          return Ok(children);
+        }
+
         [HttpGet("{parentId}/Children")]
         public async Task<IActionResult> GetChildren(int parentId)
         {
@@ -1515,11 +1537,19 @@ namespace EducNotes.API.Controllers
           return BadRequest("Could not add the photo");
         }
 
-        [HttpPost("AddUser")]
-        public async Task<IActionResult> AddUser([FromForm]TeacherForEditDto user)
+        [HttpPost("AddChild")]
+        public async Task<IActionResult> AddChild([FromForm]ChildrenForEditDto user)
+        {
+          var ff = await _context.Settings.ToListAsync();
+          ChildrenForEditDto dd = user;
+          return Ok();
+        }
+
+        [HttpPost("AddTeacher")]
+        public async Task<IActionResult> AddTeacher([FromForm]TeacherForEditDto user)
         {
           int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-          bool userOK = await _repo.AddUser(user, userId);
+          bool userOK = await _repo.AddTeacher(user, userId);
 
           if(userOK)
             return Ok();

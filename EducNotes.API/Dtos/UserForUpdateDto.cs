@@ -24,7 +24,6 @@ namespace EducNotes.API.Dtos
         public int? CityId { get; set; }
         public byte? Gender { get; set; }
         public int? SpaCode { get; set; }
-
         public DateTime Created { get; set; }
         public DateTime LastActive { get; set; }
         public List<ServiceSelectionDto> Products { get; set; }

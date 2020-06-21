@@ -115,6 +115,10 @@ constructor(private http: HttpClient) {}
     return this.http.get<User[]>(this.baseUrl + 'users/' + parentId + '/Children');
   }
 
+  getAccountChildren(parentId) {
+    return this.http.get(this.baseUrl + 'users/' + parentId + '/AccountChildren');
+  }
+
   getTeacherScheduleToday(teacherId) {
     return this.http.get(this.baseUrl + 'users/' + teacherId + '/ScheduleToday');
   }
@@ -245,9 +249,12 @@ constructor(private http: HttpClient) {}
     return this.http.get<User[]>(this.baseUrl + 'users/GetAllTeachers');
   }
 
-  // enregistrement d'un nouvel utilisateur
-  addUser(user: FormData) {
-    return this.http.post(this.baseUrl + 'users/' + 'AddUser', user);
+  addChild(user: FormData) {
+    return this.http.post(this.baseUrl + 'users/' + 'AddChild', user);
+  }
+
+  addTeacher(user: FormData) {
+    return this.http.post(this.baseUrl + 'users/' + 'AddTeacher', user);
   }
 
   getAssignedClasses(teacherId) {

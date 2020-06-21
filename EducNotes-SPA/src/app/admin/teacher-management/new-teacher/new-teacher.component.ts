@@ -176,7 +176,7 @@ export class NewTeacherComponent implements OnInit {
     formData.append('courseIds', ids);
     formData.append('userTypeId', this.teacherTypeId.toString());
 
-    this.userService.addUser(formData).subscribe(() => {
+    this.userService.addTeacher(formData).subscribe(() => {
       this.alertify.success('enseignant ajouté avec succès');
       this.router.navigate(['/teachers']);
     }, error => {

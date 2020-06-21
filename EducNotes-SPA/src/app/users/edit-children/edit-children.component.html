@@ -17,6 +17,7 @@
       </div>
     </div>
   </div>
+  <div class="col-md-12 text-15 text-muted">finalisez l'inscription de vos enfants en complétant le formulaire ci-dessous</div>
 
   <div class="col-md-12 mb-2">
     <form [formGroup]="childrenForm" (ngSubmit)="updateChildren()">
@@ -27,85 +28,103 @@
               <div class="mb-2" formArrayName="children" *ngFor="let child of childrenForm.get('children')['controls']; let i = index;">
                 <div class="border rounded-lg p-2" [formGroupName]="i">
                   <div class="row">
-                    <div class="col-md-12"><div class="text-18 text-muted">infos enfant</div></div>
+                    <div class="col-md-12">
+                      <div class="text-18 text-muted">
+                        {{i+1}}. {{children[i].lastName | titlecase}} {{children[i].firstName | titlecase}}. classe de {{children[i].classLevelName}}
+                      </div>
+                    </div>
                     <div class="col-md-12"><hr class="my-1"></div>
                   </div>
                   <div class="row">
-                    <div class="col-md-4">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="lname" class="form-control" formControlName="lname">
-                        <label for="lname" class="">nom</label>
-                        <div *ngIf="child.value.lname === '' && child.get('lname').touched"
-                          class="text-small text-danger">saisir le nom svp</div>
+                    <div class="col-md-2">
+                      <div class="file-path-wrapper d-flex justify-content-center m-0 p-1">
+                        <img [src]="photoUrl[i] || '../../assets/user.png'" class="avatar-xl rounded-lg" alt="">
+                      </div>
+                      <div class="d-flex justify-content-center m-0">
+                        <div class="file-field md-form m-0">
+                          <div mdbBtn class="btnWhiteO px-2 waves-light" size="sm" mdbWavesEffect>
+                            <span *ngIf="!photoUrl[i]">ajouter la photo</span>
+                            <span *ngIf="photoUrl[i]">editer la photo</span>
+                            <input type="file" accept='image/*' mdbFileSelect (change)="imgResult($event, i)">
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div class="col-md-4">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="fname" class="form-control" formControlName="fname" mdbValidate>
-                        <label for="fname" class="">prénom</label>
-                        <div *ngIf="child.value.fname === '' && child.get('fname').touched"
-                          class="text-small text-danger">saisir le prénom svp</div>
-                      </div>          
-                    </div>
-                    <div class="col-md-4">
-                      <div class="md-form my-0">
-                        <mdb-select [options]="sexOptions" formControlName="sex" placeholder="sexe"></mdb-select>
-                        <div *ngIf="child.value.sex === '' && child.get('sex').touched"
-                          class="text-small text-danger">saisir le sexe svp</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="dob" [textMask]="{mask: birthDateMask}"
-                          class="form-control" formControlName="dob" mdbValidate>
-                        <label for="dob" class="">date de naissance</label>
-                        <div *ngIf="child.value.dob === '' && child.get('dob').touched"
-                          class="text-small text-danger">saisir la date de nais. svp</div>
-                      </div>          
-                    </div>
-                    <div class="col-md-4">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="email" class="form-control" formControlName="email" mdbValidate>
-                        <label for="email" class="">email</label>
-                        <div *ngIf="child.value.email === '' && child.get('email').touched"
-                          class="text-small text-danger">saisir l'email svp</div>
-                      </div>          
-                    </div>
-                    <div class="col-md-4">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="cell" class="form-control" [textMask]="{mask: phoneMask}"
-                          formControlName="cell" mdbValidate>
-                        <label for="cell" class="">portable</label>
-                        <div *ngIf="child.value.cell === '' && child.get('cell').touched"
-                          class="text-small text-danger">saisir le portable svp</div>
-                      </div>          
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="username" class="form-control" formControlName="username" mdbValidate>
-                        <label for="username" class="">identifiant</label>
-                        <div *ngIf="child.value.username === '' && child.get('username').touched"
-                          class="text-small text-danger">saisir le mot de passe svp</div>
-                      </div>          
-                    </div>
-                    <div class="col-md-4">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="password" id="pwd" class="form-control" formControlName="pwd" mdbValidate>
-                        <label for="pwd" class="">password</label>
-                        <div *ngIf="child.value.pwd === '' && child.get('pwd').touched"
-                          class="text-small text-danger">saisir le mot de passe svp</div>
-                      </div>          
-                    </div>
-                    <div class="col-md-4">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="password" id="checkpwd" class="form-control" formControlName="checkpwd" mdbValidate>
-                        <label for="checkpwd" class="">confirmer mot de passe</label>
-                        <div *ngIf="child.value.checkpwd === '' && child.get('checkpwd').touched"
-                          class="text-small text-danger">saisir le prénom svp</div>
+                    <div class="col-md-10">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="md-form mt-1 mb-0">
+                            <input mdbInput type="text" id="'lname'+{{i}}" class="form-control" formControlName="lname">
+                            <label for="'lname'+{{i}}" class="">nom</label>
+                            <div *ngIf="child.value.lname === '' && child.get('lname').touched"
+                              class="text-small text-danger">saisir le nom svp</div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form mt-1 mb-0">
+                            <input mdbInput type="text" id="'fname'+{{i}}" class="form-control" formControlName="fname" mdbValidate>
+                            <label for="'fname'+{{i}}" class="">prénom</label>
+                            <div *ngIf="child.value.fname === '' && child.get('fname').touched"
+                              class="text-small text-danger">saisir le prénom svp</div>
+                          </div>          
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form my-0">
+                            <mdb-select [options]="sexOptions" formControlName="sex" placeholder="sexe"></mdb-select>
+                            <div *ngIf="child.value.sex === '' && child.get('sex').touched"
+                              class="text-small text-danger">saisir le sexe svp</div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form mt-1 mb-0">
+                            <input mdbInput type="text" id="'dob'+{{i}}" [textMask]="{mask: birthDateMask}"
+                              class="form-control" formControlName="dob" mdbValidate>
+                            <label for="'dob'+{{i}}" class="">date de naissance</label>
+                            <div *ngIf="child.value.dob === '' && child.get('dob').touched"
+                              class="text-small text-danger">saisir la date de nais. svp</div>
+                          </div>          
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form mt-1 mb-0">
+                            <input mdbInput type="text" id="'email'+{{i}}" class="form-control" formControlName="email" mdbValidate>
+                            <label for="'email'+{{i}}" class="">email</label>
+                            <div *ngIf="child.value.email === '' && child.get('email').touched"
+                              class="text-small text-danger">saisir l'email svp</div>
+                          </div>          
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form mt-1 mb-0">
+                            <input mdbInput type="text" id="'cell'+{{i}}" class="form-control" [textMask]="{mask: phoneMask}"
+                              formControlName="cell" mdbValidate>
+                            <label for="'cell'+{{i}}" class="">portable</label>
+                            <div *ngIf="child.value.cell === '' && child.get('cell').touched"
+                              class="text-small text-danger">saisir le portable svp</div>
+                          </div>          
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form mt-1 mb-0">
+                            <input mdbInput type="text" id="'username'+{{i}}" class="form-control" formControlName="username" mdbValidate>
+                            <label for="'username'+{{i}}" class="">identifiant</label>
+                            <div *ngIf="child.value.username === '' && child.get('username').touched"
+                              class="text-small text-danger">saisir le mot de passe svp</div>
+                          </div>          
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form mt-1 mb-0">
+                            <input mdbInput type="password" id="'pwd'+{{i}}" class="form-control" formControlName="pwd" mdbValidate>
+                            <label for="'pwd'+{{i}}" class="">password</label>
+                            <div *ngIf="child.value.pwd === '' && child.get('pwd').touched"
+                              class="text-small text-danger">saisir le mot de passe svp</div>
+                          </div>          
+                        </div>
+                        <div class="col-md-4">
+                          <div class="md-form mt-1 mb-0">
+                            <input mdbInput type="password" id="'checkpwd'+{{i}}" class="form-control" formControlName="checkpwd" mdbValidate>
+                            <label for="'checkpwd'+{{i}}" class="">confirmer mot de passe</label>
+                            <div *ngIf="child.value.checkpwd === '' && child.get('checkpwd').touched"
+                              class="text-small text-danger">saisir le prénom svp</div>
+                          </div>
+                        </div>  
                       </div>
                     </div>
                   </div>
@@ -114,7 +133,7 @@
             </div>
           </div>
           <div class="float-right">
-            <button type="button" mdbBtn [disabled]="!childrenForm.hasError('childNOK')" class="btnWhiteO"
+            <button type="submit" mdbBtn [disabled]="childrenForm.hasError('childNOK')" class="btnWhiteO"
               size="sm" mdbWavesEffect>saisir</button>
           </div>
         </div>

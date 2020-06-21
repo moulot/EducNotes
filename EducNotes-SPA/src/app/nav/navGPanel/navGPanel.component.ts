@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { User } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
@@ -13,7 +13,7 @@ import { NavbarComponent } from 'ng-uikit-pro-standard';
 })
 export class NavGPanelComponent implements OnInit {
   @ViewChild('navbarid', {static: false}) navbaridRef: NavbarComponent; // Get the NavbarComponent
-  user: User;
+  @Input() user: User;
   studentTypeId = environment.studentTypeId;
   teacherTypeId = environment.teacherTypeId;
   parentTypeId = environment.parentTypeId;
@@ -75,7 +75,7 @@ export class NavGPanelComponent implements OnInit {
 
   ngOnInit() {
     if (this.loggedIn()) {
-      this.user = this.authService.currentUser;
+      // this.user = this.authService.currentUser;
       this.acc_name = this.user.firstName.substring(0, 1).toLowerCase() + '. ' + this.user.lastName.toLowerCase();
       this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
     }

@@ -589,155 +589,155 @@ namespace EducNotes.API.Data
             return resultStatus;
         }
 
-        public async Task<bool> AddUser(TeacherForEditDto user, int insertUserId)
+        public async Task<bool> AddTeacher(TeacherForEditDto user, int insertUserId)
         {
-            bool resultStatus = false;
+          bool resultStatus = false;
 
-            using (var identityContextTransaction = _context.Database.BeginTransaction())
+          using (var identityContextTransaction = _context.Database.BeginTransaction())
+          {
+            try
             {
-                try
+                User appUser = new User();
+                //is it a new user
+                if (user.Id == 0)
                 {
-                    User appUser = new User();
-                    //is it a new user
-                    if (user.Id == 0)
+                  var userToSave = _mapper.Map<User>(user);
+                  var code = Guid.NewGuid();
+                  userToSave.UserName = code.ToString();
+                  userToSave.ValidationCode = code.ToString();
+                  userToSave.ValidatedCode = false;
+                  userToSave.EmailConfirmed = false;
+                  userToSave.UserName = code.ToString();
+
+                  var result = await _userManager.CreateAsync(userToSave, password);
+                  if (result.Succeeded)
+                  {
+                    // enregistrement du RoleTeacher
+                    var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
+                    appUser = await _userManager.Users
+                                    .Include(i => i.Photos)
+                                    .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
+                    _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+
+                    // send the mail to update userName/pwd - add to Email table
+                    if (appUser.Email != null)
                     {
-                        var userToSave = _mapper.Map<User>(user);
-                        var code = Guid.NewGuid();
-                        userToSave.UserName = code.ToString();
-                        userToSave.ValidationCode = code.ToString();
-                        userToSave.ValidatedCode = false;
-                        userToSave.EmailConfirmed = false;
-                        userToSave.UserName = code.ToString();
+                      var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToSave.ValidationCode;
+                      var emailToSend = new Email
+                      {
+                        StatusFlag = 0,
+                        Subject = "Confirmation de compte",
+                        ToAddress = appUser.Email,
+                        Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                        FromAddress = "no-reply@educnotes.com",
+                        EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId"),
+                        InsertUserId = insertUserId,
+                        UpdateUserId = insertUserId,
+                      };
+                      Add(emailToSend);
+                    }
+                  }
+                }
+                else
+                {
+                    appUser = await _context.Users.Include(i => i.Photos).FirstOrDefaultAsync(u => u.Id == user.Id);
+                    appUser.LastName = user.LastName;
+                    appUser.FirstName = user.FirstName;
+                    appUser.Gender = user.Gender;
+                    var dateArray = user.strDateOfBirth.Split("/");
+                    int year = Convert.ToInt32(dateArray[2]);
+                    int month = Convert.ToInt32(dateArray[1]);
+                    int day = Convert.ToInt32(dateArray[0]);
+                    DateTime birthDay = new DateTime(year, month, day);
+                    appUser.DateOfBirth = birthDay;//user.DateOfBirth;
+                    appUser.PhoneNumber = user.PhoneNumber;
+                    appUser.SecondPhoneNumber = user.SecondPhoneNumber;
+                    appUser.Email = user.Email;
+                    Update(appUser);
 
-                        var result = await _userManager.CreateAsync(userToSave, password);
-                        if (result.Succeeded)
+                    // delete previous teacher courses
+                    List<TeacherCourse> prevCourses = await _context.TeacherCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
+                    DeleteAll(prevCourses);
+                }
+
+                // add new selected courses
+                var ids = user.CourseIds.Split(",");
+                if (ids.Count() > 0)
+                {
+                  foreach (var courseId in ids)
+                    {
+                        TeacherCourse tc = new TeacherCourse();
+                        tc.CourseId = Convert.ToInt32(courseId);
+                        tc.TeacherId = appUser.Id;
+                        Add(tc);
+                    }
+                }
+
+                //add user photo
+                var photoFile = user.PhotoFile;
+                if (photoFile != null)
+                {
+                    if (photoFile.Length > 0)
+                    {
+                        var uploadResult = new ImageUploadResult();
+                        // var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
+                        using (var stream = photoFile.OpenReadStream())
                         {
-                            // enregistrement du RoleTeacher
-                            var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
-                            appUser = await _userManager.Users
-                                            .Include(i => i.Photos)
-                                            .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
-                            _userManager.AddToRoleAsync(appUser, role.Name).Wait();
-
-                            // send the mail to update userName/pwd - add to Email table
-                            if (appUser.Email != null)
+                            var uploadParams = new ImageUploadParams()
                             {
-                                var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToSave.ValidationCode;
-                                var emailToSend = new Email
-                                {
-                                    StatusFlag = 0,
-                                    Subject = "Confirmation de compte",
-                                    ToAddress = appUser.Email,
-                                    Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                                    FromAddress = "no-reply@educnotes.com",
-                                    EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId"),
-                                    InsertUserId = insertUserId,
-                                    UpdateUserId = insertUserId,
-                                };
-                                Add(emailToSend);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        appUser = await _context.Users.Include(i => i.Photos).FirstOrDefaultAsync(u => u.Id == user.Id);
-                        appUser.LastName = user.LastName;
-                        appUser.FirstName = user.FirstName;
-                        appUser.Gender = user.Gender;
-                        var dateArray = user.strDateOfBirth.Split("/");
-                        int year = Convert.ToInt32(dateArray[2]);
-                        int month = Convert.ToInt32(dateArray[1]);
-                        int day = Convert.ToInt32(dateArray[0]);
-                        DateTime birthDay = new DateTime(year, month, day);
-                        appUser.DateOfBirth = birthDay;//user.DateOfBirth;
-                        appUser.PhoneNumber = user.PhoneNumber;
-                        appUser.SecondPhoneNumber = user.SecondPhoneNumber;
-                        appUser.Email = user.Email;
-                        Update(appUser);
+                                File = new FileDescription(photoFile.Name, stream),
+                                Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+                            };
 
-                        // delete previous teacher courses
-                        List<TeacherCourse> prevCourses = await _context.TeacherCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
-                        DeleteAll(prevCourses);
-                    }
-
-                    // add new selected courses
-                    var ids = user.CourseIds.Split(",");
-                    if (ids.Count() > 0)
-                    {
-                        foreach (var courseId in ids)
-                        {
-                            TeacherCourse tc = new TeacherCourse();
-                            tc.CourseId = Convert.ToInt32(courseId);
-                            tc.TeacherId = appUser.Id;
-                            Add(tc);
-                        }
-                    }
-
-                    //add user photo
-                    var photoFile = user.PhotoFile;
-                    if (photoFile != null)
-                    {
-                        if (photoFile.Length > 0)
-                        {
-                            var uploadResult = new ImageUploadResult();
-                            // var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
-                            using (var stream = photoFile.OpenReadStream())
+                            uploadResult = _cloudinary.Upload(uploadParams);
+                            if (uploadResult.StatusCode == HttpStatusCode.OK)
                             {
-                                var uploadParams = new ImageUploadParams()
+                                Photo photo = new Photo();
+                                photo.Url = uploadResult.Uri.ToString();
+                                photo.PublicId = uploadResult.PublicId;
+                                photo.UserId = appUser.Id;
+                                photo.DateAdded = DateTime.Now;
+                                if (appUser.Photos.Any(u => u.IsMain))
                                 {
-                                    File = new FileDescription(photoFile.Name, stream),
-                                    Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
-                                };
-
-                                uploadResult = _cloudinary.Upload(uploadParams);
-                                if (uploadResult.StatusCode == HttpStatusCode.OK)
-                                {
-                                    Photo photo = new Photo();
-                                    photo.Url = uploadResult.Uri.ToString();
-                                    photo.PublicId = uploadResult.PublicId;
-                                    photo.UserId = appUser.Id;
-                                    photo.DateAdded = DateTime.Now;
-                                    if (appUser.Photos.Any(u => u.IsMain))
-                                    {
-                                        var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
-                                        oldPhoto.IsMain = false;
-                                        Update(oldPhoto);
-                                    }
-                                    photo.IsMain = true;
-                                    photo.IsApproved = true;
-                                    Add(photo);
+                                  var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                                  oldPhoto.IsMain = false;
+                                  Update(oldPhoto);
                                 }
+                                photo.IsMain = true;
+                                photo.IsApproved = true;
+                                Add(photo);
                             }
                         }
-                        // Boolean photoAdded = await AddPhoto(appUser.Id, user.PhotoFile);
-                        // if(!photoAdded)
-                        // {
-                        //   identityContextTransaction.Rollback();
-                        //   resultStatus = false;
-                        // }
                     }
-                    else
-                    {
-                        resultStatus = true;
-                    }
-
-                    if (await SaveAll())
-                    {
-                        // fin de la transaction
-                        identityContextTransaction.Commit();
-                        resultStatus = true;
-                    }
-                    else
-                        resultStatus = false;
-
+                    // Boolean photoAdded = await AddPhoto(appUser.Id, user.PhotoFile);
+                    // if(!photoAdded)
+                    // {
+                    //   identityContextTransaction.Rollback();
+                    //   resultStatus = false;
+                    // }
                 }
-                catch (System.Exception)
+                else
                 {
-                    identityContextTransaction.Rollback();
-                    return resultStatus = false;
+                    resultStatus = true;
                 }
+
+                if (await SaveAll())
+                {
+                    // fin de la transaction
+                    identityContextTransaction.Commit();
+                    resultStatus = true;
+                }
+                else
+                    resultStatus = false;
+
             }
-            return resultStatus;
+            catch (System.Exception)
+            {
+                identityContextTransaction.Rollback();
+                return resultStatus = false;
+            }
+          }
+          return resultStatus;
         }
 
         public async Task<bool> AddPhoto(int userId, IFormFile photoFile)

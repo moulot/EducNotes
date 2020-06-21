@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   @ViewChild(PerfectScrollbarDirective, { static: true }) perfectScrollbar: PerfectScrollbarDirective;
   userActivity;
   userInactive: Subject<any> = new Subject();
+  loggedUser: User;
 
   constructor(private mdbSpinningPreloader: MDBSpinningPreloader, private authService: AuthService, private router: Router) {
     this.setTimeout();
@@ -56,6 +57,7 @@ export class AppComponent implements OnInit {
       this.authService.decodedToken = this.jwtHelper.decodeToken(token);
     }
     if (user) {
+      this.loggedUser = user;
       this.authService.currentUser = user;
       this.authService.settings = settings;
       this.authService.currentPeriod = currentPeriod;
