@@ -26,6 +26,7 @@ namespace EducNotes.API.Controllers
     public UserManager<User> _userManager { get; }
     CultureInfo frC = new CultureInfo("fr-FR");
     int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
+    int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId;
     string password;
     int registrationEmailId, tuitionId, nextYearTuitionId, newRegToBePaidEmailId;
 
@@ -46,6 +47,12 @@ namespace EducNotes.API.Controllers
       tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
       nextYearTuitionId = _config.GetValue<int>("AppSettings:nextYearTuitionId");
       password = _config.GetValue<String>("AppSettings:defaultPassword");
+      parentRoleId = _config.GetValue<int>("AppSettings:parentRoleId");
+      memberRoleId = _config.GetValue<int>("AppSettings:memberRoleId");
+      moderatorRoleId = _config.GetValue<int>("AppSettings:moderatorRoleId");
+      adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
+      teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
+
     }
 
     [HttpGet("tuitionOrderData")]
@@ -166,6 +173,10 @@ namespace EducNotes.API.Controllers
               identityContextTransaction.Rollback();
               return BadRequest("erreur lors de l'ajout de l'inscription.");
             }
+            // add user role
+            var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
+            _userManager.AddToRoleAsync(user, role.Name).Wait();
+
             user.IdNum = user.Id.ToString().To5Digits();
             _repo.Update(user);
             ChildList.Add(user);
@@ -242,6 +253,10 @@ namespace EducNotes.API.Controllers
             }
             if(result.Succeeded)
             {
+              // add user role
+              var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentRoleId);
+              _userManager.AddToRoleAsync(father, role.Name).Wait();
+
               father.IdNum = father.Id.ToString().To5Digits();
               fathercode = await _userManager.GenerateEmailConfirmationTokenAsync(father);
               _repo.Update(father);
@@ -300,6 +315,10 @@ namespace EducNotes.API.Controllers
             }
             if(result.Succeeded)
             {
+              // add user role
+              var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentRoleId);
+              _userManager.AddToRoleAsync(mother, role.Name).Wait();
+
               mother.IdNum = mother.Id.ToString().To5Digits();
               mothercode = await _userManager.GenerateEmailConfirmationTokenAsync(mother);
               _repo.Update(mother);

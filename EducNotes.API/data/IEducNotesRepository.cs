@@ -34,6 +34,7 @@ namespace EducNotes.API.Data
         Task<bool> EmailExist(string email);
         Task<bool> UserNameExist(string userName);
         Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId);
+        Task<bool> UpdateChildren(ChildrenForEditDto users);
         Task<bool> AddTeacher(TeacherForEditDto userForRegister, int insertUserId);
         Task<IEnumerable<User>> GetStudentsForClass(int classId);
         Task<IEnumerable<Agenda>> GetClassAgenda(int classId);

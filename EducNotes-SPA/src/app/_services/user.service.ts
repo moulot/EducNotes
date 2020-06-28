@@ -249,8 +249,8 @@ constructor(private http: HttpClient) {}
     return this.http.get<User[]>(this.baseUrl + 'users/GetAllTeachers');
   }
 
-  addChild(user: FormData) {
-    return this.http.post(this.baseUrl + 'users/' + 'AddChild', user);
+  validateChildAccounts(users: FormData) {
+    return this.http.post(this.baseUrl + 'users/' + 'validateChildAccounts', users);
   }
 
   addTeacher(user: FormData) {

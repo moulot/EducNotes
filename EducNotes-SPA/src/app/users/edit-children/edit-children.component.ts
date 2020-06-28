@@ -5,6 +5,7 @@ import { Utils } from 'src/app/shared/utils';
 import { ClassService } from 'src/app/_services/class.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from 'src/app/_services/user.service';
+import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
   selector: 'app-edit-children',
@@ -21,9 +22,12 @@ export class EditChildrenComponent implements OnInit {
   children: any;
   photoUrl: any[] = [];
   photoFile: File[] = [];
+  userNameExist = false;
+  confirmedPwd: boolean;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private userService: UserService,
-    private classService: ClassService, private route: ActivatedRoute, private router: Router) { }
+    private classService: ClassService, private route: ActivatedRoute, private router: Router,
+    private authService: AuthService) { }
 
   ngOnInit() {
     this.createChildrenForm();
@@ -57,16 +61,8 @@ export class EditChildrenComponent implements OnInit {
       email: [email, Validators.email],
       cell: [cell],
       pwd: ['', Validators.required],
-      checkpwd: ['', [ Validators.required, this.confirmationValidator ]]
+      checkpwd: ['', Validators.required]
     });
-  }
-
-  confirmationValidator = (control: FormControl): { [ s: string ]: boolean } => {
-    if (!control.value) {
-      return { required: true };
-    } else if (control.value !== this.childrenForm.controls.pwd.value) {
-      return { confirm: true, error: true };
-    }
   }
 
   addChildItem(username, lname, fname, dob, sex, email, cell): void {
@@ -87,6 +83,33 @@ export class EditChildrenComponent implements OnInit {
     });
   }
 
+  // confirmationValidator = (control: FormControl): { [ s: string ]: boolean } => {
+  //   if (!control.value) {
+  //     return { required: true };
+  //   } else if (control.value !== this.childrenForm.controls.pwd.value) {
+  //     return { confirm: true, error: true };
+  //   }
+  // }
+  pwdValidator(index) {
+    const pwd = this.childrenForm.value.children[index].pwd;
+    const checkpwd = this.childrenForm.value.children[index].checkpwd;
+    if (pwd === checkpwd) {
+      this.confirmedPwd = true;
+    } else {
+      this.confirmedPwd = false;
+    }
+  }
+
+  userNameVerification(index) {
+    const userName = this.childrenForm.value.children[index].username;
+    this.userNameExist = false;
+    this.authService.userNameExist(userName).subscribe((res: boolean) => {
+      if (res === true) {
+        this.userNameExist = true;
+      }
+    });
+  }
+
   imgResult(event, i) {
     let file: File = null;
     file = <File>event.target.files[0];
@@ -96,35 +119,40 @@ export class EditChildrenComponent implements OnInit {
       this.photoUrl[i] = e.target.result;
     };
     reader.readAsDataURL(event.target.files[0]);
-
     this.photoFile[i] = file;
-    // console.log(this.photoFile);
-    // console.log(this.photoUrl);
   }
 
   updateChildren() {
     const formData = new FormData();
     for (let i = 0; i < this.childrenForm.value.children.length; i++) {
       const child = this.childrenForm.value.children[i];
-      console.log(child.lname + '-' + child.fname);
       if (this.photoFile[i]) {
         formData.append('photoFiles', this.photoFile[i], this.photoFile[i].name);
+        formData.append('photoIndex', this.children[i].id);
       }
       formData.append('id', this.children[i].id);
       formData.append('lastName', child.lname);
       formData.append('firstName', child.fname);
-      // formData.append('gender', this.teacherForm.value.gender);
-      // formData.append('strDateOfBirth', this.teacherForm.value.dateOfBirth);
-      // formData.append('email', this.teacherForm.value.email);
-      // formData.append('phoneNumber', this.teacherForm.value.cell);
-      // formData.append('secondPhoneNumber', this.teacherForm.value.phone2);
-      // formData.append('courseIds', ids);
-      // formData.append('userTypeId', this.teacherTypeId.toString());
+      formData.append('gender', child.sex);
+      formData.append('strDateOfBirth', child.dob);
+      formData.append('userName', child.username);
+      formData.append('password', child.pwd);
+      // optional data
+      if (child.email) {
+        formData.append('email', child.email);
+      } else {
+        formData.append('email', '');
+      }
+      if (child.cell) {
+        formData.append('phoneNumber', child.cell);
+      } else {
+        formData.append('phoneNumber', '');
+      }
     }
 
-    this.userService.addChild(formData).subscribe(() => {
-      this.alertify.success('enseignant ajouté avec succès');
-      // this.router.navigate(['/teachers']);
+    this.userService.validateChildAccounts(formData).subscribe(() => {
+      this.alertify.success('les comptes enfants sont valiés. merci.');
+      this.router.navigate(['/tuitions']);
     }, error => {
       this.alertify.error(error);
     });

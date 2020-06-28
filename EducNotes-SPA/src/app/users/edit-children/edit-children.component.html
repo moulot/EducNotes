@@ -53,76 +53,80 @@
                     <div class="col-md-10">
                       <div class="row">
                         <div class="col-md-4">
-                          <div class="md-form mt-1 mb-0">
+                          <div class="md-form mt-2 mb-0">
                             <input mdbInput type="text" id="'lname'+{{i}}" class="form-control" formControlName="lname">
                             <label for="'lname'+{{i}}" class="">nom</label>
-                            <div *ngIf="child.value.lname === '' && child.get('lname').touched"
+                            <div *ngIf="child.get('lname').errors && child.get('lname').touched"
                               class="text-small text-danger">saisir le nom svp</div>
                           </div>
                         </div>
                         <div class="col-md-4">
-                          <div class="md-form mt-1 mb-0">
+                          <div class="md-form mt-2 mb-0">
                             <input mdbInput type="text" id="'fname'+{{i}}" class="form-control" formControlName="fname" mdbValidate>
                             <label for="'fname'+{{i}}" class="">prénom</label>
-                            <div *ngIf="child.value.fname === '' && child.get('fname').touched"
+                            <div *ngIf="child.get('fname').errors && child.get('fname').touched"
                               class="text-small text-danger">saisir le prénom svp</div>
                           </div>          
                         </div>
                         <div class="col-md-4">
-                          <div class="md-form my-0">
+                          <div class="md-form mt-2 my-0">
                             <mdb-select [options]="sexOptions" formControlName="sex" placeholder="sexe"></mdb-select>
-                            <div *ngIf="child.value.sex === '' && child.get('sex').touched"
+                            <div *ngIf="child.get('sex').errors && child.get('sex').touched"
                               class="text-small text-danger">saisir le sexe svp</div>
                           </div>
                         </div>
                         <div class="col-md-4">
-                          <div class="md-form mt-1 mb-0">
+                          <div class="md-form mt-2 mb-0">
                             <input mdbInput type="text" id="'dob'+{{i}}" [textMask]="{mask: birthDateMask}"
                               class="form-control" formControlName="dob" mdbValidate>
                             <label for="'dob'+{{i}}" class="">date de naissance</label>
-                            <div *ngIf="child.value.dob === '' && child.get('dob').touched"
-                              class="text-small text-danger">saisir la date de nais. svp</div>
+                            <div *ngIf="child.get('dob').errors && child.get('dob').touched"
+                              class="text-small text-danger">saisir la date de naiss. svp</div>
                           </div>          
                         </div>
                         <div class="col-md-4">
-                          <div class="md-form mt-1 mb-0">
+                          <div class="md-form mt-2 mb-0">
                             <input mdbInput type="text" id="'email'+{{i}}" class="form-control" formControlName="email" mdbValidate>
                             <label for="'email'+{{i}}" class="">email</label>
-                            <div *ngIf="child.value.email === '' && child.get('email').touched"
-                              class="text-small text-danger">saisir l'email svp</div>
+                            <!-- <div *ngIf="child.get('email').errors && child.get('email').touched"
+                              class="text-small text-danger">saisir l'email svp</div> -->
                           </div>          
                         </div>
                         <div class="col-md-4">
-                          <div class="md-form mt-1 mb-0">
+                          <div class="md-form mt-2 mb-0">
                             <input mdbInput type="text" id="'cell'+{{i}}" class="form-control" [textMask]="{mask: phoneMask}"
                               formControlName="cell" mdbValidate>
                             <label for="'cell'+{{i}}" class="">portable</label>
-                            <div *ngIf="child.value.cell === '' && child.get('cell').touched"
-                              class="text-small text-danger">saisir le portable svp</div>
+                            <!-- <div *ngIf="child.get('cell').errors && child.get('cell').touched"
+                              class="text-small text-danger">saisir le portable svp</div> -->
                           </div>          
                         </div>
                         <div class="col-md-4">
-                          <div class="md-form mt-1 mb-0">
-                            <input mdbInput type="text" id="'username'+{{i}}" class="form-control" formControlName="username" mdbValidate>
+                          <div class="md-form mt-2 mb-0">
+                            <input mdbInput type="text" id="'username'+{{i}}" class="form-control"
+                             (blur)="userNameVerification(i)" formControlName="username" mdbValidate>
                             <label for="'username'+{{i}}" class="">identifiant</label>
-                            <div *ngIf="child.value.username === '' && child.get('username').touched"
+                            <div *ngIf="child.get('username').errors && child.get('username').touched"
                               class="text-small text-danger">saisir le mot de passe svp</div>
-                          </div>          
+                            <div *ngIf="userNameExist" class="text-small text-danger">cet identifiant existe déjà. choisir un autre svp</div>                          </div>          
                         </div>
                         <div class="col-md-4">
-                          <div class="md-form mt-1 mb-0">
+                          <div class="md-form mt-2 mb-0">
                             <input mdbInput type="password" id="'pwd'+{{i}}" class="form-control" formControlName="pwd" mdbValidate>
                             <label for="'pwd'+{{i}}" class="">password</label>
-                            <div *ngIf="child.value.pwd === '' && child.get('pwd').touched"
+                            <div *ngIf="child.get('pwd').errors && child.get('pwd').touched"
                               class="text-small text-danger">saisir le mot de passe svp</div>
                           </div>          
                         </div>
                         <div class="col-md-4">
-                          <div class="md-form mt-1 mb-0">
-                            <input mdbInput type="password" id="'checkpwd'+{{i}}" class="form-control" formControlName="checkpwd" mdbValidate>
+                          <div class="md-form mt-2 mb-0">
+                            <input mdbInput type="password" id="'checkpwd'+{{i}}" class="form-control"
+                              (keyup)="pwdValidator(i)" formControlName="checkpwd" mdbValidate>
                             <label for="'checkpwd'+{{i}}" class="">confirmer mot de passe</label>
-                            <div *ngIf="child.value.checkpwd === '' && child.get('checkpwd').touched"
-                              class="text-small text-danger">saisir le prénom svp</div>
+                            <div *ngIf="child.get('checkpwd').hasError('required') && child.get('checkpwd').touched">confirmer le mot de passe svp</div>
+                            <div *ngIf="!confirmedPwd">
+                              les deux mots de passe que vous entrez sont differents!
+                            </div>
                           </div>
                         </div>  
                       </div>
@@ -131,10 +135,13 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="float-right">
-            <button type="submit" mdbBtn [disabled]="childrenForm.hasError('childNOK')" class="btnWhiteO"
-              size="sm" mdbWavesEffect>saisir</button>
+            <div class="col-md-12"><hr class="my-1" style="background-color: #f89f20;"></div>
+            <div class="col-md-12">
+              <div class="float-right">
+                <button type="submit" mdbBtn [disabled]="!childrenForm.valid || userNameExist" class="btnBlue"
+                  size="sm" mdbWavesEffect>enregistrer et valider les comptes enfants</button>
+              </div>    
+            </div>
           </div>
         </div>
       </div>

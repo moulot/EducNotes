@@ -28,7 +28,7 @@
         </div>
       </ul>
       <ul class="navbar-nav nav-flex-icons">
-        <li class="nav-item waves-light" mdbWavesEffect>
+        <li *ngIf="user" class="nav-item waves-light" mdbWavesEffect>
           <a class="nav-link text-17 text-muted" (click)="closeNav()" [routerLink]="['/userAccount', user.id]">
             <i class="fad fa-user-lock mr-1" style="font-size:20px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
           </a>

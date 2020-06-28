@@ -1537,12 +1537,15 @@ namespace EducNotes.API.Controllers
           return BadRequest("Could not add the photo");
         }
 
-        [HttpPost("AddChild")]
-        public async Task<IActionResult> AddChild([FromForm]ChildrenForEditDto user)
+        [HttpPost("validateChildAccounts")]
+        public async Task<IActionResult> validateChildAccounts([FromForm]ChildrenForEditDto users)
         {
-          var ff = await _context.Settings.ToListAsync();
-          ChildrenForEditDto dd = user;
-          return Ok();
+          var dd = await _context.Settings.ToListAsync();
+          bool usersOk = await _repo.UpdateChildren(users);
+          if(usersOk)
+            return Ok();
+          else
+            return BadRequest("problème pour valider les enfants");
         }
 
         [HttpPost("AddTeacher")]

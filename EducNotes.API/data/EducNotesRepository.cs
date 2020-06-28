@@ -589,6 +589,98 @@ namespace EducNotes.API.Data
             return resultStatus;
         }
 
+        public async Task<bool> UpdateChildren(ChildrenForEditDto users)
+        {
+          bool resultStatus = false;
+          using(var identityContextTransaction = _context.Database.BeginTransaction())
+          {
+            try
+            {
+              for (int i = 0; i < users.Id.Count(); i++)
+              {
+                var childid = users.Id[i];
+                var child = await _context.Users.Include(p => p.Photos).FirstAsync(u => u.Id == childid);
+                child.UserName = users.UserName[i];
+                child.LastName = users.LastName[i];
+                child.FirstName = users.FirstName[i];
+                child.Gender = users.Gender[i];
+                var dateArray = users.strDateOfBirth[i].Split("/");
+                var day = Convert.ToInt32(dateArray[0]);
+                var month = Convert.ToInt32(dateArray[1]);
+                var year = Convert.ToInt32(dateArray[2]);
+                child.DateOfBirth = new DateTime(year, month, day);
+                child.Email = users.Email[i];
+                child.PhoneNumber = users.PhoneNumber[i];
+                var pwd = users.Password[i];
+                // validate user
+                child.PasswordHash = users.Password[i];
+                child.EmailConfirmed = true;
+                child.ValidatedCode = true;
+                Update(child);       
+
+                //does the current user has photo?
+                var photoIndex = users.PhotoIndex.IndexOf(childid);
+                if(photoIndex != -1)
+                {
+                  var photoFile = users.PhotoFiles[photoIndex];
+                  if (photoFile.Length > 0)
+                  {
+                    var uploadResult = new ImageUploadResult();
+                    using (var stream = photoFile.OpenReadStream())
+                    {
+                      var uploadParams = new ImageUploadParams()
+                      {
+                        File = new FileDescription(photoFile.Name, stream),
+                        Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+                      };
+
+                      uploadResult = _cloudinary.Upload(uploadParams);
+                      if (uploadResult.StatusCode == HttpStatusCode.OK)
+                      {
+                        //remove tag 'Main' from child photo if it exists
+                        if (child.Photos.Any(u => u.IsMain))
+                        {
+                          var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == child.Id && p.IsMain == true);
+                          oldPhoto.IsMain = false;
+                          Update(oldPhoto);
+                        }
+                        Photo photo = new Photo();
+                        photo.Url = uploadResult.Uri.ToString();
+                        photo.PublicId = uploadResult.PublicId;
+                        photo.UserId = child.Id;
+                        photo.DateAdded = DateTime.Now;
+                        photo.IsMain = true;
+                        photo.IsApproved = true;
+                        Add(photo);
+                      }
+                    }
+                  }
+                }
+                else
+                {
+                  resultStatus = true;
+                }
+
+              }
+
+              if (await SaveAll())
+              {
+                // validate transaction
+                identityContextTransaction.Commit();
+                resultStatus = true;
+              }
+              else
+                resultStatus = false;
+            }
+            catch (System.Exception)
+            {
+              identityContextTransaction.Rollback();
+              resultStatus = false;
+            }
+          }
+          return resultStatus;
+        }
+
         public async Task<bool> AddTeacher(TeacherForEditDto user, int insertUserId)
         {
           bool resultStatus = false;
@@ -677,44 +769,38 @@ namespace EducNotes.API.Data
                 var photoFile = user.PhotoFile;
                 if (photoFile != null)
                 {
-                    if (photoFile.Length > 0)
-                    {
-                        var uploadResult = new ImageUploadResult();
-                        // var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
-                        using (var stream = photoFile.OpenReadStream())
-                        {
-                            var uploadParams = new ImageUploadParams()
-                            {
-                                File = new FileDescription(photoFile.Name, stream),
-                                Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
-                            };
+                  if (photoFile.Length > 0)
+                  {
+                      var uploadResult = new ImageUploadResult();
+                      // var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
+                      using (var stream = photoFile.OpenReadStream())
+                      {
+                          var uploadParams = new ImageUploadParams()
+                          {
+                              File = new FileDescription(photoFile.Name, stream),
+                              Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+                          };
 
-                            uploadResult = _cloudinary.Upload(uploadParams);
-                            if (uploadResult.StatusCode == HttpStatusCode.OK)
-                            {
-                                Photo photo = new Photo();
-                                photo.Url = uploadResult.Uri.ToString();
-                                photo.PublicId = uploadResult.PublicId;
-                                photo.UserId = appUser.Id;
-                                photo.DateAdded = DateTime.Now;
-                                if (appUser.Photos.Any(u => u.IsMain))
-                                {
-                                  var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
-                                  oldPhoto.IsMain = false;
-                                  Update(oldPhoto);
-                                }
-                                photo.IsMain = true;
-                                photo.IsApproved = true;
-                                Add(photo);
-                            }
-                        }
-                    }
-                    // Boolean photoAdded = await AddPhoto(appUser.Id, user.PhotoFile);
-                    // if(!photoAdded)
-                    // {
-                    //   identityContextTransaction.Rollback();
-                    //   resultStatus = false;
-                    // }
+                          uploadResult = _cloudinary.Upload(uploadParams);
+                          if (uploadResult.StatusCode == HttpStatusCode.OK)
+                          {
+                              Photo photo = new Photo();
+                              photo.Url = uploadResult.Uri.ToString();
+                              photo.PublicId = uploadResult.PublicId;
+                              photo.UserId = appUser.Id;
+                              photo.DateAdded = DateTime.Now;
+                              if (appUser.Photos.Any(u => u.IsMain))
+                              {
+                                var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                                oldPhoto.IsMain = false;
+                                Update(oldPhoto);
+                              }
+                              photo.IsMain = true;
+                              photo.IsApproved = true;
+                              Add(photo);
+                          }
+                      }
+                  }
                 }
                 else
                 {
@@ -723,12 +809,12 @@ namespace EducNotes.API.Data
 
                 if (await SaveAll())
                 {
-                    // fin de la transaction
-                    identityContextTransaction.Commit();
-                    resultStatus = true;
+                  // fin de la transaction
+                  identityContextTransaction.Commit();
+                  resultStatus = true;
                 }
                 else
-                    resultStatus = false;
+                  resultStatus = false;
 
             }
             catch (System.Exception)

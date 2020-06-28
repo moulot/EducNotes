@@ -13,7 +13,7 @@ import { NavbarComponent } from 'ng-uikit-pro-standard';
 })
 export class NavGPanelComponent implements OnInit {
   @ViewChild('navbarid', {static: false}) navbaridRef: NavbarComponent; // Get the NavbarComponent
-  @Input() user: User;
+  user: User;
   studentTypeId = environment.studentTypeId;
   teacherTypeId = environment.teacherTypeId;
   parentTypeId = environment.parentTypeId;
@@ -75,7 +75,7 @@ export class NavGPanelComponent implements OnInit {
 
   ngOnInit() {
     if (this.loggedIn()) {
-      // this.user = this.authService.currentUser;
+      this.user = this.authService.currentUser;
       this.acc_name = this.user.firstName.substring(0, 1).toLowerCase() + '. ' + this.user.lastName.toLowerCase();
       this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
     }
