@@ -97,12 +97,12 @@ export class NewTuitionComponent implements OnInit {
       fFirstName: ['georges', Validators.required],
       fEmail: ['gmoulot@hotmail.com', Validators.required],
       fCell: ['12345678', Validators.required],
-      fSendEmail: [false],
+      // fSendEmail: [false],
       mLastName: ['moulot', Validators.required],
       mFirstName: ['jacqueline', Validators.required],
       mEmail: ['jm@hotmail.com', Validators.required],
       mCell: ['34566554', Validators.required],
-      mSendEmail: [false],
+      // mSendEmail: [false],
       children: this.fb.array([])
     }, {validator: this.formValidator});
   }
@@ -128,10 +128,8 @@ export class NewTuitionComponent implements OnInit {
     const mfname = g.get('mFirstName').value;
     const mcell = g.get('mCell').value;
     const memail = g.get('mEmail').value;
-    const fsendemail = g.get('fSendEmail').value;
-    const msendemail = g.get('mSendEmail').value;
     if (flname === '' && ffname === '' && fcell === '' && femail === '' && mlname === ''
-      && mfname === '' && mcell === '' && memail === '' && fsendemail === false && msendemail === false) {
+      && mfname === '' && mcell === '' && memail === '') {
       parenterror = true;
     }
 
@@ -140,7 +138,7 @@ export class NewTuitionComponent implements OnInit {
     if (flname !== '' || ffname !== '' || fcell !== '' || femail !== '') {
       if (flname === '' || ffname === '' || fcell === '' || femail === '') {
         fathererror = true;
-        parenterror = true;
+        // parenterror = true;
       }
     }
 
@@ -149,26 +147,26 @@ export class NewTuitionComponent implements OnInit {
     if (mlname !== '' || mfname !== '' || mcell !== '' || memail !== '') {
       if (mlname === '' || mfname === '' || mcell === '' || memail === '') {
         mothererror = true;
-        parenterror = true;
+        // parenterror = true;
       }
     }
 
     // did we select at least one parent to cope with the registration?
-    let emailerror = false;
-    if (fsendemail === false && msendemail === false) {
-      emailerror = true;
-      parenterror = true;
-    }
+    // let emailerror = false;
+    // if (fsendemail === false && msendemail === false) {
+    //   emailerror = true;
+    //   parenterror = true;
+    // }
 
     if (childerror === false && parenterror === true) {
       return {'childNOK': false, 'parentNOK': true, 'formNOK': true,
-        'fatherNOK': fathererror, 'motherNOK': mothererror, 'sendemailNOK': emailerror};
+        'fatherNOK': fathererror, 'motherNOK': mothererror}; // , 'sendemailNOK': emailerror};
     } else if (childerror === true && parenterror === false) {
       return {'childNOK': true, 'parentNOK': false, 'formNOK': true,
-        'fatherNOK': fathererror, 'motherNOK': mothererror, 'sendemailNOK': emailerror};
+        'fatherNOK': fathererror, 'motherNOK': mothererror}; // , 'sendemailNOK': emailerror};
     } else if (childerror === true && parenterror === true) {
       return {'childNOK': true, 'parentNOK': true, 'formNOK': true,
-        'fatherNOK': fathererror, 'motherNOK': mothererror, 'sendemailNOK': emailerror};
+        'fatherNOK': fathererror, 'motherNOK': mothererror}; // , 'sendemailNOK': emailerror};
     }
 
     return null;
@@ -279,13 +277,13 @@ export class NewTuitionComponent implements OnInit {
     tuitionData.fFirstName = this.tuitionForm.value.fFirstName;
     tuitionData.fCell = this.tuitionForm.value.fCell;
     tuitionData.fEmail = this.tuitionForm.value.fEmail;
-    tuitionData.fSendEmail = this.tuitionForm.value.fSendEmail;
+    // tuitionData.fSendEmail = this.tuitionForm.value.fSendEmail;
     tuitionData.fActive = this.tuitionForm.hasError('fathererror') === true ? false : true;
     tuitionData.mLastName = this.tuitionForm.value.mLastName;
     tuitionData.mFirstName = this.tuitionForm.value.mFirstName;
     tuitionData.mCell = this.tuitionForm.value.mCell;
     tuitionData.mEmail = this.tuitionForm.value.mEmail;
-    tuitionData.mSendEmail = this.tuitionForm.value.mSendEmail;
+    // tuitionData.mSendEmail = this.tuitionForm.value.mSendEmail;
     tuitionData.mActive = this.tuitionForm.hasError('mothererror') === true ? false : true;
     tuitionData.orderAmount = this.orderAmount;
     tuitionData.dueAmount = this.amountDue;

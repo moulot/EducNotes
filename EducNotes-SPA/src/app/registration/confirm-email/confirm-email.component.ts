@@ -21,6 +21,7 @@ export class ConfirmEmailComponent implements OnInit {
   userNameExist = false;
   emailOK = false;
   phoneMask = Utils.phoneMask;
+  validAccount = false;
 
   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
     private alertify: AlertifyService,  private router: Router, private accountService: AccountService) { }
@@ -59,14 +60,18 @@ export class ConfirmEmailComponent implements OnInit {
       userName: '', cell: this.user.phoneNumber, pwd: '', checkpwd: ''});
   }
 
+  sendEmailToConfirm() {
+    
+  }
+
   validateEmail(confirmEmail: ConfirmEmail) {
     this.accountService.confirmEmail(confirmEmail).subscribe((data: any) => {
       this.emailOK = data.emailOK;
       this.user = data.user;
+      this.validAccount = data.accountValidated;
       this.initialValues();
     }, error => {
       this.alertify.error(error);
-      // console.log(error);
     });
   }
 

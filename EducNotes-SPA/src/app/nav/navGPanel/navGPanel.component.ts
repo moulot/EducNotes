@@ -74,12 +74,10 @@ export class NavGPanelComponent implements OnInit {
     }
 
   ngOnInit() {
-    if (this.loggedIn()) {
-      this.user = this.authService.currentUser;
-      this.acc_name = this.user.firstName.substring(0, 1).toLowerCase() + '. ' + this.user.lastName.toLowerCase();
-      this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
-    }
-  }
+    this.user = this.authService.currentUser;
+    this.acc_name = this.user.firstName.substring(0, 1).toLowerCase() + '. ' + this.user.lastName.toLowerCase();
+    this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
+}
 
   closeNav() {
     if (this.navbaridRef.shown) {

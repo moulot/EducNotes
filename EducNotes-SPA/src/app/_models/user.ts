@@ -29,6 +29,7 @@ export interface User {
   districtId: number;
   cityId?: number;
   active: number;
+  validated: boolean;
 
   photos?: Photo[];
   roles?: string[];

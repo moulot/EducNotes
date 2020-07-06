@@ -272,23 +272,20 @@ namespace EducNotes.API.Controllers
 
             order.FatherId = father.Id;
 
-            if(newTuition.FSendEmail)
-            {
-              emails.Add(fatherEmail);
-              fatherEmail.ParentId = father.Id;
-              fatherEmail.ParentLastName = father.LastName;
-              fatherEmail.ParentFirstName = father.FirstName;
-              fatherEmail.ParentEmail = father.Email;
-              fatherEmail.ParentCellPhone = father.PhoneNumber;
-              fatherEmail.ParentGender = father.Gender;
-              fatherEmail.EmailSubject = schoolName + " - inscription pour l'année scolaire prochaine";
-              fatherEmail.OrderId = order.Id;
-              fatherEmail.OrderNum = order.OrderNum;
-              fatherEmail.Token = fathercode;
-              fatherEmail.DueDate = firstDeadline.DueDate.ToString("dd/MM/yyyy", frC);
-              fatherEmail.TotalAmount = newTuition.DueAmount.ToString("N0");
-              fatherEmail.Children = children;
-            }
+            emails.Add(fatherEmail);
+            fatherEmail.ParentId = father.Id;
+            fatherEmail.ParentLastName = father.LastName;
+            fatherEmail.ParentFirstName = father.FirstName;
+            fatherEmail.ParentEmail = father.Email;
+            fatherEmail.ParentCellPhone = father.PhoneNumber;
+            fatherEmail.ParentGender = father.Gender;
+            fatherEmail.EmailSubject = schoolName + " - inscription pour l'année scolaire prochaine";
+            fatherEmail.OrderId = order.Id;
+            fatherEmail.OrderNum = order.OrderNum;
+            fatherEmail.Token = fathercode;
+            fatherEmail.DueDate = firstDeadline.DueDate.ToString("dd/MM/yyyy", frC);
+            fatherEmail.TotalAmount = newTuition.DueAmount.ToString("N0");
+            fatherEmail.Children = children;
           }
 
           //mother
@@ -334,23 +331,20 @@ namespace EducNotes.API.Controllers
 
             order.MotherId = mother.Id;
 
-            if(newTuition.MSendEmail)
-            {
-              emails.Add(motherEmail);
-              motherEmail.ParentId = mother.Id;
-              motherEmail.ParentLastName = mother.LastName;
-              motherEmail.ParentFirstName = mother.FirstName;
-              motherEmail.ParentEmail = mother.Email;
-              motherEmail.ParentCellPhone = mother.PhoneNumber;
-              motherEmail.ParentGender = mother.Gender;
-              motherEmail.EmailSubject = schoolName + " - inscription pour l'année scolaire prochaine";
-              motherEmail.OrderId = order.Id;
-              motherEmail.OrderNum = order.OrderNum;
-              motherEmail.Token = mothercode;
-              motherEmail.DueDate = firstDeadline.DueDate.ToString("dd/MM/yyyy", frC);
-              motherEmail.TotalAmount = newTuition.DueAmount.ToString("N0");
-              motherEmail.Children = children;
-            }
+            emails.Add(motherEmail);
+            motherEmail.ParentId = mother.Id;
+            motherEmail.ParentLastName = mother.LastName;
+            motherEmail.ParentFirstName = mother.FirstName;
+            motherEmail.ParentEmail = mother.Email;
+            motherEmail.ParentCellPhone = mother.PhoneNumber;
+            motherEmail.ParentGender = mother.Gender;
+            motherEmail.EmailSubject = schoolName + " - inscription pour l'année scolaire prochaine";
+            motherEmail.OrderId = order.Id;
+            motherEmail.OrderNum = order.OrderNum;
+            motherEmail.Token = mothercode;
+            motherEmail.DueDate = firstDeadline.DueDate.ToString("dd/MM/yyyy", frC);
+            motherEmail.TotalAmount = newTuition.DueAmount.ToString("N0");
+            motherEmail.Children = children;
           }
 
           _repo.Update(order);

@@ -5,13 +5,13 @@ export interface TuitionData {
   fFirstName: string;
   fCell: string;
   fEmail: string;
-  fSendEmail: boolean;
+  // fSendEmail: boolean;
   fActive: boolean;
   mLastName: string;
   mFirstName: string;
   mCell: string;
   mEmail: string;
-  mSendEmail: boolean;
+  // mSendEmail: boolean;
   mActive: boolean;
   orderAmount: number;
   dueAmount: number;

@@ -1,16 +1,12 @@
-<div style="margin-bottom: 75px;">
-  <mdb-navbar SideClass="navbar navbar-expand-md navbar-light white ie-nav fixed-top scrolling-navbar" [containerInside]="false">
-    <mdb-navbar-brand>
-        <div class="logo">
-            <img src="../../../assets/images/hat_logo.png" alt="">
-        </div>
-    </mdb-navbar-brand>
-    <links>
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item waves-light" mdbWavesEffect>
-            <a class="nav-link text-muted" [routerLink]="['/home']">accueil</a>
-          </li>
-        </ul>
-    </links>
-  </mdb-navbar>
-</div>
+<mdb-navbar #navbarid SideClass="navbar navbar-expand-md navbar-light white ie-nav fixed-top scrolling-navbar" [containerInside]="false">
+  <mdb-navbar-brand>
+      <div class="logo">
+          <img src="../../../assets/images/logo_sm.png" alt="">
+      </div>
+  </mdb-navbar-brand>
+  <links>
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item waves-light pl-3 text-25">Educ'Notes</li>
+    </ul>        
+  </links>
+</mdb-navbar>

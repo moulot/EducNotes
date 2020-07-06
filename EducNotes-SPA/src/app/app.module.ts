@@ -236,6 +236,7 @@ import { AccountService } from './_services/account.service';
 import { ContactUsComponent } from './contactus/contact-us/contact-us.component';
 import { EditChildrenComponent } from './users/edit-children/edit-children.component';
 import { EditChildrenResolver } from './_resolvers/edit-children-resolver';
+import { InvalidAccountComponent } from './registration/invalid-account/invalid-account.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -394,7 +395,8 @@ export function tokenGetter() {
       CheckoutComponent,
       NewTuitionComponent,
       ContactUsComponent,
-      EditChildrenComponent
+      EditChildrenComponent,
+      InvalidAccountComponent
    ],
    imports: [
       FormWizardModule,

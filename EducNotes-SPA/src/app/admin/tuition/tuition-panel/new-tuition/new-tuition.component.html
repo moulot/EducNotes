@@ -19,10 +19,11 @@
           </div>
           <div class="row">
             <div class="col-md-12">
-              <div class="alert alert-danger text-15" role="alert" *ngIf="tuitionForm.hasError('parentNOK') && tuitionForm.touched">
+              <div class="alert alert-danger text-15" role="alert"
+                *ngIf="tuitionForm.hasError('parentNOK') && tuitionForm.touched">
                 <div *ngIf="tuitionForm.hasError('fatherNOK') && tuitionForm.touched">les données du père sont incorrectes</div>
                 <div *ngIf="tuitionForm.hasError('motherNOK') && tuitionForm.touched">les données de la mère sont incorrectes</div>
-                <div *ngIf="tuitionForm.hasError('sendemailNOK') && tuitionForm.touched">sélectionner au moins un parent pour l'envoi du email</div>
+                <!-- <div *ngIf="tuitionForm.hasError('sendemailNOK') && tuitionForm.touched">sélectionner au moins un parent pour l'envoi du email</div> -->
               </div>
             </div>
           </div>
@@ -65,11 +66,11 @@
                             class="text-small text-danger">saisir l'email svp</div>
                       </div>
                     </div>
-                    <div class="col-md-12">
+                    <!-- <div class="col-md-12">
                       <div class="md-form my-1">
                         <mdb-checkbox formControlName="fSendEmail">envoyer les infos de l'inscription au père</mdb-checkbox>
                       </div>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -110,11 +111,11 @@
                           class="text-small text-danger">saisir l'email svp</div>
                       </div>
                     </div>
-                    <div class="col-md-12" >
+                    <!-- <div class="col-md-12" >
                       <div class="md-form my-1">
                         <mdb-checkbox formControlName="mSendEmail">envoyer les infos de l'inscription à la mère</mdb-checkbox>
                       </div>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>

@@ -1,0 +1,42 @@
+<div class="alert alert-warning text-18" role="alert">
+  <div class="text-17 mt-4">Pour toute informaiton vous pouvez nous contacter au :</div>
+  <div class="my-3 pl-3 text-17"> téléphone :<b>12.34.56.78</b></div>
+  <div class="mb-3 pl-3 text-17"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
+</div>
+<div class="text-17 mt-2">Bonjour
+  <span  *ngIf="user.gender == 0">Mme</span>
+  <span  *ngIf="user.gender == 1">Mr</span>
+  {{user.lastName | titlecase}},
+</div>
+<div class="text-17">Votre compte est créé mais il n'est pas encore actif. Pour le faire, vous devez :</div>
+<ul>
+  <li>valider votre email.</li>
+  <li>valider votre numéro de téléphone.</li>
+  <li>compléter les informations sur vos enfants</li>
+</ul>
+<div class="text-17">Merci de valider les informations demandées ci-dessous.</div>
+<div class="row">
+  <div class="col-md-12">
+    <form [formGroup]="phoneForm" (ngSubmit)="validatePhone()">
+      <div class="md-form mt-1">
+        <input mdbInput type="text" id="phone" class="form-control" formControlName="phone" mdbValidate>
+        <label for="mFirstName" class="">numéro de téléphone à valider</label>
+        <div *ngIf="phoneForm.get('phone').errors && phoneForm.get('phone').touched"
+          class="text-small text-danger">saisir le numéro svp</div>
+      </div>
+    </form>
+  </div>
+  <!-- <div class="col-md-12">
+    <form [formGroup]="emailForm" (ngSubmit)="validateEmail()">
+      <div class="md-form mt-1">
+        <input mdbInput type="text" id="email" class="form-control" formControlName="email" mdbValidate>
+        <label for="email" class="">email à valider</label>
+        <div *ngIf="emailForm.get('email').errors && emailForm.get('email').touched"
+          class="text-small text-danger">saisir l'email svp</div>
+      </div>
+    </form>
+  </div> -->
+  <div class="col-md-12 mt-4 mx-auto">
+    <button type="button" mdbBtn class="btnBlue" mdbWavesEffect>renseigner les informations de vos enfants</button>
+  </div>
+</div>

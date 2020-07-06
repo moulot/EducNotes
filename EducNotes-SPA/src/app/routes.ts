@@ -120,6 +120,7 @@ import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/n
 import { ContactUsComponent } from './contactus/contact-us/contact-us.component';
 import { EditChildrenComponent } from './users/edit-children/edit-children.component';
 import { EditChildrenResolver } from './_resolvers/edit-children-resolver';
+import { InvalidAccountComponent } from './registration/invalid-account/invalid-account.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -225,6 +226,7 @@ export const appRoutes: Routes = [
         { path: 'addClassEvent/:id', component: AddClassLifeComponent},
         { path: 'checkout/:id', component: CheckoutComponent, resolve: {order: CheckoutResolver}},
         { path: 'newTuition', component: NewTuitionComponent},
+        { path: 'invalidAccount', component: InvalidAccountComponent},
         { path: 'editChildren/:id', component: EditChildrenComponent, resolve: {users: EditChildrenResolver}}
       ]
     },

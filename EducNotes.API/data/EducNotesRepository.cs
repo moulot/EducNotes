@@ -613,7 +613,8 @@ namespace EducNotes.API.Data
                 child.PhoneNumber = users.PhoneNumber[i];
                 var pwd = users.Password[i];
                 // validate user
-                child.PasswordHash = users.Password[i];
+                var newPassword = _userManager.PasswordHasher.HashPassword(child, users.Password[i]);
+                child.PasswordHash = newPassword;
                 child.EmailConfirmed = true;
                 child.ValidatedCode = true;
                 Update(child);       

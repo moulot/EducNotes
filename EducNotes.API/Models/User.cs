@@ -9,6 +9,7 @@ namespace EducNotes.API.Models
         public User()
         {
           Active = 1;
+          Validated = false;
           RegCreated = false;
           NextRegCreated = false;
         }
@@ -44,6 +45,7 @@ namespace EducNotes.API.Models
         public Boolean RegCreated { get; set; }
         public Boolean NextRegCreated { get; set; }
         public byte Active { get; set; }
+        public Boolean Validated { get; set; }
         public DateTime? ResetPasswordDate { get; set; }
         public DateTime? ForgotPasswordDate { get; set; }
         public ICollection<Photo> Photos { get; set; }
