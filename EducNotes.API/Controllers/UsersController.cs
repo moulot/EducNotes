@@ -325,7 +325,10 @@ namespace EducNotes.API.Controllers
             child.ClassLevelName = user.ClassLevel.Name;
             children.Add(child);
           }
-          return Ok(children);
+          return Ok(new {
+            children,
+            parentid = parentId
+          });
         }
 
         [HttpGet("{parentId}/Children")]
@@ -1540,7 +1543,6 @@ namespace EducNotes.API.Controllers
         [HttpPost("validateChildAccounts")]
         public async Task<IActionResult> validateChildAccounts([FromForm]ChildrenForEditDto users)
         {
-          var dd = await _context.Settings.ToListAsync();
           bool usersOk = await _repo.UpdateChildren(users);
           if(usersOk)
             return Ok();

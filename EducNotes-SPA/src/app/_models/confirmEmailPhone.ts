@@ -1,4 +1,4 @@
-export interface ConfirmEmail {
+export interface ConfirmEmailPhone {
   userId: string;
   token: string;
 }

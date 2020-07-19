@@ -24,6 +24,8 @@ export class EditChildrenComponent implements OnInit {
   photoFile: File[] = [];
   userNameExist = false;
   confirmedPwd: boolean;
+  parentId: any;
+  model: any;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private userService: UserService,
     private classService: ClassService, private route: ActivatedRoute, private router: Router,
@@ -31,9 +33,10 @@ export class EditChildrenComponent implements OnInit {
 
   ngOnInit() {
     this.createChildrenForm();
-    this.route.data.subscribe((data: any) => {
-      this.children = data['users'];
-      console.log(this.children);
+    this.route.data.subscribe((childInfo: any) => {
+      const data =  childInfo['users'];
+      this.children = data.children;
+      this.parentId = data.parentId;
       for (let i = 0; i < this.children.length; i++) {
         const elt = this.children[i];
         this.addChildItem('', elt.lastName, elt.firstName, elt.strDateOfBirth, elt.gender, elt.email, elt.phoneNumber);
@@ -42,7 +45,6 @@ export class EditChildrenComponent implements OnInit {
       }
     });
     this.getClassLevels();
-    console.log(this.photoFile);
   }
 
   createChildrenForm() {
@@ -124,6 +126,7 @@ export class EditChildrenComponent implements OnInit {
 
   updateChildren() {
     const formData = new FormData();
+    formData.append('parentId', this.parentId);
     for (let i = 0; i < this.childrenForm.value.children.length; i++) {
       const child = this.childrenForm.value.children[i];
       if (this.photoFile[i]) {
@@ -152,7 +155,7 @@ export class EditChildrenComponent implements OnInit {
 
     this.userService.validateChildAccounts(formData).subscribe(() => {
       this.alertify.success('les comptes enfants sont valiés. merci.');
-      this.router.navigate(['/tuitions']);
+      this.router.navigate(['/confirmEmail']);
     }, error => {
       this.alertify.error(error);
     });

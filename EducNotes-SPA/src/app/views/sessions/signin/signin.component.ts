@@ -63,7 +63,12 @@ export class SigninComponent implements OnInit {
         this.authService.redirectUrl = '';
         this.router.navigate([r]);
       } else {
-        if (this.authService.currentUser.emailConfirmed) {
+        this.user = this.authService.currentUser;
+        // console.log(this.user);
+        // console.log('phone confirmed:' + this.user.phoneNumberConfirmed);
+        // console.log('email confirmed:' + this.user.emailConfirmed);
+        // console.log('validated:' + this.user.validated);
+        if (this.user.emailConfirmed && this.user.phoneNumberConfirmed && this.user.validated) {
           this.router.navigate(['/home']);
         } else {
           this.router.navigate(['invalidAccount']);

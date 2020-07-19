@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using System.Web;
 using AutoMapper;
 using EducNotes.API.Data;
 using EducNotes.API.Dtos;
@@ -9,6 +8,7 @@ using EducNotes.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace EducNotes.API.Controllers
@@ -47,11 +47,62 @@ namespace EducNotes.API.Controllers
     }
 
     [AllowAnonymous]
-    [HttpPost("ConfirmEmail")]
-    public async Task<IActionResult> ConfirmEmail(confirmEmailDto confirmEmailDto)
+    [HttpGet("PhoneCode/{userId}/{num}")]
+    public async Task<IActionResult> PhoneCode(int userId, string num)
     {
-      string userId = confirmEmailDto.UserId;
-      string token = confirmEmailDto.Token;
+      bool codeSent = false;
+      var user = await _context.Users.FirstAsync(u => u.Id == userId);
+      user.PhoneNumber = num;
+      _repo.Update(user);
+      var token = await _userManager.GenerateChangePhoneNumberTokenAsync(user, num);
+      Sms sms = new Sms();
+      sms.To = num;
+      sms.ToUserId = user.Id;
+      sms.SmsTypeId = _config.GetValue<int>("AppSettings:SmsValidationTypeId");
+      sms.Content = "SVP saisir le code " + token + " pour valider votre numéro sur Educ'Notes. " +
+      "Vous ne serez jamais contacter pour ce code. Ne le révéler à persone.";
+      sms.InsertUserId = _config.GetValue<int>("AppSettings:Admin");
+      sms.InsertDate = DateTime.Now;
+      sms.UpdateDate = DateTime.Now;
+      _repo.Add(sms);
+
+      if(await _repo.SaveAll())
+      {
+        codeSent = true;
+        return Ok(codeSent);
+      }
+
+      return BadRequest("problème lors de l'envoi du sms de validation");
+    }
+
+    [AllowAnonymous]
+    [HttpPost("ConfirmPhoneNumber")]
+    public async Task<IActionResult> ConfirmPhoneNumber(ConfirmEmailPhoneDto confirmEmailPhoneDto)
+    {
+      int userId = Convert.ToInt32(confirmEmailPhoneDto.UserId);
+      string token = confirmEmailPhoneDto.Token;
+
+      bool phoneNumValidated = false;
+      var user = await _context.Users.FirstAsync(u => u.Id == userId);
+      var result = await _userManager.ChangePhoneNumberAsync(user, user.PhoneNumber, token);
+
+      if(result.Succeeded)
+      {
+        phoneNumValidated = true;
+      }
+
+      return Ok(new {
+        phoneOK = phoneNumValidated,
+        user
+      });
+    }
+
+    [AllowAnonymous]
+    [HttpPost("ConfirmEmail")]
+    public async Task<IActionResult> ConfirmEmail(ConfirmEmailPhoneDto confirmEmailPhoneDto)
+    {
+      string userId = confirmEmailPhoneDto.UserId;
+      string token = confirmEmailPhoneDto.Token;
       Boolean success = false;
       Boolean validated = false;
 

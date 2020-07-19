@@ -1,42 +1,66 @@
-<div class="alert alert-warning text-18" role="alert">
-  <div class="text-17 mt-4">Pour toute informaiton vous pouvez nous contacter au :</div>
-  <div class="my-3 pl-3 text-17"> téléphone :<b>12.34.56.78</b></div>
-  <div class="mb-3 pl-3 text-17"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
+<div class="alert alert-success text-15" role="alert">
+  <div>Pour toute information vous pouvez nous contacter.</div>
+  <div class="pl-1">téléphone : <b>12.34.56.78</b> - <a [routerLink]="['/contactus']"><b>envoyer un message</b></a></div>
 </div>
+
 <div class="text-17 mt-2">Bonjour
   <span  *ngIf="user.gender == 0">Mme</span>
   <span  *ngIf="user.gender == 1">Mr</span>
   {{user.lastName | titlecase}},
 </div>
+
 <div class="text-17">Votre compte est créé mais il n'est pas encore actif. Pour le faire, vous devez :</div>
-<ul>
-  <li>valider votre email.</li>
-  <li>valider votre numéro de téléphone.</li>
-  <li>compléter les informations sur vos enfants</li>
+<ul class="text-16">
+  <li>valider votre numéro de téléphone,</li>
+  <li>compléter les informations sur vos enfants.</li>
 </ul>
-<div class="text-17">Merci de valider les informations demandées ci-dessous.</div>
+<hr class="my-1">
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-6">
     <form [formGroup]="phoneForm" (ngSubmit)="validatePhone()">
-      <div class="md-form mt-1">
-        <input mdbInput type="text" id="phone" class="form-control" formControlName="phone" mdbValidate>
-        <label for="mFirstName" class="">numéro de téléphone à valider</label>
-        <div *ngIf="phoneForm.get('phone').errors && phoneForm.get('phone').touched"
-          class="text-small text-danger">saisir le numéro svp</div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="md-form mt-3 mb-0">
+            <input mdbInput type="text" id="phone" class="form-control" formControlName="phone" mdbValidate>
+            <label for="mFirstName" class="">numéro de téléphone à valider</label>
+            <div *ngIf="phoneForm.get('phone').errors && phoneForm.get('phone').touched"
+              class="text-small text-danger">saisir le numéro svp</div>
+          </div>
+        </div>
+        <div class="col-md-6 mt-3">
+          <button type="button" mdbBtn size="sm" class="btnBlue" mdbWavesEffect>valider mon numero</button>
+        </div>
       </div>
     </form>
   </div>
-  <!-- <div class="col-md-12">
-    <form [formGroup]="emailForm" (ngSubmit)="validateEmail()">
-      <div class="md-form mt-1">
-        <input mdbInput type="text" id="email" class="form-control" formControlName="email" mdbValidate>
-        <label for="email" class="">email à valider</label>
-        <div *ngIf="emailForm.get('email').errors && emailForm.get('email').touched"
-          class="text-small text-danger">saisir l'email svp</div>
-      </div>
-    </form>
-  </div> -->
-  <div class="col-md-12 mt-4 mx-auto">
-    <button type="button" mdbBtn class="btnBlue" mdbWavesEffect>renseigner les informations de vos enfants</button>
+  <div class="col-md-12"><hr class="my-1"></div>
+  <div class="col-md-12 mt-1 mx-auto">
+    <button type="button" mdbBtn [routerLink]="['/editChildren', user.id]" 
+      class="btnBlue" mdbWavesEffect>saisir les infos enfants</button>
   </div>
 </div>
+
+<!-- <div *ngIf="!user.validated" class="row">
+  <div class="col-md-12 p-0 text-18 mb-3">Bonjour
+    <span  *ngIf="user.gender == 0">Mme</span>
+    <span  *ngIf="user.gender == 1">Mr</span>
+    {{user.lastName | titlecase}},
+  </div>
+  <div class="col-md-12 p-0">
+    <div class="text-16 border rounded-lg p-2">
+      <div>Votre compte est activé.</div>
+      <div>Vous devez maintenant compléter toutes les informations concernant vos enfants 
+        pour profiter pleinement de la plateforme. merci.</div>
+      <div class="my-3">
+        <div>Nous sommes disponibles pour toutes informations supplémentaires. Veuillez nous contacter au :</div>
+        <div class="my-2 pl-1"> téléphone : <b>12.34.56.78</b></div>
+        <div class="mb-2 pl-1"> email : <a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
+      </div>
+      <hr class="my-1">
+      <div>
+        <button type="button" mdbBtn [routerLink]="['/editChildren', user.id]" 
+          class="btnBlue mx-auto" mdbWavesEffect>saisir les infos enfants</button>
+      </div>
+    </div>
+  </div>
+</div> -->

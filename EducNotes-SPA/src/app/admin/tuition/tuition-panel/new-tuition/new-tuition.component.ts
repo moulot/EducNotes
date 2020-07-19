@@ -275,13 +275,13 @@ export class NewTuitionComponent implements OnInit {
     const tuitionData = <TuitionData>{};
     tuitionData.fLastName = this.tuitionForm.value.fLastName;
     tuitionData.fFirstName = this.tuitionForm.value.fFirstName;
-    tuitionData.fCell = this.tuitionForm.value.fCell;
+    tuitionData.fCell = this.tuitionForm.value.fCell.replace(/./g, '');
     tuitionData.fEmail = this.tuitionForm.value.fEmail;
     // tuitionData.fSendEmail = this.tuitionForm.value.fSendEmail;
     tuitionData.fActive = this.tuitionForm.hasError('fathererror') === true ? false : true;
     tuitionData.mLastName = this.tuitionForm.value.mLastName;
     tuitionData.mFirstName = this.tuitionForm.value.mFirstName;
-    tuitionData.mCell = this.tuitionForm.value.mCell;
+    tuitionData.mCell = this.tuitionForm.value.mCell.replace(/./g, '');
     tuitionData.mEmail = this.tuitionForm.value.mEmail;
     // tuitionData.mSendEmail = this.tuitionForm.value.mSendEmail;
     tuitionData.mActive = this.tuitionForm.hasError('mothererror') === true ? false : true;

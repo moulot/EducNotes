@@ -6,6 +6,7 @@ namespace EducNotes.API.Dtos
 {
   public class ChildrenForEditDto
   {
+    public int ParentId { get; set; }
     public List<int> Id { get; set; }
     public List<string> LastName { get; set; }
     public List<string> FirstName { get; set; }

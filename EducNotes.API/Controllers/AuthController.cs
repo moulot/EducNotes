@@ -144,19 +144,19 @@ namespace EducNotes.API.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
-          // verification de l'existence du userName 
+          // verification de l'existence du userName
           if (await _repo.UserNameExist(userForLoginDto.Username.ToLower()))
           {
             var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
             if (!user.ValidatedCode)
-                return BadRequest("Compte non validé pour l'instant...");
+              return BadRequest("Compte non validé pour l'instant...");
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
             if (result.Succeeded)
             {
               var appUser = await _userManager.Users.Include(p => p.Photos)
-                  .FirstOrDefaultAsync(u => u.NormalizedUserName == userForLoginDto.Username.ToUpper());
+                .FirstOrDefaultAsync(u => u.NormalizedUserName == userForLoginDto.Username.ToUpper());
 
               var userToReturn = _mapper.Map<UserForListDto>(appUser);
 
@@ -501,7 +501,6 @@ namespace EducNotes.API.Controllers
             user.NormalizedUserName = userData.UserName.ToUpper();
             user.PasswordHash = newPassword;
             user.ValidatedCode = true;
-            //user.EmailConfirmed = true;
             user.ValidationDate = DateTime.Now;
             var res = await _userManager.UpdateAsync(user);
             if (res.Succeeded)

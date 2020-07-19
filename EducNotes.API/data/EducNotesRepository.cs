@@ -664,6 +664,10 @@ namespace EducNotes.API.Data
 
               }
 
+              User parent = await _context.Users.FirstAsync(u => u.Id == users.ParentId);
+              parent.Validated = true;
+              Update(parent);
+
               if (await SaveAll())
               {
                 // validate transaction

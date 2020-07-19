@@ -1,6 +1,7 @@
 <div class="row">
   <div class="col-md-3 my-5" *ngFor="let child of children; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
-    <mdb-card class="testimonial-card">
+    <a (click)="goToChildPage(child)" class="text-17 text-primary">
+      <mdb-card class="testimonial-card">
       <div class="avatar mx-auto">
         <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" class="rounded-circle">
       </div>
@@ -40,12 +41,13 @@
             </div>
           </div>
           <div class="col-md-12 text-small text-danger p-0">détails : pointez/clicker sur les infos</div>
-          <div><hr class="mt-2 mb-2" style="background-color: #f89f20;"></div>
+          <!-- <div><hr class="mt-2 mb-2" style="background-color: #f89f20;"></div>
           <div class="col-md-12 text-center mt-2">
             <a (click)="goToChildPage(child)" class="text-17 text-primary">sélectionner {{child.firstName}}</a>
-          </div>
+          </div> -->
       </mdb-card-body>
-    </mdb-card>
+      </mdb-card>
+    </a>
   </div>
 </div>
 

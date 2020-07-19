@@ -19,11 +19,12 @@ export interface User {
   classId?: number;
   className: string;
   email: string;
+  emailConfirmed: boolean;
   gender: number;
   dateOfBirth: Date;
   userTypeName: string;
-  emailConfirmed: boolean;
   phoneNumber: string;
+  phoneNumberConfirmed: boolean;
   secondPhoneNumber: string;
   validatedCode: boolean;
   districtId: number;

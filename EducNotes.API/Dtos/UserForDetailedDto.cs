@@ -11,6 +11,7 @@ namespace EducNotes.API.Dtos
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+        public Boolean EmailConfirmed { get; set; }
         public int ClassLevelId { get; set; }
         public string ClassLevelName { get; set; }
         public int ClassId { get; set; }
@@ -28,6 +29,7 @@ namespace EducNotes.API.Dtos
         // public string Country { get; set; }
         public string PhotoUrl { get; set; }
           public string PhoneNumber { get; set; }
+          public Boolean PhoneNumberConfirmed { get; set; }
         public string SecondPhoneNumber { get; set; }
         public string userTypeName { get; set; }
         public int userTypeId { get; set; }

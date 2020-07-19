@@ -4,10 +4,9 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { User } from './_models/user';
 import { Period } from './_models/period';
 import { PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
-import { NavigationService } from './shared/services/navigation.service';
 import { Subject } from 'rxjs';
 import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
-import { RouterStateSnapshot, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Setting } from './_models/setting';
 
 @Component({
@@ -20,7 +19,6 @@ export class AppComponent implements OnInit {
   @ViewChild(PerfectScrollbarDirective, { static: true }) perfectScrollbar: PerfectScrollbarDirective;
   userActivity;
   userInactive: Subject<any> = new Subject();
-  loggedUser: User;
 
   constructor(private mdbSpinningPreloader: MDBSpinningPreloader, private authService: AuthService, private router: Router) {
     this.setTimeout();
@@ -35,7 +33,6 @@ export class AppComponent implements OnInit {
     }
     );
   }
-
 
   setTimeout() {
     this.userActivity = setTimeout(() => this.userInactive.next(undefined), 900000); // soit 15 minutes d'inactivité
@@ -57,7 +54,6 @@ export class AppComponent implements OnInit {
       this.authService.decodedToken = this.jwtHelper.decodeToken(token);
     }
     if (user) {
-      this.loggedUser = user;
       this.authService.currentUser = user;
       this.authService.settings = settings;
       this.authService.currentPeriod = currentPeriod;
@@ -71,5 +67,9 @@ export class AppComponent implements OnInit {
 
   loggedIn() {
     return this.authService.loggedIn();
+  }
+
+  accountValidated() {
+    return this.authService.accountValidated();
   }
 }

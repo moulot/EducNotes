@@ -152,6 +152,10 @@ export class AuthService {
     return !this.jwtHelper.isTokenExpired(token);
   }
 
+  accountValidated() {
+    return this.currentUser.validated;
+  }
+
   parentLoggedIn() {
     return this.currentUser.userTypeId === this.parentTypeId;
   }
