@@ -18,6 +18,7 @@ namespace EducNotes.API.Data
         Task<PagedList<User>> GetUsers(UserParams userParams);
         Task<User> GetUser(int id, bool isCurrentUser);
         Task<IEnumerable<User>> GetChildren(int parentId);
+        Task<List<UserForDetailedDto>> GetAccountChildren(int parentId);
         Task<IEnumerable<User>> GetClassStudents(int classId);
         Task<IEnumerable<Agenda>> GetClassAgenda(int classId, DateTime StartDate, DateTime EndDate);
         Task<IEnumerable<Agenda>> GetClassAgendaTodayToNDays(int classId, int toNbDays);

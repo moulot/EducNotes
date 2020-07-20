@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -107,6 +108,7 @@ namespace EducNotes.API.Controllers
       Boolean validated = false;
 
       var user = await _userManager.FindByIdAsync(userId);
+      List<UserForDetailedDto> children = new List<UserForDetailedDto>();
       if(user != null)
       {
         if(user.EmailConfirmed)
@@ -122,12 +124,16 @@ namespace EducNotes.API.Controllers
             success = true;
           }
         }
+
+        //get children...
+        children = await _repo.GetAccountChildren(user.Id);
       }
 
       return Ok(new {
         emailOK = success,
         accountValidated = validated,
-        user
+        user,
+        children
       });
     }
 

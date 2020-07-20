@@ -309,22 +309,8 @@ namespace EducNotes.API.Controllers
         [HttpGet("{parentId}/AccountChildren")]
         public async Task<IActionResult> GetAccountChildren(int parentId)
         {
-          // MANAGEMENT OF TUITION AND NEXT YEAR TUITION TO BE TREATED!!!!!!!!!!!!!!
-          var order = await _context.Orders.FirstAsync(o => o.isReg == true && (o.MotherId == parentId || o.FatherId == parentId));
-          var usersFromDB = await _context.OrderLines
-                              .Include(i => i.Child)
-                              .Include(i => i.ClassLevel)
-                              .Where(o => o.OrderId == order.Id).ToListAsync();
-          List<UserForDetailedDto> children = new List<UserForDetailedDto>();
-          for (int i = 0; i < usersFromDB.Count(); i++)
-          {
-            var user = usersFromDB[i];
-            UserForDetailedDto child = new UserForDetailedDto();
-            child = _mapper.Map<UserForDetailedDto>(user.Child);
-            child.ClassLevelId = Convert.ToInt32(user.ClassLevelId);
-            child.ClassLevelName = user.ClassLevel.Name;
-            children.Add(child);
-          }
+          var children = await _repo.GetAccountChildren(parentId);
+
           return Ok(new {
             children,
             parentid = parentId
@@ -1538,16 +1524,6 @@ namespace EducNotes.API.Controllers
             return Ok();
 
           return BadRequest("Could not add the photo");
-        }
-
-        [HttpPost("validateChildAccounts")]
-        public async Task<IActionResult> validateChildAccounts([FromForm]ChildrenForEditDto users)
-        {
-          bool usersOk = await _repo.UpdateChildren(users);
-          if(usersOk)
-            return Ok();
-          else
-            return BadRequest("problème pour valider les enfants");
         }
 
         [HttpPost("AddTeacher")]

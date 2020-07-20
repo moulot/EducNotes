@@ -141,6 +141,7 @@ namespace EducNotes.API.Controllers
             return BadRequest("email non trouvé. Veuillez réessayer");
 
         }
+
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
@@ -241,6 +242,15 @@ namespace EducNotes.API.Controllers
             return tokenHandler.WriteToken(token);
         }
 
+        [HttpPost("validateChildAccounts")]
+        public async Task<IActionResult> validateChildAccounts([FromForm]ChildrenForEditDto users)
+        {
+          bool usersOk = await _repo.UpdateChildren(users);
+          if(usersOk)
+            return Ok();
+          else
+            return BadRequest("problème pour valider les enfants");
+        }
 
         [HttpPost("codeValidation")] // validation du code utilisateur emit a son inscription
         public async Task<IActionResult> codeValidation([FromBody]UserForCodeValidationDto userForCodeValidation)
@@ -274,8 +284,6 @@ namespace EducNotes.API.Controllers
                     //return Ok("");
 
                 }
-
-
             }
             return NotFound();
 

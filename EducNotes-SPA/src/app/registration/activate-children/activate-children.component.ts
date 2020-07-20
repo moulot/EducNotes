@@ -1,30 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
-import { AlertifyService } from 'src/app/_services/alertify.service';
-import { Utils } from 'src/app/shared/utils';
+import { Component, OnInit, Input } from '@angular/core';
+import { Validators, FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ClassService } from 'src/app/_services/class.service';
+import { AuthService } from 'src/app/_services/auth.service';
+import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from 'src/app/_services/user.service';
-import { AuthService } from 'src/app/_services/auth.service';
+import { Utils } from 'src/app/shared/utils';
 
 @Component({
-  selector: 'app-edit-children',
-  templateUrl: './edit-children.component.html',
-  styleUrls: ['./edit-children.component.scss']
+  selector: 'app-activate-children',
+  templateUrl: './activate-children.component.html',
+  styleUrls: ['./activate-children.component.scss']
 })
-export class EditChildrenComponent implements OnInit {
+export class ActivateChildrenComponent implements OnInit {
+  @Input() parentId: any;
+  @Input() children: any;
   childrenForm: FormGroup;
   birthDateMask = Utils.birthDateMask;
   phoneMask = Utils.phoneMask;
   sexOptions = [{value: 0, label: 'femme'}, {value: 1, label: 'homme'}];
   levelOptions: any[] = [];
   levels: any;
-  children: any;
   photoUrl: any[] = [];
   photoFile: File[] = [];
   userNameExist = false;
   confirmedPwd: boolean;
-  parentId: any;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private userService: UserService,
     private classService: ClassService, private route: ActivatedRoute, private router: Router,
@@ -32,18 +32,13 @@ export class EditChildrenComponent implements OnInit {
 
   ngOnInit() {
     this.createChildrenForm();
-    this.route.data.subscribe((childInfo: any) => {
-      const data =  childInfo['users'];
-      this.children = data.children;
-      this.parentId = data.parentId;
-      for (let i = 0; i < this.children.length; i++) {
-        const elt = this.children[i];
-        this.addChildItem('', elt.lastName, elt.firstName, elt.strDateOfBirth, elt.gender, elt.email, elt.phoneNumber);
-        // initialize photo file data
-        this.photoFile[i] = null;
-      }
-    });
-    this.getClassLevels();
+    for (let i = 0; i < this.children.length; i++) {
+      const elt = this.children[i];
+      this.addChildItem('', elt.lastName, elt.firstName, elt.strDateOfBirth, elt.gender, elt.email, elt.phoneNumber);
+      // initialize photo file data
+      this.photoFile[i] = null;
+    }
+  // this.getClassLevels();
   }
 
   createChildrenForm() {
@@ -71,18 +66,24 @@ export class EditChildrenComponent implements OnInit {
     children.push(this.createChildItem(username, lname, fname, dob, sex, email, cell));
   }
 
-  getClassLevels() {
-    this.classService.getLevels().subscribe(data => {
-      this.levels = data;
-      for (let i = 0; i < this.levels.length; i++) {
-        const elt = this.levels[i];
-        const level = {value: elt.id, label: elt.name};
-        this.levelOptions = [...this.levelOptions, level];
-      }
-    }, error => {
-      this.alertify.error(error);
+  getParentChildren() {
+    this.userService.getAccountChildren(this.parentId).subscribe((data: any) => {
+      this.children = data.children;
     });
   }
+
+  // getClassLevels() {
+  //   this.classService.getLevels().subscribe(data => {
+  //     this.levels = data;
+  //     for (let i = 0; i < this.levels.length; i++) {
+  //       const elt = this.levels[i];
+  //       const level = {value: elt.id, label: elt.name};
+  //       this.levelOptions = [...this.levelOptions, level];
+  //     }
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
 
   pwdValidator(index) {
     const pwd = this.childrenForm.value.children[index].pwd;
@@ -93,6 +94,9 @@ export class EditChildrenComponent implements OnInit {
       this.confirmedPwd = false;
     }
   }
+  // passwordMatchValidator(g: FormGroup) {
+  //   return g.get('pwd').value === g.get('checkpwd').value ? null : {'mismatch': true};
+  // }
 
   userNameVerification(index) {
     const userName = this.childrenForm.value.children[index].username;
@@ -139,15 +143,15 @@ export class EditChildrenComponent implements OnInit {
         formData.append('email', '');
       }
       if (child.cell) {
-        formData.append('phoneNumber', child.cell);
+        formData.append('phoneNumber', child.cell.replace(/./g, ''));
       } else {
         formData.append('phoneNumber', '');
       }
     }
 
-    this.userService.validateChildAccounts(formData).subscribe(() => {
+    this.authService.validateChildAccounts(formData).subscribe(() => {
       this.alertify.success('les comptes enfants sont valiés. merci.');
-      this.router.navigate(['/signIn']);
+      this.router.navigate(['/confirmEmail']);
     }, error => {
       this.alertify.error(error);
     });

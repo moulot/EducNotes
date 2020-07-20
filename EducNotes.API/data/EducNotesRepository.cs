@@ -127,6 +127,28 @@ namespace EducNotes.API.Data
             return user;
         }
 
+        public async Task<List<UserForDetailedDto>> GetAccountChildren(int parentId)
+        {
+          // MANAGEMENT OF TUITION AND NEXT YEAR TUITION TO BE TREATED!!!!!!!!!!!!!!
+          var order = await _context.Orders.FirstAsync(o => o.isReg == true && (o.MotherId == parentId || o.FatherId == parentId));
+          var usersFromDB = await _context.OrderLines
+                              .Include(i => i.Child)
+                              .Include(i => i.ClassLevel)
+                              .Where(o => o.OrderId == order.Id).ToListAsync();
+          List<UserForDetailedDto> children = new List<UserForDetailedDto>();
+          for (int i = 0; i < usersFromDB.Count(); i++)
+          {
+            var user = usersFromDB[i];
+            UserForDetailedDto child = new UserForDetailedDto();
+            child = _mapper.Map<UserForDetailedDto>(user.Child);
+            child.ClassLevelId = Convert.ToInt32(user.ClassLevelId);
+            child.ClassLevelName = user.ClassLevel.Name;
+            children.Add(child);
+          }
+
+          return children;
+        }
+
         public async Task<IEnumerable<User>> GetChildren(int parentId)
         {
           var userIds = await _context.UserLinks.Where(u => u.UserPId == parentId).Select(s => s.UserId).ToListAsync();
@@ -615,8 +637,10 @@ namespace EducNotes.API.Data
                 // validate user
                 var newPassword = _userManager.PasswordHasher.HashPassword(child, users.Password[i]);
                 child.PasswordHash = newPassword;
-                child.EmailConfirmed = true;
+                if(child.Email != "")
+                  child.EmailConfirmed = true;
                 child.ValidatedCode = true;
+                child.Validated = true;
                 Update(child);       
 
                 //does the current user has photo?

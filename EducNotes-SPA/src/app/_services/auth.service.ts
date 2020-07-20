@@ -116,6 +116,10 @@ export class AuthService {
       );
   }
 
+  validateChildAccounts(users: FormData) {
+    return this.http.post(this.baseUrl + 'validateChildAccounts', users);
+  }
+
   setUserLoginPassword(id: number, userData: any) {
     return this.http.post(this.baseUrl + id + '/setLoginPassword', userData)
       .pipe(

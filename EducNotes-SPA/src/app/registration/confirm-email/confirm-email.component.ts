@@ -17,6 +17,7 @@ import { Utils } from 'src/app/shared/utils';
 })
 export class ConfirmEmailComponent implements OnInit {
   user: User;
+  children: any;
   userForm: FormGroup;
   phoneForm: FormGroup;
   userNameExist = false;
@@ -27,6 +28,8 @@ export class ConfirmEmailComponent implements OnInit {
   phoneOk = false;
   parentOk = false;
   childrenOk = false;
+  username: string;
+  pwd: string;
 
   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
     private alertify: AlertifyService,  private router: Router, private accountService: AccountService) { }
@@ -96,6 +99,7 @@ export class ConfirmEmailComponent implements OnInit {
     this.accountService.confirmEmail(confirmEmail).subscribe((data: any) => {
       this.emailOK = data.emailOK;
       this.user = data.user;
+      this.children = data.children;
       this.parentOk = this.user.validatedCode;
       this.validAccount = data.accountValidated;
       this.initialValues();
@@ -127,15 +131,6 @@ export class ConfirmEmailComponent implements OnInit {
         this.userNameExist = true;
       }
     });
-  }
-
-  resultMode(val: boolean) {
-    if (val) {
-      this.alertify.success('votre mot de passe a bien été enregistré');
-      this.router.navigate(['/Home']);
-    } else {
-      this.alertify.error('erreur survenue');
-    }
   }
 
   confirmationValidator = (control: FormControl): { [ s: string ]: boolean } => {
