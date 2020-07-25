@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { Validators, FormGroup, FormArray, FormBuilder } from '@angular/forms';
 import { ClassService } from 'src/app/_services/class.service';
 import { AuthService } from 'src/app/_services/auth.service';
@@ -15,6 +15,7 @@ import { Utils } from 'src/app/shared/utils';
 export class ActivateChildrenComponent implements OnInit {
   @Input() parentId: any;
   @Input() children: any;
+  @Output() updateAccount = new EventEmitter();
   childrenForm: FormGroup;
   birthDateMask = Utils.birthDateMask;
   phoneMask = Utils.phoneMask;
@@ -151,7 +152,7 @@ export class ActivateChildrenComponent implements OnInit {
 
     this.authService.validateChildAccounts(formData).subscribe(() => {
       this.alertify.success('les comptes enfants sont valiés. merci.');
-      this.router.navigate(['/confirmEmail']);
+      this.updateAccount.emit();
     }, error => {
       this.alertify.error(error);
     });

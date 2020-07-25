@@ -1,5 +1,5 @@
 <div *ngIf="!user">
-  <div class="text-25 text-center mt-2 text-muted">CONFIRMATION DE EMAIL</div>
+  <div class="text-20 mt-2">CONFIRMATION DE EMAIL</div>
   <div class="text-center p-4">
     <i class="fad fa-exclamation-triangle fa-6x" style="--fa-secondary-opacity: 1;
       --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
@@ -14,27 +14,36 @@
 </div>
 
 <div class="text-20" *ngIf="user && !emailOK">
-  <div class="text-25 text-center mt-2 text-muted">CONFIRMATION DE EMAIL</div>
-  <div class="text-center p-4">
-    <i class="fad fa-exclamation-triangle fa-4x" style="--fa-secondary-opacity: 1;
-      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-  </div>
+  <div class="text-20 text-center mt-2">CONFIRMATION DE EMAIL</div>
   <div *ngIf="user">Bonjour
     <span  *ngIf="user.gender == 0">Mme</span>
     <span  *ngIf="user.gender == 1">Mr</span>
     {{user.lastName | titlecase}},
   </div>
-  <div>Nous n'avons pas pu valider votre email. recommencez svp.</div>
-  <div class="my-3">
+  <div class="border rounded-lg p-2">
+    <div class="row">
+      <div class="col-md-1 text-center my-auto">
+        <i class="fad fa-exclamation-triangle fa-3x" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      </div>
+      <div class="col-md-11"><div>Nous n'avons pas pu valider votre email.</div>
+        <span class="text-15">le lien que vous avez reçu dans votre email est invalide.
+          recommencez en clickant sur le lien reçu par email ou en le copiant dans votre navigateur. Si le problème persiste envoyez
+          à nouveau le email de validation en clickant sur le bouton ci-dessous.</span>
+      </div>
+    </div>
+  </div>
+  <div class="my-3 text-center">
     <button type="button" mdbBtn (click)="sendEmailToConfirm()" class="btnBlue"
-      size="sm" mdbWavesEffect>envoyer à nouveau le email de confirmation</button></div>
-  <div>Si le problème persiste veuillez nous contacter au :</div>
-  <div class="my-3 pl-3"> téléphone :<b>12.34.56.78</b></div>
-  <div class="mb-3 pl-3"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
+      mdbWavesEffect>envoyer à nouveau le email de confirmation</button>
+  </div>
+  <div class="text-16">Si le problème persiste veuillez nous contacter au :</div>
+  <div class="text-16 my-3 pl-3"> téléphone :<b>12.34.56.78</b></div>
+  <div class="text-16 mb-3 pl-3"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
 </div>
 
 <div class="row" *ngIf="emailOK">
-  <div class="col-md-12 text-16">Bonjour
+  <div class="col-md-12 text-16 mb-2">Bonjour
     <span  *ngIf="user.gender == 0">Mme</span>
     <span  *ngIf="user.gender == 1">Mr</span>
     {{user.lastName | titlecase}},
@@ -43,14 +52,14 @@
     <div class="col-md-12 text-16 my-2">finaliser svp la création de votre compte sur la plateforme Educ'Notes. 
       Vous pourrez alors effectuer des paiements et accéder à votre inscription.</div>
   </div>
-  <div class="col-md-10 my-2">
+  <div class="col-md-10 mx-auto">
     <div class="card mb-2">
       <div class="card-body">
-        <div class="col-md-12 text-16 mt-2 font-weight-bold">votre email, '{{user.email}}', est maintenant confirmé. merci!</div>
+        <div class="text-16">votre email, <b>'{{user.email}}'</b>, est maintenant confirmé. merci!</div>
       </div>
     </div>
   </div>
-  <div class="col-md-10">
+  <div class="col-md-10 mx-auto">
     <div class="card mb-2">
       <div class="card-body">
         <div *ngIf="!user.phoneNumberConfirmed">
@@ -93,7 +102,7 @@
         </div>
         <div *ngIf="user.phoneNumberConfirmed" class="row">
           <div class="col-md-12">
-            <div class="text-16">votre numéro de mobile, {{user.phoneNumber}}, est validé. merci.</div>
+            <div class="text-16">votre numéro de mobile, <b>{{user.phoneNumber}}</b>, est validé. merci!</div>
             <!-- <i class="fad fa-check fa-2x my-auto ml-2" style="border: 1px solid blue;--fa-secondary-opacity: 1;
               --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i> -->
           </div>
@@ -101,7 +110,7 @@
       </div>
     </div>
   </div>
-  <div class="col-md-10">
+  <div class="col-md-10 mx-auto">
     <div class="card mb-2">
       <div class="card-body">
         <div *ngIf="!parentOk">
@@ -173,16 +182,16 @@
           </form>
         </div>
         <div *ngIf="parentOk">
-          <div class="text-16">votre compte Educ'Notes est maintenant actif. merci</div>
+          <div class="text-16">votre compte Educ'Notes est maintenant actif. merci!</div>
         </div>
       </div>
     </div>
   </div>
-  <div *ngIf="parentOk && !validAccount" class="col-md-10">
+  <div *ngIf="parentOk && !validAccount" class="col-md-10 mx-auto">
     <div class="card">
       <div class="card-body">
         <div *ngIf="!childrenOk">
-          <app-activate-children [parentId]="user.id" [children]="children"></app-activate-children>
+          <app-activate-children [parentId]="user.id" [children]="children" (updateAccount)="updateAccount($event)"></app-activate-children>
         </div>
         <div *ngIf="childrenOk">
           
@@ -190,7 +199,14 @@
       </div>
     </div>
   </div>
+  <div *ngIf="validAccount" class="col-md-10 mx-auto">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-16">les comptes de vos enfants sont validés et actifs. merci!</div>
+      </div>
+    </div>
+  </div>
   <div *ngIf="validAccount" class="mt-4 mx-auto">
-    <button type="button" mdbBtn [routerLink]="['/home']"  class="btnBlue" mdbWavesEffect>connecter vous à votre compte</button>
+    <button type="button" mdbBtn [routerLink]="['/signIn']"  class="btnBlue" mdbWavesEffect>connecter vous à votre compte</button>
   </div>
 </div>

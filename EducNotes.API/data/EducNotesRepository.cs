@@ -623,6 +623,7 @@ namespace EducNotes.API.Data
                 var childid = users.Id[i];
                 var child = await _context.Users.Include(p => p.Photos).FirstAsync(u => u.Id == childid);
                 child.UserName = users.UserName[i];
+                child.NormalizedUserName = users.UserName[i].ToUpper();
                 child.LastName = users.LastName[i];
                 child.FirstName = users.FirstName[i];
                 child.Gender = users.Gender[i];
@@ -632,6 +633,8 @@ namespace EducNotes.API.Data
                 var year = Convert.ToInt32(dateArray[2]);
                 child.DateOfBirth = new DateTime(year, month, day);
                 child.Email = users.Email[i];
+                if(child.NormalizedEmail != null)
+                  child.NormalizedEmail = users.Email[i].ToUpper();
                 child.PhoneNumber = users.PhoneNumber[i];
                 var pwd = users.Password[i];
                 // validate user

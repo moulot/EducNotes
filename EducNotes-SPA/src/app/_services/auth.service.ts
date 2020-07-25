@@ -120,6 +120,14 @@ export class AuthService {
     return this.http.post(this.baseUrl + 'validateChildAccounts', users);
   }
 
+  getUser(id) {
+    return this.http.get(this.baseUrl + 'GetUser/' + id);
+  }
+
+  resendConfrimEmail() {
+    
+  }
+
   setUserLoginPassword(id: number, userData: any) {
     return this.http.post(this.baseUrl + id + '/setLoginPassword', userData)
       .pipe(

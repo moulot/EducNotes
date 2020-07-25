@@ -170,4 +170,13 @@ export class ConfirmEmailComponent implements OnInit {
     });
   }
 
+  updateAccount() {
+    this.authService.getUser(this.user.id).subscribe((parent: User) => {
+      this.user = parent;
+      this.validAccount = this.user.validated;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
 }

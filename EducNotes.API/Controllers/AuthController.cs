@@ -617,7 +617,14 @@ namespace EducNotes.API.Controllers
         [HttpGet("GetClasses")]
         public async Task<IActionResult> GetClasses()
         {
-            return Ok(await _context.Classes.ToListAsync());
+          return Ok(await _context.Classes.ToListAsync());
+        }
+
+        [HttpGet("GetUser/{id}")]
+        public async Task<IActionResult> GetUser(int id)
+        {
+          var user = await _repo.GetUser(id, false);
+          return Ok(user);
         }
 
         // [HttpPost("AddFile")]
