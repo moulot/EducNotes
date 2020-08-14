@@ -74,6 +74,7 @@ export class ConfirmEmailComponent implements OnInit {
   initialValues() {
     this.userForm.setValue({lastName: this.user.lastName, firstName: this.user.firstName, email: this.user.email,
       userName: '', cell: this.user.phoneNumber, pwd: '', checkpwd: ''});
+    // console.log('phone:' + this.user.phoneNumber);
     this.phoneForm.setValue({phone: this.user.phoneNumber, code: ''});
   }
 
@@ -100,8 +101,9 @@ export class ConfirmEmailComponent implements OnInit {
       this.emailOK = data.emailOK;
       this.user = data.user;
       this.children = data.children;
-      this.parentOk = this.user.validatedCode;
+      this.parentOk = this.user.validated;
       this.validAccount = data.accountValidated;
+      this.childrenOk = data.childrenValidated;
       this.initialValues();
     }, error => {
       this.alertify.error(error);
@@ -165,6 +167,15 @@ export class ConfirmEmailComponent implements OnInit {
   updateUser(): void {
     this.authService.setUserLoginPassword(this.user.id, this.userForm.value).subscribe(() => {
       this.parentOk = true;
+      this.childrenOk = true;
+      this.validAccount = this.user.validated;
+      for (let i = 0; i < this.children.length; i++) {
+        const child = this.children[i];
+        if (child.validated !== true) {
+          this.childrenOk = false;
+          break;
+        }
+      }
     }, error => {
       this.alertify.error(error);
     });

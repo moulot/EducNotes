@@ -166,7 +166,7 @@ namespace EducNotes.API.Controllers
               Period CurrentPeriod = await _repo.GetPeriodFromDate(DateTime.Now);
 
               //get school settings
-              var settings = await _repo.GetSettings(user.Id);
+              var settings = await _repo.GetSettings();
 
               return Ok(new
               {
@@ -509,6 +509,7 @@ namespace EducNotes.API.Controllers
             user.NormalizedUserName = userData.UserName.ToUpper();
             user.PasswordHash = newPassword;
             user.ValidatedCode = true;
+            user.Validated = true;
             user.ValidationDate = DateTime.Now;
             var res = await _userManager.UpdateAsync(user);
             if (res.Succeeded)

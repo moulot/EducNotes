@@ -38,7 +38,12 @@ export class AppComponent implements OnInit {
     this.userActivity = setTimeout(() => this.userInactive.next(undefined), 900000); // soit 15 minutes d'inactivité
   }
 
-  @HostListener('window:mousemove') refreshUserState() {
+  @HostListener('window:mousemove') refreshUserStateMouse() {
+    clearTimeout(this.userActivity);
+    this.setTimeout();
+  }
+
+  @HostListener('window:keypress') refreshUserStateKey() {
     clearTimeout(this.userActivity);
     this.setTimeout();
   }

@@ -145,7 +145,7 @@ export class EditChildrenComponent implements OnInit {
       }
     }
 
-    this.userService.validateChildAccounts(formData).subscribe(() => {
+    this.authService.validateChildAccounts(formData).subscribe(() => {
       this.alertify.success('les comptes enfants sont valiés. merci.');
       this.router.navigate(['/signIn']);
     }, error => {

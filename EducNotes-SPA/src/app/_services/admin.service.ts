@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { Establishment } from '../_models/establishment';
 import { DataForBroadcast } from '../_models/dataForBroadcast';
 import { DataForEmail } from '../_models/dataForEmail';
+import { Setting } from '../_models/setting';
 
 @Injectable({
   providedIn: 'root'
@@ -167,6 +168,14 @@ export class AdminService {
 
   sendEmailRegistration() {
     return this.http.post(this.baseUrl + 'admin/EmailRegistration', {});
+  }
+
+  getSettings() {
+    return this.http.get(this.baseUrl + 'admin/Settings');
+  }
+
+  updateSettings(settings: Setting[]) {
+    return this.http.post(this.baseUrl + 'admin/UpdateSettings', settings);
   }
 
   // saveImportedTeacher(importedParents, insertUserId) {

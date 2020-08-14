@@ -714,8 +714,7 @@ namespace EducNotes.API.Controllers
                 {
                   users = await _context.Users
                     .Where(u => classIds.Contains(Convert.ToInt32(u.ClassId)) && u.Active == 1 &&
-                      u.UserTypeId == studentTypeId && u.EmailConfirmed == true)
-                    .ToListAsync();
+                    u.UserTypeId == studentTypeId && u.EmailConfirmed == true).ToListAsync();
                 }
 
                 if (ut == studentTypeId)
@@ -1195,10 +1194,25 @@ namespace EducNotes.API.Controllers
                     return NoContent();
             }
 
-
             return BadRequest();
         }
 
+        [HttpGet("Settings")]
+        public async Task<IActionResult> GetSettings()
+        {
+          var settings = await _repo.GetSettings();
+          return Ok(settings);
+        }
+
+        [HttpPost("UpdateSettings")]
+        public async Task<IActionResult> UpdateSettings(List<Setting> settings)
+        {
+          _context.UpdateRange(settings);
+          if(await _repo.SaveAll())
+            return Ok();
+
+          return BadRequest("problème pour metre à jour les paramètres");
+        }
     }
 
 }

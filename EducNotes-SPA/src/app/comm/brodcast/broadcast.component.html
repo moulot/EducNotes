@@ -1,7 +1,7 @@
 <div class="row">
 
   <div class="col-md-9">
-    <p class="lead mb-1">admin - communication. e-mails de diffusion</p>
+    <p class="text-18 mb-1">admin - communication. e-mails de diffusion</p>
   </div>
 
   <div [@animate]="{value:'*', params:{delay: 300+'ms', y:'80px'}}" class="col-lg-12 col-md-12">
@@ -11,22 +11,62 @@
         <div class="col-md-12">
           <div class="row">
 
-            <div class="col-md-12 mb-2">
+            <div *ngIf="showTo" class="col-md-12 mb-2">
               <div class="card">
                 <div class="card-body p-2">
-                  <div class="text-15 text-muted">destinataires...</div>
-                  <hr class="my-1" style="background-color: #f89f20;">
                   <div class="row">
+                    <div class="col-md-10 text-16 text-muted my-auto">destinataires...</div>
+                    <div class="col-md-2 my-auto"> 
+                      <div class="text-right">
+                        <button type="button" (click)="getRecipients()" mdbBtn size="sm"
+                          [disabled]="emailForm.hasError('usersNOK')" class="btnBlue" mdbWavesEffect>OK</button>
+                      </div>
+                    </div>
+                    <div class="col-md-12">
+                      <hr class="my-1" style="background-color: #f89f20;">
+                    </div>
                     <div formArrayName="userTypes" *ngFor="let ut of emailForm.get('userTypes')['controls'];
-                      let i = index;" class="col-md-2">
+                      let i = index;" class="col-md-2 my-auto">
                       <div [formGroupName]="i">
                         <mdb-checkbox formControlName="active">{{ut.value.name}}</mdb-checkbox>
                       </div>
                     </div>
                   </div>
-                  <div class="text-15 text-muted mt-2">groupes...</div>
-                  <hr class="my-1" style="background-color: #f89f20;">
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="!showTo" class="col-md-12 mb-2">
+              <div class="card">
+                  <div class="card-body p-2">
+                    <div class="row">
+                    <div class="col-md-9 my-auto">
+                      <div class="text-16 text-muted">destinataires: <b>{{this.toData}}</b></div>
+                    </div>
+                    <div class="col-md-3 my-auto">
+                      <div class="text-right">
+                        <button type="button" (click)="showToForm()" mdbBtn size="sm" class="btnBlue" mdbWavesEffect>modifier</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="showGroups" class="col-md-12 mb-2">
+              <div class="card">
+                <div class="card-body p-2">
                   <div class="row">
+                    <div class="col-md-10 text-16 text-muted my-auto">groupes...</div>
+                    <div class="col-md-2 my-auto"> 
+                      <div class="text-right">
+                        <button type="button" (click)="getGroups()" mdbBtn size="sm"
+                          [disabled]="emailForm.hasError('classesNOK')" class="btnBlue" mdbWavesEffect>OK</button>
+                      </div>
+                    </div>
+                    <div class="col-md-12">
+                      <hr class="my-1" style="background-color: #f89f20;">
+                    </div>
                     <div class="col-md-2"><b>niveau education</b></div>
                     <div formArrayName="educLevels" *ngFor="let el of emailForm.get('educLevels')['controls'];
                       let i = index;" class="col-md-2">
@@ -45,7 +85,7 @@
                       </div>
                     </div>
                   </div>
-                  <hr class="my-1">
+                  <!-- <hr class="my-1">
                   <div class="row">
                     <div class="col-md-2"><b>cycles</b></div>
                     <div formArrayName="cycles" *ngFor="let cycle of emailForm.get('cycles')['controls'];
@@ -54,7 +94,7 @@
                         <mdb-checkbox (change)="cycleSelect(cycle.value)" formControlName="active">{{cycle.value.name}}</mdb-checkbox>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                   <hr class="my-1">
                   <div class="row">
                     <div class="col-md-2"><b>niveau classe</b></div>
@@ -62,7 +102,9 @@
                       <div class="row">
                         <div formArrayName="classLevels" *ngFor="let cl of emailForm.get('classLevels')['controls'];
                           let i = index;" class="col-md-2">
-                          <div [formGroupName]="i"><mdb-checkbox formControlName="active">{{cl.value.name}}</mdb-checkbox></div>
+                          <div [formGroupName]="i">
+                            <mdb-checkbox (change)="classLevelSelect(cl.value)" formControlName="active">{{cl.value.name}}</mdb-checkbox>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -75,7 +117,7 @@
                         <div formArrayName="classes" *ngFor="let class of emailForm.get('classes')['controls'];
                           let i = index;" class="col-md-2">
                           <div [formGroupName]="i">
-                            <mdb-checkbox formControlName="active">{{class.value.name}}</mdb-checkbox>
+                            <mdb-checkbox formControlName="selected">{{class.value.name}}</mdb-checkbox>
                           </div>
                         </div>
                       </div>
@@ -85,33 +127,51 @@
               </div>
             </div>
 
+            <div *ngIf="!showGroups" class="col-md-12 mb-2">
+              <div class="card">
+                  <div class="card-body p-2">
+                    <div class="row">
+                    <div class="col-md-9 my-auto">
+                      <div class="text-16 text-muted">classes: <b>{{groupData}}</b></div>
+                    </div>
+                    <div class="col-md-3 my-auto">
+                      <div class="text-right">
+                        <button type="button" (click)="showGroupForm()" mdbBtn size="sm" class="btnBlue" mdbWavesEffect>modifier</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="col-md-12">
               <div class="card">
                 <div class="card-body">
-                  <div class="row">                                      
+                  <div class="row">
+
                     <div class="col-md-12">
                       <div class="border rounded-lg p-2 mb-2">
                         <div class="row">
-                          <div class="col-md-12 mb-2 pl-0">
-                            <div class="form-check form-check-inline">
-                              <input type="radio" class="form-check-input" id="absence" value="1"
-                                (change)="selectBody()" formControlName="type" name="type" [checked]="true" mdbInput>
-                              <label class="form-check-label pl-4" for="absence">template</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <input type="radio" class="form-check-input" id="late" value="2"
-                                (change)="selectBody()" formControlName="type" name="type" mdbInput>
-                              <label class="form-check-label pl-4" for="late">texte libre</label>
-                            </div>
-                            <!-- <div *ngIf="absenceForm.get('type').errors && absenceForm.get('type').touched"
-                              class="text-small text-danger">choisir le type</div> -->
-                          </div>
                           <div class="col-md-7 mb-2">
                             <div class="form-group shadow-textarea">
                               <textarea class="form-control z-depth-1" id="subject" formControlName="subject"
                                 rows="1" placeholder="objet du email..."></textarea>
                             </div>
-                          </div>      
+                          </div>
+                          <div class="col-md-12 mb-2 pl-0">
+                            <div class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" id="template" value="1"
+                                (change)="selectBody()" formControlName="type" name="type" [checked]="true" mdbInput>
+                              <label class="form-check-label pl-4" for="template">template</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" id="txt" value="2"
+                                (change)="selectBody()" formControlName="type" name="type" mdbInput>
+                              <label class="form-check-label pl-4" for="txt">texte libre</label>
+                            </div>
+                            <!-- <div *ngIf="absenceForm.get('type').errors && absenceForm.get('type').touched"
+                              class="text-small text-danger">choisir le type</div> -->
+                          </div>
                           <div *ngIf="bodyType == 1" class="col-md-7 mb-3">
                             <mdb-select [options]="templateOptions" formControlName="template"
                               (ngModelChange)="setTemplateData()"  placeholder="choisir le modèle d'email"></mdb-select>
@@ -119,16 +179,16 @@
                           <div *ngIf="bodyType == 2" class="col-md-12">
                             <div class="form-group shadow-textarea">
                               <textarea class="form-control z-depth-1" id="body" formControlName="body"
-                                rows="10" placeholder="message du email..."></textarea>
+                                rows="5" placeholder="message du email..."></textarea>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-  
-                    <div class="col-md-12 mb-2">
-                      <button type="submit" size="sm" mdbBtn color="primary" mdbWavesEffect [disabled]="!emailForm.valid || showWarning"
-                        class="btn btn-block">envoyer email</button>
+
+                    <div class="col-md-12 mb-1">
+                      <button type="submit" size="sm" mdbBtn class="btnBlue" block="true" mdbWavesEffect
+                        [disabled]="!emailForm.valid || emailForm.hasError('formNOK')">envoyer email</button>
                     </div>
                   </div>                  
                 </div>

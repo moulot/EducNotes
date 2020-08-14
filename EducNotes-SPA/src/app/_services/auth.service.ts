@@ -125,7 +125,7 @@ export class AuthService {
   }
 
   resendConfrimEmail() {
-    
+
   }
 
   setUserLoginPassword(id: number, userData: any) {
@@ -165,7 +165,11 @@ export class AuthService {
   }
 
   accountValidated() {
-    return this.currentUser.validated;
+    if (this.loggedIn() === true) {
+      return this.currentUser.validated;
+    } else {
+      return false;
+    }
   }
 
   parentLoggedIn() {

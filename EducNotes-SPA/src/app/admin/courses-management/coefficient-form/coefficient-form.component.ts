@@ -57,7 +57,6 @@ export class CoefficientFormComponent implements OnInit {
     });
   }
 
-
   getCourses() {
     this.classService.getAllCourses().subscribe((res: any[]) => {
       for (let i = 0; i < res.length; i++) {

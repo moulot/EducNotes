@@ -109,6 +109,7 @@ namespace EducNotes.API.Controllers
 
       var user = await _userManager.FindByIdAsync(userId);
       List<UserForDetailedDto> children = new List<UserForDetailedDto>();
+      bool childrenValidated = true;
       if(user != null)
       {
         if(user.EmailConfirmed)
@@ -127,13 +128,22 @@ namespace EducNotes.API.Controllers
 
         //get children...
         children = await _repo.GetAccountChildren(user.Id);
+        foreach (var child in children)
+        {
+          if(!child.Validated)
+          {
+            childrenValidated = false;
+            break;
+          }
+        }
       }
 
       return Ok(new {
         emailOK = success,
         accountValidated = validated,
         user,
-        children
+        children,
+        childrenValidated
       });
     }
 

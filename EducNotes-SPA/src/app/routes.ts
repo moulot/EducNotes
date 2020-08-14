@@ -121,6 +121,9 @@ import { ContactUsComponent } from './contactus/contact-us/contact-us.component'
 import { EditChildrenComponent } from './users/edit-children/edit-children.component';
 import { EditChildrenResolver } from './_resolvers/edit-children-resolver';
 import { InvalidAccountComponent } from './registration/invalid-account/invalid-account.component';
+import { TreasuryComponent } from './admin/treso/treasury/treasury.component';
+import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
+import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -189,7 +192,8 @@ export const appRoutes: Routes = [
         { path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve: { classes: LevelClassesResolver } },
         { path: 'studentGrades/:id', component: GradeStudentComponent}, // , resolve: { student: StudentResolver } },
         { path: 'studentGradesP/:id', component: GradeStudentComponent},
-        { path: 'tuition', component: TuitionPanelComponent },
+        { path: 'tuitions', component: TuitionPanelComponent },
+        { path: 'treasury', component: TreasuryComponent },
         { path: 'productsList', component: ProductsListComponent, resolve: { products: ProductsListResolver } },
         { path: 'createProduct', component: ProductFormComponent },
         { path: 'editProduct/:id', component: ProductFormComponent, resolve: { product: ProductFormResolver } },
@@ -227,7 +231,8 @@ export const appRoutes: Routes = [
         { path: 'checkout/:id', component: CheckoutComponent, resolve: {order: CheckoutResolver}},
         { path: 'newTuition', component: NewTuitionComponent},
         { path: 'invalidAccount', component: InvalidAccountComponent},
-        { path: 'editChildren/:id', component: EditChildrenComponent, resolve: {users: EditChildrenResolver}}
+        { path: 'editChildren/:id', component: EditChildrenComponent, resolve: {users: EditChildrenResolver}},
+        { path: 'settings', component: SchoolSettingsComponent, resolve: {settings: SchoolSettingsResolver}}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

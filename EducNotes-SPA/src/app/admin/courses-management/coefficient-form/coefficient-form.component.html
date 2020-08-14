@@ -1,28 +1,28 @@
 <div class="row justify-content-center align-items-center mt-3"  [@animate]="{value:'*',params:{delay: 100+'ms', y:'50px'}}">
  
   <div class="col-md-8" >
-      <div class="card p-3">
-              <form  [formGroup]="coefficientForm" (ngSubmit)="save()">
-                      <div class="md-form">
-                        <mdb-select id="levelId" [options]="levels"  placeholder="Choisir le niveau"  formControlName="classLevelId"></mdb-select>
-                      </div>
-                      <div class="md-form">
-                        <mdb-select id="courseId" [options]="courses"  placeholder="Choisir le cours"  formControlName="courseId"></mdb-select>
-                      </div>
-                  
-                      <div class="md-form">
-                        <mdb-select id="typeId" [options]="classTypes"  placeholder="Choisir le type de classe"  formControlName="classTypeId"></mdb-select>
-                      </div>
-                  
-                     <div class="md-form">
-                        <input type="number" class="form-control" id="coefficient" formControlName="coefficient" class="form-control" mdbInput>
-                        <label for="coefficient">Entrer le coéfficient</label>
-                     </div>
-                      
-                      <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!coefficientForm.valid" mdbWavesEffect>enregistrer</button>
-                      <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect [routerLink]="['/coefficients']" >annuler</button>
-                  </form>
-      </div>
+    <div class="card p-3">
+      <form  [formGroup]="coefficientForm" (ngSubmit)="save()">
+        <div class="md-form">
+          <mdb-select id="levelId" [options]="levels"  placeholder="Choisir le niveau"  formControlName="classLevelId"></mdb-select>
+        </div>
+        <div class="md-form">
+          <mdb-select id="courseId" [options]="courses"  placeholder="Choisir le cours"  formControlName="courseId"></mdb-select>
+        </div>
+    
+        <div class="md-form">
+          <mdb-select id="typeId" [options]="classTypes"  placeholder="Choisir le type de classe"  formControlName="classTypeId"></mdb-select>
+        </div>
+    
+        <div class="md-form">
+          <input type="number" class="form-control" id="coefficient" formControlName="coefficient" class="form-control" mdbInput>
+          <label for="coefficient">Entrer le coéfficient</label>
+        </div>
+        
+        <button type="submit" mdbBtn color="primary" size="sm" [disabled]="!coefficientForm.valid" mdbWavesEffect>enregistrer</button>
+        <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect [routerLink]="['/coefficients']" >annuler</button>
+      </form>
+    </div>
   </div>
 </div>
 

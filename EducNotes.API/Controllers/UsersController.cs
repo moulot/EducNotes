@@ -1743,5 +1743,43 @@ namespace EducNotes.API.Controllers
           return BadRequest("problème pour valider l'inscription");
         }
 
+        [HttpGet("searchData")]
+        public async Task<IActionResult> searchData()
+        {
+          var users = await _context.Users
+                            .Include(i => i.Photos)
+                            .Include(i => i.Class)
+                            .ToListAsync();
+
+          List<SearchUsersDataDto> data = new List<SearchUsersDataDto>();
+          List<string> data1 = new List<string>();
+          foreach (var user in users)
+          {
+            int userid = user.Id;
+            string fname = user.FirstName == null ? "" : user.FirstName;
+            string lname = user.LastName == null ? "" : user.LastName;
+            string idNum = user.IdNum == null ? "" : user.IdNum;
+            string className = "";
+            if(user.Class != null)
+              className = user.Class.Name;
+            string photoUrl = "";
+            if(user.Photos.Count() > 0)
+              photoUrl = user.Photos.FirstOrDefault(p => p.IsMain).Url;
+            SearchUsersDataDto sudd = new SearchUsersDataDto();
+            sudd.UserId = userid;
+            sudd.FirstName = fname;
+            sudd.LastName = lname;
+            sudd.IDNum = idNum;
+            sudd.ClassName = className;
+            sudd.PhotoUrl = photoUrl;
+            data.Add(sudd);
+
+            if(fname != null) {data1.Add(fname.ToLower());};
+            if(lname != null) {data1.Add(lname.ToLower());}
+            if(idNum != null) {data1.Add(idNum.ToLower());}
+          }
+
+          return Ok(data);
+        }
     }
 }

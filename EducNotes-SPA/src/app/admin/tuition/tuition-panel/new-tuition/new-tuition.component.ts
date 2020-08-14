@@ -95,13 +95,13 @@ export class NewTuitionComponent implements OnInit {
     this.tuitionForm = this.fb.group({
       fLastName: ['moulot', Validators.required],
       fFirstName: ['georges', Validators.required],
-      fEmail: ['gmoulot@hotmail.com', Validators.required],
-      fCell: ['12345678', Validators.required],
+      fEmail: ['georges.moulot@albatrostechnologies.com', Validators.required],
+      fCell: ['07104446', Validators.required],
       // fSendEmail: [false],
       mLastName: ['moulot', Validators.required],
       mFirstName: ['jacqueline', Validators.required],
-      mEmail: ['jm@hotmail.com', Validators.required],
-      mCell: ['34566554', Validators.required],
+      mEmail: ['georges.moulot@albatrostechnologies.com', Validators.required],
+      mCell: ['07104446', Validators.required],
       // mSendEmail: [false],
       children: this.fb.array([])
     }, {validator: this.formValidator});
@@ -275,13 +275,13 @@ export class NewTuitionComponent implements OnInit {
     const tuitionData = <TuitionData>{};
     tuitionData.fLastName = this.tuitionForm.value.fLastName;
     tuitionData.fFirstName = this.tuitionForm.value.fFirstName;
-    tuitionData.fCell = this.tuitionForm.value.fCell.replace(/./g, '');
+    tuitionData.fCell = this.tuitionForm.value.fCell.replace(/\./g, '');
     tuitionData.fEmail = this.tuitionForm.value.fEmail;
     // tuitionData.fSendEmail = this.tuitionForm.value.fSendEmail;
     tuitionData.fActive = this.tuitionForm.hasError('fathererror') === true ? false : true;
     tuitionData.mLastName = this.tuitionForm.value.mLastName;
     tuitionData.mFirstName = this.tuitionForm.value.mFirstName;
-    tuitionData.mCell = this.tuitionForm.value.mCell.replace(/./g, '');
+    tuitionData.mCell = this.tuitionForm.value.mCell.replace(/\./g, '');
     tuitionData.mEmail = this.tuitionForm.value.mEmail;
     // tuitionData.mSendEmail = this.tuitionForm.value.mSendEmail;
     tuitionData.mActive = this.tuitionForm.hasError('mothererror') === true ? false : true;

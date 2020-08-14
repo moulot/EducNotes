@@ -65,7 +65,7 @@
         <div *ngIf="!user.phoneNumberConfirmed">
           <form [formGroup]="phoneForm" (ngSubmit)="validatePhone()">
             <div *ngIf="phoneValidationSteps == 0" class="row">
-              <div class="text-15 text-danger">pour le valider le numéro de votre mobile vous recevrez un code par sms à saisir ici.</div>
+              <div class="col-md-12 text-15 text-danger">pour valider le numéro de votre mobile vous recevrez un code par sms à saisir ici.</div>
               <div class="col-md-6">
                 
                   <div class="md-form mt-3 mb-0">
@@ -84,12 +84,14 @@
               </div>
             </div>
             <div *ngIf="phoneValidationSteps == 1" class="row">
+              <div class="col-md-12 text-15 text-danger">saisir le code reçu par sms sur votre mobile.</div>
               <div class="col-md-6">
                 <div>
                   <div class="md-form mt-3 mb-0">
                     <input mdbInput type="text" id="code" class="form-control" formControlName="code" mdbValidate>
                     <label for="code" class="">saisir le code</label>
-                    <div *ngIf="phoneForm.get('code').hasError('empty')" class="text-small text-danger">saisir le code de validation svp</div>
+                    <div *ngIf="phoneForm.get('code').hasError('empty') && phoneForm.get('code').touched"
+                      class="text-small text-danger">saisir le code de validation svp</div>
                   </div>
                 </div>
               </div>
@@ -187,7 +189,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="parentOk && !validAccount" class="col-md-10 mx-auto">
+  <div *ngIf="parentOk && !childrenOk" class="col-md-10 mx-auto">
     <div class="card">
       <div class="card-body">
         <div *ngIf="!childrenOk">
@@ -199,14 +201,14 @@
       </div>
     </div>
   </div>
-  <div *ngIf="validAccount" class="col-md-10 mx-auto">
+  <div *ngIf="childrenOk" class="col-md-10 mx-auto">
     <div class="card">
       <div class="card-body">
         <div class="text-16">les comptes de vos enfants sont validés et actifs. merci!</div>
       </div>
     </div>
   </div>
-  <div *ngIf="validAccount" class="mt-4 mx-auto">
+  <div *ngIf="parentOk && childrenOk" class="mt-4 mx-auto">
     <button type="button" mdbBtn [routerLink]="['/signIn']"  class="btnBlue" mdbWavesEffect>connecter vous à votre compte</button>
   </div>
 </div>

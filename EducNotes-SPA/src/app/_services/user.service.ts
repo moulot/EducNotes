@@ -318,4 +318,8 @@ constructor(private http: HttpClient) {}
   validateRegistration(order: OrderToValidate) {
     return this.http.post(this.baseUrl + 'users/ValidateRegistration', order);
   }
+
+  searchData() {
+    return this.http.get(this.baseUrl + 'users/searchData');
+  }
 }

@@ -1,0 +1,34 @@
+<div class="animated zoomInDown">
+  <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
+    <div class="row">
+      <div class="col-md-12">
+        <a [routerLink]="['/home']">
+          <i class="fad fa-home-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        </a> 
+        <span class="text-17 mb-2">paramètres de l'école</span>
+      </div>
+      <div class="col-md-12"><button type="submit" mdbBtn block="true" size="sm" class="btnBlue" mdbWavesEffect>enregistrer</button></div>
+        <div class="col-md-6 my-2" formArrayName="settings" *ngFor="let setting of settingsForm.get('settings')['controls']; let i = index;">
+          <div [formGroupName]="i">
+            <div class="card">
+              <div class="card-body p-2">
+                <!-- <div class="row col-md-6 text-17"> -->
+                  <div class="row">
+                    <div class="col-md-8 text-16 d-flex align-items-end">{{setting.value.displayName}}</div>
+                    <div class="col-md-4">
+                      <div class="md-form mt-0 mb-1">
+                        <input mdbInput type="text" id="value" class="form-control" formControlName="value">
+                        <label for="value">valeur</label>
+                      </div>
+                    </div>
+                  </div>
+                <!-- </div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      <div class="col-md-12 mb-2"><button type="submit" mdbBtn block="true" size="sm" class="btnBlue" mdbWavesEffect>enregistrer</button></div>
+  </div>
+</form>
+</div>

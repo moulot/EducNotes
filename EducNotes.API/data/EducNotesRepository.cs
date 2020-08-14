@@ -640,55 +640,58 @@ namespace EducNotes.API.Data
                 // validate user
                 var newPassword = _userManager.PasswordHasher.HashPassword(child, users.Password[i]);
                 child.PasswordHash = newPassword;
-                if(child.Email != "")
+                if(child.Email != "" && child.Email != null)
                   child.EmailConfirmed = true;
                 child.ValidatedCode = true;
                 child.Validated = true;
-                Update(child);       
+                Update(child);
+                resultStatus = true;
 
                 //does the current user has photo?
-                var photoIndex = users.PhotoIndex.IndexOf(childid);
-                if(photoIndex != -1)
+                if(users.PhotoIndex != null)
                 {
-                  var photoFile = users.PhotoFiles[photoIndex];
-                  if (photoFile.Length > 0)
+                  var photoIndex = users.PhotoIndex.IndexOf(childid);
+                  if(photoIndex != -1)
                   {
-                    var uploadResult = new ImageUploadResult();
-                    using (var stream = photoFile.OpenReadStream())
+                    var photoFile = users.PhotoFiles[photoIndex];
+                    if (photoFile.Length > 0)
                     {
-                      var uploadParams = new ImageUploadParams()
+                      var uploadResult = new ImageUploadResult();
+                      using (var stream = photoFile.OpenReadStream())
                       {
-                        File = new FileDescription(photoFile.Name, stream),
-                        Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
-                      };
-
-                      uploadResult = _cloudinary.Upload(uploadParams);
-                      if (uploadResult.StatusCode == HttpStatusCode.OK)
-                      {
-                        //remove tag 'Main' from child photo if it exists
-                        if (child.Photos.Any(u => u.IsMain))
+                        var uploadParams = new ImageUploadParams()
                         {
-                          var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == child.Id && p.IsMain == true);
-                          oldPhoto.IsMain = false;
-                          Update(oldPhoto);
+                          File = new FileDescription(photoFile.Name, stream),
+                          Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+                        };
+
+                        uploadResult = _cloudinary.Upload(uploadParams);
+                        if (uploadResult.StatusCode == HttpStatusCode.OK)
+                        {
+                          //remove tag 'Main' from child photo if it exists
+                          if (child.Photos.Any(u => u.IsMain))
+                          {
+                            var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == child.Id && p.IsMain == true);
+                            oldPhoto.IsMain = false;
+                            Update(oldPhoto);
+                          }
+                          Photo photo = new Photo();
+                          photo.Url = uploadResult.Uri.ToString();
+                          photo.PublicId = uploadResult.PublicId;
+                          photo.UserId = child.Id;
+                          photo.DateAdded = DateTime.Now;
+                          photo.IsMain = true;
+                          photo.IsApproved = true;
+                          Add(photo);
                         }
-                        Photo photo = new Photo();
-                        photo.Url = uploadResult.Uri.ToString();
-                        photo.PublicId = uploadResult.PublicId;
-                        photo.UserId = child.Id;
-                        photo.DateAdded = DateTime.Now;
-                        photo.IsMain = true;
-                        photo.IsApproved = true;
-                        Add(photo);
                       }
                     }
                   }
+                  else
+                  {
+                    resultStatus = true;
+                  }
                 }
-                else
-                {
-                  resultStatus = true;
-                }
-
               }
 
               User parent = await _context.Users.FirstAsync(u => u.Id == users.ParentId);
@@ -2297,7 +2300,7 @@ namespace EducNotes.API.Data
 
         }
 
-        public async Task<IEnumerable<Setting>> GetSettings(int userId)
+        public async Task<IEnumerable<Setting>> GetSettings()
         {
           var settings = await _context.Settings.OrderBy(s => s.Name).ToListAsync();
           return settings;

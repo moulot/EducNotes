@@ -1,65 +1,58 @@
+<div class="row centerOnScreen">
+  <div class="col-lg-3 col-md-6 col-sm-6 mb-1 text-center">
+    <button type="button" mdbBtn class="btnBlue px-1" [routerLink]="['/tuitions']"  size="sm" block="true" mdbWavesEffect>
+      <i class="fad fa-user-plus fa-2x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>      
+      <span class="text-17 text-lowercase">inscriptions</span>
+    </button>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6 mb-1 text-center">
+    <button type="button" mdbBtn class="btnBlue px-1" [routerLink]="['/broadcast']"  size="sm" block="true" mdbWavesEffect>
+      <i class="fad fa-at fa-2x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+      <span class="text-17 text-lowercase">emails de diffusion</span>
+    </button>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6 mb-1 text-center">
+    <button type="button" mdbBtn class="btnWhiteB px-1" size="sm" block="true" mdbWavesEffect>
+      <i class="fad fa-chalkboard-teacher fa-2x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <span class="text-17 text-lowercase">enseignants</span>
+    </button>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6 mb-1 text-center">
+    <button type="button" mdbBtn class="btnWhiteB px-1" size="sm" block="true" mdbWavesEffect>
+      <i class="fad fa-users-cog fa-2x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <span class="text-17 text-lowercase">employés</span>
+    </button>
+  </div>
+</div>
+
 <div class="row">
-  <!-- ICON BG -->
-  <div class="col-lg-3 col-md-6 col-sm-6 mb-1">
-    <div class="card">
-      <div class="card-body p-2">
-        <div class="d-flex ml-4">
-          <i class="fad fa-user-check fa-3x mr-3" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-          <div>
-            <p class="text-17 text-muted line-height-1 mb-1">élèves inscrits</p>
-            <p class="text-24 text-primary line-height-1 mt-0 mb-0">{{students?.totalActive}}/{{students?.totalAccount}}</p>
+  <div class="box_content centerOnScreen">
+    <div class="col-md-9">
+      <form [formGroup]="searchForm" (ngSubmit)="search()">
+        <div class="md-form mb-1">
+          <input type="text" id="searchData" class="completer-input form-control mdb-autocomplete mb-0"
+            [mdbAutoCompleter]="auto"
+            autocomplete="off"
+            placeholder="rechercher un dossier"
+            formControlName="searchData" />
+          <!-- <label class="text-20" for="searchData">rechercher un dossier</label> -->
+          <mdb-auto-completer #auto="mdbAutoCompleter" textNoResults="aucun résultat trouvé :(">
+            <mdb-option *ngFor="let option of results | async" [value]="option.idNum + ' - ' + option.lastName + ' ' + option.firstName">
+              <div class="d-flex">
+                <div class="mr-1" style="border: 1px solid blue;">
+                  <img src="{{option.photoUrl || '../../../../../../assets/user.png'}}" alt="" style="width: 40px;" class="rounded-circle z-depth-0">
+                </div>
+                <div class="d-flex flex-column" style="border: 1px solid blue;">
+                  <strong>nom: {{ option.lastName }} {{ option.firstName }} ({{option.className}})</strong>
+                  <small>matricule: {{ option.idNum }}</small>
+                </div>
+              </div>
+              <!-- {{ option }} -->
+            </mdb-option>
+          </mdb-auto-completer>
           </div>
-        </div>
-      </div>
+      </form>
+      <p class="text-15 text-danger mt-0">recherche par matricule, nom, prénom ou classe...</p>
     </div>
   </div>
-  <div class="col-lg-3 col-md-6 col-sm-6 mb-1">
-    <div class="card">
-      <div class="card-body p-2">
-        <div class="d-flex ml-4">
-          <i class="fad fa-user-friends fa-3x mr-3" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-          <div>
-            <p class="text-17 text-muted line-height-1 mb-1">parents inscrits</p>
-            <p class="text-24 text-primary line-height-1 mt-0 mb-0">{{parents?.totalActive}}/{{parents?.totalAccount}}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-lg-3 col-md-6 col-sm-6 mb-1">
-    <div class="card">
-      <div class="card-body p-2">
-        <div class="d-flex ml-4">
-          <i class="fad fa-chalkboard-teacher fa-3x mr-3" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-          <div>
-            <p class="text-17 text-muted line-height-1 mb-1">enseignants inscrits</p>
-            <p class="text-24 text-primary line-height-1 mt-0 mb-0">{{teachers?.totalActive}}/{{teachers?.totalAccount}}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-lg-3 col-md-6 col-sm-6 mb-1">
-    <div class="card">
-      <div class="card-body p-2">
-        <div class="d-flex ml-4">
-          <i class="fad fa-users-cog fa-3x mr-3" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-          <div>
-            <p class="text-17 text-muted line-height-1 mb-1">employés</p>
-            <p class="text-24 text-primary line-height-1 mt-0 mb-0">{{admins?.totalActive}}/{{admins?.totalAccount}}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-12 mt-3">
-  <p class="mr-1 card-title">récapitulatif des inscriptions</p>
-    <app-inscription-panel></app-inscription-panel>
-  </div>
-  <div class="col-md-12">
-    <app-account-history></app-account-history>
-  </div>
-  
-
 </div>

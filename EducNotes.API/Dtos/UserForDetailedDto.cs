@@ -34,6 +34,7 @@ namespace EducNotes.API.Dtos
         public string userTypeName { get; set; }
         public int userTypeId { get; set; }
         public bool ValidatedCode { get; set; }
+        public bool Validated { get; set; }
         public double Avg { get; set; }
         private ICollection<Photo> photos;
         public ICollection<AgendaForListDto> AgendaItems { get; set; }
