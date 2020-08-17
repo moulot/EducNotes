@@ -124,6 +124,7 @@ import { InvalidAccountComponent } from './registration/invalid-account/invalid-
 import { TreasuryComponent } from './admin/treso/treasury/treasury.component';
 import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
 import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
+import { UserFileComponent } from './admin/user-file/user-file.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -232,7 +233,8 @@ export const appRoutes: Routes = [
         { path: 'newTuition', component: NewTuitionComponent},
         { path: 'invalidAccount', component: InvalidAccountComponent},
         { path: 'editChildren/:id', component: EditChildrenComponent, resolve: {users: EditChildrenResolver}},
-        { path: 'settings', component: SchoolSettingsComponent, resolve: {settings: SchoolSettingsResolver}}
+        { path: 'settings', component: SchoolSettingsComponent, resolve: {settings: SchoolSettingsResolver}},
+        { path: 'userFile/:id', component: UserFileComponent }
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

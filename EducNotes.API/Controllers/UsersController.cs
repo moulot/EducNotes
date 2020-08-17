@@ -1743,21 +1743,21 @@ namespace EducNotes.API.Controllers
           return BadRequest("problème pour valider l'inscription");
         }
 
-        [HttpGet("searchData")]
-        public async Task<IActionResult> searchData()
+        [HttpGet("LoadStudents")]
+        public async Task<IActionResult> loadStuentData()
         {
           var users = await _context.Users
                             .Include(i => i.Photos)
                             .Include(i => i.Class)
+                            .Where(u => u.UserTypeId == studentTypeId)
                             .ToListAsync();
 
           List<SearchUsersDataDto> data = new List<SearchUsersDataDto>();
-          List<string> data1 = new List<string>();
           foreach (var user in users)
           {
             int userid = user.Id;
-            string fname = user.FirstName == null ? "" : user.FirstName;
-            string lname = user.LastName == null ? "" : user.LastName;
+            string fname = user.FirstName == null ? "" : user.FirstName.ToLower().FirstLetterToUpper();
+            string lname = user.LastName == null ? "" : user.LastName.ToLower().FirstLetterToUpper();
             string idNum = user.IdNum == null ? "" : user.IdNum;
             string className = "";
             if(user.Class != null)
@@ -1773,13 +1773,97 @@ namespace EducNotes.API.Controllers
             sudd.ClassName = className;
             sudd.PhotoUrl = photoUrl;
             data.Add(sudd);
-
-            if(fname != null) {data1.Add(fname.ToLower());};
-            if(lname != null) {data1.Add(lname.ToLower());}
-            if(idNum != null) {data1.Add(idNum.ToLower());}
-          }
+         }
 
           return Ok(data);
+        }
+
+        [HttpPost("LoadUserFile")]
+        public async Task<IActionResult> LoadUserFile(UserFileDataDto userFileDataDto)
+        {
+          var childId = userFileDataDto.UserId;
+          var searchData = userFileDataDto.SearchData;
+
+          var childFromRepo = await _repo.GetUser(childId, false);
+          var child = _mapper.Map<UserForDetailedDto>(childFromRepo);
+
+          UserForFileDto userFile = new UserForFileDto();
+          userFile.Id = childId;
+          userFile.LastName = child.LastName;
+          userFile.FirstName = child.FirstName;
+          userFile.Email = child.Email;
+          userFile.ClassLevelId = child.ClassLevelId;
+          userFile.ClassLevelName = child.ClassLevelName;
+          userFile.ClassId = child.ClassId;
+          userFile.ClassName = child.ClassName;
+          userFile.Gender = child.Gender;
+          userFile.strDateOfBirth = child.strDateOfBirth;
+          userFile.Age = child.Age;
+          userFile.PhotoUrl = child.PhotoUrl;
+          userFile.PhoneNumber = child.PhoneNumber;
+
+          var parentsFromRepo = await _repo.GetParents(childId);
+          var parents = _mapper.Map<IEnumerable<UserForDetailedDto>>(parentsFromRepo);
+          foreach (var parent in parents)
+          {
+            if(parent.UserTypeId == parentTypeId && parent.Gender == 0)
+            {
+              userFile.MotherId = parent.Id;
+              userFile.MotherLastName = parent.LastName;
+              userFile.MotherFirstName = parent.FirstName;
+              userFile.MotherPhoneNumber = parent.PhoneNumber;
+              userFile.Mother2ndPhoneNumber = parent.SecondPhoneNumber;
+              userFile.MotherPhotoUrl = parent.PhotoUrl;
+            }
+
+            if(parent.UserTypeId == parentTypeId && parent.Gender == 1)
+            {
+              userFile.FatherId = parent.Id;
+              userFile.FatherLastName = parent.LastName;
+              userFile.FatherFirstName = parent.FirstName;
+              userFile.FatherPhoneNumber = parent.PhoneNumber;
+              userFile.Father2ndPhoneNumber = parent.SecondPhoneNumber;
+              userFile.FatherPhotoUrl = parent.PhotoUrl;
+            }
+          }
+
+          return Ok(userFile);
+        }
+
+        [HttpGet("UserFiles/{data}")]
+        public async Task<IActionResult> GetUserFiles(string data)
+        {
+          var words = data.Split(" ");
+          string lastNameWhere = "";
+          string firstNameWhere = "";
+          string idNumWhere = "";
+
+          foreach (var word in words)
+          {
+            if(lastNameWhere == "")
+            {
+              lastNameWhere = " LastName like '%" + word + "%' ";
+              firstNameWhere = " FirstName like '%" + word + "%' ";
+              idNumWhere = " IdNum like '%" + word + "%' ";
+            }
+            else
+            {
+              lastNameWhere += " OR LastName like '%" + word + "%' ";
+              firstNameWhere += " OR FirstName like '%" + word + "%' ";
+              idNumWhere += " OR IdNum like '%" + word + "%' ";
+            }
+          }
+
+          List<User> children = new List<User>();
+          string query = "select * from AspNetUsers where UserTypeId=" + studentTypeId + " AND (";
+          query += lastNameWhere + " OR " + firstNameWhere + " OR " + idNumWhere + ")";
+          var usersFromRepo = await _context.Users.Include(i => i.Photos)
+                                                  .Include(i => i.Class)
+                                                  .FromSql(query)
+                                                  .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
+                                                  .ToListAsync();
+          var users = _mapper.Map<IEnumerable<UserForDetailedDto>>(usersFromRepo);
+          return Ok(users);
         }
     }
 }

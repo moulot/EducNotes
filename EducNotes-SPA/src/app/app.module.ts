@@ -241,6 +241,7 @@ import { ActivateChildrenComponent } from './registration/activate-children/acti
 import { TreasuryComponent } from './admin/treso/treasury/treasury.component';
 import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
 import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
+import { UserFileComponent } from './admin/user-file/user-file.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -403,7 +404,8 @@ export function tokenGetter() {
       InvalidAccountComponent,
       ActivateChildrenComponent,
       TreasuryComponent,
-      SchoolSettingsComponent
+      SchoolSettingsComponent,
+      UserFileComponent
    ],
    imports: [
       FormWizardModule,

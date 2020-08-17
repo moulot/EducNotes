@@ -73,7 +73,7 @@ namespace EducNotes.API.Controllers {
 
         if (!prod.IsPeriodic) {
           produit.ProductDeadLines = await _context.ProductDeadLines
-            .Include (d => d.DeadLine)
+            // .Include (d => d.DeadLine)
             .Where (p => p.ProductId == prod.Id)
             .ToListAsync ();
         }
@@ -164,7 +164,7 @@ namespace EducNotes.API.Controllers {
         foreach (var deadline in productToCreate.Deadlines) {
           if (deadline.DeadLineId != null && deadline.Percentage != null)
             _repo.Add (new ProductDeadLine {
-              DeadLineId = Convert.ToInt32 (deadline.DeadLineId),
+              // DeadLineId = Convert.ToInt32 (deadline.DeadLineId),
                 ProductId = produit.Id,
                 Percentage = Convert.ToDecimal (deadline.Percentage)
             });

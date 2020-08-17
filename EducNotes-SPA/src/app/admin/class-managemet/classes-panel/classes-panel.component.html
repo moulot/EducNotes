@@ -33,7 +33,7 @@
 
   <div class="col-md-12 mt-2">
     <div class="row">
-      <div *ngFor="let level of levels" class="col-md-4 mb-2">
+      <div class="col-md-3 mb-2" *ngFor="let level of filledLevels">
         <app-class-card [level]="level"></app-class-card>
       </div>
     </div>

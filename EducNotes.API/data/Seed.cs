@@ -75,6 +75,55 @@ namespace EducNotes.API.Data
               };
               context.AddRange(products);
 
+              var classLevels = new List<ClassLevel> {
+                  new ClassLevel { Name = "TPS", DsplSeq = 1, CycleId = 1, SchoolId = 1, EducationLevelId =1 },
+                  new ClassLevel { Name = "MS", DsplSeq = 2, CycleId = 1, SchoolId = 1, EducationLevelId =1  },
+                  new ClassLevel { Name = "PS", DsplSeq = 3, CycleId = 1, SchoolId = 1, EducationLevelId =1  },
+                  new ClassLevel { Name = "CP1", DsplSeq = 4, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
+                  new ClassLevel { Name = "CP2", DsplSeq = 5, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
+                  new ClassLevel { Name = "CE1", DsplSeq = 6, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
+                  new ClassLevel { Name = "CE2", DsplSeq = 7, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
+                  new ClassLevel { Name = "CM1", DsplSeq = 8, CycleId = 3, SchoolId = 2, EducationLevelId =1  },
+                  new ClassLevel { Name = "CM2", DsplSeq = 9, CycleId = 3, SchoolId = 2, EducationLevelId =1  },
+                  new ClassLevel { Name = "6e", DsplSeq = 10, CycleId = 3, SchoolId = 3, EducationLevelId = 2 },
+                  new ClassLevel { Name = "5e", DsplSeq = 11, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
+                  new ClassLevel { Name = "4e", DsplSeq = 12, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
+                  new ClassLevel { Name = "3e", DsplSeq = 13, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
+                  new ClassLevel { Name = "2nde", DsplSeq = 14, SchoolId = 4, EducationLevelId = 2 },
+                  new ClassLevel { Name = "1ere", DsplSeq = 15, SchoolId = 4, EducationLevelId = 2 },
+                  new ClassLevel { Name = "Tle", DsplSeq = 16, SchoolId = 4, EducationLevelId = 2 }
+              };
+              context.AddRange(classLevels);
+              context.SaveChanges();
+
+              var classLevelProds = new List<ClassLevelProduct>() {
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 1, Price = 250000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 2, Price = 250000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 3, Price = 250000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 4, Price = 350000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 5, Price = 350000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 6, Price = 350000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 7, Price = 350000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 8, Price = 350000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 9, Price = 350000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 10, Price = 500000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 11, Price = 500000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 12, Price = 500000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 13, Price = 500000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 14, Price = 650000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 15, Price = 650000 },
+                new ClassLevelProduct { ProductId = 1, ClassLevelId = 16, Price = 650000 },
+              };
+              context.AddRange(classLevelProds);
+
+              var prodDeadlines = new List<ProductDeadLine>() {
+                new ProductDeadLine { ProductId = 1, DueDate = new DateTime(2020, 9, 1), DeadLineName = "1er acompte", Seq = 1, Percentage = 50},
+                new ProductDeadLine { ProductId = 1, DueDate = new DateTime(2020, 11, 15), DeadLineName = "2e acompte", Seq = 2, Percentage = 30},
+                new ProductDeadLine { ProductId = 1, DueDate = new DateTime(2021, 2, 15), DeadLineName = "3e acompte", Seq = 3, Percentage = 20}
+              };
+              context.AddRange(prodDeadlines);
+              context.SaveChanges();
+
               var roles = new List<Role> {
                 new Role { Name = "élève" },
                 new Role { Name = "professeur" },
@@ -149,27 +198,6 @@ namespace EducNotes.API.Data
                 new Cycle { Name = "cycle 4"}
               };
               context.AddRange(cycles);
-              context.SaveChanges();
-
-              var classLevels = new List<ClassLevel> {
-                  new ClassLevel { Name = "TPS", DsplSeq = 1, CycleId = 1, SchoolId = 1, EducationLevelId =1 },
-                  new ClassLevel { Name = "MS", DsplSeq = 2, CycleId = 1, SchoolId = 1, EducationLevelId =1  },
-                  new ClassLevel { Name = "PS", DsplSeq = 3, CycleId = 1, SchoolId = 1, EducationLevelId =1  },
-                  new ClassLevel { Name = "CP1", DsplSeq = 4, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
-                  new ClassLevel { Name = "CP2", DsplSeq = 5, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
-                  new ClassLevel { Name = "CE1", DsplSeq = 6, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
-                  new ClassLevel { Name = "CE2", DsplSeq = 7, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
-                  new ClassLevel { Name = "CM1", DsplSeq = 8, CycleId = 3, SchoolId = 2, EducationLevelId =1  },
-                  new ClassLevel { Name = "CM2", DsplSeq = 9, CycleId = 3, SchoolId = 2, EducationLevelId =1  },
-                  new ClassLevel { Name = "6e", DsplSeq = 10, CycleId = 3, SchoolId = 3, EducationLevelId = 2 },
-                  new ClassLevel { Name = "5e", DsplSeq = 11, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
-                  new ClassLevel { Name = "4e", DsplSeq = 12, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
-                  new ClassLevel { Name = "3e", DsplSeq = 13, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
-                  new ClassLevel { Name = "2nde", DsplSeq = 14, SchoolId = 4, EducationLevelId = 2 },
-                  new ClassLevel { Name = "1ere", DsplSeq = 15, SchoolId = 4, EducationLevelId = 2 },
-                  new ClassLevel { Name = "Tle", DsplSeq = 16, SchoolId = 4, EducationLevelId = 2 }
-              };
-              context.AddRange(classLevels);
               context.SaveChanges();
 
               var paymentTypes = new List<PaymentType> {
@@ -288,6 +316,13 @@ namespace EducNotes.API.Data
                 new Periodicity {Name = "trimestriel"}
               };
               context.AddRange(periodicities);
+
+              var orderTypes = new List<OrderType> {
+                new OrderType { Name = "frais scolarité"},
+                new OrderType { Name = "services"},
+                new OrderType { Name = "produits divers"}
+              };
+              context.AddRange(orderTypes);
 
               var userTypes = new List<UserType> {
                 new UserType { Name = "élève" },

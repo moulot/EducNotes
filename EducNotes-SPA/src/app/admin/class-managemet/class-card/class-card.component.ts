@@ -14,7 +14,7 @@ export class ClassCardComponent implements OnInit {
 
   ngOnInit() {
     const cardWrapper = this.el.nativeElement.querySelectorAll('.card-wrapper');
-    this.renderer.setStyle(cardWrapper[0], 'height', '220px');
+    this.renderer.setStyle(cardWrapper[0], 'height', '200px');
   }
 
 }

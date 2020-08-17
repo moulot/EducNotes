@@ -11,6 +11,7 @@ import { UserSanction } from '../_models/userSanction';
 import { UserReward } from '../_models/userReward';
 import { UserClassEvent } from '../_models/userClassEvent';
 import { OrderToValidate } from '../_models/orderToValidate';
+import { UserFileData } from '../_models/userFileData';
 
 @Injectable({
   providedIn: 'root'
@@ -319,7 +320,15 @@ constructor(private http: HttpClient) {}
     return this.http.post(this.baseUrl + 'users/ValidateRegistration', order);
   }
 
-  searchData() {
-    return this.http.get(this.baseUrl + 'users/searchData');
+  loadStudentData() {
+    return this.http.get(this.baseUrl + 'users/LoadStudents');
+  }
+
+  loadUserFile(userFileData: UserFileData) {
+    return this.http.post(this.baseUrl + 'users/loadUserFile', userFileData);
+  }
+
+  searchUserFiles(searchData) {
+    return this.http.get(this.baseUrl + 'users/UserFiles');
   }
 }

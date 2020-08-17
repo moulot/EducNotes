@@ -1,7 +1,10 @@
 <mdb-flipping-card #card>
   <div class="face front card tp-box_side tp-box_front">
-    <div class="content">
-      <h4 class="text-center">niveau {{level.name}}</h4>
+    <div class="content p-2">
+      <div class="d-flex flex align-items-center">
+      <div class="flex-grow-1 text-17">niveau {{level.name}}</div>
+      <button size="sm" mdbBtn class="btnBlue p-2 text-lowercase" style="letter-spacing: 1px;" mdbWavesEffect (click)="card.toggle()">détails</button>
+      </div>
       <hr class="my-1" style="background-color: #f89f20;">
       <div class="text-center">
         <span class="text-15 text-muted">classes</span>
@@ -9,22 +12,23 @@
       </div>
       <div class="text-center">
         <span class="text-15 text-muted">effectif</span>
-        <h4 class="m-0">{{level.totalStudents}}</h4>
+        <h4 *ngIf="level.totalStudents == 0" class="m-0">aucun élève</h4>
+        <h4 *ngIf="level.totalStudents > 0" class="m-0">{{level.totalStudents}} élèves</h4>
       </div>
-      <div *ngIf="level.classes.length > 0" class="text-center">
-        <button class="" size="sm" mdbBtn class="btnWhiteO" mdbWavesEffect (click)="card.toggle()" routerLinkActive="router-link-active" >details</button>
-      </div>
+      <!-- <div class="text-center">
+        <button size="sm" mdbBtn class="btnBlue" mdbWavesEffect (click)="card.toggle()">details</button>
+      </div> -->
     </div>
   </div>
 
   <div class="face back card tp-box_side tp-box_back p-0">
     <div class="content">
       <div class="d-flex">        
-        <h4 class="flex-grow-1 text-center">niveau {{level.name}}</h4>
+        <div class="flex-grow-1 text-17">niveau {{level.name}}</div>
         <div>
           <a (click)="card.toggle()">
             <i class="fad fa-undo-alt fa-2x" style="--fa-secondary-opacity: 1;
-              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+              --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
           </a>
         </div>
       </div>

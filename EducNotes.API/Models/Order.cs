@@ -30,6 +30,8 @@ namespace EducNotes.API.Models {
     }
 
     public int Id { get; set; }
+    public int OrderTypeId { get; set; }
+    public OrderType OrderType { get; set; }
     public int OrderNum { get; set; }
     public string OrderLabel { get; set; }
     public DateTime OrderDate { get; set; }

@@ -109,8 +109,7 @@ namespace EducNotes.API.Data
 
         public async Task<Photo> GetMainPhotoForUser(int userId)
         {
-            return await _context.Photos.Where(u => u.UserId == userId)
-                .FirstOrDefaultAsync(p => p.IsMain);
+          return await _context.Photos.Where(u => u.UserId == userId).FirstOrDefaultAsync(p => p.IsMain);
         }
 
         public async Task<User> GetUser(int id, bool isCurrentUser)
@@ -159,13 +158,20 @@ namespace EducNotes.API.Data
               .Where(u => userIds.Contains(u.Id)).ToListAsync();
         }
 
-        public async Task<User> GetParent(int ChildId)
+        public async Task<IEnumerable<User>> GetParents(int ChildId)
         {
-            var parent = await _context.UserLinks.FirstOrDefaultAsync(u => u.UserId == ChildId);
+            var links = await _context.UserLinks.Where(u => u.UserId == ChildId).ToListAsync();
 
-            return await _context.Users
-                            .Include(i => i.Photos)
-                            .FirstOrDefaultAsync(p => p.Id == parent.UserPId);
+            List<User> parents = new List<User>();
+            foreach (var link in links)
+            {
+              var parent = await _context.Users
+                              .Include(i => i.Photos)
+                              .FirstOrDefaultAsync(p => p.Id == link.UserPId);
+              parents.Add(parent);
+            }
+            
+            return parents;
         }
 
         public async Task<PagedList<User>> GetUsers(UserParams userParams)
@@ -2256,20 +2262,23 @@ namespace EducNotes.API.Data
                     var students = await GetClassStudents(classId);
                     foreach (var student in students)
                     {
-                        var parent = await GetParent(student.Id);
-                        if (parent != null && parent.Email != null && parent.EmailConfirmed)
+                        var parents = await GetParents(student.Id);
+                        foreach (var parent in parents)
                         {
-                            var parentEmail = new Email
-                            {
-                                EmailTypeId = 1,
-                                ToAddress = parent.Email,
-                                Subject = "<b> Bonjour, un conténu de cours de <b>" + courseName + "<b> vient d'etre ajouté pour enfant "
-                                + student.LastName + " " + student.FirstName,
-                                Body = $"veuillez cliquer sur le lien suivant pour acceder au contenu : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                                InsertUserId = teacherId,
-                                UpdateUserId = teacherId
-                            };
-                            Add(parentEmail);
+                          if (parent != null && parent.Email != null && parent.EmailConfirmed)
+                          {
+                              var parentEmail = new Email
+                              {
+                                  EmailTypeId = 1,
+                                  ToAddress = parent.Email,
+                                  Subject = "<b> Bonjour, un conténu de cours de <b>" + courseName + "<b> vient d'etre ajouté pour enfant "
+                                  + student.LastName + " " + student.FirstName,
+                                  Body = $"veuillez cliquer sur le lien suivant pour acceder au contenu : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                                  InsertUserId = teacherId,
+                                  UpdateUserId = teacherId
+                              };
+                              Add(parentEmail);
+                          }
                         }
 
                         if (student.Email != null && student.EmailConfirmed)
@@ -2277,7 +2286,7 @@ namespace EducNotes.API.Data
                             var studentEmail = new Email
                             {
                                 EmailTypeId = 1,
-                                ToAddress = parent.Email,
+                                ToAddress = student.Email,
                                 Subject = "<b> Bonjour, un conténu de cours de <b>" + courseName + "<b> vient d'etre ajouté."
                                 + student.LastName + " " + student.FirstName,
                                 Body = $"veuillez cliquer sur le lien suivant pour acceder au contenu : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
@@ -2298,6 +2307,14 @@ namespace EducNotes.API.Data
             }
             return false;
 
+        }
+
+        public string GetUserIDNumber(int userId, string lastName, string firstName)
+        {
+          int randomVal = 300631;
+          int val = userId * 2 + randomVal;
+          string idNum = lastName.Substring(0, 1) + firstName.Substring(0,1) + val.ToString().To5Digits();
+          return idNum;
         }
 
         public async Task<IEnumerable<Setting>> GetSettings()

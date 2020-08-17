@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Setting } from 'src/app/_models/setting';
 import { AdminService } from 'src/app/_services/admin.service';
 
@@ -15,7 +15,7 @@ export class SchoolSettingsComponent implements OnInit {
   settingData: Setting[];
   updatedSettings: Setting[] = [];
 
-  constructor(private fb: FormBuilder, private alertify: AlertifyService,
+  constructor(private fb: FormBuilder, private alertify: AlertifyService, private router: Router,
     private route: ActivatedRoute, private adminService: AdminService) { }
 
   ngOnInit() {
@@ -64,6 +64,7 @@ export class SchoolSettingsComponent implements OnInit {
     // console.log(this.updatedSettings);
     this.adminService.updateSettings(this.updatedSettings).subscribe(() => {
       this.alertify.success('les paramètres sont mis à jour!');
+      this.router.navigate(['home']);
     }, error => {
       this.alertify.error(error);
     });

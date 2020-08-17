@@ -1,7 +1,8 @@
-import { OrderLine } from "./orderLine";
+import { OrderLine } from './orderLine';
 
 export interface Order {
   id: number;
+  orderTypeId: number;
   orderNum: number;
   orderLabel: string;
   orderDate: Date;

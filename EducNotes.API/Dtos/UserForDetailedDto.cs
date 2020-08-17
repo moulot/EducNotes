@@ -31,8 +31,8 @@ namespace EducNotes.API.Dtos
           public string PhoneNumber { get; set; }
           public Boolean PhoneNumberConfirmed { get; set; }
         public string SecondPhoneNumber { get; set; }
-        public string userTypeName { get; set; }
-        public int userTypeId { get; set; }
+        public string UserTypeName { get; set; }
+        public int UserTypeId { get; set; }
         public bool ValidatedCode { get; set; }
         public bool Validated { get; set; }
         public double Avg { get; set; }

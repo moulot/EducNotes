@@ -34,6 +34,7 @@ export class TuitionPanelComponent implements OnInit {
     const regDate = this.settings.find(s => s.name === 'RegistrationDate').value;
     this.regDate = Utils.inputDateDDMMYY(regDate, '/');
     const today = new Date();
+    console.log('today:' + today + ' - ' + this.regDate);
     if (today >= this.regDate) {
       this.regActive = true;
     }

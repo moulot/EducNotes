@@ -26,6 +26,7 @@ namespace EducNotes.API.Controllers
     public UserManager<User> _userManager { get; }
     CultureInfo frC = new CultureInfo("fr-FR");
     int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
+    int tuitionTypeId;
     int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId;
     string password;
     int registrationEmailId, tuitionId, nextYearTuitionId, newRegToBePaidEmailId;
@@ -42,6 +43,7 @@ namespace EducNotes.API.Controllers
       parentTypeId = _config.GetValue<int>("AppSettings:parentTypeId");
       adminTypeId = _config.GetValue<int>("AppSettings:adminTypeId");
       studentTypeId = _config.GetValue<int>("AppSettings:studentTypeId");
+      tuitionTypeId = _config.GetValue<int>("AppSettings:tuitionTypeId");
       registrationEmailId = _config.GetValue<int>("AppSettings:registrationEmailId");
       newRegToBePaidEmailId = _config.GetValue<int>("AppSettings:newRegToBePaidEmailId");
       tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
@@ -138,6 +140,7 @@ namespace EducNotes.API.Controllers
 
           //tuition order
           Order order = new Order();
+          order.OrderTypeId = tuitionTypeId;
           order.OrderDate = DateTime.Now;
           order.OrderLabel = "inscription";
           order.Deadline = newTuition.Deadline;
@@ -177,7 +180,7 @@ namespace EducNotes.API.Controllers
             var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
             _userManager.AddToRoleAsync(user, role.Name).Wait();
 
-            user.IdNum = user.Id.ToString().To5Digits();
+            user.IdNum = _repo.GetUserIDNumber(user.Id, user.LastName, user.FirstName);
             _repo.Update(user);
             ChildList.Add(user);
 

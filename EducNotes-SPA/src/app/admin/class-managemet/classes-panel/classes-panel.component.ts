@@ -12,6 +12,7 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 })
 export class ClassesPanelComponent implements OnInit {
   levels: any[];
+  filledLevels: any[] = [];
   lev: any [] = [];
   // addNew = false;
 
@@ -21,6 +22,12 @@ export class ClassesPanelComponent implements OnInit {
    ngOnInit() {
       this.route.data.subscribe(data => {
         this.levels = data.levels;
+        for (let i = 0; i < this.levels.length; i++) {
+          const elt = this.levels[i];
+          if (elt.classes.length > 0) {
+            this.filledLevels = [... this.filledLevels, elt];
+          }
+        }
       });
       for (let index = 0; index < this.levels.length; index++) {
         const element: any = {

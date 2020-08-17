@@ -1,0 +1,17 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-1">
+        <img src="{{parent.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
+      </div>
+      <div class="col-md-10">
+        <p class="text-20 text-muted font-weight-500 text-capitalize p-0 m-0">{{parent.lastName}} {{parent.firstName}}</p>
+        <p class="text-15 text-primary p-0 mx-1 my-0">{{parent.email}}</p>
+        <div class="p-0 m-0">
+          <label class="text-15 text-primary p-0 mx-1">tél: {{parent.phoneNumber}}</label>
+          <label *ngIf="parent.secondPhoneNumber" class="text-15 text-primary p-0 mx-1"> / {{parent.secondPhoneNumber}}</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

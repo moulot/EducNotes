@@ -18,6 +18,7 @@ namespace EducNotes.API.Data
     Task<PagedList<User>> GetUsers(UserParams userParams);
     Task<User> GetUser(int id, bool isCurrentUser);
     Task<IEnumerable<User>> GetChildren(int parentId);
+    Task<IEnumerable<User>> GetParents(int childId);
     Task<List<UserForDetailedDto>> GetAccountChildren(int parentId);
     Task<IEnumerable<User>> GetClassStudents(int classId);
     Task<IEnumerable<Agenda>> GetClassAgenda(int classId, DateTime StartDate, DateTime EndDate);
@@ -94,5 +95,6 @@ namespace EducNotes.API.Data
     List<Email> SetEmailDataForRegistration(List<RegistrationEmailDto> emailData, string content, string RegDeadLine);
     Task<Order> GetOrder(int id);
     Email SetEmailForAccountUpdated(string subject, string content, string lastName, byte gender, string parentEmail);
+    string GetUserIDNumber(int userId, string lastName, string firstName);
   }
 }

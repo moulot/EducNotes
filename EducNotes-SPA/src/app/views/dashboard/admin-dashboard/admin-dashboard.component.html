@@ -25,34 +25,36 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="box_content centerOnScreen">
-    <div class="col-md-9">
-      <form [formGroup]="searchForm" (ngSubmit)="search()">
+<form [formGroup]="searchForm" (ngSubmit)="loadUserFile()">
+  <div class="row">
+    <div class="box_content centerOnScreen">
+      <div class="col-md-7">
         <div class="md-form mb-1">
+          <input type="hidden" id="userid" formControlName="userid" />
           <input type="text" id="searchData" class="completer-input form-control mdb-autocomplete mb-0"
             [mdbAutoCompleter]="auto"
             autocomplete="off"
             placeholder="rechercher un dossier"
             formControlName="searchData" />
-          <!-- <label class="text-20" for="searchData">rechercher un dossier</label> -->
           <mdb-auto-completer #auto="mdbAutoCompleter" textNoResults="aucun résultat trouvé :(">
-            <mdb-option *ngFor="let option of results | async" [value]="option.idNum + ' - ' + option.lastName + ' ' + option.firstName">
+            <mdb-option (click)="selectUserId(option.userId)" *ngFor="let option of results | async" [value]="option.lastName + ' ' + option.firstName">
               <div class="d-flex">
-                <div class="mr-1" style="border: 1px solid blue;">
+                <div class="mr-1">
                   <img src="{{option.photoUrl || '../../../../../../assets/user.png'}}" alt="" style="width: 40px;" class="rounded-circle z-depth-0">
                 </div>
-                <div class="d-flex flex-column" style="border: 1px solid blue;">
+                <div class="d-flex flex-column">
                   <strong>nom: {{ option.lastName }} {{ option.firstName }} ({{option.className}})</strong>
                   <small>matricule: {{ option.idNum }}</small>
                 </div>
               </div>
-              <!-- {{ option }} -->
             </mdb-option>
           </mdb-auto-completer>
-          </div>
-      </form>
-      <p class="text-15 text-danger mt-0">recherche par matricule, nom, prénom ou classe...</p>
+        </div>
+        <p class="text-15 text-danger mt-0">recherche par matricule, nom, prénom ou classe...</p>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" mdbBtn class="btnBlue" size="sm" block="true" mdbWavesEffect>rechercher</button>
+      </div>
     </div>
   </div>
-</div>
+</form>

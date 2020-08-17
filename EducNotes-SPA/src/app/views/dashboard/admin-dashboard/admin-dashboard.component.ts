@@ -3,10 +3,11 @@ import { AdminService } from 'src/app/_services/admin.service';
 import { environment } from 'src/environments/environment';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Subject, Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 import { startWith, map } from 'rxjs/operators';
 import { UserService } from 'src/app/_services/user.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
+import { Router } from '@angular/router';
+import { UserFileData } from 'src/app/_models/userFileData';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -27,13 +28,13 @@ export class AdminDashboardComponent implements OnInit {
   results: Observable<any[]>;
   data: any = [];
 
-  constructor(private adminService: AdminService, private fb: FormBuilder,
+  constructor(private adminService: AdminService, private fb: FormBuilder, private router: Router,
     private userService: UserService, private alertify: AlertifyService) { }
 
   ngOnInit() {
     this.createSearchForm();
     this.getUSersRecap();
-    this.loadSearchData();
+    this.loadStudentData();
 
     this.results = this.searchForm.controls.searchData.valueChanges
       .pipe(
@@ -52,9 +53,8 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  loadSearchData() {
-    this.userService.searchData().subscribe((data: any) => {
-      // console.log(data);
+  loadStudentData() {
+    this.userService.loadStudentData().subscribe((data: any) => {
       this.data = data;
     }, error => {
       this.alertify.error(error);
@@ -63,7 +63,8 @@ export class AdminDashboardComponent implements OnInit {
 
   createSearchForm() {
     this.searchForm = this.fb.group({
-      searchData: ['', Validators.required]
+      searchData: ['', Validators.required],
+      userid: ['', Validators.required]
     });
   }
 
@@ -78,8 +79,27 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  search() {
+  loadUserFile() {
+    const userid = this.searchForm.value.userid;
+    const searchData = this.searchForm.value.searchData;
+    const userFileData = <UserFileData>{};
+    userFileData.userId = userid;
+    userFileData.searchData = searchData;
+    if (userid) {
+      this.userService.loadUserFile(userFileData).subscribe((userData: any) => {
+        this.router.navigate(['userFile', userData.id]);
+      }, error => {
+        this.alertify.error(error);
+      });
+    } else {
+      if (searchData !== '') {
+        
+      }
+    }
+  }
 
+  selectUserId(userid) {
+    this.searchForm.patchValue({userid: userid});
   }
 
 }
