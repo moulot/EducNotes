@@ -56,7 +56,7 @@
       <div class="col-md-12 text-20 font-weight-300">frais de scolarité</div>
       <div class="col-md-12 mb-1"><hr class="my-1" style="background-color: #f89f20;"></div>
 
-      <div *ngIf="registration.status == orderCreated" class="col-md-12">
+      <div *ngIf="registration.created" class="col-md-12">
         <div class="alert alert-success" role="alert">
           <div class="text-17">inscription</div>
           <hr class="my-1">
@@ -88,7 +88,7 @@
         </form>
       </div>
 
-      <div *ngIf="registration.status == orderValidated" class="col-md-12">
+      <div *ngIf="registration.validated" class="col-md-12">
         <div class="alert alert-success" role="alert">
           <div class="text-17">inscription - <b>fin des inscriptions le {{registration.strDeadline}}</b></div>
           <hr class="my-1">

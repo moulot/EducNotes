@@ -93,6 +93,7 @@ namespace EducNotes.API.Data {
   public DbSet<EducationLevel> EducationLevels { get; set; }
   public DbSet<Cycle> Cycles { get; set; }
   public DbSet<School> Schools { get; set; }
+  public DbSet<Cheque> Cheques { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {

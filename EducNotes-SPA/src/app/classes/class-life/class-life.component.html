@@ -113,57 +113,6 @@
 
   </div>
 
-  <!-- <nz-table #absenceTable nzSize="small" [nzPageSize]="5" [nzShowSizeChanger]="false" [nzShowPagination]="true"
-    [nzFrontPagination]="true" [nzTitle]="title ? 'Absences' : null" nzBordered [nzData]="absencesList">
-    <thead>
-      <tr>
-        <th nzWidth="12%">élève</th>
-        <th nzWidth="24%">absence / retard</th>
-        <th nzWidth="6%">durée</th>
-        <th nzWidth="6%">justifié ?</th>
-        <th nzWidth="17%">motif</th>
-        <th nzWidth="35%">commentaire</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let data of absenceTable.data">
-          <td>{{ data.userName }}</td>
-        <td *ngIf="data.startDate == data.endDate">
-          {{ data.startDate }} de {{data.startTime}} à {{data.endTime}}</td>
-        <td *ngIf="data.startDate != data.endDate">
-          du {{ data.startDate }} {{data.startTime}} à {{data.endDate}} {{data.endTime}}</td>
-        <td>{{ data.justified }}</td>
-        <td>{{ data.justified }}</td>
-        <td>{{ data.reason }}</td>
-        <td>{{ data.comment }}</td>
-      </tr>
-    </tbody>
-  </nz-table>
-
-  <nz-table #sanctionTable nzSize="small" [nzPageSize]="5" [nzShowSizeChanger]="false" [nzShowPagination]="true"
-    [nzFrontPagination]="true" [nzTitle]="title ? 'Sanctions' : null" nzBordered [nzData]="sanctionsList">
-    <thead>
-      <tr>
-        <th nzWidth="15%">élève</th>
-        <th nzWidth="13%">sanction</th>
-        <th nzWidth="8%">date</th>
-        <th nzWidth="17%">motif</th>
-        <th nzWidth="15%">sanctionné par</th>
-        <th nzWidth="32%">commentaire</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let data of sanctionTable.data">
-        <td>{{data.userName}}</td>
-        <td>{{ data.sanctionName }}</td>
-        <td>{{ data.sanctionDate }}</td>
-        <td>{{ data.reason }}</td>
-        <td>{{ data.sanctionedBy }}</td>
-        <td>{{ data.comment }}</td>
-      </tr>
-    </tbody>
-  </nz-table> -->
-
 </div>
               
   <div #classLifeForm class="row m-2" *ngIf="toggleFormAdd">

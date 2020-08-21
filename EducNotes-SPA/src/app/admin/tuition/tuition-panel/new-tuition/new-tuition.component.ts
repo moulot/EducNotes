@@ -11,6 +11,7 @@ import { Utils } from 'src/app/shared/utils';
 import { TuitionData } from 'src/app/_models/tuitionData';
 import { TuitionChildData } from 'src/app/_models/tuitionChildData';
 import { Router } from '@angular/router';
+import { PaymentService } from 'src/app/_services/payment.service';
 
 @Component({
   selector: 'app-new-tuition',
@@ -23,8 +24,13 @@ export class NewTuitionComponent implements OnInit {
   @ViewChild('children', {static: false}) childrenDiv: CollapseComponent;
   @ViewChild('sumchildren', {static: false}) sumchildrenDiv: CollapseComponent;
   @ViewChild('checkout', {static: false}) checkoutDiv: CollapseComponent;
+  payCash = environment.payCash;
+  payCheque = environment.payCheque;
+  payWire = environment.payWire;
   tuitionForm: FormGroup;
+  paymentForm: FormGroup;
   levels: any;
+  paytypes: any;
   levelOptions: any[] = [];
   sexOptions = [{value: 0, label: 'femme'}, {value: 1, label: 'homme'}];
   nbChildren = 0;
@@ -48,10 +54,20 @@ export class NewTuitionComponent implements OnInit {
   daysToValidateReg: any;
   orderAmount: number;
   totalRegFee: number;
+  tuitionData = <TuitionData>{};
+  showTuitionForm = true;
+  showPaymentForm = false;
+  myDatePickerOptions = Utils.myDatePickerOptions;
+  bankOptions = [];
+  banks: any;
+  showPayDataBox = false;
+  showCashData = false;
+  showChequeData = false;
+  showWireData = false;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private router: Router,
-    private authService: AuthService, private classService: ClassService,
-    private orderService: OrderService) { }
+    private authService: AuthService, private classService: ClassService, private orderService: OrderService,
+    private paymentService: PaymentService) { }
 
   ngOnInit() {
     this.createTuitionForm();
@@ -63,6 +79,9 @@ export class NewTuitionComponent implements OnInit {
     this.addChildItem('moulot', 'inna', 3, '14/06/2011', 0);
     this.getClassLevels();
     this.getTuitionData();
+    this.getPaymentData();
+    this.createPaymentForm();
+
   }
 
   getTuitionData() {
@@ -85,6 +104,20 @@ export class NewTuitionComponent implements OnInit {
         const elt = this.levels[i];
         const level = {value: elt.id, label: elt.name};
         this.levelOptions = [...this.levelOptions, level];
+      }
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getPaymentData() {
+    this.paymentService.getPaymentData().subscribe((data: any) => {
+      this.paytypes = data.paymentTypes;
+      this.banks = data.banks;
+      for (let i = 0; i < this.banks.length; i++) {
+        const elt = this.banks[i];
+        const bank = {value: elt.id, label: elt.name};
+        this.bankOptions = [...this.bankOptions, bank];
       }
     }, error => {
       this.alertify.error(error);
@@ -170,6 +203,31 @@ export class NewTuitionComponent implements OnInit {
     }
 
     return null;
+  }
+
+  createPaymentForm() {
+    this.paymentForm = this.fb.group({
+      type: [null, Validators.required],
+      opDate: ['', Validators.required],
+      bank: [],
+      numCheque: [],
+      refDoc: []
+    }, {validator: this.paymentValidator});
+  }
+
+  paymentValidator(g: FormGroup) {
+    let chequeerror = false;
+    const paytype = g.get('type').value;
+    const numcheque = g.get('numCheque').value;
+    if ((paytype !== '' && numcheque === '') || (paytype === '' && numcheque !== '')) {
+      chequeerror = true;
+    }
+
+    let docerror = false;
+    const refDoc = g.get('refDoc').value;
+    if ((paytype !== '' && refDoc === '') || (paytype === '' && refDoc !== '')) {
+      docerror = true;
+    }
   }
 
   addChildItem(lname, fname, classlevelId, dob, sex): void {
@@ -272,24 +330,48 @@ export class NewTuitionComponent implements OnInit {
   }
 
   saveTuition() {
-    const tuitionData = <TuitionData>{};
-    tuitionData.fLastName = this.tuitionForm.value.fLastName;
-    tuitionData.fFirstName = this.tuitionForm.value.fFirstName;
-    tuitionData.fCell = this.tuitionForm.value.fCell.replace(/\./g, '');
-    tuitionData.fEmail = this.tuitionForm.value.fEmail;
+    this.setTuitionData();
+    this.orderService.addNewTuition(this.tuitionData).subscribe(() => {
+      this.router.navigate(['/tuition']);
+      this.alertify.success('l\'inscription a bien été enregistrée');
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  saveTuitionAndPayment() {
+    this.setTuitionData();
+    // this.orderService.addNewTuition(this.tuitionData).subscribe((id) => {
+    //   this.alertify.success('l\'inscription a bien été enregistrée');
+    //   this.showTuitionForm = false;
+    //   this.showPaymentForm = true;
+    //   const orderid = id;
+
+    // }, error => {
+    //   this.alertify.error(error);
+    // });
+    this.showTuitionForm = false;
+    this.showPaymentForm = true;
+}
+
+  setTuitionData() {
+    this.tuitionData.fLastName = this.tuitionForm.value.fLastName;
+    this.tuitionData.fFirstName = this.tuitionForm.value.fFirstName;
+    this.tuitionData.fCell = this.tuitionForm.value.fCell.replace(/\./g, '');
+    this.tuitionData.fEmail = this.tuitionForm.value.fEmail;
     // tuitionData.fSendEmail = this.tuitionForm.value.fSendEmail;
-    tuitionData.fActive = this.tuitionForm.hasError('fathererror') === true ? false : true;
-    tuitionData.mLastName = this.tuitionForm.value.mLastName;
-    tuitionData.mFirstName = this.tuitionForm.value.mFirstName;
-    tuitionData.mCell = this.tuitionForm.value.mCell.replace(/\./g, '');
-    tuitionData.mEmail = this.tuitionForm.value.mEmail;
+    this.tuitionData.fActive = this.tuitionForm.hasError('fathererror') === true ? false : true;
+    this.tuitionData.mLastName = this.tuitionForm.value.mLastName;
+    this.tuitionData.mFirstName = this.tuitionForm.value.mFirstName;
+    this.tuitionData.mCell = this.tuitionForm.value.mCell.replace(/\./g, '');
+    this.tuitionData.mEmail = this.tuitionForm.value.mEmail;
     // tuitionData.mSendEmail = this.tuitionForm.value.mSendEmail;
-    tuitionData.mActive = this.tuitionForm.hasError('mothererror') === true ? false : true;
-    tuitionData.orderAmount = this.orderAmount;
-    tuitionData.dueAmount = this.amountDue;
-    tuitionData.deadline = Utils.inputDateDDMMYY(this.regDeadline, '/');
-    tuitionData.validity = Utils.inputDateDDMMYY(this.tuitionValidity, '/');
-    tuitionData.children = [];
+    this.tuitionData.mActive = this.tuitionForm.hasError('mothererror') === true ? false : true;
+    this.tuitionData.orderAmount = this.orderAmount;
+    this.tuitionData.dueAmount = this.amountDue;
+    this.tuitionData.deadline = Utils.inputDateDDMMYY(this.regDeadline, '/');
+    this.tuitionData.validity = Utils.inputDateDDMMYY(this.tuitionValidity, '/');
+    this.tuitionData.children = [];
     for (let i = 0; i < this.tuitionForm.value.children.length; i++) {
       const elt = this.tuitionForm.value.children[i];
       const child = <TuitionChildData>{};
@@ -301,15 +383,28 @@ export class NewTuitionComponent implements OnInit {
       child.tuitionFee = this.tuitionFee[i];
       child.regFee = this.regFee;
       child.downPayment = this.downPayment[i];
-      tuitionData.children = [...tuitionData.children, child];
+      this.tuitionData.children = [...this.tuitionData.children, child];
     }
+  }
 
-    this.orderService.addNewTuition(tuitionData).subscribe(() => {
-      this.router.navigate(['/tuition']);
-      this.alertify.success('l\'inscription a bien été enregistré');
-    }, error => {
-      this.alertify.error(error);
-    });
+  selectPayType() {
+    const type = this.paymentForm.value.type;
+    this.showCashData = false;
+    this.showChequeData = false;
+    this.showWireData = false;
+    switch (type) {
+      case this.payCash:
+        this.showCashData = true;
+        break;
+      case this.payCheque:
+        this.showChequeData = true;
+        break;
+      case this.payWire:
+        this.showWireData = true;
+        break;
+      default:
+        break;
+    }
   }
 
 }

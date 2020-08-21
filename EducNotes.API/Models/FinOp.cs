@@ -10,7 +10,11 @@ namespace EducNotes.API.Models
     }
     public int Id { get; set; }
     public DateTime FinOpDate { get; set; }
-    public int InvoiceId { get; set; }
+    public int? OrderId { get; set; }
+    public Order Order { get; set; }
+    public int? InvoiceId { get; set; }
+    public int? ChequeId { get; set; }
+    public Cheque Cheque { get; set; }
     public Invoice Invoice { get; set; }
     public int PaymentTypeId { get; set; }
     public PaymentType PaymentType { get; set; }

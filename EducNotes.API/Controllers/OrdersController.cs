@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
 
 namespace EducNotes.API.Controllers
 {
@@ -148,12 +149,22 @@ namespace EducNotes.API.Controllers
           order.TotalHT = newTuition.OrderAmount;
           order.AmountHT = order.TotalHT - order.Discount;
           order.AmountTTC = order.TotalHT;
-          order.Status = Convert.ToByte(Order.StatusEnum.ValidatedByClient);
+          order.Created = true;
           order.isReg = true;
           _repo.Add(order);
           if(! await _repo.SaveAll())
             return BadRequest("problème pour ajouter l'inscription");
           order.OrderNum = order.Id.GetOrderNumber();
+
+          Invoice invoice = new Invoice();
+          invoice.InvoiceDate = DateTime.Now;
+          invoice.Amount = order.AmountTTC;
+          invoice.UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+          invoice.OrderId = order.Id;
+          _repo.Add(invoice);
+          _context.SaveChanges();
+          invoice.InvoiceNum = _repo.GetInvoiceNumber(invoice.Id);
+          _context.Update(invoice);
 
           //children
           List<TuitionChildDataDto> childTuitions = newTuition.Children;
@@ -358,7 +369,7 @@ namespace EducNotes.API.Controllers
           if(await _repo.SaveAll())
           {
             identityContextTransaction.Commit();
-            return Ok();
+            return Ok(order.Id);
           }
         }
         catch (System.Exception)

@@ -12,11 +12,8 @@ export const environment = {
   schoolServiceId: 1,
   maxChildNumber: 6,
   byDeadLineTypeId: true,
-  orderCreated: 0,
-  orderValidated: 1,
-  orderExpired: 2,
-  orderCancelled: 3,
-  orderPaid: 4,
-  orderOverdue: 5,
-  orderCompleted: 6
+  payCash: 1,
+  payCheque: 2,
+  payWire: 3,
+  payMobile: 4
 };

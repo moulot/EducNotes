@@ -1713,7 +1713,8 @@ namespace EducNotes.API.Controllers
               order.AmountTTC += line.AmountTTC;
             }
           }
-          order.Status = Convert.ToByte(Order.StatusEnum.ValidatedByClient);
+          order.Validated = true;
+          order.Created = false;
           _repo.Update(order);
           updatedOrder = _mapper.Map<OrderDto>(order);
 

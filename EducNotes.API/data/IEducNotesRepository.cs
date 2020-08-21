@@ -96,5 +96,9 @@ namespace EducNotes.API.Data
     Task<Order> GetOrder(int id);
     Email SetEmailForAccountUpdated(string subject, string content, string lastName, byte gender, string parentEmail);
     string GetUserIDNumber(int userId, string lastName, string firstName);
+    string GetInvoiceNumber(int invoiceId);
+    Task<IEnumerable<PaymentType>> GetPaymentTypes();
+    Task<IEnumerable<ClassLevel>> GetClasslevels();
+    Task<IEnumerable<Bank>> GetBanks();
   }
 }

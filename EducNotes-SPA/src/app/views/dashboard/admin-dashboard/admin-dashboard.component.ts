@@ -93,7 +93,7 @@ export class AdminDashboardComponent implements OnInit {
       });
     } else {
       if (searchData !== '') {
-        
+
       }
     }
   }

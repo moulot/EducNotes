@@ -398,9 +398,7 @@ export class BroadcastComponent implements OnInit {
     this.bodyType = this.emailForm.value.type;
     this.emailForm.get('subject').setValue('');
     this.emailForm.get('body').setValue('');
-    console.log('tplte before:' + this.emailForm.value.template);
     this.emailForm.get('template').reset();
-    console.log('tplte after:' + this.emailForm.value.template);
   }
 
   setTemplateData() {

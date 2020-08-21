@@ -144,7 +144,9 @@ namespace EducNotes.API.Data
                 new SmsType { Name = "absence" },
                 new SmsType { Name = "alerte" },
                 new SmsType { Name = "comm" },
-                new SmsType { Name = "note" }
+                new SmsType { Name = "note" },
+                new SmsType { Name = "note" },
+                new SmsType { Name = "validation" }
               };
               context.AddRange(smsTypes);
                 context.SaveChanges();
@@ -204,7 +206,7 @@ namespace EducNotes.API.Data
                 new PaymentType { Name = "espèces" },
                 new PaymentType { Name = "chèque" },
                 new PaymentType { Name = "virement" },
-                new PaymentType { Name = "paiement mobible" }
+                new PaymentType { Name = "paiement mobile" }
               };
               context.AddRange(paymentTypes);
 

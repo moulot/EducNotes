@@ -19,8 +19,6 @@ export class UserAccountComponent implements OnInit {
   selectedSms = [];
   registration: any;
   nextRegistration: any;
-  orderCreated = environment.orderCreated;
-  orderValidated = environment.orderValidated;
   regForm: FormGroup;
   settings: any;
   regNbChild: number;

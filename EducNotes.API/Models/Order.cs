@@ -7,7 +7,6 @@ namespace EducNotes.API.Models {
     public Order()
     {
       OrderDate = DateTime.Now;
-      Status = 0;
       TotalHT = 0;
       Discount = 0;
       AmountHT = 0;
@@ -16,17 +15,13 @@ namespace EducNotes.API.Models {
       TVAAmount = 0;
       isReg = false;
       isNextReg = false;
-    }
-
-    public enum StatusEnum
-    {
-      Created = 0,
-      ValidatedByClient = 1,
-      Expired = 2,
-      Cancelled = 3,
-      Paid = 4,
-      OverDue = 5,
-      Completed = 6
+      Created = false;
+      Validated = false;
+      Expired = false;
+      Cancelled = false;
+      Overdue = false;
+      Paid = false;
+      Completed = false;
     }
 
     public int Id { get; set; }
@@ -53,7 +48,13 @@ namespace EducNotes.API.Models {
     public User Father { get; set; }
     public int? MotherId { get; set; }
     public User Mother { get; set; }
-    public byte Status { get; set; }
+    public Boolean Created { get; set; }
+    public Boolean Validated { get; set; }
+    public Boolean Expired { get; set; }
+    public Boolean Cancelled { get; set; }
+    public Boolean Overdue { get; set; }
+    public Boolean Paid { get; set; }
+    public Boolean Completed { get; set; }
     public Boolean isReg { get; set; }
     public Boolean isNextReg { get; set; }
     public List<OrderLine> Lines { get; set; }

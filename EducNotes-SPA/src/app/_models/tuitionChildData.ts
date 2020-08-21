@@ -4,6 +4,7 @@ export interface TuitionChildData {
   sex: number;
   dateOfBirth: Date;
   classlevelId: number;
+  classlevelName: string;
   tuitionFee: number;
   regFee: number;
   downPayment: number;

@@ -2451,5 +2451,36 @@ namespace EducNotes.API.Data
           }
           return order;
         }
+
+        public string GetInvoiceNumber(int invoiceId)
+        {
+          var today = DateTime.Now;
+          string year = today.Year.ToString().Substring(2);
+          var todaymonth = today.Month;
+          string month = todaymonth.ToString().Length == 1 ? "0" + todaymonth : todaymonth.ToString();
+          var todayday = today.Day;
+          string day = todayday.ToString().Length == 1 ? "0" + todayday : todayday.ToString();
+
+          var num = year + month + day + "-" + invoiceId.ToString();
+          return num;
+        }
+
+        public async Task<IEnumerable<PaymentType>> GetPaymentTypes()
+        {
+          var types = await _context.PaymentTypes.ToListAsync();
+          return types;
+        }
+
+        public async Task<IEnumerable<ClassLevel>> GetClasslevels()
+        {
+          var levels = await _context.ClassLevels.OrderBy(o => o.DsplSeq).ToListAsync();
+          return levels;
+        }
+
+        public async Task<IEnumerable<Bank>> GetBanks()
+        {
+          var banks = await _context.Banks.OrderBy(o => o.Name).ToListAsync();
+          return banks;
+        }
     }
 }

@@ -14,7 +14,6 @@ using Microsoft.Extensions.Configuration;
 namespace EducNotes.API.Controllers {
   [Route ("api/[controller]")]
   [ApiController]
-
   public class TresoController : ControllerBase {
     private readonly DataContext _context;
     private readonly IEducNotesRepository _repo;
@@ -122,10 +121,10 @@ namespace EducNotes.API.Controllers {
 
     [HttpGet ("GetProducts/{productTypeId}")]
     public async Task<IActionResult> GetProducts (int productTypeId) {
-      var producTypes = await _context.Products.
-      Where (p => p.ProductTypeId == productTypeId)
-        .OrderBy (p => p.Name)
-        .ToListAsync ();
+      var producTypes = await _context.Products
+                              .Where (p => p.ProductTypeId == productTypeId)
+                              .OrderBy (p => p.Name)
+                              .ToListAsync ();
       return Ok (producTypes);
     }
 
