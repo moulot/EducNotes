@@ -369,7 +369,10 @@ namespace EducNotes.API.Controllers
           if(await _repo.SaveAll())
           {
             identityContextTransaction.Commit();
-            return Ok(order.Id);
+            return Ok(new {
+              orderId = order.Id,
+              invoiceId = invoice.Id
+            });
           }
         }
         catch (System.Exception)

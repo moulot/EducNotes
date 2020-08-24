@@ -242,6 +242,7 @@ import { TreasuryComponent } from './admin/treso/treasury/treasury.component';
 import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
 import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
 import { UserFileComponent } from './admin/user-file/user-file.component';
+import { SpacedAmountDirective } from './_directives/spacedAmount.directive';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -270,6 +271,7 @@ export function tokenGetter() {
       HasRoleDirective,
       FullScreenDirective,
       BtnBackDirective,
+      SpacedAmountDirective,
       UserManagementComponent,
       PhotoManagementComponent,
       RolesModalComponent,

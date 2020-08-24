@@ -26,7 +26,7 @@ export interface User {
   phoneNumber: string;
   phoneNumberConfirmed: boolean;
   secondPhoneNumber: string;
-  validatedCode: boolean;
+  // validatedCode: boolean;
   districtId: number;
   cityId?: number;
   active: number;

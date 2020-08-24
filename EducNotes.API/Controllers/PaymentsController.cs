@@ -20,12 +20,14 @@ namespace EducNotes.API.Controllers
     private readonly IEducNotesRepository _repo;
     private readonly IMapper _mapper;
     private readonly IConfiguration _config;
+    int chequeTypeId;
 
     public PaymentsController (DataContext context, IEducNotesRepository repo, IMapper mapper, IConfiguration config) {
       _context = context;
       _repo = repo;
       _config = config;
       _mapper = mapper;
+      chequeTypeId = _config.GetValue<int>("AppSettings:chequeTypeId");
     }
 
     [HttpGet("GetPaymentTypes")]
@@ -47,5 +49,41 @@ namespace EducNotes.API.Controllers
         banks
       });
     }
+
+    [HttpPost("AddFinOp")]
+    public async Task<IActionResult> AddFinOp(FinOpDataDto finOpDataDto)
+    {
+      FinOp finOp = new FinOp();
+      finOp.FinOpDate = finOpDataDto.FinOpDate;
+      finOp.OrderId = finOpDataDto.OrderId;
+      finOp.InvoiceId = finOpDataDto.InvoiceId;
+      finOp.PaymentTypeId = finOpDataDto.PaymentTypeId;
+      finOp.Amount = finOpDataDto.Amount;
+      finOp.Note = finOpDataDto.Note;
+      finOp.DocRef = finOpDataDto.RefDoc;
+
+      if(finOp.PaymentTypeId == chequeTypeId)
+      {
+        Cheque cheque = new Cheque();
+        cheque.ChequeNum = finOpDataDto.numCheque;
+        cheque.Amount = finOp.Amount;
+        if(finOpDataDto.BankId == 0)
+          cheque.BankId = finOpDataDto.BankId;
+
+        _context.Add(cheque);
+        _context.SaveChanges();
+        finOp.ChequeId = cheque.Id;
+      }
+
+      _context.Add(finOp);
+
+      if(await _repo.SaveAll())
+      {
+        return Ok();
+      }
+
+      return BadRequest("problème pour saisir le paiement.");
+    }
+
   }
 }

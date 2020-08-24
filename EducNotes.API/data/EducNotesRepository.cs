@@ -548,7 +548,7 @@ namespace EducNotes.API.Data
             var code = Guid.NewGuid();
             userToCreate.UserName = code.ToString();
             userToCreate.ValidationCode = code.ToString();
-            userToCreate.ValidatedCode = false;
+            userToCreate.Validated = false;
             userToCreate.EmailConfirmed = false;
             userToCreate.UserName = code.ToString();
             bool resultStatus = false;
@@ -648,7 +648,6 @@ namespace EducNotes.API.Data
                 child.PasswordHash = newPassword;
                 if(child.Email != "" && child.Email != null)
                   child.EmailConfirmed = true;
-                child.ValidatedCode = true;
                 child.Validated = true;
                 Update(child);
                 resultStatus = true;
@@ -738,7 +737,7 @@ namespace EducNotes.API.Data
                   var code = Guid.NewGuid();
                   userToSave.UserName = code.ToString();
                   userToSave.ValidationCode = code.ToString();
-                  userToSave.ValidatedCode = false;
+                  userToSave.Validated = false;
                   userToSave.EmailConfirmed = false;
                   userToSave.UserName = code.ToString();
 
@@ -1223,7 +1222,7 @@ namespace EducNotes.API.Data
                             // configuration du nouveau mot de passe
                             var newPassword = _userManager.PasswordHasher.HashPassword(parentFromRepo, user.Password);
                             parentFromRepo.PasswordHash = newPassword;
-                            parentFromRepo.ValidatedCode = true;
+                            parentFromRepo.Validated = true;
                             parentFromRepo.EmailConfirmed = true;
                             parentFromRepo.ValidationDate = DateTime.Now;
                             var res = await _userManager.UpdateAsync(parentFromRepo);
@@ -1264,7 +1263,7 @@ namespace EducNotes.API.Data
                             // configuration du mot de passe
                             var newPass = _userManager.PasswordHasher.HashPassword(child, user.Password);
                             child.PasswordHash = newPass;
-                            child.ValidatedCode = true;
+                            child.Validated = true;
                             child.EmailConfirmed = false;
                             if (!string.IsNullOrEmpty(child.Email))
                                 child.EmailConfirmed = true;

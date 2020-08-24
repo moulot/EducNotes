@@ -295,10 +295,10 @@ namespace EducNotes.API.Controllers
 
             foreach (var item in usertypes)
             {
-                data.Add( new UserTypesDto {
+                data.Add(new UserTypesDto {
                     UserType = item,
                     Total = users.Where(a => a.UserTypeId == item.Id).Count(),
-                    TotalActive = users.Where(a => a.UserTypeId == item.Id && a.ValidatedCode == true).Count(),
+                    TotalActive = users.Where(a => a.UserTypeId == item.Id && a.Validated == true).Count(),
                     
                 });
             }

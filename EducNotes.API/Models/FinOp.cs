@@ -21,7 +21,7 @@ namespace EducNotes.API.Models
     public decimal Amount { get; set; }
     public int? FromUserId { get; set; }
     public User FromUser { get; set; }
-    public int ForUserId { get; set; }
+    public int? ForUserId { get; set; }
     public User ForUser { get; set; }
     public int? FromCashDeskId { get; set; }
     public CashDesk FromCashDesk { get; set; }

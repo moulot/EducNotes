@@ -81,7 +81,7 @@ namespace EducNotes.API.Controllers
                 bool emailCOnfirmed = user.EmailConfirmed;
                 var newPassword = _userManager.PasswordHasher.HashPassword(user, password);
                 user.PasswordHash = newPassword;
-                user.ValidatedCode = true;
+                user.Validated = true;
                 user.EmailConfirmed = true;
                 if (!emailCOnfirmed)
                   user.ValidationDate = DateTime.Now;
@@ -149,7 +149,7 @@ namespace EducNotes.API.Controllers
           if (await _repo.UserNameExist(userForLoginDto.Username.ToLower()))
           {
             var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
-            if (!user.ValidatedCode)
+            if (!user.Validated)
               return BadRequest("Compte non validé pour l'instant...");
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
@@ -258,7 +258,7 @@ namespace EducNotes.API.Controllers
             var user = await _repo.GetSingleUser(userForCodeValidation.UserName);
             if (user != null)
             {
-                if (user.ValidatedCode == true)
+                if (user.Validated == true)
                 {
                     return BadRequest("compte déjà confirmé...");
                 }
@@ -460,7 +460,7 @@ namespace EducNotes.API.Controllers
             user.UserTypeId = teacherTypeId;
             var newPassword = _userManager.PasswordHasher.HashPassword(user, userToUpdate.Password);
             user.PasswordHash = newPassword;
-            user.ValidatedCode = true;
+            user.Validated = true;
             user.EmailConfirmed = true;
             user.ValidationDate = DateTime.Now;
             var result = await _userManager.UpdateAsync(user);
@@ -508,7 +508,6 @@ namespace EducNotes.API.Controllers
             user.UserName = userData.UserName.ToLower();
             user.NormalizedUserName = userData.UserName.ToUpper();
             user.PasswordHash = newPassword;
-            user.ValidatedCode = true;
             user.Validated = true;
             user.ValidationDate = DateTime.Now;
             var res = await _userManager.UpdateAsync(user);

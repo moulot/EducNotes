@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ClassService } from 'src/app/_services/class.service';
 import { CollapseComponent } from 'ng-uikit-pro-standard';
@@ -64,6 +64,8 @@ export class NewTuitionComponent implements OnInit {
   showCashData = false;
   showChequeData = false;
   showWireData = false;
+  orderid: any;
+  invoiceid: any;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private router: Router,
     private authService: AuthService, private classService: ClassService, private orderService: OrderService,
@@ -71,6 +73,7 @@ export class NewTuitionComponent implements OnInit {
 
   ngOnInit() {
     this.createTuitionForm();
+    this.createPaymentForm();
     this.settings = this.authService.settings;
     this.regFee = Number(this.settings.find(s => s.name === 'RegFee').value);
     this.regDeadline = this.settings.find(s => s.name === 'RegistrationDeadLine').value;
@@ -80,7 +83,6 @@ export class NewTuitionComponent implements OnInit {
     this.getClassLevels();
     this.getTuitionData();
     this.getPaymentData();
-    this.createPaymentForm();
 
   }
 
@@ -207,27 +209,35 @@ export class NewTuitionComponent implements OnInit {
 
   createPaymentForm() {
     this.paymentForm = this.fb.group({
-      type: [null, Validators.required],
+      typeid: [null, Validators.required],
       opDate: ['', Validators.required],
-      bank: [],
-      numCheque: [],
-      refDoc: []
+      amount: ['', Validators.required],
+      bankid: [0],
+      numCheque: [''],
+      refDoc: [''],
+      note: ['']
     }, {validator: this.paymentValidator});
   }
 
   paymentValidator(g: FormGroup) {
     let chequeerror = false;
-    const paytype = g.get('type').value;
+    const paytype = g.get('typeid').value;
     const numcheque = g.get('numCheque').value;
-    if ((paytype !== '' && numcheque === '') || (paytype === '' && numcheque !== '')) {
+    if ((Number(paytype) === environment.payCheque && numcheque === '')) {
       chequeerror = true;
     }
 
-    let docerror = false;
-    const refDoc = g.get('refDoc').value;
-    if ((paytype !== '' && refDoc === '') || (paytype === '' && refDoc !== '')) {
-      docerror = true;
+    // let docerror = false;
+    // const refDoc = g.get('refDoc').value;
+    // if ((paytype !== '' && refDoc === '') || (paytype === '' && refDoc !== '')) {
+    //   docerror = true;
+    // }
+
+    if (chequeerror === true) {
+      return {'chequeNOK': true};
     }
+
+    return null;
   }
 
   addChildItem(lname, fname, classlevelId, dob, sex): void {
@@ -341,18 +351,41 @@ export class NewTuitionComponent implements OnInit {
 
   saveTuitionAndPayment() {
     this.setTuitionData();
-    // this.orderService.addNewTuition(this.tuitionData).subscribe((id) => {
-    //   this.alertify.success('l\'inscription a bien été enregistrée');
-    //   this.showTuitionForm = false;
-    //   this.showPaymentForm = true;
-    //   const orderid = id;
-
-    // }, error => {
-    //   this.alertify.error(error);
-    // });
-    this.showTuitionForm = false;
-    this.showPaymentForm = true;
+    this.orderService.addNewTuition(this.tuitionData).subscribe((data: any) => {
+      this.alertify.success('l\'inscription a bien été enregistrée');
+      this.showTuitionForm = false;
+      this.showPaymentForm = true;
+      this.orderid = data.orderId;
+      this.invoiceid = data.invoiceId;
+    }, error => {
+      this.alertify.error(error);
+    }, () => {
+      const amount = this.paymentForm.get('amount') as FormControl;
+      amount.setValue(this.tuitionData.dueAmount);
+      this.showTuitionForm = false;
+      this.showPaymentForm = true;
+    });
 }
+
+  savePayment() {
+    const paydata = <any>{};
+    paydata.finOpDate = Utils.inputDateDDMMYY(this.paymentForm.value.opDate, '/');
+    paydata.orderId = this.orderid;
+    paydata.invoiceId = this.invoiceid;
+    paydata.paymentTypeId = this.paymentForm.value.typeid;
+    paydata.amount = this.paymentForm.value.amount;
+    paydata.numCheque = this.paymentForm.value.numCheque;
+    paydata.refDoc = this.paymentForm.value.refDoc;
+    paydata.note = this.paymentForm.value.note;
+    paydata.bankId = this.paymentForm.value.bankid;
+    console.log(paydata);
+    this.paymentService.addFinOp(paydata).subscribe(() => {
+      this.alertify.success('paiment effectué avec succès');
+      this.router.navigate(['/tuitions']);
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
 
   setTuitionData() {
     this.tuitionData.fLastName = this.tuitionForm.value.fLastName;
@@ -388,11 +421,12 @@ export class NewTuitionComponent implements OnInit {
   }
 
   selectPayType() {
-    const type = this.paymentForm.value.type;
+    this.showPayDataBox = true;
+    const typeid = this.paymentForm.value.typeid;
     this.showCashData = false;
     this.showChequeData = false;
     this.showWireData = false;
-    switch (type) {
+    switch (Number(typeid)) {
       case this.payCash:
         this.showCashData = true;
         break;

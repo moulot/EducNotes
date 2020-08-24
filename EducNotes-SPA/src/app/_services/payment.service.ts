@@ -18,4 +18,9 @@ export class PaymentService {
     return this.http.get(this.baseUrl + 'PaymentData');
   }
 
+  addFinOp(finOpData: any)
+  {
+    return this.http.post(this.baseUrl + 'AddFinOp', finOpData);
+  }
+
 }

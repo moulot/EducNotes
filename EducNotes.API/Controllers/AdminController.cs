@@ -882,7 +882,7 @@ namespace EducNotes.API.Controllers
 
             red.Children = new List<ChildRegistrationDto>();
             var children = await _context.UserLinks
-                            .Where(u => u.UserPId == parent.Id && u.User.Active == 1 && u.User.ValidatedCode == true)
+                            .Where(u => u.UserPId == parent.Id && u.User.Active == 1 && u.User.Validated == true)
                             .Select(u => u.User)
                             .Include(i => i.Class).ThenInclude(i => i.ClassLevel)
                             .Distinct().ToListAsync();
@@ -1016,13 +1016,13 @@ namespace EducNotes.API.Controllers
           var userTypes = await _context.UserTypes.Include(u => u.Users).ToListAsync();
           foreach (var item in userTypes)
           {
-              dataToReturn.Add(new UsersRecapDto
-              {
-                  UserTypeId = item.Id,
-                  UserTypeName = item.Name,
-                  TotalAccount = item.Users.Count(),
-                  TotalActive = item.Users.Where(u => u.EmailConfirmed == true).Count()
-              });
+            dataToReturn.Add(new UsersRecapDto
+            {
+              UserTypeId = item.Id,
+              UserTypeName = item.Name,
+              TotalAccount = item.Users.Count(),
+              TotalActive = item.Users.Where(u => u.Validated == true).Count()
+            });
           }
           return Ok(dataToReturn);
         }

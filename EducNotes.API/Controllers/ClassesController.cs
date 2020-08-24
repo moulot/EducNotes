@@ -1465,7 +1465,7 @@ namespace EducNotes.API.Controllers
             //recuperation de tous les professeurs ainsi que les cours affectés
             var teachers = await _context.Users
                                   .Include(p => p.Photos)
-                                  .Where(u => u.UserTypeId == teacherTypeId && u.ValidatedCode == true)
+                                  .Where(u => u.UserTypeId == teacherTypeId && u.Validated == true)
                                   .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
 
             var teachersToReturn = new List<TeacherForListDto>();

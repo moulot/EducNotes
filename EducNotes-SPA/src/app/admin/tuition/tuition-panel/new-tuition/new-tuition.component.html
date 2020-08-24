@@ -341,7 +341,7 @@
     </div>
   </div>
 </form>
-<form *ngIf="showPaymentForm" [formGroup]="paymentForm" (ngSubmit)="saveTuition()">
+<form *ngIf="showPaymentForm" [formGroup]="paymentForm" (ngSubmit)="savePayment()">
   <div class="row mb-2">
     <div class="col-md-12 d-flex">
       <i class="fad fa-sack-dollar fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
@@ -372,23 +372,42 @@
             </div>
           </div>
         </div>
+        <div class="row">
+          <div class="col-md-2 text-15 d-flex align-items-end pb-1">montant du paiement</div>
+          <div class="col-md-2">
+            <div class="md-form mt-2 mb-0">
+              <input mdbInput type="text" id="amnt" appSpacedAmnt class="form-control" formControlName="amount" mdbValidate>
+              <label for="amnt" class=""></label>
+              <div *ngIf="paymentForm.get('amount').hasError('required') && paymentForm.get('amount').touched"
+                class="text-small text-danger">saisir le montant du paiement</div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="md-form">
+              <textarea type="text" id="note" formControlName="note" class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
+              <label for="content">note</label>  
+            </div>
+          </div>
+        </div>
         <div class="row mt-3">
           <div class="col-md-2 text-15 d-flex align-items-end pb-1">moyen de paiement</div>
           <div class="col-md-2" *ngFor="let paytype of paytypes">
             <div class="form-check form-check-inline">
               <input type="radio" class="form-check-input" (change)="selectPayType()" id="{{paytype.id}}"
-                value="{{paytype.id}}" formControlName="type" name="type" mdbInput>
+                value="{{paytype.id}}" formControlName="typeid" name="typeid" mdbInput>
               <label class="form-check-label" for="{{paytype.id}}">{{paytype.name | lowercase}}</label>
             </div>
           </div>
-          <div *ngIf="paymentForm.get('type').errors && paymentForm.get('type').touched"
+          <div *ngIf="paymentForm.get('typeid').hasError('required') && paymentForm.get('typeid').touched"
             class="text-small text-danger">choisir le type de paiement</div>
         </div>
         <div *ngIf="showPayDataBox">
           <hr class="my-1">
           <div *ngIf="showChequeData || showWireData" class="row mt-1">
             <div class="col-md-3">
-              <mdb-select [options]="bankOptions" formControlName="bank" placeholder="choisir la banque"></mdb-select>
+              <mdb-select [options]="bankOptions" formControlName="bankid" placeholder="choisir la banque"></mdb-select>
             </div>
           </div>
           <div *ngIf="showChequeData" class="row mt-2">
@@ -396,8 +415,7 @@
               <div class="md-form mt-2 mb-0">
                 <input mdbInput type="text" id="numCheque" class="form-control" formControlName="numCheque" mdbValidate>
                 <label for="numCheque" class="">numéro du chèque</label>
-                <div *ngIf="paymentForm.get('numCheque').hasError('chequeerror')"
-                  class="text-small text-danger">saisir le numéro de chèque</div>
+                <div *ngIf="paymentForm.hasError('chequeNOK')" class="text-small text-danger">saisir le numéro de chèque</div>
               </div>
             </div>
           </div>
@@ -406,10 +424,15 @@
               <div class="md-form mt-2 mb-0">
                 <input mdbInput type="text" id="refDoc" class="form-control" formControlName="refDoc" mdbValidate>
                 <label for="refDoc" class="">réf: bordereau</label>
-                <div *ngIf="paymentForm.get('refDoc').hasError('docerror')"
-                  class="text-small text-danger">saisir la référence de bordereau</div>
               </div>
             </div>
+          </div>
+        </div>
+        <hr class="my-1">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="!paymentForm.valid" mdbBtn class="btnBlue" block="true"
+              size="sm" mdbWavesEffect>saisir le paiement</button>
           </div>
         </div>
       </div>

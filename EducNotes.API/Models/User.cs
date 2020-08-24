@@ -24,7 +24,7 @@ namespace EducNotes.API.Models
         public string SecondPhoneNumber { get; set; }
         public string ValidationCode { get; set; }
         public DateTime? ValidationDate { get; set; }
-        public bool ValidatedCode { get; set; }
+        // public bool ValidatedCode { get; set; }
         public int? ClassId { get; set; }
         public Class Class { get; set; }
         public DateTime DateOfBirth { get; set; }

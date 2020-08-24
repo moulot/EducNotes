@@ -5,6 +5,7 @@ import { Utils } from 'src/app/shared/utils';
 import { OrderService } from 'src/app/_services/order.service';
 import { environment } from 'src/environments/environment';
 import { AdminService } from 'src/app/_services/admin.service';
+import { AlertifyService } from 'src/app/_services/alertify.service';
 
 @Component({
   selector: 'app-tuition-panel',
@@ -26,7 +27,8 @@ export class TuitionPanelComponent implements OnInit {
   teachers: any;
   students: any;
 
-  constructor(private authService: AuthService, private orderService: OrderService, private adminService: AdminService) { }
+  constructor(private authService: AuthService, private orderService: OrderService,
+    private alertify: AlertifyService, private adminService: AdminService) { }
 
   ngOnInit() {
     this.getUSersRecap();
@@ -34,7 +36,6 @@ export class TuitionPanelComponent implements OnInit {
     const regDate = this.settings.find(s => s.name === 'RegistrationDate').value;
     this.regDate = Utils.inputDateDDMMYY(regDate, '/');
     const today = new Date();
-    console.log('today:' + today + ' - ' + this.regDate);
     if (today >= this.regDate) {
       this.regActive = true;
     }
@@ -45,13 +46,13 @@ export class TuitionPanelComponent implements OnInit {
   }
 
   getUSersRecap() {
-    this.adminService.getUsersRecap().subscribe((res: any[]) => {
-     this.admins = res.find(i => i.userTypeId === this.adminTypeId);
-     this.parents = res.find(i => i.userTypeId === this.parentTypeId);
-     this.teachers = res.find(i => i.userTypeId === this.teacherTypeId);
-     this.students = res.find(i => i.userTypeId === this.studentTypeId);
+    this.adminService.getUsersRecap().subscribe((data: any[]) => {
+      this.admins = data.find(i => i.userTypeId === this.adminTypeId);
+      this.parents = data.find(i => i.userTypeId === this.parentTypeId);
+      this.teachers = data.find(i => i.userTypeId === this.teacherTypeId);
+      this.students = data.find(i => i.userTypeId === this.studentTypeId);
     }, error => {
-      console.log(error);
+      this.alertify.error(error);
     });
   }
 
