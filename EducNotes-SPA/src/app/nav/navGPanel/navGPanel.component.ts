@@ -75,7 +75,7 @@ export class NavGPanelComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.currentUser;
-    this.acc_name = this.user.firstName.substring(0, 1).toLowerCase() + '. ' + this.user.lastName.toLowerCase();
+    this.acc_name = this.user.firstName.toLowerCase() + ' ' + this.user.lastName.substring(0, 1).toLowerCase() + '.';
     this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
 }
 

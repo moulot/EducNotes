@@ -10,16 +10,11 @@ namespace EducNotes.API.Models
       Qty = 1;
       Discount = 0;
       TVA = 0;
-      Status = 0;
+      Validated = false;
+      Paid = false;
+      Expired = false;
+      OverDue = false;
       Cancelled = false;
-    }
-
-    public enum StatusEnum
-    {
-      ProductFee = 0,
-      Created = 0,
-      Shipped = 1,
-      Completed = 2
     }
 
     public int Id { get; set; }
@@ -41,7 +36,10 @@ namespace EducNotes.API.Models
     public decimal AmountTTC { get; set; }
     public int? ChildId { get; set; }
     public User Child { get; set; }
-    public byte Status { get; set; }
+    public Boolean Validated { get; set; }
+    public Boolean Paid { get; set; }
+    public Boolean Expired { get; set; }
+    public Boolean OverDue { get; set; }
     public Boolean Cancelled { get; set; }
     public List<OrderLineDeadline> Deadlines { get; set; }
   }

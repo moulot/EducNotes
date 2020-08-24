@@ -23,6 +23,10 @@ export interface OrderLine {
    classLevelId: number;
    childClassId: number;
    childClassName: string;
+   validated: boolean;
+   paid: boolean;
+   overDue: boolean;
+   expired: boolean;
    cancelled: boolean;
    payments: OrderLineDeadline[];
 }

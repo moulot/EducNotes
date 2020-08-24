@@ -214,7 +214,6 @@ namespace EducNotes.API.Controllers
             line.TotalHT = line.Qty * line.UnitPrice + line.ProductFee;
             line.AmountHT = line.TotalHT - line.Discount;
             line.AmountTTC = line.AmountHT + line.TVAAmount;
-            line.Status = Convert.ToByte(OrderLine.StatusEnum.Created);
             _repo.Add(line);
 
             byte seq = 1;
@@ -383,6 +382,24 @@ namespace EducNotes.API.Controllers
       }
 
       return BadRequest("problème pour ajouter l'inscription");
+    }
+
+    [HttpGet("TuitionFigures")]
+    public async Task<IActionResult> GetTuitionFigures()
+    {
+      var tuitionIds = await _context.Orders.Where(t => t.OrderTypeId == tuitionTypeId).Select(s => s.Id).ToListAsync();
+      var tuitions = await _context.OrderLines.Where(t => tuitionIds.Contains(t.OrderId)).ToListAsync();
+      var totalTuitions = tuitions.Where(t => tuitionIds.Contains(t.OrderId)).Count();
+      var tuitionsNotValidated = tuitions.Where(t => t.Validated == false).Count();
+      var tuitionsValidated = tuitions.Where(t => t.Validated == true).Count();
+      var classSpaces = await _context.Classes.SumAsync(c => c.MaxStudent);
+
+      return Ok(new {
+        totalTuitions,
+        tuitionsNotValidated,
+        tuitionsValidated,
+        classSpaces
+      });
     }
 
   }

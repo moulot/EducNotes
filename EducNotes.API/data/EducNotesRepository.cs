@@ -2481,5 +2481,60 @@ namespace EducNotes.API.Data
           var banks = await _context.Banks.OrderBy(o => o.Name).ToListAsync();
           return banks;
         }
+
+        public async Task<bool> ValidateTuition(decimal finOpAmount, int orderId)
+        {
+          var order = await _context.Orders.FirstAsync(o => o.Id == orderId);
+          var lines = await _context.OrderLines
+                            .Where(t => t.OrderId == orderId && t.Validated == false)
+                            .OrderBy(o => o.AmountTTC)
+                            .ToListAsync();
+          var lineIds = lines.Select(t => t.Id);
+          var totalRegFees = lines.Sum(f => f.ProductFee);
+          var deadlines = await _context.OrderLineDeadlines.Where(d =>
+            lineIds.Contains(d.OrderLineId) && d.Seq == 1).ToListAsync();
+
+          // 1st DownPayment must be paid (+ registration fee) to validate a tuition
+          var totalDownPayments = await _context.OrderLineDeadlines.Where(d =>
+            lineIds.Contains(d.OrderLineId) && d.Seq == 1).SumAsync(o => o.Amount);
+          var validationAmnt = totalDownPayments + totalRegFees;
+
+          if(finOpAmount >= validationAmnt)
+          {
+            foreach (var line in lines)
+            {
+              line.Validated = true;
+            }
+            _context.UpdateRange(lines);
+            order.Validated = true;
+            _context.Update(order);
+          }
+          else
+          {
+            var balance = finOpAmount;
+            order.Validated = true;
+            foreach (var line in lines)
+            {
+              var tuitionDP = deadlines.First(t => t.OrderLineId == line.Id).Amount;
+              var amntToBePaid = line.ProductFee + tuitionDP;
+              if(balance >= amntToBePaid)
+              {
+                line.Validated = true;
+                balance -= amntToBePaid;
+              }
+              else
+              {
+                order.Validated = false;
+                break;
+              }
+            }
+            _context.UpdateRange(lines);
+            _context.Update(order);
+          }
+
+          await SaveAll();
+          return order.Validated;
+
+        }
     }
 }

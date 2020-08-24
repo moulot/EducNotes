@@ -26,12 +26,17 @@ export class TuitionPanelComponent implements OnInit {
   parents: any;
   teachers: any;
   students: any;
+  totalTuitions: any;
+  tuitionsNotValidated: any;
+  tuitionsValidated: any;
+  classSpaces: any;
 
   constructor(private authService: AuthService, private orderService: OrderService,
     private alertify: AlertifyService, private adminService: AdminService) { }
 
   ngOnInit() {
     this.getUSersRecap();
+    this.getTuitionFigures();
     this.settings = this.authService.settings;
     const regDate = this.settings.find(s => s.name === 'RegistrationDate').value;
     this.regDate = Utils.inputDateDDMMYY(regDate, '/');
@@ -46,11 +51,22 @@ export class TuitionPanelComponent implements OnInit {
   }
 
   getUSersRecap() {
-    this.adminService.getUsersRecap().subscribe((data: any[]) => {
+    this.adminService.getUsersRecap().subscribe((data: any) => {
       this.admins = data.find(i => i.userTypeId === this.adminTypeId);
       this.parents = data.find(i => i.userTypeId === this.parentTypeId);
       this.teachers = data.find(i => i.userTypeId === this.teacherTypeId);
       this.students = data.find(i => i.userTypeId === this.studentTypeId);
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getTuitionFigures() {
+    this.orderService.getTuitionFigures().subscribe((data: any) => {
+      this.totalTuitions = data.totalTuitions;
+      this.tuitionsNotValidated = data.tuitionsNotValidated;
+      this.tuitionsValidated = data.tuitionsValidated;
+      this.classSpaces = data.classSpaces;
     }, error => {
       this.alertify.error(error);
     });

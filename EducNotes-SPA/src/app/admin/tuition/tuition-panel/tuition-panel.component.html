@@ -79,17 +79,23 @@
     </div>
   </div>
 
-  <div *ngIf="regActive" class="col-md-6 my-2">
+  <div *ngIf="regActive" class="col-md-7 my-2">
     <div class="card">
       <div class="card-body p-2">
         <div class="text-17">situation des inscriptions</div>
         <hr class="my-1">
-        <div class="text-15 text-muted">inscrits : 250 / 1000 places disponibles</div>
-        <div class="text-15 text-muted">180 inscriptions validés sur 250 inscrits</div>
+        <div class="text-16 text-muted">
+          {{totalTuitions}} inscriptions sur {{classSpaces}} places disponibles
+          <span class="text-small text-danger"><a>voir les détails</a></span>
+        </div>
+        <div class="text-16 text-muted">
+          {{tuitionsValidated}} inscriptions validés sur {{totalTuitions}}
+          <span class="text-small text-danger"><a>voir les détails</a></span>
+        </div>
       </div>
     </div>
   </div>
-  <div *ngIf="regActive" class="col-md-6 my-2">
+  <div *ngIf="regActive" class="col-md-5 my-2">
     <div class="card">
       <div class="card-body p-2">
         <div class="text-17">tâches à effectuer</div>

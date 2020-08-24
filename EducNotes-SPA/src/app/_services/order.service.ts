@@ -29,4 +29,8 @@ export class OrderService {
   addNewTuition(tuition: TuitionData) {
     return this.http.post(this.baseUrl + 'NewTuition', tuition);
   }
+
+  getTuitionFigures() {
+    return this.http.get(this.baseUrl + 'TuitionFigures');
+  }
 }

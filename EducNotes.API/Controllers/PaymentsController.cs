@@ -55,8 +55,10 @@ namespace EducNotes.API.Controllers
     {
       FinOp finOp = new FinOp();
       finOp.FinOpDate = finOpDataDto.FinOpDate;
-      finOp.OrderId = finOpDataDto.OrderId;
-      finOp.InvoiceId = finOpDataDto.InvoiceId;
+      if(finOpDataDto.InvoiceId != 0)
+      {
+        finOp.InvoiceId = finOpDataDto.InvoiceId;
+      }
       finOp.PaymentTypeId = finOpDataDto.PaymentTypeId;
       finOp.Amount = finOpDataDto.Amount;
       finOp.Note = finOpDataDto.Note;
@@ -67,12 +69,19 @@ namespace EducNotes.API.Controllers
         Cheque cheque = new Cheque();
         cheque.ChequeNum = finOpDataDto.numCheque;
         cheque.Amount = finOp.Amount;
-        if(finOpDataDto.BankId == 0)
+        if(finOpDataDto.BankId != 0)
           cheque.BankId = finOpDataDto.BankId;
 
         _context.Add(cheque);
         _context.SaveChanges();
         finOp.ChequeId = cheque.Id;
+      }
+
+      //order validation
+      if(finOpDataDto.OrderId != 0)
+      {
+        finOp.OrderId = finOpDataDto.OrderId;
+        await _repo.ValidateTuition(finOp.Amount, Convert.ToInt32(finOp.OrderId));
       }
 
       _context.Add(finOp);
