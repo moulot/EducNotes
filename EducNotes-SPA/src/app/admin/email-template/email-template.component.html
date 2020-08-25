@@ -1,4 +1,4 @@
-<div class="row m-2">
+<div class="row">
   <div class="col-md-12 mb-2">
     <button type="button" class="mr-2" mdbBtn size="sm" class="btnBlue" (click)="addNew()" mdbWavesEffect>nouveau modèle</button>
   </div>
@@ -10,13 +10,14 @@
         <div *ngFor="let item of emailTemplates">
           <div class="p-2 border rounded my-1">
             <div class="row p-2">
-              <div class="col-md-1 text-15 font-weight-450">
-                <a (click)="editTemplate(item.id)" style="text-decoration: underline;">editer</a>
+              <div class="col-md-5">
+                <button type="button" mdbBtn (click)="editTemplate(item.id)" size="sm" class="btnBlue"
+                  mdbWavesEffect>editer le modele</button>
+                <div class="col-md-12 text-16">nom : <b>{{item.name}}</b></div>
+                <div class="col-md-12 text-16">type : <b>{{item.emailCategoryName}}</b></div>
               </div>
-              <div class="col-md-2 text-15 font-weight-450">{{item.name}}</div>
-              <div class="col-md-2 text-15">{{item.emailCategoryName}}</div>
-              <div class="col-md-7 text-15">
-                <div class="text-15">objet : <b>{{item.subject}}</b></div>
+              <div class="col-md-7">
+                <div class="text-15"><span style="text-decoration: underline;">objet</span> : <b>{{item.subject}}</b></div>
                 <div class="text-15">{{item.body}}</div>
               </div>
             </div>

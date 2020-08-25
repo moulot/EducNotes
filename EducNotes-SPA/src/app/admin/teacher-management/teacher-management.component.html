@@ -123,15 +123,15 @@
               </div>
             </div>
             <div>
-              <button mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect [routerLink]="['/editTeacher',teacher.id]">
+              <button mdbBtn class="btnWhiteB" size="sm" mdbWavesEffect [routerLink]="['/editTeacher',teacher.id]">
                 <i class="fad fa-user-edit fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                  --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                  --fa-primary-color:#192C47;--fa-secondary-color:#192C47;"></i>
                 editer
               </button>
-              <button mdbBtn class="btnWhiteO ml-2" size="sm" mdbWavesEffect [routerLink]="['/teacherAssignment',teacher.id]"
+              <button mdbBtn class="btnWhiteB ml-2" size="sm" mdbWavesEffect [routerLink]="['/teacherAssignment',teacher.id]"
                 [disabled]="teacher.courseClasses.length === 0" (click)="assignment(teacher)">
                 <i class="fad fa-users-class fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                  --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                  --fa-primary-color:#192C47;--fa-secondary-color:#192C47;"></i>
                 affecter
               </button>
             </div>

@@ -125,12 +125,14 @@ import { TreasuryComponent } from './admin/treso/treasury/treasury.component';
 import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
 import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
 import { UserFileComponent } from './admin/user-file/user-file.component';
+import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-email/confirm-teacher-email.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
     { path: 'imgCropper', component: AppImgCropperComponent },
     { path: 'signIn', component: SigninComponent },
     {path: 'confirmEmail', component: ConfirmEmailComponent},
+    {path: 'confirmTeacherEmail', component: ConfirmTeacherEmailComponent},
     {path: 'contactus', component: ContactUsComponent},
     // { path: 'confirmEmail/:code', component: ConfirmEmailComponent, resolve: { user: EmailConfirmResolver } },
     { path: 'resetPassword/:code', component: ResetPasswordComponent, resolve: { user: ResetPasswordResolver } },

@@ -244,6 +244,7 @@ import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
 import { UserFileComponent } from './admin/user-file/user-file.component';
 import { SpacedAmountDirective } from './_directives/spacedAmount.directive';
 import { TuitionDetailsComponent } from './admin/tuition/tuition-details/tuition-details.component';
+import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-email/confirm-teacher-email.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -410,7 +411,8 @@ export function tokenGetter() {
       SchoolSettingsComponent,
       UserFileComponent,
       TuitionDetailsComponent,
-      TuitionDetailsComponent
+      TuitionDetailsComponent,
+      ConfirmTeacherEmailComponent
    ],
    imports: [
       FormWizardModule,

@@ -771,19 +771,7 @@ namespace EducNotes.API.Data
 
                     var template = await _context.EmailTemplates.FirstAsync(t => t.Id == teacherConfirmEmailId);
                     Email emailToSend = await SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
-                    // var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToSave.ValidationCode;
-                    // var emailToSend = new Email
-                    // {
-                    //   StatusFlag = 0,
-                    //   Subject = "Confirmation de compte",
-                    //   ToAddress = appUser.Email,
-                    //   Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                    //   FromAddress = "no-reply@educnotes.com",
-                    //   EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId"),
-                    //   InsertUserId = insertUserId,
-                    //   UpdateUserId = insertUserId,
-                    // };
-                    // Add(emailToSend);
+                    Add(emailToSend);
                   }
                 }
               }
@@ -1886,7 +1874,7 @@ namespace EducNotes.API.Data
                 td.Value = emailData.Token;
                 break;
               case "<CONFIRM_LINK>":
-                td.Value = string.Format("{0}/confirmEmail?id={1}&token={2}", baseUrl,
+                td.Value = string.Format("{0}/confirmTeacherEmail?id={1}&token={2}", "localHost:4200",
                   teacherId, HttpUtility.UrlEncode(emailData.Token));
                 break;
               default:

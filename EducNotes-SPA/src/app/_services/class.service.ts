@@ -312,7 +312,7 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/courses/' + courseId + '/teacher/' + teacherId + '/Program');
   }
 
-  searchThemes(classLevelId: number, courseId: number){
+  searchThemes(classLevelId: number, courseId: number) {
     return this.http.get(this.baseUrl + 'classes/ClassLevelCourseThemes/' + classLevelId + '/' + courseId);
   }
 

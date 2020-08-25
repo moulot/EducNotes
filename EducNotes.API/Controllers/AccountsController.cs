@@ -125,14 +125,17 @@ namespace EducNotes.API.Controllers
           }
         }
 
-        //get children...
-        children = await _repo.GetAccountChildren(user.Id);
-        foreach (var child in children)
+        //get children if it's a parent...
+        if(user.UserTypeId == parentTypeId)
         {
-          if(!child.Validated)
+          children = await _repo.GetAccountChildren(user.Id);
+          foreach (var child in children)
           {
-            childrenValidated = false;
-            break;
+            if(!child.Validated)
+            {
+              childrenValidated = false;
+              break;
+            }
           }
         }
       }

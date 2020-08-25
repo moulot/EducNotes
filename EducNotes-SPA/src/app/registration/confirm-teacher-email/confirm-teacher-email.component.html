@@ -1,0 +1,192 @@
+<div *ngIf="!user">
+  <div class="text-20 mt-2">CONFIRMATION DU MOBILE ET DU EMAIL</div>
+  <div class="text-center p-4">
+    <i class="fad fa-exclamation-triangle fa-6x" style="--fa-secondary-opacity: 1;
+      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+  </div>
+  <div class="text-20">
+    <div>Bonjour,</div>
+    <div>Le lien de validation est incorrect. Pour valider votre email et votre compte vous devez clicker sur le lien reçu dans le email que nous vous avons envoyé. merci</div>
+    <div class="my-3">Pour des informations complémentaires vous pouvez nous contacter au :</div>
+    <div class="mb-3 pl-3"> téléphone :<b>12.34.56.78</b></div>
+    <div class="mb-3 pl-3"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
+  </div>
+</div>
+
+<div class="text-20" *ngIf="user && !emailOK">
+  <div class="text-20 text-center mt-2">CONFIRMATION DU MOBILE ET DU EMAIL</div>
+  <div *ngIf="user">Bonjour
+    <span  *ngIf="user.gender == 0">Mme</span>
+    <span  *ngIf="user.gender == 1">Mr</span>
+    {{user.lastName | titlecase}},
+  </div>
+  <div class="border rounded-lg p-2">
+    <div class="row">
+      <div class="col-md-1 text-center my-auto">
+        <i class="fad fa-exclamation-triangle fa-3x" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      </div>
+      <div class="col-md-11"><div>Nous n'avons pas pu valider votre email.</div>
+        <span class="text-15">le lien que vous avez reçu dans votre email est invalide.
+          recommencez en clickant sur le lien reçu par email ou en le copiant dans votre navigateur. Si le problème persiste envoyez
+          à nouveau le email de validation en clickant sur le bouton ci-dessous.</span>
+      </div>
+    </div>
+  </div>
+  <div class="my-3 text-center">
+    <button type="button" mdbBtn (click)="sendEmailToConfirm()" class="btnBlue"
+      mdbWavesEffect>envoyer à nouveau le email de confirmation</button>
+  </div>
+  <div class="text-16">Si le problème persiste veuillez nous contacter au :</div>
+  <div class="text-16 my-3 pl-3"> téléphone :<b>12.34.56.78</b></div>
+  <div class="text-16 mb-3 pl-3"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
+</div>
+
+<div class="row" *ngIf="emailOK">
+  <div class="col-md-12 text-16 mb-2">Bonjour
+    <span  *ngIf="user.gender == 0">Mme</span>
+    <span  *ngIf="user.gender == 1">Mr</span>
+    {{user.lastName | titlecase}},
+  </div>
+  <div *ngIf="!validAccount">
+    <div class="col-md-12 text-16 my-2">finaliser svp la création de votre compte sur la plateforme Educ'Notes.</div>
+  </div>
+  <div class="col-md-10 mx-auto">
+    <div class="card mb-2">
+      <div class="card-body">
+        <div class="text-16">votre email, <b>'{{user.email}}'</b>, est maintenant confirmé. merci!</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-10 mx-auto">
+    <div class="card mb-2">
+      <div class="card-body">
+        <div *ngIf="!user.phoneNumberConfirmed">
+          <form [formGroup]="phoneForm" (ngSubmit)="validatePhone()">
+            <div *ngIf="phoneValidationSteps == 0" class="row">
+              <div class="col-md-12 text-15 text-danger">pour valider le numéro de votre mobile vous recevrez un code par sms à saisir ici.</div>
+              <div class="col-md-6">
+                <div class="md-form mt-3 mb-0">
+                  <input mdbInput type="text" id="phone" (ngModelChange)="changePhone($event)"
+                    class="form-control" formControlName="phone" mdbValidate>
+                  <label for="phone" class="">numéro de téléphone à valider</label>
+                  <div *ngIf="phoneForm.get('phone').hasError('required')" class="text-small text-danger">saisir le mobile svp</div>
+                  <div *ngIf="phoneForm.get('phone').hasError('lenError')"
+                    class="text-small text-danger">le numéro doit avoir 8 chiffres</div>
+                </div>                
+              </div>
+              <div class="col-md-6 mt-3">
+                <button type="button" [disabled]="phoneForm.get('phone').errors" mdbBtn size="sm" (click)="sendPhoneNumber()"
+                  class="btnBlue" mdbWavesEffect>confirmer mon numero</button>
+              </div>
+            </div>
+            <div *ngIf="phoneValidationSteps == 1" class="row">
+              <div class="col-md-12 text-15 text-danger">saisir le code reçu par sms sur votre mobile.</div>
+              <div class="col-md-6">
+                <div>
+                  <div class="md-form mt-3 mb-0">
+                    <input mdbInput type="text" id="code" class="form-control" formControlName="code" mdbValidate>
+                    <label for="code" class="">saisir le code</label>
+                    <div *ngIf="phoneForm.get('code').hasError('empty') && phoneForm.get('code').touched"
+                      class="text-small text-danger">saisir le code de validation svp</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mt-3">
+                <button type="submit" [disabled]="phoneForm.get('code').hasError('empty')" mdbBtn size="sm"
+                  class="btnBlue" mdbWavesEffect>valider mon numero</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div *ngIf="user.phoneNumberConfirmed" class="row">
+          <div class="col-md-12">
+            <div class="text-16">votre numéro de mobile, <b>{{user.phoneNumber}}</b>, est validé. merci!</div>
+            <!-- <i class="fad fa-check fa-2x my-auto ml-2" style="border: 1px solid blue;--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-10 mx-auto">
+    <div class="card mb-2">
+      <div class="card-body">
+        <div *ngIf="!teacherOk">
+          <form [formGroup]="userForm" (ngSubmit)="updateUser()">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="md-form mt-1">
+                  <input mdbInput type="text" id="lastName" class="form-control" formControlName="lastName" mdbValidate>
+                  <label for="lastName" class="">nom</label>
+                  <div *ngIf="userForm.get('lastName').errors && userForm.get('lastName').touched"
+                    class="text-small text-danger">saisir le nom svp</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="md-form mt-1">
+                  <input mdbInput type="text" id="firstName" class="form-control" formControlName="firstName" mdbValidate>
+                  <label for="firstName" class="">prénom</label>
+                  <div *ngIf="userForm.get('firstName').errors && userForm.get('firstName').touched"
+                    class="text-small text-danger">saisir le prénom svp</div>
+                </div>          
+              </div>
+              <div class="col-md-4">
+                <div class="md-form my-0">
+                  <input mdbInput type="text" id="cell"
+                    class="form-control disabled" formControlName="cell" mdbValidate>
+                  <label for="cell" class="">mobile</label>
+                  <div *ngIf="userForm.get('cell').hasError('required')" class="text-small text-danger">saisir le mobile svp</div>
+                  <div *ngIf="userForm.get('cell').hasError('lenError')"
+                    class="text-small text-danger">le numéro doit avoir 8 chiffres</div>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="md-form my-0">
+                  <input mdbInput type="text" id="email" class="form-control disabled" formControlName="email" mdbValidate>
+                  <label for="email" class="">email</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="md-form my-0">
+                  <input mdbInput type="text" id="userName" class="form-control" formControlName="userName"
+                    (blur)="userNameVerification()" mdbValidate>
+                  <label for="userName" class="">identifiant</label>
+                  <div *ngIf="userForm.get('userName').errors && userForm.get('userName').touched"
+                    class="text-small text-danger">saisir un identifiant svp</div>
+                  <div *ngIf="userNameExist" class="text-small text-danger">cet identifiant existe déjà. choisir un autre svp</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="md-form my-0">
+                  <input mdbInput type="password" id="pwd" class="form-control" formControlName="pwd" mdbValidate>
+                  <label for="pwd" class="">mot de passe</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="md-form my-0">
+                  <input mdbInput type="password" id="checkpwd" class="form-control" formControlName="checkpwd" mdbValidate>
+                  <label for="checkpwd" class="">confirmer mot de passe</label>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <hr class="mt-2 mb-1">
+                <div class="float-right">
+                  <button type="button" (click)="initialValues()" mdbBtn class="btnBlue" size="sm" mdbWavesEffect>données initiales</button>
+                  <button type="submit" mdbBtn [disabled]="!userForm.valid || userNameExist" class="btnBlue"
+                    size="sm" mdbWavesEffect>saisir mes données</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div *ngIf="teacherOk">
+          <div class="text-16">votre compte Educ'Notes est maintenant actif. merci!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="teacherOk" class="mt-4 mx-auto">
+    <button type="button" mdbBtn [routerLink]="['/signIn']"  class="btnBlue" mdbWavesEffect>connecter vous à votre compte</button>
+  </div>
+</div>
