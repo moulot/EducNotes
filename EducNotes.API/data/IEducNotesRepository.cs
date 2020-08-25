@@ -92,14 +92,15 @@ namespace EducNotes.API.Data
     Task<IEnumerable<EducationLevelDto>> GetEducationLevels();
     Task<IEnumerable<SchoolDto>> GetSchools();
     Task<IEnumerable<CycleDto>> GetCycles();
-    List<Email> SetEmailDataForRegistration(List<RegistrationEmailDto> emailData, string content, string RegDeadLine);
+    Task<IEnumerable<Email>> SetEmailDataForRegistration(IEnumerable<RegistrationEmailDto> emailData, string content, string RegDeadLine);
     Task<Order> GetOrder(int id);
-    Email SetEmailForAccountUpdated(string subject, string content, string lastName, byte gender, string parentEmail);
+    Task<Email> SetEmailForAccountUpdated(string subject, string content, string lastName, byte gender, string parentEmail);
     string GetUserIDNumber(int userId, string lastName, string firstName);
     string GetInvoiceNumber(int invoiceId);
     Task<IEnumerable<PaymentType>> GetPaymentTypes();
     Task<IEnumerable<ClassLevel>> GetClasslevels();
     Task<IEnumerable<Bank>> GetBanks();
     Task<bool> ValidateTuition(decimal finOpAmount, int orderId);
+    Task<Email> SetDataForConfirmTeacherEmail(ConfirmTeacherEmailDto emailData, string body, string subject);
   }
 }

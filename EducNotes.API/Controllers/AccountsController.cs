@@ -26,7 +26,7 @@ namespace EducNotes.API.Controllers
     CultureInfo frC = new CultureInfo("fr-FR");
     int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
     string password;
-    int registrationEmailId, tuitionId, nextYearTuitionId, newRegToBePaidEmailId;
+    int tuitionId, nextYearTuitionId, newRegToBePaidEmailId;
 
     public AccountsController(IEducNotesRepository repo, IMapper mapper, DataContext context,
      IConfiguration config, UserManager<User> userManager)
@@ -40,7 +40,6 @@ namespace EducNotes.API.Controllers
       parentTypeId = _config.GetValue<int>("AppSettings:parentTypeId");
       adminTypeId = _config.GetValue<int>("AppSettings:adminTypeId");
       studentTypeId = _config.GetValue<int>("AppSettings:studentTypeId");
-      registrationEmailId = _config.GetValue<int>("AppSettings:registrationEmailId");
       newRegToBePaidEmailId = _config.GetValue<int>("AppSettings:newRegToBePaidEmailId");
       tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
       nextYearTuitionId = _config.GetValue<int>("AppSettings:nextYearTuitionId");

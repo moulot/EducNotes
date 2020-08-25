@@ -116,7 +116,7 @@ import { ClassStudentsAssignmentComponent } from './classes/class-students-assig
 import { TuitionPanelComponent } from './admin/tuition/tuition-panel/tuition-panel.component';
 import { CheckoutComponent } from './tuition/checkout/checkout.component';
 import { CheckoutResolver } from './_resolvers/checkout-resolver';
-import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/new-tuition.component';
+import { NewTuitionComponent } from './admin/tuition/new-tuition/new-tuition.component';
 import { ContactUsComponent } from './contactus/contact-us/contact-us.component';
 import { EditChildrenComponent } from './users/edit-children/edit-children.component';
 import { EditChildrenResolver } from './_resolvers/edit-children-resolver';

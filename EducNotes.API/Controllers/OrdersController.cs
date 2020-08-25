@@ -30,7 +30,7 @@ namespace EducNotes.API.Controllers
     int tuitionTypeId;
     int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId;
     string password;
-    int registrationEmailId, tuitionId, nextYearTuitionId, newRegToBePaidEmailId;
+    int tuitionId, nextYearTuitionId, newRegToBePaidEmailId;
 
     public OrdersController(IEducNotesRepository repo, IMapper mapper, DataContext context,
      IConfiguration config, UserManager<User> userManager)
@@ -45,7 +45,6 @@ namespace EducNotes.API.Controllers
       adminTypeId = _config.GetValue<int>("AppSettings:adminTypeId");
       studentTypeId = _config.GetValue<int>("AppSettings:studentTypeId");
       tuitionTypeId = _config.GetValue<int>("AppSettings:tuitionTypeId");
-      registrationEmailId = _config.GetValue<int>("AppSettings:registrationEmailId");
       newRegToBePaidEmailId = _config.GetValue<int>("AppSettings:newRegToBePaidEmailId");
       tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
       nextYearTuitionId = _config.GetValue<int>("AppSettings:nextYearTuitionId");
@@ -363,7 +362,7 @@ namespace EducNotes.API.Controllers
           _repo.Update(order);
 
           var template = await _context.EmailTemplates.FirstAsync(t => t.Id == newRegToBePaidEmailId);
-          List<Email> RegEmails = _repo.SetEmailDataForRegistration(emails, template.Body, RegDeadLine);
+          var RegEmails = await _repo.SetEmailDataForRegistration(emails, template.Body, RegDeadLine);
           _context.AddRange(RegEmails);
           if(await _repo.SaveAll())
           {

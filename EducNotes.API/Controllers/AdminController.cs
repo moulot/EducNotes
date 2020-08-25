@@ -38,7 +38,7 @@ namespace EducNotes.API.Controllers
         string password;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
         int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId, schoolInscTypeId;
-        int registrationEmailId, tuitionId, nextYearTuitionId;
+        int renewRegEmailId, tuitionId, nextYearTuitionId;
         byte lastClassLevelSeq;
         CultureInfo frC = new CultureInfo("fr-FR");
 
@@ -63,7 +63,7 @@ namespace EducNotes.API.Controllers
             adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
             teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
             schoolInscTypeId = _config.GetValue<int>("AppSettings:schoolInscTypeId");
-            registrationEmailId = _config.GetValue<int>("AppSettings:registrationEmailId");
+            renewRegEmailId = _config.GetValue<int>("AppSettings:renewRegEmailId");
             tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
             nextYearTuitionId = _config.GetValue<int>("AppSettings:nextYearTuitionId");
             lastClassLevelSeq = _config.GetValue<byte>("AppSettings:lastClassLevelSeq");
@@ -993,8 +993,8 @@ namespace EducNotes.API.Controllers
 
           if(EmailData.Count() > 0)
           {
-            var template = await _context.EmailTemplates.FirstAsync(t => t.Id == registrationEmailId);
-            List<Email> RegEmails = _repo.SetEmailDataForRegistration(EmailData, template.Body, RegDeadLine);
+            var template = await _context.EmailTemplates.FirstAsync(t => t.Id == renewRegEmailId);
+            var RegEmails = await _repo.SetEmailDataForRegistration(EmailData, template.Body, RegDeadLine);
             _context.AddRange(RegEmails);
             if(await _repo.SaveAll())
               return Ok(new{

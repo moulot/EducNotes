@@ -34,7 +34,7 @@ namespace EducNotes.API.Data
         private readonly UserManager<User> _userManager;
         private Cloudinary _cloudinary;
         string password, baseUrl;
-        int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
+        int teacherTypeId, parentTypeId, studentTypeId, adminTypeId, teacherConfirmEmailId;
         int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId, schoolInscTypeId;
         CultureInfo frC = new CultureInfo("fr-FR");
 
@@ -58,6 +58,7 @@ namespace EducNotes.API.Data
             moderatorRoleId = _config.GetValue<int>("AppSettings:moderatorRoleId");
             adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
             teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
+            teacherConfirmEmailId = _config.GetValue<int>("AppSettings:teacherConfirmEmailId");
             baseUrl = _config.GetValue<String>("AppSettings:DefaultLink");
 
             _cloudinaryConfig = cloudinaryConfig;
@@ -729,138 +730,154 @@ namespace EducNotes.API.Data
           {
             try
             {
-                User appUser = new User();
-                //is it a new user
-                if (user.Id == 0)
+              User appUser = new User();
+              //is it a new user
+              if (user.Id == 0)
+              {
+                var userToSave = _mapper.Map<User>(user);
+                var code = Guid.NewGuid();
+                userToSave.UserName = code.ToString();
+                userToSave.ValidationCode = code.ToString();
+                userToSave.Validated = false;
+                userToSave.EmailConfirmed = false;
+                userToSave.UserName = code.ToString();
+
+                var result = await _userManager.CreateAsync(userToSave, password);
+                var teacherCode = "";
+                if (result.Succeeded)
                 {
-                  var userToSave = _mapper.Map<User>(user);
-                  var code = Guid.NewGuid();
-                  userToSave.UserName = code.ToString();
-                  userToSave.ValidationCode = code.ToString();
-                  userToSave.Validated = false;
-                  userToSave.EmailConfirmed = false;
-                  userToSave.UserName = code.ToString();
+                  // enregistrement du RoleTeacher
+                  var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
+                  appUser = await _userManager.Users
+                                  .Include(i => i.Photos)
+                                  .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
+                  _userManager.AddToRoleAsync(appUser, role.Name).Wait();
 
-                  var result = await _userManager.CreateAsync(userToSave, password);
-                  if (result.Succeeded)
+                  appUser.IdNum = GetUserIDNumber(appUser.Id, appUser.LastName, appUser.FirstName);
+                  teacherCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+                  Update(appUser);
+
+                  // send the mail to update userName/pwd - add to Email table
+                  if (appUser.Email != null)
                   {
-                    // enregistrement du RoleTeacher
-                    var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
-                    appUser = await _userManager.Users
-                                    .Include(i => i.Photos)
-                                    .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
-                    _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+                    ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {
+                      Id = appUser.Id,
+                      LastName = appUser.LastName,
+                      FirstName = appUser.FirstName,
+                      Cell = appUser.PhoneNumber,
+                      Email = appUser.Email,
+                      Token = teacherCode
+                    };
 
-                    // send the mail to update userName/pwd - add to Email table
-                    if (appUser.Email != null)
-                    {
-                      var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToSave.ValidationCode;
-                      var emailToSend = new Email
-                      {
-                        StatusFlag = 0,
-                        Subject = "Confirmation de compte",
-                        ToAddress = appUser.Email,
-                        Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                        FromAddress = "no-reply@educnotes.com",
-                        EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId"),
-                        InsertUserId = insertUserId,
-                        UpdateUserId = insertUserId,
-                      };
-                      Add(emailToSend);
-                    }
+                    var template = await _context.EmailTemplates.FirstAsync(t => t.Id == teacherConfirmEmailId);
+                    Email emailToSend = await SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
+                    // var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToSave.ValidationCode;
+                    // var emailToSend = new Email
+                    // {
+                    //   StatusFlag = 0,
+                    //   Subject = "Confirmation de compte",
+                    //   ToAddress = appUser.Email,
+                    //   Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+                    //   FromAddress = "no-reply@educnotes.com",
+                    //   EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId"),
+                    //   InsertUserId = insertUserId,
+                    //   UpdateUserId = insertUserId,
+                    // };
+                    // Add(emailToSend);
                   }
                 }
-                else
-                {
-                    appUser = await _context.Users.Include(i => i.Photos).FirstOrDefaultAsync(u => u.Id == user.Id);
-                    appUser.LastName = user.LastName;
-                    appUser.FirstName = user.FirstName;
-                    appUser.Gender = user.Gender;
-                    var dateArray = user.strDateOfBirth.Split("/");
-                    int year = Convert.ToInt32(dateArray[2]);
-                    int month = Convert.ToInt32(dateArray[1]);
-                    int day = Convert.ToInt32(dateArray[0]);
-                    DateTime birthDay = new DateTime(year, month, day);
-                    appUser.DateOfBirth = birthDay;//user.DateOfBirth;
-                    appUser.PhoneNumber = user.PhoneNumber;
-                    appUser.SecondPhoneNumber = user.SecondPhoneNumber;
-                    appUser.Email = user.Email;
-                    Update(appUser);
+              }
+              else
+              {
+                appUser = await _context.Users.Include(i => i.Photos).FirstOrDefaultAsync(u => u.Id == user.Id);
+                appUser.LastName = user.LastName;
+                appUser.FirstName = user.FirstName;
+                appUser.Gender = user.Gender;
+                var dateArray = user.strDateOfBirth.Split("/");
+                int year = Convert.ToInt32(dateArray[2]);
+                int month = Convert.ToInt32(dateArray[1]);
+                int day = Convert.ToInt32(dateArray[0]);
+                DateTime birthDay = new DateTime(year, month, day);
+                appUser.DateOfBirth = birthDay;
+                appUser.PhoneNumber = user.PhoneNumber;
+                appUser.SecondPhoneNumber = user.SecondPhoneNumber;
+                appUser.Email = user.Email;
+                Update(appUser);
 
-                    // delete previous teacher courses
-                    List<TeacherCourse> prevCourses = await _context.TeacherCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
-                    DeleteAll(prevCourses);
-                }
+                // delete previous teacher courses
+                List<TeacherCourse> prevCourses = await _context.TeacherCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
+                DeleteAll(prevCourses);
+              }
 
-                // add new selected courses
-                var ids = user.CourseIds.Split(",");
-                if (ids.Count() > 0)
+              // add new selected courses
+              var ids = user.CourseIds.Split(",");
+              if (ids.Count() > 0)
+              {
+                foreach (var courseId in ids)
+                  {
+                      TeacherCourse tc = new TeacherCourse();
+                      tc.CourseId = Convert.ToInt32(courseId);
+                      tc.TeacherId = appUser.Id;
+                      Add(tc);
+                  }
+              }
+
+              //add user photo
+              var photoFile = user.PhotoFile;
+              if (photoFile != null)
+              {
+                if (photoFile.Length > 0)
                 {
-                  foreach (var courseId in ids)
+                    var uploadResult = new ImageUploadResult();
+                    // var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
+                    using (var stream = photoFile.OpenReadStream())
                     {
-                        TeacherCourse tc = new TeacherCourse();
-                        tc.CourseId = Convert.ToInt32(courseId);
-                        tc.TeacherId = appUser.Id;
-                        Add(tc);
+                        var uploadParams = new ImageUploadParams()
+                        {
+                            File = new FileDescription(photoFile.Name, stream),
+                            Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+                        };
+
+                        uploadResult = _cloudinary.Upload(uploadParams);
+                        if (uploadResult.StatusCode == HttpStatusCode.OK)
+                        {
+                            Photo photo = new Photo();
+                            photo.Url = uploadResult.Uri.ToString();
+                            photo.PublicId = uploadResult.PublicId;
+                            photo.UserId = appUser.Id;
+                            photo.DateAdded = DateTime.Now;
+                            if (appUser.Photos.Any(u => u.IsMain))
+                            {
+                              var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                              oldPhoto.IsMain = false;
+                              Update(oldPhoto);
+                            }
+                            photo.IsMain = true;
+                            photo.IsApproved = true;
+                            Add(photo);
+                        }
                     }
                 }
-
-                //add user photo
-                var photoFile = user.PhotoFile;
-                if (photoFile != null)
-                {
-                  if (photoFile.Length > 0)
-                  {
-                      var uploadResult = new ImageUploadResult();
-                      // var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
-                      using (var stream = photoFile.OpenReadStream())
-                      {
-                          var uploadParams = new ImageUploadParams()
-                          {
-                              File = new FileDescription(photoFile.Name, stream),
-                              Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
-                          };
-
-                          uploadResult = _cloudinary.Upload(uploadParams);
-                          if (uploadResult.StatusCode == HttpStatusCode.OK)
-                          {
-                              Photo photo = new Photo();
-                              photo.Url = uploadResult.Uri.ToString();
-                              photo.PublicId = uploadResult.PublicId;
-                              photo.UserId = appUser.Id;
-                              photo.DateAdded = DateTime.Now;
-                              if (appUser.Photos.Any(u => u.IsMain))
-                              {
-                                var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
-                                oldPhoto.IsMain = false;
-                                Update(oldPhoto);
-                              }
-                              photo.IsMain = true;
-                              photo.IsApproved = true;
-                              Add(photo);
-                          }
-                      }
-                  }
-                }
-                else
-                {
-                    resultStatus = true;
-                }
-
-                if (await SaveAll())
-                {
-                  // fin de la transaction
-                  identityContextTransaction.Commit();
+              }
+              else
+              {
                   resultStatus = true;
-                }
-                else
-                  resultStatus = false;
+              }
+
+              if (await SaveAll())
+              {
+                // fin de la transaction
+                identityContextTransaction.Commit();
+                resultStatus = true;
+              }
+              else
+                resultStatus = false;
 
             }
             catch (System.Exception)
             {
-                identityContextTransaction.Rollback();
-                return resultStatus = false;
+              identityContextTransaction.Rollback();
+              return resultStatus = false;
             }
           }
           return resultStatus;
@@ -1695,7 +1712,7 @@ namespace EducNotes.API.Data
         public async Task<List<Sms>> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, int sessionId, int teacherId)
         {
             List<Sms> AbsencesSms = new List<Sms>();
-            List<Token> tokens = GetTokens();
+            var tokens = await GetTokens();
             int absenceSmsId = _config.GetValue<int>("AppSettings:AbsenceSms");
             int lateSmsId = _config.GetValue<int>("AppSettings:LateSms");
             var AbsenceSms = await _context.SmsTemplates.FirstAsync(s => s.Id == absenceSmsId);
@@ -1730,7 +1747,7 @@ namespace EducNotes.API.Data
                 smsContent = LateSms.Content;
               }
               // replace tokens with dynamic data
-              List<TokenDto> tags = GetTokenAbsenceValues(tokens, abs);
+              List<TokenDto> tags = GetTokenAbsenceValues(tokens.ToList(), abs);
               newSms.Content = ReplaceTokens(tags, smsContent);
               newSms.InsertUserId = teacherId;
               newSms.InsertDate = DateTime.Now;
@@ -1789,10 +1806,30 @@ namespace EducNotes.API.Data
           return tokenValues;
         }
 
-        public List<Email> SetEmailDataForRegistration(List<RegistrationEmailDto> emailData, string content, string RegDeadLine)
+        public async Task<Email> SetDataForConfirmTeacherEmail(ConfirmTeacherEmailDto emailData, string content, string subject)
+        {
+          var tokens = await GetTokens();
+          var schoolName = _context.Settings.First(s => s.Name == "SchoolName").Value;
+          Email newEmail = new Email();
+          newEmail.EmailTypeId = 1;
+          newEmail.ToAddress = emailData.Email;
+          newEmail.FromAddress = "no-reply@educnotes.com";
+          newEmail.Subject = subject.Replace("<NOM_ECOLE>", schoolName);
+          List<TokenDto> tags = GetTeacherEmailTokenValues(tokens.ToList(), emailData);
+          newEmail.Body = ReplaceTokens(tags, content);
+          newEmail.InsertUserId = 1;
+          newEmail.InsertDate = DateTime.Now;
+          newEmail.UpdateUserId = 1;
+          newEmail.UpdateDate = DateTime.Now;
+
+          return newEmail;
+        }
+
+        public async Task<IEnumerable<Email>> SetEmailDataForRegistration(IEnumerable<RegistrationEmailDto> emailData,
+          string content, string RegDeadLine)
         {
           List<Email> RegEmails = new List<Email>();
-          List<Token> tokens = GetTokens();
+          var tokens = await GetTokens();
 
           foreach (var data in emailData)
           {
@@ -1814,7 +1851,55 @@ namespace EducNotes.API.Data
           return RegEmails;
         }
 
-        public List<TokenDto> GetRegistrationTokenValues(List<Token> tokens, RegistrationEmailDto regEmail, string RegDeadLine)
+        public List<TokenDto> GetTeacherEmailTokenValues(List<Token> tokens, ConfirmTeacherEmailDto emailData)
+        {
+          List<TokenDto> tokenValues = new List<TokenDto>();
+
+          foreach (var token in tokens)
+          {
+            TokenDto td = new TokenDto();
+            td.TokenString = token.TokenString;
+
+            string teacherId = emailData.Id.ToString();
+
+            switch (td.TokenString)
+            {
+              // case "<USER_ID>":
+              //   td.Value = parentId;
+              //   break;
+              case "<N_ENSEIGNANT>":
+                td.Value = emailData.LastName.FirstLetterToUpper();
+                break;
+              case "<P_ENSEIGNANT>":
+                td.Value = emailData.FirstName.FirstLetterToUpper();
+                break;
+              case "<M_MME>":
+                td.Value = emailData.Gender == 0 ? "Mme" : "M.";
+                break;
+              case "<CELL_ENSEIGNANT>":
+                td.Value = emailData.Cell;
+                break;
+              case "<EMAIL_ENSEIGNANT>":
+                td.Value = emailData.Email;
+                break;
+              case "<TOKEN>":
+                td.Value = emailData.Token;
+                break;
+              case "<CONFIRM_LINK>":
+                td.Value = string.Format("{0}/confirmEmail?id={1}&token={2}", baseUrl,
+                  teacherId, HttpUtility.UrlEncode(emailData.Token));
+                break;
+              default:
+                break;
+            }
+
+            tokenValues.Add(td);
+          }
+
+          return tokenValues;
+        }
+
+        public List<TokenDto> GetRegistrationTokenValues(IEnumerable<Token> tokens, RegistrationEmailDto regEmail, string RegDeadLine)
         {
           List<TokenDto> tokenValues = new List<TokenDto>();
 
@@ -1878,8 +1963,8 @@ namespace EducNotes.API.Data
               case "<TOKEN>":
                 td.Value = regEmail.Token;
                 break;
-              case "<BASE_URL>":
-                td.Value = string.Format("{0}/confirmEmail?id={1}&orderid={2}&token={3}", "localhost:4200",
+              case "<CONFIRM_LINK>":
+                td.Value = string.Format("{0}/confirmEmail?id={1}&orderid={2}&token={3}", baseUrl,
                   parentId, orderid, HttpUtility.UrlEncode(regEmail.Token));
                 break;
               default:
@@ -1892,10 +1977,11 @@ namespace EducNotes.API.Data
           return tokenValues;
         }
 
-        public Email SetEmailForAccountUpdated(string subject, string content, string lastName, byte gender, string parentEmail)
+        public async Task<Email> SetEmailForAccountUpdated(string subject, string content, string lastName,
+          byte gender, string parentEmail)
         {
           var schoolName = _context.Settings.First(s => s.Name == "SchoolName").Value;
-          List<Token> tokens = GetTokens();
+          var tokens = await GetTokens();
 
           Email newEmail = new Email();
           newEmail.EmailTypeId = 1;
@@ -1912,7 +1998,7 @@ namespace EducNotes.API.Data
           return newEmail;
         }
 
-        public List<TokenDto> GetAccountUpdatedTokenValues(List<Token> tokens, string lastName, byte gender)
+        public List<TokenDto> GetAccountUpdatedTokenValues(IEnumerable<Token> tokens, string lastName, byte gender)
         {
           List<TokenDto> tokenValues = new List<TokenDto>();
 
@@ -1941,7 +2027,7 @@ namespace EducNotes.API.Data
         public async Task<List<Sms>> SetSmsDataForNewGrade(List<EvalSmsDto> grades, string content, int teacherId)
         {
             List<Sms> GradesSms = new List<Sms>();
-            List<Token> tokens = GetTokens();
+            var tokens = await GetTokens();
             int SmsGradeTypeId = _config.GetValue<int>("AppSettings:SmsGradeTypeId");
 
             foreach (var grade in grades)
@@ -1970,7 +2056,7 @@ namespace EducNotes.API.Data
             return GradesSms;
         }
 
-        public List<TokenDto> GetTokenGradeValues(List<Token> tokens, EvalSmsDto gradeSms, Boolean forUpdate)
+        public List<TokenDto> GetTokenGradeValues(IEnumerable<Token> tokens, EvalSmsDto gradeSms, Boolean forUpdate)
         {
             List<TokenDto> tokenValues = new List<TokenDto>();
 
@@ -2048,9 +2134,9 @@ namespace EducNotes.API.Data
           return content;
         }
 
-        public List<Token> GetTokens()
+        public async Task<IEnumerable<Token>> GetTokens()
         {
-          var tokens = _context.Tokens.OrderBy(t => t.Name).ToList();
+          var tokens = await _context.Tokens.OrderBy(t => t.Name).ToListAsync();
           return tokens;
         }
 

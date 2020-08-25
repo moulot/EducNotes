@@ -180,7 +180,6 @@ export class NewTeacherComponent implements OnInit {
       this.alertify.success('enseignant ajouté avec succès');
       this.router.navigate(['/teachers']);
     }, error => {
-      // console.log(error);
       this.alertify.error(error);
     });
   }

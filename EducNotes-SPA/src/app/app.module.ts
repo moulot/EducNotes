@@ -231,7 +231,7 @@ import { TuitionPanelComponent } from './admin/tuition/tuition-panel/tuition-pan
 import { CheckoutComponent } from './tuition/checkout/checkout.component';
 import { CheckoutResolver } from './_resolvers/checkout-resolver';
 import { OrderService } from './_services/order.service';
-import { NewTuitionComponent } from './admin/tuition/tuition-panel/new-tuition/new-tuition.component';
+import { NewTuitionComponent } from './admin/tuition/new-tuition/new-tuition.component';
 import { AccountService } from './_services/account.service';
 import { ContactUsComponent } from './contactus/contact-us/contact-us.component';
 import { EditChildrenComponent } from './users/edit-children/edit-children.component';
@@ -243,6 +243,7 @@ import { SchoolSettingsComponent } from './admin/school-settings/school-settings
 import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
 import { UserFileComponent } from './admin/user-file/user-file.component';
 import { SpacedAmountDirective } from './_directives/spacedAmount.directive';
+import { TuitionDetailsComponent } from './admin/tuition/tuition-details/tuition-details.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -407,7 +408,9 @@ export function tokenGetter() {
       ActivateChildrenComponent,
       TreasuryComponent,
       SchoolSettingsComponent,
-      UserFileComponent
+      UserFileComponent,
+      TuitionDetailsComponent,
+      TuitionDetailsComponent
    ],
    imports: [
       FormWizardModule,

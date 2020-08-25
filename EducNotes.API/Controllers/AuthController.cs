@@ -514,8 +514,7 @@ namespace EducNotes.API.Controllers
             if (res.Succeeded)
             {
               var template = await _context.EmailTemplates.FirstAsync(t => t.Id == updateAccountEmailId);
-              var email = new Email();
-              email = _repo.SetEmailForAccountUpdated(template.Subject, template.Body, user.LastName, user.Gender, user.Email);
+              var email = await _repo.SetEmailForAccountUpdated(template.Subject, template.Body, user.LastName, user.Gender, user.Email);
               _context.Add(email);
 
               var userToReturn = _mapper.Map<UserForListDto>(user);

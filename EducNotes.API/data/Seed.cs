@@ -149,7 +149,7 @@ namespace EducNotes.API.Data
                 new SmsType { Name = "validation" }
               };
               context.AddRange(smsTypes);
-                context.SaveChanges();
+              context.SaveChanges();
 
               var districts = new List<District> {
                 new District { Name = "Cocody", CityId = 1 },
@@ -158,6 +158,31 @@ namespace EducNotes.API.Data
                 new District { Name = "Djibi", CityId = 1 },
               };
               context.AddRange(districts);
+
+              var emailCat = new List<EmailCategory> {
+                new EmailCategory {Name = "notes"},
+                new EmailCategory {Name = "communication"},
+                new EmailCategory {Name = "scolarité"},
+                new EmailCategory {Name = "paiement"}
+              };
+              context.AddRange(emailCat);
+              context.SaveChanges();
+
+              var emailTemplates = new List<EmailTemplate> {
+                new EmailTemplate {Name = "nouvelle inscription - informations paiement",
+                  Subject ="<NOM_ECOLE> - confirmation nouvelle inscription / paiement", Body = "",
+                  EmailCategoryId = 3, Internal = true},
+                new EmailTemplate {Name = "re-inscription année prochaine",
+                  Subject ="<NOM_ECOLE> - re-inscription pour l'année prochaine", Body = "",
+                  EmailCategoryId = 3, Internal = true},
+                new EmailTemplate {Name = "confirmation mise à jour du compte",
+                  Subject ="<NOM_ECOLE> - confirmation mise à jour de compte", Body = "",
+                  EmailCategoryId = 2, Internal = true},
+                new EmailTemplate {Name = "confirmation compte enseignant",
+                  Subject ="<NOM_ECOLE> - confirmation de compte enseignant Educ'Notes", Body = "",
+                  EmailCategoryId = 2, Internal = true},
+              };
+              context.AddRange(emailTemplates);
 
               var AbsenceTypes = new List<AbsenceType> {
                 new AbsenceType { Name = "Absence" },
@@ -270,7 +295,11 @@ namespace EducNotes.API.Data
                   new Token {Name = "token de confirmation", TokenString = "<TOKEN>"},
                   new Token {Name = "id de commande", TokenString = "<CDE_ID>"},
                   new Token {Name = "id du parent", TokenString = "<PARENT_ID>"},
-                  new Token {Name = "url site web", TokenString = "<BASE_URL>"}
+                  new Token {Name = "nom enseignant", TokenString = "<N_ENSEIGNANT>"},
+                  new Token {Name = "prénom enseignant", TokenString = "<P_ENSEIGNANT>"},
+                  new Token {Name = "email enseignant", TokenString = "<EMAIL_ENSEIGNANT>"},
+                  new Token {Name = "mobile enseignant", TokenString = "<CELL_ENSEIGNANT>"},
+                  new Token {Name = "lien de confirmation", TokenString = "<CONFIRM_LINK>"}
               };
               context.AddRange(tokens);
 
@@ -302,14 +331,6 @@ namespace EducNotes.API.Data
                 new SmsCategory {Name = "administration"},
                 new SmsCategory {Name = "alertes"},
                 new SmsCategory {Name = "communication"}
-              };
-              context.AddRange(smsCat);
-
-              var emailCat = new List<EmailCategory> {
-                new EmailCategory {Name = "notes"},
-                new EmailCategory {Name = "communication"},
-                new EmailCategory {Name = "scolarité"},
-                new EmailCategory {Name = "paiement"}
               };
               context.AddRange(smsCat);
 
