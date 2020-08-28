@@ -853,7 +853,7 @@ namespace EducNotes.API.Controllers
         {
             var courseFromRepo = await _repo.GetCourse(courseId);
             courseFromRepo.Name = courseDto.Name;
-            courseFromRepo.Abbreviation = courseDto.Abbreviation;
+            courseFromRepo.Abbreviation = courseDto.Abbrev;
             courseFromRepo.Color = courseDto.Color;
             _repo.Update(courseFromRepo);
             if (await _repo.SaveAll())
@@ -958,7 +958,7 @@ namespace EducNotes.API.Controllers
           {
             var course = new Course {
               Name = newCourseDto.Name,
-              Abbreviation = newCourseDto.Abbreviation,
+              Abbreviation = newCourseDto.Abbrev,
               Color = newCourseDto.Color
             };
             _repo.Add(course);
@@ -967,7 +967,7 @@ namespace EducNotes.API.Controllers
           {
             var course = await _context.Courses.FirstAsync(c => c.Id == id);
             course.Name = newCourseDto.Name;
-            course.Abbreviation = newCourseDto.Abbreviation;
+            course.Abbreviation = newCourseDto.Abbrev;
             course.Color = newCourseDto.Color;
             _repo.Update(course);
           }

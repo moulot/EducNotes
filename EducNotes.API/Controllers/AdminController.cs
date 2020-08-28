@@ -21,6 +21,8 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Net;
 using System.Text;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace EducNotes.API.Controllers
 {
@@ -290,34 +292,32 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPost("{classId}/StudentAffectation")]
-        public async Task<IActionResult> StudentAffectation(int classId, List<StudentPostingDto> model, int userId)
+        public async Task<IActionResult> StudentAffectation(int classId, List<StudentPostingDto> studentIds)
         {
-            if (model.Count() > 0)
+          if (studentIds.Count() > 0)
+          {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            foreach (var student in studentIds)
             {
-                foreach (var student in model)
-                {
-                    var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == student.UserId);
-                    user.ClassId = classId;
-
-                    var inscription = await _context.Inscriptions.FirstOrDefaultAsync(i => i.Id == student.Id);
-                    inscription.Validated = true;
-                    inscription.ValidatedDate = DateTime.Now;
-                }
-
-                if (await _repo.SaveAll())
-                {
-                    //envoi du mail d'affectation à chaque parent
-                    foreach (var student in model)
-                    {
-                        await _repo.sendOk(studentTypeId, userId);
-                    }
-                    return Ok();
-                }
-
-                return BadRequest("imposible d'effectuer cette opération");
+              var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == student.Id);
+              user.ClassId = classId;
             }
 
-            return NotFound();
+            if (await _repo.SaveAll())
+            {
+              //envoi du mail d'affectation à chaque parent
+              foreach (var student in studentIds)
+              {
+                await _repo.sendOk(studentTypeId, student.Id);
+              }
+              return Ok();
+            }
+
+            return BadRequest("imposible d'effectuer cette opération");
+          }
+
+          return NotFound();
         }
 
         [HttpPost("{insertUserId}/AddUser")]
@@ -1028,49 +1028,34 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpGet("SearchInscription")]
-        public async Task<IActionResult> SearchInscription([FromQuery] InscriptionSearchParams parametre)
+        public async Task<IActionResult> SearchInscription([FromQuery] InscriptionSearchParams searchParams)
         {
-            List<Inscription> inscrFromDB = new List<Inscription>();
-            if (parametre.LastName == null)
-                parametre.LastName = "";
-            if (parametre.FirstName == null)
-                parametre.FirstName = "";
-            int levelId = Convert.ToInt32(parametre.LevelId);
+            List<User> usersFromDB = new List<User>();
+            if (searchParams.LastName == null) { searchParams.LastName = ""; }
+            if (searchParams.FirstName == null) { searchParams.FirstName = ""; }
+            int levelId = Convert.ToInt32(searchParams.LevelId);
 
             if (levelId > 0)
             {
-              inscrFromDB = await _context.Inscriptions
-                            .Include(u => u.User).ThenInclude(p => p.Photos)
-                            .Where(u => u.ClassLevelId == levelId && u.Validated == false &&
-                            EF.Functions.Like(u.User.LastName, "%" + parametre.LastName + "%") &&
-                            EF.Functions.Like(u.User.FirstName, "%" + parametre.FirstName + "%"))
+              usersFromDB = await _context.Users
+                            .Include(p => p.Photos)
+                            .Where(u => u.ClassLevelId == levelId && u.ClassId == null &&
+                              EF.Functions.Like(u.LastName, "%" + searchParams.LastName + "%") &&
+                              EF.Functions.Like(u.FirstName, "%" + searchParams.FirstName + "%"))
                             .ToListAsync();
             }
             else
             {
-              inscrFromDB = await _context.Inscriptions
-                            .Include(u => u.User)
-                            .ThenInclude(p => p.Photos)
-                            .Where(u => u.Validated == false && EF.Functions.Like(u.User.LastName, "%" + parametre.LastName + "%") &&
-                              EF.Functions.Like(u.User.FirstName, "%" + parametre.FirstName + "%"))
+              usersFromDB = await _context.Users
+                            .Include(p => p.Photos)
+                            .Where(u => u.ClassId == null && u.UserTypeId == studentTypeId && EF.Functions.Like(u.LastName, "%" + searchParams.LastName + "%") &&
+                              EF.Functions.Like(u.FirstName, "%" + searchParams.FirstName + "%"))
                             .ToListAsync();
             }
 
-            // var res = new List<InscriptionDetailDto>();
-            // foreach (var item in inscr)
-            // {
-            //     res.Add(new InscriptionDetailDto
-            //     {
-            //         Id = item.Id,
-            //         InsertDate = item.InsertDate,
-            //         ClassLevelId = item.ClassLevelId,
-            //         UserId = item.UserId,
-            //         User = _mapper.Map<UserForDetailedDto>(item.User)
-            //     });
-            // }
-            var inscr = _mapper.Map<IEnumerable<UserForClassAllocationDto>>(inscrFromDB);
+            var users = _mapper.Map<IEnumerable<UserForClassAllocationDto>>(usersFromDB);
 
-            return Ok(inscr);
+            return Ok(users);
         }
 
         [HttpPost("ImportTeachers")]
@@ -1213,6 +1198,64 @@ namespace EducNotes.API.Controllers
 
           return BadRequest("problème pour metre à jour les paramètres");
         }
+
+        [HttpGet("GetToken")]
+        public List<string> GetOrangeAccessToken()
+        {
+          ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+          var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.orange.com/oauth/v2/token");
+          httpWebRequest.ContentType = "application/json";
+          httpWebRequest.Method = "POST";
+          httpWebRequest.Accept = "application/json";
+          httpWebRequest.PreAuthenticate = true;
+          httpWebRequest.Headers.Add("Authorization", "Basic YlppdEs0aHhKdjl0Q2tkc1p1ZHVMVFdkU3E3anJUN0E6OUFtUWVRd0hOQ0cyNFVQQQ==");
+
+          using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+          {
+            streamWriter.Write("");
+            streamWriter.Flush();
+            streamWriter.Close();
+          }
+
+          List<string> result = new List<string>();
+          var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+          using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+          {
+            result.Add(streamReader.ReadToEnd());
+          }
+
+          return result;
+        }
+
+        [HttpGet("TestJson")]
+        public void GetTest()
+        {
+          SmsDataRequest data = new SmsDataRequest();
+          data.outboundSMSMessageRequest = new OutboundSMSMessageRequest();
+          data.outboundSMSMessageRequest.Address = "tel+22507104446";
+          data.outboundSMSMessageRequest.SenderAddress = "tel+22507104446";
+          data.outboundSMSMessageRequest.outboundSMSTextMessage = new OutboundSMSTextMessage();
+          data.outboundSMSMessageRequest.outboundSMSTextMessage.Message = "hello!";
+          string JsonArray = JsonConvert.SerializeObject(data);
+          Dictionary<string, string> Params = new Dictionary<string, string>();
+          Params.Add("content", "hello!");
+          Params.Add("to", "07104446,22334455");
+          Params.Add("validityPeriod", "1");
+
+          Params["to"] = CreateRecipientList(Params["to"]);
+          string JsonArray1 = JsonConvert.SerializeObject(Params, Formatting.None);
+          JsonArray1 = JsonArray1.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
+        }
+
+        public static string CreateRecipientList(string to)
+        {
+          string[] tmp = to.Split(new char[] { ',' });
+          to = "[\"";
+          to = to + string.Join("\",\"", tmp);
+          to = to + "\"]";
+          return to;
+        }
+
     }
 
 }

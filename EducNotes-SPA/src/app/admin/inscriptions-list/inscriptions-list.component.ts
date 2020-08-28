@@ -20,7 +20,7 @@ import { AuthService } from 'src/app/_services/auth.service';
 export class InscriptionsListComponent implements OnInit {
 
   constructor(private adminService: AdminService, private alertify: AlertifyService,
-    private modalService: NgbModal, private fb: FormBuilder, private classService: ClassService,
+    private fb: FormBuilder, private classService: ClassService,
     private toastr: ToastrService, private authService: AuthService) { }
 
   levels: any[] = [];
@@ -60,7 +60,7 @@ export class InscriptionsListComponent implements OnInit {
         this.levels = [...this.levels, element];
       }
     }, error => {
-      console.log(error);
+      this.alertify.error(error);
     });
   }
   createSearchForm() {
@@ -75,9 +75,8 @@ export class InscriptionsListComponent implements OnInit {
     this.selectedIds = [];
     for (let index = 0; index < this.filteredStudents.length; index++) {
       if (this.filteredStudents[index].isSelected) {
-        // this.classIds = [...this.classIds, teachercourses.classes[index].classId];
-        const s = { id: Number(this.filteredStudents[index].id), userId: Number(this.filteredStudents[index].userId) };
-        this.selectedIds = [...this.selectedIds, s];
+        const id = { id: Number(this.filteredStudents[index].id) };
+        this.selectedIds = [...this.selectedIds, id];
       }
     }
 
@@ -85,7 +84,6 @@ export class InscriptionsListComponent implements OnInit {
       this.alertify.warning('Veuillez sélectionnez au moins un élève...');
     } else {
 
-      // debugger;
       const room = this.classes.find(item => item.id === Number(this.classId));
       this.className = room.name;
 
@@ -110,11 +108,10 @@ export class InscriptionsListComponent implements OnInit {
   }
 
   studentAffectation() {
-    this.adminService.studentAffectation(this.classId, this.selectedIds, this.userId).subscribe(() => {
+    this.adminService.studentAffectation(this.classId, this.selectedIds).subscribe(() => {
       this.searchStudents();
       this.alertify.success('enegistrement terminé...');
       this.classId = null;
-
     }, error => {
       this.alertify.error(error);
     });
@@ -152,10 +149,10 @@ export class InscriptionsListComponent implements OnInit {
     this.searchParams.lastName = this.searchForm.value.lastName;
     this.searchParams.firstName = this.searchForm.value.firstName;
 
-    this.adminService.searchIncription(this.searchParams).subscribe((res: any[]) => {
-      if (res.length > 0) {
-        this.students = res;
-        this.filteredStudents = res;
+    this.adminService.searchIncription(this.searchParams).subscribe((users: any[]) => {
+      if (users.length > 0) {
+        this.students = users;
+        this.filteredStudents = users;
 
         this.classService.getClassesByLevelId(this.searchParams.levelId).subscribe((response: Class[]) => {
           this.classes = response;
@@ -176,7 +173,6 @@ export class InscriptionsListComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
       this.showListDiv = true;
-
     });
 
   }

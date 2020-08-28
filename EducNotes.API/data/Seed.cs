@@ -14,8 +14,8 @@ namespace EducNotes.API.Data
           if (!context.FileTypes.Any())
           {
             var fileTypes = new List<FileType>() {
-              new FileType {Name="FILE TYPE 1"},
-              new FileType  {Name="FILE TYPE 2"}
+              new FileType {Name="file type 1"},
+              new FileType  {Name="file type 2"}
             };
             context.AddRange(fileTypes);
             context.SaveChanges();
@@ -24,7 +24,7 @@ namespace EducNotes.API.Data
           {
             var docTypes = new List<DocType>(){
             new DocType {Name="fichier principal"},
-              new DocType  {Name="Autre fichier"}
+              new DocType  {Name="autre fichier"}
             };
             context.AddRange(docTypes);
             context.SaveChanges();
@@ -46,11 +46,9 @@ namespace EducNotes.API.Data
               };
               context.AddRange(settings);
 
-              // var userData = System.IO.File.ReadAllText("Data/UserSeedData.json");
-              // var users = JsonConvert.DeserializeObject<List<User>>(userData);
               var emailtypes = new List<EmailType>() {
-                new EmailType { Name = "Confirmation Email" },
-                new EmailType { Name = "Confirmed Email" }
+                new EmailType { Name = "confirmation Email" },
+                new EmailType { Name = "confirmed Email" }
               };
               context.AddRange(emailtypes);
 
@@ -59,6 +57,7 @@ namespace EducNotes.API.Data
                 new ClassType { Name = "littéraire" },
                 new ClassType { Name = "semi-littéraire" }
               };
+              context.AddRange(classtypes);
 
               var productTypes = new List<ProductType>() {
                 new ProductType { Name = "scolarité" },
@@ -74,6 +73,29 @@ namespace EducNotes.API.Data
                 new Product { Name = "cantine", ProductTypeId = 2, IsByLevel = true, IsPeriodic = true, IsRequired = false, IsPaidCash = true}
               };
               context.AddRange(products);
+
+              var educLevels = new List<EducationLevel>() {
+                new EducationLevel { Name ="primaire" },
+                new EducationLevel { Name ="secondaire" }
+              };
+              context.AddRange(educLevels);
+
+              var schools = new List<School>() {
+                new School { Name = "maternelle", DsplSeq = 1 },
+                new School { Name = "élémentaire", DsplSeq = 2 },
+                new School { Name = "collège", DsplSeq = 3 },
+                new School { Name = "lycée", DsplSeq = 4 },
+              };
+              context.AddRange(schools);
+
+              var cycles = new List<Cycle>() {
+                new Cycle { Name = "cycle 1"},
+                new Cycle { Name = "cycle 2"},
+                new Cycle { Name = "cycle 3"},
+                new Cycle { Name = "cycle 4"}
+              };
+              context.AddRange(cycles);
+              context.SaveChanges();
 
               var classLevels = new List<ClassLevel> {
                   new ClassLevel { Name = "TPS", DsplSeq = 1, CycleId = 1, SchoolId = 1, EducationLevelId =1 },
@@ -117,9 +139,9 @@ namespace EducNotes.API.Data
               context.AddRange(classLevelProds);
 
               var prodDeadlines = new List<ProductDeadLine>() {
-                new ProductDeadLine { ProductId = 1, DueDate = new DateTime(2020, 9, 1), DeadLineName = "1er acompte", Seq = 1, Percentage = 50},
-                new ProductDeadLine { ProductId = 1, DueDate = new DateTime(2020, 11, 15), DeadLineName = "2e acompte", Seq = 2, Percentage = 30},
-                new ProductDeadLine { ProductId = 1, DueDate = new DateTime(2021, 2, 15), DeadLineName = "3e acompte", Seq = 3, Percentage = 20}
+                new ProductDeadLine { ProductId = 1, DueDate = new DateTime(2020, 9, 1), DeadLineName = "1er acompte", Seq = 1, Percentage = 0.5M},
+                new ProductDeadLine { ProductId = 1, DueDate = new DateTime(2020, 11, 15), DeadLineName = "2e acompte", Seq = 2, Percentage = 0.3M},
+                new ProductDeadLine { ProductId = 1, DueDate = new DateTime(2021, 2, 15), DeadLineName = "3e acompte", Seq = 3, Percentage = 0.2M}
               };
               context.AddRange(prodDeadlines);
               context.SaveChanges();
@@ -138,13 +160,11 @@ namespace EducNotes.API.Data
 
               var city = new City { Name = "Abidjan" };
               context.Add(city);
-              context.SaveChanges();
 
               var smsTypes = new List<SmsType> {
                 new SmsType { Name = "absence" },
                 new SmsType { Name = "alerte" },
                 new SmsType { Name = "comm" },
-                new SmsType { Name = "note" },
                 new SmsType { Name = "note" },
                 new SmsType { Name = "validation" }
               };
@@ -152,12 +172,21 @@ namespace EducNotes.API.Data
               context.SaveChanges();
 
               var districts = new List<District> {
-                new District { Name = "Cocody", CityId = 1 },
-                new District { Name = "Angré", CityId = 1 },
+                new District { Name = "cocody", CityId = 1 },
+                new District { Name = "angré", CityId = 1 },
                 new District { Name = "2 Plateaux", CityId = 1 },
-                new District { Name = "Djibi", CityId = 1 },
+                new District { Name = "djibi", CityId = 1 },
               };
               context.AddRange(districts);
+
+              var smsCat = new List<SmsCategory> {
+                new SmsCategory {Name = "notes"},
+                new SmsCategory {Name = "vie de classe"},
+                new SmsCategory {Name = "administration"},
+                new SmsCategory {Name = "alertes"},
+                new SmsCategory {Name = "communication"}
+              };
+              context.AddRange(smsCat);
 
               var emailCat = new List<EmailCategory> {
                 new EmailCategory {Name = "notes"},
@@ -184,6 +213,16 @@ namespace EducNotes.API.Data
               };
               context.AddRange(emailTemplates);
 
+              var smsTemplates = new List<SmsTemplate> {
+                new SmsTemplate {Name = "nouvelle note", Content = "", SmsCategoryId = 1},
+                new SmsTemplate {Name = "absence", Content = "", SmsCategoryId = 2},
+                new SmsTemplate {Name = "devoir de maison", Content = "", SmsCategoryId = 2},
+                new SmsTemplate {Name = "alerte note basse", Content = "", SmsCategoryId = 1},
+                new SmsTemplate {Name = "congés et sorties", Content = "", SmsCategoryId = 5},
+                new SmsTemplate {Name = "retard", Content = "", SmsCategoryId = 2}
+              };
+              context.AddRange(smsTemplates);
+
               var AbsenceTypes = new List<AbsenceType> {
                 new AbsenceType { Name = "Absence" },
                 new AbsenceType { Name = "Retard" }
@@ -201,30 +240,6 @@ namespace EducNotes.API.Data
                 new InscriptionType { Name = "FromSchool" }
               };
               context.AddRange(inscTypes);
-              context.SaveChanges();
-
-
-              var educLevels = new List<EducationLevel>() {
-                new EducationLevel { Name ="primaire" },
-                new EducationLevel { Name ="secondaire" }
-              };
-              context.AddRange(educLevels);
-
-              var schools = new List<School>() {
-                new School { Name = "maternelle", DsplSeq = 1 },
-                new School { Name = "élémentaire", DsplSeq = 2 },
-                new School { Name = "collège", DsplSeq = 3 },
-                new School { Name = "lycée", DsplSeq = 4 },
-              };
-              context.AddRange(schools);
-
-              var cycles = new List<Cycle>() {
-                new Cycle { Name = "cycle 1"},
-                new Cycle { Name = "cycle 2"},
-                new Cycle { Name = "cycle 3"},
-                new Cycle { Name = "cycle 4"}
-              };
-              context.AddRange(cycles);
               context.SaveChanges();
 
               var paymentTypes = new List<PaymentType> {
@@ -325,15 +340,6 @@ namespace EducNotes.API.Data
               };
               context.AddRange(eventTypes);
 
-              var smsCat = new List<SmsCategory> {
-                new SmsCategory {Name = "notes"},
-                new SmsCategory {Name = "vie de classe"},
-                new SmsCategory {Name = "administration"},
-                new SmsCategory {Name = "alertes"},
-                new SmsCategory {Name = "communication"}
-              };
-              context.AddRange(smsCat);
-
               var periodicities = new List<Periodicity> {
                 new Periodicity {Name = "mensuel"},
                 new Periodicity {Name = "trimestriel"}
@@ -373,7 +379,7 @@ namespace EducNotes.API.Data
               if (result.Succeeded)
               {
                 var admin = userManager.FindByNameAsync("Admin").Result;
-                userManager.AddToRolesAsync(admin, new[] { "Admin", "Professeur" }).Wait();
+                userManager.AddToRolesAsync(admin, new[] { "Admin", "enseignant" }).Wait();
               }
 
           }

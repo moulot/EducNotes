@@ -180,6 +180,7 @@ namespace EducNotes.API.Controllers
             user.FirstName = child.FirstName;
             user.Gender = child.Sex;
             user.DateOfBirth = child.DateOfBirth;
+            user.ClassLevelId = child.ClassLevelId;
             var result = await _userManager.CreateAsync(user, password);
             if(result.Errors.Count() > 0)
             {

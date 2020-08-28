@@ -153,10 +153,10 @@ namespace EducNotes.API.Data
         {
           var userIds = await _context.UserLinks.Where(u => u.UserPId == parentId).Select(s => s.UserId).ToListAsync();
           return await _context.Users
-              .Include(i => i.Photos)
-              .Include(i => i.Class)
-              .Include(i => i.UserType)
-              .Where(u => userIds.Contains(u.Id)).ToListAsync();
+                        .Include(i => i.Photos)
+                        .Include(i => i.Class)
+                        .Include(i => i.UserType)
+                        .Where(u => userIds.Contains(u.Id)).ToListAsync();
         }
 
         public async Task<IEnumerable<User>> GetParents(int ChildId)
@@ -765,6 +765,7 @@ namespace EducNotes.API.Data
                       LastName = appUser.LastName,
                       FirstName = appUser.FirstName,
                       Cell = appUser.PhoneNumber,
+                      Gender = appUser.Gender,
                       Email = appUser.Email,
                       Token = teacherCode
                     };
@@ -1874,7 +1875,7 @@ namespace EducNotes.API.Data
                 td.Value = emailData.Token;
                 break;
               case "<CONFIRM_LINK>":
-                td.Value = string.Format("{0}/confirmTeacherEmail?id={1}&token={2}", "localHost:4200",
+                td.Value = string.Format("{0}/confirmTeacherEmail?id={1}&token={2}", baseUrl,
                   teacherId, HttpUtility.UrlEncode(emailData.Token));
                 break;
               default:

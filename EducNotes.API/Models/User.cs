@@ -25,6 +25,8 @@ namespace EducNotes.API.Models
         public string ValidationCode { get; set; }
         public DateTime? ValidationDate { get; set; }
         // public bool ValidatedCode { get; set; }
+        public int? ClassLevelId { get; set; }
+        public ClassLevel ClassLevel { get; set; }
         public int? ClassId { get; set; }
         public Class Class { get; set; }
         public DateTime DateOfBirth { get; set; }

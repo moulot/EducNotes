@@ -85,7 +85,8 @@ export class AdminService {
 
     return this.http.get(this.baseUrl + 'admin/SearchInscription', { params });
   }
-  studentAffectation(classid, ids, userId) {
+
+  studentAffectation(classid, ids) {
     return this.http.post(this.baseUrl + 'admin/' + classid + '/StudentAffectation', ids);
   }
 

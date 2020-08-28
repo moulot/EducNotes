@@ -130,10 +130,33 @@ namespace EducNotes.API.Controllers
           return Ok(userToReturn);
         }
 
+        [HttpGet("UserFile/{id}")]
+        public async Task<IActionResult> GetUserFile(int id)
+        {
+          var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
+          var userFromRepo = await _repo.GetUser(id, isCurrentUser);
+          var user = _mapper.Map<UserForAccountDto>(userFromRepo);
+
+          var parents = await _repo.GetParents(id);
+          List<User> children = new List<User>();
+          foreach (var parent in parents)
+          {
+            IEnumerable<User> child = await _repo.GetChildren(parent.Id);
+            children = child.ToList();
+          }
+
+          return Ok(new {
+            user
+          });
+        }
+
         [HttpGet("Account/{id}")]
         public async Task<IActionResult> GetUserAccount(int id)
         {
           var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
+          if(id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+            return Unauthorized();
+
           var user = await _repo.GetUser(id, isCurrentUser);
           var parent = _mapper.Map<UserForAccountDto>(user);
 

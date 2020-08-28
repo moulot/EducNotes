@@ -78,8 +78,6 @@ export class NewTuitionComponent implements OnInit {
     this.regFee = Number(this.settings.find(s => s.name === 'RegFee').value);
     this.regDeadline = this.settings.find(s => s.name === 'RegistrationDeadLine').value;
     this.daysToValidateReg = this.settings.find(s => s.name === 'DaysToValidateReg').value;
-    this.addChildItem('moulot', 'sandrine', 10, '31/06/2006', 0);
-    this.addChildItem('moulot', 'inna', 3, '14/06/2011', 0);
     this.getClassLevels();
     this.getTuitionData();
     this.getPaymentData();
@@ -128,16 +126,14 @@ export class NewTuitionComponent implements OnInit {
 
   createTuitionForm() {
     this.tuitionForm = this.fb.group({
-      fLastName: ['moulot', Validators.required],
-      fFirstName: ['georges', Validators.required],
-      fEmail: ['georges.moulot@albatrostechnologies.com', Validators.required],
-      fCell: ['07104446', Validators.required],
-      // fSendEmail: [false],
-      mLastName: ['moulot', Validators.required],
-      mFirstName: ['jacqueline', Validators.required],
-      mEmail: ['georges.moulot@albatrostechnologies.com', Validators.required],
-      mCell: ['07104446', Validators.required],
-      // mSendEmail: [false],
+      fLastName: ['', Validators.required],
+      fFirstName: ['', Validators.required],
+      fEmail: ['', Validators.required],
+      fCell: ['', Validators.required],
+      mLastName: ['', Validators.required],
+      mFirstName: ['', Validators.required],
+      mEmail: ['', Validators.required],
+      mCell: ['', Validators.required],
       children: this.fb.array([])
     }, {validator: this.formValidator});
   }

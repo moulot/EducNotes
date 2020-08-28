@@ -17,7 +17,7 @@ import { UserFileData } from '../_models/userFileData';
   providedIn: 'root'
 })
 export class UserService {
-  baseUrl = environment.apiUrl;
+  baseUrl = environment.apiUrl + 'users/';
   sexe = [{id : 0, name : ' FEMME'}, {id : 1, name : ' HOMME'}];
 
 constructor(private http: HttpClient) {}
@@ -61,107 +61,111 @@ constructor(private http: HttpClient) {}
   }
 
   getUsers() {
-    return this.http.get(this.baseUrl + 'users');
+    return this.http.get(this.baseUrl);
   }
 
   getUsersWithRoles() {
-    return this.http.get(this.baseUrl + 'users/usersWithRoles');
+    return this.http.get(this.baseUrl + 'usersWithRoles');
   }
 
   updateUserRoles(user: User, roles: {}) {
-    return this.http.post(this.baseUrl + 'users/editRoles/' + user.userName, roles);
+    return this.http.post(this.baseUrl + 'editRoles/' + user.userName, roles);
   }
 
   saveAbsence(absence: Absence) {
-    return this.http.put(this.baseUrl + 'users/saveAbsence', absence);
+    return this.http.put(this.baseUrl + 'saveAbsence', absence);
   }
 
   getStudentClassLifeData(userId) {
-    return this.http.get(this.baseUrl + 'users/' + userId + '/ClassLifeData/');
+    return this.http.get(this.baseUrl + userId + '/ClassLifeData/');
   }
 
   getStudentLifeData(userId) {
-    return this.http.get(this.baseUrl + 'users/' + userId + '/LifeData/');
+    return this.http.get(this.baseUrl + userId + '/LifeData/');
   }
 
   saveClassEvent(userClassEvent: UserClassEvent) {
-    return this.http.put(this.baseUrl + 'users/saveClassEvent', userClassEvent);
+    return this.http.put(this.baseUrl + 'saveClassEvent', userClassEvent);
   }
 
   saveSanction(userSanction: UserSanction) {
-    return this.http.put(this.baseUrl + 'users/saveSanction', userSanction);
+    return this.http.put(this.baseUrl + 'saveSanction', userSanction);
   }
 
   saveReward(userReward: UserReward) {
-    return this.http.put(this.baseUrl + 'users/saveReward', userReward);
+    return this.http.put(this.baseUrl + 'saveReward', userReward);
   }
 
   getUser(id): Observable<User> {
-    return this.http.get<User>(this.baseUrl + 'users/' + id);
+    return this.http.get<User>(this.baseUrl + id);
   }
 
   getTeacherWithCourses(teacherId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/teacherWithCourses');
+    return this.http.get(this.baseUrl + teacherId + '/teacherWithCourses');
   }
 
   getParentAccount(id): any {
-    return this.http.get(this.baseUrl + 'users/Account/' + id);
+    return this.http.get(this.baseUrl + 'Account/' + id);
+  }
+
+  getUserFile(id) {
+    return this.http.get(this.baseUrl + 'UserFile/' + id);
   }
 
   saveUserSms(parentId, sms: any) {
-    return this.http.put(this.baseUrl + 'users/' + parentId + '/saveSms', sms);
+    return this.http.put(this.baseUrl + parentId + '/saveSms', sms);
   }
 
   getChildren(parentId): Observable<User[]> {
-    return this.http.get<User[]>(this.baseUrl + 'users/' + parentId + '/Children');
+    return this.http.get<User[]>(this.baseUrl + parentId + '/Children');
   }
 
   getAccountChildren(parentId) {
-    return this.http.get(this.baseUrl + 'users/' + parentId + '/AccountChildren');
+    return this.http.get(this.baseUrl + parentId + '/AccountChildren');
   }
 
   getTeacherScheduleToday(teacherId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/ScheduleToday');
+    return this.http.get(this.baseUrl + teacherId + '/ScheduleToday');
   }
 
   getTeacherSchedule(teacherId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/Schedule');
+    return this.http.get(this.baseUrl + teacherId + '/Schedule');
   }
 
   getTeacherScheduleByDay(teacherId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/ScheduleByDay');
+    return this.http.get(this.baseUrl + teacherId + '/ScheduleByDay');
   }
 
   getTeacherScheduleByClassByDay(teacherId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/ScheduleByClassByDay');
+    return this.http.get(this.baseUrl + teacherId + '/ScheduleByClassByDay');
   }
 
   getGradesData(teacherId, periodId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/GradesData/' + periodId);
+    return this.http.get(this.baseUrl + teacherId + '/GradesData/' + periodId);
   }
 
   getTeacherClasses(teacherId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/Classes');
+    return this.http.get(this.baseUrl + teacherId + '/Classes');
   }
 
   getTeacherClassesWithEvalsByPeriod(teacherId, periodId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/period/' + periodId + '/ClassesWithEvalsByPeriod');
+    return this.http.get(this.baseUrl + teacherId + '/period/' + periodId + '/ClassesWithEvalsByPeriod');
   }
 
   getTeacherCourses(teacherId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/Courses');
+    return this.http.get(this.baseUrl + teacherId + '/Courses');
   }
 
   getTeacherNextCourses(teacherId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/NextCourses');
+    return this.http.get(this.baseUrl + teacherId + '/NextCourses');
   }
 
   getTeacherCurrWeekSessions(teacherId, classId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/CurrWeekSessions/' + classId);
+    return this.http.get(this.baseUrl + teacherId + '/CurrWeekSessions/' + classId);
   }
 
   getTeacherSessionsFromToday(teacherId, classId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/SessionsFromToday/' + classId);
+    return this.http.get(this.baseUrl + teacherId + '/SessionsFromToday/' + classId);
   }
 
   getMovedWeekSessions(teacherId, classId, agendaParams) {
@@ -170,27 +174,27 @@ constructor(private http: HttpClient) {}
     params = params.append('dueDate', agendaParams.dueDate);
     params = params.append('moveWeek', agendaParams.moveWeek);
 
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/MovedWeekSessions/' + classId, { params });
+    return this.http.get(this.baseUrl + teacherId + '/MovedWeekSessions/' + classId, { params });
   }
 
   updateUser(id: number, user: User) {
-    return this.http.put(this.baseUrl + 'users/' + id, user);
+    return this.http.put(this.baseUrl + id, user);
   }
 
   SetMainPhoto(userId: number, id: number) {
-    return this.http.post(this.baseUrl + 'users/' + userId + '/photos/' + id + '/setMain', {});
+    return this.http.post(this.baseUrl + userId + '/photos/' + id + '/setMain', {});
   }
   // le posr pour enrgister la preinscription : model {father:any,mother:any; children : any[]}
   savePreinscription(data: any) {
-    return this.http.post(this.baseUrl + 'users/SavePreinscription', data);
+    return this.http.post(this.baseUrl + 'SavePreinscription', data);
   }
 
   deletePhoto(userId: number, id: number) {
-    return this.http.delete(this.baseUrl + 'users/' + userId + '/photos/' + id);
+    return this.http.delete(this.baseUrl + userId + '/photos/' + id);
   }
 
   sendLike(id: number, recipientId: number) {
-    return this.http.post(this.baseUrl + 'users/' + id + '/like/' + recipientId, {});
+    return this.http.post(this.baseUrl + id + '/like/' + recipientId, {});
   }
 
   getMessages(id: number, page?, itemsPerPage?, messageContainer?) {
@@ -206,7 +210,7 @@ constructor(private http: HttpClient) {}
       params = params.append('pageSize', itemsPerPage);
     }
 
-    return this.http.get<Message[]>(this.baseUrl + 'users/' + id + '/messages', {observe: 'response', params})
+    return this.http.get<Message[]>(this.baseUrl + id + '/messages', {observe: 'response', params})
       .pipe(
         map(response => {
           paginatedResult.result = response.body;
@@ -220,115 +224,115 @@ constructor(private http: HttpClient) {}
   }
 
   getMessageThread(id: number, recipientId: number) {
-    return this.http.get<Message[]>(this.baseUrl + 'users/' + id + '/messages/thread/' + recipientId);
+    return this.http.get<Message[]>(this.baseUrl + id + '/messages/thread/' + recipientId);
   }
 
   sendMessage(id: number, message: Message) {
-    return this.http.post(this.baseUrl + 'users/' + id + '/messages', message);
+    return this.http.post(this.baseUrl + id + '/messages', message);
   }
 
   deleteMessage(id: number, userId: number) {
-    return this.http.post(this.baseUrl + 'users/' + userId + '/messages/' + id, {});
+    return this.http.post(this.baseUrl + userId + '/messages/' + id, {});
   }
 
   markAsRead(userId: number, messageId: number) {
-    this.http.post(this.baseUrl + 'users/' + userId + '/messages/' + messageId + '/read', {})
+    this.http.post(this.baseUrl + userId + '/messages/' + messageId + '/read', {})
       .subscribe();
   }
 
   // métode poour récuperer la liste des types User
   getUserTypes() {
-    return this.http.get(this.baseUrl + 'users/GetUserTypes');
+    return this.http.get(this.baseUrl + 'GetUserTypes');
   }
 
   getAllClassesCourses(): Observable<any[]> {
-    return this.http.get<any[]>(this.baseUrl + 'users/GetAllClassesCourses');
+    return this.http.get<any[]>(this.baseUrl + 'GetAllClassesCourses');
   }
 
   // recuperations de tous les professeurs
   getAllTeachers(): Observable<User[]> {
-    return this.http.get<User[]>(this.baseUrl + 'users/GetAllTeachers');
+    return this.http.get<User[]>(this.baseUrl + 'GetAllTeachers');
   }
 
   addTeacher(user: FormData) {
-    return this.http.post(this.baseUrl + 'users/' + 'AddTeacher', user);
+    return this.http.post(this.baseUrl + 'AddTeacher', user);
   }
 
   getAssignedClasses(teacherId) {
-    return this.http.get(this.baseUrl + 'users/' + teacherId + '/AssignedClasses');
+    return this.http.get(this.baseUrl + teacherId + '/AssignedClasses');
   }
 
   getUserByTypeId(id: number) {
-    return this.http.get(this.baseUrl + 'users/' + 'GetUserByTypeId/' + id);
+    return this.http.get(this.baseUrl + 'GetUserByTypeId/' + id);
   }
   // supprimer un professeur
   deleteTeacher(id: number) {
-    return this.http.post(this.baseUrl + 'users/' + id + '/DeleteTeacher', {});
+    return this.http.post(this.baseUrl + id + '/DeleteTeacher', {});
   }
 
   emailExist(email: string) {
-    return this.http.get(this.baseUrl + 'users/' + email + '/VerifyEmail');
+    return this.http.get(this.baseUrl + email + '/VerifyEmail');
   }
 
   // recuperation de tous les userTypes avec details
   getUserTypesDetails() {
-    return this.http.get(this.baseUrl + 'users/GetUserTypesDetails');
+    return this.http.get(this.baseUrl + 'GetUserTypesDetails');
   }
 
   // recupeation des types User pour le personnel
   getAdministrationUserTypes() {
-    return this.http.get(this.baseUrl + 'users/GetAdminUserTypes');
+    return this.http.get(this.baseUrl + 'GetAdminUserTypes');
   }
 
   // mise a jour du userTypes
   updateUserType(id: number, typeName: string) {
-      return this.http.post(this.baseUrl + 'users/' + id + '/updateUserType/' + typeName , {} );
+      return this.http.post(this.baseUrl + id + '/updateUserType/' + typeName , {} );
   }
 
   // add usertypes
   addUserType(userType: any) {
-   return this.http.post(this.baseUrl + 'users/AddUserType', userType);
+   return this.http.post(this.baseUrl + 'AddUserType', userType);
   }
 
   deleteUSerType(id: number) {
-    return this.http.post(this.baseUrl + 'users/' + id + '/DeleteUserType',  {});
+    return this.http.post(this.baseUrl + id + '/DeleteUserType',  {});
    }
 
    updatePerson(id: number, user: any) {
-    return this.http.post(this.baseUrl + 'users/' + id + '/updatePerson', user);
+    return this.http.post(this.baseUrl + id + '/updatePerson', user);
   }
 
   searchUsers(data: any) {
-    return this.http.post(this.baseUrl + 'users/SearchUsers', data);
+    return this.http.post(this.baseUrl + 'SearchUsers', data);
   }
 
 // recuperation de toutes les villes
   getAllCities() {
-    return this.http.get(this.baseUrl + 'users/GetAllCities');
+    return this.http.get(this.baseUrl + 'GetAllCities');
   }
 
   // recuperation des districts en fonction de  l'id de la ville
   getDistrictsByCityId(id: number) {
-    return this.http.get(this.baseUrl + 'users/' + id + '/GetDistrictsByCityId');
+    return this.http.get(this.baseUrl + id + '/GetDistrictsByCityId');
   }
 
   getEvents(userId) {
-    return this.http.get(this.baseUrl + 'users/' + userId + '/events');
+    return this.http.get(this.baseUrl + userId + '/events');
   }
 
   validateRegistration(order: OrderToValidate) {
-    return this.http.post(this.baseUrl + 'users/ValidateRegistration', order);
+    return this.http.post(this.baseUrl + 'ValidateRegistration', order);
   }
 
   loadStudentData() {
-    return this.http.get(this.baseUrl + 'users/LoadStudents');
+    return this.http.get(this.baseUrl + 'LoadStudents');
   }
 
   loadUserFile(userFileData: UserFileData) {
-    return this.http.post(this.baseUrl + 'users/loadUserFile', userFileData);
+    return this.http.post(this.baseUrl + 'loadUserFile', userFileData);
   }
 
   searchUserFiles(searchData) {
-    return this.http.get(this.baseUrl + 'users/UserFiles');
+    return this.http.get(this.baseUrl + 'UserFiles');
   }
 }
