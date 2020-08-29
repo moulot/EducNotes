@@ -76,7 +76,7 @@ namespace EducNotes.API.Controllers
                 }
             }
 
-            photoForCreationDto.Url = uploadResult.Uri.ToString();
+            photoForCreationDto.Url = uploadResult.SecureUri.ToString();
             photoForCreationDto.PublicId = uploadResult.PublicId;
 
             var photo = _mapper.Map<Photo>(photoForCreationDto);

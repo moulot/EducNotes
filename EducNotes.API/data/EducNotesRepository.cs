@@ -682,7 +682,7 @@ namespace EducNotes.API.Data
                             Update(oldPhoto);
                           }
                           Photo photo = new Photo();
-                          photo.Url = uploadResult.Uri.ToString();
+                          photo.Url = uploadResult.SecureUri.ToString();
                           photo.PublicId = uploadResult.PublicId;
                           photo.UserId = child.Id;
                           photo.DateAdded = DateTime.Now;
@@ -831,7 +831,7 @@ namespace EducNotes.API.Data
                         if (uploadResult.StatusCode == HttpStatusCode.OK)
                         {
                             Photo photo = new Photo();
-                            photo.Url = uploadResult.Uri.ToString();
+                            photo.Url = uploadResult.SecureUri.ToString();
                             photo.PublicId = uploadResult.PublicId;
                             photo.UserId = appUser.Id;
                             photo.DateAdded = DateTime.Now;
@@ -2197,7 +2197,7 @@ namespace EducNotes.API.Data
                         {
                             DocTypeId = _config.GetValue<int>("AppSettings:mainDocTypes"),
                             PublicId = uploadResult.PublicId,
-                            Url = uploadResult.Uri.ToString(),
+                            Url = uploadResult.SecureUri.ToString(),
                             FileTypeId = 1
                         };
                         Add(MainDoc);
@@ -2231,7 +2231,7 @@ namespace EducNotes.API.Data
                         {
                             DocTypeId = docTypeId,
                             PublicId = uploadResult.PublicId,
-                            Url = uploadResult.Uri.ToString(),
+                            Url = uploadResult.SecureUri.ToString(),
                             FileTypeId = 1
                         };
                         Add(MainDoc);
@@ -2267,7 +2267,7 @@ namespace EducNotes.API.Data
                         {
                             DocTypeId = _config.GetValue<int>("AppSettings:otherDocTypes"),
                             PublicId = uploadResult.PublicId,
-                            Url = uploadResult.Uri.ToString(),
+                            Url = uploadResult.SecureUri.ToString(),
                             FileTypeId = 1
 
                         };

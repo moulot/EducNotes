@@ -103,6 +103,19 @@ namespace EducNotes.API.Controllers
         }
 
         [Authorize(Policy = "RequireAdminRole")]
+        [HttpGet("rolesWithUsers")]
+        public async Task<IActionResult> GetRolesWithUsers()
+        {
+          var rolesFromDB = await _context.UserRoles
+                            .Include(i => i.Role)
+                            .Include(i => i.User)
+                            .ToListAsync();
+
+          var roles = _mapper.Map<IEnumerable<UserForAutoCompleteDto>>(users);
+          return Ok(usersToReturn);
+        }
+
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpGet("usersWithRoles")]
         public async Task<IActionResult> GetUsersWithRoles()
         {
@@ -154,7 +167,7 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetUserAccount(int id)
         {
           var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
-          if(id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+          if(isCurrentUser)
             return Unauthorized();
 
           var user = await _repo.GetUser(id, isCurrentUser);
@@ -1532,7 +1545,7 @@ namespace EducNotes.API.Controllers
           }
 
           Photo photo = new Photo();
-          photo.Url = uploadResult.Uri.ToString();
+          photo.Url = uploadResult.SecureUri.ToString();
           photo.PublicId = uploadResult.PublicId;
           photo.UserId = userId;
           photo.DateAdded = DateTime.Now;

@@ -1199,62 +1199,62 @@ namespace EducNotes.API.Controllers
           return BadRequest("problème pour metre à jour les paramètres");
         }
 
-        [HttpGet("GetToken")]
-        public List<string> GetOrangeAccessToken()
-        {
-          ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-          var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.orange.com/oauth/v2/token");
-          httpWebRequest.ContentType = "application/json";
-          httpWebRequest.Method = "POST";
-          httpWebRequest.Accept = "application/json";
-          httpWebRequest.PreAuthenticate = true;
-          httpWebRequest.Headers.Add("Authorization", "Basic YlppdEs0aHhKdjl0Q2tkc1p1ZHVMVFdkU3E3anJUN0E6OUFtUWVRd0hOQ0cyNFVQQQ==");
+        // [HttpGet("GetToken")]
+        // public List<string> GetOrangeAccessToken()
+        // {
+        //   ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+        //   var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.orange.com/oauth/v2/token");
+        //   httpWebRequest.ContentType = "application/json";
+        //   httpWebRequest.Method = "POST";
+        //   httpWebRequest.Accept = "application/json";
+        //   httpWebRequest.PreAuthenticate = true;
+        //   httpWebRequest.Headers.Add("Authorization", "Basic YlppdEs0aHhKdjl0Q2tkc1p1ZHVMVFdkU3E3anJUN0E6OUFtUWVRd0hOQ0cyNFVQQQ==");
 
-          using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-          {
-            streamWriter.Write("");
-            streamWriter.Flush();
-            streamWriter.Close();
-          }
+        //   using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+        //   {
+        //     streamWriter.Write("");
+        //     streamWriter.Flush();
+        //     streamWriter.Close();
+        //   }
 
-          List<string> result = new List<string>();
-          var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-          using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-          {
-            result.Add(streamReader.ReadToEnd());
-          }
+        //   List<string> result = new List<string>();
+        //   var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+        //   using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+        //   {
+        //     result.Add(streamReader.ReadToEnd());
+        //   }
 
-          return result;
-        }
+        //   return result;
+        // }
 
-        [HttpGet("TestJson")]
-        public void GetTest()
-        {
-          SmsDataRequest data = new SmsDataRequest();
-          data.outboundSMSMessageRequest = new OutboundSMSMessageRequest();
-          data.outboundSMSMessageRequest.Address = "tel+22507104446";
-          data.outboundSMSMessageRequest.SenderAddress = "tel+22507104446";
-          data.outboundSMSMessageRequest.outboundSMSTextMessage = new OutboundSMSTextMessage();
-          data.outboundSMSMessageRequest.outboundSMSTextMessage.Message = "hello!";
-          string JsonArray = JsonConvert.SerializeObject(data);
-          Dictionary<string, string> Params = new Dictionary<string, string>();
-          Params.Add("content", "hello!");
-          Params.Add("to", "07104446,22334455");
-          Params.Add("validityPeriod", "1");
+        // [HttpGet("TestJson")]
+        // public void GetTest()
+        // {
+        //   SmsDataRequest data = new SmsDataRequest();
+        //   data.outboundSMSMessageRequest = new OutboundSMSMessageRequest();
+        //   data.outboundSMSMessageRequest.Address = "tel+22507104446";
+        //   data.outboundSMSMessageRequest.SenderAddress = "tel+22507104446";
+        //   data.outboundSMSMessageRequest.outboundSMSTextMessage = new OutboundSMSTextMessage();
+        //   data.outboundSMSMessageRequest.outboundSMSTextMessage.Message = "hello!";
+        //   string JsonArray = JsonConvert.SerializeObject(data);
+        //   Dictionary<string, string> Params = new Dictionary<string, string>();
+        //   Params.Add("content", "hello!");
+        //   Params.Add("to", "07104446,22334455");
+        //   Params.Add("validityPeriod", "1");
 
-          Params["to"] = CreateRecipientList(Params["to"]);
-          string JsonArray1 = JsonConvert.SerializeObject(Params, Formatting.None);
-          JsonArray1 = JsonArray1.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
-        }
+        //   Params["to"] = CreateRecipientList(Params["to"]);
+        //   string JsonArray1 = JsonConvert.SerializeObject(Params, Formatting.None);
+        //   JsonArray1 = JsonArray1.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
+        // }
 
-        public static string CreateRecipientList(string to)
-        {
-          string[] tmp = to.Split(new char[] { ',' });
-          to = "[\"";
-          to = to + string.Join("\",\"", tmp);
-          to = to + "\"]";
-          return to;
-        }
+        // public static string CreateRecipientList(string to)
+        // {
+        //   string[] tmp = to.Split(new char[] { ',' });
+        //   to = "[\"";
+        //   to = to + string.Join("\",\"", tmp);
+        //   to = to + "\"]";
+        //   return to;
+        // }
 
     }
 

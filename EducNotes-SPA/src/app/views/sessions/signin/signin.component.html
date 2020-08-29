@@ -1,11 +1,8 @@
 <div class="animated zoomInDown">
-  <div class="card w-75 mx-auto">
-    <div class="row">
-      <div class="col-md-6">
+  <div class="card  w-75 mx-auto">
+    <div class="row" style="background-size:contain;background-image: url(./assets/images/watermark_sm.jpg)">
+      <div class="col-md-5">
         <div class="p-md-5 p-3">
-          <!-- <div class="logo text-center mb-4">
-            <img src="assets/images/logo_sm.png" alt="" />
-          </div> -->
           <div class="text-center">
             <i class="fad fa-sign-in-alt fa-4x mx-auto" style="--fa-secondary-opacity: 1;
               --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>        
@@ -29,8 +26,16 @@
           </div>
         </div>
       </div>
-      <div class="col-md-6 text-center"
-        style="background-size: cover;background-image: url(./assets/images/signin_pic.JPG)"></div>
+      <div class="col-md-7" style="border-left: 1px solid #f0f0f0;">
+        <div class="d-none d-md-block">
+          <div class="text-17 font-weight-bolder">informations générales</div>
+          <hr class="mt-1 mb-2">
+          <div *ngFor="let item of infos">
+            <div class="text-15 font-weight-bold" style="color: #192C47"><b>{{item.title}}</b></div>
+            <div class="text-15 mb-2">{{item.text}}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

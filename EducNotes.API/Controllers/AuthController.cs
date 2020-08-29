@@ -554,7 +554,7 @@ namespace EducNotes.API.Controllers
             }
           }
 
-          photoForCreationDto.Url = uploadResult.Uri.ToString();
+          photoForCreationDto.Url = uploadResult.SecureUri.ToString();
           photoForCreationDto.PublicId = uploadResult.PublicId;
 
           var photo = _mapper.Map<Photo>(photoForCreationDto);
@@ -624,6 +624,13 @@ namespace EducNotes.API.Controllers
         {
           var user = await _repo.GetUser(id, false);
           return Ok(user);
+        }
+
+        [HttpGet("LoginPageInfos")]
+        public async Task<IActionResult> GetLoginPageInfos()
+        {
+          var infos = await _context.LoginPageInfos.OrderBy(o => o.Title).ToListAsync();
+          return Ok(infos);
         }
 
         // [HttpPost("AddFile")]

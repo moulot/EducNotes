@@ -245,6 +245,7 @@ import { UserFileComponent } from './admin/user-file/user-file.component';
 import { SpacedAmountDirective } from './_directives/spacedAmount.directive';
 import { TuitionDetailsComponent } from './admin/tuition/tuition-details/tuition-details.component';
 import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-email/confirm-teacher-email.component';
+import { RolesComponent } from './admin/roles/roles.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -412,7 +413,8 @@ export function tokenGetter() {
       UserFileComponent,
       TuitionDetailsComponent,
       TuitionDetailsComponent,
-      ConfirmTeacherEmailComponent
+      ConfirmTeacherEmailComponent,
+      RolesComponent
    ],
    imports: [
       FormWizardModule,

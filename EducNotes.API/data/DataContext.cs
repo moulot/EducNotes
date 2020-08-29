@@ -94,6 +94,7 @@ namespace EducNotes.API.Data {
   public DbSet<Cycle> Cycles { get; set; }
   public DbSet<School> Schools { get; set; }
   public DbSet<Cheque> Cheques { get; set; }
+  public DbSet<LoginPageInfo> LoginPageInfos { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {

@@ -5,6 +5,7 @@ import { Router, RouteConfigLoadStart, ResolveStart, RouteConfigLoadEnd, Resolve
 import { User } from 'src/app/_models/user';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { AuthService } from 'src/app/_services/auth.service';
+import { AdminService } from 'src/app/_services/admin.service';
 
 
 @Component({
@@ -25,6 +26,7 @@ export class SigninComponent implements OnInit {
   loading: boolean;
   loadingText: string;
   formValid: boolean;
+  infos: any;
 
   constructor(private authService: AuthService, private router: Router, private fb: FormBuilder,
       private route: ActivatedRoute, private alertify: AlertifyService) { }
@@ -43,11 +45,21 @@ export class SigninComponent implements OnInit {
         }
       });
 
+      this.getLoginPageInfos();
+
       this.signinForm = this.fb.group({
         username: ['', Validators.required],
         password: ['', Validators.required]
       });
     }
+  }
+
+  getLoginPageInfos() {
+    this.authService.getLoginPageInfos().subscribe(data => {
+      this.infos = data;
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
   loggedIn() {
@@ -64,10 +76,6 @@ export class SigninComponent implements OnInit {
         this.router.navigate([r]);
       } else {
         this.user = this.authService.currentUser;
-        // console.log(this.user);
-        // console.log('phone confirmed:' + this.user.phoneNumberConfirmed);
-        // console.log('email confirmed:' + this.user.emailConfirmed);
-        // console.log('validated:' + this.user.validated);
         if (this.user.emailConfirmed && this.user.phoneNumberConfirmed && this.user.validated) {
           this.router.navigate(['/home']);
         } else {

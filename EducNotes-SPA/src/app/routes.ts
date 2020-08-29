@@ -126,6 +126,7 @@ import { SchoolSettingsComponent } from './admin/school-settings/school-settings
 import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
 import { UserFileComponent } from './admin/user-file/user-file.component';
 import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-email/confirm-teacher-email.component';
+import { RolesComponent } from './admin/roles/roles.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -236,7 +237,8 @@ export const appRoutes: Routes = [
         { path: 'invalidAccount', component: InvalidAccountComponent},
         { path: 'editChildren/:id', component: EditChildrenComponent, resolve: {users: EditChildrenResolver}},
         { path: 'settings', component: SchoolSettingsComponent, resolve: {settings: SchoolSettingsResolver}},
-        { path: 'userFile/:id', component: UserFileComponent }
+        { path: 'userFile/:id', component: UserFileComponent },
+        { path: 'roles', component: RolesComponent}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

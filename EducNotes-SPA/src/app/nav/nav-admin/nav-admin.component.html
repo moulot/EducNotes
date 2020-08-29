@@ -81,7 +81,15 @@
   <li class="nav-item waves-light" mdbWavesEffect>
     <a class="nav-link text-16 text-muted" (click)="closeNavOnClick()" [routerLink]="['/themesList']">prog. scolaire</a>
   </li>
-  <li class="nav-item waves-light" mdbWavesEffect>
-    <a class="nav-link text-16 text-muted" (click)="closeNavOnClick()" [routerLink]="['/settings']">paramètres</a>
+  <li class="nav-item dropdown btn-group" dropdown>
+    <a dropdownToggle type="button" class="nav-link text-16 text-muted dropdown-toggle waves-light" mdbWavesEffect>
+      paramètres
+    </a>
+    <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/settings']"  class="dropdown-item">données initiales</a>
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/loginInfos']" class="dropdown-item">infos générales</a>
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/roles']" class="dropdown-item">rôles</a>
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/menu']" class="dropdown-item">menu</a>
+    </div>
   </li>
 </ul>

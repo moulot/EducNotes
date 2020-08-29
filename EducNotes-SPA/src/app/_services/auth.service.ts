@@ -302,4 +302,9 @@ export class AuthService {
   getAllFiles() {
     return this.http.get(this.baseUrl + 'GetAllFiles');
   }
+
+  getLoginPageInfos() {
+    return this.http.get(this.baseUrl + 'LoginPageInfos');
+  }
+
 }
