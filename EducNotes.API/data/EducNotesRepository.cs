@@ -117,6 +117,7 @@ namespace EducNotes.API.Data
         {
             var query = _context.Users
                 .Include(c => c.Class)
+                .Include(c => c.ClassLevel)
                 .Include(p => p.Photos).AsQueryable();
 
             if (isCurrentUser)
@@ -2141,17 +2142,17 @@ namespace EducNotes.API.Data
 
         public async Task<Period> GetPeriodFromDate(DateTime date)
         {
-            var shortDate = date.Date;
-            var periods = await _context.Periods.OrderBy(p => p.StartDate).ToListAsync();
-            foreach (var period in periods)
+          var shortDate = date.Date;
+          var periods = await _context.Periods.OrderBy(p => p.StartDate).ToListAsync();
+          foreach (var period in periods)
+          {
+            if (shortDate >= period.StartDate && date.Date <= period.EndDate.Date)
             {
-                if (shortDate >= period.StartDate && date.Date <= period.EndDate.Date)
-                {
-                    return period;
-                }
+              return period;
             }
+          }
 
-            return null;
+          return null;
         }
 
         public async Task<IEnumerable<Theme>> ClassLevelCourseThemes(int classLevelId, int courseId)

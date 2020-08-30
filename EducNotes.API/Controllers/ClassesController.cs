@@ -1465,7 +1465,7 @@ namespace EducNotes.API.Controllers
             //recuperation de tous les professeurs ainsi que les cours affectés
             var teachers = await _context.Users
                                   .Include(p => p.Photos)
-                                  .Where(u => u.UserTypeId == teacherTypeId && u.Validated == true)
+                                  .Where(u => u.UserTypeId == teacherTypeId)
                                   .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
 
             var teachersToReturn = new List<TeacherForListDto>();
@@ -1480,11 +1480,12 @@ namespace EducNotes.API.Controllers
                 tdetails.FirstName = teacher.FirstName;
                 tdetails.Gender = teacher.Gender;
                 tdetails.DateOfBirth = teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
-                tdetails.CourseClasses = new List<TeacherCourseClassesDto>();
+                tdetails.Validated = teacher.Validated;
                 var photo = teacher.Photos.FirstOrDefault(i => i.IsMain == true);
                 if (photo != null)
                     tdetails.PhotoUrl = photo.Url;
 
+                tdetails.CourseClasses = new List<TeacherCourseClassesDto>();
                 var allteacherCourses = await _context.TeacherCourses
                                               .Include(c => c.Course)
                                               .Where(t => t.TeacherId == teacher.Id).ToListAsync();

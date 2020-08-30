@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { AlertifyService } from 'src/app/_services/alertify.service';
 
 @Component({
   selector: 'app-user-file',
@@ -6,11 +8,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./user-file.component.scss']
 })
 export class UserFileComponent implements OnInit {
-  parent: any;
+  userFile: any;
 
-  constructor() { }
+  constructor( private route: ActivatedRoute, private alertify: AlertifyService) { }
 
   ngOnInit() {
+    this.route.data.subscribe((data: any) => {
+      this.userFile = data['file'];
+    });
   }
 
 }

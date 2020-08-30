@@ -147,11 +147,10 @@
                 <div class="col-md-5 float-right">
                   <div class="float-right">
                     <button type="submit" mdbBtn class="btnBlue ml-2" size="sm" mdbWavesEffect
-                      [disabled]="!teacherForm.valid">
+                      [disabled]="!teacherForm.valid || wait">
                       <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
                         --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
-                      <span *ngIf="!editionMode">ajouter</span>
-                      <span *ngIf="editionMode">editer</span>
+                      <span *ngIf="!editionMode">ajouter</span><span *ngIf="editionMode">editer</span>
                     </button>
                     <!-- <button type="button" (click)="resetValues()" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>reset</button> -->
                     <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>annuler</button>

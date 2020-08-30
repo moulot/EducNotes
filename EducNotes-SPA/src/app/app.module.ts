@@ -246,6 +246,8 @@ import { SpacedAmountDirective } from './_directives/spacedAmount.directive';
 import { TuitionDetailsComponent } from './admin/tuition/tuition-details/tuition-details.component';
 import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-email/confirm-teacher-email.component';
 import { RolesComponent } from './admin/roles/roles.component';
+import { PaymentsComponent } from './admin/payments/payments.component';
+import { UserFileResolver } from './_resolvers/user-file-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -414,7 +416,8 @@ export function tokenGetter() {
       TuitionDetailsComponent,
       TuitionDetailsComponent,
       ConfirmTeacherEmailComponent,
-      RolesComponent
+      RolesComponent,
+      PaymentsComponent
    ],
    imports: [
       FormWizardModule,
@@ -519,6 +522,7 @@ export function tokenGetter() {
       CheckoutResolver,
       EditChildrenResolver,
       SchoolSettingsResolver,
+      UserFileResolver,
       OrderService,
       AccountService,
       { provide: NZ_I18N, useValue: fr_FR }

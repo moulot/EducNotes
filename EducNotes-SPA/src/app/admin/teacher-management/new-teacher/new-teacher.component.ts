@@ -32,6 +32,7 @@ export class NewTeacherComponent implements OnInit {
   photoUrl = '';
   photoFile: File;
   selectedCourses = [];
+  wait = false;
   gender = [{value: 0, label: 'femme'}, {value: 1, label: 'homme'}];
 
   constructor(private classService: ClassService, private fb: FormBuilder, private authService: AuthService,
@@ -148,6 +149,7 @@ export class NewTeacherComponent implements OnInit {
   }
 
   addTeacher() {
+    this.wait = true;
     // get the selected courses for the teacher
     let ids = '';
     for (let i = 0; i < this.teacherForm.value.courses.length; i++) {
@@ -181,6 +183,7 @@ export class NewTeacherComponent implements OnInit {
       this.router.navigate(['/teachers']);
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 }

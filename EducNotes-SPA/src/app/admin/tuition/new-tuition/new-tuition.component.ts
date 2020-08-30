@@ -66,6 +66,7 @@ export class NewTuitionComponent implements OnInit {
   showWireData = false;
   orderid: any;
   invoiceid: any;
+  wait = false;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private router: Router,
     private authService: AuthService, private classService: ClassService, private orderService: OrderService,
@@ -78,6 +79,7 @@ export class NewTuitionComponent implements OnInit {
     this.regFee = Number(this.settings.find(s => s.name === 'RegFee').value);
     this.regDeadline = this.settings.find(s => s.name === 'RegistrationDeadLine').value;
     this.daysToValidateReg = this.settings.find(s => s.name === 'DaysToValidateReg').value;
+    this.addChildItem('', '', null, '', null);
     this.getClassLevels();
     this.getTuitionData();
     this.getPaymentData();
@@ -374,7 +376,6 @@ export class NewTuitionComponent implements OnInit {
     paydata.refDoc = this.paymentForm.value.refDoc;
     paydata.note = this.paymentForm.value.note;
     paydata.bankId = this.paymentForm.value.bankid;
-    console.log(paydata);
     this.paymentService.addFinOp(paydata).subscribe(() => {
       this.alertify.success('paiment effectué avec succès');
       this.router.navigate(['/tuitions']);

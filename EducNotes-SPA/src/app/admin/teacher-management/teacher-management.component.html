@@ -46,6 +46,9 @@
     <div class="card mb-2" *ngFor="let teacher of filteredTeachers">
       <div class="card-body p-2">
         <div class="row">
+          <div *ngIf="!teacher.validated" class="col-md-12 text-right">
+            <div class="text-18 text-danger"><b>l'enseignant n'est pas validé</b></div>
+          </div>
           <div class="col-md-1 mb-1">
             <img class="avatar-lg rounded-lg mr-3" src="{{teacher.photoUrl || '../../assets/user.png'}}" alt="">
           </div>
@@ -123,13 +126,13 @@
               </div>
             </div>
             <div>
-              <button mdbBtn class="btnWhiteB" size="sm" mdbWavesEffect [routerLink]="['/editTeacher',teacher.id]">
+              <button mdbBtn class="btnWhiteB" [disabled]="!teacher.validated" size="sm" mdbWavesEffect [routerLink]="['/editTeacher',teacher.id]">
                 <i class="fad fa-user-edit fa-1x mr-1" style="--fa-secondary-opacity: 1;
                   --fa-primary-color:#192C47;--fa-secondary-color:#192C47;"></i>
                 editer
               </button>
               <button mdbBtn class="btnWhiteB ml-2" size="sm" mdbWavesEffect [routerLink]="['/teacherAssignment',teacher.id]"
-                [disabled]="teacher.courseClasses.length === 0" (click)="assignment(teacher)">
+                [disabled]="teacher.courseClasses.length === 0 || !teacher.validated" (click)="assignment(teacher)">
                 <i class="fad fa-users-class fa-1x mr-1" style="--fa-secondary-opacity: 1;
                   --fa-primary-color:#192C47;--fa-secondary-color:#192C47;"></i>
                 affecter

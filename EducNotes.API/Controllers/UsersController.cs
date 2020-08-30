@@ -102,17 +102,28 @@ namespace EducNotes.API.Controllers
           return Ok(usersToReturn);
         }
 
-        [Authorize(Policy = "RequireAdminRole")]
+        // [Authorize(Policy = "RequireAdminRole")]
         [HttpGet("rolesWithUsers")]
         public async Task<IActionResult> GetRolesWithUsers()
         {
           var rolesFromDB = await _context.UserRoles
-                            .Include(i => i.Role)
-                            .Include(i => i.User)
-                            .ToListAsync();
+                                  .Include(i => i.User)
+                                  .Include(i => i.Role)
+                                  .OrderBy(r => r.Role.Name).ToListAsync();
 
-          var roles = _mapper.Map<IEnumerable<UserForAutoCompleteDto>>(users);
-          return Ok(usersToReturn);
+          List<RolesWithUsersDto> roles = new List<RolesWithUsersDto>();
+          foreach (var urole in rolesFromDB)
+          {
+            RolesWithUsersDto rwud = new RolesWithUsersDto();
+            rwud.Id = urole.Role.Id;
+            rwud.Name = urole.Role.Name;
+            var usersFromList = rolesFromDB.Where(u => u.RoleId == urole.RoleId).Select(s => s.User).ToList();
+            var users = _mapper.Map<List<UserForDetailedDto>>(usersFromList);
+            rwud.RoleUsers = users;
+            roles.Add(rwud);
+          }
+
+          return Ok(roles);
         }
 
         [Authorize(Policy = "RequireAdminRole")]
@@ -143,24 +154,59 @@ namespace EducNotes.API.Controllers
           return Ok(userToReturn);
         }
 
-        [HttpGet("UserFile/{id}")]
-        public async Task<IActionResult> GetUserFile(int id)
+        [HttpGet("UserFile/{childId}")]
+        public async Task<IActionResult> GetUserFile(int childId)
         {
-          var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
-          var userFromRepo = await _repo.GetUser(id, isCurrentUser);
-          var user = _mapper.Map<UserForAccountDto>(userFromRepo);
+          var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == childId;
+          if(!isCurrentUser)
+            Unauthorized();
 
-          var parents = await _repo.GetParents(id);
-          List<User> children = new List<User>();
+          var childFromRepo = await _repo.GetUser(childId, false);
+          var child = _mapper.Map<UserForDetailedDto>(childFromRepo);
+
+          UserForFileDto userFile = new UserForFileDto();
+          userFile.Id = childId;
+          userFile.LastName = child.LastName;
+          userFile.FirstName = child.FirstName;
+          userFile.Email = child.Email;
+          userFile.ClassLevelId = child.ClassLevelId;
+          userFile.ClassLevelName = child.ClassLevelName;
+          userFile.ClassId = child.ClassId;
+          userFile.ClassName = child.ClassName;
+          userFile.Gender = child.Gender;
+          userFile.strDateOfBirth = child.strDateOfBirth;
+          userFile.Age = child.Age;
+          userFile.PhotoUrl = child.PhotoUrl;
+          userFile.PhoneNumber = child.PhoneNumber;
+
+          var parentsFromRepo = await _repo.GetParents(childId);
+          var parents = _mapper.Map<IEnumerable<UserForDetailedDto>>(parentsFromRepo);
           foreach (var parent in parents)
           {
-            IEnumerable<User> child = await _repo.GetChildren(parent.Id);
-            children = child.ToList();
+            if(parent.UserTypeId == parentTypeId && parent.Gender == 0)
+            {
+              userFile.MotherId = parent.Id;
+              userFile.MotherLastName = parent.LastName;
+              userFile.MotherFirstName = parent.FirstName;
+              userFile.MotherPhoneNumber = parent.PhoneNumber.FormatPhoneNumber();
+              userFile.Mother2ndPhoneNumber = parent.SecondPhoneNumber.FormatPhoneNumber();
+              userFile.MotherEmail = parent.Email;
+              userFile.MotherPhotoUrl = parent.PhotoUrl;
+            }
+
+            if(parent.UserTypeId == parentTypeId && parent.Gender == 1)
+            {
+              userFile.FatherId = parent.Id;
+              userFile.FatherLastName = parent.LastName;
+              userFile.FatherFirstName = parent.FirstName;
+              userFile.FatherPhoneNumber = parent.PhoneNumber.FormatPhoneNumber();
+              userFile.Father2ndPhoneNumber = parent.SecondPhoneNumber.FormatPhoneNumber();
+              userFile.FatherEmail = parent.Email;
+              userFile.FatherPhotoUrl = parent.PhotoUrl;
+            }
           }
 
-          return Ok(new {
-            user
-          });
+          return Ok(userFile);
         }
 
         [HttpGet("Account/{id}")]

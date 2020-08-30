@@ -61,7 +61,6 @@ export class SchoolSettingsComponent implements OnInit {
       settingData.value = elt.value;
       this.updatedSettings = [...this.updatedSettings, settingData];
     }
-    // console.log(this.updatedSettings);
     this.adminService.updateSettings(this.updatedSettings).subscribe(() => {
       this.alertify.success('les paramètres sont mis à jour!');
       this.router.navigate(['home']);

@@ -215,6 +215,8 @@ namespace EducNotes.API.Helpers
         
         public static string FormatPhoneNumber(this string phone)
         {
+          if(phone == null)
+            return phone;
           if (phone.Length == 8)
           {
             return String.Format("{0}.{1}.{2}.{3}", phone.Substring(0, 2), phone.Substring(2, 2),

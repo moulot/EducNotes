@@ -96,6 +96,21 @@ export class AuthService {
     }
   }
 
+  eraseSessionData() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('settings');
+    localStorage.removeItem('currentPeriod');
+    localStorage.removeItem('currentChild');
+    localStorage.removeItem('currentClassId');
+    this.decodedToken = null;
+    this.currentUser = null;
+    this.settings = null;
+    this.currentPeriod = null;
+    this.currentClassId = null;
+    this.changeCurrentChild(this.newUser);
+  }
+
   register(user: User) {
     return this.http.post(this.baseUrl + 'register', user);
   }

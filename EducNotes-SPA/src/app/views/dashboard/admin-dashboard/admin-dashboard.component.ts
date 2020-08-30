@@ -75,7 +75,7 @@ export class AdminDashboardComponent implements OnInit {
      this.teachers = res.find(i => i.userTypeId === this.teacherTypeId);
      this.students = res.find(i => i.userTypeId === this.studentTypeId);
     }, error => {
-      console.log(error);
+      this.alertify.error(error);
     });
   }
 
@@ -86,14 +86,13 @@ export class AdminDashboardComponent implements OnInit {
     userFileData.userId = userid;
     userFileData.searchData = searchData;
     if (userid) {
-      this.userService.loadUserFile(userFileData).subscribe((userData: any) => {
-        this.router.navigate(['userFile', userData.id]);
-      }, error => {
-        this.alertify.error(error);
-      });
+      this.router.navigate(['userFile', userFileData.userId]);
     } else {
       if (searchData !== '') {
-
+        this.userService.loadUserFile(userFileData).subscribe((userData: any) => {
+        }, error => {
+          this.alertify.error(error);
+        });
       }
     }
   }

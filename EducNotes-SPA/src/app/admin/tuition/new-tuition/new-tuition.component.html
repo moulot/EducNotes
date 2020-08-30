@@ -159,7 +159,7 @@
           <div class="row">
             <div class="col-md-2"><div class="text-18 text-muted">infos enfants</div></div>
             <div class="col-md-10" *ngIf="tuitionForm.hasError('childNOK') && tuitionForm.get('children').touched">
-              <div class="text-15 text-right text-danger">les données des enfants contiennent des erreurs!</div>
+              <div class="text-15 text-right text-danger">saisir les infos de tous les enfants avant de continuer</div>
             </div>
           </div>
           <div mdbCollapse [isCollapsed]="false" #children="bs-collapse">
@@ -323,7 +323,10 @@
                       </div>
                     <div class="col-md-6">
                       <button mdbBtn type="submit" [disabled]="tuitionForm.hasError('formNOK') || !tuitionForm.valid"
-                        class="btnBlue p-4" size="sm" block="true" mdbWavesEffect>enregistrer l'inscription</button>
+                        class="btnBlue p-4" size="sm" block="true" mdbWavesEffect>
+                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        enregistrer l'inscription
+                      </button>
                     </div>
                     <div class="col-md-6">
                       <button mdbBtn type="button" [disabled]="tuitionForm.hasError('formNOK') || !tuitionForm.valid"

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using EducNotes.API.Models;
 
@@ -14,6 +15,7 @@ namespace EducNotes.API.Dtos
     public string PhoneNumber { get; set; }
     public string  DateOfBirth { get; set; }
     public string SecondPhoneNumber { get; set; }
+    public Boolean Validated { get; set; }
     public List<TeacherCourseClassesDto> CourseClasses { get; set; }
     public List<Course> Courses { get; set; }
     public List<int> classIds { get; set; }
