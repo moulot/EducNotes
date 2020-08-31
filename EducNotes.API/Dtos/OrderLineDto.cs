@@ -28,7 +28,12 @@ namespace EducNotes.API.Dtos
     public string ClassLevelName { get; set; }
     public int ChildClassId { get; set; }
     public string ChildClassName { get; set; }
-    public Boolean Cancelled { get; set; }
+    public byte Validated { get; set; }
+    public byte Paid { get; set; }
+    public byte Expired { get; set; }
+    public byte Overdue { get; set; }
+    public byte Cancelled { get; set; }
+    public byte Completed { get; set; }
     public List<OrderLineDeadlineDto> Payments { get; set; }
   }
 }

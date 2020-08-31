@@ -45,7 +45,7 @@ export class UserAccountComponent implements OnInit {
       // children to be updated and confirmed
       for (let i = 0; i < this.parent.children.length; i++) {
         const elt = this.parent.children[i];
-        if (elt.child.emailConfirmed) {
+        if (elt.child.validated) {
           this.ChildToBeConfirmed += 1;
         }
       }

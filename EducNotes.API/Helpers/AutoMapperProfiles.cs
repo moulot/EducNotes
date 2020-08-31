@@ -342,6 +342,40 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.strSessionDate, opt => {
                     opt.MapFrom(src => src.SessionDate.ToString("dd/MM/yyyy", frC));
                 });
+            CreateMap<FinOp, FinOpDto>()
+                .ForMember(dest => dest.InvoiceNum, opt => {
+                    opt.MapFrom(src => src.Invoice.InvoiceNum);
+                })
+                .ForMember(dest => dest.InvoiceDate, opt => {
+                    opt.MapFrom(src => src.Invoice.InvoiceDate.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.InvoiceAmount, opt => {
+                    opt.MapFrom(src => src.Invoice.Amount);
+                })
+                .ForMember(dest => dest.ChequeBankName, opt => {
+                    opt.MapFrom(src => src.Cheque.Bank.Name);
+                })
+                .ForMember(dest => dest.ChequeAmount, opt => {
+                    opt.MapFrom(src => src.Cheque.Amount);
+                })
+                .ForMember(dest => dest.ChequePictureUrl, opt => {
+                  opt.MapFrom(src => src.Cheque.PictureUrl);
+                })
+                .ForMember(dest => dest.PaymentTypeName, opt => {
+                  opt.MapFrom(src => src.PaymentType.Name);
+                })
+                .ForMember(dest => dest.FromBankAccountName, opt => {
+                  opt.MapFrom(src => src.FromBankAccount.Name);
+                })
+                .ForMember(dest => dest.FromCashDeskName, opt => {
+                  opt.MapFrom(src => src.FromCashDesk.Name);
+                })
+                .ForMember(dest => dest.ToBankAccountName, opt => {
+                  opt.MapFrom(src => src.ToBankAccount.Name);
+                })
+                .ForMember(dest => dest.ToCashDeskName, opt => {
+                  opt.MapFrom(src => src.ToCashDesk.Name);
+                });
             CreateMap<OrderLine, OrderLineDto>()
                 .ForMember(dest => dest.ProductName, opt => {
                     opt.MapFrom(src => src.Product.Name);

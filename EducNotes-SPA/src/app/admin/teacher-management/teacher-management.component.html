@@ -46,13 +46,10 @@
     <div class="card mb-2" *ngFor="let teacher of filteredTeachers">
       <div class="card-body p-2">
         <div class="row">
-          <div *ngIf="!teacher.validated" class="col-md-12 text-right">
-            <div class="text-18 text-danger"><b>l'enseignant n'est pas validé</b></div>
-          </div>
           <div class="col-md-1 mb-1">
             <img class="avatar-lg rounded-lg mr-3" src="{{teacher.photoUrl || '../../assets/user.png'}}" alt="">
           </div>
-          <div class="col-md-11">
+          <div class="col-md-9">
             <div class="row">
               <div class="col-md-12">
                 <div class="d-flex align-content-center">
@@ -105,6 +102,11 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div *ngIf="!teacher.validated" class="col-md-2 text-center">
+            <i class="fad fa-user-lock fa-2x mr-2" style="--fa-primary-opacity: 1;
+              --fa-secondary-opacity: 1; --fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
+            <div class="text-15 text-danger"><b>non validé</b></div>
           </div>
         </div>
         <hr class="mt-2 mb-1">

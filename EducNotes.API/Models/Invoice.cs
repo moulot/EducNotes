@@ -6,16 +6,11 @@ namespace EducNotes.API.Models
   {
     public Invoice()
     {
-      Status = 0;
-    }
-
-    public enum StatusEnum
-    {
-      Created = 0,
-      Cancelled = 1,
-      Validated = 2,
-      OverDue = 3,
-      Paid = 4
+      Created = false;
+      Cancelled = false;
+      Validated = false;
+      Overdue = false;
+      Paid = false;
     }
 
     public int Id { get; set; }
@@ -26,6 +21,10 @@ namespace EducNotes.API.Models
     public Order Order { get; set; }
     public int? UserId { get; set; }
     public User User { get; set; }
-    public byte Status { get; set; }
+    public Boolean Created { get; set; }
+    public Boolean Cancelled { get; set; }
+    public Boolean Validated { get; set; }
+    public Boolean Overdue { get; set; }
+    public Boolean Paid { get; set; }
   }
 }

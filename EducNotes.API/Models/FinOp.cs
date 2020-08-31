@@ -6,8 +6,11 @@ namespace EducNotes.API.Models
   {
     public FinOp()
     {
-      Status = 0;
+      Received = false;
+      DepositedToBank = false;
+      Cashed = false;
     }
+
     public int Id { get; set; }
     public DateTime FinOpDate { get; set; }
     public int? OrderId { get; set; }
@@ -33,6 +36,8 @@ namespace EducNotes.API.Models
     public BankAccount ToBankAccount { get; set; }
     public string DocRef { get; set; }
     public string Note { get; set; }
-    public byte Status { get; set; }
+    public Boolean Received { get; set; }
+    public Boolean DepositedToBank { get; set; }
+    public Boolean Cashed { get; set; }
   }
 }

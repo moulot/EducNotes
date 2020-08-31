@@ -28,5 +28,6 @@ export interface OrderLine {
    overDue: boolean;
    expired: boolean;
    cancelled: boolean;
+   completed: boolean;
    payments: OrderLineDeadline[];
 }

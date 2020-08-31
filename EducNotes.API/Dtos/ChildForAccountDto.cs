@@ -9,6 +9,7 @@ namespace EducNotes.API.Dtos
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Boolean EmailConfirmed { get; set; }
+        public Boolean Validated { get; set; }
         public string Email { get; set; }
         public int ClassLevelId { get; set; }
         public string ClassLevelName { get; set; }

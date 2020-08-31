@@ -322,14 +322,14 @@
                         <hr class="my-2">
                       </div>
                     <div class="col-md-6">
-                      <button mdbBtn type="submit" [disabled]="tuitionForm.hasError('formNOK') || !tuitionForm.valid"
+                      <button mdbBtn type="submit" [disabled]="tuitionForm.hasError('formNOK') || !tuitionForm.valid || wait"
                         class="btnBlue p-4" size="sm" block="true" mdbWavesEffect>
-                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                         enregistrer l'inscription
                       </button>
                     </div>
                     <div class="col-md-6">
-                      <button mdbBtn type="button" [disabled]="tuitionForm.hasError('formNOK') || !tuitionForm.valid"
+                      <button mdbBtn type="button" [disabled]="tuitionForm.hasError('formNOK') || !tuitionForm.valid || wait"
                         class="btnBlue p-4" (click)="saveTuitionAndPayment()" size="sm" block="true" mdbWavesEffect>proceder au paiement</button>
                     </div>
                   </div>

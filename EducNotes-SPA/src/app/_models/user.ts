@@ -32,6 +32,7 @@ export interface User {
   cityId?: number;
   active: number;
   validated: boolean;
+  accountDataValidated: boolean;
 
   photos?: Photo[];
   roles?: string[];

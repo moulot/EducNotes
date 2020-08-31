@@ -15,6 +15,7 @@ namespace EducNotes.API.Models
       Expired = false;
       OverDue = false;
       Cancelled = false;
+      Completed = false;
     }
 
     public int Id { get; set; }
@@ -41,6 +42,7 @@ namespace EducNotes.API.Models
     public Boolean Expired { get; set; }
     public Boolean OverDue { get; set; }
     public Boolean Cancelled { get; set; }
+    public Boolean Completed { get; set; }
     public List<OrderLineDeadline> Deadlines { get; set; }
   }
 }

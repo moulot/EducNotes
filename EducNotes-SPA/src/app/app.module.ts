@@ -248,6 +248,7 @@ import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-ema
 import { RolesComponent } from './admin/roles/roles.component';
 import { PaymentsComponent } from './admin/payments/payments.component';
 import { UserFileResolver } from './_resolvers/user-file-resolver';
+import { UserFileTuitionComponent } from './admin/user-file-tuition/user-file-tuition.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -417,7 +418,8 @@ export function tokenGetter() {
       TuitionDetailsComponent,
       ConfirmTeacherEmailComponent,
       RolesComponent,
-      PaymentsComponent
+      PaymentsComponent,
+      UserFileTuitionComponent
    ],
    imports: [
       FormWizardModule,

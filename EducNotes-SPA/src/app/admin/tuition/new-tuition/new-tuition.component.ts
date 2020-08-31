@@ -338,16 +338,19 @@ export class NewTuitionComponent implements OnInit {
   }
 
   saveTuition() {
+    this.wait = true;
     this.setTuitionData();
     this.orderService.addNewTuition(this.tuitionData).subscribe(() => {
       this.router.navigate(['/tuition']);
       this.alertify.success('l\'inscription a bien été enregistrée');
     }, error => {
+      this.wait = false;
       this.alertify.error(error);
     });
   }
 
   saveTuitionAndPayment() {
+    this.wait = true;
     this.setTuitionData();
     this.orderService.addNewTuition(this.tuitionData).subscribe((data: any) => {
       this.alertify.success('l\'inscription a bien été enregistrée');
@@ -357,15 +360,18 @@ export class NewTuitionComponent implements OnInit {
       this.invoiceid = data.invoiceId;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     }, () => {
       const amount = this.paymentForm.get('amount') as FormControl;
       amount.setValue(this.tuitionData.dueAmount);
       this.showTuitionForm = false;
       this.showPaymentForm = true;
+      this.wait = false;
     });
 }
 
   savePayment() {
+    this.wait = true;
     const paydata = <any>{};
     paydata.finOpDate = Utils.inputDateDDMMYY(this.paymentForm.value.opDate, '/');
     paydata.orderId = this.orderid;
@@ -381,6 +387,7 @@ export class NewTuitionComponent implements OnInit {
       this.router.navigate(['/tuitions']);
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 

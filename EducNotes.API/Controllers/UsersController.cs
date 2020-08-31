@@ -154,6 +154,26 @@ namespace EducNotes.API.Controllers
           return Ok(userToReturn);
         }
 
+        [HttpGet("tuitions/{id}")]
+        public async Task<IActionResult> GetTuition(int id)
+        {
+          var parents = await _repo.GetParents(id);
+          var fatherId = parents.FirstOrDefault(p => p.Gender == 1).Id;
+          var motherId = parents.FirstOrDefault(p => p.Gender == 0).Id;
+          var order = await _context.Orders.FirstOrDefaultAsync(t => t.isReg && (t.MotherId == motherId || t.FatherId == fatherId));
+          var tuition = _mapper.Map<OrderDto>(order);
+
+          var linesFromDB = await _context.OrderLines.Where(ol => ol.OrderId == order.Id).ToListAsync();
+          var lines = _mapper.Map<List<OrderLineDto>>(linesFromDB);
+          tuition.Lines = lines;
+
+          var paymentsFromDB = await _context.FinOps.Where(f => f.OrderId == order.Id).ToListAsync();
+          var payments = _mapper.Map<List<FinOpDto>>(paymentsFromDB);
+          tuition.Payments = payments;
+
+          return Ok(tuition);
+        }
+
         [HttpGet("UserFile/{childId}")]
         public async Task<IActionResult> GetUserFile(int childId)
         {
@@ -213,7 +233,7 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetUserAccount(int id)
         {
           var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
-          if(isCurrentUser)
+          if(!isCurrentUser)
             return Unauthorized();
 
           var user = await _repo.GetUser(id, isCurrentUser);
