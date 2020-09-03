@@ -112,10 +112,6 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'UserFile/' + id);
   }
 
-  getTuition(id) {
-    return this.http.get(this.baseUrl + 'tuitions/' + id);
-  }
-
   saveUserSms(parentId, sms: any) {
     return this.http.put(this.baseUrl + parentId + '/saveSms', sms);
   }

@@ -154,26 +154,6 @@ namespace EducNotes.API.Controllers
           return Ok(userToReturn);
         }
 
-        [HttpGet("tuitions/{id}")]
-        public async Task<IActionResult> GetTuition(int id)
-        {
-          var parents = await _repo.GetParents(id);
-          var fatherId = parents.FirstOrDefault(p => p.Gender == 1).Id;
-          var motherId = parents.FirstOrDefault(p => p.Gender == 0).Id;
-          var order = await _context.Orders.FirstOrDefaultAsync(t => t.isReg && (t.MotherId == motherId || t.FatherId == fatherId));
-          var tuition = _mapper.Map<OrderDto>(order);
-
-          var linesFromDB = await _context.OrderLines.Where(ol => ol.OrderId == order.Id).ToListAsync();
-          var lines = _mapper.Map<List<OrderLineDto>>(linesFromDB);
-          tuition.Lines = lines;
-
-          var paymentsFromDB = await _context.FinOps.Where(f => f.OrderId == order.Id).ToListAsync();
-          var payments = _mapper.Map<List<FinOpDto>>(paymentsFromDB);
-          tuition.Payments = payments;
-
-          return Ok(tuition);
-        }
-
         [HttpGet("UserFile/{childId}")]
         public async Task<IActionResult> GetUserFile(int childId)
         {
@@ -224,6 +204,24 @@ namespace EducNotes.API.Controllers
               userFile.FatherEmail = parent.Email;
               userFile.FatherPhotoUrl = parent.PhotoUrl;
             }
+          }
+
+          var motherChildren = await _repo.GetChildren(userFile.MotherId);
+          var fatherChildren = await _repo.GetChildren(userFile.FatherId);
+          var siblingsFromRepo = motherChildren.ToList();
+          if(fatherChildren.Count() > 0)
+          {
+            foreach (var item in fatherChildren)
+            {
+              var user = siblingsFromRepo.ToList().Find(s => s.Id == item.Id);
+              if(user == null)
+              {
+                siblingsFromRepo.Add(item);
+              }
+            }
+            
+            siblingsFromRepo.Remove(childFromRepo);
+            userFile.Siblings = _mapper.Map<List<UserForDetailedDto>>(siblingsFromRepo);
           }
 
           return Ok(userFile);
@@ -1850,6 +1848,7 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> loadStuentData()
         {
           var users = await _context.Users
+                            .Where(u => u.UserTypeId == studentTypeId && u.AccountDataValidated)
                             .Include(i => i.Photos)
                             .Include(i => i.Class)
                             .Where(u => u.UserTypeId == studentTypeId)

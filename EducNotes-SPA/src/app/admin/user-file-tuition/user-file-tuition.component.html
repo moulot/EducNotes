@@ -1,29 +1,114 @@
 <div class="d-none d-md-block mt-2">
-  <div class="row border rounded-lg p-2">
-    <div class="col-md-12">
-      <div class="text-17">
-        <b>frais de scolarité</b>
-        <span class="text-danger ml-2">solde à payer: 435.000 F</span>
+  <div class="border rounded-lg p-2 mt-2">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="text-17 mb-0">
+          <b>frais de scolarité</b>
+          <span class="ml-1">
+            <b>- solde global à payer: {{tuition?.balance | number:'':'fr-FR'}} F</b>
+          </span>
+        </div>
+        <div class="text-13 text-muted mt-0">
+          {{tuition?.amountToValidate | number:'':'fr-FR'}} F reçus et en cours de validation (chèques et virements).
+        </div>
+      </div>
+      <div class="col-md-4 text-right">
+        <button type="button" mdbBtn (click)="addPayment()" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement</button>
+      </div>
+      <div class="col-md-12"><hr class="my-1"></div>
+      <div class="col-md-12">
+        <div class="border rounded-lg p-2">
+          <i class="fad fa-exclamation-triangle fa-2x mr-2" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          <span class="text-15 text-danger"><b>échéance du 28/08/2020 dépassé. montant à payer : 175.000 F</b></span>
+        </div>
+      </div>
+      <div class="col-md-12 text-16"><b>élèves</b></div>
+      <div class="col-md-12" *ngFor="let child of tuition?.lines">
+        <div class="text-16">{{child.childFirstName}} ({{child.childAge}} ans). classe de 
+          {{child.childClassName || child.classLevelName}}. montant de la scolarité : {{child.amountTTC | number:'':'fr-FR'}} F</div>
+      </div>
+      <div class="col-md-12 text-16 mt-1"><b>paiements reçus</b></div>
+      <div *ngFor="let pay of tuition?.payments" class="col-md-12 d-flex">
+        <i *ngIf="pay.rejected" class="fad fa-times-circle fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <i *ngIf="pay.cashed" class="fad fa-check fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <i *ngIf="pay.received || pay.depositedToBank" class="fad fa-question fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+        <span class="text-16 mr-1">{{pay.strFinOpDate}}.</span>
+        <span *ngIf="pay.paymentTypeId == payCash" class="text-16">espèce. ref n°{{pay.docRef}}. 
+          montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
+        <span *ngIf="pay.paymentTypeId == payCheque" class="text-16">chèque n°{{pay.chequeNum}} 
+          ({{pay.chequeBankName}}). montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
+        <span *ngIf="pay.paymentTypeId == payWire" class="text-16">virement. ref n°{{pay.docRef}} ({{pay.fromBankAccountName}}). 
+          montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
+        <span *ngIf="pay.paymentTypeId == payMobile" class="text-16">mobile money. ref n°{{pay.docRef}}. 
+          montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
+        <span class="text-16 text-danger ml-1" *ngIf="pay.rejected"><b>refusé</b></span>
+        <span class="text-16 text-danger ml-1" *ngIf="pay.depositedToBank"><b>remise ok</b></span>
+        <span class="text-16 text-danger ml-1" *ngIf="pay.received"><b>en cours</b></span>
       </div>
     </div>
-    <div class="col-md-12"><hr class="my-1"></div>
-    <div class="col-md-12">
-      <div class="alert alert-danger" role="alert">
-        échéance du 28/08/2020 dépassé. montant à payer : 175.000 F
-      </div>
-    </div>
-    <div class="col-md-12 text-16">sandrine. 3e A. montant de la scolarité : 550.000 F</div>
-    <div class="col-md-12 text-16">inna. CM1 A. montant de la scolarité : 350.000 F</div>
-    <div class="col-md-12 text-16 mt-1"><b>paiements reçus</b></div>
-    <div class="col-md-12 d-flex">
-      <i class="fad fa-times-circle fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
-        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-      <span class="text-15">12/04/2020. chèque n°132455 (NSIA). montant: 280.000 F. <b class="text-danger">refusé</b></span>
-    </div>
-    <div class="col-md-12 d-flex">
-      <i class="fad fa-check fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
-        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-      <span class="text-15">12/03/2020. espèce ref n° 234_2020 (ECOBANK). montant: 380.000 F.</span>
-    </div>
+  </div>
 </div>
+<div class="d-md-none mt-2">
+  <div class="border rounded-lg p-2">
+    <div class="row">
+      <div class="col-md-12"><div class="text-20"><b>frais de scolarité</b></div></div>
+      <div class="col-md-12"><hr class="my-1"></div>
+      <div class="col-md-12">
+        <div class="text-17 text-center"><b>solde global à payer:</b></div>
+        <div class="text-17 text-center"><b>{{tuition?.balance | number:'':'fr-FR'}} F</b></div>
+        <div class="text-13 text-center text-muted mt-0">en cours de validation: {{tuition?.amountToValidate | number:'':'fr-FR'}} F</div>
+      </div>
+      <div class="col-md-12 my-1">
+        <button type="button" mdbBtn (click)="addPayment()" block="true" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement</button>
+      </div>
+      <div class="col-md-12 mt-2">
+        <div class="border rounded-lg p-2 text-center">
+          <i class="fad fa-exclamation-triangle fa-2x" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          <div class="text-15 text-danger"><b>échéance du 28/08/2020 dépassé. montant à payer: 175.000 F</b></div>
+        </div>
+      </div>
+      <div class="col-md-12 text-18 mt-1 mb-2"><b>paiements reçus</b></div>
+      <div *ngFor="let pay of tuition?.payments">
+        <div class="col-md-12 d-flex">
+          <i *ngIf="pay.rejected" class="fad fa-times-circle fa-2x my-auto" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          <i *ngIf="pay.cashed" class="fad fa-check fa-2x my-auto" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          <i *ngIf="pay.received || pay.depositedToBank" class="fad fa-question fa-2x my-auto" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+          <span class="text-20 text-danger my-auto ml-2" *ngIf="pay.rejected"><b>refusé</b></span>
+          <span class="text-20 text-danger my-auto ml-2" *ngIf="pay.depositedToBank"><b>remise ok</b></span>
+          <span class="text-20 text-danger my-auto ml-2" *ngIf="pay.received"><b>en cours</b></span>
+          <span class="text-20 text-danger my-auto ml-2" *ngIf="pay.cashed"><b>paiement OK</b></span>
+        </div>
+        <div class="col-md-12 text-16">date: {{pay.strFinOpDate}}</div>
+        <div *ngIf="pay.paymentTypeId == payCash" class="col-md-12 text-16">
+          <div>espèce. ref n°{{pay.docRef}}.</div>
+          <div>montant: {{pay.amount | number:'':'fr-FR'}} F.</div>
+        </div>
+        <div *ngIf="pay.paymentTypeId == payCheque" class="col-md-12 text-16">
+          <div>chèque n°{{pay.chequeNum}} ({{pay.chequeBankName}}).</div>
+          <div>montant: {{pay.amount | number:'':'fr-FR'}} F.</div>
+        </div>
+        <div *ngIf="pay.paymentTypeId == payWire" class="col-md-12 text-16">
+          <div>virement. ref n°{{pay.docRef}} ({{pay.fromBankAccountName}}).</div>
+          <div>montant: {{pay.amount | number:'':'fr-FR'}} F.</div>
+        </div>
+        <div *ngIf="pay.paymentTypeId == payMobile" class="col-md-12 text-16">
+          <div>mobile money. ref n°{{pay.docRef}}.</div>
+          <div>montant: {{pay.amount | number:'':'fr-FR'}} F.</div>
+        </div>
+        <div class="col-md-12"><hr class="my-1"></div>
+      </div>
+    </div>
+  </div>
+  <div class="border rounded-lg p-2">
+    <div class="row">
+    </div>
+  </div>
 </div>

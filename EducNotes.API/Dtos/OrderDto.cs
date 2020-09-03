@@ -14,15 +14,23 @@ namespace EducNotes.API.Dtos
     public string strDeadline { get; set; }
     public DateTime Validity { get; set; }
     public string strValidity { get; set; }
+    public int NbDaysLate { get; set; }
     public int? ShippingAddressId { get; set; }
     public int? BillingAddressId { get; set; }
     public decimal TotalHT { get; set; }
     public decimal Discount { get; set; }
     public decimal AmountHT { get; set; }
+    public string strAmountHT { get; set; }
+    public decimal AmountToValidate { get; set; }
+    public string strAmountToValidate { get; set; }
     public decimal TVA { get; set; }
     public decimal TVAAmount { get; set; }
     public decimal AmountTTC { get; set; }
     public string strAmountTTC { get; set; }
+    public decimal AmountPaid { get; set; }
+    public string strAmountPaid { get; set; }
+    public decimal Balance { get; set; }
+    public string strBalance { get; set; }
     public int ChildId { get; set; }
     public string ChildLastName { get; set; }
     public string ChildFirstName { get; set; }

@@ -35,9 +35,7 @@ export class ConfirmEmailComponent implements OnInit {
     private alertify: AlertifyService,  private router: Router, private accountService: AccountService) { }
 
   ngOnInit() {
-    // this.route.data.subscribe(data => {
-    //   this.user = data['user'].user;
-    // });
+    this.authService.eraseSessionData();
     this.createPhoneForm();
     this.createUserForm();
 

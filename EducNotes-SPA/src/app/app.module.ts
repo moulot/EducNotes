@@ -249,6 +249,8 @@ import { RolesComponent } from './admin/roles/roles.component';
 import { PaymentsComponent } from './admin/payments/payments.component';
 import { UserFileResolver } from './_resolvers/user-file-resolver';
 import { UserFileTuitionComponent } from './admin/user-file-tuition/user-file-tuition.component';
+import { AddPaymentComponent } from './admin/add-payment/add-payment.component';
+import { AddPaymentResolver } from './_resolvers/add-payment-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -419,7 +421,8 @@ export function tokenGetter() {
       ConfirmTeacherEmailComponent,
       RolesComponent,
       PaymentsComponent,
-      UserFileTuitionComponent
+      UserFileTuitionComponent,
+      AddPaymentComponent
    ],
    imports: [
       FormWizardModule,
@@ -525,6 +528,7 @@ export function tokenGetter() {
       EditChildrenResolver,
       SchoolSettingsResolver,
       UserFileResolver,
+      AddPaymentResolver,
       OrderService,
       AccountService,
       { provide: NZ_I18N, useValue: fr_FR }

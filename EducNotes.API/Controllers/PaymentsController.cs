@@ -20,7 +20,7 @@ namespace EducNotes.API.Controllers
     private readonly IEducNotesRepository _repo;
     private readonly IMapper _mapper;
     private readonly IConfiguration _config;
-    int chequeTypeId;
+    int chequeTypeId, cashTypeId, bankTransferTypeId, mobileMoneyTypeId;
 
     public PaymentsController (DataContext context, IEducNotesRepository repo, IMapper mapper, IConfiguration config) {
       _context = context;
@@ -28,6 +28,9 @@ namespace EducNotes.API.Controllers
       _config = config;
       _mapper = mapper;
       chequeTypeId = _config.GetValue<int>("AppSettings:chequeTypeId");
+      cashTypeId = _config.GetValue<int>("AppSettings:cashTypeId");
+      bankTransferTypeId = _config.GetValue<int>("AppSettings:bankTransferTypeId");
+      mobileMoneyTypeId = _config.GetValue<int>("AppSettings:mobileMoneyTypeId");
     }
 
     [HttpGet("GetPaymentTypes")]
@@ -75,6 +78,15 @@ namespace EducNotes.API.Controllers
         _context.Add(cheque);
         _context.SaveChanges();
         finOp.ChequeId = cheque.Id;
+      }
+
+      if(finOp.PaymentTypeId == cashTypeId || finOp.PaymentTypeId == mobileMoneyTypeId)
+      {
+        finOp.Cashed = true;
+      }
+      if(finOp.PaymentTypeId == bankTransferTypeId || finOp.PaymentTypeId == chequeTypeId)
+      {
+        finOp.Received = true;
       }
 
       //order validation

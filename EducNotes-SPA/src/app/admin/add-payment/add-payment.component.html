@@ -1,0 +1,192 @@
+<form [formGroup]="paymentForm" (ngSubmit)="savePayment()">
+  <div class="row mb-2">
+    <div class="col-md-12 d-flex">
+      <i class="fad fa-sack-dollar fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+      <div class="text-19">ajouter un paiement - dossier n°{{order.orderNum}}</div>
+    </div>
+    <div class="col-md-12">
+      <div class="border rounded-lg p-2">
+      <div class="row">
+        <div class="d-none d-md-block col-md-12 text-15 text-muted">
+          père:<span class="text-capitalize pl-1" style="color: #192C47;">{{order.fatherLastName}} {{order.fatherFirstName}}.</span>
+          <span class="pl-2">mobile: <span style="color: #192C47;">{{order.fatherCell}}</span></span>
+          <span class="pl-2">email: <span style="color: #192C47;">{{order.fatherEmail}}</span></span>
+        </div>
+        <div class="d-none d-md-block col-md-12 text-15 text-muted">
+          mère:<span class="text-capitalize pl-1" style="color: #192C47;">{{order.motherLastName}} {{order.motherFirstName}}.</span>
+          <span class="pl-2">mobile: <span style="color: #192C47;">{{order.motherCell}}</span></span>
+          <span class="pl-2">email: <span style="color: #192C47;">{{order.motherEmail}}</span></span>
+        </div>
+        <div class="d-md-none col-md-12 text-16">
+          <div><b>père:</b></div>
+          <div class="text-capitalize">{{order.fatherLastName}} {{order.fatherFirstName}}.</div>
+          <div class="">mobile: <span style="color: #192C47;">{{order.fatherCell}}</span></div>
+          <div class="overflow-auto">email: <span style="color: #192C47;">{{order.fatherEmail}}</span></div>
+        </div>
+        <div class="d-md-none col-md-12 text-16">
+          <div><b>mère:</b></div>
+          <div class="text-capitalize">{{order.motherLastName}} {{order.motherFirstName}}.</div>
+          <div class="">mobile: <span style="color: #192C47;">{{order.motherCell}}</span></div>
+          <div class="overflow-auto">email: <span style="color: #192C47;">{{order.motherEmail}}</span></div>
+        </div>
+        <div class="col-md-12"><hr class="my-1"></div>
+        <div class="col-md-12 text-15 text-muted mb-1">frères et soeurs</div>
+        <div class="col-md-4 mb-1" *ngFor="let child of order.lines">
+          <div class="border rounded-lg p-1">
+            <div class="row">
+              <div class="col-md-2 d-none d-md-block">
+                <img src="{{child.childPhotoUrl || '../../../../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
+              </div>
+              <div class="col-md-10 my-auto pl-1 d-none d-md-block">
+                <span class="text-16 font-weight-500 text-capitalize" style="color: #192C47;">
+                  {{child.childLastName}} {{child.childFirstName}}</span> ({{child.childAge}} ans) - classe de {{child.className || child.classLevelName}}.
+              </div>
+            </div>
+            <div class="row d-md-none">
+              <div class="col-md-2 text-center">
+                <img src="{{child.childPhotoUrl || '../../../../../assets/user.png'}}" width="80"
+                  alt="" class="rounded-circle img-responsive">
+              </div>
+              <div class="col-md-10 text-center">
+                <div class="text-17 text-capitalize" style="color: #192C47;">{{child.childLastName}} {{child.childFirstName}} ({{child.childAge}} ans)</div>
+                <div class="text-17">classe de {{child.className || child.classLevelName}}.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-2">
+    <div class="col-md-12 d-none d-md-block">
+      <div class="border rounded-lg p-2">
+        <div>
+          <span class="text-16 text-muted">solde global du compte:</span>
+          <span class="text-17 ml-1" style="color: #192C47;">{{order.balance - order.amountToValidate | number: '1.0-0': 'fr-FR'}} F</span>
+        </div>
+        <div *ngIf="order.nbDaysLate >= 0">
+          <span *ngIf="order.nbDaysLate == 1" class="text-16 text-muted">
+            montant exigible (échéance: {{order.strDeadline}}. dans {{order.nbDaysLate}} jour:
+          </span>
+          <span *ngIf="order.nbDaysLate > 1" class="text-16 text-muted">
+            montant exigible (échéance: {{order.strDeadline}}. dans {{order.nbDaysLate}} jours):
+          </span>
+          <span class="text-16 ml-1" style="color: #192C47;">{{order.balance | number: '1.0-0': 'fr-FR'}} F</span>
+        </div>
+        <div class="d-flex text-danger" *ngIf="order.nbDaysLate < 0">
+          <i class="fad fa-exclamation-triangle fa-2x mr-2" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          <span *ngIf="-order.nbDaysLate == 1" class="text-16">
+            <b>montant exigible (échéance: {{order.strDeadline}}. retard de {{order.nbDaysLate}} jour):</b>
+          </span>
+          <span *ngIf="-order.nbDaysLate > 1" class="text-16">
+            <b>montant exigible (échéance: {{order.strDeadline}}. retard de {{order.nbDaysLate}} jours):</b>
+          </span>
+          <span class="text-16"><b>montant exigible (échéance: {{order.strDeadline}}. retard de {{order.nbDaysLate}} jour(s)):</b></span>
+          <span class="text-16 ml-1"><b>{{order.balance | number: '1.0-0': 'fr-FR'}} F</b></span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 d-md-none">
+      <div class="border rounded-lg p-2">
+        <div>
+          <div class="text-16 text-muted">solde global du compte :</div>
+          <div class="text-16 ml-1" style="color: #192C47;">{{order.balance | number: '1.0-0': 'fr-FR'}} F</div>
+        </div>
+        <div *ngIf="order.nbDaysLate >= 0">
+          <div *ngIf="order.nbDaysLate == 1" class="text-16 text-muted">montant exigible (échéance: {{order.strDeadline}}. dans {{order.nbDaysLate}} jour:</div>
+          <div *ngIf="order.nbDaysLate > 1" class="text-16 text-muted">montant exigible (échéance: {{order.strDeadline}}. dans {{order.nbDaysLate}} jours):</div>
+          <div class="text-16 ml-1" style="color: #192C47;">{{order.balance | number: '1.0-0': 'fr-FR'}} F</div>
+        </div>
+        <div class="text-danger" *ngIf="order.nbDaysLate < 0">
+          <i class="fad fa-exclamation-triangle fa-2x mr-2" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          <div class="text-16">
+            solde exigible (échéance: {{order.strDeadline}}. retard de {{order.nbDaysLate}} jour(s)):
+          </div>
+          <div class="text-16 ml-1">{{order.balance | number: '1.0-0': 'fr-FR'}} F</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12 mb-1">
+      <div class="border rounded-lg p-2">
+        <div class="row">
+          <div class="col-md-2 text-15 d-flex align-items-end pb-1">date de paiement</div>
+            <div class="col-md-2">
+            <div class="md-form mt-0 mb-0">
+              <mdb-date-picker name="opDate" [options]="myDatePickerOptions" formControlName="opDate"></mdb-date-picker>
+              <div *ngIf="paymentForm.get('opDate').errors && paymentForm.get('opDate').touched"
+                class="text-small text-danger">saisir la date svp</div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-2 text-15 d-flex align-items-end pb-1">montant du paiement</div>
+          <div class="col-md-2">
+            <div class="md-form mt-2 mb-0">
+              <input mdbInput type="text" id="amnt" appSpacedAmnt class="form-control" formControlName="amount" mdbValidate>
+              <label for="amnt" class=""></label>
+              <div *ngIf="paymentForm.get('amount').hasError('required') && paymentForm.get('amount').touched"
+                class="text-small text-danger">saisir le montant du paiement</div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="md-form">
+              <textarea type="text" id="note" formControlName="note" class="md-textarea md-textarea-auto form-control" mdbInput></textarea>
+              <label for="content">note</label>  
+            </div>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-2 text-15 d-flex align-items-end pb-1">moyen de paiement</div>
+          <div class="col-md-2" *ngFor="let paytype of paytypes">
+            <div class="form-check form-check-inline">
+              <input type="radio" class="form-check-input" (change)="selectPayType()" id="{{paytype.id}}"
+                value="{{paytype.id}}" formControlName="typeid" name="typeid" mdbInput>
+              <label class="form-check-label" for="{{paytype.id}}">{{paytype.name | lowercase}}</label>
+            </div>
+          </div>
+          <div *ngIf="paymentForm.get('typeid').hasError('required') && paymentForm.get('typeid').touched"
+            class="text-small text-danger">choisir le type de paiement</div>
+        </div>
+        <div *ngIf="showPayDataBox">
+          <hr class="my-1">
+          <div *ngIf="showChequeData || showWireData" class="row mt-1">
+            <div class="col-md-3">
+              <mdb-select [options]="bankOptions" formControlName="bankid" placeholder="choisir la banque"></mdb-select>
+            </div>
+          </div>
+          <div *ngIf="showChequeData" class="row mt-2">
+            <div class="col-md-3">
+              <div class="md-form mt-2 mb-0">
+                <input mdbInput type="text" id="numCheque" class="form-control" formControlName="numCheque" mdbValidate>
+                <label for="numCheque" class="">numéro du chèque</label>
+                <div *ngIf="paymentForm.hasError('chequeNOK')" class="text-small text-danger">saisir le numéro de chèque</div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="showCashData || showWireData" class="row mt-2">
+            <div class="col-md-3">
+              <div class="md-form mt-2 mb-0">
+                <input mdbInput type="text" id="refDoc" class="form-control" formControlName="refDoc" mdbValidate>
+                <label for="refDoc" class="">réf: bordereau</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr class="my-1">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="!paymentForm.valid" mdbBtn class="btnBlue" block="true"
+              size="sm" mdbWavesEffect>saisir le paiement</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

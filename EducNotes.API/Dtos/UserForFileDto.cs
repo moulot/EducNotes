@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace EducNotes.API.Dtos
 {
   public class UserForFileDto
@@ -29,5 +31,6 @@ namespace EducNotes.API.Dtos
     public string MotherPhoneNumber { get; set; }
     public string Mother2ndPhoneNumber { get; set; }
     public string MotherPhotoUrl { get; set; }
+    public List<UserForDetailedDto> Siblings { get; set; }
   }
 }

@@ -87,7 +87,7 @@ export class InscriptionsListComponent implements OnInit {
       const room = this.classes.find(item => item.id === Number(this.classId));
       this.className = room.name;
 
-      const diff = (room.maxStudent - room.totalStudent);
+      const diff = (room.maxStudent - room.totalStudents);
 
       if (diff < this.selectedIds.length) {
         this.alertify.warning('il reste seulement ' + diff + 'place(s) disponible(s) pour cette classe');
@@ -156,11 +156,12 @@ export class InscriptionsListComponent implements OnInit {
 
         this.classService.getClassesByLevelId(this.searchParams.levelId).subscribe((response: Class[]) => {
           this.classes = response;
+          console.log(this.classes);
           this.classOptions = [];
           for (let i = 0; i < this.classes.length; i++) {
             const elt = this.classes[i];
             const aclass = {value: elt.id, label: 'classe ' + elt.name + ' (dispo : ' +
-              (Number(elt.maxStudent) - Number(elt.totalStudent)) + ')'};
+              (Number(elt.maxStudent) - Number(elt.totalStudents)) + ')'};
             this.classOptions = [...this.classOptions, aclass];
           }
         });

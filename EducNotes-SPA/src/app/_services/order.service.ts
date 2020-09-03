@@ -30,6 +30,10 @@ export class OrderService {
     return this.http.post(this.baseUrl + 'NewTuition', tuition);
   }
 
+  getTuitionFromChild(childid) {
+    return this.http.get(this.baseUrl + 'tuitionFromChild/' + childid);
+  }
+
   getTuitionFigures() {
     return this.http.get(this.baseUrl + 'TuitionFigures');
   }

@@ -38,18 +38,18 @@
             <div class="card">
               <div class="card-body text-center p-2">
                 <button type="button" *ngIf="btnColor[0] === 'primary'" (click)="loadDefaultChart()" mdbBtn
-                  size="sm" color="primary" mdbWavesEffect>graphe general</button>
+                  size="sm" class="btnBlue" mdbWavesEffect>graphe general</button>
                 <button type="button" *ngIf="btnColor[0] === 'light'" (click)="loadDefaultChart()" mdbBtn
-                  size="sm" color="light" mdbWavesEffect>graphe general</button>
+                  size="sm" class="btnWhiteB" mdbWavesEffect>graphe general</button>
                 <span *ngFor="let period of periods; let i = index">
                 <button type="button" *ngIf="btnColor[i+1] === 'primary' && btnDisabled[i]" (click)="loadChartSetBtn(period.id, i+1)" mdbBtn
-                  size="sm" color="primary" disabled mdbWavesEffect>{{period.abbrev}}</button>
+                  size="sm" class="btnBlue" disabled mdbWavesEffect>{{period.abbrev}}</button>
                 <button type="button" *ngIf="btnColor[i+1] === 'primary' && !btnDisabled[i]" (click)="loadChartSetBtn(period.id, i+1)" mdbBtn
-                  size="sm" color="primary" mdbWavesEffect>{{period.abbrev}}</button>
+                  size="sm" class="btnBlue" mdbWavesEffect>{{period.abbrev}}</button>
                 <button type="button" *ngIf="btnColor[i+1] === 'light' && btnDisabled[i]" (click)="loadChartSetBtn(period.id, i+1)" mdbBtn
-                  size="sm" color="light" disabled mdbWavesEffect>{{period.abbrev}}</button>
+                  size="sm" class="btnWhiteB" disabled mdbWavesEffect>{{period.abbrev}}</button>
                 <button type="button" *ngIf="btnColor[i+1] === 'light' && !btnDisabled[i]" (click)="loadChartSetBtn(period.id, i+1)" mdbBtn
-                  size="sm" color="light" mdbWavesEffect>{{period.abbrev}}</button>
+                  size="sm" class="btnWhiteB" mdbWavesEffect>{{period.abbrev}}</button>
                 </span>
               </div>
             </div>

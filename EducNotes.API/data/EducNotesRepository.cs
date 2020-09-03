@@ -2515,7 +2515,10 @@ namespace EducNotes.API.Data
 
         public async Task<Order> GetOrder(int id)
         {
-          var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
+          var order = await _context.Orders
+                              .Include(i => i.Mother)
+                              .Include(i => i.Father)
+                              .FirstOrDefaultAsync(o => o.Id == id);
           if(order != null)
           {
             order.Lines = await _context.OrderLines.Where(o => o.OrderId == order.Id).ToListAsync();
@@ -2524,7 +2527,34 @@ namespace EducNotes.API.Data
               line.Deadlines = await _context.OrderLineDeadlines.Where(d => d.OrderLineId == line.Id).ToListAsync();
             }
           }
+
           return order;
+        }
+
+        public async Task<List<FinOpDto>> GetOrderPayments(int orderId)
+        {
+          var paymentsFromDB = await _context.FinOps.Where(f => f.OrderId == orderId)
+                                      .Include(i => i.Cheque).ThenInclude(i => i.Bank)
+                                      .Include(i => i.Invoice)
+                                      .Include(i => i.PaymentType)
+                                      .Include(i => i.FromBankAccount)
+                                      .Include(i => i.FromCashDesk)
+                                      .Include(i => i.ToBankAccount)
+                                      .Include(i => i.ToCashDesk)
+                                      .ToListAsync();
+          var payments = _mapper.Map<List<FinOpDto>>(paymentsFromDB);
+          return payments;
+        }
+
+        public async Task<List<OrderLineDto>> GetOrderLines(int orderId)
+        {
+          var linesFromDB = await _context.OrderLines.Where(ol => ol.OrderId == orderId)
+                                    .Include(i => i.Child).ThenInclude(i => i.Photos)
+                                    .Include(i => i.ClassLevel)
+                                    .Include(i => i.Product)
+                                    .ToListAsync();
+          var lines = _mapper.Map<List<OrderLineDto>>(linesFromDB);
+          return lines;
         }
 
         public string GetInvoiceNumber(int invoiceId)
@@ -2539,25 +2569,21 @@ namespace EducNotes.API.Data
           var num = year + month + day + "-" + invoiceId.ToString();
           return num;
         }
-
         public async Task<IEnumerable<PaymentType>> GetPaymentTypes()
         {
           var types = await _context.PaymentTypes.ToListAsync();
           return types;
         }
-
         public async Task<IEnumerable<ClassLevel>> GetClasslevels()
         {
           var levels = await _context.ClassLevels.OrderBy(o => o.DsplSeq).ToListAsync();
           return levels;
         }
-
         public async Task<IEnumerable<Bank>> GetBanks()
         {
           var banks = await _context.Banks.OrderBy(o => o.Name).ToListAsync();
           return banks;
         }
-
         public async Task<bool> ValidateTuition(decimal finOpAmount, int orderId)
         {
           var order = await _context.Orders.FirstAsync(o => o.Id == orderId);

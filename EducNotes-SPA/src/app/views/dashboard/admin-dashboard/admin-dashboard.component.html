@@ -1,23 +1,23 @@
-<div class="row centerOnScreen">
-  <div class="col-lg-3 col-md-6 col-sm-6 mb-1 text-center">
+<div class="row">
+  <div class="col-md-3 mb-1 text-center">
     <button type="button" mdbBtn class="btnBlue px-1" [routerLink]="['/tuitions']" size="sm" block="true" mdbWavesEffect>
       <i class="fad fa-user-plus fa-2x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>      
       <span class="text-17 text-lowercase">inscriptions</span>
     </button>
   </div>
-  <div class="col-lg-3 col-md-6 col-sm-6 mb-1 text-center">
+  <div class="col-md-3 mb-1 text-center">
     <button type="button" mdbBtn class="btnBlue px-1" [routerLink]="['/broadcast']" size="sm" block="true" mdbWavesEffect>
       <i class="fad fa-at fa-2x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
       <span class="text-17 text-lowercase">emails de diffusion</span>
     </button>
   </div>
-  <div class="col-lg-3 col-md-6 col-sm-6 mb-1 text-center">
+  <div class="col-md-3 mb-1 text-center">
     <button type="button" mdbBtn class="btnBlue px-1" [routerLink]="['/teachers']" size="sm" block="true" mdbWavesEffect>
       <i class="fad fa-chalkboard-teacher fa-2x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
       <span class="text-17 text-lowercase">enseignants</span>
     </button>
   </div>
-  <div class="col-lg-3 col-md-6 col-sm-6 mb-1 text-center">
+  <div class="col-md-3 mb-1 text-center">
     <button type="button" mdbBtn class="btnBlue px-1" [routerLink]="['/treasury']" size="sm" block="true" mdbWavesEffect>
       <i class="fad fa-coins fa-2x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
       <span class="text-17 text-lowercase">situation tréso</span>
@@ -26,35 +26,36 @@
 </div>
 
 <form [formGroup]="searchForm" (ngSubmit)="loadUserFile()">
-  <div class="row">
-    <div class="box_content centerOnScreen">
-      <div class="col-md-7">
-        <div class="md-form mb-1">
-          <input type="hidden" id="userid" formControlName="userid" />
-          <input type="text" id="searchData" class="completer-input form-control mdb-autocomplete mb-0"
-            [mdbAutoCompleter]="auto"
-            autocomplete="off"
-            placeholder="rechercher un dossier"
-            formControlName="searchData" />
-          <mdb-auto-completer #auto="mdbAutoCompleter" textNoResults="aucun résultat trouvé :(">
-            <mdb-option (click)="selectUserId(option.userId)" *ngFor="let option of results | async" [value]="option.lastName + ' ' + option.firstName">
-              <div class="d-flex">
-                <div class="mr-1">
-                  <img src="{{option.photoUrl || '../../../../../../assets/user.png'}}" alt="" style="width: 40px;" class="rounded-circle z-depth-0">
-                </div>
-                <div class="d-flex flex-column">
-                  <strong>nom: {{ option.lastName }} {{ option.firstName }} ({{option.className}})</strong>
-                  <small>matricule: {{ option.idNum }}</small>
-                </div>
-              </div>
-            </mdb-option>
-          </mdb-auto-completer>
-        </div>
-        <p class="text-15 text-danger mt-0">recherche par matricule, nom, prénom ou classe...</p>
+  <div class="row mt-5 mt-md-5 pt-0 pt-md-5">
+    <div class="col-md-3"></div>
+    <div class="col-md-4">
+      <div class="md-form mb-1">
+        <input type="hidden" id="userid" formControlName="userid" />
+        <input type="text" id="searchData" class="completer-input form-control mdb-autocomplete mb-0"
+        [mdbAutoCompleter]="auto"
+        autocomplete="off"
+        placeholder="rechercher un dossier"
+          formControlName="searchData" />
+        <mdb-auto-completer #auto="mdbAutoCompleter" textNoResults="aucun résultat trouvé :(">
+        <mdb-option (click)="selectUserId(option.userId)" *ngFor="let option of results | async" [value]="option.lastName + ' ' + option.firstName">
+          <div class="d-flex">
+            <div class="mr-1">
+              <img src="{{option.photoUrl || '../../../../../../assets/user.png'}}" alt="" style="width: 40px;" class="rounded-circle z-depth-0">
+            </div>
+            <div class="d-flex flex-column">
+              <strong>nom: {{ option.lastName }} {{ option.firstName }} ({{option.className}})</strong>
+              <small>matricule: {{ option.idNum }}</small>
+            </div>
+          </div>
+        </mdb-option>
+        </mdb-auto-completer>
       </div>
-      <div class="col-md-2">
-        <button type="submit" mdbBtn class="btnBlue" size="sm" block="true" mdbWavesEffect>rechercher</button>
-      </div>
+      <div class="text-13 text-muted d-none d-md-block">recherche par matricule, nom, prénom...</div>
+      <div class="text-13 text-muted d-md-none">matricule, nom, prénom...</div>
     </div>
+    <div class="col-md-2 my-auto">
+      <button type="submit" mdbBtn class="btnBlue" size="sm" block="true" mdbWavesEffect>rechercher</button>
+    </div>
+    <div class="col-md-3"></div>
   </div>
 </form>

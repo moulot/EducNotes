@@ -7,6 +7,6 @@ export interface Class {
     name: string;
     active: number;
     maxStudent: number;
-    totalStudent: number;
+    totalStudents: number;
     students: User[];
 }

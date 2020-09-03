@@ -129,6 +129,8 @@ import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-ema
 import { RolesComponent } from './admin/roles/roles.component';
 import { PaymentsComponent } from './admin/payments/payments.component';
 import { UserFileResolver } from './_resolvers/user-file-resolver';
+import { AddPaymentComponent } from './admin/add-payment/add-payment.component';
+import { AddPaymentResolver } from './_resolvers/add-payment-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -241,6 +243,7 @@ export const appRoutes: Routes = [
         { path: 'settings', component: SchoolSettingsComponent, resolve: {settings: SchoolSettingsResolver}},
         { path: 'userFile/:id', component: UserFileComponent, resolve: {file: UserFileResolver} },
         { path: 'roles', component: RolesComponent},
+        { path: 'addFinOp/:id', component: AddPaymentComponent, resolve: {order: AddPaymentResolver} },
         { path: 'payments', component: PaymentsComponent}
       ]
     },

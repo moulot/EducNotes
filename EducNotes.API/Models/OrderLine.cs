@@ -35,6 +35,7 @@ namespace EducNotes.API.Models
     public decimal TVA { get; set; }
     public decimal TVAAmount { get; set; }
     public decimal AmountTTC { get; set; }
+    public DateTime Deadline { get; set; }
     public int? ChildId { get; set; }
     public User Child { get; set; }
     public Boolean Validated { get; set; }

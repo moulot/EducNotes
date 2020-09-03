@@ -87,11 +87,48 @@ namespace EducNotes.API.Controllers
       });
     }
 
+    [HttpGet("tuitionFromChild/{id}")]
+    public async Task<IActionResult> GetTuitionFromChild(int id)
+    {
+      var parents = await _repo.GetParents(id);
+      var fatherId = parents.FirstOrDefault(p => p.Gender == 1).Id;
+      var motherId = parents.FirstOrDefault(p => p.Gender == 0).Id;
+      var order = await _context.Orders
+                          .Include(i => i.Child)
+                          .Include(i => i.Father)
+                          .Include(i => i.Mother)
+                          .FirstOrDefaultAsync(t => t.isReg && (t.MotherId == motherId || t.FatherId == fatherId));
+      var tuition = _mapper.Map<OrderDto>(order);
+
+      tuition.Lines = await _repo.GetOrderLines(tuition.Id);
+      tuition.Payments = await _repo.GetOrderPayments(tuition.Id);
+
+      tuition.AmountPaid = tuition.Payments.Where(f => f.Cashed).Sum(a => a.Amount);
+      tuition.strAmountPaid = tuition.AmountPaid.ToString("N0") + " F";
+      tuition.Balance = tuition.AmountTTC - tuition.AmountPaid;
+      tuition.strBalance = tuition.Balance.ToString("N0") + " F";
+      tuition.AmountToValidate = tuition.Payments.Where(p => p.Received == true || p.DepositedToBank == true).Sum(s => s.Amount);
+      tuition.strAmountToValidate = tuition.AmountToValidate.ToString("N0") + " F";
+
+      return Ok(tuition);
+    }
+
     [HttpGet("{id}", Name = "GetOrder")]
     public async Task<IActionResult> GetOrder(int id)
     {
       var orderFromRepo = await _repo.GetOrder(id);
       var order = _mapper.Map<OrderDto>(orderFromRepo);
+
+      order.Lines = await _repo.GetOrderLines(order.Id);
+      order.Payments = await _repo.GetOrderPayments(order.Id);
+
+      order.AmountPaid = order.Payments.Where(f => f.Cashed).Sum(a => a.Amount);
+      order.strAmountPaid = order.AmountPaid.ToString("N0") + " F";
+      order.Balance = order.AmountTTC - order.AmountPaid;
+      order.strBalance = order.Balance.ToString("N0") + " F";
+      order.AmountToValidate = order.Payments.Where(p => p.Received == true || p.DepositedToBank == true).Sum(s => s.Amount);
+      order.strAmountToValidate = order.AmountToValidate.ToString("N0") + " F";
+
       return Ok(order);
     }
 
@@ -120,6 +157,8 @@ namespace EducNotes.API.Controllers
         balanceFromDB
       });
     }
+
+
 
     [HttpPost("NewTuition")]
     public async Task<IActionResult> AddNewTuition(TuitionDataDto newTuition)
@@ -154,16 +193,6 @@ namespace EducNotes.API.Controllers
           if(! await _repo.SaveAll())
             return BadRequest("problème pour ajouter l'inscription");
           order.OrderNum = order.Id.GetOrderNumber();
-
-          Invoice invoice = new Invoice();
-          invoice.InvoiceDate = DateTime.Now;
-          invoice.Amount = order.AmountTTC;
-          invoice.UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-          invoice.OrderId = order.Id;
-          _repo.Add(invoice);
-          _context.SaveChanges();
-          invoice.InvoiceNum = _repo.GetInvoiceNumber(invoice.Id);
-          _context.Update(invoice);
 
           //children
           List<TuitionChildDataDto> childTuitions = newTuition.Children;
@@ -215,6 +244,7 @@ namespace EducNotes.API.Controllers
             line.AmountHT = line.TotalHT - line.Discount;
             line.AmountTTC = line.AmountHT + line.TVAAmount;
             _repo.Add(line);
+            _context.SaveChanges();
 
             byte seq = 1;
             foreach (var deadline in deadlines)
@@ -223,13 +253,25 @@ namespace EducNotes.API.Controllers
               decimal Payment = Pct * tuitionFee;
               OrderLineDeadline orderDeadline = new OrderLineDeadline();
               orderDeadline.OrderLineId = line.Id;
-              orderDeadline.Percent = Pct * 100;
+              orderDeadline.Percent = Pct;
               orderDeadline.Amount = Payment;
               orderDeadline.DueDate = deadline.DueDate;
               orderDeadline.Seq = seq;
               _repo.Add(orderDeadline);
               seq++;
             }
+
+            //an invoice for each child
+            Invoice invoice = new Invoice();
+            invoice.InvoiceDate = DateTime.Now;
+            invoice.Amount = line.AmountTTC;
+            invoice.UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            invoice.OrderId = order.Id;
+            invoice.OrderLineId = line.Id;
+            _repo.Add(invoice);
+            _context.SaveChanges();
+            invoice.InvoiceNum = _repo.GetInvoiceNumber(invoice.Id);
+            _context.Update(invoice);
 
             ChildRegistrationDto crd = new ChildRegistrationDto();
             crd.LastName = child.LastName;
@@ -369,8 +411,8 @@ namespace EducNotes.API.Controllers
           {
             identityContextTransaction.Commit();
             return Ok(new {
-              orderId = order.Id,
-              invoiceId = invoice.Id
+              orderId = order.Id
+              // invoiceId = invoice.Id
             });
           }
         }
