@@ -22,6 +22,7 @@ namespace EducNotes.API.Data {
   public DbSet<BankAccount> BankAccounts { get; set; }
   public DbSet<CashDesk> CashDesks { get; set; }
   public DbSet<FinOp> FinOps { get; set; }
+  public DbSet<FinOpOrderLine> FinOpOrderLines { get; set; }
   public DbSet<PaymentType> PaymentTypes { get; set; }
   public DbSet<UserEvaluation> UserEvaluations { get; set; }
   public DbSet<UserLink> UserLinks { get; set; }

@@ -198,6 +198,7 @@ namespace EducNotes.API.Controllers
           List<TuitionChildDataDto> childTuitions = newTuition.Children;
           List<ChildRegistrationDto> children = new List<ChildRegistrationDto>();
           List<OrderLine> lines = new List<OrderLine>();
+          List<OrderLineDto> linesDto = new List<OrderLineDto>();
           List<User> ChildList = new List<User>();
           foreach (var child in childTuitions)
           {
@@ -245,6 +246,10 @@ namespace EducNotes.API.Controllers
             line.AmountTTC = line.AmountHT + line.TVAAmount;
             _repo.Add(line);
             _context.SaveChanges();
+
+            var lineDto = _mapper.Map<OrderLineDto>(line);
+            lineDto.DueAmount = child.RegFee + child.DownPayment;
+            linesDto.Add(lineDto);
 
             byte seq = 1;
             foreach (var deadline in deadlines)
@@ -407,12 +412,14 @@ namespace EducNotes.API.Controllers
           var template = await _context.EmailTemplates.FirstAsync(t => t.Id == newRegToBePaidEmailId);
           var RegEmails = await _repo.SetEmailDataForRegistration(emails, template.Body, RegDeadLine);
           _context.AddRange(RegEmails);
+
+          // var linesDto = _mapper.Map<IEnumerable<OrderLineDto>>(order.Lines);
           if(await _repo.SaveAll())
           {
             identityContextTransaction.Commit();
             return Ok(new {
-              orderId = order.Id
-              // invoiceId = invoice.Id
+              orderId = order.Id,
+              orderlines = linesDto
             });
           }
         }

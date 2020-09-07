@@ -156,6 +156,7 @@ namespace EducNotes.API.Data
           return await _context.Users
                         .Include(i => i.Photos)
                         .Include(i => i.Class)
+                        .Include(i => i.ClassLevel)
                         .Include(i => i.UserType)
                         .Where(u => userIds.Contains(u.Id)).ToListAsync();
         }
@@ -2569,21 +2570,25 @@ namespace EducNotes.API.Data
           var num = year + month + day + "-" + invoiceId.ToString();
           return num;
         }
+
         public async Task<IEnumerable<PaymentType>> GetPaymentTypes()
         {
           var types = await _context.PaymentTypes.ToListAsync();
           return types;
         }
+
         public async Task<IEnumerable<ClassLevel>> GetClasslevels()
         {
           var levels = await _context.ClassLevels.OrderBy(o => o.DsplSeq).ToListAsync();
           return levels;
         }
+
         public async Task<IEnumerable<Bank>> GetBanks()
         {
           var banks = await _context.Banks.OrderBy(o => o.Name).ToListAsync();
           return banks;
         }
+
         public async Task<bool> ValidateTuition(decimal finOpAmount, int orderId)
         {
           var order = await _context.Orders.FirstAsync(o => o.Id == orderId);
@@ -2636,7 +2641,6 @@ namespace EducNotes.API.Data
 
           await SaveAll();
           return order.Validated;
-
         }
     }
 }

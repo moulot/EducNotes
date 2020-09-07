@@ -16,8 +16,6 @@ namespace EducNotes.API.Models
     public DateTime FinOpDate { get; set; }
     public int? OrderId { get; set; }
     public Order Order { get; set; }
-    public int? OrderLineId { get; set; }
-    public OrderLine OrderLine { get; set; }
     public int? InvoiceId { get; set; }
     public Invoice Invoice { get; set; }
     public int? ChequeId { get; set; }

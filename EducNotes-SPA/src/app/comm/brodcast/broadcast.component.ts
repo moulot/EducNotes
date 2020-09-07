@@ -109,9 +109,7 @@ export class BroadcastComponent implements OnInit {
     const template = g.get('template').value;
     const body = g.get('body').value;
     let bodyerror = false;
-    console.log(template);
     if ((template === null || template === 'undefined') && body === '') {
-      console.log('in body error');
       bodyerror = true;
     }
 

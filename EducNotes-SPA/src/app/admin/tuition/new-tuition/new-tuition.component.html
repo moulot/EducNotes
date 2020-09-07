@@ -351,15 +351,16 @@
         <i class="fad fa-sack-dollar fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
         <div class="text-19">paiements</div>
       </div>
-      <div class="col-md-12"><hr class="my-2" style="background-color: #f89f20;"></div>
+      <div class="col-md-12"><hr class="my-2"></div>
       <div class="col-md-6">
         <div class="border rounded-lg p-2">
           <div class="text-16"><b>paiement de l'inscription n°</b></div>
           <div *ngFor="let child of tuitionData.children; let i = index">
             <div class="text-15"><b>{{i+1}}. {{child.lastName}} {{child.firstName}}</b>. classe de {{classnames[i]}}. montant dû : {{child.downPayment + child.regFee | number: '1.0-0': 'fr-FR'}} F CFA</div>
             </div>
-          <hr class="my-1" style="background-color: #f89f20;">
-          <div class="text-17 text-primary text-center">montant à payer: <span>{{tuitionData.dueAmount | number: '1.0-0': 'fr-FR'}}</span></div>
+          <hr class="my-1">
+          <div class="text-17 text-primary text-center">montant à payer: <span>{{tuitionData.dueAmount | number: '1.0-0': 'fr-FR'}} F</span></div>
+          <input type="hidden" id="dueamnt" formControlName="dueAmount" />
         </div>
       </div>
     </div>
@@ -380,10 +381,41 @@
             <div class="col-md-2 text-15 d-flex align-items-end pb-1">montant du paiement</div>
             <div class="col-md-2">
               <div class="md-form mt-2 mb-0">
-                <input mdbInput type="text" id="amnt" appSpacedAmnt class="form-control" formControlName="amount" mdbValidate>
+                <input mdbInput type="text" id="amnt" (blur)="setChildPayments()" class="form-control" formControlName="amount" mdbValidate>
                 <label for="amnt" class=""></label>
                 <div *ngIf="paymentForm.get('amount').hasError('required') && paymentForm.get('amount').touched"
                   class="text-small text-danger">saisir le montant du paiement</div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="showChildPayments" class="row">
+            <div class="col-md-7">
+              <div class=" border rounded-lg p-2">
+                <div class="row">
+                  <div class="col-md-12 text-15">montant payé par enfant</div>
+                  <div class="col-md-12"><hr class="my-1"></div>
+                  <div *ngIf="paymentForm.hasError('childpay')" class="col-md-12 text-13 text-danger">
+                    renseigner un montant pour chaque enfant svp
+                  </div>
+                  <div *ngIf="paymentForm.hasError('dueamntNOK')" class="col-md-12 text-13 text-danger">
+                    les montants attribués sont incohérents p/r au montant dû! recommencez svp
+                  </div>
+                  <div class="col-md-12" formArrayName="payments" *ngFor="let payment of paymentForm.get('payments')['controls']; let i = index;">
+                    <div [formGroupName]="i">
+                      <div class="row">
+                        <div class="col-md-4 my-1">{{payment.value.child}}</div>
+                        <div class="col-md-3 my-1">
+                          <div class="md-form my-0">
+                            <input mdbInput type="text" mdbInput id="lineamnt"  class="form-control" formControlName="amount" mdbValidate>
+                            <label for="lineamnt">montant</label>
+                            <div *ngIf="paymentForm.get('payments').hasError('required') && paymentForm.get('payments').get('amount').touched"
+                            class="text-small text-danger">saisir le montant dédié à l'enfant</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -435,8 +467,8 @@
           <hr class="my-1">
           <div class="row">
             <div class="col-md-12">
-              <button type="submit" [disabled]="!paymentForm.valid" mdbBtn class="btnBlue" block="true"
-                size="sm" mdbWavesEffect>saisir le paiement</button>
+              <button type="submit" mdbBtn [disabled]="!paymentForm.valid || paymentForm.hasError('formNOK')"
+                class="btnBlue" block="true" size="sm" mdbWavesEffect>saisir le paiement</button>
             </div>
           </div>
         </div>

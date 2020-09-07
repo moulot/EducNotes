@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace EducNotes.API.Dtos
 {
@@ -6,6 +7,7 @@ namespace EducNotes.API.Dtos
   {
     public DateTime FinOpDate { get; set; }
     public int OrderId { get; set; }
+    public int OrderLineId { get; set; }
     public int PaymentTypeId { get; set; }
     public int InvoiceId { get; set; }
     public int BankId { get; set; }
@@ -13,5 +15,6 @@ namespace EducNotes.API.Dtos
     public string numCheque { get; set; }
     public string RefDoc { get; set; }
     public string Note { get; set; }
+    public List<PaymentDto> Payments { get; set; }
   }
 }

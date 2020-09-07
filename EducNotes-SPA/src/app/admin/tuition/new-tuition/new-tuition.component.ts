@@ -65,8 +65,10 @@ export class NewTuitionComponent implements OnInit {
   showChequeData = false;
   showWireData = false;
   orderid: any;
+  orderlines: any;
   invoiceid: any;
   wait = false;
+  showChildPayments = false;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private router: Router,
     private authService: AuthService, private classService: ClassService, private orderService: OrderService,
@@ -209,11 +211,12 @@ export class NewTuitionComponent implements OnInit {
     this.paymentForm = this.fb.group({
       typeid: [null, Validators.required],
       opDate: ['', Validators.required],
-      amount: ['', Validators.required],
+      amount: [0, Validators.required],
       bankid: [0],
       numCheque: [''],
       refDoc: [''],
-      note: ['']
+      note: [''],
+      payments: this.fb.array([])
     }, {validator: this.paymentValidator});
   }
 
@@ -225,17 +228,61 @@ export class NewTuitionComponent implements OnInit {
       chequeerror = true;
     }
 
-    // let docerror = false;
-    // const refDoc = g.get('refDoc').value;
-    // if ((paytype !== '' && refDoc === '') || (paytype === '' && refDoc !== '')) {
-    //   docerror = true;
-    // }
+    const childAmounts = g.get('payments') as FormArray;
+    let payerror = false;
+    let payempty = false;
+    let totalpay = 0;
+    for (let i = 0; i < childAmounts.length; i++) {
+      const elt = childAmounts.controls[i];
+      if (elt.value.amount === '') {
+        payempty = true;
+      } else {
+        totalpay += Number(elt.value.amount);
+      }
+    }
+    if (payempty) {
+      payerror = true;
+    }
 
-    if (chequeerror === true) {
-      return {'chequeNOK': true};
+    const dueAmount = Number(g.get('amount').value);
+    // console.log(dueAmount + '-' + totalpay);
+    let dueamnterror = false;
+    if (dueAmount !== totalpay) {
+      dueamnterror = true;
+    }
+
+    if (chequeerror === true || payerror === true || dueamnterror === true) {
+      return {'chequeNOK': chequeerror, 'childpay': payerror, 'dueamntNOK': dueamnterror, 'formNOK': true};
     }
 
     return null;
+  }
+
+  addPaymentItem(id, finOpId, orderlineId, child, lineamnt): void {
+    const courses = this.paymentForm.get('payments') as FormArray;
+    courses.push(this.createPaymentItem(id, finOpId, orderlineId, child, lineamnt));
+  }
+
+  createPaymentItem(id, finOpId, orderlineId, child, amnt): FormGroup {
+    return this.fb.group({
+      id: id,
+      finOpId: finOpId,
+      orderLineId: orderlineId,
+      child: child,
+      amount: amnt
+    });
+  }
+
+  removePaymentItem(index) {
+    const children = this.tuitionForm.get('payments') as FormArray;
+    children.removeAt(index);
+  }
+
+  removeAllPaymentItems() {
+    const payments = this.paymentForm.get('payments') as FormArray;
+    while (payments.length > 0) {
+      payments.removeAt(0);
+    }
   }
 
   addChildItem(lname, fname, classlevelId, dob, sex): void {
@@ -337,12 +384,38 @@ export class NewTuitionComponent implements OnInit {
     }
   }
 
+  setChildPayments() {
+    this.removeAllPaymentItems();
+    const dueAmount = this.tuitionData.dueAmount;
+    const amnt = this.paymentForm.value.amount;
+    const nbChildren = this.orderlines.length;
+    // console.log(this.orderlines);
+    if (Number(amnt) < Number(dueAmount)) {
+      if (nbChildren === 1) {
+        const line = this.orderlines[0];
+        this.addPaymentItem(0, 0, line.id, line.childLastName + ' ' + line.childFirstName, amnt);
+      } else {
+        for (let i = 0; i < nbChildren; i++) {
+          const line = this.orderlines[i];
+          this.addPaymentItem(0, 0, line.id, line.childLastName + ' ' + line.childFirstName, '');
+        }
+        this.showChildPayments = true;
+      }
+    } else {
+      this.showChildPayments = false;
+      for (let i = 0; i < nbChildren; i++) {
+        const line = this.orderlines[i];
+        this.addPaymentItem(0, 0, line.id, line.childLastName + ' ' + line.childFirstName, line.dueAmount);
+      }
+  }
+  }
+
   saveTuition() {
     this.wait = true;
     this.setTuitionData();
     this.orderService.addNewTuition(this.tuitionData).subscribe(() => {
-      this.router.navigate(['/tuition']);
       this.alertify.success('l\'inscription a bien été enregistrée');
+      this.router.navigate(['/tuition']);
     }, error => {
       this.wait = false;
       this.alertify.error(error);
@@ -354,10 +427,9 @@ export class NewTuitionComponent implements OnInit {
     this.setTuitionData();
     this.orderService.addNewTuition(this.tuitionData).subscribe((data: any) => {
       this.alertify.success('l\'inscription a bien été enregistrée');
-      this.showTuitionForm = false;
-      this.showPaymentForm = true;
       this.orderid = data.orderId;
-      this.invoiceid = data.invoiceId;
+      this.orderlines = data.orderlines;
+      // this.invoiceid = data.invoiceId;
     }, error => {
       this.alertify.error(error);
       this.wait = false;
@@ -367,6 +439,12 @@ export class NewTuitionComponent implements OnInit {
       this.showTuitionForm = false;
       this.showPaymentForm = true;
       this.wait = false;
+      // console.log(this.orderlines);
+      for (let i = 0; i < this.orderlines.length; i++) {
+        const line = this.orderlines[i];
+        // console.log(line.id);
+        this.addPaymentItem(0, 0, line.id, line.childLastName + ' ' + line.childFirstName, line.dueAmount);
+      }
     });
 }
 
@@ -382,6 +460,13 @@ export class NewTuitionComponent implements OnInit {
     paydata.refDoc = this.paymentForm.value.refDoc;
     paydata.note = this.paymentForm.value.note;
     paydata.bankId = this.paymentForm.value.bankid;
+    let payments = [];
+    for (let i = 0; i < this.paymentForm.value.payments.length; i++) {
+      const elt = this.paymentForm.value.payments[i];
+      const pay = {id: elt.id, finOpId: elt.finOpId, orderLineId: elt.orderLineId, child: elt.child, amount: elt.amount};
+      payments = [...payments, pay];
+    }
+    paydata.payments = payments;
     this.paymentService.addFinOp(paydata).subscribe(() => {
       this.alertify.success('paiment effectué avec succès');
       this.router.navigate(['/tuitions']);

@@ -97,6 +97,22 @@ namespace EducNotes.API.Controllers
       }
 
       _context.Add(finOp);
+      _context.SaveChanges();
+
+      if(finOpDataDto.Payments.Count() > 0)
+      {
+        foreach (var payment in finOpDataDto.Payments)
+        {
+          FinOpOrderLine fool = new FinOpOrderLine();
+          fool.FinOpId = finOp.Id;
+          fool.OrderLineId = payment.OrderLineId;
+          var invoice = await _context.Invoices.FirstOrDefaultAsync(i => i.OrderLineId == payment.OrderLineId);
+          if(invoice != null)
+            fool.InvoiceId = invoice.Id;
+          fool.Amount = payment.Amount;
+          _repo.Add(fool);
+        }
+      }
 
       if(await _repo.SaveAll())
       {
