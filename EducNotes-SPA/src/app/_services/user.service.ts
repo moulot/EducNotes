@@ -335,4 +335,8 @@ constructor(private http: HttpClient) {}
   searchUserFiles(searchData) {
     return this.http.get(this.baseUrl + 'UserFiles');
   }
+
+  getUsersByClasslevel(levelId) {
+    return this.http.get(this.baseUrl + 'UsersByLevel/' + levelId);
+  }
 }

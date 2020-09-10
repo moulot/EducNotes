@@ -37,4 +37,8 @@ export class OrderService {
   getTuitionFigures() {
     return this.http.get(this.baseUrl + 'TuitionFigures');
   }
+
+  getTuitionList() {
+    return this.http.get(this.baseUrl + 'TuitionList');
+  }
 }

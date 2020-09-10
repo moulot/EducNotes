@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using EducNotes.API.Data;
@@ -111,6 +112,21 @@ namespace EducNotes.API.Controllers
             fool.InvoiceId = invoice.Id;
           fool.Amount = payment.Amount;
           _repo.Add(fool);
+
+          var oldAmount = _context.OrderLineHistories
+                            .OrderByDescending(o => o.OpDate)
+                            .FirstOrDefault(h => h.OrderLineId == payment.OrderLineId).NewAmount;
+
+          //add data for orderline history
+          OrderLineHistory orderlineHistory = new OrderLineHistory();
+          orderlineHistory.OrderLineId = payment.OrderLineId;
+          orderlineHistory.UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+          orderlineHistory.OpDate = finOp.FinOpDate;
+          orderlineHistory.Action = "UPD";
+          orderlineHistory.OldAmount = oldAmount;
+          orderlineHistory.NewAmount = oldAmount - payment.Amount;
+          orderlineHistory.Delta = orderlineHistory.NewAmount - orderlineHistory.OldAmount;
+          _repo.Add(orderlineHistory);
         }
       }
 

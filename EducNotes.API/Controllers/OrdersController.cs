@@ -158,8 +158,6 @@ namespace EducNotes.API.Controllers
       });
     }
 
-
-
     [HttpPost("NewTuition")]
     public async Task<IActionResult> AddNewTuition(TuitionDataDto newTuition)
     {
@@ -190,6 +188,7 @@ namespace EducNotes.API.Controllers
           order.Created = true;
           order.isReg = true;
           _repo.Add(order);
+
           if(! await _repo.SaveAll())
             return BadRequest("problème pour ajouter l'inscription");
           order.OrderNum = order.Id.GetOrderNumber();
@@ -246,6 +245,17 @@ namespace EducNotes.API.Controllers
             line.AmountTTC = line.AmountHT + line.TVAAmount;
             _repo.Add(line);
             _context.SaveChanges();
+
+            //add data for orderline history
+            OrderLineHistory orderlineHistory = new OrderLineHistory();
+            orderlineHistory.OrderLineId = line.Id;
+            orderlineHistory.UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            orderlineHistory.OpDate = order.OrderDate;
+            orderlineHistory.Action = "ADD";
+            orderlineHistory.OldAmount = 0;
+            orderlineHistory.NewAmount = line.AmountTTC + line.ProductFee;
+            orderlineHistory.Delta = orderlineHistory.NewAmount - orderlineHistory.OldAmount;
+            _repo.Add(orderlineHistory);
 
             var lineDto = _mapper.Map<OrderLineDto>(line);
             lineDto.DueAmount = child.RegFee + child.DownPayment;
@@ -448,6 +458,45 @@ namespace EducNotes.API.Controllers
         tuitionsNotValidated,
         tuitionsValidated,
         classSpaces
+      });
+    }
+
+    [HttpGet("TuitionList")]
+    public async Task<IActionResult> GetTuitionList()
+    {
+      var classlevels = await _context.Classes
+                                .Include(i => i.ClassLevel)
+                                .OrderBy(o => o.ClassLevel.DsplSeq)
+                                .Select(c => c.ClassLevel).Distinct().ToListAsync();
+      List<TuitionListDto> tuitionList = new List<TuitionListDto>();
+      var orderlines = await _context.OrderLines
+                              .Include(i => i.Order)
+                              .Where(o => o.Order.isReg == true)
+                              .ToListAsync();
+      decimal totalAmount = orderlines.Sum(s => s.AmountTTC + s.ProductFee);
+      decimal totalAmountOK = orderlines.Where(s => s.Validated).Sum(s => s.AmountTTC + s.ProductFee);
+      decimal totalTuitions = orderlines.Count();
+      decimal totalTuitionsOK = orderlines.Where(s => s.Validated).Count();
+      foreach (var level in classlevels)
+      {
+        TuitionListDto tld = new TuitionListDto();
+        tld.ClassLevelId = level.Id;
+        tld.ClassLevelName = level.Name;
+        tld.NbTuitions = orderlines.Where(o => o.ClassLevelId == level.Id).Count();
+        tld.NbTuitionsOK = orderlines.Where(o => o.Order.Validated == true && o.ClassLevelId == level.Id).Count();
+        tld.LevelAmount = orderlines.Where(o => o.ClassLevelId == level.Id).Sum(o => o.AmountTTC + o.ProductFee);
+        tld.strLevelAmount = tld.LevelAmount.ToString("N0") + " F";
+        tld.LevelAmountOK = orderlines.Where(o => o.ClassLevelId == level.Id && o.Validated).Sum(o => o.AmountTTC + o.ProductFee);
+        tld.strLevelAmountOK = tld.LevelAmountOK.ToString("N0") + " F";
+        tuitionList.Add(tld);
+      }
+
+      return Ok(new {
+        tuitionList,
+        totalAmount,
+        totalAmountOK,
+        totalTuitions,
+        totalTuitionsOK
       });
     }
 

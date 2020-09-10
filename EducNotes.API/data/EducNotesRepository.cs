@@ -279,7 +279,12 @@ namespace EducNotes.API.Data
 
         public async Task<User> GetUserByCode(string code)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.ValidationCode == code);
+          return await _context.Users.FirstOrDefaultAsync(u => u.ValidationCode == code);
+        }
+
+        public async Task<List<User>> GetUsersByClasslevel(int levelId)
+        {
+          return await _context.Users.Where(u => u.ClassLevelId == levelId).ToListAsync();
         }
 
         public async Task<EmailTemplate> GetEmailTemplate(int id)

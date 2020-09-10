@@ -154,6 +154,18 @@ namespace EducNotes.API.Controllers
           return Ok(userToReturn);
         }
 
+        [HttpGet("UsersByLevel/{levelId}")]
+        public async Task<IActionResult> GetStudentsByClasslevel(int levelId)
+        {
+          var usersFromRepo = await _repo.GetUsersByClasslevel(levelId);
+          var students = _mapper.Map<List<UserForDetailedDto>>(usersFromRepo);
+          var level = await _context.ClassLevels.FirstOrDefaultAsync(c => c.Id == levelId);
+          return Ok(new {
+            students,
+            level
+          });
+        }
+
         [HttpGet("UserFile/{childId}")]
         public async Task<IActionResult> GetUserFile(int childId)
         {

@@ -131,6 +131,10 @@ import { PaymentsComponent } from './admin/payments/payments.component';
 import { UserFileResolver } from './_resolvers/user-file-resolver';
 import { AddPaymentComponent } from './admin/add-payment/add-payment.component';
 import { AddPaymentResolver } from './_resolvers/add-payment-resolver';
+import { TuitionListComponent } from './admin/tuition/tuition-list/tuition-list.component';
+import { TuitionListResolver } from './_resolvers/tuition-list-resolver';
+import { TuitionDetailsComponent } from './admin/tuition/tuition-details/tuition-details.component';
+import { TuitionDetailsResolver } from './_resolvers/tuition-details-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -244,7 +248,9 @@ export const appRoutes: Routes = [
         { path: 'userFile/:id', component: UserFileComponent, resolve: {file: UserFileResolver} },
         { path: 'roles', component: RolesComponent},
         { path: 'addFinOp/:id', component: AddPaymentComponent, resolve: {order: AddPaymentResolver} },
-        { path: 'payments', component: PaymentsComponent}
+        { path: 'payments', component: PaymentsComponent},
+        { path: 'tuitionList', component: TuitionListComponent, resolve: {list: TuitionListResolver}},
+        { path: 'tuitionDetails/:levelId', component: TuitionDetailsComponent, resolve: {users: TuitionDetailsResolver}}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }
