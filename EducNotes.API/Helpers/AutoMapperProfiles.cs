@@ -367,6 +367,9 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.ChequePictureUrl, opt => {
                   opt.MapFrom(src => src.Cheque.PictureUrl);
                 })
+                .ForMember(dest => dest.FromBankName, opt => {
+                  opt.MapFrom(src => src.FromBank.Name);
+                })
                 .ForMember(dest => dest.strAmount, opt => {
                   opt.MapFrom(src => src.Amount.ToString("N0") + " F");
                 })
@@ -385,27 +388,43 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.ToCashDeskName, opt => {
                   opt.MapFrom(src => src.ToCashDesk.Name);
                 });
-            CreateMap<OrderLine, OrderLineDto>()
+            CreateMap<FinOpOrderLine, PaymentDto>()
+                .ForMember(dest => dest.InvoiceNum, opt => {
+                  opt.MapFrom(src => src.Invoice.InvoiceNum);
+                })
+                .ForMember(dest => dest.ProductId, opt => {
+                  opt.MapFrom(src => src.OrderLine.Product.Id);
+                })
                 .ForMember(dest => dest.ProductName, opt => {
-                    opt.MapFrom(src => src.Product.Name);
+                  opt.MapFrom(src => src.OrderLine.Product.Name);
                 })
                 .ForMember(dest => dest.ChildLastName, opt => {
-                    opt.MapFrom(src => src.Child.LastName.FirstLetterToUpper());
+                  opt.MapFrom(src => src.OrderLine.Child.LastName.FirstLetterToUpper());
                 })
                 .ForMember(dest => dest.ChildFirstName, opt => {
-                    opt.MapFrom(src => src.Child.FirstName.FirstLetterToUpper());
+                  opt.MapFrom(src => src.OrderLine.Child.FirstName.FirstLetterToUpper());
+                });
+            CreateMap<OrderLine, OrderLineDto>()
+                .ForMember(dest => dest.ProductName, opt => {
+                  opt.MapFrom(src => src.Product.Name);
+                })
+                .ForMember(dest => dest.ChildLastName, opt => {
+                  opt.MapFrom(src => src.Child.LastName.FirstLetterToUpper());
+                })
+                .ForMember(dest => dest.ChildFirstName, opt => {
+                  opt.MapFrom(src => src.Child.FirstName.FirstLetterToUpper());
                 })
                 .ForMember(dest => dest.ClassLevelName, opt => {
-                    opt.MapFrom(src => src.ClassLevel.Name);
+                  opt.MapFrom(src => src.ClassLevel.Name);
                 })
                 .ForMember(dest => dest.ChildClassName, opt => {
-                    opt.MapFrom(src => src.Child.Class.Name);
+                  opt.MapFrom(src => src.Child.Class.Name);
                 })
                 .ForMember(dest => dest.ChildAge, opt => {
-                    opt.MapFrom(src => src.Child.DateOfBirth.CalculateAge());
+                  opt.MapFrom(src => src.Child.DateOfBirth.CalculateAge());
                 })
                 .ForMember(dest => dest.ChildPhotoUrl, opt => {
-                    opt.MapFrom(src => src.Child.Photos.FirstOrDefault(p => p.IsMain).Url);
+                  opt.MapFrom(src => src.Child.Photos.FirstOrDefault(p => p.IsMain).Url);
                 })
                 .ForMember(dest => dest.NbDaysLate, opt => {
                   opt.MapFrom(src => (src.Deadline - DateTime.Now).TotalDays + 1);

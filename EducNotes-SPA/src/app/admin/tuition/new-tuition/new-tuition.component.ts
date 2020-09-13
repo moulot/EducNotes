@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray, FormControl, FormArrayName } from '@angular/forms';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ClassService } from 'src/app/_services/class.service';
 import { CollapseComponent } from 'ng-uikit-pro-standard';
@@ -258,17 +258,20 @@ export class NewTuitionComponent implements OnInit {
     return null;
   }
 
-  addPaymentItem(id, finOpId, orderlineId, child, lineamnt): void {
+  addPaymentItem(id, finOpId, orderlineId, lname, fname, prodid, prodname, lineamnt): void {
     const courses = this.paymentForm.get('payments') as FormArray;
-    courses.push(this.createPaymentItem(id, finOpId, orderlineId, child, lineamnt));
+    courses.push(this.createPaymentItem(id, finOpId, orderlineId, lname, fname, prodid, prodname, lineamnt));
   }
 
-  createPaymentItem(id, finOpId, orderlineId, child, amnt): FormGroup {
+  createPaymentItem(id, finOpId, orderlineId, lname, fname, prodid, prodname, amnt): FormGroup {
     return this.fb.group({
       id: id,
       finOpId: finOpId,
       orderLineId: orderlineId,
-      child: child,
+      childlname: lname,
+      childfname: fname,
+      prodid: prodid,
+      prodname: prodname,
       amount: amnt
     });
   }
@@ -393,11 +396,11 @@ export class NewTuitionComponent implements OnInit {
     if (Number(amnt) < Number(dueAmount)) {
       if (nbChildren === 1) {
         const line = this.orderlines[0];
-        this.addPaymentItem(0, 0, line.id, line.childLastName + ' ' + line.childFirstName, amnt);
+        this.addPaymentItem(0, 0, line.id, line.childLastName, line.childFirstName, line.productId, line.productName, amnt);
       } else {
         for (let i = 0; i < nbChildren; i++) {
           const line = this.orderlines[i];
-          this.addPaymentItem(0, 0, line.id, line.childLastName + ' ' + line.childFirstName, '');
+          this.addPaymentItem(0, 0, line.id, line.childLastName, line.childFirstName, line.productId, line.productName, '');
         }
         this.showChildPayments = true;
       }
@@ -405,7 +408,7 @@ export class NewTuitionComponent implements OnInit {
       this.showChildPayments = false;
       for (let i = 0; i < nbChildren; i++) {
         const line = this.orderlines[i];
-        this.addPaymentItem(0, 0, line.id, line.childLastName + ' ' + line.childFirstName, line.dueAmount);
+        this.addPaymentItem(0, 0, line.id, line.childLastName, line.childFirstName, line.productId, line.productName, line.dueAmount);
       }
   }
   }
@@ -439,11 +442,10 @@ export class NewTuitionComponent implements OnInit {
       this.showTuitionForm = false;
       this.showPaymentForm = true;
       this.wait = false;
-      // console.log(this.orderlines);
+      console.log(this.orderlines);
       for (let i = 0; i < this.orderlines.length; i++) {
         const line = this.orderlines[i];
-        // console.log(line.id);
-        this.addPaymentItem(0, 0, line.id, line.childLastName + ' ' + line.childFirstName, line.dueAmount);
+        this.addPaymentItem(0, 0, line.id, line.childLastName, line.childFirstName, line.productId, line.productName, line.dueAmount);
       }
     });
 }
@@ -463,10 +465,12 @@ export class NewTuitionComponent implements OnInit {
     let payments = [];
     for (let i = 0; i < this.paymentForm.value.payments.length; i++) {
       const elt = this.paymentForm.value.payments[i];
-      const pay = {id: elt.id, finOpId: elt.finOpId, orderLineId: elt.orderLineId, child: elt.child, amount: elt.amount};
+      const pay = {id: elt.id, finOpId: elt.finOpId, orderLineId: elt.orderLineId, childLastName: elt.childlname,
+        childFirstName: elt.childfname, productId: elt.prodid, productName: elt.prodname, amount: elt.amount};
       payments = [...payments, pay];
     }
     paydata.payments = payments;
+    console.log(paydata.payments);
     this.paymentService.addFinOp(paydata).subscribe(() => {
       this.alertify.success('paiment effectué avec succès');
       this.router.navigate(['/tuitions']);

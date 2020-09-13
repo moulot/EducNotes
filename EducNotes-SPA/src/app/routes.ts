@@ -135,6 +135,8 @@ import { TuitionListComponent } from './admin/tuition/tuition-list/tuition-list.
 import { TuitionListResolver } from './_resolvers/tuition-list-resolver';
 import { TuitionDetailsComponent } from './admin/tuition/tuition-details/tuition-details.component';
 import { TuitionDetailsResolver } from './_resolvers/tuition-details-resolver';
+import { ValidatePaymentsComponent } from './admin/validate-payments/validate-payments.component';
+import { ValidatePaymentsResolver } from './_resolvers/validate-payments-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -248,7 +250,7 @@ export const appRoutes: Routes = [
         { path: 'userFile/:id', component: UserFileComponent, resolve: {file: UserFileResolver} },
         { path: 'roles', component: RolesComponent},
         { path: 'addFinOp/:id', component: AddPaymentComponent, resolve: {order: AddPaymentResolver} },
-        { path: 'payments', component: PaymentsComponent},
+        { path: 'validatePayments', component: ValidatePaymentsComponent, resolve: {payments: ValidatePaymentsResolver}},
         { path: 'tuitionList', component: TuitionListComponent, resolve: {list: TuitionListResolver}},
         { path: 'tuitionDetails/:levelId', component: TuitionDetailsComponent, resolve: {users: TuitionDetailsResolver}}
       ]

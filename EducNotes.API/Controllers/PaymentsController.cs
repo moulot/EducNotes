@@ -90,12 +90,20 @@ namespace EducNotes.API.Controllers
         finOp.Received = true;
       }
 
-      //order validation
-      if(finOpDataDto.OrderId != 0)
+      if(finOp.PaymentTypeId == bankTransferTypeId)
       {
-        finOp.OrderId = finOpDataDto.OrderId;
-        await _repo.ValidateTuition(finOp.Amount, Convert.ToInt32(finOp.OrderId));
+        if(finOpDataDto.BankId != 0)
+        {
+          finOp.FromBankId = finOpDataDto.BankId;
+        }
       }
+
+      //order validation
+      // if(finOpDataDto.OrderId != 0)
+      // {
+      //   finOp.OrderId = finOpDataDto.OrderId;
+      //   await _repo.ValidateTuition(finOp.Amount, Convert.ToInt32(finOp.OrderId));
+      // }
 
       _context.Add(finOp);
       _context.SaveChanges();
@@ -136,6 +144,36 @@ namespace EducNotes.API.Controllers
       }
 
       return BadRequest("problème pour saisir le paiement.");
+    }
+
+    [HttpGet("PaymentsToValidate")]
+    public async Task<IActionResult> GetPaymentsToBeValidated()
+    {
+      var paymentsFromDB = await _context.FinOps
+                                  .Where(f => f.Rejected == false && f.Cashed == false)
+                                  .Include(i => i.Cheque).ThenInclude(i => i.Bank)
+                                  .Include(i => i.PaymentType)
+                                  .Include(i => i.FromBank)
+                                  .OrderBy(o => o.FinOpDate)
+                                  .ToListAsync();
+      var payments = _mapper.Map<List<FinOpDto>>(paymentsFromDB);
+      for(int i = 0; i < payments.Count(); i++)
+      {
+        var pay = payments[i];
+        var linesFromDB = await _context.FinOpOrderLines
+                                .Include(d => d.Invoice)
+                                .Include(o => o.OrderLine).ThenInclude(p => p.Product)
+                                .Include(o => o.OrderLine).ThenInclude( c => c.Child)
+                                .Where(f => f.FinOpId == pay.Id).ToListAsync();
+        var lines = _mapper.Map<List<PaymentDto>>(linesFromDB);
+        payments[i].LinePayments = new List<PaymentDto>();
+        foreach (var line in lines)
+        {
+          payments[i].LinePayments.Add(line);
+        }
+      }
+
+      return Ok(payments);
     }
 
   }

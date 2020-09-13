@@ -18,9 +18,12 @@ export class PaymentService {
     return this.http.get(this.baseUrl + 'PaymentData');
   }
 
-  addFinOp(finOpData: any)
-  {
+  addFinOp(finOpData: any) {
     return this.http.post(this.baseUrl + 'AddFinOp', finOpData);
+  }
+
+  getPaymentsToValidate() {
+    return this.http.get(this.baseUrl + 'PaymentsToValidate');
   }
 
 }

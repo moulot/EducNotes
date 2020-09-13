@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace EducNotes.API.Dtos
 {
@@ -24,6 +25,7 @@ namespace EducNotes.API.Dtos
     public string strAmount { get; set; }
     public int? FromUserId { get; set; }
     public int? ForUserId { get; set; }
+    public string FromBankName { get; set; }
     public int? FromCashDeskId { get; set; }
     public string FromCashDeskName { get; set; }
     public int? FromBankAccountId { get; set; }
@@ -38,5 +40,6 @@ namespace EducNotes.API.Dtos
     public Boolean DepositedToBank { get; set; }
     public Boolean Cashed { get; set; }
     public Boolean Rejected { get; set; }
+    public List<PaymentDto> LinePayments { get; set; }
   }
 }
