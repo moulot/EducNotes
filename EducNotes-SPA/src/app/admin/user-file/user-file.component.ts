@@ -9,6 +9,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 })
 export class UserFileComponent implements OnInit {
   userFile: any;
+  showInfos = false;
 
   constructor( private route: ActivatedRoute, private alertify: AlertifyService) { }
 
@@ -16,6 +17,10 @@ export class UserFileComponent implements OnInit {
     this.route.data.subscribe((data: any) => {
       this.userFile = data['file'];
     });
+  }
+
+  toggleInfos() {
+    this.showInfos = !this.showInfos;
   }
 
 }

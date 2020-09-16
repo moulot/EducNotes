@@ -2537,6 +2537,21 @@ namespace EducNotes.API.Data
           return order;
         }
 
+        public async Task<List<PaymentDto>> GetChildPayments(int childId)
+        {
+          var paymentsFromDB = await _context.FinOpOrderLines.Where(f => f.OrderLine.ChildId == childId)
+                                      .Include(i => i.FinOp).ThenInclude(i => i.Cheque).ThenInclude(i => i.Bank)
+                                      .Include(i => i.Invoice)
+                                      .Include(i => i.FinOp).ThenInclude(i => i.PaymentType)
+                                      .Include(i => i.FinOp).ThenInclude(i => i.FromBankAccount)
+                                      .Include(i => i.FinOp).ThenInclude(i => i.FromCashDesk)
+                                      .Include(i => i.FinOp).ThenInclude(i => i.ToBankAccount)
+                                      .Include(i => i.FinOp).ThenInclude(i => i.ToCashDesk)
+                                      .ToListAsync();
+          var payments = _mapper.Map<List<PaymentDto>>(paymentsFromDB);
+          return payments;
+        }
+
         public async Task<List<FinOpDto>> GetOrderPayments(int orderId)
         {
           var paymentsFromDB = await _context.FinOps.Where(f => f.OrderId == orderId)

@@ -26,4 +26,8 @@ export class PaymentService {
     return this.http.get(this.baseUrl + 'PaymentsToValidate');
   }
 
+  updatePayments(payments) {
+    return this.http.post(this.baseUrl + 'UpdatePayments', payments);
+  }
+
 }

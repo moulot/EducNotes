@@ -59,6 +59,7 @@ namespace EducNotes.API.Controllers
     {
       FinOp finOp = new FinOp();
       finOp.FinOpDate = finOpDataDto.FinOpDate;
+      finOp.FinOpTypeId = finOpDataDto.FinOpTypeId;
       if(finOpDataDto.InvoiceId != 0)
       {
         finOp.InvoiceId = finOpDataDto.InvoiceId;
@@ -134,6 +135,8 @@ namespace EducNotes.API.Controllers
           orderlineHistory.OldAmount = oldAmount;
           orderlineHistory.NewAmount = oldAmount - payment.Amount;
           orderlineHistory.Delta = orderlineHistory.NewAmount - orderlineHistory.OldAmount;
+          if(finOp.Cashed == true)
+            orderlineHistory.Cashed = true;
           _repo.Add(orderlineHistory);
         }
       }
@@ -174,6 +177,27 @@ namespace EducNotes.API.Controllers
       }
 
       return Ok(payments);
+    }
+
+    [HttpPost("UpdatePayments")]
+    public async Task<IActionResult> UpdatePaymentsStatus(List<FinOpForUpdateStatusDto> finOps)
+    {
+      foreach (var fo in finOps)
+      {
+        var finOp = await _context.FinOps.FirstAsync(f => f.Id == fo.Id);
+        finOp.Received = fo.Received;
+        finOp.DepositedToBank = fo.DepositedToBank;
+        finOp.Rejected = fo.Rejected;
+        finOp.Cashed = fo.Cashed;
+        _repo.Update(finOp);
+      }
+
+      if(await _repo.SaveAll())
+      {
+        return NoContent();
+      }
+
+      return BadRequest("problème pour mettre à jour les status");
     }
 
   }

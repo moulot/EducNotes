@@ -8,7 +8,6 @@ import { Course } from '../_models/course';
 import { Class } from '../_models/class';
 import { Absence } from '../_models/absence';
 import { Schedule } from '../_models/schedule';
-import { Theme } from '../_models/theme';
 import { Period } from '../_models/period';
 
 @Injectable({
@@ -274,10 +273,6 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'classes/' + classId + '/DeleteClass', {});
   }
 
-  // saveClassModification(courseId: number, courseName: string) {
-  //   return this.http.post(this.baseUrl + 'classes/' + courseId + '/UpdateCourse' + courseName, {}); updateCourse
-  // }
-
   teacherClassCoursByLevel(teacherId: number, levelid: number, courseId: number) {
     return this.http.get(this.baseUrl + 'classes/TeacherClassCoursByLevel/  ' + teacherId + '/' + levelid + '/' + courseId);
   }
@@ -334,6 +329,10 @@ export class ClassService {
 
   addCourseShowing(courseShowing: FormData) {
     return this.http.post(this.baseUrl + 'classes/courseShowing', courseShowing);
+  }
+
+  getActiveClasslevels() {
+    return this.http.get(this.baseUrl + 'classes/ActiveClasslevels');
   }
 
 }

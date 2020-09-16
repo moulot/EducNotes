@@ -392,11 +392,32 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.InvoiceNum, opt => {
                   opt.MapFrom(src => src.Invoice.InvoiceNum);
                 })
+                .ForMember(dest => dest.FinOpTypeId, opt => {
+                  opt.MapFrom(src => src.FinOp.FinOpTypeId);
+                })
                 .ForMember(dest => dest.ProductId, opt => {
                   opt.MapFrom(src => src.OrderLine.Product.Id);
                 })
                 .ForMember(dest => dest.ProductName, opt => {
                   opt.MapFrom(src => src.OrderLine.Product.Name);
+                })
+                .ForMember(dest => dest.TypeName, opt => {
+                  opt.MapFrom(src => src.FinOp.PaymentType.Name);
+                })
+                .ForMember(dest => dest.ChequeBank, opt => {
+                  opt.MapFrom(src => src.FinOp.Cheque.Bank.Name);
+                })
+                .ForMember(dest => dest.FromBankAccount, opt => {
+                  opt.MapFrom(src => src.FinOp.FromBankAccount.Name);
+                })
+                .ForMember(dest => dest.FromCashDesk, opt => {
+                  opt.MapFrom(src => src.FinOp.FromCashDesk.Name);
+                })
+                .ForMember(dest => dest.ToBankAccount, opt => {
+                  opt.MapFrom(src => src.FinOp.ToBankAccount.Name);
+                })
+                .ForMember(dest => dest.ToCashDesk, opt => {
+                  opt.MapFrom(src => src.FinOp.ToCashDesk.Name);
                 })
                 .ForMember(dest => dest.ChildLastName, opt => {
                   opt.MapFrom(src => src.OrderLine.Child.LastName.FirstLetterToUpper());

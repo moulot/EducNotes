@@ -12,7 +12,8 @@ import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 export class ValidatePaymentsComponent implements OnInit {
   payments: any;
   paymentsForm: FormGroup;
-  statusOptions: any[] = [];
+  statusOptions = [{value: 0, label: 'reçu'}, {value: 1, label: 'déposé en banque'},
+    {value: 2, label: 'rejeté'}, {value: 3, label: 'encaissé'}];
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
     private router: Router, private paymentService: PaymentService, private route: ActivatedRoute) { }
@@ -57,6 +58,16 @@ export class ValidatePaymentsComponent implements OnInit {
 
   createPaymentItem(id, amnt, finOpDate, payType, prodname, chqnum, chqBankName, docRef,
     fromBank, received, toBank, rejected, cashed): FormGroup {
+    let selected = 0;
+    if (received) {
+      selected = 0;
+    } else if (toBank) {
+      selected = 1;
+    } else if (rejected) {
+      selected = 2;
+    } else if (cashed) {
+      selected = 3;
+    }
     return this.fb.group({
       id: id,
       amount: amnt,
@@ -71,12 +82,39 @@ export class ValidatePaymentsComponent implements OnInit {
       toBank: toBank,
       rejected: rejected,
       cashed: cashed,
-      status: false
+      status: selected
     });
   }
 
   validatePayments() {
+    let payments = [];
+    for (let i = 0; i < this.paymentsForm.value.payments.length; i++) {
+      const pay = this.paymentsForm.value.payments[i];
+      const payment = {id: pay.id, received: false, depositedToBank: false, rejected: false, cashed: false};
+      switch (pay.status) {
+        case 0:
+          payment.received = true;
+          break;
+        case 1:
+          payment.depositedToBank = true;
+          break;
+        case 2:
+          payment.rejected = true;
+          break;
+        case 3:
+          payment.cashed = true;
+          break;
+        default:
+          break;
+      }
+      payments = [...payments, payment];
+    }
 
+    this.paymentService.updatePayments(payments).subscribe(() => {
+      this.router.navigate(['/treasury']);
+      this.alertify.success('les paiements ont été mis à jour');
+    }, error => {
+      this.alertify.error(error);
+    });
   }
-
 }

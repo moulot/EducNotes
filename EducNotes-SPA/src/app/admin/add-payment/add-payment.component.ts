@@ -94,6 +94,7 @@ export class AddPaymentComponent implements OnInit {
     this.wait = true;
     const paydata = <any>{};
     paydata.finOpDate = Utils.inputDateDDMMYY(this.paymentForm.value.opDate, '/');
+    paydata.finOpTypeId = environment.finOpTypePayment;
     paydata.orderId = this.orderid;
     paydata.invoiceId = this.invoiceid;
     paydata.paymentTypeId = this.paymentForm.value.typeid;

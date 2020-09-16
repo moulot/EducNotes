@@ -4,6 +4,11 @@ namespace EducNotes.API.Models
 {
   public class OrderLineHistory
   {
+    public OrderLineHistory()
+    {
+      Cashed = false;
+      Rejected = false;
+    }
     public int Id { get; set; }
     public int OrderLineId { get; set; }
     public OrderLine OrderLine { get; set; }
@@ -14,5 +19,7 @@ namespace EducNotes.API.Models
     public decimal OldAmount { get; set; }
     public decimal NewAmount { get; set; }
     public decimal Delta { get; set; }
+    public Boolean Cashed { get; set; }
+    public Boolean Rejected { get; set; }
   }
 }

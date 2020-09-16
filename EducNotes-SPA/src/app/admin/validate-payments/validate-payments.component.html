@@ -4,37 +4,66 @@
       <i class="fad fa-sack-dollar fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
       <div class="text-19">valider les paiements en cours</div>
     </div>
-    <div class="col-md-10 mb-1" formArrayName="payments" *ngFor="let pay of paymentsForm.get('payments')['controls']; let i = index;">
+    <div class="col-md-12 text-14 text-danger my-1">sélectionner le nouveau status des paiements et les valider</div>
+    <div class="col-md-8 mb-1" formArrayName="payments" *ngFor="let pay of paymentsForm.get('payments')['controls']; let i = index;">
       <div class="border rounded-lg p-2">
-        <div class="row" [formGroupName]="i">
-          <div class="col-md-6 text-15">
-            <div class="text-14 text-muted">{{pay.value.prodname}}</div>
-            {{i+1}}. {{pay.value.payType}} 
-            <span *ngIf="pay.value.FromBank">{{pay.value.FromBank}}</span>
-            <span *ngIf="pay.value.chequenum">{{pay.value.chqBankName}}</span>
-            n°{{pay.value.chequenum || pay.value.docRef}} du {{pay.value.date}}. 
-            montant {{pay.value.amount | number: '1.0-0': 'fr-FR'}} F.
+        <div class="d-none d-md-block">
+          <div class="row" [formGroupName]="i">
+            <div class="col-md-8 text-15">
+              <div class="text-15 text-muted">{{pay.value.prodname}}</div>
+              {{i+1}}. {{pay.value.payType}} 
+              <span *ngIf="pay.value.FromBank">{{pay.value.FromBank}}</span>
+              <span *ngIf="pay.value.chequenum">{{pay.value.chqBankName}}</span>
+              n°{{pay.value.chequenum || pay.value.docRef}} du {{pay.value.date}}. 
+              montant {{pay.value.amount | number: '1.0-0': 'fr-FR'}} F.
+            </div>
+            <div class="col-md-4">
+              <div class="md-form m-0">
+                <mdb-select [options]="statusOptions" formControlName="status" placeholder="status du paiement"></mdb-select>
+              </div>
+                <!-- <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" id="received{{i}}" value="0" formControlName="status" mdbInput>
+                <label class="form-check-label" for="received{{i}}">reçu</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" id="toBank{{i}}" value="1" formControlName="status" mdbInput>
+                <label class="form-check-label" for="toBank{{i}}">en banque</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" id="rejected{{i}}" value="2" formControlName="status" mdbInput>
+                <label class="form-check-label" for="rejected{{i}}">rejeté</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" id="cashed{{i}}" value="3" formControlName="status" mdbInput>
+                <label class="form-check-label" for="cashed{{i}}">encaissé</label>
+              </div> -->
+            </div>
           </div>
-          <div class="col-md-6">
-            <div class="form-check form-check-inline">
-              <input type="radio" class="form-check-input" id="received{{i}}" value="0" formControlName="status" name="status" mdbInput>
-              <label class="form-check-label" for="received{{i}}">reçu</label>
+        </div>
+        <div class="d-md-none">
+          <div class="row" [formGroupName]="i">
+            <div class="col-md-8 text-15">
+              <div>{{i+1}}. {{pay.value.date}}</div>
+              <div class="text-15 text-muted">{{pay.value.prodname}}</div>
+              <div>
+                {{pay.value.payType}} 
+                <span *ngIf="pay.value.FromBank">{{pay.value.FromBank}}</span>
+                <span *ngIf="pay.value.chequenum">{{pay.value.chqBankName}}</span>
+                n°{{pay.value.chequenum || pay.value.docRef}}. 
+              </div>
+              <div>montant {{pay.value.amount | number: '1.0-0': 'fr-FR'}} F.</div>
             </div>
-            <div class="form-check form-check-inline">
-              <input type="radio" class="form-check-input" id="toBank{{i}}" value="1" formControlName="status" name="status" mdbInput>
-              <label class="form-check-label" for="toBank{{i}}">en banque</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input type="radio" class="form-check-input" id="rejected{{i}}" value="2" formControlName="status" name="status" mdbInput>
-              <label class="form-check-label" for="rejected{{i}}">rejeté</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input type="radio" class="form-check-input" id="cashed{{i}}" value="3" formControlName="status" name="status" mdbInput>
-              <label class="form-check-label" for="cashed{{i}}">encaissé</label>
+            <div class="col-md-4">
+              <div class="md-form m-0">
+                <mdb-select [options]="statusOptions" formControlName="status" placeholder="status du paiement"></mdb-select>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="col-md-8 mt-1">
+      <button type="submit" mdbBtn class="btnBlue" size="sm" block="true" mdbWavesEffect>saisir les paiements</button>
     </div>
   </div>
 </form>

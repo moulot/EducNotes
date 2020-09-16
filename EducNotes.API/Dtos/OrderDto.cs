@@ -27,6 +27,8 @@ namespace EducNotes.API.Dtos
     public decimal TVAAmount { get; set; }
     public decimal AmountTTC { get; set; }
     public string strAmountTTC { get; set; }
+    public decimal AmountInvoiced { get; set; }
+    public string strAmountInvoiced { get; set; }
     public decimal AmountPaid { get; set; }
     public string strAmountPaid { get; set; }
     public decimal Balance { get; set; }
@@ -58,5 +60,6 @@ namespace EducNotes.API.Dtos
     public Boolean Completed { get; set; }
     public List<OrderLineDto> Lines { get; set; }
     public List<FinOpDto> Payments { get; set; }
+    public List<PaymentDto> LinePayments { get; set; }
   }
 }

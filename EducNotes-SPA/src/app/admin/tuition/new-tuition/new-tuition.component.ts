@@ -102,7 +102,7 @@ export class NewTuitionComponent implements OnInit {
   }
 
   getClassLevels() {
-    this.classService.getLevels().subscribe(data => {
+    this.classService.getActiveClasslevels().subscribe(data => {
       this.levels = data;
       for (let i = 0; i < this.levels.length; i++) {
         const elt = this.levels[i];
@@ -454,6 +454,7 @@ export class NewTuitionComponent implements OnInit {
     this.wait = true;
     const paydata = <any>{};
     paydata.finOpDate = Utils.inputDateDDMMYY(this.paymentForm.value.opDate, '/');
+    paydata.finOpTypeId = environment.finOpTypePayment;
     paydata.orderId = this.orderid;
     paydata.invoiceId = this.invoiceid;
     paydata.paymentTypeId = this.paymentForm.value.typeid;
@@ -470,7 +471,6 @@ export class NewTuitionComponent implements OnInit {
       payments = [...payments, pay];
     }
     paydata.payments = payments;
-    console.log(paydata.payments);
     this.paymentService.addFinOp(paydata).subscribe(() => {
       this.alertify.success('paiment effectué avec succès');
       this.router.navigate(['/tuitions']);

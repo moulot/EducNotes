@@ -1,5 +1,15 @@
 <div class="d-none d-md-block border rounded-lg p-2">
-  <div class="row">
+  <div *ngIf="showInfos" class="row animated zoomIn">
+    <div class="col-md-12 d-flex my-1">
+      <div class="">
+        <a (click)="toggleInfos()">
+          <i class="fad fa-minus-square fa-1x mr-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        </a>
+      </div>
+      <div class="text-14"><b>infos du compte</b></div>
+    </div>
+    <div class="col-md-12"><hr class="my-1"></div>
     <div class="col-md-1">
       <img src="{{userFile.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
     </div>
@@ -34,9 +44,32 @@
       </div>
     </div>
   </div>
+  <div *ngIf="!showInfos" class="row animated zoomIn">
+    <div class="col-md-12 d-flex">
+      <div class="my-1">
+        <a (click)="toggleInfos()">
+          <i class="fad fa-plus-square fa-1x my-1 mr-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        </a>
+      </div>
+      <div>
+        <b>voir détails du dossier</b>
+        <span class="text-17 text-capitalize ml-2">{{userFile.lastName}} {{userFile.firstName}}</span> ({{userFile.age}} ans) - classe de {{userFile.className || userFile.classLevelName}}
+      </div>
+    </div>
+  </div>
 </div>
 <div class="d-md-none border rounded-lg p-2" style="border: 1px solid blue;">
-  <div class="row">
+  <div *ngIf="showInfos" class="row animated zoomIn">
+    <div class="col-md-12 d-flex my-1">
+      <div class="">
+        <a (click)="toggleInfos()">
+          <i class="fad fa-minus-square fa-1x mr-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        </a>
+      </div>
+      <div class="text-14"><b>infos du compte</b></div>
+    </div>
     <div class="col-md-1 text-center">
       <img src="{{userFile.photoUrl || '../../assets/user.png'}}" alt="" width="80" class="rounded-circle img-responsive">
     </div>
@@ -71,6 +104,28 @@
             </div>
           </div>
         </div>    
+      </div>
+    </div>
+  </div>
+  <div *ngIf="!showInfos" class="row animated zoomIn">
+    <div class="col-md-12 d-flex my-1">
+      <div class="">
+        <a (click)="toggleInfos()">
+          <i class="fad fa-plus-square fa-1x my-1 mr-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        </a>
+      </div>
+      <div>
+        <b>voir détails du dossier</b>
+      </div>
+    </div>
+    <div class="col-md-1 text-center">
+      <img src="{{userFile.photoUrl || '../../assets/user.png'}}" alt="" width="80" class="rounded-circle img-responsive">
+    </div>
+    <div class="col-md-11">
+      <div class="row">
+        <div class="col-md-12 text-20 text-center font-weight-500 text-capitalize" style="color: #192C47;">{{userFile.lastName}} {{userFile.firstName}}</div>
+        <div class="col-md-12 text-20 text-center">{{userFile.age}} ans - classe de {{userFile.className || userFile.classLevelName}}</div>
       </div>
     </div>
   </div>

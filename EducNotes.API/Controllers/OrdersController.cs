@@ -27,7 +27,7 @@ namespace EducNotes.API.Controllers
     public UserManager<User> _userManager { get; }
     CultureInfo frC = new CultureInfo("fr-FR");
     int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
-    int tuitionTypeId;
+    int tuitionTypeId, finOpTypeInvoice, finOpTypePayment;
     int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId;
     string password;
     int tuitionId, nextYearTuitionId, newRegToBePaidEmailId;
@@ -54,7 +54,8 @@ namespace EducNotes.API.Controllers
       moderatorRoleId = _config.GetValue<int>("AppSettings:moderatorRoleId");
       adminRoleId = _config.GetValue<int>("AppSettings:adminRoleId");
       teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
-
+      finOpTypeInvoice = _config.GetValue<int>("AppSettings:finOpTypeInvoice");
+      finOpTypePayment = _config.GetValue<int>("AppSettings:finOpTypePayment");
     }
 
     [HttpGet("tuitionOrderData")]
@@ -101,13 +102,18 @@ namespace EducNotes.API.Controllers
       var tuition = _mapper.Map<OrderDto>(order);
 
       tuition.Lines = await _repo.GetOrderLines(tuition.Id);
-      tuition.Payments = await _repo.GetOrderPayments(tuition.Id);
+      // tuition.Payments = await _repo.GetOrderPayments(tuition.Id);
+      tuition.LinePayments = await _repo.GetChildPayments(id);
 
-      tuition.AmountPaid = tuition.Payments.Where(f => f.Cashed).Sum(a => a.Amount);
+      tuition.AmountInvoiced = tuition.LinePayments.Where(f => f.FinOpTypeId == finOpTypeInvoice).Sum(a => a.Amount);
+      tuition.strAmountInvoiced = tuition.AmountInvoiced.ToString("N0") + " F";
+      tuition.AmountPaid = tuition.LinePayments.Where(f => f.FinOpTypeId == finOpTypePayment && f.Cashed).Sum(a => a.Amount);
       tuition.strAmountPaid = tuition.AmountPaid.ToString("N0") + " F";
-      tuition.Balance = tuition.AmountTTC - tuition.AmountPaid;
+      tuition.Balance = tuition.AmountInvoiced - tuition.AmountPaid;
       tuition.strBalance = tuition.Balance.ToString("N0") + " F";
-      tuition.AmountToValidate = tuition.Payments.Where(p => p.Received == true || p.DepositedToBank == true).Sum(s => s.Amount);
+      tuition.AmountToValidate = tuition.LinePayments
+                                .Where(p => p.FinOpTypeId == finOpTypePayment && p.Cashed == false && p.Rejected == false)
+                                .Sum(s => s.Amount);
       tuition.strAmountToValidate = tuition.AmountToValidate.ToString("N0") + " F";
 
       return Ok(tuition);
@@ -137,8 +143,23 @@ namespace EducNotes.API.Controllers
     {
       var today = DateTime.Now.Date;
 
-      //outstanding balance
-      var balanceFromDB = await _context.OrderHistories.SumAsync(b => b.Delta);
+      // invoiced amount
+      var invoicedFromDB = await _context.Orders.Where(o => o.Validated == true).SumAsync(s => s.AmountTTC);
+      string invoiced = invoicedFromDB.ToString("N0");
+      // in validation amount
+      var toBeValidatedFromDB = await _context.FinOps
+                                .Where(o => o.Cashed == false && o.Rejected == false && o.FinOpTypeId == finOpTypePayment)
+                                .SumAsync(s => s.Amount);
+      var toBeValidated = toBeValidatedFromDB.ToString("N0");
+      // cashed amount
+      var cashedFromDB = await _context.FinOps
+                                .Where(o => o.Cashed == true && o.FinOpTypeId == finOpTypePayment)
+                                .SumAsync(s => s.Amount);
+      var cashed = cashedFromDB.ToString("N0");
+      // outstanding balance
+      var balanceFromDB = await _context.OrderLineHistories
+                                  .Where(f => f.Cashed == true)
+                                  .SumAsync(b => b.Delta);
       string balance = balanceFromDB.ToString("N0");
 
       //n day late outstanding balance
@@ -153,6 +174,9 @@ namespace EducNotes.API.Controllers
       var balance15day = b15day.Sum(b => b.Delta);
 
       return Ok(new {
+        invoiced,
+        toBeValidated,
+        cashed,
         openBalance = balance,
         balanceFromDB
       });
@@ -255,6 +279,7 @@ namespace EducNotes.API.Controllers
             orderlineHistory.OldAmount = 0;
             orderlineHistory.NewAmount = line.AmountTTC + line.ProductFee;
             orderlineHistory.Delta = orderlineHistory.NewAmount - orderlineHistory.OldAmount;
+            orderlineHistory.Cashed = true;
             _repo.Add(orderlineHistory);
 
             var lineDto = _mapper.Map<OrderLineDto>(line);

@@ -1,14 +1,48 @@
 <div class="row">
-  <div class="col-md-12 text-20">trésorerie</div>
+  <div class="col-md-12 d-flex">
+    <i class="fad fa-sack-dollar fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    <div class="text-19">trésorerie</div>
+  </div>
 
   <div class="col-md-12 text-17 text-muted mt-2">situation des paiements</div>
   <div class="col-md-12"><hr class="my-1" style="background-color: #f89f20;"></div>
 
+  <div class="col-md-4 my-2">
+    <div class="card">
+      <div class="card-body p-1 text-center">
+        <div class="row">
+          <div class="col-md-6 text-15">montant facturé</div>
+          <div class="col-md-6 text-17 text-success text-sucess">{{invoiced}} F CFA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 my-2">
+    <div class="card">
+      <div class="card-body p-1 text-center">
+        <div class="row">
+          <div class="col-md-6 text-15">montant encaissé</div>
+          <div class="col-md-6 text-17 text-success text-sucess">{{cashed}} F CFA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 my-2">
+    <div class="card">
+      <div class="card-body p-1 text-center">
+        <div class="row">
+          <div class="col-md-6 text-15">solde à recevoir</div>
+          <div class="col-md-6 text-17 text-success text-sucess">{{tuitionBalance}} F CFA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="col-md-2 my-2">
     <div class="card">
       <div class="card-body p-2 text-center">
-        <div class="text-15">montant dû</div>
-        <div class="text-17 text-success text-sucess">{{tuitionBalance}} F CFA</div>
+        <div class="text-15">en cours de validation</div>
+        <div class="text-17 text-success text-sucess">{{toBeValidated}} F CFA</div>
       </div>
     </div>
   </div>

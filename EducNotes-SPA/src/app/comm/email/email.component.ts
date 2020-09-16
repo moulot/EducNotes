@@ -144,7 +144,6 @@ export class EmailComponent implements OnInit {
               }
             }
           }
-
         }, error => {
           this.alertify.error(error);
         });

@@ -14,7 +14,10 @@ export class TreasuryComponent implements OnInit {
   regDate: Date;
   regActive = false;
   nbTuitionPays: number;
+  invoiced: string;
+  cashed: string;
   tuitionBalance: string;
+  toBeValidated: string;
 
   constructor(private authService: AuthService, private orderService: OrderService) { }
 
@@ -28,7 +31,10 @@ export class TreasuryComponent implements OnInit {
     }
     this.nbTuitionPays = Number(this.settings.find(s => s.name === 'NbTuitionPayments').value);
     this.orderService.getBalanceData().subscribe((data: any) => {
+      this.invoiced = data.invoiced;
+      this.cashed = data.cashed;
       this.tuitionBalance = data.openBalance;
+      this.toBeValidated = data.toBeValidated;
     });
   }
 

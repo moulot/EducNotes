@@ -6,6 +6,7 @@ namespace EducNotes.API.Dtos
   public class FinOpDataDto
   {
     public DateTime FinOpDate { get; set; }
+    public int FinOpTypeId { get; set; }
     public int OrderId { get; set; }
     public int OrderLineId { get; set; }
     public int PaymentTypeId { get; set; }

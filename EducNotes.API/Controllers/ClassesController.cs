@@ -870,6 +870,15 @@ namespace EducNotes.API.Controllers
             return Ok(levels);
         }
 
+        [HttpGet("ActiveClasslevels")]
+        public async Task<IActionResult> GetActiveClassLevels()
+        {
+          var classLevels = await _context.Classes
+                                    .OrderBy(o => o.ClassLevel.DsplSeq)
+                                    .Select(s => s.ClassLevel).Distinct().ToListAsync();
+          return Ok(classLevels);
+        }
+
         [HttpGet("LevelsWithClasses")]
         public async Task<IActionResult> GetLevelsWithClasses()
         {
@@ -885,7 +894,6 @@ namespace EducNotes.API.Controllers
             res.Id = item.Id;
             res.Name = item.Name;
             res.TotalClasses = item.Classes.Count();
-            //res.TotalEnrolled = item.Inscriptions.Count();
             res.Classes = new List<ClassDetailDto>();
             foreach (var c in item.Classes)
             {
