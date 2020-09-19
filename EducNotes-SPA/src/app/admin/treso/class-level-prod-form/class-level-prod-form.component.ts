@@ -2,9 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ClassService } from 'src/app/_services/class.service';
 import { TresoService } from 'src/app/_services/treso.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { ClassLevel } from 'src/app/_models/classLevel';
 import { environment } from 'src/environments/environment';
-import { Product } from 'src/app/_models/product';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -18,8 +16,6 @@ export class ClassLevelProdFormComponent implements OnInit {
   services: any[] = [];
   schoolServiceId = environment.schoolServiceId;
   lvlProdForm: FormGroup;
-
-
 
   constructor(private classService: ClassService, private tresoService: TresoService, private router: Router,
     private alertify: AlertifyService, private fb: FormBuilder, private route: ActivatedRoute) { }
@@ -35,7 +31,7 @@ export class ClassLevelProdFormComponent implements OnInit {
        classLevelIds: [, Validators.required],
        productId: [, Validators.required],
        amount: [, Validators.required]
-      });
+    });
   }
 
 
@@ -45,7 +41,6 @@ export class ClassLevelProdFormComponent implements OnInit {
         const element = {value: res[i].id, label : res[i].name} ;
        this.levels = [...this.levels, element];
       }
-
     }, error => {
       this.alertify.error(error);
     });

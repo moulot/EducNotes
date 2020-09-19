@@ -2,8 +2,10 @@
   <div class="row mb-2">
     <div class="col-md-12 d-flex">
       <i class="fad fa-sack-dollar fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-      <div class="text-19">valider les paiements en cours</div>
+      <div class="text-19">validation des paiements</div>
     </div>
+  </div>
+  <div *ngIf="payments.length > 0" class="row">
     <div class="col-md-12 text-14 text-danger my-1">sélectionner le nouveau status des paiements et les valider</div>
     <div class="col-md-8 mb-1" formArrayName="payments" *ngFor="let pay of paymentsForm.get('payments')['controls']; let i = index;">
       <div class="border rounded-lg p-2">
@@ -67,3 +69,6 @@
     </div>
   </div>
 </form>
+<div *ngIf="payments.length === 0" class="border rounded-lg p-2 text-17 mt-3">
+  pas de paiements en cours à valider.
+</div>

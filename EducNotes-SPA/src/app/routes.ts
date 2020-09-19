@@ -137,6 +137,8 @@ import { TuitionDetailsComponent } from './admin/tuition/tuition-details/tuition
 import { TuitionDetailsResolver } from './_resolvers/tuition-details-resolver';
 import { ValidatePaymentsComponent } from './admin/validate-payments/validate-payments.component';
 import { ValidatePaymentsResolver } from './_resolvers/validate-payments-resolver';
+import { TuitionFeesComponent } from './admin/tuition/tuition-fees/tuition-fees.component';
+import { TuitionFeesResolver } from './_resolvers/tuition-fees-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -252,7 +254,8 @@ export const appRoutes: Routes = [
         { path: 'addFinOp/:id', component: AddPaymentComponent, resolve: {order: AddPaymentResolver} },
         { path: 'validatePayments', component: ValidatePaymentsComponent, resolve: {payments: ValidatePaymentsResolver}},
         { path: 'tuitionList', component: TuitionListComponent, resolve: {list: TuitionListResolver}},
-        { path: 'tuitionDetails/:levelId', component: TuitionDetailsComponent, resolve: {users: TuitionDetailsResolver}}
+        { path: 'tuitionDetails/:levelId', component: TuitionDetailsComponent, resolve: {users: TuitionDetailsResolver}},
+        { path: 'tuitionFees', component: TuitionFeesComponent, resolve: {fees: TuitionFeesResolver}}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

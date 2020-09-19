@@ -146,20 +146,18 @@ namespace EducNotes.API.Controllers
       // invoiced amount
       var invoicedFromDB = await _context.Orders.Where(o => o.Validated == true).SumAsync(s => s.AmountTTC);
       string invoiced = invoicedFromDB.ToString("N0");
-      // in validation amount
-      var toBeValidatedFromDB = await _context.FinOps
-                                .Where(o => o.Cashed == false && o.Rejected == false && o.FinOpTypeId == finOpTypePayment)
-                                .SumAsync(s => s.Amount);
-      var toBeValidated = toBeValidatedFromDB.ToString("N0");
       // cashed amount
       var cashedFromDB = await _context.FinOps
                                 .Where(o => o.Cashed == true && o.FinOpTypeId == finOpTypePayment)
                                 .SumAsync(s => s.Amount);
       var cashed = cashedFromDB.ToString("N0");
+      // in validation amount
+      var toBeValidatedFromDB = await _context.FinOps
+                                .Where(o => o.Cashed == false && o.Rejected == false && o.FinOpTypeId == finOpTypePayment)
+                                .SumAsync(s => s.Amount);
+      var toBeValidated = toBeValidatedFromDB.ToString("N0");
       // outstanding balance
-      var balanceFromDB = await _context.OrderLineHistories
-                                  .Where(f => f.Cashed == true)
-                                  .SumAsync(b => b.Delta);
+      var balanceFromDB = await _context.OrderLineHistories.Where(f => f.Cashed == true).SumAsync(b => b.Delta);
       string balance = balanceFromDB.ToString("N0");
 
       //n day late outstanding balance
@@ -173,12 +171,45 @@ namespace EducNotes.API.Controllers
                         .Where(b => b.Order.Validity <= today && b.Order.Validity >= from15dayToToday).ToListAsync();
       var balance15day = b15day.Sum(b => b.Delta);
 
+      decimal todayDueAmount = 0;
+      // get amount due today
+      var lines = await _context.OrderLines.ToListAsync();
+      foreach (var line in lines)
+      {
+        decimal lineDueAmount = 0;
+        var lineDeadlines = await _context.OrderLineDeadlines
+                                    .Where(o => o.OrderLineId == line.Id)
+                                    .OrderBy(o => o.DueDate)
+                                    .ToListAsync();
+        if(lineDeadlines.Count() > 0)
+        {
+          foreach (var lineD in lineDeadlines)
+          {
+            if(lineD.DueDate.Date <= today)
+            {
+              lineDueAmount += lineD.Amount;
+            }
+          }
+          todayDueAmount += lineDueAmount;
+        }
+        else
+        {
+          if(line.Deadline.Date <= today)
+          {
+            todayDueAmount += line.AmountTTC;
+          }
+        }
+      }
+      decimal amountPaid = await _context.FinOpOrderLines.Where(f => f.FinOp.Cashed == true).SumAsync(s => s.Amount);
+      decimal lateAmount = Math.Abs(amountPaid - todayDueAmount);
+
       return Ok(new {
         invoiced,
         toBeValidated,
         cashed,
         openBalance = balance,
-        balanceFromDB
+        balanceFromDB,
+        lateAmount
       });
     }
 
@@ -195,8 +226,8 @@ namespace EducNotes.API.Controllers
           string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
 
           var deadlines = await _context.ProductDeadLines
-                          .OrderBy(o => o.DueDate)
-                          .Where(p => p.ProductId == tuitionId).ToListAsync();
+                                .OrderBy(o => o.DueDate)
+                                .Where(p => p.ProductId == tuitionId).ToListAsync();
           var firstDeadline = deadlines.First(d => d.Seq == 1);
 
           //tuition order
@@ -267,6 +298,7 @@ namespace EducNotes.API.Controllers
             line.TotalHT = line.Qty * line.UnitPrice + line.ProductFee;
             line.AmountHT = line.TotalHT - line.Discount;
             line.AmountTTC = line.AmountHT + line.TVAAmount;
+            line.Active = true;
             _repo.Add(line);
             _context.SaveChanges();
 
@@ -277,7 +309,7 @@ namespace EducNotes.API.Controllers
             orderlineHistory.OpDate = order.OrderDate;
             orderlineHistory.Action = "ADD";
             orderlineHistory.OldAmount = 0;
-            orderlineHistory.NewAmount = line.AmountTTC + line.ProductFee;
+            orderlineHistory.NewAmount = line.AmountTTC;
             orderlineHistory.Delta = orderlineHistory.NewAmount - orderlineHistory.OldAmount;
             orderlineHistory.Cashed = true;
             _repo.Add(orderlineHistory);
@@ -290,11 +322,11 @@ namespace EducNotes.API.Controllers
             foreach (var deadline in deadlines)
             {
               decimal Pct = deadline.Percentage;
-              decimal Payment = Pct * tuitionFee;
+              decimal amount = Pct * tuitionFee;
               OrderLineDeadline orderDeadline = new OrderLineDeadline();
               orderDeadline.OrderLineId = line.Id;
               orderDeadline.Percent = Pct;
-              orderDeadline.Amount = Payment;
+              orderDeadline.Amount = amount;
               orderDeadline.DueDate = deadline.DueDate;
               orderDeadline.Seq = seq;
               _repo.Add(orderDeadline);

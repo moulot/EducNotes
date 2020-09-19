@@ -109,5 +109,11 @@ export class TresoService {
     return this.http.post(this.baseUrl + 'treso/EditPayableAt/' + id  , payableAt);
   }
 
+  getClasslevelProducts() {
+    return this.http.get(this.baseUrl + 'treso/ClassLevelProducts');
+  }
 
+  saveClasslevelProducts(levelproducts) {
+    return this.http.post(this.baseUrl + 'treso/SaveClassLevelProducts', levelproducts);
+  }
 }

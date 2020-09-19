@@ -12,6 +12,8 @@ namespace EducNotes.API.Models
     public int Id { get; set; }
     public int OrderLineId { get; set; }
     public OrderLine OrderLine { get; set; }
+    public int? FinOpId { get; set; }
+    public FinOp FinOp { get; set; }
     public int UserId { get; set; }
     public User User { get; set; }
     public DateTime OpDate { get; set; }

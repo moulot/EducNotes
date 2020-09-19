@@ -103,7 +103,7 @@ export class AddPaymentComponent implements OnInit {
     paydata.refDoc = this.paymentForm.value.refDoc;
     paydata.note = this.paymentForm.value.note;
     paydata.bankId = this.paymentForm.value.bankid;
-    this.paymentService.addFinOp(paydata).subscribe(() => {
+    this.paymentService.addTuitionPayment(paydata).subscribe(() => {
       this.alertify.success('paiment effectué avec succès');
       this.router.navigate(['/tuitions']);
     }, error => {

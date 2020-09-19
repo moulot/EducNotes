@@ -54,99 +54,138 @@ namespace EducNotes.API.Controllers
       });
     }
 
-    [HttpPost("AddFinOp")]
-    public async Task<IActionResult> AddFinOp(FinOpDataDto finOpDataDto)
+    [HttpPost("AddTuitionPayment")]
+    public async Task<IActionResult> AddTuitionPayment(FinOpDataDto finOpDataDto)
     {
-      FinOp finOp = new FinOp();
-      finOp.FinOpDate = finOpDataDto.FinOpDate;
-      finOp.FinOpTypeId = finOpDataDto.FinOpTypeId;
-      if(finOpDataDto.InvoiceId != 0)
+      using (var identityContextTransaction = _context.Database.BeginTransaction())
       {
-        finOp.InvoiceId = finOpDataDto.InvoiceId;
-      }
-      finOp.PaymentTypeId = finOpDataDto.PaymentTypeId;
-      finOp.Amount = finOpDataDto.Amount;
-      finOp.Note = finOpDataDto.Note;
-      finOp.DocRef = finOpDataDto.RefDoc;
-
-      if(finOp.PaymentTypeId == chequeTypeId)
-      {
-        Cheque cheque = new Cheque();
-        cheque.ChequeNum = finOpDataDto.numCheque;
-        cheque.Amount = finOp.Amount;
-        if(finOpDataDto.BankId != 0)
-          cheque.BankId = finOpDataDto.BankId;
-
-        _context.Add(cheque);
-        _context.SaveChanges();
-        finOp.ChequeId = cheque.Id;
-      }
-
-      if(finOp.PaymentTypeId == cashTypeId || finOp.PaymentTypeId == mobileMoneyTypeId)
-      {
-        finOp.Cashed = true;
-      }
-      if(finOp.PaymentTypeId == bankTransferTypeId || finOp.PaymentTypeId == chequeTypeId)
-      {
-        finOp.Received = true;
-      }
-
-      if(finOp.PaymentTypeId == bankTransferTypeId)
-      {
-        if(finOpDataDto.BankId != 0)
+        try
         {
-          finOp.FromBankId = finOpDataDto.BankId;
+          FinOp finOp = new FinOp();
+          finOp.FinOpDate = finOpDataDto.FinOpDate;
+          finOp.OrderId = finOpDataDto.OrderId;
+          finOp.FinOpTypeId = finOpDataDto.FinOpTypeId;
+          if(finOpDataDto.InvoiceId != 0)
+          {
+            finOp.InvoiceId = finOpDataDto.InvoiceId;
+          }
+          finOp.PaymentTypeId = finOpDataDto.PaymentTypeId;
+          finOp.Amount = finOpDataDto.Amount;
+          finOp.Note = finOpDataDto.Note;
+          finOp.DocRef = finOpDataDto.RefDoc;
+
+          if(finOp.PaymentTypeId == chequeTypeId)
+          {
+            Cheque cheque = new Cheque();
+            cheque.ChequeNum = finOpDataDto.numCheque;
+            cheque.Amount = finOp.Amount;
+            if(finOpDataDto.BankId != 0)
+              cheque.BankId = finOpDataDto.BankId;
+
+            _context.Add(cheque);
+            _context.SaveChanges();
+            finOp.ChequeId = cheque.Id;
+          }
+
+          if(finOp.PaymentTypeId == cashTypeId || finOp.PaymentTypeId == mobileMoneyTypeId)
+          {
+            finOp.Cashed = true;
+          }
+          if(finOp.PaymentTypeId == bankTransferTypeId || finOp.PaymentTypeId == chequeTypeId)
+          {
+            finOp.Received = true;
+          }
+
+          if(finOp.PaymentTypeId == bankTransferTypeId)
+          {
+            if(finOpDataDto.BankId != 0)
+            {
+              finOp.FromBankId = finOpDataDto.BankId;
+            }
+          }
+
+          _context.Add(finOp);
+          _context.SaveChanges();
+
+          Boolean allLinesValidated = true;
+          if(finOpDataDto.Payments.Count() > 0)
+          {
+            foreach (var payment in finOpDataDto.Payments)
+            {
+              FinOpOrderLine fool = new FinOpOrderLine();
+              fool.FinOpId = finOp.Id;
+              fool.OrderLineId = payment.OrderLineId;
+              var invoice = await _context.Invoices.FirstOrDefaultAsync(i => i.OrderLineId == payment.OrderLineId);
+              if(invoice != null)
+                fool.InvoiceId = invoice.Id;
+              fool.Amount = payment.Amount;
+              _repo.Add(fool);
+              _context.SaveChanges();
+
+              // registration validation
+              var line = await _context.OrderLines.FirstAsync(l => l.Id == payment.OrderLineId);
+              if(!line.Validated)
+              {
+                var regFee = line.ProductFee;
+                var firstdeadline = await _context.OrderLineDeadlines
+                                          .Where(d => d.OrderLineId == line.Id)
+                                          .OrderBy(o => o.DueDate)
+                                          .FirstAsync();
+                var amount = firstdeadline.Amount;
+                var downpayment = regFee + amount;
+                if(payment.Amount >= downpayment)
+                {
+                  line.Validated = true;
+                  _repo.Update(line);
+                }
+                else
+                {
+                  allLinesValidated = false;
+                }
+              }
+
+              var oldAmount = _context.OrderLineHistories
+                                .OrderByDescending(o => o.OpDate)
+                                .FirstOrDefault(h => h.OrderLineId == payment.OrderLineId).NewAmount;
+
+              //add data for orderline history
+              OrderLineHistory orderlineHistory = new OrderLineHistory();
+              orderlineHistory.OrderLineId = payment.OrderLineId;
+              orderlineHistory.FinOpId = finOp.Id;
+              orderlineHistory.UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+              orderlineHistory.OpDate = finOp.FinOpDate;
+              orderlineHistory.Action = "UPD";
+              orderlineHistory.OldAmount = oldAmount;
+              orderlineHistory.NewAmount = oldAmount - payment.Amount;
+              orderlineHistory.Delta = orderlineHistory.NewAmount - orderlineHistory.OldAmount;
+              if(finOp.Cashed == true)
+                orderlineHistory.Cashed = true;
+              _repo.Add(orderlineHistory);
+            }
+          }
+
+          if(allLinesValidated)
+          {
+            var order = await _context.Orders.FirstAsync(o => o.Id == finOpDataDto.OrderId);
+            order.Validated = true;
+            _repo.Update(order);
+          }
+
+          if(await _repo.SaveAll())
+          {
+            // await _repo.ValidateTuition(finOp.Amount, Convert.ToInt32(finOp.OrderId));
+            identityContextTransaction.Commit();
+            return Ok();
+          }
         }
-      }
-
-      //order validation
-      // if(finOpDataDto.OrderId != 0)
-      // {
-      //   finOp.OrderId = finOpDataDto.OrderId;
-      //   await _repo.ValidateTuition(finOp.Amount, Convert.ToInt32(finOp.OrderId));
-      // }
-
-      _context.Add(finOp);
-      _context.SaveChanges();
-
-      if(finOpDataDto.Payments.Count() > 0)
-      {
-        foreach (var payment in finOpDataDto.Payments)
+        catch
         {
-          FinOpOrderLine fool = new FinOpOrderLine();
-          fool.FinOpId = finOp.Id;
-          fool.OrderLineId = payment.OrderLineId;
-          var invoice = await _context.Invoices.FirstOrDefaultAsync(i => i.OrderLineId == payment.OrderLineId);
-          if(invoice != null)
-            fool.InvoiceId = invoice.Id;
-          fool.Amount = payment.Amount;
-          _repo.Add(fool);
-
-          var oldAmount = _context.OrderLineHistories
-                            .OrderByDescending(o => o.OpDate)
-                            .FirstOrDefault(h => h.OrderLineId == payment.OrderLineId).NewAmount;
-
-          //add data for orderline history
-          OrderLineHistory orderlineHistory = new OrderLineHistory();
-          orderlineHistory.OrderLineId = payment.OrderLineId;
-          orderlineHistory.UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-          orderlineHistory.OpDate = finOp.FinOpDate;
-          orderlineHistory.Action = "UPD";
-          orderlineHistory.OldAmount = oldAmount;
-          orderlineHistory.NewAmount = oldAmount - payment.Amount;
-          orderlineHistory.Delta = orderlineHistory.NewAmount - orderlineHistory.OldAmount;
-          if(finOp.Cashed == true)
-            orderlineHistory.Cashed = true;
-          _repo.Add(orderlineHistory);
+          identityContextTransaction.Rollback();
+          return BadRequest("erreur lors de l'ajout du paiement.");
         }
-      }
 
-      if(await _repo.SaveAll())
-      {
-        return Ok();
+        return BadRequest("problème pour saisir le paiement.");
       }
-
-      return BadRequest("problème pour saisir le paiement.");
     }
 
     [HttpGet("PaymentsToValidate")]
@@ -190,6 +229,21 @@ namespace EducNotes.API.Controllers
         finOp.Rejected = fo.Rejected;
         finOp.Cashed = fo.Cashed;
         _repo.Update(finOp);
+
+        if(finOp.Cashed == true)
+        {
+          var lineHistories = await _context.OrderLineHistories.Where(f => f.FinOpId == finOp.Id).ToListAsync();
+          foreach (var line in lineHistories)
+          {
+            var lineHistory = await _context.OrderLineHistories.FirstOrDefaultAsync(o => o.Id == line.Id);
+            if(lineHistory != null)
+            {
+              lineHistory.Cashed = finOp.Cashed;
+              lineHistory.Rejected = finOp.Rejected;
+              _context.Update(lineHistory);
+            }
+          }
+        }
       }
 
       if(await _repo.SaveAll())

@@ -256,6 +256,8 @@ import { TuitionListResolver } from './_resolvers/tuition-list-resolver';
 import { TuitionDetailsResolver } from './_resolvers/tuition-details-resolver';
 import { ValidatePaymentsComponent } from './admin/validate-payments/validate-payments.component';
 import { ValidatePaymentsResolver } from './_resolvers/validate-payments-resolver';
+import { TuitionFeesComponent } from './admin/tuition/tuition-fees/tuition-fees.component';
+import { TuitionFeesResolver } from './_resolvers/tuition-fees-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -429,7 +431,8 @@ export function tokenGetter() {
       UserFileTuitionComponent,
       AddPaymentComponent,
       TuitionListComponent,
-      ValidatePaymentsComponent
+      ValidatePaymentsComponent,
+      TuitionFeesComponent
    ],
    imports: [
       FormWizardModule,
@@ -537,6 +540,7 @@ export function tokenGetter() {
       UserFileResolver,
       AddPaymentResolver,
       TuitionListResolver,
+      TuitionFeesResolver,
       TuitionDetailsResolver,
       ValidatePaymentsResolver,
       OrderService,

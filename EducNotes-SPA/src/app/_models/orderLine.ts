@@ -29,5 +29,6 @@ export interface OrderLine {
    expired: boolean;
    cancelled: boolean;
    completed: boolean;
+   active: boolean;
    payments: OrderLineDeadline[];
 }

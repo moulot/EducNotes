@@ -31,24 +31,24 @@ namespace EducNotes.API.Controllers {
     /////////////////////////////////////////////////////////ZONES DES GET LISTES/////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    [HttpGet ("GetProductTypes")]
+    [HttpGet("GetProductTypes")]
     public async Task<IActionResult> GetProductTypes () {
       var producTypes = await _context.ProductTypes.OrderBy (p => p.Name).ToListAsync ();
-      return Ok (producTypes);
+      return Ok(producTypes);
     }
 
-    [HttpGet ("GetDeadLines")]
+    [HttpGet("GetDeadLines")]
     public async Task<IActionResult> GetDeadLines () {
       var deadLines = await _context.DeadLines.OrderBy (p => p.DueDate).ToListAsync ();
       var res = _mapper.Map<IEnumerable<DealLineDetailsDto>> (deadLines);
 
-      return Ok (res);
+      return Ok(res);
     }
 
-    [HttpGet ("GetProducts")]
+    [HttpGet("GetProducts")]
     public async Task<IActionResult> GetProducts () {
       // var products = await _context.Products.OrderBy (p => p.Name).ToListAsync ();
-      // return Ok (products);
+      // return Ok(products);
       int schoolServiceTypeId = _config.GetValue<int> ("AppSettings:schoolServiceTypeId");
       var prods = await _context.Products
         .Include (a => a.Periodicity)
@@ -90,70 +90,82 @@ namespace EducNotes.API.Controllers {
 
     }
 
-    [HttpGet ("GetPeriodicities")]
+    [HttpGet("GetPeriodicities")]
     public async Task<IActionResult> GetPeriodicicities () {
       var periodicities = await _context.Periodicities.OrderBy (p => p.Name).ToListAsync ();
-      return Ok (periodicities);
+      return Ok(periodicities);
     }
 
-    [HttpGet ("GetPayableAts")]
+    [HttpGet("GetPayableAts")]
     public async Task<IActionResult> GetPayableAts () {
       var ats = await _context.PayableAts.OrderBy (p => p.Name).ToListAsync ();
-      return Ok (ats);
+      return Ok(ats);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////ZONE DES GET BY ID/////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    [HttpGet ("GetDeadLine/{deadLineId}")]
+    [HttpGet("GetDeadLine/{deadLineId}")]
     public async Task<IActionResult> GetDeadLine (int deadLineId) {
       var deadLine = await _context.DeadLines.FirstOrDefaultAsync (p => p.Id == deadLineId);
       deadLine.DueDate = deadLine.DueDate.Date;
       var res = _mapper.Map<DealLineDetailsDto> (deadLine);
-      return Ok (res);
+      return Ok(res);
     }
 
-    [HttpGet ("GetProduct/{productId}")]
+    [HttpGet("GetProduct/{productId}")]
     public async Task<IActionResult> GetProduct (int productId) {
       var product = await _context.Products.FirstOrDefaultAsync (p => p.Id == productId);
-      return Ok (product);
+      return Ok(product);
     }
 
-    [HttpGet ("GetProducts/{productTypeId}")]
+    [HttpGet("GetProducts/{productTypeId}")]
     public async Task<IActionResult> GetProducts (int productTypeId) {
       var producTypes = await _context.Products
                               .Where (p => p.ProductTypeId == productTypeId)
                               .OrderBy (p => p.Name)
                               .ToListAsync ();
-      return Ok (producTypes);
+      return Ok(producTypes);
     }
 
-    [HttpGet ("GetLvlServices/{classLevelId}")]
+    [HttpGet("GetLvlServices/{classLevelId}")]
     public async Task<IActionResult> GetLvlServices (int classLevelId) {
       var services = await _context.ClassLevelProducts
         .Include (p => p.Product)
         .Where (p => p.ClassLevelId == classLevelId)
         .OrderBy (p => p.Product.Name)
         .ToListAsync ();
-      return Ok (services);
+      return Ok(services);
     }
 
-    [HttpGet ("Getperiodicity/{periodicityId}")]
+    [HttpGet("Getperiodicity/{periodicityId}")]
     public async Task<IActionResult> Getperiodicity (int periodicityId) {
       var pp = await _context.Periodicities.FirstOrDefaultAsync (p => p.Id == periodicityId);
-      return Ok (pp);
+      return Ok(pp);
     }
 
-    [HttpGet ("GetpayableAt/{payableAtid}")]
+    [HttpGet("GetpayableAt/{payableAtid}")]
     public async Task<IActionResult> GetpayableAt (int payableAtid) {
       var pp = await _context.PayableAts.FirstOrDefaultAsync (p => p.Id == payableAtid);
-      return Ok (pp);
+      return Ok(pp);
+    }
+
+    [HttpGet("ClassLevelProducts")]
+    public async Task<IActionResult> GetClassLevelProducts()
+    {
+      var levelProdFromDB = await _context.ClassLevelProducts
+                                        .Include(i => i.Product)
+                                        .Include(i => i.ClassLevel)
+                                        .OrderBy(o => o.ClassLevel.DsplSeq)
+                                        .ToListAsync();
+      var levelproducts = _mapper.Map<IEnumerable<ClasslevelProductDto>>(levelProdFromDB);
+      return Ok(levelproducts);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////ZONE DES POST///////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    [HttpPost ("CreateProduct")]
+    [HttpPost("CreateProduct")]
     public async Task<IActionResult> CreateProduct (ProductDto productToCreate) {
       var produit = _mapper.Map<Product> (productToCreate);
       _context.Products.Add (produit);
@@ -179,67 +191,102 @@ namespace EducNotes.API.Controllers {
 
       }
 
-      if (await _repo.SaveAll ())
-        return Ok ();
+      if (await _repo.SaveAll())
+        return Ok();
 
-      return BadRequest ("impossible de creer ce produit");
+      return BadRequest("impossible de creer ce produit");
     }
 
-    [HttpPost ("CreatePayableAt")]
-    public async Task<IActionResult> CreatePayableAt (PayableDto payableToCreate) {
-      var p = _mapper.Map<PayableAt> (payableToCreate);
-      _context.PayableAts.Add (p);
-      if (await _repo.SaveAll ())
-        return Ok ();
+    [HttpPost("CreatePayableAt")]
+    public async Task<IActionResult> CreatePayableAt(PayableDto payableToCreate) {
+      var p = _mapper.Map<PayableAt>(payableToCreate);
+      _context.PayableAts.Add(p);
+      if (await _repo.SaveAll())
+        return Ok();
 
-      return BadRequest ("impossible de creer ce produit");
+      return BadRequest("impossible de creer ce produit");
     }
 
-    [HttpPost ("CreateClassLevelProduct")]
-    public async Task<IActionResult> CreateClassLevelProduct (ClasslevelProductDto lvlprodToCreate) {
-      decimal amount = lvlprodToCreate.Amount;
-      int productId = lvlprodToCreate.ProductId;
-
-      foreach (var levelid in lvlprodToCreate.ClassLevelIds) {
-        var lvlprod = await _context.ClassLevelProducts.FirstOrDefaultAsync (a => a.ClassLevelId == levelid && a.ProductId == productId);
-        if (lvlprod == null) {
-          var lp = new ClassLevelProduct { ProductId = productId, ClassLevelId = levelid, Price = amount };
-          _repo.Add (lp);
+    [HttpPost("SaveClassLevelProducts")]
+    public async Task<IActionResult> SaveClassLevelProducts(List<ClasslevelProductDto> levelProducts)
+    {
+      foreach (var clp in levelProducts)
+      {
+        if(clp.Id == 0)
+        {
+          ClassLevelProduct classlevelProd = new ClassLevelProduct {
+            ProductId = clp.ProductId,
+            ClassLevelId = clp.ClassLevelId,
+            Price = clp.Price
+          };
+          _repo.Add(classlevelProd);
+        }
+        else
+        {
+          ClassLevelProduct classlevelProd = await _context.ClassLevelProducts.FirstAsync(c => c.Id == clp.Id);
+          classlevelProd.ProductId = clp.ProductId;
+          classlevelProd.ClassLevelId = clp.ClassLevelId;
+          classlevelProd.Price = clp.Price;
+          _repo.Update(classlevelProd);
         }
       }
 
-      if (await _repo.SaveAll ())
-        return Ok ();
+      if(await _repo.SaveAll())
+        return NoContent();
 
-      return BadRequest ("impossible de faire l'enregistrement...");
-
+      return BadRequest("problème pour enregistrer les données");
     }
 
-    [HttpPost ("CreateDeadLine")]
+    [HttpPost("CreateClassLevelProduct")]
+    public async Task<IActionResult> CreateClassLevelProduct(LevelListProductDto lvlprodToCreate)
+    {
+      decimal amount = lvlprodToCreate.Amount;
+      int productId = lvlprodToCreate.ProductId;
+
+      foreach(var levelid in lvlprodToCreate.ClassLevelIds) {
+        var lvlprod = await _context.ClassLevelProducts
+                            .FirstOrDefaultAsync(a => a.ClassLevelId == levelid && a.ProductId == productId);
+        if(lvlprod == null) {
+          var lp = new ClassLevelProduct {
+            ProductId = productId,
+            ClassLevelId = levelid,
+            Price = amount
+          };
+          _repo.Add(lp);
+        }
+      }
+
+      if (await _repo.SaveAll())
+        return Ok();
+
+      return BadRequest("impossible de faire l'enregistrement...");
+    }
+
+    [HttpPost("CreateDeadLine")]
     public async Task<IActionResult> CreateDeadLine (DeadLineDto dtToCreate) {
       var dealdline = _mapper.Map<DeadLine> (dtToCreate);
       _repo.Add (dealdline);
       if (await _repo.SaveAll ())
-        return Ok ();
+        return Ok();
 
       return BadRequest ("impossible de terminer l'enregistrement");
 
     }
 
-    [HttpPost ("CreatePeriodicity/{periodictyName}")]
+    [HttpPost("CreatePeriodicity/{periodictyName}")]
     public async Task<IActionResult> CreatePeriodicity (string periodictyName) {
 
       if (!string.IsNullOrEmpty (periodictyName)) {
         _repo.Add (new Periodicity { Name = periodictyName });
         if (await _repo.SaveAll ())
-          return Ok ();
+          return Ok();
 
         return BadRequest ("impossible de faire l'ajout");
       }
       return BadRequest ();
     }
 
-    [HttpPost ("EditDeadLine/{deadLineId}")]
+    [HttpPost("EditDeadLine/{deadLineId}")]
     public async Task<IActionResult> EditDeadLine (int deadLineId, DeadLineDto dtToCreate) {
       var dl = await _context.DeadLines.FirstOrDefaultAsync (d => d.Id == deadLineId);
 
@@ -252,14 +299,14 @@ namespace EducNotes.API.Controllers {
         // dl.Amount = dtToCreate.Amount;
         _repo.Update (dl);
         if (await _repo.SaveAll ())
-          return Ok ();
+          return Ok();
 
         return BadRequest ("impossible de terminer l'enregistrement");
       }
       return NotFound ();
     }
 
-    [HttpPost ("EditProduct/{productId}")]
+    [HttpPost("EditProduct/{productId}")]
     public async Task<IActionResult> EditProduct (int productId, ProductDto prodToCreate) {
       var product = await _context.Products.FirstOrDefaultAsync (d => d.Id == productId);
       if (product != null) {
@@ -267,28 +314,28 @@ namespace EducNotes.API.Controllers {
         product.Comment = prodToCreate.Comment;
         _repo.Update (product);
         if (await _repo.SaveAll ())
-          return Ok ();
+          return Ok();
 
         return BadRequest ("impossible de terminer l'enregistrement");
       }
       return NotFound ();
     }
 
-    [HttpPost ("EditPeriodicity/{periodicityid}/{periodicityName}")]
+    [HttpPost("EditPeriodicity/{periodicityid}/{periodicityName}")]
     public async Task<IActionResult> EditPeriodicity (int periodicityid, string periodicityName) {
       var p = await _context.Periodicities.FirstOrDefaultAsync (a => a.Id == periodicityid);
       if (p != null) {
         p.Name = periodicityName;
         _repo.Update (p);
         if (await _repo.SaveAll ())
-          return Ok ();
+          return Ok();
 
         return BadRequest ("impossible de faier la mise à jour");
       }
       return NotFound ();
     }
 
-    [HttpPost ("EditPayableAt/{payableAtId}")]
+    [HttpPost("EditPayableAt/{payableAtId}")]
     public async Task<IActionResult> EditPeriodicity (int payableAtId, PayableDto payableToUpdate) {
       var p = await _context.PayableAts.FirstOrDefaultAsync (a => a.Id == payableAtId);
       if (p != null) {
@@ -296,7 +343,7 @@ namespace EducNotes.API.Controllers {
         p.DayCount = payableToUpdate.DayCount;
         _repo.Update (p);
         if (await _repo.SaveAll ())
-          return Ok ();
+          return Ok();
 
         return BadRequest ("impossible de faier la mise à jour");
       }

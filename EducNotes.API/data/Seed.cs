@@ -65,7 +65,7 @@ namespace EducNotes.API.Data
                 new FinOpType { Name = "avoir" },
                 new FinOpType { Name = "remboursement" }
               };
-              context.AddRange(classtypes);
+              context.AddRange(finOpTypes);
 
               var productTypes = new List<ProductType>() {
                 new ProductType { Name = "scolarité" },

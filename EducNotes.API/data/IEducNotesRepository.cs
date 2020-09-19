@@ -100,7 +100,7 @@ namespace EducNotes.API.Data
     Task<IEnumerable<PaymentType>> GetPaymentTypes();
     Task<IEnumerable<ClassLevel>> GetClasslevels();
     Task<IEnumerable<Bank>> GetBanks();
-    Task<bool> ValidateTuition(decimal finOpAmount, int orderId);
+    // Task<bool> ValidateTuition(int orderId);
     Task<Email> SetDataForConfirmTeacherEmail(ConfirmTeacherEmailDto emailData, string body, string subject);
     Task<List<FinOpDto>> GetOrderPayments(int orderId);
     Task<List<OrderLineDto>> GetOrderLines(int orderId);

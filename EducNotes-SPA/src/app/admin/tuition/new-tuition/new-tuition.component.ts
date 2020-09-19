@@ -365,6 +365,7 @@ export class NewTuitionComponent implements OnInit {
     this.tuitionFee[index] = price;
     const dp = this.dpPct * price;
     this.downPayment[index] = dp;
+    // console.log(this.downPayment);
     this.setAmountDue();
     this.setOrderAmount();
   }
@@ -373,7 +374,9 @@ export class NewTuitionComponent implements OnInit {
     this.amountDue = 0;
     for (let i = 0; i < this.downPayment.length; i++) {
       const dp = this.downPayment[i];
+      // console.log('regfee:' + this.regFee);
       this.amountDue = this.amountDue + Number(dp) + this.regFee;
+      // console.log('dp:' + dp + 'adue:' + this.amountDue);
     }
   }
 
@@ -432,7 +435,6 @@ export class NewTuitionComponent implements OnInit {
       this.alertify.success('l\'inscription a bien été enregistrée');
       this.orderid = data.orderId;
       this.orderlines = data.orderlines;
-      // this.invoiceid = data.invoiceId;
     }, error => {
       this.alertify.error(error);
       this.wait = false;
@@ -442,7 +444,6 @@ export class NewTuitionComponent implements OnInit {
       this.showTuitionForm = false;
       this.showPaymentForm = true;
       this.wait = false;
-      console.log(this.orderlines);
       for (let i = 0; i < this.orderlines.length; i++) {
         const line = this.orderlines[i];
         this.addPaymentItem(0, 0, line.id, line.childLastName, line.childFirstName, line.productId, line.productName, line.dueAmount);
@@ -471,7 +472,7 @@ export class NewTuitionComponent implements OnInit {
       payments = [...payments, pay];
     }
     paydata.payments = payments;
-    this.paymentService.addFinOp(paydata).subscribe(() => {
+    this.paymentService.addTuitionPayment(paydata).subscribe(() => {
       this.alertify.success('paiment effectué avec succès');
       this.router.navigate(['/tuitions']);
     }, error => {

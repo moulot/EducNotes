@@ -327,7 +327,16 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.DueDate, opt => {
                     opt.MapFrom(src => src.DueDate.ToString("dd/MM/yyyy", frC));
                 });
-            // CreateMap<PhotoForCreationDto, Fichier>();
+            CreateMap<ClassLevelProduct, ClasslevelProductDto>()
+                .ForMember(dest => dest.ProductName, opt => {
+                    opt.MapFrom(src => src.Product.Name);
+                })
+                .ForMember(dest => dest.LevelName, opt => {
+                    opt.MapFrom(src => src.ClassLevel.Name);
+                })
+                .ForMember(dest => dest.DsplSeq, opt => {
+                    opt.MapFrom(src => src.ClassLevel.DsplSeq);
+                });
             CreateMap<Absence, AbsenceForCallSheetDto>()
                 .ForMember(dest => dest.strStartDate, opt => {
                     opt.MapFrom(src => src.StartDate.ToString("dd/MM/yyyy", frC));
