@@ -1,8 +1,9 @@
 export interface OrderLineDeadline {
   id: number;
   orderLineId: number;
-  percent:number;
+  percent: number;
   amount: number;
+  productFee: number;
   dueDate: Date;
   strDueDate: string;
   deadlineName: string;

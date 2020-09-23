@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Utils } from 'src/app/shared/utils';
-import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder, FormArray } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PaymentService } from 'src/app/_services/payment.service';
-import { TuitionChildData } from 'src/app/_models/tuitionChildData';
 import { TuitionData } from 'src/app/_models/tuitionData';
-import { OrderService } from 'src/app/_services/order.service';
 
 @Component({
   selector: 'app-add-payment',
@@ -31,22 +29,25 @@ export class AddPaymentComponent implements OnInit {
   payCheque = environment.payCheque;
   payWire = environment.payWire;
   paytypes: any;
-  order: any;
+  userFile: any;
   childid: any;
+  showInfos = false;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
     private router: Router, private paymentService: PaymentService,
     private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.route.data.subscribe(data => {
-      this.order = data['order'];
+    this.route.data.subscribe((data: any) => {
+      this.userFile = data['file'];
     });
     this.route.params.subscribe(params => {
       this.childid = params['id'];
     });
     this.createPaymentForm();
     this.getPaymentData();
+    this.addPaymentItem(0, 0, this.userFile.orderLineId, '', '', 0, '', 0);
+    this.orderid = this.userFile.orderId;
   }
 
   getPaymentData() {
@@ -63,6 +64,10 @@ export class AddPaymentComponent implements OnInit {
     });
   }
 
+  toggleInfos() {
+    this.showInfos = !this.showInfos;
+  }
+
   createPaymentForm() {
     this.paymentForm = this.fb.group({
       typeid: [null, Validators.required],
@@ -71,7 +76,8 @@ export class AddPaymentComponent implements OnInit {
       bankid: [0],
       numCheque: [''],
       refDoc: [''],
-      note: ['']
+      note: [''],
+      payments: this.fb.array([])
     }, {validator: this.paymentValidator});
   }
 
@@ -90,6 +96,24 @@ export class AddPaymentComponent implements OnInit {
     return null;
   }
 
+  addPaymentItem(id, finOpId, orderlineId, lname, fname, prodid, prodname, lineamnt): void {
+    const courses = this.paymentForm.get('payments') as FormArray;
+    courses.push(this.createPaymentItem(id, finOpId, orderlineId, lname, fname, prodid, prodname, lineamnt));
+  }
+
+  createPaymentItem(id, finOpId, orderlineId, lname, fname, prodid, prodname, amnt): FormGroup {
+    return this.fb.group({
+      id: id,
+      finOpId: finOpId,
+      orderLineId: orderlineId,
+      childlname: lname,
+      childfname: fname,
+      prodid: prodid,
+      prodname: prodname,
+      amount: amnt
+    });
+  }
+
   savePayment() {
     this.wait = true;
     const paydata = <any>{};
@@ -103,9 +127,13 @@ export class AddPaymentComponent implements OnInit {
     paydata.refDoc = this.paymentForm.value.refDoc;
     paydata.note = this.paymentForm.value.note;
     paydata.bankId = this.paymentForm.value.bankid;
+    const elt = this.paymentForm.value.payments[0];
+    const payments = [{id: elt.id, finOpId: elt.finOpId, orderLineId: elt.orderLineId, childLastName: elt.childlname,
+      childFirstName: elt.childfname, productId: elt.prodid, productName: elt.prodname, amount: paydata.amount}];
+    paydata.payments = payments;
     this.paymentService.addTuitionPayment(paydata).subscribe(() => {
       this.alertify.success('paiment effectué avec succès');
-      this.router.navigate(['/tuitions']);
+      this.router.navigate(['/userFile', this.childid]);
     }, error => {
       this.alertify.error(error);
       this.wait = false;

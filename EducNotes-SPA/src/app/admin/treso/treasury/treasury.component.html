@@ -11,7 +11,7 @@
     <div class="card">
       <div class="card-body p-1 text-center">
         <div class="text-15">montant facturé</div>
-        <div class="text-17 text-success text-sucess">{{invoiced}} F CFA</div>
+        <div class="text-17 text-success text-sucess">{{invoiced | number: '1.0-0': 'fr-FR'}} F CFA</div>
       </div>
     </div>
   </div>
@@ -19,7 +19,7 @@
     <div class="card">
       <div class="card-body p-1 text-center">
         <div class="text-15">montant encaissé</div>
-        <div class="text-17 text-success text-sucess">{{cashed}} F CFA</div>
+        <div class="text-17 text-success text-sucess">{{cashed | number: '1.0-0': 'fr-FR'}} F CFA</div>
       </div>
     </div>
   </div>
@@ -27,7 +27,7 @@
     <div class="card">
       <div class="card-body p-1 text-center">
         <div class="text-15">en cours de validation</div>
-        <div class="text-17 text-success text-danger">{{toBeValidated}} F CFA</div>
+        <div class="text-17 text-success text-danger">{{toBeValidated | number: '1.0-0': 'fr-FR'}} F CFA</div>
       </div>
     </div>
   </div>
@@ -35,56 +35,56 @@
     <div class="card">
       <div class="card-body p-1 text-center">
         <div class="text-15">solde à payer</div>
-        <div class="text-17 text-success text-danger">{{tuitionBalance}} F CFA</div>
+        <div class="text-17 text-success text-danger">{{tuitionBalance | number: '1.0-0': 'fr-FR'}} F CFA</div>
       </div>
     </div>
   </div>
 
   <div class="col-md-2 my-2">
     <div class="card">
-      <div class="card-body p-2 text-center">
-        <div class="text-15">recouvrement</div>
-        <div class="text-15 text-danger">117.345.000 F CFA</div>
+      <div class="card-body p-1 text-center">
+        <div class="text-15">en recouvrement</div>
+        <div class="text-15 text-danger">{{lateAmount | number: '1.0-0': 'fr-FR'}} F CFA</div>
       </div>
     </div>
   </div>
   <div class="col-md-2 my-2">
     <div class="card">
-      <div class="card-body p-2 text-center">
+      <div class="card-body p-1 text-center">
         <div class="text-15">7 jours</div>
-        <div class="text-15">17.345.000 F CFA</div>
+        <div class="text-15">{{lateAmount7Days | number: '1.0-0': 'fr-FR'}} F CFA</div>
       </div>
     </div>
   </div>
   <div class="col-md-2 my-2">
     <div class="card">
-      <div class="card-body p-2 text-center">
+      <div class="card-body p-1 text-center">
         <div class="text-15">15 jours</div>
-        <div class="text-15">222.345.000 F CFA</div>
+        <div class="text-15">{{lateAmount15Days | number: '1.0-0': 'fr-FR'}} F CFA</div>
       </div>
     </div>
   </div>
   <div class="col-md-2 my-2">
     <div class="card">
-      <div class="card-body p-2 text-center">
+      <div class="card-body p-1 text-center">
         <div class="text-15">30 jours</div>
-        <div class="text-15">17.345.000 F CFA</div>
+        <div class="text-15">{{lateAmount30Days | number: '1.0-0': 'fr-FR'}} F CFA</div>
       </div>
     </div>
   </div>
   <div class="col-md-2 my-2">
     <div class="card">
-      <div class="card-body p-2 text-center">
+      <div class="card-body p-1 text-center">
         <div class="text-15">60 jours</div>
-        <div class="text-15">27.345.000 F CFA</div>
+        <div class="text-15">{{lateAmount60Days | number: '1.0-0': 'fr-FR'}} F CFA</div>
       </div>
     </div>
   </div>
   <div class="col-md-2 my-2">
     <div class="card">
-      <div class="card-body p-2 text-center">
+      <div class="card-body p-1 text-center">
         <div class="text-15">60+ jours</div>
-        <div class="text-15">27.345.000 F CFA</div>
+        <div class="text-15">{{lateAmount60DaysPlus | number: '1.0-0': 'fr-FR'}} F CFA</div>
       </div>
     </div>
   </div>

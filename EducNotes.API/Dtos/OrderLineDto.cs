@@ -14,6 +14,7 @@ namespace EducNotes.API.Dtos
     public int NbDaysLate { get; set; }
     public int ProductId { get; set; }
     public string ProductName { get; set; }
+    public decimal TuitionAmount { get; set; }
     public int Qty { get; set; }
     public decimal UnitPrice { get; set; }
     public decimal TotalHT { get; set; }
@@ -33,12 +34,12 @@ namespace EducNotes.API.Dtos
     public string ClassLevelName { get; set; }
     public int ChildClassId { get; set; }
     public string ChildClassName { get; set; }
-    public byte Validated { get; set; }
-    public byte Paid { get; set; }
-    public byte Expired { get; set; }
-    public byte Overdue { get; set; }
-    public byte Cancelled { get; set; }
-    public byte Completed { get; set; }
+    public Boolean Validated { get; set; }
+    public Boolean Paid { get; set; }
+    public Boolean Expired { get; set; }
+    public Boolean Overdue { get; set; }
+    public Boolean Cancelled { get; set; }
+    public Boolean Completed { get; set; }
     public List<OrderLineDeadlineDto> Payments { get; set; }
   }
 }

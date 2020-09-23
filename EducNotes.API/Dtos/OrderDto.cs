@@ -27,10 +27,12 @@ namespace EducNotes.API.Dtos
     public decimal TVAAmount { get; set; }
     public decimal AmountTTC { get; set; }
     public string strAmountTTC { get; set; }
+    public decimal DownPayment { get; set; }
     public decimal AmountInvoiced { get; set; }
     public string strAmountInvoiced { get; set; }
     public decimal AmountPaid { get; set; }
     public string strAmountPaid { get; set; }
+    public decimal DueAmount { get; set; }
     public decimal Balance { get; set; }
     public string strBalance { get; set; }
     public int ChildId { get; set; }
@@ -38,6 +40,7 @@ namespace EducNotes.API.Dtos
     public string ChildFirstName { get; set; }
     public int ChildClassId { get; set; }
     public string ChildClassName { get; set; }
+    public string ChildLevelName { get; set; }
     public int FatherId { get; set; }
     public string FatherLastName { get; set; }
     public string FatherFirstName { get; set; }
@@ -48,6 +51,7 @@ namespace EducNotes.API.Dtos
     public string MotherFirstName { get; set; }
     public string MotherCell { get; set; }
     public string MotherEmail { get; set; }
+    public int NbPayRejected { get; set; }
     public byte Status { get; set; }
     public Boolean isReg { get; set; }
     public Boolean isNextReg { get; set; }

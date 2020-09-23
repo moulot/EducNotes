@@ -1,13 +1,17 @@
+<div class="d-flex">
+  <i class="fad fa-file-user fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+  <div class="text-19">
+    dossier {{userFile.idNum}} - enfant <span class="text-capitalize">{{userFile.lastName}} {{userFile.firstName}}</span>
+  </div>
+</div>
 <div class="d-none d-md-block border rounded-lg p-2">
   <div *ngIf="showInfos" class="row animated zoomIn">
-    <div class="col-md-12 d-flex my-1">
-      <div class="">
-        <a (click)="toggleInfos()">
-          <i class="fad fa-minus-square fa-1x mr-1" style="--fa-secondary-opacity: 1;
-            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-        </a>
-      </div>
-      <div class="text-14"><b>infos du compte</b></div>
+    <div class="col-md-12">
+      <a class="d-flex" (click)="toggleInfos()">
+        <i class="fad fa-minus-square fa-&x mr-1 my-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+        <div class="text-14"><b>infos du compte</b></div>
+      </a>
     </div>
     <div class="col-md-12"><hr class="my-1"></div>
     <div class="col-md-1">
@@ -28,8 +32,8 @@
         <span class="pl-2">email: <span style="color: #192C47;">{{userFile.motherEmail}}</span></span>
       </div>
     </div>
-    <div class="col-md-12"><hr class="my-1"></div>
-    <div class="col-md-12 text-15 mb-1"><b>frères et soeurs</b></div>
+    <div *ngIf="userFile.siblings.length > 0" class="col-md-12"><hr class="my-1"></div>
+    <div *ngIf="userFile.siblings.length > 0" class="col-md-12 text-15 mb-1"><b>frères et soeurs</b></div>
     <div class="col-md-4 mb-1" *ngFor="let child of userFile.siblings">
       <div class="border rounded-lg p-1">
         <div class="row">
@@ -39,6 +43,9 @@
           <div class="col-md-10 my-auto pl-1 d-none d-md-block">
             <span class="text-16 font-weight-500 text-capitalize" style="color: #192C47;">
               {{child.lastName}} {{child.firstName}}</span> ({{child.age}} ans) - classe de {{child.className || child.classLevelName}}.
+            <div class="col-md-12 d-none d-md-block text-right">
+              <a (click)="changeUserFile(child.id)"><u class="text-small text-danger">voir dossier</u></a> 
+            </div>  
           </div>
         </div>
       </div>
@@ -46,20 +53,20 @@
   </div>
   <div *ngIf="!showInfos" class="row animated zoomIn">
     <div class="col-md-12 d-flex">
-      <div class="my-1">
-        <a (click)="toggleInfos()">
-          <i class="fad fa-plus-square fa-1x my-1 mr-1" style="--fa-secondary-opacity: 1;
-            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-        </a>
-      </div>
-      <div>
-        <b>voir détails du dossier</b>
-        <span class="text-17 text-capitalize ml-2">{{userFile.lastName}} {{userFile.firstName}}</span> ({{userFile.age}} ans) - classe de {{userFile.className || userFile.classLevelName}}
+      <a class="d-flex" (click)="toggleInfos()">
+        <i class="fad fa-plus-square fa-1x mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+        <div class="text-14">
+          <b>voir détails du dossier</b>
+        </div>
+      </a>
+      <div class="text-15">
+        <span class="text-capitalize ml-2 mt-0">{{userFile.lastName}} {{userFile.firstName}}</span> ({{userFile.age}} ans) - classe de {{userFile.className || userFile.classLevelName}}
       </div>
     </div>
   </div>
 </div>
-<div class="d-md-none border rounded-lg p-2" style="border: 1px solid blue;">
+<div class="d-md-none border rounded-lg p-2">
   <div *ngIf="showInfos" class="row animated zoomIn">
     <div class="col-md-12 d-flex my-1">
       <div class="">

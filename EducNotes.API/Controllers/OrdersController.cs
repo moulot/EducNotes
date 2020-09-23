@@ -101,20 +101,35 @@ namespace EducNotes.API.Controllers
                           .FirstOrDefaultAsync(t => t.isReg && (t.MotherId == motherId || t.FatherId == fatherId));
       var tuition = _mapper.Map<OrderDto>(order);
 
-      tuition.Lines = await _repo.GetOrderLines(tuition.Id);
-      // tuition.Payments = await _repo.GetOrderPayments(tuition.Id);
-      tuition.LinePayments = await _repo.GetChildPayments(id);
-
-      tuition.AmountInvoiced = tuition.LinePayments.Where(f => f.FinOpTypeId == finOpTypeInvoice).Sum(a => a.Amount);
-      tuition.strAmountInvoiced = tuition.AmountInvoiced.ToString("N0") + " F";
+      var lines = await _repo.GetOrderLines(tuition.Id);
+      tuition.Lines = _mapper.Map<List<OrderLineDto>>(lines);
+      var payments = await _repo.GetChildPayments(id);
+      tuition.NbPayRejected = payments.Where(p => p.FinOp.Rejected).Count();
+      tuition.LinePayments = _mapper.Map<List<PaymentDto>>(payments);
       tuition.AmountPaid = tuition.LinePayments.Where(f => f.FinOpTypeId == finOpTypePayment && f.Cashed).Sum(a => a.Amount);
       tuition.strAmountPaid = tuition.AmountPaid.ToString("N0") + " F";
+      for (int i = 0; i < tuition.Lines.Count(); i++)
+      {
+        var line = tuition.Lines[i];
+        tuition.Lines[i].DueAmount = await _repo.GetChildDueAmount(line.Id, tuition.AmountPaid);
+      }
+
+      tuition.ChildLevelName = tuition.Lines.Where(c => c.ChildId == id).First().ClassLevelName;
+
+      tuition.AmountInvoiced = tuition.Lines.Where(f => f.ChildId == id).Sum(a => a.AmountTTC);
+      tuition.strAmountInvoiced = tuition.AmountInvoiced.ToString("N0") + " F";
       tuition.Balance = tuition.AmountInvoiced - tuition.AmountPaid;
       tuition.strBalance = tuition.Balance.ToString("N0") + " F";
       tuition.AmountToValidate = tuition.LinePayments
                                 .Where(p => p.FinOpTypeId == finOpTypePayment && p.Cashed == false && p.Rejected == false)
                                 .Sum(s => s.Amount);
       tuition.strAmountToValidate = tuition.AmountToValidate.ToString("N0") + " F";
+      var lineDeadline = await _context.OrderLineDeadlines
+                              .Where(l => l.OrderLine.ChildId == id)
+                              .OrderBy(o => o.DueDate)
+                              .FirstAsync();
+      tuition.DownPayment = lineDeadline.Amount + lineDeadline.ProductFee;
+      tuition.Validated = (await _context.Users.Where(u => u.Id == id).FirstAsync()).Validated;
 
       return Ok(tuition);
     }
@@ -125,7 +140,8 @@ namespace EducNotes.API.Controllers
       var orderFromRepo = await _repo.GetOrder(id);
       var order = _mapper.Map<OrderDto>(orderFromRepo);
 
-      order.Lines = await _repo.GetOrderLines(order.Id);
+      var lines = await _repo.GetOrderLines(order.Id);
+      order.Lines = _mapper.Map<List<OrderLineDto>>(lines);
       order.Payments = await _repo.GetOrderPayments(order.Id);
 
       order.AmountPaid = order.Payments.Where(f => f.Cashed).Sum(a => a.Amount);
@@ -144,37 +160,31 @@ namespace EducNotes.API.Controllers
       var today = DateTime.Now.Date;
 
       // invoiced amount
-      var invoicedFromDB = await _context.Orders.Where(o => o.Validated == true).SumAsync(s => s.AmountTTC);
-      string invoiced = invoicedFromDB.ToString("N0");
+      var invoiced = await _context.Orders.Where(o => o.Validated == true).SumAsync(s => s.AmountTTC);
+      // string invoiced = invoicedFromDB.ToString("N0");
       // cashed amount
-      var cashedFromDB = await _context.FinOps
+      var cashed = await _context.FinOps
                                 .Where(o => o.Cashed == true && o.FinOpTypeId == finOpTypePayment)
                                 .SumAsync(s => s.Amount);
-      var cashed = cashedFromDB.ToString("N0");
+      // var cashed = cashedFromDB.ToString("N0");
       // in validation amount
-      var toBeValidatedFromDB = await _context.FinOps
+      var toBeValidated = await _context.FinOps
                                 .Where(o => o.Cashed == false && o.Rejected == false && o.FinOpTypeId == finOpTypePayment)
                                 .SumAsync(s => s.Amount);
-      var toBeValidated = toBeValidatedFromDB.ToString("N0");
+      // var toBeValidated = toBeValidatedFromDB.ToString("N0");
       // outstanding balance
-      var balanceFromDB = await _context.OrderLineHistories.Where(f => f.Cashed == true).SumAsync(b => b.Delta);
-      string balance = balanceFromDB.ToString("N0");
-
-      //n day late outstanding balance
-      var from7dayToToday = today.AddDays(-7);
-      var from15dayToToday = today.AddDays(-15);
-      var from30dayToToday = today.AddDays(-30);
-      var b7day = await _context.OrderHistories.Include(i => i.Order)
-                        .Where(b => b.Order.Validity <= today && b.Order.Validity >= from7dayToToday).ToListAsync();
-      var balance7day = b7day.Sum(b => b.Delta);
-      var b15day = await _context.OrderHistories.Include(i => i.Order)
-                        .Where(b => b.Order.Validity <= today && b.Order.Validity >= from15dayToToday).ToListAsync();
-      var balance15day = b15day.Sum(b => b.Delta);
+      var balance = await _context.OrderLineHistories.Where(f => f.Cashed == true).SumAsync(b => b.Delta);
+      // string balance = balanceFromDB.ToString("N0");
 
       decimal todayDueAmount = 0;
+      decimal lateAmount7Days = 0;
+      decimal lateAmount15Days = 0;
+      decimal lateAmount30Days = 0;
+      decimal lateAmount60Days = 0;
+      decimal lateAmount60DaysPlus = 0;
       // get amount due today
       var lines = await _context.OrderLines.ToListAsync();
-      foreach (var line in lines)
+      foreach(var line in lines)
       {
         decimal lineDueAmount = 0;
         var lineDeadlines = await _context.OrderLineDeadlines
@@ -187,7 +197,20 @@ namespace EducNotes.API.Controllers
           {
             if(lineD.DueDate.Date <= today)
             {
-              lineDueAmount += lineD.Amount;
+              lineDueAmount += lineD.Amount + lineD.ProductFee;
+
+              // split late amount in amounts of days late
+              var nbDaysLate = (today - lineD.DueDate.Date).TotalDays;
+              if(nbDaysLate <= 7)
+                lateAmount7Days += lineDueAmount;
+              else if(nbDaysLate > 7 && nbDaysLate <= 15)
+                lateAmount15Days += lineDueAmount;
+              else if(nbDaysLate > 15 && nbDaysLate <= 30)
+                lateAmount30Days += lineDueAmount;
+              else if(nbDaysLate > 30 && nbDaysLate <= 60)
+                lateAmount60Days += lineDueAmount;
+              else if(nbDaysLate > 60)
+                lateAmount60DaysPlus += lineDueAmount;
             }
           }
           todayDueAmount += lineDueAmount;
@@ -197,19 +220,108 @@ namespace EducNotes.API.Controllers
           if(line.Deadline.Date <= today)
           {
             todayDueAmount += line.AmountTTC;
+
+            // split late amount in amounts of days late
+            var nbDaysLate = (today - line.Deadline.Date).TotalDays;
+            if(nbDaysLate <= 7)
+              lateAmount7Days += lineDueAmount;
+            else if(nbDaysLate > 7 && nbDaysLate <= 15)
+              lateAmount15Days += lineDueAmount;
+            else if(nbDaysLate > 15 && nbDaysLate <= 30)
+              lateAmount30Days += lineDueAmount;
+            else if(nbDaysLate > 30 && nbDaysLate <= 60)
+              lateAmount60Days += lineDueAmount;
+            else if(nbDaysLate > 60)
+              lateAmount60DaysPlus += lineDueAmount;
           }
         }
       }
+
       decimal amountPaid = await _context.FinOpOrderLines.Where(f => f.FinOp.Cashed == true).SumAsync(s => s.Amount);
       decimal lateAmount = Math.Abs(amountPaid - todayDueAmount);
+      
+      decimal paidBalance = amountPaid;
+      if(paidBalance > 0 && lateAmount60DaysPlus > 0)
+      {
+        if(paidBalance >= lateAmount60DaysPlus)
+        {
+          lateAmount60DaysPlus = 0;
+          paidBalance -= lateAmount60DaysPlus;
+        }
+        else
+        {
+          lateAmount60DaysPlus -= paidBalance;
+          paidBalance = 0;
+        }
+      }
+
+      if(paidBalance > 0 && lateAmount60Days > 0)
+      {
+        if(paidBalance >= lateAmount60Days)
+        {
+          lateAmount60Days = 0;
+          paidBalance -= lateAmount60Days;
+        }
+        else
+        {
+          lateAmount60Days -= paidBalance;
+          paidBalance = 0;
+        }
+      }
+
+      if(paidBalance > 0 && lateAmount30Days > 0)
+      {
+        if(paidBalance >= lateAmount30Days)
+        {
+          lateAmount30Days = 0;
+          paidBalance -= lateAmount30Days;
+        }
+        else
+        {
+          lateAmount30Days -= paidBalance;
+          paidBalance = 0;
+        }
+      }
+
+      if(paidBalance > 0 && lateAmount15Days > 0)
+      {
+        if(paidBalance >= lateAmount15Days)
+        {
+          lateAmount15Days = 0;
+          paidBalance -= lateAmount15Days;
+        }
+        else
+        {
+          lateAmount15Days -= paidBalance;
+          paidBalance = 0;
+        }
+      }
+
+      if(paidBalance > 0 && lateAmount7Days > 0)
+      {
+        if(paidBalance >= lateAmount7Days)
+        {
+          lateAmount7Days = 0;
+          paidBalance -= lateAmount7Days;
+        }
+        else
+        {
+          lateAmount7Days -= paidBalance;
+          paidBalance = 0;
+        }
+      }
 
       return Ok(new {
         invoiced,
         toBeValidated,
         cashed,
         openBalance = balance,
-        balanceFromDB,
-        lateAmount
+        lateAmount,
+        lateAmount7Days,
+        lateAmount15Days,
+        lateAmount30Days,
+        lateAmount60Days,
+        lateAmount60DaysPlus
       });
     }
 
@@ -327,6 +439,8 @@ namespace EducNotes.API.Controllers
               orderDeadline.OrderLineId = line.Id;
               orderDeadline.Percent = Pct;
               orderDeadline.Amount = amount;
+              if(seq == 1)
+                orderDeadline.ProductFee = line.ProductFee;
               orderDeadline.DueDate = deadline.DueDate;
               orderDeadline.Seq = seq;
               _repo.Add(orderDeadline);

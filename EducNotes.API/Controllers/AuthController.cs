@@ -508,13 +508,14 @@ namespace EducNotes.API.Controllers
             user.UserName = userData.UserName.ToLower();
             user.NormalizedUserName = userData.UserName.ToUpper();
             user.PasswordHash = newPassword;
-            user.Validated = true;
+            user.AccountDataValidated = true;
             user.ValidationDate = DateTime.Now;
             var res = await _userManager.UpdateAsync(user);
             if (res.Succeeded)
             {
               var template = await _context.EmailTemplates.FirstAsync(t => t.Id == updateAccountEmailId);
-              var email = await _repo.SetEmailForAccountUpdated(template.Subject, template.Body, user.LastName, user.Gender, user.Email);
+              var email = await _repo.SetEmailForAccountUpdated(template.Subject, template.Body,
+                user.LastName, user.Gender, user.Email);
               _context.Add(email);
 
               var userToReturn = _mapper.Map<UserForListDto>(user);

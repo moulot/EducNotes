@@ -123,8 +123,8 @@ namespace EducNotes.API.Controllers
               _context.SaveChanges();
 
               // registration validation
-              var line = await _context.OrderLines.FirstAsync(l => l.Id == payment.OrderLineId);
-              if(!line.Validated)
+              var line = await _context.OrderLines.FirstAsync(o => o.Id == payment.OrderLineId);
+              if(!line.Validated && finOp.Cashed)
               {
                 var regFee = line.ProductFee;
                 var firstdeadline = await _context.OrderLineDeadlines
@@ -133,10 +133,17 @@ namespace EducNotes.API.Controllers
                                           .FirstAsync();
                 var amount = firstdeadline.Amount;
                 var downpayment = regFee + amount;
-                if(payment.Amount >= downpayment)
+                var allPaid = await _context.FinOpOrderLines
+                                    .Where(f => f.FinOp.Cashed && f.OrderLineId == line.Id).SumAsync(s => s.Amount);
+                if(allPaid >= downpayment)
                 {
                   line.Validated = true;
                   _repo.Update(line);
+
+                  // validate user tuition
+                  var child = await _context.Users.FirstAsync(u => u.Id == line.ChildId);
+                  child.Validated = true;
+                  _repo.Update(child);
                 }
                 else
                 {
@@ -232,9 +239,17 @@ namespace EducNotes.API.Controllers
 
         if(finOp.Cashed == true)
         {
-          var lineHistories = await _context.OrderLineHistories.Where(f => f.FinOpId == finOp.Id).ToListAsync();
+          var lineHistories = await _context.OrderLineHistories
+                                    .Include(i => i.OrderLine)
+                                    .Where(f => f.FinOpId == finOp.Id).ToListAsync();
           foreach (var line in lineHistories)
           {
+            // validate user tuition
+            var child = await _context.Users
+                              .FirstAsync(u => u.Id == line.OrderLine.ChildId);
+            child.Validated = true;
+            _repo.Update(child);
+
             var lineHistory = await _context.OrderLineHistories.FirstOrDefaultAsync(o => o.Id == line.Id);
             if(lineHistory != null)
             {
@@ -251,7 +266,7 @@ namespace EducNotes.API.Controllers
         return NoContent();
       }
 
-      return BadRequest("problème pour mettre à jour les status");
+      return BadRequest("problème pour mettre à jour les paiements");
     }
 
   }

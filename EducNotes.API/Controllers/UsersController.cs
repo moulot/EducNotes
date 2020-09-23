@@ -180,6 +180,7 @@ namespace EducNotes.API.Controllers
           userFile.Id = childId;
           userFile.LastName = child.LastName;
           userFile.FirstName = child.FirstName;
+          userFile.idNum = child.idNum;
           userFile.Email = child.Email;
           userFile.ClassLevelId = child.ClassLevelId;
           userFile.ClassLevelName = child.ClassLevelName;
@@ -235,6 +236,13 @@ namespace EducNotes.API.Controllers
             siblingsFromRepo.Remove(childFromRepo);
             userFile.Siblings = _mapper.Map<List<UserForDetailedDto>>(siblingsFromRepo);
           }
+
+          var line = await _context.OrderLines
+                            .Include(i => i.Order)
+                            .Where(l => l.Order.isReg && l.ChildId == childId)
+                            .FirstAsync();
+          userFile.OrderId = line.OrderId;
+          userFile.OrderLineId = line.Id;
 
           return Ok(userFile);
         }

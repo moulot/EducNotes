@@ -656,7 +656,7 @@ namespace EducNotes.API.Data
                 child.PasswordHash = newPassword;
                 if(child.Email != "" && child.Email != null)
                   child.EmailConfirmed = true;
-                child.Validated = true;
+                child.AccountDataValidated = true;
                 Update(child);
                 resultStatus = true;
 
@@ -2394,7 +2394,7 @@ namespace EducNotes.API.Data
         {
           int randomVal = 300631;
           int val = userId * 2 + randomVal;
-          string idNum = lastName.Substring(0, 1) + firstName.Substring(0,1) + val.ToString().To5Digits();
+          string idNum = lastName.Substring(0, 1).ToUpper() + firstName.Substring(0,1).ToUpper() + val.ToString().To5Digits();
           return idNum;
         }
 
@@ -2537,9 +2537,9 @@ namespace EducNotes.API.Data
           return order;
         }
 
-        public async Task<List<PaymentDto>> GetChildPayments(int childId)
+        public async Task<List<FinOpOrderLine>> GetChildPayments(int childId)
         {
-          var paymentsFromDB = await _context.FinOpOrderLines.Where(f => f.OrderLine.ChildId == childId)
+          var payments = await _context.FinOpOrderLines
                                       .Include(i => i.FinOp).ThenInclude(i => i.Cheque).ThenInclude(i => i.Bank)
                                       .Include(i => i.Invoice)
                                       .Include(i => i.FinOp).ThenInclude(i => i.PaymentType)
@@ -2547,8 +2547,9 @@ namespace EducNotes.API.Data
                                       .Include(i => i.FinOp).ThenInclude(i => i.FromCashDesk)
                                       .Include(i => i.FinOp).ThenInclude(i => i.ToBankAccount)
                                       .Include(i => i.FinOp).ThenInclude(i => i.ToCashDesk)
+                                      .Where(f => f.OrderLine.ChildId == childId)
+                                      .OrderBy(o => o.FinOp.FinOpDate)
                                       .ToListAsync();
-          var payments = _mapper.Map<List<PaymentDto>>(paymentsFromDB);
           return payments;
         }
 
@@ -2567,14 +2568,13 @@ namespace EducNotes.API.Data
           return payments;
         }
 
-        public async Task<List<OrderLineDto>> GetOrderLines(int orderId)
+        public async Task<List<OrderLine>> GetOrderLines(int orderId)
         {
-          var linesFromDB = await _context.OrderLines.Where(ol => ol.OrderId == orderId)
+          var lines = await _context.OrderLines.Where(ol => ol.OrderId == orderId)
                                     .Include(i => i.Child).ThenInclude(i => i.Photos)
                                     .Include(i => i.ClassLevel)
                                     .Include(i => i.Product)
                                     .ToListAsync();
-          var lines = _mapper.Map<List<OrderLineDto>>(linesFromDB);
           return lines;
         }
 
@@ -2609,66 +2609,24 @@ namespace EducNotes.API.Data
           return banks;
         }
 
-        // public async Task<bool> ValidateTuition(int orderId)
-        // {
-        //   var lines = await _context.OrderLines
-        //                     .Where(t => t.OrderId == orderId && t.Validated == false)
-        //                     .ToListAsync();
+        public async Task<decimal> GetChildDueAmount(int lineId, decimal paidAmount)
+        {
+          var orderDeadlines = await _context.OrderLineDeadlines
+                                    .Where(o => o.OrderLineId == lineId)
+                                    .OrderBy(o => o.DueDate)
+                                    .ToListAsync();
           
-        //   foreach (var line in lines)
-        //   {
-        //     var RegFee = line.ProductFee;
-        //     var deadlines = await _context.OrderLineDeadlines
-        //                             .OrderBy(o => o.DueDate)
-        //                             .Where(d => d.OrderLineId == line.Id).ToListAsync();
-        //     var amountPaid = await _context.FinOpOrderLines
-        //                             .Where(f => f.OrderLineId == line.Id)
-        //                             .SumAsync(s => s.Amount);
-        //   }
-        //   var lineIds = lines.Select(t => t.Id);
-        //   var totalRegFees = lines.Sum(f => f.ProductFee);
-        //   var order = await _context.Orders.FirstAsync(o => o.Id == orderId);
+          var today = DateTime.Now.Date;
+          decimal balance = paidAmount;
+          foreach(var lineD in orderDeadlines)
+          {
+            if(balance > lineD.Amount)
+            {
+              
+            }
+          }
+          return dueAmount;
+        }
 
-        //   // 1st DownPayment must be paid (+ registration fee) to validate a tuition
-        //   var totalDownPayments = await _context.OrderLineDeadlines.Where(d =>
-        //     lineIds.Contains(d.OrderLineId) && d.Seq == 1).SumAsync(o => o.Amount);
-        //   var validationAmnt = totalDownPayments + totalRegFees;
-
-        //   if(finOpAmount >= validationAmnt)
-        //   {
-        //     foreach (var line in lines)
-        //     {
-        //       line.Validated = true;
-        //     }
-        //     _context.UpdateRange(lines);
-        //     order.Validated = true;
-        //     _context.Update(order);
-        //   }
-        //   else
-        //   {
-        //     var balance = finOpAmount;
-        //     order.Validated = true;
-        //     foreach (var line in lines)
-        //     {
-        //       var tuitionDP = deadlines.First(t => t.OrderLineId == line.Id).Amount;
-        //       var amntToBePaid = line.ProductFee + tuitionDP;
-        //       if(balance >= amntToBePaid)
-        //       {
-        //         line.Validated = true;
-        //         balance -= amntToBePaid;
-        //       }
-        //       else
-        //       {
-        //         order.Validated = false;
-        //         break;
-        //       }
-        //     }
-        //     _context.UpdateRange(lines);
-        //     _context.Update(order);
-        //   }
-
-        //   await SaveAll();
-        //   return order.Validated;
-        // }
     }
 }

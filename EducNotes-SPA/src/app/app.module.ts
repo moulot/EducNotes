@@ -452,7 +452,6 @@ export function tokenGetter() {
       TabsModule.forRoot(),
       ButtonsModule.forRoot(),
       RouterModule.forRoot(appRoutes),
-      // ModalModule.forRoot(),
       ModalModule,
       NgxGalleryModule,
       FlipModule,

@@ -12,6 +12,7 @@ import { PaymentService } from 'src/app/_services/payment.service';
 })
 export class UserFileTuitionComponent implements OnInit {
   @Input() id: any;
+  @Input() showBtn: Boolean = true;
   tuition: any;
   payCash = environment.payCash;
   payCheque = environment.payCheque;
@@ -34,7 +35,7 @@ export class UserFileTuitionComponent implements OnInit {
   }
 
   addPayment() {
-    this.router.navigate(['addFinOp', this.tuition.id]);
+    this.router.navigate(['addFinOp', this.id]);
   }
 
 }

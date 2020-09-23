@@ -103,8 +103,9 @@ namespace EducNotes.API.Data
     // Task<bool> ValidateTuition(int orderId);
     Task<Email> SetDataForConfirmTeacherEmail(ConfirmTeacherEmailDto emailData, string body, string subject);
     Task<List<FinOpDto>> GetOrderPayments(int orderId);
-    Task<List<OrderLineDto>> GetOrderLines(int orderId);
+    Task<List<OrderLine>> GetOrderLines(int orderId);
     Task<List<User>> GetUsersByClasslevel(int levelId);
-    Task<List<PaymentDto>> GetChildPayments(int childId);
+    Task<List<FinOpOrderLine>> GetChildPayments(int childId);
+    Task<decimal> GetChildDueAmount(int orderLineId, decimal paidAmount);
   }
 }

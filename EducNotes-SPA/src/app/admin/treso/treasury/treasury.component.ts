@@ -18,6 +18,13 @@ export class TreasuryComponent implements OnInit {
   cashed: string;
   tuitionBalance: string;
   toBeValidated: string;
+  lateAmount: string;
+  lateAmount7Days: any;
+  lateAmount15Days: any;
+  lateAmount30Days: any;
+  lateAmount60Days: any;
+  lateAmount60DaysPlus: any;
+
 
   constructor(private authService: AuthService, private orderService: OrderService) { }
 
@@ -35,6 +42,12 @@ export class TreasuryComponent implements OnInit {
       this.cashed = data.cashed;
       this.tuitionBalance = data.openBalance;
       this.toBeValidated = data.toBeValidated;
+      this.lateAmount = data.lateAmount;
+      this.lateAmount7Days = data.lateAmount7Days;
+      this.lateAmount15Days = data.lateAmount15Days;
+      this.lateAmount30Days = data.lateAmount30Days;
+      this.lateAmount60Days = data.lateAmount60Days;
+      this.lateAmount60DaysPlus = data.lateAmount60DaysPlus;
     });
   }
 
