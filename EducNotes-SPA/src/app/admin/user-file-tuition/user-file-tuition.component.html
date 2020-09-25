@@ -3,7 +3,8 @@
     <div class="row">
       <div class="col-md-8 mb-2">
         <div class="text-16 mb-0">
-          <b>frais de scolarité pour la classe de {{tuition?.childLevelName}}: {{tuition?.amountInvoiced | number:'':'fr-FR'}} F</b>
+          frais de scolarité <b>{{tuition?.amountInvoiced | number:'':'fr-FR'}} F</b>. solde à payer: 
+          <span class="text-danger"><b>{{tuition?.balance | number:'':'fr-FR'}} F</b></span>
         </div>
       </div>
       <div *ngIf="showBtn" class="col-md-4 text-right">
@@ -46,7 +47,7 @@
           </div> -->
         </div>
         <div *ngIf="tuition?.validated" class="border rounded-lg p-2 text-15">
-          vous êtes à jour, merci!. la prochaine échéance est le XX/XX/XXXX. montant : {{tuition.dueAmount | number:'':'fr-FR'}} F.
+          vous êtes à jour, merci!. la prochaine échéance est le {{tuition.strNextDeadline}}. montant : {{tuition.nextDueAmount | number:'':'fr-FR'}} F.
         </div>
     </div>
       <!-- <div class="col-md-12 text-16"><b>élèves</b></div>

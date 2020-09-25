@@ -33,6 +33,8 @@ namespace EducNotes.API.Dtos
     public decimal AmountPaid { get; set; }
     public string strAmountPaid { get; set; }
     public decimal DueAmount { get; set; }
+    public decimal NextDueAmount { get; set; }
+    public string strNextDeadline { get; set; }
     public decimal Balance { get; set; }
     public string strBalance { get; set; }
     public int ChildId { get; set; }

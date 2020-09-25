@@ -9,4 +9,5 @@ export interface OrderLineDeadline {
   deadlineName: string;
   comment: string;
   seq: number;
+  paid: boolean;
 }

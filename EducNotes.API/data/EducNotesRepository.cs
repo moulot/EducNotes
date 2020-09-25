@@ -2609,24 +2609,33 @@ namespace EducNotes.API.Data
           return banks;
         }
 
-        public async Task<decimal> GetChildDueAmount(int lineId, decimal paidAmount)
+        public async Task<NextDueAmountDto> GetChildDueAmount(int lineId, decimal paidAmount)
         {
-          var orderDeadlines = await _context.OrderLineDeadlines
-                                    .Where(o => o.OrderLineId == lineId)
-                                    .OrderBy(o => o.DueDate)
-                                    .ToListAsync();
-          
           var today = DateTime.Now.Date;
-          decimal balance = paidAmount;
-          foreach(var lineD in orderDeadlines)
+
+          var lineDeadlines = await _context.OrderLineDeadlines
+                                      .Where(o => o.OrderLineId == lineId)
+                                      .OrderBy(o => o.DueDate)
+                                      .ToListAsync();
+          decimal dueAmountToday = lineDeadlines.Where(o => o.Paid == true).Sum(s => s.Amount + s.ProductFee);
+          var firstUnPaid = lineDeadlines.Where(o => o.Paid == false).FirstOrDefault();
+          if(firstUnPaid != null)
           {
-            if(balance > lineD.Amount)
-            {
-              
-            }
+            
           }
-          return dueAmount;
+          dueAmountToday += firstUnPaid.Amount + firstUnPaid.ProductFee;
+          var deadline = lineDeadlines.Where(o => o.Paid == false).First().DueDate;
+
+          NextDueAmountDto nextDueAmount = new NextDueAmountDto();
+          nextDueAmount.DueAmount = dueAmountToday - paidAmount;
+          nextDueAmount.Deadline = deadline;
+
+          return nextDueAmount;
         }
+
+        // public async Task<Boolean> ValidateChildren(int lineId)
+        // {
+        // }
 
     }
 }

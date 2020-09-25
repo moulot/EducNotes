@@ -19,5 +19,6 @@ namespace EducNotes.API.Models
     public string DeadlineName { get; set; }
     public string Comment { get; set; }
     public byte Seq { get; set; }
+    public Boolean Paid { get; set; }
   }
 }

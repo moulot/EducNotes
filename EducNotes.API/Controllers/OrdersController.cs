@@ -108,13 +108,15 @@ namespace EducNotes.API.Controllers
       tuition.LinePayments = _mapper.Map<List<PaymentDto>>(payments);
       tuition.AmountPaid = tuition.LinePayments.Where(f => f.FinOpTypeId == finOpTypePayment && f.Cashed).Sum(a => a.Amount);
       tuition.strAmountPaid = tuition.AmountPaid.ToString("N0") + " F";
-      for (int i = 0; i < tuition.Lines.Count(); i++)
-      {
-        var line = tuition.Lines[i];
-        tuition.Lines[i].DueAmount = await _repo.GetChildDueAmount(line.Id, tuition.AmountPaid);
-      }
 
-      tuition.ChildLevelName = tuition.Lines.Where(c => c.ChildId == id).First().ClassLevelName;
+      var child = tuition.Lines.Where(c => c.ChildId == id).First();
+      tuition.ChildLevelName = child.ClassLevelName;
+      if(!tuition.Completed)
+      {
+        var nextDueAmount = await _repo.GetChildDueAmount(child.Id, tuition.AmountPaid);
+        tuition.NextDueAmount = nextDueAmount.DueAmount;
+        tuition.strNextDeadline = nextDueAmount.Deadline.ToString("dd/MM/yyyy", frC);
+      }
 
       tuition.AmountInvoiced = tuition.Lines.Where(f => f.ChildId == id).Sum(a => a.AmountTTC);
       tuition.strAmountInvoiced = tuition.AmountInvoiced.ToString("N0") + " F";
@@ -160,21 +162,17 @@ namespace EducNotes.API.Controllers
       var today = DateTime.Now.Date;
 
       // invoiced amount
-      var invoiced = await _context.Orders.Where(o => o.Validated == true).SumAsync(s => s.AmountTTC);
-      // string invoiced = invoicedFromDB.ToString("N0");
+      var invoiced = await _context.Orders.SumAsync(s => s.AmountTTC);
       // cashed amount
       var cashed = await _context.FinOps
-                                .Where(o => o.Cashed == true && o.FinOpTypeId == finOpTypePayment)
-                                .SumAsync(s => s.Amount);
-      // var cashed = cashedFromDB.ToString("N0");
+                          .Where(o => o.Cashed == true && o.FinOpTypeId == finOpTypePayment)
+                          .SumAsync(s => s.Amount);
       // in validation amount
       var toBeValidated = await _context.FinOps
                                 .Where(o => o.Cashed == false && o.Rejected == false && o.FinOpTypeId == finOpTypePayment)
                                 .SumAsync(s => s.Amount);
-      // var toBeValidated = toBeValidatedFromDB.ToString("N0");
       // outstanding balance
       var balance = await _context.OrderLineHistories.Where(f => f.Cashed == true).SumAsync(b => b.Delta);
-      // string balance = balanceFromDB.ToString("N0");
 
       decimal todayDueAmount = 0;
       decimal lateAmount7Days = 0;
@@ -195,7 +193,7 @@ namespace EducNotes.API.Controllers
         {
           foreach (var lineD in lineDeadlines)
           {
-            if(lineD.DueDate.Date <= today)
+            if(lineD.DueDate.Date > today && !lineD.Paid)
             {
               lineDueAmount += lineD.Amount + lineD.ProductFee;
 

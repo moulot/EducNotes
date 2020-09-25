@@ -109,7 +109,7 @@ export class ValidatePaymentsComponent implements OnInit {
       }
       payments = [...payments, payment];
     }
-
+    console.log(payments);
     this.paymentService.updatePayments(payments).subscribe(() => {
       this.router.navigate(['/treasury']);
       this.alertify.success('les paiements ont été mis à jour');
