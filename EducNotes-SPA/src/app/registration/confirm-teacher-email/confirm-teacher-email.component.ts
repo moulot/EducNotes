@@ -106,7 +106,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
     const confirmPhone = <ConfirmEmailPhone>{};
     confirmPhone.userId = this.user.id.toString();
     confirmPhone.token = this.phoneForm.value.code;
-    this.accountService.validtePhone(confirmPhone).subscribe((data: any) => {
+    this.accountService.validatePhone(confirmPhone).subscribe((data: any) => {
       this.user = data.user;
       this.phoneOk = data.phoneOk;
       if (this.phoneOk) {

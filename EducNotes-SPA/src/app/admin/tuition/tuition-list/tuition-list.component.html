@@ -14,7 +14,7 @@
           <b>{{totalTuitionsOK | number: '1.0-0': 'fr-FR'}} / {{totalTuitions | number: '1.0-0': 'fr-FR'}} inscriptions validées</b>
         </div>
         <div class="col-md-9">
-          <b>{{amountOK | number: '1.0-0': 'fr-FR'}} F / {{amount | number: '1.0-0': 'fr-FR'}} F reçus</b>
+          <b>{{paid | number: '1.0-0': 'fr-FR'}} F reçus sur {{invoiced | number: '1.0-0': 'fr-FR'}} F</b>
         </div>
       </div>
     </div>
@@ -22,7 +22,7 @@
   <div class="col-md-6 mb-1" *ngFor="let level of tuitionList; let i = index">
     <div class="border rounded-lg p-2">
       <div class="row">
-        <div class="col-md-12 text-small"><a [routerLink]="['/tuitionDetails', level.classLevelId]">liste des élèves</a></div>
+        <div class="col-md-12 text-14"><a [routerLink]="['/tuitionDetails', level.classLevelId]">liste des élèves</a></div>
         <div class="col-md-3 text-15 text-muted pr-0">niveau {{level.classLevelName}}</div>
         <div class="col-md-4 text-15 pl-md-0">{{level.nbTuitionsOK}} / {{level.nbTuitions}} inscr. validées</div>
         <div class="col-md-5 text-15">{{level.strLevelAmountOK}}/{{level.strLevelAmount}}</div>

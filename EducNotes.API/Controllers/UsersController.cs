@@ -1871,6 +1871,7 @@ namespace EducNotes.API.Controllers
                             .Where(u => u.UserTypeId == studentTypeId && u.AccountDataValidated)
                             .Include(i => i.Photos)
                             .Include(i => i.Class)
+                            .Include(i => i.ClassLevel)
                             .Where(u => u.UserTypeId == studentTypeId)
                             .ToListAsync();
 
@@ -1881,6 +1882,8 @@ namespace EducNotes.API.Controllers
             string fname = user.FirstName == null ? "" : user.FirstName.ToLower().FirstLetterToUpper();
             string lname = user.LastName == null ? "" : user.LastName.ToLower().FirstLetterToUpper();
             string idNum = user.IdNum == null ? "" : user.IdNum;
+            int age = user.DateOfBirth.CalculateAge();
+            string levelname = user.ClassLevel.Name;
             string className = "";
             if(user.Class != null)
               className = user.Class.Name;
@@ -1892,10 +1895,12 @@ namespace EducNotes.API.Controllers
             sudd.FirstName = fname;
             sudd.LastName = lname;
             sudd.IDNum = idNum;
+            sudd.Age = age;
+            sudd.ClassLevelName = levelname;
             sudd.ClassName = className;
             sudd.PhotoUrl = photoUrl;
             data.Add(sudd);
-         }
+          }
 
           return Ok(data);
         }

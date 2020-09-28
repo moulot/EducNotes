@@ -8,8 +8,8 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class TuitionListComponent implements OnInit {
   tuitionList: any;
-  amount: any;
-  amountOK: any;
+  invoiced: any;
+  paid: any;
   totalTuitions: any;
   totalTuitionsOK: any;
 
@@ -19,8 +19,8 @@ export class TuitionListComponent implements OnInit {
     this.route.data.subscribe(data => {
       const listdata = data['list'];
       this.tuitionList = listdata.tuitionList;
-      this.amount = listdata.totalAmount;
-      this.amountOK = listdata.totalAmountOK;
+      this.invoiced = listdata.totalInvoiced;
+      this.paid = listdata.totalPaid;
       this.totalTuitions = listdata.totalTuitions;
       this.totalTuitionsOK = listdata.totalTuitionsOK;
     });

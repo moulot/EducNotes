@@ -2617,17 +2617,17 @@ namespace EducNotes.API.Data
                                       .Where(o => o.OrderLineId == lineId)
                                       .OrderBy(o => o.DueDate)
                                       .ToListAsync();
-          decimal dueAmountToday = lineDeadlines.Where(o => o.Paid == true).Sum(s => s.Amount + s.ProductFee);
+          decimal amountOK = lineDeadlines.Where(o => o.Paid == true).Sum(s => s.Amount + s.ProductFee);
+          var deadline = new DateTime();
           var firstUnPaid = lineDeadlines.Where(o => o.Paid == false).FirstOrDefault();
           if(firstUnPaid != null)
           {
-            
+            amountOK += firstUnPaid.Amount + firstUnPaid.ProductFee;
+            deadline = lineDeadlines.Where(o => o.Paid == false).First().DueDate;
           }
-          dueAmountToday += firstUnPaid.Amount + firstUnPaid.ProductFee;
-          var deadline = lineDeadlines.Where(o => o.Paid == false).First().DueDate;
 
           NextDueAmountDto nextDueAmount = new NextDueAmountDto();
-          nextDueAmount.DueAmount = dueAmountToday - paidAmount;
+          nextDueAmount.DueAmount = amountOK - paidAmount;
           nextDueAmount.Deadline = deadline;
 
           return nextDueAmount;

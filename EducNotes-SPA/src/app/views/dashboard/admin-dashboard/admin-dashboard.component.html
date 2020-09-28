@@ -43,7 +43,7 @@
               <img src="{{option.photoUrl || '../../../../../../assets/user.png'}}" alt="" style="width: 40px;" class="rounded-circle z-depth-0">
             </div>
             <div class="d-flex flex-column">
-              <strong>nom: {{ option.lastName }} {{ option.firstName }} ({{option.className}})</strong>
+              <strong>nom: {{ option.lastName }} {{ option.firstName }} ({{option.className || option.classLevelName}}) - {{option.age}} ans</strong>
               <small>matricule: {{ option.idNum }}</small>
             </div>
           </div>

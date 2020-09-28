@@ -123,16 +123,21 @@ namespace EducNotes.API.Controllers
                 fool.InvoiceId = invoice.Id;
               fool.Amount = payment.Amount;
               _repo.Add(fool);
-              // _context.SaveChanges();
+              _context.SaveChanges();
 
+              var orderPaid = true;
               if(finOp.Cashed)
               {
-                decimal paidBalance = fool.Amount;
                 var line = await _context.OrderLines.FirstAsync(o => o.Id == payment.OrderLineId);
                 var deadlines = await _context.OrderLineDeadlines
-                                          .Where(d => d.OrderLineId == line.Id && !d.Paid)
-                                          .OrderBy(o => o.DueDate)
-                                          .ToListAsync();
+                                        .Where(d => d.OrderLineId == line.Id)
+                                        .OrderBy(o => o.DueDate)
+                                        .ToListAsync();
+                // var lineDueAmount = deadlines.Sum(s => s.Amount + s.ProductFee);
+                var allPaid = await _context.FinOpOrderLines
+                                    .Where(f => f.FinOp.Cashed && f.FinOp.FinOpTypeId == finOpTypePayment && f.OrderLineId == line.Id)
+                                    .SumAsync(s => s.Amount);
+                decimal paidBalance = allPaid;
                 if(!line.Validated)
                 {
                   // tuition validation
@@ -140,10 +145,7 @@ namespace EducNotes.API.Controllers
                   var firstdeadline = deadlines.First();
                   var amount = firstdeadline.Amount;
                   var downpayment = regFee + amount;
-                  // var allPaid = await _context.FinOpOrderLines
-                  //                     .Where(f => f.FinOp.Cashed && f.FinOp.FinOpTypeId == finOpTypePayment && f.OrderLineId == line.Id)
-                  //                     .SumAsync(s => s.Amount);
-                  if(paidBalance >= downpayment)
+                  if(allPaid >= downpayment)
                   {
                     line.Validated = true;
                     _repo.Update(line);
@@ -162,11 +164,18 @@ namespace EducNotes.API.Controllers
                     for (int i = 1; i < deadlines.Count(); i++)
                     {
                       var lineD = deadlines[i];
-                      if(paidBalance >= lineD.Amount)
+                      var dueTotal = lineD.Amount + lineD.ProductFee;
+                      if(paidBalance >= dueTotal)
                       {
                         lineD.Paid = true;
                         _repo.Update(lineD);
-                        paidBalance -= lineD.Amount;
+                        paidBalance -= dueTotal;
+                      }
+                      else
+                      {
+                        orderPaid = false;
+                        allLinesValidated = false;
+                        break;
                       }
                     }
                   }
@@ -176,17 +185,46 @@ namespace EducNotes.API.Controllers
                   }
                 }
 
+                var lineDueAmount = deadlines.Sum(s => s.Amount + s.ProductFee);
+                if(allPaid >= lineDueAmount)
+                  line.Paid  = true;
+                _repo.Update(line);
+
                 // check if the current payment covers the other due amounts
                 for (int i = 0; i < deadlines.Count(); i++)
                 {
                   var lineD = deadlines[i];
-                  if(paidBalance >= lineD.Amount)
+                  var odeadline = lineD.Amount + lineD.ProductFee;
+                  if(paidBalance >= odeadline)
                   {
                     lineD.Paid = true;
                     _repo.Update(lineD);
-                    paidBalance -= lineD.Amount;
+                    paidBalance -= odeadline;
+                  }
+                  else
+                  {
+                    orderPaid = false;
+                    allLinesValidated = false;
+                    break;
                   }
                 }
+              }
+              else
+              {
+                allLinesValidated = false;
+                orderPaid = false;
+              }
+
+              if(allLinesValidated)
+              {
+                var order = await _context.Orders.FirstAsync(o => o.Id == finOpDataDto.OrderId);
+                order.Validated = true;
+                if(orderPaid)
+                {
+                  order.Paid = true;
+                  order.Completed = true;
+                }
+                _repo.Update(order);
               }
 
               var oldAmount = _context.OrderLineHistories
@@ -207,13 +245,6 @@ namespace EducNotes.API.Controllers
                 orderlineHistory.Cashed = true;
               _repo.Add(orderlineHistory);
             }
-          }
-
-          if(allLinesValidated)
-          {
-            var order = await _context.Orders.FirstAsync(o => o.Id == finOpDataDto.OrderId);
-            order.Validated = true;
-            _repo.Update(order);
           }
 
           if(await _repo.SaveAll())
@@ -277,25 +308,26 @@ namespace EducNotes.API.Controllers
 
         if(finOp.Cashed == true)
         {
-          // registration validation
-          var allLinesValidated = true;
+          _context.SaveChanges();
           var finOplines = await _context.FinOpOrderLines.Where(f => f.FinOpId == finOp.Id).ToListAsync();
           foreach (var finOpline in finOplines)
           {
-            decimal paidBalance = finOpline.Amount;
+            var allLinesValidated = true;
+            Boolean orderPaid = true;
             var deadlines = await _context.OrderLineDeadlines
-                                      .Where(d => d.OrderLineId == finOpline.OrderLineId && !d.Paid)
+                                      .Where(d => d.OrderLineId == finOpline.OrderLineId)
                                       .OrderBy(o => o.DueDate)
                                       .ToListAsync();
             var line = await _context.OrderLines.FirstAsync(o => o.Id == finOpline.OrderLineId);
+            var allPaid = await _context.FinOpOrderLines
+                                .Where(f => f.FinOp.Cashed && f.FinOp.FinOpTypeId == finOpTypePayment && f.OrderLineId == line.Id)
+                                .SumAsync(s => s.Amount);
+            decimal paidBalance = allPaid;
+            // registration validation
             if(!line.Validated)
             {
               var firstdeadline = deadlines.First();
               var downpayment = firstdeadline.Amount + firstdeadline.ProductFee;
-              // var downpayment = amount;
-              // var allPaid = await _context.FinOpOrderLines
-              //                     .Where(f => f.FinOp.Cashed && f.FinOp.FinOpTypeId == finOpTypePayment && f.OrderLineId == line.Id)
-              //                     .SumAsync(s => s.Amount);
               if(paidBalance >= downpayment)
               {
                 line.Validated = true;
@@ -315,14 +347,16 @@ namespace EducNotes.API.Controllers
                 for (int i = 1; i < deadlines.Count(); i++)
                 {
                   var lineD = deadlines[i];
-                  if(paidBalance >= lineD.Amount)
+                  var dueTotal = lineD.Amount + lineD.ProductFee;
+                  if(paidBalance >= dueTotal)
                   {
                     lineD.Paid = true;
                     _repo.Update(lineD);
-                    paidBalance -= lineD.Amount;
+                    paidBalance -= dueTotal;
                   }
                   else
                   {
+                    orderPaid = false;
                     break;
                   }
                 }
@@ -330,21 +364,30 @@ namespace EducNotes.API.Controllers
               else
               {
                 allLinesValidated = false;
+                orderPaid = false;
               }
             }
+
+            var lineDueAmount = deadlines.Sum(s => s.Amount + s.ProductFee);
+            if(allPaid >= lineDueAmount)
+              line.Paid  = true;
+            _repo.Update(line);
 
             // check if the paid amount covers the other due amounts
             for (int i = 0; i < deadlines.Count(); i++)
             {
               var lineD = deadlines[i];
-              if(paidBalance >= lineD.Amount)
+              var dueline = lineD.Amount + lineD.ProductFee;
+              if(paidBalance >=  dueline)
               {
                 lineD.Paid = true;
                 _repo.Update(lineD);
-                paidBalance -= lineD.Amount;
+                paidBalance -= dueline;
               }
               else
               {
+                orderPaid = false;
+                allLinesValidated = false;
                 break;
               }
             }
@@ -353,6 +396,11 @@ namespace EducNotes.API.Controllers
             {
               var order = await _context.Orders.FirstAsync(o => o.Id == line.OrderId);
               order.Validated = true;
+              if(orderPaid)
+              {
+                order.Paid = true;
+                order.Completed = true;
+              }
               _repo.Update(order);
             }
 

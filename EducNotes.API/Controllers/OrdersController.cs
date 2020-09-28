@@ -111,7 +111,7 @@ namespace EducNotes.API.Controllers
 
       var child = tuition.Lines.Where(c => c.ChildId == id).First();
       tuition.ChildLevelName = child.ClassLevelName;
-      if(!tuition.Completed)
+      if(!tuition.Paid)
       {
         var nextDueAmount = await _repo.GetChildDueAmount(child.Id, tuition.AmountPaid);
         tuition.NextDueAmount = nextDueAmount.DueAmount;
@@ -121,6 +121,7 @@ namespace EducNotes.API.Controllers
       tuition.AmountInvoiced = tuition.Lines.Where(f => f.ChildId == id).Sum(a => a.AmountTTC);
       tuition.strAmountInvoiced = tuition.AmountInvoiced.ToString("N0") + " F";
       tuition.Balance = tuition.AmountInvoiced - tuition.AmountPaid;
+      var baba = _context.OrderLineHistories.Sum(s => s.Delta);
       tuition.strBalance = tuition.Balance.ToString("N0") + " F";
       tuition.AmountToValidate = tuition.LinePayments
                                 .Where(p => p.FinOpTypeId == finOpTypePayment && p.Cashed == false && p.Rejected == false)
@@ -184,21 +185,21 @@ namespace EducNotes.API.Controllers
       var lines = await _context.OrderLines.ToListAsync();
       foreach(var line in lines)
       {
-        decimal lineDueAmount = 0;
         var lineDeadlines = await _context.OrderLineDeadlines
                                     .Where(o => o.OrderLineId == line.Id)
                                     .OrderBy(o => o.DueDate)
                                     .ToListAsync();
+        decimal lineDueAmount = 0;
         if(lineDeadlines.Count() > 0)
         {
-          foreach (var lineD in lineDeadlines)
+          foreach(var lineD in lineDeadlines)
           {
-            if(lineD.DueDate.Date > today && !lineD.Paid)
+            if(lineD.DueDate.Date < today && !lineD.Paid)
             {
               lineDueAmount += lineD.Amount + lineD.ProductFee;
 
               // split late amount in amounts of days late
-              var nbDaysLate = (today - lineD.DueDate.Date).TotalDays;
+              var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
               if(nbDaysLate <= 7)
                 lateAmount7Days += lineDueAmount;
               else if(nbDaysLate > 7 && nbDaysLate <= 15)
@@ -215,97 +216,23 @@ namespace EducNotes.API.Controllers
         }
         else
         {
-          if(line.Deadline.Date <= today)
+          if(line.Deadline.Date < today)
           {
             todayDueAmount += line.AmountTTC;
 
             // split late amount in amounts of days late
-            var nbDaysLate = (today - line.Deadline.Date).TotalDays;
+            var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
             if(nbDaysLate <= 7)
-              lateAmount7Days += lineDueAmount;
+              lateAmount7Days += line.AmountTTC;
             else if(nbDaysLate > 7 && nbDaysLate <= 15)
-              lateAmount15Days += lineDueAmount;
+              lateAmount15Days += line.AmountTTC;
             else if(nbDaysLate > 15 && nbDaysLate <= 30)
-              lateAmount30Days += lineDueAmount;
+              lateAmount30Days += line.AmountTTC;
             else if(nbDaysLate > 30 && nbDaysLate <= 60)
-              lateAmount60Days += lineDueAmount;
+              lateAmount60Days += line.AmountTTC;
             else if(nbDaysLate > 60)
-              lateAmount60DaysPlus += lineDueAmount;
+              lateAmount60DaysPlus += line.AmountTTC;
           }
-        }
-      }
-
-      decimal amountPaid = await _context.FinOpOrderLines.Where(f => f.FinOp.Cashed == true).SumAsync(s => s.Amount);
-      decimal lateAmount = Math.Abs(amountPaid - todayDueAmount);
-      
-      decimal paidBalance = amountPaid;
-      if(paidBalance > 0 && lateAmount60DaysPlus > 0)
-      {
-        if(paidBalance >= lateAmount60DaysPlus)
-        {
-          lateAmount60DaysPlus = 0;
-          paidBalance -= lateAmount60DaysPlus;
-        }
-        else
-        {
-          lateAmount60DaysPlus -= paidBalance;
-          paidBalance = 0;
-        }
-      }
-
-      if(paidBalance > 0 && lateAmount60Days > 0)
-      {
-        if(paidBalance >= lateAmount60Days)
-        {
-          lateAmount60Days = 0;
-          paidBalance -= lateAmount60Days;
-        }
-        else
-        {
-          lateAmount60Days -= paidBalance;
-          paidBalance = 0;
-        }
-      }
-
-      if(paidBalance > 0 && lateAmount30Days > 0)
-      {
-        if(paidBalance >= lateAmount30Days)
-        {
-          lateAmount30Days = 0;
-          paidBalance -= lateAmount30Days;
-        }
-        else
-        {
-          lateAmount30Days -= paidBalance;
-          paidBalance = 0;
-        }
-      }
-
-      if(paidBalance > 0 && lateAmount15Days > 0)
-      {
-        if(paidBalance >= lateAmount15Days)
-        {
-          lateAmount15Days = 0;
-          paidBalance -= lateAmount15Days;
-        }
-        else
-        {
-          lateAmount15Days -= paidBalance;
-          paidBalance = 0;
-        }
-      }
-
-      if(paidBalance > 0 && lateAmount7Days > 0)
-      {
-        if(paidBalance >= lateAmount7Days)
-        {
-          lateAmount7Days = 0;
-          paidBalance -= lateAmount7Days;
-        }
-        else
-        {
-          lateAmount7Days -= paidBalance;
-          paidBalance = 0;
         }
       }
 
@@ -314,7 +241,7 @@ namespace EducNotes.API.Controllers
         toBeValidated,
         cashed,
         openBalance = balance,
-        lateAmount,
+        lateAmount = todayDueAmount,
         lateAmount7Days,
         lateAmount15Days,
         lateAmount30Days,
@@ -642,8 +569,9 @@ namespace EducNotes.API.Controllers
                               .Include(i => i.Order)
                               .Where(o => o.Order.isReg == true)
                               .ToListAsync();
-      decimal totalAmount = orderlines.Sum(s => s.AmountTTC + s.ProductFee);
-      decimal totalAmountOK = orderlines.Where(s => s.Validated).Sum(s => s.AmountTTC + s.ProductFee);
+      var finOpLines = await _context.FinOpOrderLines.Where(f => f.FinOp.Cashed).ToListAsync();
+      decimal totalInvoiced = orderlines.Sum(s => s.AmountTTC);
+      decimal totalPaid = finOpLines.Sum(s => s.Amount);
       decimal totalTuitions = orderlines.Count();
       decimal totalTuitionsOK = orderlines.Where(s => s.Validated).Count();
       foreach (var level in classlevels)
@@ -652,18 +580,18 @@ namespace EducNotes.API.Controllers
         tld.ClassLevelId = level.Id;
         tld.ClassLevelName = level.Name;
         tld.NbTuitions = orderlines.Where(o => o.ClassLevelId == level.Id).Count();
-        tld.NbTuitionsOK = orderlines.Where(o => o.Order.Validated == true && o.ClassLevelId == level.Id).Count();
-        tld.LevelAmount = orderlines.Where(o => o.ClassLevelId == level.Id).Sum(o => o.AmountTTC + o.ProductFee);
+        tld.NbTuitionsOK = orderlines.Where(o => o.Validated == true && o.ClassLevelId == level.Id).Count();
+        tld.LevelAmount = orderlines.Where(f => f.ClassLevelId == level.Id).Sum(o => o.AmountTTC);
         tld.strLevelAmount = tld.LevelAmount.ToString("N0") + " F";
-        tld.LevelAmountOK = orderlines.Where(o => o.ClassLevelId == level.Id && o.Validated).Sum(o => o.AmountTTC + o.ProductFee);
+        tld.LevelAmountOK = finOpLines.Where(o => o.OrderLine.ClassLevelId == level.Id && o.OrderLine.Validated).Sum(o => o.Amount);
         tld.strLevelAmountOK = tld.LevelAmountOK.ToString("N0") + " F";
         tuitionList.Add(tld);
       }
 
       return Ok(new {
         tuitionList,
-        totalAmount,
-        totalAmountOK,
+        totalInvoiced,
+        totalPaid,
         totalTuitions,
         totalTuitionsOK
       });

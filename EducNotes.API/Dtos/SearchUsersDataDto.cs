@@ -6,7 +6,9 @@ namespace EducNotes.API.Dtos
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string IDNum { get; set; }
+    public int Age { get; set; }
     public string ClassName { get; set; }
+    public string ClassLevelName { get; set; }
     public string PhotoUrl { get; set; }
   }
 }

@@ -19,7 +19,7 @@ export class AccountService {
     return this.http.get(this.baseUrl + 'PhoneCode/' + userId + '/' + num);
   }
 
-  validtePhone(confirmEmail: ConfirmEmailPhone) {
+  validatePhone(confirmEmail: ConfirmEmailPhone) {
     return this.http.post(this.baseUrl + 'ConfirmPhoneNumber', confirmEmail);
   }
 

@@ -114,7 +114,7 @@ namespace EducNotes.API.Controllers
         if(user.EmailConfirmed)
         {
           success = true;
-          validated = user.Validated;
+          validated = user.AccountDataValidated;
         }
         else
         {
@@ -131,7 +131,7 @@ namespace EducNotes.API.Controllers
           children = await _repo.GetAccountChildren(user.Id);
           foreach (var child in children)
           {
-            if(!child.Validated)
+            if(!child.AccountDataValidated)
             {
               childrenValidated = false;
               break;

@@ -30,6 +30,7 @@ export class ConfirmEmailComponent implements OnInit {
   childrenOk = false;
   username: string;
   pwd: string;
+  wait = false;
 
   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
     private alertify: AlertifyService,  private router: Router, private accountService: AccountService) { }
@@ -81,12 +82,15 @@ export class ConfirmEmailComponent implements OnInit {
   }
 
   sendPhoneNumber() {
+    this.wait = true;
     this.accountService.sendPhoneNumberToValidate(this.user.id, this.phoneForm.value.phone).subscribe(codeSent => {
       if (codeSent) {
         this.phoneValidationSteps = 1;
       }
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 
@@ -109,17 +113,20 @@ export class ConfirmEmailComponent implements OnInit {
   }
 
   validatePhone() {
+    this.wait = true;
     const confirmPhone = <ConfirmEmailPhone>{};
     confirmPhone.userId = this.user.id.toString();
     confirmPhone.token = this.phoneForm.value.code;
-    this.accountService.validtePhone(confirmPhone).subscribe((data: any) => {
+    this.accountService.validatePhone(confirmPhone).subscribe((data: any) => {
       this.user = data.user;
       this.phoneOk = data.phoneOk;
       if (this.phoneOk) {
         this.phoneValidationSteps = 2;
       }
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 
@@ -163,29 +170,35 @@ export class ConfirmEmailComponent implements OnInit {
   }
 
   updateUser(): void {
+    this.wait = true;
     this.authService.setUserLoginPassword(this.user.id, this.userForm.value).subscribe(() => {
       this.parentOk = true;
       this.childrenOk = true;
-      this.validAccount = this.user.validated;
+      this.validAccount = this.user.accountDataValidated;
       for (let i = 0; i < this.children.length; i++) {
         const child = this.children[i];
-        if (child.validated !== true) {
+        if (child.accountDataValidated !== true) {
           this.childrenOk = false;
           break;
         }
       }
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 
   updateAccount() {
+    this.wait = true;
     this.authService.getUser(this.user.id).subscribe((parent: User) => {
       this.user = parent;
-      this.validAccount = this.user.validated;
+      this.validAccount = this.user.accountDataValidated;
       this.childrenOk = true;
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 

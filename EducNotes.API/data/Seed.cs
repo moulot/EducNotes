@@ -18,7 +18,7 @@ namespace EducNotes.API.Data
               new FileType  {Name="file type 2"}
             };
             context.AddRange(fileTypes);
-            context.SaveChanges();
+            // context.SaveChanges();
           }
           if (!context.DocTypes.Any())
           {
@@ -27,7 +27,7 @@ namespace EducNotes.API.Data
               new DocType  {Name="autre fichier"}
             };
             context.AddRange(docTypes);
-            context.SaveChanges();
+            // context.SaveChanges();
           }
           if (!userManager.Users.Any())
           {
@@ -243,13 +243,6 @@ namespace EducNotes.API.Data
               };
               context.AddRange(classEvents);
 
-              var inscTypes = new List<InscriptionType> {
-                new InscriptionType { Name = "FromParent" },
-                new InscriptionType { Name = "FromSchool" }
-              };
-              context.AddRange(inscTypes);
-              context.SaveChanges();
-
               var paymentTypes = new List<PaymentType> {
                 new PaymentType { Name = "espèces" },
                 new PaymentType { Name = "chèque" },
@@ -258,10 +251,20 @@ namespace EducNotes.API.Data
               };
               context.AddRange(paymentTypes);
 
+              var inscTypes = new List<InscriptionType> {
+                new InscriptionType { Name = "FromParent" },
+                new InscriptionType { Name = "FromSchool" }
+              };
+              context.AddRange(inscTypes);
+              context.SaveChanges();
+
               var pers = new List<Period> {
-                new Period { Name = "1er trimestre", Abbrev = "1er trim", Active = false },
-                new Period { Name = "2e trimestre", Abbrev = "2e trim", Active = false },
-                new Period { Name = "3e trimestre", Abbrev = "3e trim", Active = false }
+                new Period { Name = "1er trimestre", Abbrev = "1er trim", StartDate = new DateTime(2020, 9, 1), 
+                  EndDate = new DateTime(2020, 11, 30), Active = false },
+                new Period { Name = "2e trimestre", Abbrev = "2e trim",  StartDate = new DateTime(2020, 12, 1), 
+                  EndDate = new DateTime(2021, 2, 27),Active = false },
+                new Period { Name = "3e trimestre", Abbrev = "3e trim", StartDate = new DateTime(2021, 3, 1), 
+                  EndDate = new DateTime(2021, 6, 30), Active = false }
               };
               context.AddRange(pers);
 

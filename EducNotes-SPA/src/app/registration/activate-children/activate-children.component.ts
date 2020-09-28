@@ -26,6 +26,7 @@ export class ActivateChildrenComponent implements OnInit {
   photoFile: File[] = [];
   userNameExist = false;
   confirmedPwd: boolean;
+  wait = false;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private userService: UserService,
     private classService: ClassService, private route: ActivatedRoute, private router: Router,
@@ -122,6 +123,7 @@ export class ActivateChildrenComponent implements OnInit {
   }
 
   updateChildren() {
+    this.wait = true;
     const formData = new FormData();
     formData.append('parentId', this.parentId);
     for (let i = 0; i < this.childrenForm.value.children.length; i++) {
@@ -153,8 +155,10 @@ export class ActivateChildrenComponent implements OnInit {
     this.authService.validateChildAccounts(formData).subscribe(() => {
       this.alertify.success('les comptes enfants sont valiés. merci.');
       this.updateAccount.emit();
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 
