@@ -41,4 +41,8 @@ export class OrderService {
   getTuitionList() {
     return this.http.get(this.baseUrl + 'TuitionList');
   }
+
+  getOrderAmountByDeadline() {
+    return this.http.get(this.baseUrl + 'AmountByDeadline');
+  }
 }

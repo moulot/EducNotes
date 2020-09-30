@@ -8,7 +8,6 @@ import { debounceTime } from 'rxjs/operators';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { Class } from 'src/app/_models/class';
 import { ToastrService } from 'ngx-toastr';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
@@ -54,7 +53,7 @@ export class InscriptionsListComponent implements OnInit {
   }
 
   getLevels() {
-    this.classService.getLevelsWithClasses().subscribe((res: any[]) => {
+    this.classService.getActiveClasslevels().subscribe((res: any[]) => {
       for (let i = 0; i < res.length; i++) {
         const element = {value: res[i].id, label:  res[i].name};
         this.levels = [...this.levels, element];
@@ -63,6 +62,7 @@ export class InscriptionsListComponent implements OnInit {
       this.alertify.error(error);
     });
   }
+
   createSearchForm() {
     this.searchForm = this.fb.group({
       levelId: [null, Validators.required],

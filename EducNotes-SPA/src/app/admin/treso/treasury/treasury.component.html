@@ -45,6 +45,7 @@
       <div class="card-body p-1 text-center">
         <div class="text-15">en recouvrement</div>
         <div class="text-15 text-danger">{{lateAmount | number: '1.0-0': 'fr-FR'}} F CFA</div>
+        <div class="text-small"><a [routerLink]="['/recovery']">voir les détails</a></div>
       </div>
     </div>
   </div>
@@ -53,58 +54,82 @@
       <div class="card-body p-1 text-center">
         <div class="text-15">7 jours</div>
         <div class="text-15">{{lateAmount7Days | number: '1.0-0': 'fr-FR'}} F CFA</div>
+        <div class="text-small"><a>voir les détails</a></div>
       </div>
     </div>
   </div>
   <div class="col-md-2 my-2">
     <div class="card">
       <div class="card-body p-1 text-center">
-        <div class="text-15">15 jours</div>
+        <div class="text-15">8 à 15 jours</div>
         <div class="text-15">{{lateAmount15Days | number: '1.0-0': 'fr-FR'}} F CFA</div>
+        <div class="text-small"><a>voir les détails</a></div>
       </div>
     </div>
   </div>
   <div class="col-md-2 my-2">
     <div class="card">
       <div class="card-body p-1 text-center">
-        <div class="text-15">30 jours</div>
+        <div class="text-15">16 à 30 jours</div>
         <div class="text-15">{{lateAmount30Days | number: '1.0-0': 'fr-FR'}} F CFA</div>
+        <div class="text-small"><a>voir les détails</a></div>
       </div>
     </div>
   </div>
   <div class="col-md-2 my-2">
     <div class="card">
       <div class="card-body p-1 text-center">
-        <div class="text-15">60 jours</div>
+        <div class="text-15">31 à 60 jours</div>
         <div class="text-15">{{lateAmount60Days | number: '1.0-0': 'fr-FR'}} F CFA</div>
+        <div class="text-small"><a>voir les détails</a></div>
       </div>
     </div>
   </div>
   <div class="col-md-2 my-2">
     <div class="card">
       <div class="card-body p-1 text-center">
-        <div class="text-15">60+ jours</div>
+        <div class="text-15">60 jours et plus</div>
         <div class="text-15">{{lateAmount60DaysPlus | number: '1.0-0': 'fr-FR'}} F CFA</div>
+        <div class="text-small"><a>voir les détails</a></div>
       </div>
     </div>
   </div>
 
   <div class="col-md-12 text-17 text-muted">échéances</div>
   <div class="col-md-12"><hr class="my-1" style="background-color: #f89f20;"></div>
-  <div *ngFor="let item of counter(nbTuitionPays); let i = index" class="col-md-3 my-2">
+  <div class="col-md-3 my-2" *ngFor="let item of amountByDeadline; let i = index">
     <div class="card">
       <div class="card-body p-2">
         <div class="d-flex">
-          <div *ngIf="i == 0" class="flex-grow-1 text-15">{{i+1}}er acompte</div>
-          <div *ngIf="i > 0" class="flex-grow-1 text-15">{{i+1}}e acompte</div>
-          <div><a class="text-small small-link">voir détails</a></div>
+          <div *ngIf="i == 0" class="flex-grow-1 text-15">{{i+1}}ère échéance</div>
+          <div *ngIf="i > 0" class="flex-grow-1 text-15">{{i+1}}e échéance</div>
+          <div><a class="text-14 small-link">voir détails</a></div>
+        </div>
+        <hr class="my-1">
+        <div class="row">
+          <div class="col-md-6"><b>date limite</b></div>
+          <div class="col-md-6 text-right"><b>{{item.strDueDate}}</b></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">facturé</div>
+          <div class="col-md-6 text-right">{{item.invoiced | number:'':'fr-FR'}} F</div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">payé</div>
+          <div class="col-md-6 text-right">{{item.paid | number:'':'fr-FR'}} F</div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">solde à payer</div>
+          <div class="col-md-6 text-right">{{item.balance | number:'':'fr-FR'}} F</div>
+        </div>
+        <div class="row text-danger">
+          <div class="col-md-6">dont retard</div>
+          <div class="col-md-6 text-right">{{item.lateAmount | number:'':'fr-FR'}} F</div>
         </div>
         <hr class="my-1">
         <div class="text-13 text-muted">emails envoyés</div>
         <div class="text-13 text-muted">factures envoyées</div>
-        <div class="text-13 text-muted">solde : 15.345.000 F</div>
       </div>
     </div>
   </div>
-
 </div>

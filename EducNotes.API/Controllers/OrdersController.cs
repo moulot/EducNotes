@@ -196,7 +196,8 @@ namespace EducNotes.API.Controllers
           {
             if(lineD.DueDate.Date < today && !lineD.Paid)
             {
-              lineDueAmount += lineD.Amount + lineD.ProductFee;
+              lineDueAmount = lineD.Amount + lineD.ProductFee;
+              todayDueAmount += lineDueAmount;
 
               // split late amount in amounts of days late
               var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
@@ -212,7 +213,6 @@ namespace EducNotes.API.Controllers
                 lateAmount60DaysPlus += lineDueAmount;
             }
           }
-          todayDueAmount += lineDueAmount;
         }
         else
         {
@@ -595,6 +595,50 @@ namespace EducNotes.API.Controllers
         totalTuitions,
         totalTuitionsOK
       });
+    }
+
+    [HttpGet("AmountByDeadline")]
+    public async Task<IActionResult> GetOrderAmountWithDeadlines()
+    {
+      var today = DateTime.Now.Date;
+      var duedates = _context.OrderLineDeadlines.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
+      List<AmountWithDeadlinesDto> amountDeadlines = new List<AmountWithDeadlinesDto>();
+      int i = 0;
+      var olddate = new DateTime();
+      foreach (var duedate in duedates)
+      {
+        var linedeadlines = new List<OrderLineDeadline>();
+        if(i == 0)
+          linedeadlines =  await _context.OrderLineDeadlines.Where(o => o.DueDate <= duedate).ToListAsync();
+        else
+          linedeadlines =  await _context.OrderLineDeadlines.Where(o => o.DueDate > olddate && o.DueDate <= duedate).ToListAsync();
+        decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
+        decimal paid = linedeadlines.Where(o => o.Paid).Sum(s => s.Amount + s.ProductFee);
+        decimal balance = invoiced - paid;
+        decimal lateAmount = 0;
+        if(duedate.Date < today)
+          lateAmount = linedeadlines.Where(o => !o.Paid).Sum(s => s.Amount + s.ProductFee);
+
+        AmountWithDeadlinesDto awd = new AmountWithDeadlinesDto();
+        awd.DueDate = duedate;
+        awd.strDueDate = duedate.ToString("dd/MM/yyyy", frC);
+        awd.Invoiced = invoiced;
+        awd.Paid = paid;
+        awd.Balance = balance;
+        awd.LateAmount = lateAmount;
+        amountDeadlines.Add(awd);
+
+        olddate = duedate;
+        i++;
+      }
+
+      return Ok(amountDeadlines);
+    }
+
+    [HttpGet("RecoveryData")]
+    public async Task<IActionResult> GetRecoveryData()
+    {
+      
     }
 
   }

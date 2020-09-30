@@ -139,6 +139,7 @@ import { ValidatePaymentsComponent } from './admin/validate-payments/validate-pa
 import { ValidatePaymentsResolver } from './_resolvers/validate-payments-resolver';
 import { TuitionFeesComponent } from './admin/tuition/tuition-fees/tuition-fees.component';
 import { TuitionFeesResolver } from './_resolvers/tuition-fees-resolver';
+import { RecoveryListComponent } from './admin/recovery-list/recovery-list.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -256,7 +257,8 @@ export const appRoutes: Routes = [
         { path: 'validatePayments', component: ValidatePaymentsComponent, resolve: {payments: ValidatePaymentsResolver}},
         { path: 'tuitionList', component: TuitionListComponent, resolve: {list: TuitionListResolver}},
         { path: 'tuitionDetails/:levelId', component: TuitionDetailsComponent, resolve: {users: TuitionDetailsResolver}},
-        { path: 'tuitionFees', component: TuitionFeesComponent, resolve: {fees: TuitionFeesResolver}}
+        { path: 'tuitionFees', component: TuitionFeesComponent, resolve: {fees: TuitionFeesResolver}},
+        { path: 'recovery', component: RecoveryListComponent}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

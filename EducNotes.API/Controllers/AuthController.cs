@@ -509,6 +509,8 @@ namespace EducNotes.API.Controllers
             user.NormalizedUserName = userData.UserName.ToUpper();
             user.PasswordHash = newPassword;
             user.AccountDataValidated = true;
+            if(user.UserTypeId == teacherTypeId)
+              user.Validated = true;
             user.ValidationDate = DateTime.Now;
             var res = await _userManager.UpdateAsync(user);
             if (res.Succeeded)

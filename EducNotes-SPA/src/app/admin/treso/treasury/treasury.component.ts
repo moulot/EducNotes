@@ -3,6 +3,7 @@ import { Setting } from 'src/app/_models/setting';
 import { AuthService } from 'src/app/_services/auth.service';
 import { OrderService } from 'src/app/_services/order.service';
 import { Utils } from 'src/app/shared/utils';
+import { AlertifyService } from 'src/app/_services/alertify.service';
 
 @Component({
   selector: 'app-treasury',
@@ -24,9 +25,11 @@ export class TreasuryComponent implements OnInit {
   lateAmount30Days: any;
   lateAmount60Days: any;
   lateAmount60DaysPlus: any;
+  amountByDeadline: any;
 
 
-  constructor(private authService: AuthService, private orderService: OrderService) { }
+  constructor(private authService: AuthService, private orderService: OrderService,
+    private alertify: AlertifyService) { }
 
   ngOnInit() {
     this.settings = this.authService.settings;
@@ -37,6 +40,11 @@ export class TreasuryComponent implements OnInit {
       this.regActive = true;
     }
     this.nbTuitionPays = Number(this.settings.find(s => s.name === 'NbTuitionPayments').value);
+    this.getBalanceData();
+    this.getAmountByDeadline();
+  }
+
+  getBalanceData() {
     this.orderService.getBalanceData().subscribe((data: any) => {
       this.invoiced = data.invoiced;
       this.cashed = data.cashed;
@@ -48,6 +56,16 @@ export class TreasuryComponent implements OnInit {
       this.lateAmount30Days = data.lateAmount30Days;
       this.lateAmount60Days = data.lateAmount60Days;
       this.lateAmount60DaysPlus = data.lateAmount60DaysPlus;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getAmountByDeadline() {
+    this.orderService.getOrderAmountByDeadline().subscribe(data => {
+      this.amountByDeadline = data;
+    }, error => {
+      this.alertify.error(error);
     });
   }
 
