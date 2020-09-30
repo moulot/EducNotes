@@ -873,9 +873,7 @@ namespace EducNotes.API.Controllers
         [HttpGet("ActiveClasslevels")]
         public async Task<IActionResult> GetActiveClassLevels()
         {
-          var classLevels = await _context.Classes
-                                    .OrderBy(o => o.ClassLevel.DsplSeq)
-                                    .Select(s => s.ClassLevel).Distinct().ToListAsync();
+          var classLevels = await _repo.GetActiveClassLevels();
           return Ok(classLevels);
         }
 

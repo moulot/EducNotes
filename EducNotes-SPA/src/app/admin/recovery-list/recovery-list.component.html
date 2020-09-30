@@ -21,3 +21,11 @@
   </div>
   <div class="col-md-2"><button type="button" mdbBtn size="sm" block="true" class="btnBlue" mdbWavesEffect>60 jours et plus</button></div>
 </div>
+
+<div class="row">
+  <div class="col-md-12" *ngFor="let level of levelRecovery">
+    <div class="border rounded-lg p-2">
+      <div class="text-15">{{level.levelName}}</div>
+    </div>
+  </div>
+</div>

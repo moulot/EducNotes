@@ -107,6 +107,6 @@ namespace EducNotes.API.Data
     Task<List<User>> GetUsersByClasslevel(int levelId);
     Task<List<FinOpOrderLine>> GetChildPayments(int childId);
     Task<NextDueAmountDto> GetChildDueAmount(int orderLineId, decimal paidAmount);
-    // Task<Boolean> ValidateChildren(int lineId);
+    Task<List<ClassLevel>> GetActiveClassLevels();
   }
 }

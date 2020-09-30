@@ -45,4 +45,12 @@ export class OrderService {
   getOrderAmountByDeadline() {
     return this.http.get(this.baseUrl + 'AmountByDeadline');
   }
+
+  getLevelRecovery() {
+    return this.http.get(this.baseUrl + 'LevelRecoveryData');
+  }
+
+  getChildRecovery() {
+    return this.http.get(this.baseUrl + 'ChildrenRecoveryData');
+  }
 }

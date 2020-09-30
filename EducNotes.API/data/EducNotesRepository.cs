@@ -284,7 +284,11 @@ namespace EducNotes.API.Data
 
         public async Task<List<User>> GetUsersByClasslevel(int levelId)
         {
-          return await _context.Users.Where(u => u.ClassLevelId == levelId).ToListAsync();
+          return await _context.Users
+                        .Include(i => i.Photos)
+                        .Where(u => u.ClassLevelId == levelId)
+                        .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
+                        .ToListAsync();
         }
 
         public async Task<EmailTemplate> GetEmailTemplate(int id)
@@ -2633,9 +2637,12 @@ namespace EducNotes.API.Data
           return nextDueAmount;
         }
 
-        // public async Task<Boolean> ValidateChildren(int lineId)
-        // {
-        // }
-
+        public async Task<List<ClassLevel>> GetActiveClassLevels()
+        {
+          var classLevels = await _context.Classes
+                                    .OrderBy(o => o.ClassLevel.DsplSeq)
+                                    .Select(s => s.ClassLevel).Distinct().ToListAsync();
+          return classLevels;
+        }
     }
 }
