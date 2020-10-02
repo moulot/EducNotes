@@ -1,0 +1,33 @@
+<div class="row mb-2">
+  <div class="col-md-12 d-md-flex">
+    <a appBtnBack>
+      <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    </a>
+    <i class="fad fa-usd-circle fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    <div class="text-19">niveau {{children[0].levelName}} - paiements en retard</div>
+  </div>
+  <div class="col-md-12"><hr class="my-2"></div>
+  
+  <div class="col-md-3 mb-2" *ngFor="let child of children">
+    <div *ngIf="child.lateAmount > 0" class="border rounded-lg p-2">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="row">
+            <div class="col-md-12">
+              <a class="text-13" [routerLink]="['/userFile', child.id]">voir dossier</a>
+            </div>
+            <div class="col-md-7 text-14 text-capitalize text-center text-md-left"><b>{{child.lastName}} {{child.firstName}}</b></div>
+            <div class="col-md-5 text-14 text-danger text-center text-md-right">{{child.lateAmount | number:'':'fr-FR'}} F</div>
+          </div>
+        </div>
+        <div class="col-md-12"><hr class="my-1"></div>
+        <div class="col-md-12" *ngFor="let prod of child.productRecovery">
+          <div class="row">
+            <div class="col-md-6 text-13">retard {{prod.productName}}</div>
+            <div class="col-md-6 text-13 text-md-right">{{prod.lateAmount | number:'':'fr-FR'}} F</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

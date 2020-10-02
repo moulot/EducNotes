@@ -14,10 +14,12 @@ export class RecoveryListComponent implements OnInit {
   constructor(private orderService: OrderService, private alertify: AlertifyService) { }
 
   ngOnInit() {
+    this.getLevelLatePayments();
+    // this.getChildRecovery();
   }
 
-  getLevelRecovery() {
-    this.orderService.getLevelRecovery().subscribe(data => {
+  getLevelLatePayments() {
+    this.orderService.getLevelLatePayments().subscribe(data => {
       this.levelRecovery = data;
     }, error => {
       this.alertify.error(error);
@@ -25,7 +27,7 @@ export class RecoveryListComponent implements OnInit {
   }
 
   getChildRecovery() {
-    this.orderService.getChildRecovery().subscribe(data => {
+    this.orderService.getChildLatePayments().subscribe(data => {
       this.childRecovery = data;
     }, error => {
       this.alertify.error(error);

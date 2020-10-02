@@ -291,6 +291,14 @@ namespace EducNotes.API.Data
                         .ToListAsync();
         }
 
+        public async Task<List<Product>> GetActiveProducts()
+        {
+          var products = await _context.Products
+                                .Where(p => p.Active)
+                                .OrderBy(o => o.DsplSeq).ThenBy(p => p.Name).ToListAsync();
+          return products;
+        }
+
         public async Task<EmailTemplate> GetEmailTemplate(int id)
         {
             return await _context.EmailTemplates.FirstOrDefaultAsync(s => s.Id == id);

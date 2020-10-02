@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Session } from 'src/app/_models/session';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute, Router } from '@angular/router';

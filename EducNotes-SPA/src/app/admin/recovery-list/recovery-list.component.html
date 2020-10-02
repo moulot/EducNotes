@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row mb-2">
   <div class="col-md-12 d-flex">
     <a [routerLink]="['/treasury']">
       <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
@@ -8,24 +8,40 @@
   </div>
   <div class="col-md-12"><hr class="my-2"></div>
 
-  <div class="col-md-2"><button type="button" mdbBtn size="sm" block="true" class="btnBlue" mdbWavesEffect>total</button></div>
-  <div class="col-md-2"><button type="button" mdbBtn size="sm" block="true" class="btnBlue" mdbWavesEffect>7 jours</button></div>
-  <div class="col-md-2"><button type="button" mdbBtn size="sm" block="true" class="btnBlue" mdbWavesEffect>
-    8 <span class="text-lowercase">à</span> 15 jours</button>
+  <div class="col-md-3 mb-1">
+    <button type="button" mdbBtn size="sm" block="true" class="btnBlue" mdbWavesEffect>retards paiements par niveau</button>
   </div>
-  <div class="col-md-2"><button type="button" mdbBtn size="sm" block="true" class="btnBlue" mdbWavesEffect>
-    16 <span class="text-lowercase">à</span> 30 jours</button>
+  <div class="col-md-3 mb-1">
+    <button type="button" mdbBtn size="sm" block="true" class="btnBlue" mdbWavesEffect>retards paiements par enfant</button>
   </div>
-  <div class="col-md-2"><button type="button" mdbBtn size="sm" block="true" class="btnBlue" mdbWavesEffect>
-    31 <span class="text-lowercase">à</span> 60 jours</button>
-  </div>
-  <div class="col-md-2"><button type="button" mdbBtn size="sm" block="true" class="btnBlue" mdbWavesEffect>60 jours et plus</button></div>
 </div>
 
 <div class="row">
-  <div class="col-md-12" *ngFor="let level of levelRecovery">
-    <div class="border rounded-lg p-2">
-      <div class="text-15">{{level.levelName}}</div>
+  <div class="col-md-12 text-17 mb-2">paiements en retard par niveau</div>
+  <div class="col-md-12 mb-1" *ngFor="let level of levelRecovery">
+    <div *ngIf="level.lateAmount > 0" class="border rounded-lg p-2">
+      <div class="text-16">
+        niveau {{level.levelName}} 
+        <span class="ml-2 text-13">
+          <a [routerLink]="['/paymentLevelChild', level.levelId]" routerLinkActive="router-link-active" >voir détails</a>
+        </span>
+      </div>
+      <hr class="my-1" style="background-color: #f89f20;">
+      <div class="row">
+        <div class="col-md-12" *ngFor="let prod of level.productRecovery">
+          <div *ngIf="prod.lateAmount > 0" class="text-14">
+            <div class="row">
+              <div class="col-md-12"><b>retard {{prod.productName}}</b></div>
+              <div class="col-md-2 text-13">total dû: <span class="text-danger">{{prod.lateAmount | number:'':'fr-FR'}} F</span></div>
+              <div class="col-md-2 text-13">7 jours: <span class="text-danger">{{prod.lateAmount7Days | number:'':'fr-FR'}} F</span></div>
+              <div class="col-md-2 text-13">15 jours: <span class="text-danger">{{prod.lateAmount15Days | number:'':'fr-FR'}} F</span></div>
+              <div class="col-md-2 text-13">30 jours: <span class="text-danger">{{prod.lateAmount30Days | number:'':'fr-FR'}} F</span></div>
+              <div class="col-md-2 text-13">60 jours: <span class="text-danger">{{prod.lateAmount60Days | number:'':'fr-FR'}} F</span></div>
+              <div class="col-md-2 text-13">60+ jours: <span class="text-danger">{{prod.lateAmount60DaysPlus | number:'':'fr-FR'}} F</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

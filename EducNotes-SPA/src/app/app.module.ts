@@ -259,6 +259,8 @@ import { ValidatePaymentsResolver } from './_resolvers/validate-payments-resolve
 import { TuitionFeesComponent } from './admin/tuition/tuition-fees/tuition-fees.component';
 import { TuitionFeesResolver } from './_resolvers/tuition-fees-resolver';
 import { RecoveryListComponent } from './admin/recovery-list/recovery-list.component';
+import { PaymentLevelChildComponent } from './admin/payment-level-child/payment-level-child.component';
+import { PaymentLevelChildResolver } from './_resolvers/payment-level-child-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -434,7 +436,8 @@ export function tokenGetter() {
       TuitionListComponent,
       ValidatePaymentsComponent,
       TuitionFeesComponent,
-      RecoveryListComponent
+      RecoveryListComponent,
+      PaymentLevelChildComponent
    ],
    imports: [
       FormWizardModule,
@@ -544,6 +547,7 @@ export function tokenGetter() {
       TuitionFeesResolver,
       TuitionDetailsResolver,
       ValidatePaymentsResolver,
+      PaymentLevelChildResolver,
       OrderService,
       AccountService,
       { provide: NZ_I18N, useValue: fr_FR }

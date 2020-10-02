@@ -189,6 +189,9 @@ namespace EducNotes.API.Controllers
                                     .Where(o => o.OrderLineId == line.Id)
                                     .OrderBy(o => o.DueDate)
                                     .ToListAsync();
+        var amountPaid = await _context.FinOpOrderLines
+                                .Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+                                .SumAsync(s => s.Amount);
         decimal lineDueAmount = 0;
         if(lineDeadlines.Count() > 0)
         {
@@ -196,7 +199,7 @@ namespace EducNotes.API.Controllers
           {
             if(lineD.DueDate.Date < today && !lineD.Paid)
             {
-              lineDueAmount = lineD.Amount + lineD.ProductFee;
+              lineDueAmount = lineD.Amount + lineD.ProductFee - amountPaid;
               todayDueAmount += lineDueAmount;
 
               // split late amount in amounts of days late
@@ -218,7 +221,7 @@ namespace EducNotes.API.Controllers
         {
           if(line.Deadline.Date < today)
           {
-            todayDueAmount += line.AmountTTC;
+            todayDueAmount += line.AmountTTC - amountPaid;
 
             // split late amount in amounts of days late
             var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
@@ -635,7 +638,7 @@ namespace EducNotes.API.Controllers
       return Ok(amountDeadlines);
     }
 
-    [HttpGet("LevelRecoveryData")]
+    [HttpGet("LevelLatePayments")]
     public async Task<IActionResult> GetRecoveryData()
     {
       var today = DateTime.Now.Date;
@@ -644,13 +647,14 @@ namespace EducNotes.API.Controllers
       foreach (var level in activelevels)
       {
         RecoveryForLevelDto rfld = new RecoveryForLevelDto();
+        rfld.LevelId = level.Id;
         rfld.LevelName = level.Name;
         rfld.ProductRecovery = new List<ProductRecoveryDto>();
 
         decimal levelDueAmount = 0;
         List<ProductRecoveryDto> productRecovery = new List<ProductRecoveryDto>();
         rfld.ProductRecovery = productRecovery;
-        var products = await _context.Products.OrderBy(p => p.Name).ToListAsync();
+        var products = await _repo.GetActiveProducts();
         foreach (var product in products)
         {
           decimal productDueAmount = 0;
@@ -672,6 +676,9 @@ namespace EducNotes.API.Controllers
                                         .Where(o => o.OrderLineId == line.Id)
                                         .OrderBy(o => o.DueDate)
                                         .ToListAsync();
+            var amountPaid = await _context.FinOpOrderLines
+                                    .Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+                                    .SumAsync(s => s.Amount);
             decimal lineDueAmount = 0;
             if(lineDeadlines.Count() > 0)
             {
@@ -679,7 +686,7 @@ namespace EducNotes.API.Controllers
               {
                 if(lineD.DueDate.Date < today && !lineD.Paid)
                 {
-                  lineDueAmount = lineD.Amount + lineD.ProductFee;
+                  lineDueAmount = lineD.Amount + lineD.ProductFee - amountPaid;
                   productDueAmount += lineDueAmount;
                   levelDueAmount += lineDueAmount;
 
@@ -702,8 +709,9 @@ namespace EducNotes.API.Controllers
             {
               if(line.Deadline.Date < today)
               {
-                productDueAmount += line.AmountTTC;
-                levelDueAmount += line.AmountTTC;
+                lineDueAmount = line.AmountTTC - amountPaid;
+                productDueAmount += lineDueAmount;
+                levelDueAmount += lineDueAmount;
 
                 // split late amount in amounts of days late
                 var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
@@ -721,7 +729,7 @@ namespace EducNotes.API.Controllers
             }
           }
 
-          prd.TotalLateAmount = productDueAmount;
+          prd.LateAmount = productDueAmount;
           prd.LateAmount7Days = lateAmount7Days;
           prd.LateAmount15Days = lateAmount15Days;
           prd.LateAmount30Days = lateAmount30Days;
@@ -738,16 +746,17 @@ namespace EducNotes.API.Controllers
       return Ok(levelRecovery);
     }
 
-    [HttpGet("ChildrenRecoveryData")]
+    [HttpGet("ChildLatePayments")]
     public async Task<IActionResult> GetChildrenRecoveryData()
     {
       var today = DateTime.Now.Date;
-      var linesFromDB = await _context.OrderLines
+      var childrenFromDB = await _context.Users
                             .Include(i => i.ClassLevel)
-                            .Include(i => i.Child).ThenInclude(i => i.Photos)
-                            .Include(i => i.Child).ThenInclude(i => i.Class)
+                            .Include(i => i.Photos)
+                            .Include(i => i.Class)
+                            .Where(o => o.UserTypeId == studentTypeId)
+                            .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
                             .ToListAsync();
-      var childrenFromDB = linesFromDB.Select(s => s.Child);
       var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(childrenFromDB);
       List<RecoveryForChildDto> childRecovery = new List<RecoveryForChildDto>();
       foreach (var child in children)
@@ -762,7 +771,7 @@ namespace EducNotes.API.Controllers
 
         decimal childDueAmount = 0;
         List<ProductRecoveryDto> productRecovery = new List<ProductRecoveryDto>();
-        var products = await _context.Products.OrderBy(p => p.Name).ToListAsync();
+        var products = await _repo.GetActiveProducts();
         foreach (var product in products)
         {
           ProductRecoveryDto prd = new ProductRecoveryDto();
@@ -784,6 +793,9 @@ namespace EducNotes.API.Controllers
                                         .Where(o => o.OrderLineId == line.Id)
                                         .OrderBy(o => o.DueDate)
                                         .ToListAsync();
+            var amountPaid = await _context.FinOpOrderLines
+                                    .Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+                                    .SumAsync(s => s.Amount);
             decimal lineDueAmount = 0;
             if(lineDeadlines.Count() > 0)
             {
@@ -791,7 +803,7 @@ namespace EducNotes.API.Controllers
               {
                 if(lineD.DueDate.Date < today && !lineD.Paid)
                 {
-                  lineDueAmount = lineD.Amount + lineD.ProductFee;
+                  lineDueAmount = lineD.Amount + lineD.ProductFee - amountPaid;
                   productDueAmount += lineDueAmount;
                   childDueAmount += lineDueAmount;
 
@@ -814,8 +826,9 @@ namespace EducNotes.API.Controllers
             {
               if(line.Deadline.Date < today)
               {
-                productDueAmount += line.AmountTTC;
-                childDueAmount += line.AmountTTC;
+                lineDueAmount = line.AmountTTC - amountPaid;
+                productDueAmount += lineDueAmount;
+                childDueAmount += lineDueAmount;
 
                 // split late amount in amounts of days late
                 var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
@@ -833,7 +846,7 @@ namespace EducNotes.API.Controllers
             }
           }
 
-          prd.TotalLateAmount = productDueAmount;
+          prd.LateAmount = productDueAmount;
           prd.LateAmount7Days = lateAmount7Days;
           prd.LateAmount15Days = lateAmount15Days;
           prd.LateAmount30Days = lateAmount30Days;
@@ -849,5 +862,125 @@ namespace EducNotes.API.Controllers
 
       return Ok(childRecovery);
     }
+
+    [HttpGet("ChildLatePaymentByLevel/{levelid}")]
+    public async Task<IActionResult> GetChildLatePaymentByLevel(int levelid)
+    {
+      var today = DateTime.Now.Date;
+      var childrenFromDB = await _context.Users
+                            .Include(i => i.ClassLevel)
+                            .Include(i => i.Photos)
+                            .Include(i => i.Class)
+                            .Where(o => o.ClassLevelId == levelid && o.UserTypeId == studentTypeId)
+                            .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
+                            .ToListAsync();
+      var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(childrenFromDB);
+      List<RecoveryForChildDto> childRecovery = new List<RecoveryForChildDto>();
+      foreach (var child in children)
+      {
+        RecoveryForChildDto rfcd = new RecoveryForChildDto();
+        rfcd.ProductRecovery = new List<ProductRecoveryDto>();
+        rfcd.Id = child.Id;
+        rfcd.LastName = child.LastName;
+        rfcd.FirstName = child.FirstName;
+        rfcd.LevelName = child.ClassLevelName;
+        rfcd.ClassName = child.ClassName;
+        rfcd.PhotoUrl = child.PhotoUrl;
+
+        decimal childDueAmount = 0;
+        List<ProductRecoveryDto> productRecovery = new List<ProductRecoveryDto>();
+        var products = await _repo.GetActiveProducts();
+        foreach (var product in products)
+        {
+          ProductRecoveryDto prd = new ProductRecoveryDto();
+          prd.ProductName = product.Name;
+          decimal productDueAmount = 0;
+
+          // decimal lateAmount7Days = 0;
+          // decimal lateAmount15Days = 0;
+          // decimal lateAmount30Days = 0;
+          // decimal lateAmount60Days = 0;
+          // decimal lateAmount60DaysPlus = 0;
+
+          var lines = await _context.OrderLines
+                            .Where(o => o.ChildId == child.Id && o.ProductId == product.Id)
+                            .ToListAsync();
+          foreach(var line in lines)
+          {
+            var lineDeadlines = await _context.OrderLineDeadlines
+                                        .Where(o => o.OrderLineId == line.Id)
+                                        .OrderBy(o => o.DueDate)
+                                        .ToListAsync();
+            var amountPaid = await _context.FinOpOrderLines
+                                    .Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+                                    .SumAsync(s => s.Amount);
+            decimal lineDueAmount = 0;
+            if(lineDeadlines.Count() > 0)
+            {
+              foreach(var lineD in lineDeadlines)
+              {
+                if(lineD.DueDate.Date < today && !lineD.Paid)
+                {
+                  lineDueAmount = lineD.Amount + lineD.ProductFee - amountPaid;
+                  productDueAmount += lineDueAmount;
+                  childDueAmount += lineDueAmount;
+
+                  // split late amount in amounts of days late
+                  // var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
+                  // if(nbDaysLate <= 7)
+                  //   lateAmount7Days += lineDueAmount;
+                  // else if(nbDaysLate > 7 && nbDaysLate <= 15)
+                  //   lateAmount15Days += lineDueAmount;
+                  // else if(nbDaysLate > 15 && nbDaysLate <= 30)
+                  //   lateAmount30Days += lineDueAmount;
+                  // else if(nbDaysLate > 30 && nbDaysLate <= 60)
+                  //   lateAmount60Days += lineDueAmount;
+                  // else if(nbDaysLate > 60)
+                  //   lateAmount60DaysPlus += lineDueAmount;
+                }
+              }
+            }
+            else
+            {
+              if(line.Deadline.Date < today)
+              {
+                lineDueAmount = line.AmountTTC + amountPaid;
+                productDueAmount += lineDueAmount;
+                childDueAmount += lineDueAmount;
+
+                // split late amount in amounts of days late
+                // var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
+                // if(nbDaysLate <= 7)
+                //   lateAmount7Days += line.AmountTTC;
+                // else if(nbDaysLate > 7 && nbDaysLate <= 15)
+                //   lateAmount15Days += line.AmountTTC;
+                // else if(nbDaysLate > 15 && nbDaysLate <= 30)
+                //   lateAmount30Days += line.AmountTTC;
+                // else if(nbDaysLate > 30 && nbDaysLate <= 60)
+                //   lateAmount60Days += line.AmountTTC;
+                // else if(nbDaysLate > 60)
+                //   lateAmount60DaysPlus += line.AmountTTC;
+              }
+            }
+          }
+
+          prd.LateAmount = productDueAmount;
+          // prd.LateAmount7Days = lateAmount7Days;
+          // prd.LateAmount15Days = lateAmount15Days;
+          // prd.LateAmount30Days = lateAmount30Days;
+          // prd.LateAmount60Days = lateAmount60Days;
+          // prd.LateAmount60DaysPlus = lateAmount60DaysPlus;
+          if(productDueAmount > 0)
+            rfcd.ProductRecovery.Add(prd);
+        }
+
+        rfcd.LateAmount = childDueAmount;
+        if(childDueAmount > 0)
+          childRecovery.Add(rfcd);
+      }
+
+      return Ok(childRecovery);
+    }
+
   }
 }

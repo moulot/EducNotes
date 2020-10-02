@@ -46,11 +46,16 @@ export class OrderService {
     return this.http.get(this.baseUrl + 'AmountByDeadline');
   }
 
-  getLevelRecovery() {
-    return this.http.get(this.baseUrl + 'LevelRecoveryData');
+  getLevelLatePayments() {
+    return this.http.get(this.baseUrl + 'LevelLatePayments');
   }
 
-  getChildRecovery() {
-    return this.http.get(this.baseUrl + 'ChildrenRecoveryData');
+  getChildLatePayments() {
+    return this.http.get(this.baseUrl + 'ChildLatePayments');
   }
+
+  getChildLatePaymentByLevel(levelid) {
+    return this.http.get(this.baseUrl + 'ChildLatePaymentByLevel/' + levelid);
+  }
+
 }

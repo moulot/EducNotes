@@ -4,6 +4,8 @@ namespace EducNotes.API.Models {
         {
             IsRequired = false;
             IsPaidCash = true;
+            Active = true;
+            DsplSeq = 0;
         }
         public int Id { get; set; }
         public string Name { get; set; }
@@ -19,5 +21,7 @@ namespace EducNotes.API.Models {
         public int? PayableAtId { get; set; }
         public PayableAt PayableAt { get; set; }
         public bool IsRequired { get; set; }
+        public bool Active { get; set; }
+        public byte DsplSeq { get; set; }
     }
 }
