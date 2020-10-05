@@ -10,4 +10,8 @@ export interface OrderLineDeadline {
   comment: string;
   seq: number;
   paid: boolean;
+  insertDate: Date;
+  insertUserId: number;
+  updateDate: Date;
+  updateUserId: number;
 }

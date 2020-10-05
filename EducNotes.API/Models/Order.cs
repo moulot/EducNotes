@@ -22,6 +22,10 @@ namespace EducNotes.API.Models {
       Overdue = false;
       Paid = false;
       Completed = false;
+      InsertDate = DateTime.Now;
+      InsertUserId = 1;
+      UpdateDate = DateTime.Now;
+      UpdateUserId = 1;
     }
 
     public int Id { get; set; }
@@ -57,6 +61,12 @@ namespace EducNotes.API.Models {
     public Boolean Completed { get; set; }
     public Boolean isReg { get; set; }
     public Boolean isNextReg { get; set; }
+    public DateTime InsertDate { get; set; } = DateTime.Now;
+    public int InsertUserId { get; set; }
+    public User InsertUser { get; set; }
+    public DateTime UpdateDate { get; set; } = DateTime.Now;
+    public int UpdateUserId { get; set; }
+    public User UpdateUser { get; set; }
     public List<OrderLine> Lines { get; set; }
   }
 }

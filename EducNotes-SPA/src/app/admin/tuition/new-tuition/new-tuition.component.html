@@ -13,19 +13,6 @@
         <div class="card-body p-2">
           <div class="row">
             <div class="col-md-2"><div class="text-18 text-muted">infos parents</div></div>
-            <div class="col-md-10" *ngIf="tuitionForm.hasError('parentNOK') && tuitionForm.touched">
-              <div class="text-15 text-right text-danger">les données des parents contiennent des erreurs!</div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="alert alert-danger text-15" role="alert"
-                *ngIf="tuitionForm.hasError('parentNOK') && tuitionForm.touched">
-                <div *ngIf="tuitionForm.hasError('fatherNOK') && tuitionForm.touched">les données du père sont incorrectes</div>
-                <div *ngIf="tuitionForm.hasError('motherNOK') && tuitionForm.touched">les données de la mère sont incorrectes</div>
-                <!-- <div *ngIf="tuitionForm.hasError('sendemailNOK') && tuitionForm.touched">sélectionner au moins un parent pour l'envoi du email</div> -->
-              </div>
-            </div>
           </div>
           <div mdbCollapse [isCollapsed]="false" #parents="bs-collapse">
             <div class="row">
@@ -60,17 +47,12 @@
                     </div>
                     <div class="col-md-8">
                       <div class="md-form my-0">
-                        <input mdbInput type="text" id="fEmail" class="form-control" formControlName="fEmail" mdbValidate>
+                        <input mdbInput type="email" id="fEmail" class="form-control" formControlName="fEmail" mdbValidate>
                           <label for="fEmail" class="">email</label>
                           <div *ngIf="tuitionForm.get('fEmail').errors && tuitionForm.get('fEmail').touched"
                             class="text-small text-danger">saisir l'email svp</div>
                       </div>
                     </div>
-                    <!-- <div class="col-md-12">
-                      <div class="md-form my-1">
-                        <mdb-checkbox formControlName="fSendEmail">envoyer les infos de l'inscription au père</mdb-checkbox>
-                      </div>
-                    </div> -->
                   </div>
                 </div>
               </div>
@@ -111,30 +93,26 @@
                           class="text-small text-danger">saisir l'email svp</div>
                       </div>
                     </div>
-                    <!-- <div class="col-md-12" >
-                      <div class="md-form my-1">
-                        <mdb-checkbox formControlName="mSendEmail">envoyer les infos de l'inscription à la mère</mdb-checkbox>
-                      </div>
-                    </div> -->
                   </div>
                 </div>
               </div>
             </div>
             <div class="float-right">
-              <button type="button" mdbPageScroll href="#child" mdbBtn [disabled]="tuitionForm.hasError('parentNOK')" class="btnBlue" 
-                size="sm" mdbWavesEffect (click)="openDiv(1)">suivant</button>
+              <button type="button" mdbPageScroll href="#child" mdbBtn 
+                [disabled]="tuitionForm.hasError('motherNOK') || tuitionForm.hasError('fatherNOK') ||
+                tuitionForm.hasError('parentNOK')" class="btnBlue" size="sm" mdbWavesEffect (click)="openDiv(1)">suivant</button>
             </div>
           </div>
           <div mdbCollapse #sumparents="bs-collapse">
             <div class="row">
               <div class="col-md-10">
                 <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-md-12" *ngIf="tuitionForm.value.fEmail !== ''">
                     <b class="text-15">père</b>. <span class="text-typed-cptlize mr-2">{{tuitionForm.value.fLastName}}</span>
                     <span class="text-typed-cptlize">{{tuitionForm.value.fFirstName}}</span>.
                     <span class="text-typed">{{tuitionForm.value.fCell}}</span> / <span class="text-typed">{{tuitionForm.value.fEmail}}</span>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-12" *ngIf="tuitionForm.value.mEmail !== ''">
                     <b class="text-15">mère</b>. <span class="text-typed-cptlize mr-2">{{tuitionForm.value.mLastName}}</span>
                     <span class="text-typed-cptlize">{{tuitionForm.value.mFirstName}}</span>.
                     <span class="text-typed">{{tuitionForm.value.mCell}}</span> / <span class="text-typed">{{tuitionForm.value.mEmail}}</span>

@@ -9,6 +9,6 @@ namespace EducNotes.API.Dtos
     public decimal Invoiced { get; set; }
     public decimal Paid { get; set; }
     public decimal Balance { get; set; }
-    public decimal LateAmount { get; set; }
+    public Boolean IsLate { get; set; }
   }
 }

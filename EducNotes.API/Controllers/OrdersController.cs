@@ -72,7 +72,8 @@ namespace EducNotes.API.Controllers
                       .Where(p => p.ProductId == tuitionId || p.ProductId == nextYearTuitionId).ToListAsync();
 
       var classProducts = await _context.ClassLevelProducts
-                          .Where(c => c.ProductId == tuitionId || c.ProductId == nextYearTuitionId).ToListAsync();
+                                .Where(c => c.ProductId == tuitionId || c.ProductId == nextYearTuitionId)
+                                .ToListAsync();
 
       //order dates
       var todayDate = DateTime.Now;
@@ -268,7 +269,8 @@ namespace EducNotes.API.Controllers
           var deadlines = await _context.ProductDeadLines
                                 .OrderBy(o => o.DueDate)
                                 .Where(p => p.ProductId == tuitionId).ToListAsync();
-          var firstDeadline = deadlines.First(d => d.Seq == 1);
+          var firstDeadline = deadlines.First();
+          var firstDeadlineDate = firstDeadline.DueDate.Date;
 
           //tuition order
           Order order = new Order();
@@ -277,11 +279,15 @@ namespace EducNotes.API.Controllers
           order.OrderLabel = "inscription";
           order.Deadline = newTuition.Deadline;
           order.Validity = newTuition.Validity;
+          if(firstDeadlineDate < order.Validity.Date)
+            order.Validity = firstDeadlineDate;
           order.TotalHT = newTuition.OrderAmount;
           order.AmountHT = order.TotalHT - order.Discount;
           order.AmountTTC = order.TotalHT;
           order.Created = true;
           order.isReg = true;
+          order.InsertUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+          order.UpdateUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
           _repo.Add(order);
 
           if(! await _repo.SaveAll())
@@ -331,6 +337,8 @@ namespace EducNotes.API.Controllers
             line.OrderLineLabel = "inscription de " + child.LastName + " " + child.FirstName;
             line.ProductId = tuitionId;
             line.ProductFee = child.RegFee;
+            line.Deadline = order.Deadline;
+            line.Validity = order.Validity;
             line.ChildId = user.Id;
             line.ClassLevelId = nextClassLevel.Id;
             line.Qty = 1;
@@ -400,11 +408,11 @@ namespace EducNotes.API.Controllers
           }
 
           //father
-          User father = new User();
-          string fathercode = "";
-          RegistrationEmailDto fatherEmail = new RegistrationEmailDto();
-          if(newTuition.FActive)
+          if(newTuition.FEmail != "")
           {
+            User father = new User();
+            string fathercode = "";
+            RegistrationEmailDto fatherEmail = new RegistrationEmailDto();
             var GUID = Guid.NewGuid();
             father.UserName = GUID.ToString();
             father.LastName = newTuition.FLastName;
@@ -458,11 +466,11 @@ namespace EducNotes.API.Controllers
           }
 
           //mother
-          User mother = new User();
-          string mothercode = "";
-          RegistrationEmailDto motherEmail = new RegistrationEmailDto();
-          if(newTuition.MActive)
+          if(newTuition.MEmail != "")
           {
+            User mother = new User();
+            string mothercode = "";
+            RegistrationEmailDto motherEmail = new RegistrationEmailDto();
             var GUID = Guid.NewGuid();
             mother.UserName = GUID.ToString();
             mother.LastName = newTuition.MLastName;
@@ -612,15 +620,42 @@ namespace EducNotes.API.Controllers
       {
         var linedeadlines = new List<OrderLineDeadline>();
         if(i == 0)
-          linedeadlines =  await _context.OrderLineDeadlines.Where(o => o.DueDate <= duedate).ToListAsync();
+        {
+          linedeadlines =  await _context.OrderLineDeadlines
+                                  .Include(o => o.OrderLine)
+                                  .Where(o => o.DueDate <= duedate).ToListAsync();
+        }
         else
-          linedeadlines =  await _context.OrderLineDeadlines.Where(o => o.DueDate > olddate && o.DueDate <= duedate).ToListAsync();
+        {
+          linedeadlines =  await _context.OrderLineDeadlines
+                                  .Include(o => o.OrderLine)
+                                  .OrderBy(o => o.DueDate)
+                                  .Where(o => o.DueDate > olddate && o.DueDate <= duedate).ToListAsync();
+        }
+
         decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
-        decimal paid = linedeadlines.Where(o => o.Paid).Sum(s => s.Amount + s.ProductFee);
+
+        var lineids = linedeadlines.Select(s => s.OrderLineId);
+        // decimal linePaid = 0;
+        decimal paid = 0;
+        foreach (var lineid in lineids)
+        {
+          var linePaid = await _context.FinOpOrderLines
+                                .Where(f => f.OrderLineId == lineid && f.FinOp.Cashed)
+                                .SumAsync(s => s.Amount);
+          var lined = linedeadlines.First(d => d.OrderLineId == lineid);
+          var lineDueAmount = lined.Amount + lined.ProductFee;
+          if(linePaid >= lineDueAmount)
+          {
+            paid += lineDueAmount;
+          }
+          else
+          {
+            paid += linePaid;
+          }
+        }
+
         decimal balance = invoiced - paid;
-        decimal lateAmount = 0;
-        if(duedate.Date < today)
-          lateAmount = linedeadlines.Where(o => !o.Paid).Sum(s => s.Amount + s.ProductFee);
 
         AmountWithDeadlinesDto awd = new AmountWithDeadlinesDto();
         awd.DueDate = duedate;
@@ -628,7 +663,7 @@ namespace EducNotes.API.Controllers
         awd.Invoiced = invoiced;
         awd.Paid = paid;
         awd.Balance = balance;
-        awd.LateAmount = lateAmount;
+        awd.IsLate = duedate.Date < today ? true : false;
         amountDeadlines.Add(awd);
 
         olddate = duedate;

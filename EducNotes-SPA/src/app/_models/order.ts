@@ -34,4 +34,8 @@ export interface Order {
   isReg: boolean;
   isNextReg: boolean;
   lines: OrderLine[];
+  insertDate: Date;
+  insertUserId: number;
+  updateDate: Date;
+  updateUserId: number;
 }

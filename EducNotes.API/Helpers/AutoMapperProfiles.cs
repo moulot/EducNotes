@@ -478,7 +478,7 @@ namespace EducNotes.API.Helpers {
                   opt.MapFrom(src => src.Child.Photos.FirstOrDefault(p => p.IsMain).Url);
                 })
                 .ForMember(dest => dest.NbDaysLate, opt => {
-                  opt.MapFrom(src => (src.Deadline - DateTime.Now).TotalDays + 1);
+                  opt.MapFrom(src => (src.Validity - DateTime.Now).TotalDays + 1);
                 })
                 .ForMember(dest => dest.strAmountHT, opt => {
                   opt.MapFrom(src => src.AmountHT.ToString("N0") + " F");

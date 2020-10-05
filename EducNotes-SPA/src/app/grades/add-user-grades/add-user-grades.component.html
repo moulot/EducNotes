@@ -1,7 +1,7 @@
 <div class="row">
 
   <div class="col-md-12">
-    <div class="lead text-15 m-0 pb-2">
+    <div class="text-17 m-0 pb-2">
       saisie des notes - classe : {{eval.className}}. {{eval.name}} du {{eval.evalDate}}</div>
   </div>
 
@@ -18,25 +18,26 @@
       </div>
 
       <!-- DATA LIST LG -->
-      <div class="row d-none d-md-block">
+      <div class="row d-none d-md-block animated zoomIn">
         <div class="col-md-12">
-          <div *ngFor="let student of filteredUserGrades; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
-            <div class="card my-1">
-              <div class="card-body p-0 d-flex">
-                <div class="my-auto" style="width: 25%;">
+          <div *ngFor="let student of filteredUserGrades; let i = index">
+            <div class="border rounded-lg p-2 mb-1">
+              <div class="row">
+                <div class="col-4 my-auto">
                   <div class="div-thumb">
-                    <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
-                    <label class="text-17 ml-2">{{student.studentName}}</label>
+                    <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle">
+                    <label class="text-17 text-capitalize ml-2">{{student.studentName}}</label>
                   </div>
                 </div>
-                <div class="my-auto mr-4" style="width: 10%;">
+                <div class="col-2 my-auto">
                   <div class="md-form form-sm m-0">
-                    <input mdbInput type="text" id="note + {{i}}" class="form-control form-control-sm"
+                    <input mdbInput type="number" (blur)="checkGrade(i, eval.maxGrade)" id="note + {{i}}" class="form-control form-control-sm"
                       [(ngModel)]="student.grade" name="note + {{i}}">
                     <label for="note + {{i}}" class="">note / {{eval.maxGrade}}</label>
+                    <div class="text-small text-danger" *ngIf="gradeErrors[i] == true">la note est incorrecte</div>
                   </div>
                 </div>
-                <div class="my-auto" style="width: 50%;">
+                <div class="col-6 my-auto">
                   <div class="md-form form-sm m-0">
                     <input mdbInput type="text" id="comment + {{i}}" class="form-control form-control-sm"
                       [(ngModel)]="student.comment" name="comment + {{i}}">
@@ -50,9 +51,9 @@
       </div>
 
       <!-- DATA LIST SM -->
-      <div class="row d-md-none">
+      <div class="row d-md-none animated zoomIn">
         <div class="col-md-12">
-          <div *ngFor="let student of filteredUserGrades; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+          <div *ngFor="let student of filteredUserGrades; let i = index">
             <!-- <div class="card my-5">
               <div class="card-body p-0 d-flex">
                 <div class="div-thumb-block">
@@ -82,9 +83,11 @@
                     <hr class="my-1" style="background-color: 1px solid #f89f20;">
                   </mdb-card-title>
                   <div class="md-form">
-                    <input mdbInput type="text" id="sm-note + {{i}}" class="form-control form-control-sm"
+                    <input mdbInput type="text" id="sm-note + {{i}}" (blur)="checkGrade(i, eval.maxGrade)"
+                      class="form-control form-control-sm"
                       [(ngModel)]="student.grade" name="sm-note + {{i}}">
                     <label for="sm-note + {{i}}" class="">note/{{eval.maxGrade}}</label>
+                    <div class="text-small text-danger" *ngIf="gradeErrors[i] == true">la note est incorrecte</div>
                   </div>
                   <div class="md-form">
                     <input mdbInput type="text" id="sm-comment + {{i}}" class="form-control form-control-sm"
@@ -119,7 +122,8 @@
           <div>
             <div class="row">
               <div class="col-md-8 mb-1">
-                <button mdbBtn type="submit" block="true" color="primary" size="sm" mdbWavesEffect>saisir les notes</button>
+                <button mdbBtn type="submit" block="true" [disabled]="formNOK"
+                  color="primary" size="sm" mdbWavesEffect>saisir les notes</button>
               </div>
               <div class="col-md-4">
                 <button mdbBtn type="button" block="true" (click)="cancelForm()" color="primary" size="sm" mdbWavesEffect>annuler</button>

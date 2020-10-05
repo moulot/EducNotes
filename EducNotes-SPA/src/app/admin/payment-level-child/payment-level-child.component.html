@@ -16,15 +16,15 @@
             <div class="col-md-12">
               <a class="text-13" [routerLink]="['/userFile', child.id]">voir dossier</a>
             </div>
-            <div class="col-md-7 text-14 text-capitalize text-center text-md-left"><b>{{child.lastName}} {{child.firstName}}</b></div>
-            <div class="col-md-5 text-14 text-danger text-center text-md-right">{{child.lateAmount | number:'':'fr-FR'}} F</div>
+            <div class="col-7 text-14 text-capitalize"><b>{{child.lastName}} {{child.firstName}}</b></div>
+            <div class="col-5 text-14 text-danger text-right">{{child.lateAmount | number:'':'fr-FR'}} F</div>
           </div>
         </div>
         <div class="col-md-12"><hr class="my-1"></div>
         <div class="col-md-12" *ngFor="let prod of child.productRecovery">
           <div class="row">
-            <div class="col-md-6 text-13">retard {{prod.productName}}</div>
-            <div class="col-md-6 text-13 text-md-right">{{prod.lateAmount | number:'':'fr-FR'}} F</div>
+            <div class="col-6 text-13">retard {{prod.productName}}</div>
+            <div class="col-6 text-13 text-right">{{prod.lateAmount | number:'':'fr-FR'}} F</div>
           </div>
         </div>
       </div>

@@ -130,14 +130,14 @@ export class NewTuitionComponent implements OnInit {
 
   createTuitionForm() {
     this.tuitionForm = this.fb.group({
-      fLastName: ['', Validators.required],
-      fFirstName: ['', Validators.required],
-      fEmail: ['', Validators.required],
-      fCell: ['', Validators.required],
-      mLastName: ['', Validators.required],
-      mFirstName: ['', Validators.required],
-      mEmail: ['', Validators.required],
-      mCell: ['', Validators.required],
+      fLastName: [''],
+      fFirstName: [''],
+      fEmail: ['', Validators.email],
+      fCell: [''],
+      mLastName: [''],
+      mFirstName: [''],
+      mEmail: [''],
+      mCell: [''],
       children: this.fb.array([])
     }, {validator: this.formValidator});
   }
@@ -154,7 +154,6 @@ export class NewTuitionComponent implements OnInit {
       }
     }
 
-    let parenterror = false;
     const flname = g.get('fLastName').value;
     const ffname = g.get('fFirstName').value;
     const fcell = g.get('fCell').value;
@@ -163,6 +162,8 @@ export class NewTuitionComponent implements OnInit {
     const mfname = g.get('mFirstName').value;
     const mcell = g.get('mCell').value;
     const memail = g.get('mEmail').value;
+
+    let parenterror = false;
     if (flname === '' && ffname === '' && fcell === '' && femail === '' && mlname === ''
       && mfname === '' && mcell === '' && memail === '') {
       parenterror = true;
@@ -173,7 +174,6 @@ export class NewTuitionComponent implements OnInit {
     if (flname !== '' || ffname !== '' || fcell !== '' || femail !== '') {
       if (flname === '' || ffname === '' || fcell === '' || femail === '') {
         fathererror = true;
-        // parenterror = true;
       }
     }
 
@@ -182,26 +182,21 @@ export class NewTuitionComponent implements OnInit {
     if (mlname !== '' || mfname !== '' || mcell !== '' || memail !== '') {
       if (mlname === '' || mfname === '' || mcell === '' || memail === '') {
         mothererror = true;
-        // parenterror = true;
       }
     }
 
-    // did we select at least one parent to cope with the registration?
-    // let emailerror = false;
-    // if (fsendemail === false && msendemail === false) {
-    //   emailerror = true;
-    //   parenterror = true;
+    // if (childerror === false && parenterror === true) {
+    //   return {'childNOK': false, 'parentNOK': true, 'formNOK': true,
+    //     'fatherNOK': fathererror, 'motherNOK': mothererror};
+    // } else if (childerror === true && parenterror === false) {
+    //   return {'childNOK': true, 'parentNOK': false, 'formNOK': true,
+    //     'fatherNOK': fathererror, 'motherNOK': mothererror};
+    // } else if (childerror === true && parenterror === true) {
+    //   return {'childNOK': true, 'parentNOK': true, 'formNOK': true,
+    //     'fatherNOK': fathererror, 'motherNOK': mothererror};
     // }
-
-    if (childerror === false && parenterror === true) {
-      return {'childNOK': false, 'parentNOK': true, 'formNOK': true,
-        'fatherNOK': fathererror, 'motherNOK': mothererror}; // , 'sendemailNOK': emailerror};
-    } else if (childerror === true && parenterror === false) {
-      return {'childNOK': true, 'parentNOK': false, 'formNOK': true,
-        'fatherNOK': fathererror, 'motherNOK': mothererror}; // , 'sendemailNOK': emailerror};
-    } else if (childerror === true && parenterror === true) {
-      return {'childNOK': true, 'parentNOK': true, 'formNOK': true,
-        'fatherNOK': fathererror, 'motherNOK': mothererror}; // , 'sendemailNOK': emailerror};
+    if (parenterror === true || childerror === true || (mothererror === true && fathererror === true)) {
+      return {'formNOK': true, 'childNOK': childerror, 'parentNOK': parenterror, 'fatherNOK': fathererror, 'motherNOK': mothererror};
     }
 
     return null;
@@ -486,13 +481,11 @@ export class NewTuitionComponent implements OnInit {
     this.tuitionData.fFirstName = this.tuitionForm.value.fFirstName;
     this.tuitionData.fCell = this.tuitionForm.value.fCell.replace(/\./g, '');
     this.tuitionData.fEmail = this.tuitionForm.value.fEmail;
-    // tuitionData.fSendEmail = this.tuitionForm.value.fSendEmail;
     this.tuitionData.fActive = this.tuitionForm.hasError('fathererror') === true ? false : true;
     this.tuitionData.mLastName = this.tuitionForm.value.mLastName;
     this.tuitionData.mFirstName = this.tuitionForm.value.mFirstName;
     this.tuitionData.mCell = this.tuitionForm.value.mCell.replace(/\./g, '');
     this.tuitionData.mEmail = this.tuitionForm.value.mEmail;
-    // tuitionData.mSendEmail = this.tuitionForm.value.mSendEmail;
     this.tuitionData.mActive = this.tuitionForm.hasError('mothererror') === true ? false : true;
     this.tuitionData.orderAmount = this.orderAmount;
     this.tuitionData.dueAmount = this.amountDue;

@@ -4,7 +4,6 @@ import { UserService } from 'src/app/_services/user.service';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/_services/auth.service';
-import { NzModalService, NzModalRef } from 'ng-zorro-antd';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { SkillsModalComponent } from '../skills-modal/skills-modal.component';
 import { EvalType } from 'src/app/_models/evalType';
@@ -29,12 +28,11 @@ export class EvalAddFormComponent implements OnInit {
   teacherCourses: any;
   periods: Period[];
   evalTypes: EvalType[];
-  nzModalRef: NzModalRef;
   coursesSkills: any = [];
   selCourseSkills: any = [];
   skillsSelected: any = [];
   teacherClasses: any;
-  newEvaluation = <Evaluation>{};
+  newEval = <Evaluation>{};
   progEltIds: string;
   isGradedOn = false;
   isGradeCounted = true;
@@ -46,7 +44,7 @@ export class EvalAddFormComponent implements OnInit {
 
   constructor(private userService: UserService, private evalService: EvaluationService,
     private fb: FormBuilder, private authService: AuthService, private router: Router, private classService: ClassService,
-    public alertify: AlertifyService, private nzModalService: NzModalService, private modalService: MDBModalService) { }
+    public alertify: AlertifyService, private modalService: MDBModalService) { }
 
   ngOnInit() {
     this.createNewEvalForm();
@@ -121,21 +119,21 @@ export class EvalAddFormComponent implements OnInit {
   }
 
   createEvaluation(more: boolean) {
-    this.newEvaluation.userId = this.teacher.id;
-    this.newEvaluation.name = this.newEvalForm.value.evalName;
-    this.newEvaluation.courseId = this.newEvalForm.value.newcourse;
-    this.newEvaluation.evalTypeId = this.newEvalForm.value.evalType;
+    this.newEval.userId = this.teacher.id;
+    this.newEval.name = this.newEvalForm.value.evalName;
+    this.newEval.courseId = this.newEvalForm.value.newcourse;
+    this.newEval.evalTypeId = this.newEvalForm.value.evalType;
     const dateData = this.newEvalForm.value.evalDate.split('/');
-    this.newEvaluation.evalDate = new Date(dateData[2], dateData[1] - 1, dateData[0]);
-    this.newEvaluation.graded = this.newEvalForm.controls['grades'].value.evalGraded;
-    this.newEvaluation.periodId = this.newEvalForm.value.newperiod;
-    this.newEvaluation.canBeNagative = this.newEvalForm.controls['grades'].value.isNegative;
-    this.newEvaluation.classId = this.newEvalForm.value.newaclass;
-    this.newEvaluation.coeff = this.newEvalForm.controls['grades'].value.evalCoeff;
-    this.newEvaluation.gradeInLetter = this.newEvalForm.controls['grades'].value.gradeInLetter;
-    this.newEvaluation.maxGrade = this.newEvalForm.controls['grades'].value.evalMaxGrade;
-    this.newEvaluation.significant = this.newEvalForm.controls['grades'].value.notCounted;
-    this.newEvaluation.progElts = [];
+    this.newEval.evalDate = new Date(dateData[2], dateData[1] - 1, dateData[0]);
+    this.newEval.graded = this.newEvalForm.controls['grades'].value.evalGraded;
+    this.newEval.periodId = this.newEvalForm.value.newperiod;
+    this.newEval.canBeNagative = this.newEvalForm.controls['grades'].value.isNegative;
+    this.newEval.classId = this.newEvalForm.value.newaclass;
+    this.newEval.coeff = this.newEvalForm.controls['grades'].value.evalCoeff;
+    this.newEval.gradeInLetter = this.newEvalForm.controls['grades'].value.gradeInLetter;
+    this.newEval.maxGrade = this.newEvalForm.controls['grades'].value.evalMaxGrade;
+    this.newEval.significant = this.newEvalForm.controls['grades'].value.notCounted;
+    this.newEval.progElts = [];
     this.progEltIds = '';
     for (let i = 0; i < this.skillsSelected.length; i++) {
       const id = this.skillsSelected[i].progEltId;
@@ -146,13 +144,16 @@ export class EvalAddFormComponent implements OnInit {
       }
     }
 
-    this.evalService.saveEvaluation(this.newEvaluation, this.progEltIds).subscribe(() => {
+    this.evalService.saveEvaluation(this.newEval, this.progEltIds).subscribe(() => {
       this.alertify.success('ajout de l\'évaluation validé.');
     }, error => {
       this.alertify.error(error);
     }, () => {
       this.newEvalForm.reset();
       this.skillsSelected = [];
+      if (this.isGradedOn) {
+        this.isGradedOn = false;
+      }
       if (more === false) {
         this.router.navigate(['/teacher']);
       }
@@ -162,7 +163,10 @@ export class EvalAddFormComponent implements OnInit {
   newCancel() {
     this.newEvalForm.reset();
     this.skillsSelected = [];
-  }
+    if (this.isGradedOn) {
+      this.isGradedOn = false;
+    }
+}
 
   toggleGrade() {
     this.isGradedOn = !this.isGradedOn;

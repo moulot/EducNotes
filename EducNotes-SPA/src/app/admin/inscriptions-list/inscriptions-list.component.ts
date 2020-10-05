@@ -156,7 +156,6 @@ export class InscriptionsListComponent implements OnInit {
 
         this.classService.getClassesByLevelId(this.searchParams.levelId).subscribe((response: Class[]) => {
           this.classes = response;
-          console.log(this.classes);
           this.classOptions = [];
           for (let i = 0; i < this.classes.length; i++) {
             const elt = this.classes[i];

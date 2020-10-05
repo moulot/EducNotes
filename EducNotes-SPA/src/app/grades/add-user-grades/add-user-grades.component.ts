@@ -18,7 +18,7 @@ export class AddUserGradesComponent implements OnInit {
   eval: any;
   userGrades: any = [];
   newUserGrades: any = [];
-  notesForm: FormGroup;
+  evalForm: FormGroup;
   userEvals: UserEvaluation[] = [];
   searchControl: FormControl = new FormControl();
   filteredUserGrades: any = [];
@@ -26,6 +26,8 @@ export class AddUserGradesComponent implements OnInit {
   page = 1;
   pageSize = 15;
   closed: boolean;
+  gradeErrors = [];
+  formNOK = false;
 
   constructor(private evalService: EvaluationService, private fb: FormBuilder,
     private alertify: AlertifyService, private route: ActivatedRoute, private router: Router) { }
@@ -35,14 +37,24 @@ export class AddUserGradesComponent implements OnInit {
       const classEval = data['data'];
       this.eval = classEval.eval;
       this.userGrades = classEval.usersEval;
+      console.log(this.userGrades);
       this.filteredUserGrades = this.userGrades;
       this.newUserGrades = this.userGrades;
       this.closed = this.eval.closed;
+      for (let i = 0; i < this.userGrades.length; i++) {
+        const elt = false;
+        this.gradeErrors = [...this.gradeErrors, elt];
+      }
+      console.log(this.gradeErrors);
     });
 
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
       this.filerData(value);
     });
+  }
+
+  createEvalForm() {
+
   }
 
   filerData(val) {
@@ -69,7 +81,7 @@ export class AddUserGradesComponent implements OnInit {
   }
 
   saveNotes() {
-
+    let formOK = true;
     let evalClosed = false;
     if (this.closed === true) {
       evalClosed = true;
@@ -77,6 +89,9 @@ export class AddUserGradesComponent implements OnInit {
 
     for (let i = 0; i < this.userGrades.length; i++) {
       const elt = this.userGrades[i];
+      if (Number(elt.grade) > Number(this.eval.maxGrade)) {
+        formOK = false;
+      }
       const ue = <UserEvaluation>{};
       ue.id = elt.id;
       ue.evaluationId = this.eval.id;
@@ -86,13 +101,29 @@ export class AddUserGradesComponent implements OnInit {
       this.userEvals = [...this.userEvals, ue];
     }
 
-    this.evalService.saveUserGrades(this.userEvals, evalClosed).subscribe(() => {
-      this.alertify.success('ajout des notes validé');
-    }, error => {
-      this.alertify.error(error);
-    }, () => {
-      this.router.navigate(['/grades']);
-    });
+    if (formOK) {
+      this.evalService.saveUserGrades(this.userEvals, evalClosed).subscribe(() => {
+        this.alertify.success('ajout des notes OK');
+      }, error => {
+        this.alertify.error(error);
+      }, () => {
+        this.router.navigate(['/grades']);
+      });
+    } else {
+      this.alertify.error('des notes sont incorrectes. recommencez svp');
+    }
+  }
+
+  checkGrade(index, maxGrade) {
+    const grade = this.userGrades[index].grade;
+    if (Number(grade) > Number(maxGrade)) {
+      this.gradeErrors[index] = true;
+      this.formNOK = true;
+    } else {
+      this.gradeErrors[index] = false;
+      this.formNOK = false;
+    }
+    console.log(this.gradeErrors);
   }
 
   cancelForm() {
