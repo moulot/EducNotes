@@ -34,7 +34,7 @@ namespace EducNotes.API.Data
     Task<IEnumerable<Schedule>> GetScheduleDay(int classId, int day);
     Task<Like> GetLike(int userId, int recipientId);
     Task<bool> EmailExist(string email);
-    Task<bool> UserNameExist(string userName);
+    Task<bool> UserNameExist(string userName, int currentUserId);
     Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId);
     Task<bool> UpdateChildren(ChildrenForEditDto users);
     Task<bool> AddTeacher(TeacherForEditDto userForRegister, int insertUserId);

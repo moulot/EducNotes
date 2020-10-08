@@ -880,13 +880,18 @@ namespace EducNotes.API.Controllers
         [HttpGet("LevelsWithClasses")]
         public async Task<IActionResult> GetLevelsWithClasses()
         {
-          var levels = await _context.ClassLevels
-                              .Include(c => c.Classes).ThenInclude(i => i.Students)
-                              .OrderBy(a => a.DsplSeq)
-                              .ToListAsync();
-          var dataToReturn = new List<ClassLevelDetailDto>();
+          var classLevels = await _context.Classes
+                                    .OrderBy(o => o.ClassLevel.DsplSeq)
+                                    .Select(s => s.ClassLevel)
+                                    .Include(i => i.Classes).ThenInclude(i => i.Students)
+                                    .Distinct().ToListAsync();
 
-          foreach (var item in levels)
+          // var levels = await _context.ClassLevels
+          //                     .Include(c => c.Classes).ThenInclude(i => i.Students)
+          //                     .OrderBy(a => a.DsplSeq)
+          //                     .ToListAsync();
+          var dataToReturn = new List<ClassLevelDetailDto>();
+          foreach (var item in classLevels)
           {
             var res = new ClassLevelDetailDto();
             res.Id = item.Id;

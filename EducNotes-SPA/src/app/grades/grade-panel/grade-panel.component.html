@@ -12,7 +12,7 @@
 
   <div class="col-md-12">
     <form [formGroup]="notesForm" (ngSubmit)="showNotes()">
-      <div class="card p-2 mb-1">
+      <div class="border rounded-lg p-2 mb-1">
         <div class="row">
           <div class="col-md-2">
             <mdb-select [options]="optionsClass" formControlName="aclass" name="aclass" placeholder="classe"></mdb-select>
@@ -24,8 +24,8 @@
             <mdb-select [options]="optionsPeriod" formControlName="period" name="period" placeholder="période"></mdb-select>
           </div>
           <div class="col-md-3">
-            <button type="submit" [disabled]="!notesForm.valid" mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect>valider</button>
-            <button type="button" (click)="cancelNotesFrom()" mdbBtn class="btnWhiteO" size="sm" mdbWavesEffect>annuler</button>
+            <button type="submit" [disabled]="!notesForm.valid" mdbBtn class="btnWhiteB" size="sm" mdbWavesEffect>valider</button>
+            <button type="button" (click)="cancelNotesFrom()" mdbBtn class="btnWhiteB" size="sm" mdbWavesEffect>annuler</button>
           </div>
           <div class="col-md-3">
             <div class="text-right d-none d-md-block">
@@ -49,11 +49,9 @@
             <div class="p-2 border rounded">
               <div>
                 <h4 class="text-18 mb-1">évaluations à noter</h4>
-                <p class="text-small text-muted">notes à renseigner pour ces évaluations</p>
+                <div class="text-small text-muted">notes à renseigner pour ces évaluations</div>
               </div>
-
               <hr class="my-1">
-
               <div *ngFor="let class of evalsToBeGraded">
                 <p class="text-17 font-weight-400 m-0">classe {{class.className}}</p>
                 <div *ngIf="class.evals.length > 0">
@@ -97,11 +95,9 @@
             <div class="p-2 border rounded">
               <div>
                 <h4 class="text-18 mb-1">évaluations à venir</h4>
-                <p class="text-small text-muted">évaluations programmées par le professeur</p>
+                <div class="text-small text-muted">évaluations programmées par le professeur</div>
               </div>
-
               <hr class="my-1">
-
               <div *ngFor="let class of evalsToCome">
                 <p class="text-17 font-weight-400 m-0">classe {{class.className}}</p>
                 <div *ngIf="class.evals.length > 0">
@@ -147,11 +143,8 @@
 
 
 <div *ngIf="toggleListAdd">
-
   <div *ngIf="showTable">
-
     <div *ngIf="evals.length > 0">
-
       <div class="row my-2">
         <div class="col-md-4">
           <div class="md-form m-0">
@@ -160,29 +153,48 @@
           </div>
         </div>
       </div>
-
       <!--HEADER LG-->
-      <div class="row d-none d-md-block">
+      <div class="row d-none d-md-block mb-2">
         <div class="col-md-12">
-          <div class="card">
-            <div class="card-body p-2 d-flex">
-              <div class="w-20 my-auto">
-                <div class="my-auto">nom & prénoms</div>
-              </div>
-              <div class="w-10" *ngFor="let eval of evals, index as i">
+          <div class="border rounded-lg p-1">
+            <div class="row">
+              <div class="col-3 text-17 my-auto">nom & prénoms</div>
+              <div class="col-1" *ngFor="let eval of evals, index as i">
                 <div>
                   <p class="text-muted text-13 m-0">{{eval.evalDate | date: 'dd/MM/yy'}}</p>
                   <p class="text-muted text-13 m-0">{{eval.name}}</p>
                   <p class="text-muted text-13 m-0" *ngIf="eval.graded">note/{{eval.maxGrade}}. coeff:{{eval.coeff}}</p>
-                  <p class="text-muted text-13 m-0">{{eval.evalType.name}}</p>
-                  <!-- <p class="text-muted text-13 m-0" *ngIf="!eval.graded">non notée</p> -->
-                  <div class="">
-                    <!-- <a *ngIf="eval.evalDateExpired" (click)="enterGrades(eval, userGrades, i)">
-                      <label class="font-weight-450 m-0 primary-lighter-hover">editer</label>
-                    </a> -->
-                    <a *ngIf="eval.evalDateExpired" [routerLink]="['/AddUserGrades', eval.id]">
-                      <label class="font-weight-450 m-0 primary-lighter-hover">editer</label>
-                    </a>
+                  <p class="text-muted text-13 m-0">{{eval.evalTypeAbbrev}}</p>
+                  <div *ngIf="eval.evalDateExpired">
+                    <div *ngIf="!eval.closed">
+                      <a [routerLink]="['/AddUserGrades', eval.id]">
+                        <label class="font-weight-450 m-0 primary-lighter-hover">editer</label>
+                      </a>
+                    </div>
+                    <div *ngIf="eval.closed" class="text-14 text-danger">cloturée</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- DATA LIST LG -->
+      <div class="row d-none d-md-block animated zoomIn">
+        <div class="col-md-12">
+          <div *ngFor="let student of filteredUserGrades; let i = index">
+            <div class="border rounded-lg p-1 mb-1">
+              <div class="row">
+                <div class="col-3 my-auto">
+                  <div class="div-thumb">
+                    <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle">
+                    <label class="text-17 text-capitalize ml-2">{{student.studentName}}</label>
+                  </div>
+                </div>
+                <div class="col-1 my-auto" *ngFor="let grade of student.grades, index as j">
+                  <div *ngIf="grade > -1000">
+                    <div *ngIf="grade >= evals[j].maxGrade/2" class="text-15 font-weight-450">{{grade}}</div>
+                    <div *ngIf="grade < evals[j].maxGrade/2" class="text-15 text-danger font-weight-450">{{grade}}</div>
                   </div>
                 </div>
               </div>
@@ -203,7 +215,7 @@
                   <p class="text-muted text-15 m-0">{{eval.evalDate | date: 'dd/MM/yy'}}</p>
                   <p class="text-muted text-15 m-0">{{eval.name}}</p>
                   <p class="text-muted text-15 m-0" *ngIf="eval.graded">note/{{eval.maxGrade}}. coeff:{{eval.coeff}}</p>
-                  <p class="text-muted text-15 m-0">{{eval.evalType.name}}</p>
+                  <p class="text-muted text-15 m-0">{{eval.evalTypeAbbrev}}</p>
                   <div class="">
                     <a *ngIf="eval.evalDateExpired" [routerLink]="['/AddUserGrades', eval.id]">
                       <label class="font-weight-450 m-0 primary-lighter-hover">editer</label>
@@ -216,64 +228,8 @@
           </div>
         </div>
       </div>
-
-      <!-- DATA LIST LG -->
-      <div class="row d-none d-md-block">
-        <div class="col-md-12">
-          <div *ngFor="let student of filteredUserGrades; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
-            <div class="card my-1">
-              <div class="card-body p-0 d-flex">
-                <div class="w-20 my-auto">
-                  <div class="div-thumb">
-                    <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
-                    <label class="ml-2">{{student.studentName}}</label>
-                  </div>
-                </div>
-                <div class="w-10 my-auto ml-2" *ngFor="let grade of student.grades, index as j">
-                  <div *ngIf="grade > -1000">
-                    <div *ngIf="grade >= evals[j].maxGrade/2" class="text-15 font-weight-450">{{grade}}</div>
-                    <div *ngIf="grade < evals[j].maxGrade/2" class="text-15 text-danger font-weight-450">{{grade}}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- DATA LIST SM -->
       <div class="row d-md-none">
-        <!-- <div class="col-md-12">
-          <div *ngFor="let student of filteredUserGrades; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
-            <div class="card my-1">
-              <div class="card-body p-0 d-flex">
-                <div class="div-thumb-block">
-                  <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
-                </div>
-                <div class="flex-grow-1">
-                  <div class="text-17 text-capitalize font-weight-450 ml-1">{{student.studentName}}</div>
-                  <div class="my-auto ml-2" *ngFor="let grade of student.grades, index as i">
-                    <div class="d-flex">
-                      <div class="text-15 pb-1">{{evals[i].name}} du {{evals[i].evalDate | date: 'dd/MM/yy'}}</div>
-                      <div class="ml-3 pb-1">:</div>
-                      <div style="width: 60px;">
-                        <div *ngIf="grade.length > 0">
-                          <div *ngIf="grade >= evals[i].maxGrade/2"
-                            class="text-15 text-right pb-1 font-weight-450">{{grade}}/{{evals[i].maxGrade}}</div>
-                          <div *ngIf="grade < evals[i].maxGrade/2"
-                            class="text-15 text-right pb-1 text-danger font-weight-450">{{grade}}/{{evals[i].maxGrade}}</div>
-                        </div>
-                        <div *ngIf="grade.length == 0">
-                          <div class="text-15 text-right pb-1 font-weight-450">N/C</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> -->
         <div class="col-md-12 my-5" *ngFor="let student of filteredUserGrades">
           <mdb-card class="testimonial-card">
             <div class="avatar mx-auto">
@@ -289,7 +245,7 @@
                   <div class="w-60 text-left">
                     <div class="text-14">{{evals[i].evalDate | date: 'dd/MM/yy'}}</div>
                     <div class="text-14">{{evals[i].name}}</div>
-                    <div class="text-14">{{evals[i].evalType.name}}</div>
+                    <div class="text-14">{{evals[i].evalTypeAbbrev}}</div>
                   </div>
                   <div class="px-2 d-flex flex-wrap align-content-center">:</div>
                   <div class="flex-grow-1 d-flex flex-wrap align-content-center justify-content-center">

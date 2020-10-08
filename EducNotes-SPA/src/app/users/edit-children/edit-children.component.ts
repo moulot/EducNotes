@@ -96,8 +96,9 @@ export class EditChildrenComponent implements OnInit {
 
   userNameVerification(index) {
     const userName = this.childrenForm.value.children[index].username;
+    const childid = this.childrenForm.value.children[index].id;
     this.userNameExist = false;
-    this.authService.userNameExist(userName).subscribe((res: boolean) => {
+    this.authService.userNameExist(userName, childid).subscribe((res: boolean) => {
       if (res === true) {
         this.userNameExist = true;
       }

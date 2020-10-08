@@ -3,5 +3,5 @@ export interface DataForBroadcast {
     classIds: number[];
     subject: string;
     body: string;
-    EmailTemplateId: number;
+    emailTemplateId: number;
 }

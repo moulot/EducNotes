@@ -1,13 +1,10 @@
 <div class="row">
-
   <div class="col-md-12">
     <div class="text-17 m-0 pb-2">
       saisie des notes - classe : {{eval.className}}. {{eval.name}} du {{eval.evalDate}}</div>
   </div>
-
   <div class="col-md-12">
     <form #evalForm="ngForm" (ngSubmit)="saveNotes()">
-
       <div class="row">
         <div class="col-md-4">
           <div class="md-form form-sm m-0">
@@ -16,7 +13,6 @@
           </div>
         </div>
       </div>
-
       <!-- DATA LIST LG -->
       <div class="row d-none d-md-block animated zoomIn">
         <div class="col-md-12">
@@ -31,8 +27,8 @@
                 </div>
                 <div class="col-2 my-auto">
                   <div class="md-form form-sm m-0">
-                    <input mdbInput type="number" (blur)="checkGrade(i, eval.maxGrade)" id="note + {{i}}" class="form-control form-control-sm"
-                      [(ngModel)]="student.grade" name="note + {{i}}">
+                    <input mdbInput type="text" (blur)="checkGrade(i, eval.maxGrade)" class="form-control form-control-sm"
+                      id="note + {{i}}" [(ngModel)]="student.grade" name="note + {{i}}">
                     <label for="note + {{i}}" class="">note / {{eval.maxGrade}}</label>
                     <div class="text-small text-danger" *ngIf="gradeErrors[i] == true">la note est incorrecte</div>
                   </div>
@@ -51,27 +47,9 @@
       </div>
 
       <!-- DATA LIST SM -->
-      <div class="row d-md-none animated zoomIn">
+      <div class="row d-md-none mt-2 animated zoomIn">
         <div class="col-md-12">
           <div *ngFor="let student of filteredUserGrades; let i = index">
-            <!-- <div class="card my-5">
-              <div class="card-body p-0 d-flex">
-                <div class="div-thumb-block">
-                  <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="">
-                </div>
-                <div class="flex-grow-1">
-                  <div class="ml-1 my-1" style="width: 40%;">
-                    <input type="text" placeholder="note/{{eval.maxGrade}}" id="sm-note + {{i}}" class="form-control form-control-sm"
-                      [(ngModel)]="student.grade" name="sm-note + {{i}}">
-                  </div>
-                  <div class="mb-1 ml-1" style="width: 95%;">
-                    <input  type="text" placeholder="commentaire" id="sm-comment + {{i}}" class="form-control form-control-sm"
-                      [(ngModel)]="student.comment" name="sm-comment + {{i}}">
-                  </div>
-                </div>
-              </div>
-              <div class="text-15 ml-1 mb-1 text-capitalize">{{student.studentName}}</div>
-            </div> -->
             <div class="row">
               <mdb-card class="col-md-12 testimonial-card my-5">
                 <div class="avatar mx-auto">
@@ -94,14 +72,6 @@
                       [(ngModel)]="student.comment" name="sm-comment + {{i}}">
                     <label for="sm-comment + {{i}}" class="">commentaire</label>
                   </div>
-                  <!-- <div class="ml-1 my-1" style="width: 40%;">
-                    <input type="text" placeholder="note/{{eval.maxGrade}}" id="sm-note + {{i}}" class="form-control form-control-sm"
-                      [(ngModel)]="student.grade" name="sm-note + {{i}}">
-                  </div>
-                  <div class="mb-1 ml-1" style="width: 95%;">
-                    <input  type="text" placeholder="commentaire" id="sm-comment + {{i}}" class="form-control form-control-sm"
-                      [(ngModel)]="student.comment" name="sm-comment + {{i}}">
-                  </div> -->
                 </mdb-card-body>
               </mdb-card>
             </div>
@@ -117,16 +87,22 @@
               <input type="checkbox" [(ngModel)]="closed" name="evalClosed">
               <span class="slider"></span>
             </label>
+            <i class="fad fa-exclamation-triangle fa-2x mr-2" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+            <span class="text-14 text-danger my-auto">une fois cloturées les notes ne peuvent plus être modifiées</span>
           </div>
           <hr class="my-1">
+          <div *ngIf="formNOK" class="border rounded-lg p-1 mb-1 text-13" style="background-color: red; color: white">
+            des notes sont incorrectes. recommencez svp
+          </div>
           <div>
             <div class="row">
               <div class="col-md-8 mb-1">
                 <button mdbBtn type="submit" block="true" [disabled]="formNOK"
-                  color="primary" size="sm" mdbWavesEffect>saisir les notes</button>
+                  class="btnBlue" size="sm" mdbWavesEffect>saisir les notes</button>
               </div>
               <div class="col-md-4">
-                <button mdbBtn type="button" block="true" (click)="cancelForm()" color="primary" size="sm" mdbWavesEffect>annuler</button>
+                <button mdbBtn type="button" block="true" (click)="cancelForm()" class="btnBlue" size="sm" mdbWavesEffect>annuler</button>
               </div>
             </div>
           </div>

@@ -305,7 +305,7 @@ export class ParentRegisterComponent implements OnInit {
   parentNameVerification() {
     const userName = this.parentForm.value.userName;
     this.parentNameExist = false;
-    this.authService.userNameExist(userName).subscribe((res: boolean) => {
+    this.authService.userNameExist(userName, 0).subscribe((res: boolean) => {
       if (res === true) {
         this.parentNameExist = true;
       }
@@ -315,7 +315,7 @@ export class ParentRegisterComponent implements OnInit {
   childNameVerification() {
     const userName = this.childForm.value.userName;
     this.childNameExist = false;
-    this.authService.userNameExist(userName).subscribe((res: boolean) => {
+    this.authService.userNameExist(userName, 0).subscribe((res: boolean) => {
       if (res === true) {
         this.childNameExist = true;
       }

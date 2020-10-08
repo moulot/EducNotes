@@ -37,9 +37,9 @@ export class Utils {
 
     // // Enable dates (when disabled)
 
-    // // Year limits
-    // minYear: 1000,
-    // maxYear: 9999,
+    // Year limits
+    minYear: 1950,
+    maxYear: 2035,
 
     // // Show Today button
     // showTodayBtn: true,

@@ -81,24 +81,22 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetUserEvaluations(int classId, int courseId, int periodId)
         {
             var evalsFromRepo = await _context.Evaluations
-                            .Include(i => i.EvalType)
-                            .Where(e => e.ClassId == classId && e.CourseId == courseId &&
-                                e.PeriodId == periodId && e.Graded == true)
-                            .OrderBy(o => o.EvalDate)
-                            .ToListAsync();
-
+                                      .Include(i => i.EvalType)
+                                      .Where(e => e.ClassId == classId && e.CourseId == courseId &&
+                                        e.PeriodId == periodId && e.Graded == true)
+                                      .OrderBy(o => o.EvalDate)
+                                      .ToListAsync();
             var evals = _mapper.Map<IEnumerable<EvalsForEditDto>>(evalsFromRepo);
 
             var usersFromRepo = await _repo.GetClassStudents(classId);
             var users = _mapper.Map<IEnumerable<UserForDetailedDto>>(usersFromRepo);
 
             List<UserEvaluation> uevals = await _context.UserEvaluations
-                            .Where(u => u.Evaluation.ClassId == classId && u.Evaluation.CourseId == courseId &&
-                                    u.Evaluation.PeriodId == periodId && u.Evaluation.Graded == true)
-                            .OrderBy(o => o.Evaluation.EvalDate).ToListAsync();
+                                  .Where(u => u.Evaluation.ClassId == classId && u.Evaluation.CourseId == courseId &&
+                                          u.Evaluation.PeriodId == periodId && u.Evaluation.Graded == true)
+                                  .OrderBy(o => o.Evaluation.EvalDate).ToListAsync();
 
             List<UserGradesToReturnDto> usersWithGrades = new List<UserGradesToReturnDto>();
-
             for(int i = 0; i < users.Count(); i++)
             {
               UserGradesToReturnDto usergrades = new UserGradesToReturnDto();

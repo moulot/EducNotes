@@ -37,7 +37,6 @@ export class AddUserGradesComponent implements OnInit {
       const classEval = data['data'];
       this.eval = classEval.eval;
       this.userGrades = classEval.usersEval;
-      console.log(this.userGrades);
       this.filteredUserGrades = this.userGrades;
       this.newUserGrades = this.userGrades;
       this.closed = this.eval.closed;
@@ -45,7 +44,6 @@ export class AddUserGradesComponent implements OnInit {
         const elt = false;
         this.gradeErrors = [...this.gradeErrors, elt];
       }
-      console.log(this.gradeErrors);
     });
 
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
@@ -123,7 +121,6 @@ export class AddUserGradesComponent implements OnInit {
       this.gradeErrors[index] = false;
       this.formNOK = false;
     }
-    console.log(this.gradeErrors);
   }
 
   cancelForm() {

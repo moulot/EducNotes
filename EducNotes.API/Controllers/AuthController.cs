@@ -146,7 +146,7 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
           // verification de l'existence du userName
-          if (await _repo.UserNameExist(userForLoginDto.Username.ToLower()))
+          if (await _repo.UserNameExist(userForLoginDto.Username.ToLower(), 0))
           {
             var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
             if (!user.Validated)
@@ -492,10 +492,10 @@ namespace EducNotes.API.Controllers
             return Ok(await _repo.EmailExist(email));
         }
 
-        [HttpGet("{userName}/VerifyUserName")]
-        public async Task<IActionResult> VerifyUserName(string userName)
+        [HttpGet("VerifyUserName/{currentUserId}/{userName}")]
+        public async Task<IActionResult> VerifyUserName(string userName, int currentUserId)
         {
-            return Ok(await _repo.UserNameExist(userName));
+            return Ok(await _repo.UserNameExist(userName, currentUserId));
         }
 
         [HttpPost("{id}/setLoginPassword")]

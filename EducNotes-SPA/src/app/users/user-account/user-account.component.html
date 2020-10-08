@@ -39,8 +39,8 @@
               <p class="text-15 m-0">{{child.child.lastName | titlecase}} {{child.child.firstName | titlecase}}</p>
               <p *ngIf="child.child.className" class="text-15 m-0">classe {{child.child.className}}</p>
               <p *ngIf="!child.child.className" class="text-15 m-0">classe {{child.child.classLevelName}}</p>
-              <div *ngIf="!child.child.emailConfirmed">
-                <div class="text-danger text-15"><b>enfant non confirmé</b></div>
+              <div *ngIf="!child.child.accountDataValidated">
+                <div class="text-danger text-15">enfant non confirmé</div>
               </div>
             </mdb-card-title>
           </mdb-card-body>

@@ -713,15 +713,15 @@ namespace EducNotes.API.Controllers
                 if (users.Count() == 0)
                 {
                   users = await _context.Users
-                    .Where(u => classIds.Contains(Convert.ToInt32(u.ClassId)) && u.Active == 1 &&
-                    u.UserTypeId == studentTypeId && u.EmailConfirmed == true).ToListAsync();
+                    .Where(u => classIds.Contains(Convert.ToInt32(u.ClassId)) && u.AccountDataValidated == true &&
+                    u.UserTypeId == studentTypeId).ToListAsync();
                 }
 
                 if (ut == studentTypeId)
                 {
                   foreach (var user in users)
                   {
-                    if (!string.IsNullOrEmpty(user.Email))
+                    if(string.IsNullOrEmpty(user.Email))
                       recipientEmails.Add(user.Email);
                   }
                 }
@@ -733,7 +733,7 @@ namespace EducNotes.API.Controllers
 
                   foreach (var user in parents)
                   {
-                    if (!string.IsNullOrEmpty(user.Email))
+                    if (user.AccountDataValidated && user.EmailConfirmed)
                       recipientEmails.Add(user.Email);
                   }
                 }
@@ -742,7 +742,7 @@ namespace EducNotes.API.Controllers
               if (ut == teacherTypeId)
               {
                 var teachers = await _context.ClassCourses
-                  .Where(t => classIds.Contains(t.ClassId) && t.Teacher.Active == 1 &&
+                  .Where(t => classIds.Contains(t.ClassId) && t.Teacher.AccountDataValidated == true &&
                     t.Teacher.UserTypeId == teacherTypeId && t.Teacher.EmailConfirmed == true)
                   .Select(t => t.Teacher)
                   .Distinct()
@@ -750,7 +750,7 @@ namespace EducNotes.API.Controllers
 
                 foreach (var user in teachers)
                 {
-                  if (!string.IsNullOrEmpty(user.Email))
+                  if (user.AccountDataValidated && user.EmailConfirmed)
                     recipientEmails.Add(user.Email);
                 }
               }
@@ -762,8 +762,8 @@ namespace EducNotes.API.Controllers
             //did we select a template?
             if(templateId != 0)
             {
-              subject = schoolName + " - inscription pour l'année scolaire prochaine";
               var template = await _context.EmailTemplates.FirstAsync(t => t.Id == templateId);
+              subject = dataForEmailDto.Subject;
 
               return NoContent();
             }

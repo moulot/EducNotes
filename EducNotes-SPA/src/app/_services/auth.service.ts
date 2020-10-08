@@ -297,8 +297,8 @@ export class AuthService {
     return this.http.get(this.baseUrl + email + '/VerifyEmail');
   }
 
-  userNameExist(userName: string) {
-    return this.http.get(this.baseUrl + userName + '/VerifyUserName');
+  userNameExist(userName: string, currentUserId: number) {
+    return this.http.get(this.baseUrl + 'VerifyUserName/' + currentUserId + '/' + userName);
   }
 
   addUserPhoto(userId: number, photo: any) {

@@ -43,8 +43,6 @@ export class NewUserComponent implements OnInit {
   userNameExist = false;
   showSuccessDiv = false;
 
-
-
   courses: any;
   teacherTypeId = environment.teacherTypeId;
   parentTypeId = environment.parentTypeId;
@@ -84,14 +82,12 @@ export class NewUserComponent implements OnInit {
 
     }
 
-
-
   }
 
   userNameVerification() {
     const userName = this.userForm.value.userName;
     this.userNameExist = false;
-    this.authService.userNameExist(userName).subscribe((res: boolean) => {
+    this.authService.userNameExist(userName, this.userId).subscribe((res: boolean) => {
       if (res === true) {
         this.userNameExist = true;
         // this.user1Form.valid = false;

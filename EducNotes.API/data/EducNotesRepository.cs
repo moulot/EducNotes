@@ -1174,11 +1174,15 @@ namespace EducNotes.API.Data
             return await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
         }
 
-        public async Task<bool> UserNameExist(string userName)
+        public async Task<bool> UserNameExist(string userName, int currentUserId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(e => e.UserName == userName.ToLower());
+            var user = await _context.Users
+                              .Where(u => u.Id != currentUserId)
+                              .FirstOrDefaultAsync(e => e.UserName.ToLower() == userName.ToLower());
             if (user != null)
+            {
               return true;
+            }
             return false;
         }
 

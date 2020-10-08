@@ -17,7 +17,8 @@ namespace EducNotes.API.Dtos
         public int PeriodId { get; set; }
         public Period Period { get; set; }
         public int EvalTypeId { get; set; }
-        public EvalType EvalType { get; set; }
+        public string EvalTypeName { get; set; }
+        public string EvalTypeAbbrev { get; set; }
         public DateTime EvalDate { get; set; }
         public Boolean Graded { get; set; }
         public string MinGrade { get; set; }
@@ -26,7 +27,7 @@ namespace EducNotes.API.Dtos
         public Boolean Significant { get; set; }
         public Boolean CanBeNegative { get; set; }
         public Boolean GradeInLetter { get; set; }
-        public byte Closed { get; set; }
+        public Boolean Closed { get; set; }
         public ICollection<EvalProgElt> EvalProgElts { get; set; }
         public Boolean EvalDateExpired { get; set; }
     }

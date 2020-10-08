@@ -9,6 +9,7 @@ import { UserService } from 'src/app/_services/user.service';
 import { DataForBroadcast } from 'src/app/_models/dataForBroadcast';
 import { ClassForBroadCast } from 'src/app/_models/classForBroadCast';
 import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-broadcast',
@@ -48,7 +49,7 @@ export class BroadcastComponent implements OnInit {
   schoolClassList: any[] = [];
   classLevelClassList: any[] = [];
 
-  constructor(private classService: ClassService, private alertify: AlertifyService,
+  constructor(private classService: ClassService, private alertify: AlertifyService, private router: Router,
     private adminService: AdminService, private fb: FormBuilder, private userService: UserService) { }
 
   ngOnInit() {
@@ -485,30 +486,42 @@ export class BroadcastComponent implements OnInit {
   }
 
   sendEmail() {
-    const userTypeIds = this.emailForm.value.userType;
-    const classIds = this.emailForm.value.class;
+    let userTypeIds = [];
+    for (let i = 0; i < this.emailForm.value.userTypes.length; i++) {
+      const userType = this.emailForm.value.userTypes[i];
+      if (userType.active === true) {
+        userTypeIds = [...userTypeIds, userType.userTypeId];
+      }
+    }
+    let classIds = [];
+    for (let j = 0; j < this.emailForm.value.classes.length; j++) {
+      const aclass = this.emailForm.value.classes[j];
+      if (aclass.selected === true) {
+        classIds = [...classIds, aclass.classId];
+      }
+    }
     const subject = this.emailForm.value.subject;
     const body = this.emailForm.value.body;
     const templateId = this.emailForm.value.template;
 
     const dataForEmails = <DataForBroadcast>{};
     if (Number(this.bodyType) === 1) {
-      dataForEmails.EmailTemplateId = templateId;
+      dataForEmails.emailTemplateId = templateId;
       dataForEmails.subject = '';
       dataForEmails.body = '';
     } else {
-      dataForEmails.EmailTemplateId = 0;
+      dataForEmails.emailTemplateId = 0;
       dataForEmails.subject = subject;
       dataForEmails.body = body;
     }
 
     dataForEmails.userTypeIds = userTypeIds;
     dataForEmails.classIds = classIds;
-
     this.adminService.sendEmailBroadcast(dataForEmails).subscribe(() => {
-      this.alertify.successBar('messages envoyés.');
+      this.alertify.success('messages envoyés.');
+      this.router.navigate(['/home']);
     }, error => {
-      this.alertify.errorBar('problème avec l\'envoi des emails');
+      this.alertify.error('problème avec l\'envoi des emails');
     });
   }
 

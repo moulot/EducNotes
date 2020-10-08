@@ -152,12 +152,6 @@
                     <div class="col-md-12">
                       <div class="border rounded-lg p-2 mb-2">
                         <div class="row">
-                          <div class="col-md-7 mb-2">
-                            <div class="form-group shadow-textarea">
-                              <textarea class="form-control z-depth-1" id="subject" formControlName="subject"
-                                rows="1" placeholder="objet du email..."></textarea>
-                            </div>
-                          </div>
                           <div class="col-md-12 mb-2 pl-0">
                             <div class="form-check form-check-inline">
                               <input type="radio" class="form-check-input" id="template" value="1"
@@ -175,6 +169,12 @@
                           <div *ngIf="bodyType == 1" class="col-md-7 mb-3">
                             <mdb-select [options]="templateOptions" formControlName="template"
                               (ngModelChange)="setTemplateData()"  placeholder="choisir le modèle d'email"></mdb-select>
+                          </div>
+                          <div *ngIf="bodyType == 2" class="col-md-7 mb-2">
+                            <div class="form-group shadow-textarea">
+                              <textarea class="form-control z-depth-1" id="subject" formControlName="subject"
+                                rows="1" placeholder="objet du email..."></textarea>
+                            </div>
                           </div>
                           <div *ngIf="bodyType == 2" class="col-md-12">
                             <div class="form-group shadow-textarea">

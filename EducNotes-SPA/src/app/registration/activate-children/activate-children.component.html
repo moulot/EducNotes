@@ -75,7 +75,16 @@
                               class="text-small text-danger">saisir le sexe svp</div>
                           </div>
                         </div>
+                        <!-- <div class="col-md-2 text-15 d-flex align-items-end pb-1">date de naiss.</div> -->
                         <div class="col-md-4">
+                          <div class="md-form mt-0 mb-0">
+                            <mdb-date-picker id="'dob'+{{i}}" name="opDate" [options]="myDatePickerOptions"
+                              [placeholder]="'date de naiss.'" formControlName="dob"></mdb-date-picker>
+                            <div *ngIf="child.get('dob').errors && child.get('dob').touched"
+                              class="text-small text-danger">saisir la date de naiss. svp</div>
+                          </div>
+                        </div>
+                        <!-- <div class="col-md-4">
                           <div class="md-form mt-2 mb-0">
                             <input mdbInput type="text" id="'dob'+{{i}}" [textMask]="{mask: birthDateMask}"
                               class="form-control" formControlName="dob" mdbValidate>
@@ -83,7 +92,7 @@
                             <div *ngIf="child.get('dob').errors && child.get('dob').touched"
                               class="text-small text-danger">saisir la date de naiss. svp</div>
                           </div>          
-                        </div>
+                        </div> -->
                         <div class="col-md-4">
                           <div class="md-form mt-2 mb-0">
                             <input mdbInput type="text" id="'email'+{{i}}" class="form-control" formControlName="email" mdbValidate>

@@ -19,6 +19,7 @@ export class ActivateChildrenComponent implements OnInit {
   childrenForm: FormGroup;
   birthDateMask = Utils.birthDateMask;
   phoneMask = Utils.phoneMask;
+  myDatePickerOptions = Utils.myDatePickerOptions;
   sexOptions = [{value: 0, label: 'femme'}, {value: 1, label: 'homme'}];
   levelOptions: any[] = [];
   levels: any;
@@ -102,8 +103,9 @@ export class ActivateChildrenComponent implements OnInit {
 
   userNameVerification(index) {
     const userName = this.childrenForm.value.children[index].username;
+    const userid = this.childrenForm.value.children[index].id;
     this.userNameExist = false;
-    this.authService.userNameExist(userName).subscribe((res: boolean) => {
+    this.authService.userNameExist(userName, userid).subscribe((res: boolean) => {
       if (res === true) {
         this.userNameExist = true;
       }

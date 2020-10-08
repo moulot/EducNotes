@@ -106,6 +106,12 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom(src => src.Students.Count());
                 });
             CreateMap<Evaluation, EvalsForEditDto>()
+                .ForMember(dest => dest.EvalTypeName, opt => {
+                    opt.MapFrom(src => src.EvalType.Name);
+                })
+                .ForMember(dest => dest.EvalTypeAbbrev, opt => {
+                    opt.MapFrom(src => src.EvalType.Abbrev);
+                })
                 .ForMember(dest => dest.EvalDateExpired, opt => {
                     opt.MapFrom(src => (src.EvalDate.Date <= DateTime.Now.Date));
                 });

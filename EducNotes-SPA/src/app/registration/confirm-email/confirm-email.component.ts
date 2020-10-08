@@ -28,9 +28,10 @@ export class ConfirmEmailComponent implements OnInit {
   phoneOk = false;
   parentOk = false;
   childrenOk = false;
-  username: string;
+  initialUserName: string;
   pwd: string;
   wait = false;
+  parentid: number;
 
   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
     private alertify: AlertifyService,  private router: Router, private accountService: AccountService) { }
@@ -71,9 +72,14 @@ export class ConfirmEmailComponent implements OnInit {
   }
 
   initialValues() {
+    let login = '';
+    if (this.user.accountDataValidated) {
+      login = this.user.userName;
+      this.parentid = this.user.id;
+    }
+    this.initialUserName = login;
     this.userForm.setValue({lastName: this.user.lastName, firstName: this.user.firstName, email: this.user.email,
-      userName: '', cell: this.user.phoneNumber, pwd: '', checkpwd: ''});
-    // console.log('phone:' + this.user.phoneNumber);
+      userName: login, cell: this.user.phoneNumber, pwd: '', checkpwd: ''});
     this.phoneForm.setValue({phone: this.user.phoneNumber, code: ''});
   }
 
@@ -133,7 +139,7 @@ export class ConfirmEmailComponent implements OnInit {
   userNameVerification() {
     const userName = this.userForm.value.userName;
     this.userNameExist = false;
-    this.authService.userNameExist(userName).subscribe((res: boolean) => {
+    this.authService.userNameExist(userName, this.parentid).subscribe((res: boolean) => {
       if (res === true) {
         this.userNameExist = true;
       }

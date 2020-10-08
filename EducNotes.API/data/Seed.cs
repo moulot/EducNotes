@@ -278,15 +278,15 @@ namespace EducNotes.API.Data
               context.AddRange(banks);
 
               var evalTypes = new List<EvalType> {
-                  new EvalType { Name = "devoir maison" },
-                  new EvalType { Name = "oral" },
-                  new EvalType { Name = "devoir" },
-                  new EvalType { Name = "interro. écrite" },
-                  new EvalType { Name = "exposé" },
-                  new EvalType { Name = "travaux pratiques" },
-                  new EvalType { Name = "rapport de stage" },
-                  new EvalType { Name = "tenue de cahier" },
-                  new EvalType { Name = "examen" }
+                  new EvalType { Name = "devoir maison", Abbrev = "devoir maison" },
+                  new EvalType { Name = "oral", Abbrev = "oral" },
+                  new EvalType { Name = "devoir", Abbrev = "devoir" },
+                  new EvalType { Name = "interro. écrite", Abbrev = "interro. écrite" },
+                  new EvalType { Name = "exposé", Abbrev = "exposé" },
+                  new EvalType { Name = "travaux pratiques", Abbrev = "TP" },
+                  new EvalType { Name = "rapport de stage", Abbrev = "rapport de stage" },
+                  new EvalType { Name = "tenue de cahier", Abbrev = "tenue de cahier" },
+                  new EvalType { Name = "examen", Abbrev = "examen" }
               };
               context.AddRange(evalTypes);
 

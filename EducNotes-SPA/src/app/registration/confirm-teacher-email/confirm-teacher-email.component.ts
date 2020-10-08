@@ -26,6 +26,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   phoneValidationSteps = 0;
   phoneOk = false;
   teacherOk = false;
+  userid: any;
   username: string;
   pwd: string;
 
@@ -40,6 +41,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
     const id: string = this.route.snapshot.queryParamMap.get('id');
     const token: string = this.route.snapshot.queryParamMap.get('token');
     if (id !== null && token !== null) {
+      this.userid = id;
       const confirmEmail = <ConfirmEmailPhone>{};
       confirmEmail.userId = id;
       confirmEmail.token = token;
@@ -120,7 +122,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   userNameVerification() {
     const userName = this.userForm.value.userName;
     this.userNameExist = false;
-    this.authService.userNameExist(userName).subscribe((res: boolean) => {
+    this.authService.userNameExist(userName, this.userid).subscribe((res: boolean) => {
       if (res === true) {
         this.userNameExist = true;
       }
