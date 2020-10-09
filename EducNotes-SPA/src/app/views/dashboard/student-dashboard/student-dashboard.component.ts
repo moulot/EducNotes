@@ -42,6 +42,7 @@ export class StudentDashboardComponent implements OnInit {
   showUsersList = false;
   hourCols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   events: any;
+  periodAvgs: any;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -78,14 +79,32 @@ export class StudentDashboardComponent implements OnInit {
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
-      this.getAgenda(this.student.classId, this.toNbDays);
-      this.getEvalsToCome(this.student.classId);
-      this.getCoursesWithEvals(this.student.id, this.student.classId);
-      this.getScheduleDay(this.student.classId);
-      this.getEvents();
+      let parentId = 0;
+      if (this.isParentConnected === true) {
+        parentId = this.parent.id;
+      }
+      this.getUserInfos(this.student.id, parentId);
+      // this.getAgenda(this.student.classId, this.toNbDays);
+      // this.getEvalsToCome(this.student.classId);
+      // this.getCoursesWithEvals(this.student.id, this.student.classId);
+      // this.getScheduleDay(this.student.classId);
+      // this.getEvents();
       this.showChildrenList = false;
     }, error => {
       this.alertify.error(error);
+    });
+  }
+
+  getUserInfos(userId, parentId) {
+    this.userService.getUserInfos(userId, parentId).subscribe((data: any) => {
+      this.agendaItems = data.agendaItems;
+      this.evalsToCome = data.evalsToCome;
+      this.studentAvg = data.studentAvg;
+      this.periodAvgs = data.periodAvgs;
+      this.scheduleDay = data.coursesToday;
+    }, error => {
+      this.alertify.error(error);
+      console.log(error);
     });
   }
 
@@ -130,10 +149,6 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  parentLoggedIn() {
-    return this.authService.parentLoggedIn();
-  }
-
   getEvents() {
     let userId = 0;
     if (this.isParentConnected === true) {
@@ -146,6 +161,10 @@ export class StudentDashboardComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  parentLoggedIn() {
+    return this.authService.parentLoggedIn();
   }
 
 }

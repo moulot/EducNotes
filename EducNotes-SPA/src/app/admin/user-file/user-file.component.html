@@ -36,7 +36,7 @@
       </div>
     </div>
     <div *ngIf="userFile.siblings.length > 0" class="col-md-12"><hr class="my-1"></div>
-    <div *ngIf="userFile.siblings.length > 0" class="col-md-12 text-15 mb-1"><b>frères et soeurs</b></div>
+    <div *ngIf="userFile.siblings.length > 0" class="col-md-12 text-14 text-muted mb-1">frères et soeurs</div>
     <div class="col-md-4 mb-1" *ngFor="let child of userFile.siblings">
       <div class="border rounded-lg p-1">
         <div class="row">
@@ -141,3 +141,4 @@
   </div>
 </div>
 <app-user-file-tuition [id]="userFile.id"></app-user-file-tuition>
+<app-user-file-notes [id]="userFile.id"></app-user-file-notes>

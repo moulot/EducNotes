@@ -32,7 +32,7 @@ export class ValidatePaymentsComponent implements OnInit {
         for (let j = 0; j < linepays.length; j++) {
           const lpay = linepays[j];
           if (prodname === '') {
-            prodname += lpay.productName + ' de ' + lpay.childFirstName;
+            prodname += lpay.productName + ' de ' + lpay.childLastName + ' ' + lpay.childFirstName;
           } else {
             prodname += ' et ' + lpay.childFirstName;
           }

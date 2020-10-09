@@ -611,6 +611,7 @@ namespace EducNotes.API.Controllers
     [HttpGet("AmountByDeadline")]
     public async Task<IActionResult> GetOrderAmountWithDeadlines()
     {
+      var balanceLinesPaid = await _repo.GetOrderLinesPaid();
       var today = DateTime.Now.Date;
       var duedates = _context.OrderLineDeadlines.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
       List<AmountWithDeadlinesDto> amountDeadlines = new List<AmountWithDeadlinesDto>();
@@ -640,19 +641,21 @@ namespace EducNotes.API.Controllers
         decimal paid = 0;
         foreach (var lineid in lineids)
         {
-          var linePaid = await _context.FinOpOrderLines
-                                .Where(f => f.OrderLineId == lineid && f.FinOp.Cashed)
-                                .SumAsync(s => s.Amount);
+          var linePaid = balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount;
           var lined = linedeadlines.First(d => d.OrderLineId == lineid);
           var lineDueAmount = lined.Amount + lined.ProductFee;
+          decimal amountpaid = 0;
           if(linePaid >= lineDueAmount)
           {
             paid += lineDueAmount;
+            amountpaid = lineDueAmount;
           }
           else
           {
             paid += linePaid;
+            amountpaid = linePaid;
           }
+          balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount -= amountpaid;
         }
 
         decimal balance = invoiced - paid;

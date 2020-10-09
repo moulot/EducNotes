@@ -1,83 +1,103 @@
-<div class="d-none d-md-block mt-2">
-  <div class="border rounded-lg p-2 mt-2">
-    <div class="row">
-      <div class="col-md-8 mb-2">
-        <div *ngIf="tuition?.balance > 0" class="text-16 mb-0">
-          frais de scolarité: <b>{{tuition?.amountInvoiced | number:'':'fr-FR'}} F</b>. solde à payer: 
-          <span class="text-danger"><b>{{tuition?.balance | number:'':'fr-FR'}} F</b></span>
+<div class="d-none d-md-block border rounded-lg p-2 mt-2">
+  <div *ngIf="!showInfos" class="row animated zoomIn">
+    <div class="col-8">
+      <a class="d-flex" (click)="toggleInfos()">
+        <i class="fad fa-plus-square fa-&x mr-1 my-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+        <div class="text-15">
+          <b>frais de scolarité</b> - montant: <b>{{tuition?.amountInvoiced | number:'':'fr-FR'}} F</b>. solde à payer: 
+            <span class="text-danger"><b>{{tuition?.balance | number:'':'fr-FR'}} F</b></span>
         </div>
-        <div *ngIf="tuition?.balance == 0" class="d-flex text-20">
-          <i class="fad fa-check-circle fa-2x my-auto mr-1" style="--fa-secondary-opacity: 1;
-            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-          la scolarité est entièrement payée. merci!
-        </div>
-      </div>
-      <div *ngIf="showBtn && tuition?.balance > 0" class="col-md-4 text-right">
-        <button type="button" mdbBtn (click)="addPayment()" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement</button>
-      </div>
-      <div class="col-md-12 mt-1">
-        <div *ngIf="!tuition?.validated" class="border rounded-lg p-2">
-          <i class="fad fa-exclamation-triangle fa-2x mr-2" style="--fa-secondary-opacity: 1;
-            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-          <span *ngIf="tuition?.nbDaysLate < 0" class="text-15 text-danger">
-            valider l'inscription en payant : {{tuition.downPayment - tuition.amountPaid | number:'':'fr-FR'}} F.
-            <span *ngIf="tuition?.amountToValidate == 0">
-              échéance du {{tuition?.strValidity}} dépassé de {{-tuition.nbDaysLate}} jour(s). 
-            </span>
-            <div class="text-14 text-primary" *ngIf="tuition?.amountToValidate > 0">
-              paiement de {{tuition?.amountToValidate | number:'':'fr-FR'}} F en cours de validation.
-            </div>
-          </span>
-          <span *ngIf="tuition?.nbDaysLate > 0" class="text-15">
-            valider l'inscription en payant : {{tuition.downPayment - tuition.amountPaid | number:'':'fr-FR'}} F.
-            <span>
-              date limite le {{tuition?.strValidity}} ({{tuition.nbDaysLate}} jours).
-            </span>
-            <div class="text-14 text-primary" *ngIf="tuition?.amountToValidate > 0">
-              paiement de {{tuition?.amountToValidate | number:'':'fr-FR'}} F en cours de validation.
-            </div>
-          </span>
-          <span *ngIf="tuition?.nbDaysLate == 0" class="text-15 text-danger">
-            valider l'inscription en payant : {{tuition.downPayment - tuition.amountPaid | number:'':'fr-FR'}} F.
-            <span *ngIf="tuition?.amountToValidate == 0">
-              la date limite, {{tuition?.strValidity}}, est aujourd'hui.
-            </span>
-            <div class="text-14 text-primary" *ngIf="tuition?.amountToValidate > 0">
-              paiement de {{tuition?.amountToValidate | number:'':'fr-FR'}} F en cours de validation.
-            </div>
-          </span>
-        </div>
-        <div *ngIf="tuition?.validated && !tuition?.paid" class="border rounded-lg p-2 text-15">
-          vous êtes à jour, merci!. la prochaine échéance est le {{tuition.strNextDeadline}}. montant : {{tuition.nextDueAmount | number:'':'fr-FR'}} F.
-        </div>
-      </div>
-      <div class="col-md-12 text-16 mt-1">
-        <b>paiements reçus</b>
-        <span *ngIf="tuition?.nbPayRejected > 1" class="text-danger"> - {{tuition.nbPayRejected}} paiements rejectés</span>
-        <span *ngIf="tuition?.nbPayRejected == 1" class="text-danger"> - {{tuition.nbPayRejected}} paiement rejecté</span>
-      </div>
-      <div *ngFor="let pay of tuition?.linePayments" class="col-md-12 d-flex">
-        <i *ngIf="pay.rejected" class="fad fa-times-circle fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
-          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-        <i *ngIf="pay.cashed" class="fad fa-check fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
-          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-        <i *ngIf="pay.received || pay.depositedToBank" class="fad fa-question fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
-          --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-        <span class="text-16 mr-1">{{pay.strFinOpDate}}.</span>
-        <span *ngIf="pay.paymentTypeId == payCash" class="text-16">paiement en espèce. montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
-        <span *ngIf="pay.docRef" class="ml-1">ref n°{{pay.docRef}}.</span>
-        <span *ngIf="pay.paymentTypeId == payCheque" class="text-16">chèque n°{{pay.chequeNum}} 
-          ({{pay.chequeBank}}). montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
-        <span *ngIf="pay.paymentTypeId == payWire" class="text-16">virement. ref n°{{pay.docRef}} ({{pay.fromBankAccountName}}). 
-          montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
-        <span *ngIf="pay.paymentTypeId == payMobile" class="text-16">mobile money. ref n°{{pay.docRef}}. 
-          montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
-        <span class="text-16 text-danger ml-1" *ngIf="pay.rejected"><b>refusé</b></span>
-        <span class="text-16 text-danger ml-1" *ngIf="pay.depositedToBank"><b>remise ok</b></span>
-        <span class="text-16 text-danger ml-1" *ngIf="pay.received"><b>en cours</b></span>
-      </div>
-      <div *ngIf="tuition?.linePayments.length == 0" class="col-md-12 text-15 text-danger">aucun paiement reçu à ce jour</div>
+      </a>
     </div>
+    <div *ngIf="showBtn && tuition?.balance > 0" class="col-md-4 text-right">
+      <button type="button" mdbBtn (click)="addPayment()" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement</button>
+    </div>      
+  </div>
+  <div *ngIf="showInfos" class="row animated zoomIn">
+    <div class="col-8 my-auto">
+      <a class="d-flex" (click)="toggleInfos()">
+        <i class="fad fa-minus-square fa-&x mr-1 my-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+        <div class="">
+          <b>frais de scolarité</b> - montant: <b>{{tuition?.amountInvoiced | number:'':'fr-FR'}} F</b>. solde à payer: 
+            <span class="text-danger"><b>{{tuition?.balance | number:'':'fr-FR'}} F</b></span>
+        </div>
+      </a>
+    </div>
+    <div *ngIf="showBtn && tuition?.balance > 0" class="col-md-4 text-right">
+      <button type="button" mdbBtn (click)="addPayment()" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement</button>
+    </div>    
+    <div class="col-md-12"><hr class="my-1"></div>
+    <div class="col-md-8 mb-2">
+      <div *ngIf="tuition?.balance == 0" class="d-flex text-20">
+        <i class="fad fa-check-circle fa-2x my-auto mr-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        la scolarité est entièrement payée. merci!
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div *ngIf="!tuition?.validated" class="border rounded-lg p-2">
+        <i class="fad fa-exclamation-triangle fa-2x mr-2" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <span *ngIf="tuition?.nbDaysLate < 0" class="text-15 text-danger">
+          valider l'inscription en payant : {{tuition.downPayment - tuition.amountPaid | number:'':'fr-FR'}} F.
+          <span *ngIf="tuition?.amountToValidate == 0">
+            échéance du {{tuition?.strValidity}} dépassé de {{-tuition.nbDaysLate}} jour(s). 
+          </span>
+          <div class="text-14 text-primary" *ngIf="tuition?.amountToValidate > 0">
+            paiement de {{tuition?.amountToValidate | number:'':'fr-FR'}} F en cours de validation.
+          </div>
+        </span>
+        <span *ngIf="tuition?.nbDaysLate > 0" class="text-15">
+          valider l'inscription en payant : {{tuition.downPayment - tuition.amountPaid | number:'':'fr-FR'}} F.
+          <span>
+            date limite le {{tuition?.strValidity}} ({{tuition.nbDaysLate}} jours).
+          </span>
+          <div class="text-14 text-primary" *ngIf="tuition?.amountToValidate > 0">
+            paiement de {{tuition?.amountToValidate | number:'':'fr-FR'}} F en cours de validation.
+          </div>
+        </span>
+        <span *ngIf="tuition?.nbDaysLate == 0" class="text-15 text-danger">
+          valider l'inscription en payant : {{tuition.downPayment - tuition.amountPaid | number:'':'fr-FR'}} F.
+          <span *ngIf="tuition?.amountToValidate == 0">
+            la date limite, {{tuition?.strValidity}}, est aujourd'hui.
+          </span>
+          <div class="text-14 text-primary" *ngIf="tuition?.amountToValidate > 0">
+            paiement de {{tuition?.amountToValidate | number:'':'fr-FR'}} F en cours de validation.
+          </div>
+        </span>
+      </div>
+      <div *ngIf="tuition?.validated && !tuition?.paid" class="border rounded-lg p-2 text-15">
+        vous êtes à jour, merci!. la prochaine échéance est le {{tuition.strNextDeadline}}. montant : {{tuition.nextDueAmount | number:'':'fr-FR'}} F.
+      </div>
+    </div>
+    <div class="col-md-12 text-15 mt-1">
+      <b>paiements reçus</b>
+      <span *ngIf="tuition?.nbPayRejected > 1" class="text-danger"> - {{tuition.nbPayRejected}} paiements rejectés</span>
+      <span *ngIf="tuition?.nbPayRejected == 1" class="text-danger"> - {{tuition.nbPayRejected}} paiement rejecté</span>
+    </div>
+    <div *ngFor="let pay of tuition?.linePayments" class="col-md-12 d-flex">
+      <i *ngIf="pay.rejected" class="fad fa-times-circle fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
+        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <i *ngIf="pay.cashed" class="fad fa-check fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
+        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <i *ngIf="pay.received || pay.depositedToBank" class="fad fa-question fa-1x my-auto mr-1" style="--fa-secondary-opacity: 1;
+        --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+      <span class="text-16 mr-1">{{pay.strFinOpDate}}.</span>
+      <span *ngIf="pay.paymentTypeId == payCash" class="text-16">paiement en espèce. montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
+      <span *ngIf="pay.docRef" class="ml-1">ref n°{{pay.docRef}}.</span>
+      <span *ngIf="pay.paymentTypeId == payCheque" class="text-16">chèque n°{{pay.chequeNum}} 
+        ({{pay.chequeBank}}). montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
+      <span *ngIf="pay.paymentTypeId == payWire" class="text-16">virement. ref n°{{pay.docRef}} ({{pay.fromBankAccountName}}). 
+        montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
+      <span *ngIf="pay.paymentTypeId == payMobile" class="text-16">mobile money. ref n°{{pay.docRef}}. 
+        montant: {{pay.amount | number:'':'fr-FR'}} F.</span>
+      <span class="text-16 text-danger ml-1" *ngIf="pay.rejected"><b>refusé</b></span>
+      <span class="text-16 text-danger ml-1" *ngIf="pay.depositedToBank"><b>remise ok</b></span>
+      <span class="text-16 text-danger ml-1" *ngIf="pay.received"><b>en cours</b></span>
+    </div>
+    <div *ngIf="tuition?.linePayments.length == 0" class="col-md-12 text-15 text-danger">aucun paiement reçu à ce jour</div>
   </div>
 </div>
 <div class="d-md-none mt-2">

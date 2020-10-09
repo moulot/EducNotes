@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-md-3 my-5" *ngFor="let child of children; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+  <div class="col-md-4 my-5" *ngFor="let child of children; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
     <a (click)="goToChildPage(child)" class="text-17 text-primary">
       <mdb-card class="testimonial-card">
       <div class="avatar mx-auto">
@@ -7,17 +7,17 @@
       </div>
       <mdb-card-body class="text-left p-2">
           <div class="text-center text-16 text-capitalize font-weight-400 m-0">{{child.lastName}} {{child.firstName}}</div>
-          <div class="text-center text-14 font-weight-400 m-0">classe {{child.className}}</div>
-          <div><hr class="my-1" style="background-color: #f89f20;"></div>
+          <div class="text-center text-14 font-weight-400 m-0">classe {{child.className || child.classLevelName}}</div>
+          <hr class="my-1">
           <div class="row">
             <div class="col-md-12">
-              <i class="fad fa-scrubber fa-1x mr-2" style="--fa-secondary-opacity: 1;
+              <i class="fad fa-user-chart fa-1x mr-2" style="--fa-secondary-opacity: 1;
                 --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-              <a class="text-15"><span class="text-muted text-13">moyenne</span> : {{child.avg}} / 20</a>
+              <a class="text-15"><span class="text-muted text-14">moyenne</span> : {{child.avg}} / 20</a>
             </div>
             <div class="col-md-12 text-muted text-13">
-              <i class="fad fa-scrubber fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+              <!-- <i class="fad fa-scrubber fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i> -->
               devoirs de maison
             </div>
             <div class="col-md-12 ml-4" *ngIf="child.agendaItems.length > 0">
@@ -30,17 +30,17 @@
                   class=" text-13 mr-2"><u>{{item.dueDateAbbrev}}</u></a>
               </span>
             </div>
-            <div class="col-md-12 ml-4 text-danger" *ngIf="child.agendaItems.length == 0">pas de devoirs</div>
+            <div class="col-md-12 ml-4 text-13 text-muted" *ngIf="child.agendaItems.length == 0">pas de devoirs</div>
             <div class="col-md-12 mb-0">
-              <i class="fad fa-scrubber fa-1x mr-2" style="--fa-secondary-opacity: 1;
-                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+              <!-- <i class="fad fa-scrubber fa-1x mr-2" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i> -->
               <label class=" text-muted text-13 mr-1">absences : </label>
               <a class=" text-15 mr-1" href="">1</a>
               <label class=" text-muted text-13 mr-1">retards : </label>
               <a class=" text-15 mr-1" href="">3</a>
             </div>
           </div>
-          <div class="col-md-12 text-small text-danger p-0">détails : pointez/clicker sur les infos</div>
+          <!-- <div class="col-md-12 text-small text-danger p-0">détails : pointez/clicker sur les infos</div> -->
           <!-- <div><hr class="mt-2 mb-2" style="background-color: #f89f20;"></div>
           <div class="col-md-12 text-center mt-2">
             <a (click)="goToChildPage(child)" class="text-17 text-primary">sélectionner {{child.firstName}}</a>

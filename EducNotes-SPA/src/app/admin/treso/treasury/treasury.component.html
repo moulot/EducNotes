@@ -101,15 +101,15 @@
     <div class="card">
       <div class="card-body p-2">
         <div class="d-flex">
-          <div *ngIf="i == 0" class="flex-grow-1 text-15">{{i+1}}ère échéance</div>
-          <div *ngIf="i > 0" class="flex-grow-1 text-15">{{i+1}}e échéance</div>
+          <div class="flex-grow-1 text-15">échéance: <b>{{item.strDueDate}}</b></div>
+          <!-- <div *ngIf="i > 0" class="flex-grow-1 text-15">{{i+1}}e échéance</div> -->
           <div><a class="text-14 small-link">voir détails</a></div>
         </div>
         <hr class="my-1">
-        <div class="row">
+        <!-- <div class="row">
           <div class="col-6"><b>date limite</b></div>
           <div class="col-6 text-right"><b>{{item.strDueDate}}</b></div>
-        </div>
+        </div> -->
         <div class="row">
           <div class="col-6">facturé</div>
           <div class="col-6 text-right">{{item.invoiced | number:'':'fr-FR'}} F</div>

@@ -339,4 +339,8 @@ constructor(private http: HttpClient) {}
   getUsersByClasslevel(levelId) {
     return this.http.get(this.baseUrl + 'UsersByLevel/' + levelId);
   }
+
+  getUserInfos(userId, parentId) {
+    return this.http.get(this.baseUrl + 'UserInfos/' + userId + '/' + parentId);
+  }
 }

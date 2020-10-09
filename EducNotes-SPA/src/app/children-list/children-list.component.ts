@@ -2,7 +2,6 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { SharedAnimations } from '../shared/animations/shared-animations';
 import { Router } from '@angular/router';
 import { AuthService } from '../_services/auth.service';
-import { User } from '../_models/user';
 
 @Component({
   selector: 'app-children-list',

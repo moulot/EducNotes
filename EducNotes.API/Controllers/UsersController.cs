@@ -247,6 +247,107 @@ namespace EducNotes.API.Controllers
           return Ok(userFile);
         }
 
+        [HttpGet("UserInfos/{id}/{parentId}")]
+        public async Task<IActionResult> GetStudentInfos(int id, int parentId)
+        {
+          // agenda
+          var toNbDays = 7;
+          var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
+          var user = await _repo.GetUser(id, isCurrentUser);
+          var classid = Convert.ToInt32(user.ClassId);
+          var agendasFromRepo = await _repo.GetClassAgendaTodayToNDays(classid, toNbDays);
+          var agendaItems = _repo.GetAgendaListByDueDate(agendasFromRepo);
+
+          // evaluations to come
+          var evalsToCome = await _repo.GetEvalsToCome(classid);
+
+          //student grades
+          var periods = await _context.Periods.OrderBy(o => o.Abbrev).ToListAsync();
+          List<UserEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, classid);
+          double courseAvgSum = 0;
+          double courseCoeffSum = 0;
+          double GeneralAvg = -1000;
+          List<PeriodAvgDto> periodAvgs = new List<PeriodAvgDto>();
+          if(coursesWithEvals.Count() > 0)
+          {
+            foreach (var course in coursesWithEvals)
+            {
+              courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
+              courseCoeffSum += course.CourseCoeff;
+            }
+
+            if(courseCoeffSum > 0)
+              GeneralAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
+
+            Period currPeriod = await _repo.GetPeriodFromDate(DateTime.Now);
+
+            foreach (var period in periods)
+            {
+              PeriodAvgDto pad = new PeriodAvgDto();
+              pad.PeriodId = period.Id;
+              pad.PeriodName = period.Name;
+              pad.PeriodAbbrev = period.Abbrev;
+              pad.StartDate = period.StartDate;
+              pad.EndDate = period.EndDate;
+              //set activated period depending on startDate
+              if(DateTime.Now.Date >= period.StartDate)
+              {
+                pad.activated = true;
+              }
+              else
+              {
+                pad.activated = false;
+              }
+              if(currPeriod.Id == period.Id)
+                pad.Active = true;
+              else
+                pad.Active = false;
+              pad.Avg = -1000;
+
+              double periodAvgSum = 0;
+              double coeffSum = 0;
+              foreach (var course in coursesWithEvals)
+              {
+                var periodData = course.PeriodEvals.FirstOrDefault(p => p.PeriodId == period.Id);
+                if(periodData.grades != null)
+                {
+                  periodAvgSum += periodData.UserCourseAvg * course.CourseCoeff;
+                  coeffSum += course.CourseCoeff;
+                }
+              }
+
+              if(coeffSum > 0)
+                pad.Avg = Math.Round(periodAvgSum / coeffSum, 2);
+
+              periodAvgs.Add(pad);
+            }
+          }
+
+          // today courses
+          var today = ((int)DateTime.Now.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
+          //if saturday or sunday goes to monday schedule
+          if (today == 6 || today == 7)
+            today = 1;
+          var coursesFromRepo = await _repo.GetScheduleDay(classid, today);
+          var coursesToday = _mapper.Map<IEnumerable<ScheduleForTimeTableDto>>(coursesFromRepo);
+
+          // user events
+          var userIdEvents = user.Id;
+          if(parentId != 0)
+            userIdEvents = parentId;
+          var events = await _repo.GetUserEvents(userIdEvents);
+
+          return Ok(new
+          {
+            agendaItems,
+            evalsToCome,
+            StudentAvg = GeneralAvg,
+            periodAvgs = periodAvgs,
+            coursesToday,
+            events
+          });
+        }
+
         [HttpGet("Account/{id}")]
         public async Task<IActionResult> GetUserAccount(int id)
         {
@@ -1717,80 +1818,7 @@ namespace EducNotes.API.Controllers
         [HttpGet("{userId}/events")]
         public async Task<IActionResult> GetUserEvents(int userId)
         {
-          List<EventDto> events = new List<EventDto>();
-          var user = await _context.Users.FirstAsync(u => u.Id == userId);
-
-          //events dedicated to user
-          var userEvents = await _context.Events
-                                  .Where(e => e.UserId == user.Id && e.EventDate.Date >= DateTime.Now.Date)
-                                  .ToListAsync();
-          foreach (var item in userEvents)
-          {
-            EventDto eventDto= new EventDto();
-            eventDto.EventDate = item.EventDate;
-            eventDto.strEventDate = item.EventDate.ToString("dd/MM/yyyy", frC);
-            eventDto.Title = item.Title;
-            eventDto.Desc = item.Desc;
-            events.Add(eventDto);
-          }
-
-          //children events for the parent
-          if(user.UserTypeId == parentTypeId)
-          {
-            var children = await _repo.GetChildren(userId);
-            foreach (var child in children)
-            {
-              if(child.ClassId != null)
-              {
-                var items = await _context.Events
-                                    .Include(i => i.Class)
-                                    .Where(e => e.ClassId == child.ClassId && e.EventDate.Date >= DateTime.Now.Date)
-                                    .ToListAsync();
-                foreach (var aevent in items)
-                {
-                  EventDto eventDto= new EventDto();
-                  eventDto.EventDate = aevent.EventDate;
-                  eventDto.strEventDate = aevent.EventDate.ToString("dd/MM/yyyy", frC);
-                  eventDto.Title = aevent.Title;
-                  eventDto.Desc = aevent.Desc;
-                  eventDto.ChildFirstName = child.FirstName;
-                  eventDto.ChildLastName = child.LastName;
-                  eventDto.ChildInitials = child.LastName.ToUpper().Substring(0, 1) +
-                                                          child.FirstName.ToUpper().Substring(0, 1);
-                  eventDto.ClassName = child.Class.Name;
-                  events.Add(eventDto);
-                }
-              }
-            }
-          }
-
-          //student (child) events
-          if(user.UserTypeId == studentTypeId)
-          {
-            if(user.ClassId != null)
-            {
-              var items = await _context.Events
-                                  .Include(i => i.Class)
-                                  .Where(e => e.ClassId == user.ClassId && e.EventDate.Date >= DateTime.Now.Date)
-                                  .ToListAsync();
-              foreach (var aevent in items)
-              {
-                EventDto eventDto= new EventDto();
-                eventDto.EventDate = aevent.EventDate;
-                eventDto.strEventDate = aevent.EventDate.ToString("dd/MM/yyyy", frC);
-                eventDto.Title = aevent.Title;
-                eventDto.Desc = aevent.Desc;
-                // eventDto.ChildFirstName = child.FirstName;
-                // eventDto.ChildLastName = child.LastName;
-                // eventDto.ChildInitials = child.LastName.ToUpper().Substring(0, 1) +
-                //                                         child.FirstName.ToUpper().Substring(0, 1);
-                // eventDto.ClassName = child.Class.Name;
-                events.Add(eventDto);
-              }
-            }
-          }
-
-          events = events.OrderBy(o => o.EventDate).ToList();
+          var events = await _repo.GetUserEvents(userId);
           return Ok(events);
         }
 

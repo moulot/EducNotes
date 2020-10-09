@@ -14,6 +14,7 @@ export class UserFileTuitionComponent implements OnInit {
   @Input() id: any;
   @Input() showBtn: Boolean = true;
   tuition: any;
+  showInfos = true;
   payCash = environment.payCash;
   payCheque = environment.payCheque;
   payWire = environment.payWire;
@@ -36,6 +37,10 @@ export class UserFileTuitionComponent implements OnInit {
 
   addPayment() {
     this.router.navigate(['addFinOp', this.id]);
+  }
+
+  toggleInfos() {
+    this.showInfos = !this.showInfos;
   }
 
 }

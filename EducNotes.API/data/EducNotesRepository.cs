@@ -2414,6 +2414,80 @@ namespace EducNotes.API.Data
           return idNum;
         }
 
+        public async Task<List<EventDto>> GetUserEvents(int userId)
+        {
+          var user = await _context.Users.FirstAsync(u => u.Id == userId);
+          List<EventDto> events = new List<EventDto>();
+
+          //events dedicated to user
+          var userEvents = await _context.Events
+                                  .Where(e => e.UserId == user.Id && e.EventDate.Date >= DateTime.Now.Date)
+                                  .ToListAsync();
+          foreach (var item in userEvents)
+          {
+            EventDto eventDto= new EventDto();
+            eventDto.EventDate = item.EventDate;
+            eventDto.strEventDate = item.EventDate.ToString("dd/MM/yyyy", frC);
+            eventDto.Title = item.Title;
+            eventDto.Desc = item.Desc;
+            events.Add(eventDto);
+          }
+
+          //children events for the parent
+          if(user.UserTypeId == parentTypeId)
+          {
+            var children = await GetChildren(userId);
+            foreach (var child in children)
+            {
+              if(child.ClassId != null)
+              {
+                var items = await _context.Events
+                                    .Include(i => i.Class)
+                                    .Where(e => e.ClassId == child.ClassId && e.EventDate.Date >= DateTime.Now.Date)
+                                    .ToListAsync();
+                foreach (var aevent in items)
+                {
+                  EventDto eventDto= new EventDto();
+                  eventDto.EventDate = aevent.EventDate;
+                  eventDto.strEventDate = aevent.EventDate.ToString("dd/MM/yyyy", frC);
+                  eventDto.Title = aevent.Title;
+                  eventDto.Desc = aevent.Desc;
+                  eventDto.ChildFirstName = child.FirstName;
+                  eventDto.ChildLastName = child.LastName;
+                  eventDto.ChildInitials = child.LastName.ToUpper().Substring(0, 1) +
+                                                          child.FirstName.ToUpper().Substring(0, 1);
+                  eventDto.ClassName = child.Class.Name;
+                  events.Add(eventDto);
+                }
+              }
+            }
+          }
+
+          //student (child) events
+          if(user.UserTypeId == studentTypeId)
+          {
+            if(user.ClassId != null)
+            {
+              var items = await _context.Events
+                                  .Include(i => i.Class)
+                                  .Where(e => e.ClassId == user.ClassId && e.EventDate.Date >= DateTime.Now.Date)
+                                  .ToListAsync();
+              foreach (var aevent in items)
+              {
+                EventDto eventDto= new EventDto();
+                eventDto.EventDate = aevent.EventDate;
+                eventDto.strEventDate = aevent.EventDate.ToString("dd/MM/yyyy", frC);
+                eventDto.Title = aevent.Title;
+                eventDto.Desc = aevent.Desc;
+                events.Add(eventDto);
+              }
+            }
+          }
+
+          events = events.OrderBy(o => o.EventDate).ToList();
+          return events;
+        }
+
         public async Task<IEnumerable<Setting>> GetSettings()
         {
           var settings = await _context.Settings.OrderBy(s => s.Name).ToListAsync();
@@ -2655,6 +2729,22 @@ namespace EducNotes.API.Data
                                     .OrderBy(o => o.ClassLevel.DsplSeq)
                                     .Select(s => s.ClassLevel).Distinct().ToListAsync();
           return classLevels;
+        }
+
+        public async Task<List<OrderLinePaidDto>> GetOrderLinesPaid()
+        {
+          var lines = await _context.OrderLines.ToListAsync();
+          List<OrderLinePaidDto> linesPaid = new List<OrderLinePaidDto>();
+          foreach (var line in lines)
+          {
+            OrderLinePaidDto olpd = new OrderLinePaidDto();
+            olpd.OrderLineId = line.Id;
+            olpd.Amount = await _context.FinOpOrderLines
+                                .Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+                                .SumAsync(s => s.Amount);
+            linesPaid.Add(olpd);
+          }
+          return linesPaid;
         }
     }
 }
