@@ -30,12 +30,8 @@ export class TeacherDashboardComponent implements OnInit {
   optionsCourse: any[] = [];
   sessionForm: FormGroup;
 
-  // visible = true;
-  // date = new Date();
-  // today = this.date.getDate() + '/' + (this.date.getMonth() + 1) + '/' + this.date.getFullYear();
-
-  constructor(private userService: UserService, private authService: AuthService,private fb: FormBuilder,
-    private adminService: AdminService, public alertify: AlertifyService, private router: Router,
+  constructor(private userService: UserService, private authService: AuthService,
+    public alertify: AlertifyService, private router: Router, private fb: FormBuilder,
     private evalService: EvaluationService, private route: ActivatedRoute) { }
 
   ngOnInit() {
@@ -44,9 +40,6 @@ export class TeacherDashboardComponent implements OnInit {
     this.getTeacherClasses(this.teacher.id);
     this.getTeacherNextCourses(this.teacher.id);
     this.getEvals(this.teacher.id);
-    // setTimeout(() => {
-    //   this.visible = false;
-    //   }, 2000);
   }
 
   createSessionForm() {
@@ -88,7 +81,6 @@ export class TeacherDashboardComponent implements OnInit {
         const option = {value: elt.scheduleId, label: elt.className + ' ' + elt.courseName + ' ' +
           elt.startHourMin + ' - ' + elt.endHourMin};
         this.optionsCourse = [...this.optionsCourse, option];
-
       }
     });
   }
@@ -97,11 +89,4 @@ export class TeacherDashboardComponent implements OnInit {
     const scheduleId = this.sessionForm.value.course;
     this.router.navigate(['/classSession', scheduleId]);
   }
-
-  // showModal(p: any) {
-  //   this.selectedClass = p;
-  //   this.classService.getClassStudents(p.id).subscribe(data => {
-  //     this.students = data;
-  //   });
-  // }
 }

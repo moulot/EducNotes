@@ -104,7 +104,6 @@ export class StudentDashboardComponent implements OnInit {
       this.scheduleDay = data.coursesToday;
     }, error => {
       this.alertify.error(error);
-      console.log(error);
     });
   }
 

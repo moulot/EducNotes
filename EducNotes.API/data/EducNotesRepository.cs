@@ -511,6 +511,73 @@ namespace EducNotes.API.Data
             return teacherClasses;
         }
 
+        public async Task<List<NextCoursesByClassDto>> GetNextCoursesByClass(int teacherId)
+        {
+          var nextCourses = 10; // next coming courses
+          var today = DateTime.Now;
+          // monday=1, tue=2, ...
+          var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;            
+          var todayHourMin = today.TimeOfDay;
+
+          var teacher = await _context.Users.FirstAsync(u => u.Id == teacherId);
+          var teacherClasses = await GetTeacherClasses(teacherId);
+          List<NextCoursesByClassDto> nextCoursesByClass = new List<NextCoursesByClassDto>();
+          foreach (var aclass in teacherClasses)
+          {
+            NextCoursesByClassDto coursesByClass = new NextCoursesByClassDto();
+            coursesByClass.TeacherId = teacherId;
+            coursesByClass.TeacherName = teacher.LastName + ' ' + teacher.FirstName;
+            coursesByClass.ClassId = aclass.ClassId;
+            coursesByClass.ClassName = aclass.ClassName;
+            coursesByClass.Courses = new List<ClassNextCoursesDto>();
+
+            var teacherCourses = await (from courses in _context.ClassCourses
+                                        join Schedule in _context.Schedules
+                                        on courses.CourseId equals Schedule.CourseId
+                                        select new
+                                        {
+                                          ScheduleId = Schedule.Id,
+                                          TeacherId = courses.TeacherId,
+                                          TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
+                                          ClassId = Schedule.ClassId,
+                                          ClassName = Schedule.Class.Name,
+                                          CourseId = courses.CourseId,
+                                          CourseName = courses.Course.Name,
+                                          Day = Schedule.Day,
+                                          CourseStartHM = Schedule.StartHourMin,
+                                          CourseEndHM = Schedule.EndHourMin,
+                                          StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
+                                          EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
+                                        })
+                                        .Where(w => w.TeacherId == teacherId && w.ClassId == aclass.ClassId && w.Day == todayDay)
+                                          //&& w.CourseStartHM.TimeOfDay >= todayHourMin)
+                                        .OrderBy(o => o.StartHourMin)
+                                        .Distinct()
+                                        .Take(nextCourses)
+                                        .ToListAsync();
+            
+            foreach (var course in teacherCourses)
+            {
+              ClassNextCoursesDto cncd = new ClassNextCoursesDto();
+              cncd.ScheduleId = course.ScheduleId;
+              cncd.ClassId = course.ClassId;
+              cncd.ClassName = course.ClassName;
+              cncd.CourseId = course.CourseId;
+              cncd.CourseName = course.CourseName;
+              cncd.Day = course.Day;
+              cncd.CourseStartHM = course.CourseStartHM;
+              cncd.CourseEndHM = course.CourseEndHM;
+              cncd.StartHourMin = course.StartHourMin;
+              cncd.EndHourMin = course.EndHourMin;
+              coursesByClass.Courses.Add(cncd);
+            }
+
+            nextCoursesByClass.Add(coursesByClass);
+          }
+
+          return nextCoursesByClass;
+        }
+
         public async Task<List<ClassesWithEvalsDto>> GetTeacherClassesWithEvalsByPeriod(int teacherId, int periodId)
         {
             var Classes = await _context.ClassCourses

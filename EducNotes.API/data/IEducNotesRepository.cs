@@ -111,5 +111,6 @@ namespace EducNotes.API.Data
     Task<List<Product>> GetActiveProducts();
     Task<List<OrderLinePaidDto>> GetOrderLinesPaid();
     Task<List<EventDto>> GetUserEvents(int userId);
+    Task<List<NextCoursesByClassDto>> GetNextCoursesByClass(int teacherId);
   }
 }

@@ -1,47 +1,46 @@
 <div class="row m-2">
-
-  <div class="col-md-12">
-    <p class="text-17 font-weight-300">classe {{session.className}} - <b>session de cours</b>: {{session.courseName}} de 
+  <div class="col-md-12 d-flex mb-2">
+    <a appBtnBack>
+      <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    </a>
+    <i class="fad fa-chalkboard-teacher fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    <div class="text-17">classe {{session.className}} - <b>session de cours</b>: {{session.courseName}} de 
       {{session.startHourMin}} à {{session.endHourMin}} 
-    </p>
+    </div>
   </div>
-
   <div class="col-md-12 mt-1">
     <div class="row">
       <div class="col-md-6 mb-2">
-
         <div class="p-1 border rounded">
           <div class="content">
             <p class="text-center m-0">
-              <button type="button" mdbBtn block="true" (click)="goToProgress()" color="primary" mdbWavesEffect>
+              <button type="button" mdbBtn block="true" (click)="goToProgress()" class="btnBlue" mdbWavesEffect>
                 <span class="text-17 text-lowercase">saisir progression du cours</span>
               </button>
             </p>
           </div>
         </div>
-
       </div>
       <div class="col-md-6">
-
         <div class="p-1 border rounded">
           <div class="content">
             <p class="text-center m-0">
-              <button type="button" mdbBtn block="true" (click)="goToCallSheet()" color="primary" mdbWavesEffect>
+              <button type="button" mdbBtn block="true" (click)="goToCallSheet()" class="btnBlue" mdbWavesEffect>
                 <span class="text-17 text-lowercase">faire l'appel du cours</span>
               </button>
             </p>
           </div>
         </div>
-
       </div>
     </div>
   </div>
-
   <div class="col-md-12 mt-2">
-    <div class="row">
-      <div class="col-md-12 text-17 font-weight-300">information du cours</div>
-      <div class="col-md-12"><hr class="mt-1"></div>
-      <h3>INFORMATIONS CONCERNANT LE COURS</h3>
+    <div class="border rounded-lg p-2">
+      <div class="row">
+        <div class="col-md-12 text-17 font-weight-300">information du cours</div>
+        <div class="col-md-12"><hr class="my-1"></div>
+        <div class="col-md-12 text-15">informations du cours sont disponibles ici.</div>
+      </div>
     </div>
   </div>
 </div>

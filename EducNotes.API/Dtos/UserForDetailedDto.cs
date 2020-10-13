@@ -38,6 +38,8 @@ namespace EducNotes.API.Dtos
         public bool Validated { get; set; }
         public bool AccountDataValidated { get; set; }
         public double Avg { get; set; }
+        public int NbAbsences { get; set; }
+        public int NbLateArrivals { get; set; }
         private ICollection<Photo> photos;
         public ICollection<AgendaForListDto> AgendaItems { get; set; }
         public ICollection<PhotosForDetailedDto> Photos { get; set; }

@@ -34,6 +34,7 @@ export class NewTeacherComponent implements OnInit {
   selectedCourses = [];
   wait = false;
   gender = [{value: 0, label: 'femme'}, {value: 1, label: 'homme'}];
+  myDatePickerOptions = Utils.myDatePickerOptions;
 
   constructor(private classService: ClassService, private fb: FormBuilder, private authService: AuthService,
     private router: Router, private adminService: AdminService, private userService: UserService,

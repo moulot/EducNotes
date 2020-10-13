@@ -160,6 +160,10 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + teacherId + '/NextCourses');
   }
 
+  getNextCoursesByClass(teacherId) {
+    return this.http.get(this.baseUrl + teacherId + '/NextCoursesByClass');
+  }
+
   getTeacherCurrWeekSessions(teacherId, classId) {
     return this.http.get(this.baseUrl + teacherId + '/CurrWeekSessions/' + classId);
   }
@@ -260,6 +264,10 @@ constructor(private http: HttpClient) {}
 
   getAssignedClasses(teacherId) {
     return this.http.get(this.baseUrl + teacherId + '/AssignedClasses');
+  }
+
+  assignClasses(teacherId, courses) {
+    return this.http.post(this.baseUrl + 'classes/' + teacherId + '/AssignClasses', courses);
   }
 
   getUserByTypeId(id: number) {

@@ -88,25 +88,25 @@ export class TeacherManagementComponent implements OnInit {
     });
   }
 
-  assignment(params: any) {
-    let courses = [];
-    let classIds = [];
-    for (let i = 0; i < params.courseClasses.length; i++) {
-      const cours = params.courseClasses[i].course;
-      courses = [...courses, cours];
-      const classes = params.courseClasses[i].classes;
-      for (let j = 0; j < classes.length; j++) {
-        const cl = classes[j];
-        classIds = [...classIds, cl];
+  // assignment(params: any) {
+  //   let courses = [];
+  //   let classIds = [];
+  //   for (let i = 0; i < params.courseClasses.length; i++) {
+  //     const cours = params.courseClasses[i].course;
+  //     courses = [...courses, cours];
+  //     const classes = params.courseClasses[i].classes;
+  //     for (let j = 0; j < classes.length; j++) {
+  //       const cl = classes[j];
+  //       classIds = [...classIds, cl];
 
-      }
-    }
-    params.classes = classIds;
-    params.courses = courses;
-    this.teacher = params;
+  //     }
+  //   }
+  //   params.classes = classIds;
+  //   params.courses = courses;
+  //   this.teacher = params;
 
-    this.show = 'affect';
-  }
+  //   this.show = 'affect';
+  // }
 
   saveImport() {
     this.adminService.importTeachersFile(this.exportedTeachers).subscribe(() => {

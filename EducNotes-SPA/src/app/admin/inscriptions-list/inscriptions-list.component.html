@@ -1,72 +1,46 @@
-<div class="row">
+<div class="row mb-2">
   <div class="col-md-12 d-flex">
     <i class="fad fa-users-class fa-2x mr-2" style="--fa-primary-opacity: 1; --fa-secondary-opacity: 1; --fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
     <p class="lead font-weigth-300">affectation des élèves dans les classes</p>
   </div>
   <div class="col-md-12">
-    <div class="card">
-      <div class="card-body p-2">
-        <form [formGroup]="searchForm" (ngSubmit)="searchStudents()" class="text-center">
-          <div class="form-row m-0">
-            <div class="col-md-2">
-              <mdb-select class="selMarginTop" [options]="levels" [visibleOptions]="5"
-                formControlName="levelId" placeholder="choisir le niveau">
-              </mdb-select>
-            </div>
-            <div class="col-md-2">
-              <div class="md-form form-sm inpMarginTop mb-0">
-                <input mdbInput type="text" id="lastName" class="form-control" formControlName="lastName" mdbValidate>
-                <label for="lastName" class="">Nom</label>
-              </div>
-            </div>
-            <div class="col-md-2">
-              <div class="md-form form-sm inpMarginTop mb-0">
-                <input mdbInput type="text" id="firstName" class="form-control" formControlName="firstName" mdbValidate>
-                <label for="firstName" class="">Prénom(s)</label>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <button type="submit" [disabled]="!searchForm.valid" size="sm" mdbBtn class="btnBlue" mdbWavesEffect>rechercher</button>
-              <button type="button" (click)="resetSessions()" size="sm" mdbBtn class="btnOrange" mdbWavesEffect>annuler</button>
+    <div class="border rounded-lg p-2">
+      <form [formGroup]="searchForm" (ngSubmit)="searchStudents()" class="text-center">
+        <div class="form-row m-0">
+          <div class="col-md-2">
+            <mdb-select class="selMarginTop" [options]="levels" [visibleOptions]="5"
+              formControlName="levelId" placeholder="choisir le niveau">
+            </mdb-select>
+          </div>
+          <div class="col-md-2">
+            <div class="md-form form-sm inpMarginTop mb-0">
+              <input mdbInput type="text" id="lastName" class="form-control" formControlName="lastName" mdbValidate>
+              <label for="lastName" class="">Nom</label>
             </div>
           </div>
-        </form>
-        <div *ngIf="students?.length > 0">
-          <hr class="my-1">
-          <div class="row my-2">
-            <div class="col-md-4">
-              <div class="d-flex">
-                <mdb-select id="id" [options]="classOptions" [(ngModel)]="classId"></mdb-select>
-                <button type="button" (click)=" checkValid(modalConfirm)" size="sm"
-                  mdbBtn [disabled]="!classId" class="btnBlue" mdbWaveEffect>affecter</button>
-              </div>
+          <div class="col-md-2">
+            <div class="md-form form-sm inpMarginTop mb-0">
+              <input mdbInput type="text" id="firstName" class="form-control" formControlName="firstName" mdbValidate>
+              <label for="firstName" class="">Prénom(s)</label>
             </div>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" [disabled]="!searchForm.valid" size="sm" mdbBtn class="btnBlue" mdbWavesEffect>rechercher</button>
+            <button type="button" (click)="resetSessions()" size="sm" mdbBtn class="btnOrange" mdbWavesEffect>annuler</button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </div>
 
 <div *ngIf="showListDiv">
   <div *ngIf="noResult">
-    <div class="alert alert-warning text-17 mt-2" role="alert">{{noResult}}</div>
-
+    <div class="border rounded-lg p-2 text-15 text-danger">{{noResult}}</div>
   </div>
 
   <div *ngIf="students.length > 0">
-    <!-- <div class="row my-2">
-      <div class="col-6">
-       <nz-select #classSelect nzShowSearch nzPlaceHolder="choisissez la classe" nzSize="'default'"
-          style="width: 250px" id="id" class="" nzAllowClear [(ngModel)]="classId">
-          <nz-option *ngFor="let item of classes"
-            nzLabel="{{item.name}} (dispo : {{item.maxStudent-item.totalStudent}})" nzValue="{{item.id}}"></nz-option>
-        </nz-select>
-        <button type="button" (click)=" checkValid(modalConfirm)" class="btn btn-sm btn-primary btn-outlet mb-1 ml-2"
-          [disabled]="!classId">affecter</button>
-      </div>
-    </div> -->
-    <div class="row my-2">
+    <div class="row mb-1">
       <div class="col-md-3">
         <div class="md-form form-sm my-1">
           <input mdbInput type="text" id="search" [formControl]="searchControl" class="form-control">
@@ -74,52 +48,64 @@
         </div>
       </div>
     </div>
-
-    <div class="row">
-      <div class="col-md-6 mt-2">
-        <div class="mb-2">
-          <label class="switch switch-primary mr-3">
-            <span class="font-weight-bold">sélectionner tous les élèves</span>
-            <input type="checkbox" [(ngModel)]="allSelected" (change)="selectAll($event)">
-            <span class="slider"></span>
-          </label>
+    <div class="border rounded-lg p-2">
+      <div class="row">
+          <div *ngIf="students?.length > 0" class="col-md-4">
+            <div class="d-flex">
+              <mdb-select id="id" [options]="classOptions" placeholder="choisir la classe" [(ngModel)]="classId"></mdb-select>
+              <button type="button" (click)=" checkValid(modalConfirm)" size="sm"
+                mdbBtn [disabled]="!classId" class="btnBlue" mdbWaveEffect>affecter</button>
+            </div>
+          </div>
+        <div class="col-md-12"><hr class="my-1"></div>
+        <div class="col-md-6 mt-2">
+          <div class="mb-2">
+            <label class="switch switch-primary mr-3">
+              <span class="font-weight-bold">sélectionner tous les élèves</span>
+              <input type="checkbox" [(ngModel)]="allSelected" (change)="selectAll($event)">
+              <span class="slider"></span>
+            </label>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="row m-4" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
-      <div *ngFor="let student of filteredStudents | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index"
-        class="col-md-3" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
-        <mdb-card class="testimonial-card my-5">
-          <div class="avatar mx-auto">
-            <img src="{{student.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
-          </div>
-          <mdb-card-body class="p-2">
-            <div class="d-flex justify-content-center">
-              <div *ngIf="student.gender === 1">
-                <i class="fad fa-male fa-2x mr-2" style="--fa-primary-opacity: 1;
-                  --fa-secondary-opacity: 1; --fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
-              </div>
-              <div *ngIf="student.gender === 0">
-                <i class="fad fa-female fa-2x mr-2" style="--fa-primary-opacity: 1;
-                  --fa-secondary-opacity: 1;--fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
-              </div>
-              <div class="text-15 text-capitalize">{{student.lastName}} {{student.firstName}}</div>
-            </div>
-            <p class="text-15 my-1">age : {{student.dateOfBirth}} ({{student.age}} ans)</p>
-            <hr class="mt-1 mb-3">
-            <div class="mb-2">
-              <label class="switch switch-primary mr-3">
-                <span class="font-weight-bold">sélectionner {{student.firstName}}</span>
-                <input type="checkbox" [(ngModel)]="student.isSelected">
-                <span class="slider"></span>
-              </label>
-            </div>
-          </mdb-card-body>
-        </mdb-card>
+  
+      <div class="row">
       </div>
-      <div class="col-md-12 mt-3" *ngIf="students?.length">
-        <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
+  
+      <div class="row m-4" [ngClass]="{'list-horizontal': viewMode === 'list', 'list-grid': viewMode === 'grid'}">
+        <div *ngFor="let student of filteredStudents | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index"
+          class="col-md-3" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+          <mdb-card class="testimonial-card my-5">
+            <div class="avatar mx-auto">
+              <img src="{{student.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+            </div>
+            <mdb-card-body class="p-2">
+              <div class="d-flex justify-content-center">
+                <div *ngIf="student.gender === 1">
+                  <i class="fad fa-male fa-2x mr-2" style="--fa-primary-opacity: 1;
+                    --fa-secondary-opacity: 1; --fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
+                </div>
+                <div *ngIf="student.gender === 0">
+                  <i class="fad fa-female fa-2x mr-2" style="--fa-primary-opacity: 1;
+                    --fa-secondary-opacity: 1;--fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
+                </div>
+                <div class="text-15 text-capitalize">{{student.lastName}} {{student.firstName}}</div>
+              </div>
+              <p class="text-15 my-1">age : {{student.dateOfBirth}} ({{student.age}} ans)</p>
+              <hr class="mt-1 mb-3">
+              <div class="mb-2">
+                <label class="switch switch-primary mr-3">
+                  <span class="font-weight-bold">sélectionner {{student.firstName}}</span>
+                  <input type="checkbox" [(ngModel)]="student.isSelected">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </mdb-card-body>
+          </mdb-card>
+        </div>
+        <div class="col-md-12 mt-1" *ngIf="students?.length">
+          <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
+        </div>
       </div>
     </div>
   </div>

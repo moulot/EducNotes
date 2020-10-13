@@ -194,10 +194,6 @@ export class ClassService {
     return this.http.put(this.baseUrl + 'classes/saveSchedules', schedules);
   }
 
-  assignClasses(teacherId, courses) {
-    return this.http.post(this.baseUrl + 'classes/' + teacherId + '/AssignClasses', courses);
-  }
-
   saveTeacherAffectation(id: number, courseId: number, levelId: number, classIds: number[]) {
     return this.http.post(this.baseUrl + 'classes/' + id + '/' + courseId + '/' + levelId + ' /SaveTeacherAffectation', classIds);
   }

@@ -1,10 +1,10 @@
-<div class="app-admin-wrap layout-sidebar-large">
+<div class="">
   <div>
     <app-navGPanel *ngIf="loggedIn() && accountValidated()"></app-navGPanel>
     <app-navNotLogged *ngIf="!loggedIn() || !accountValidated()"></app-navNotLogged>
   </div>
-  <div class="d-flex flex-column main-content-wrap">
-    <div class="container-fluid">
+  <div class="main-content-wrap">
+    <div class="">
       <router-outlet></router-outlet>
     </div>
   </div>

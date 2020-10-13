@@ -1124,8 +1124,8 @@ namespace EducNotes.API.Controllers
             // monday=1, tue=2, ...
             var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
 
-            if (todayDay != scheduleDay)
-              return BadRequest("l'emploi du temps du jour est incohérent.");
+            // if (todayDay != scheduleDay)
+            //   return BadRequest("l'emploi du temps du jour est incohérent.");
 
             // get session by schedule and date
             var sessionFromDB = await _context.Sessions
@@ -1568,113 +1568,42 @@ namespace EducNotes.API.Controllers
             return BadRequest("veuillez selectionner au moins un cours");
         }
 
-        [HttpPost("{teacherId}/AssignClasses")]
-        public async Task<IActionResult> AssignClasses(int teacherId, [FromBody] List<AssignedClassesDto> courses)
-        {
-            Boolean dataToBeSaved = false;
-
-            foreach (var course in courses)
-            {
-                foreach (var level in course.Levels)
-                {
-                    //delete previous classes selection
-                    List<ClassCourse> prevClasses = await _context.ClassCourses
-                                                    .Include(c => c.Class)
-                                                    .Where(c => c.CourseId == course.CourseId && c.Class.ClassLevelId == level.LevelId)
-                                                    .ToListAsync();
-                    if (prevClasses.Count() > 0)
-                    {
-                        _repo.DeleteAll(prevClasses);
-                        dataToBeSaved = true;
-                    }
-
-                    // add new classes selection
-                    List<ClassCourse> newSelection = new List<ClassCourse>();
-                    foreach (var aclass in level.Classes)
-                    {
-                        if (aclass.Active == true)
-                        {
-                            ClassCourse classCourse = new ClassCourse()
-                            {
-                                ClassId = aclass.ClassId,
-                                CourseId = course.CourseId,
-                                TeacherId = teacherId
-                            };
-                            //newSelection.Add(classCourse);
-                            _repo.Add(classCourse);
-                            dataToBeSaved = true;
-                        }
-                    }
-                    //_context.AddRange(newSelection);
-                }
-            }
-
-            if (dataToBeSaved && await _repo.SaveAll())
-            {
-                return Ok();
-            }
-            else
-            {
-                return NoContent();
-            }
-        }
-
         [HttpPost("{id}/{courseId}/{levelId}/SaveTeacherAffectation")]
         public async Task<IActionResult> SaveTeacherAffectation(int id, int courseId, int levelId, [FromBody] List<int> classIds)
         {
-            var classcourses = await _context.ClassCourses
-                                      .Include(c => c.Class)
-                                      .Where(c => c.CourseId == courseId && c.Class.ClassLevelId == levelId)
-                                      .ToListAsync();
+          var classcourses = await _context.ClassCourses
+                                    .Include(c => c.Class)
+                                    .Where(c => c.CourseId == courseId && c.Class.ClassLevelId == levelId)
+                                    .ToListAsync();
 
-            Boolean dataToBeSaved = false;
+          Boolean dataToBeSaved = false;
 
-            // récupération des classIds
-            var cids = classcourses.Select(c => c.ClassId).Distinct().ToList();
+          // récupération des classIds
+          var cids = classcourses.Select(c => c.ClassId).Distinct().ToList();
 
-            //add new affection (new lines in DB)
-            foreach (var item in classIds.Except(cids))
+          //add new affection (new lines in DB)
+          foreach (var item in classIds.Except(cids))
+          {
+            ClassCourse classCourse = new ClassCourse
             {
-                ClassCourse classCourse = new ClassCourse
-                {
-                    CourseId = courseId,
-                    ClassId = item,
-                    TeacherId = id
-                };
-                _context.Add(classCourse);
-                dataToBeSaved = true;
-            }
+              CourseId = courseId,
+              ClassId = item,
+              TeacherId = id
+            };
+            _context.Add(classCourse);
+            dataToBeSaved = true;
+          }
 
-            //set teacher for existing class/course
-            // foreach(var item in classIds)
-            // {
-            //     var cc = classcourses.FirstOrDefault(c => c.ClassId == item && c.TeacherId == null);
-            //     if (cc != null)
-            //     {
-            //       cc.TeacherId = id;
-            //       dataToBeSaved = true;
-            //     }
-            // }
+          if (dataToBeSaved && await _repo.SaveAll())
+          {
+            return Ok();
+          }
+          else
+          {
+            return NoContent();
+          }
 
-            // //remove teacher from class/course as it's unselected
-            // var u = classcourses.Where(t => t.TeacherId == id).Select(c => c.ClassId);
-            // foreach(var item in u.Except(classIds))
-            // {
-            //   var cc = classcourses.FirstOrDefault(c => c.ClassId == item);
-            //   cc.TeacherId = null;
-            //   dataToBeSaved = true;
-            // }
-
-            if (dataToBeSaved && await _repo.SaveAll())
-            {
-                return Ok();
-            }
-            else
-            {
-                return NoContent();
-            }
-
-            //return BadRequest("problème pour affecter les classes");
+          //return BadRequest("problème pour affecter les classes");
         }
 
         [HttpGet("TeacherClassCoursByLevel/{teacherId}/{levelId}/{courseId}")]

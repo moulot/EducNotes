@@ -19,31 +19,49 @@
 
 <div class="row m-0">
 
-  <div class="col-md-12 d-flex">
-    <a [routerLink]="['/classSession', session.id]">
+  <div class="col-md-12 d-flex mb-2">
+    <!-- <a [routerLink]="['/classSession', session.id]">
       <i class="i-Back1 text-32 mr-2"></i>
+    </a> -->
+    <a appBtnBack>
+      <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
     </a>
-    <p class="text-20 font-weight-400 m-0 pb-1">feuille d'appel - classe {{session.className}}. {{session.courseName}} de 
+    <i class="fad fa-chalkboard-teacher fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    <div class="text-17 font-weight-400">feuille d'appel - classe {{session.className}}. {{session.courseName}} de 
       {{session.startHourMin}} à {{session.endHourMin}} 
-    </p>
+    </div>
   </div>
   
   <div class="col-md-12 mb-1">
-    <button type="button" (click)="validateAbsences()" mdbBtn block="true"
-      class="p-2 text-nowrap" color="primary" mdbWavesEffect>valider les absences</button>
   </div>
   
   <div class="col-md-12 mb-1">
     <div class="p-2 text-center border rounded">
-      <span class="text-18 text-danger m-0">
-        <b *ngIf="nbAbsents <= 1">{{nbAbsents}} élève absent</b>
-        <b *ngIf="nbAbsents > 1">{{nbAbsents}} élèves absents</b>
-      </span>
-      <span class="text-18 text-danger m-0 mx-2">/</span>
-      <span class="text-18 text-danger m-0">
-        <b *ngIf="nbLate <= 1">{{nbLate}} élève en retard</b>
-        <b *ngIf="nbLate > 1">{{nbLate}} élèves en retard</b>
-      </span>
+      <button type="button" (click)="validateAbsences()" mdbBtn block="true" size="sm"
+        class="p-2 text-nowrap" class="btnBlue" mdbWavesEffect>valider les absences</button>
+      <hr class="my-2">
+      <div class="d-none d-md-block">
+        <span class="text-18 text-danger m-0">
+          <b *ngIf="nbAbsents <= 1">{{nbAbsents}} élève absent</b>
+          <b *ngIf="nbAbsents > 1">{{nbAbsents}} élèves absents</b>
+        </span>
+        <span class="text-18 text-danger m-0 mx-2">/</span>
+        <span class="text-18 text-danger m-0">
+          <b *ngIf="nbLate <= 1">{{nbLate}} élève en retard</b>
+          <b *ngIf="nbLate > 1">{{nbLate}} élèves en retard</b>
+        </span>
+      </div>
+      <div class="d-md-none">
+        <div class="text-18 text-danger m-0">
+          <b *ngIf="nbAbsents <= 1">{{nbAbsents}} élève absent</b>
+          <b *ngIf="nbAbsents > 1">{{nbAbsents}} élèves absents</b>
+        </div>
+        <!-- <span class="text-18 text-danger m-0 mx-2">/</span> -->
+        <div class="text-18 text-danger m-0">
+          <b *ngIf="nbLate <= 1">{{nbLate}} élève en retard</b>
+          <b *ngIf="nbLate > 1">{{nbLate}} élèves en retard</b>
+        </div>
+      </div>
     </div>
   </div>
 

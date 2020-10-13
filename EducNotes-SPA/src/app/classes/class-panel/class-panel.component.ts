@@ -5,6 +5,8 @@ import { AuthService } from 'src/app/_services/auth.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { UserService } from 'src/app/_services/user.service';
 import { CourseUser } from 'src/app/_models/courseUser';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -42,21 +44,76 @@ export class ClassPanelComponent implements OnInit {
   friCourses = [];
   satCourses = [];
   sunCourses = [];
+  courseOptions = [];
+  nextCourses: any;
+  sessionForm: FormGroup;
 
   constructor(private userService: UserService, private classService: ClassService,
-    private authService: AuthService, public alertify: AlertifyService) { }
+    private authService: AuthService, public alertify: AlertifyService,
+    private router: Router, private fb: FormBuilder) { }
 
   ngOnInit() {
+    this.createSessionForm();
     this.teacher = this.authService.currentUser;
     this.getTeacherClasses(this.teacher.id);
+    // this.getTeacherNextCourses(this.teacher.id);
+    // this.getNextCoursesByClass(this.teacher.id);
+  }
+
+  createSessionForm() {
+    this.sessionForm = this.fb.group({
+      course: [null, Validators.required]
+    });
   }
 
   getTeacherClasses(teacherId) {
-    this.userService.getTeacherClasses(teacherId).subscribe((courses: CourseUser[]) => {
-      this.teacherClasses = courses;
+    this.userService.getTeacherClasses(teacherId).subscribe((classes: CourseUser[]) => {
+      this.teacherClasses = classes;
+      this.getNextCoursesByClass(this.teacher.id);
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  // getTeacherNextCourses(teacherId) {
+  //   this.userService.getTeacherNextCourses(teacherId).subscribe((data: any) => {
+  //     this.nextCourses = data;
+  //     for (let i = 0; i < data.length; i++) {
+  //       const elt = data[i];
+  //       const option = {value: elt.scheduleId, label: elt.className + ' ' + elt.courseName + ' ' +
+  //         elt.startHourMin + ' - ' + elt.endHourMin};
+  //       this.optionsCourse = [...this.optionsCourse, option];
+  //     }
+  //   });
+  // }
+
+  getNextCoursesByClass(teacherId) {
+    this.userService.getNextCoursesByClass(teacherId).subscribe((data: any) => {
+      this.nextCourses = data;
+      // console.log(this.nextCourses);
+      for (let i = 0; i < this.teacherClasses.length; i++) {
+        const aclass = this.teacherClasses[i];
+        const index = this.nextCourses.findIndex(item => item.classId === aclass.classId);
+        // console.log(index);
+        const coursesByClass = this.nextCourses[index];
+        let classOptions = [];
+        for (let j = 0; j < coursesByClass.courses.length; j++) {
+          const course = coursesByClass.courses[j];
+          // console.log(course);
+          const option = {value: course.scheduleId, label: aclass.className + '. ' + course.courseName + '. '
+            + course.startHourMin + ' à ' + course.endHourMin};
+          classOptions = [...classOptions, option];
+        }
+        this.courseOptions = [...this.courseOptions, classOptions];
+      }
+      // console.log(this.courseOptions);
+    });
+  }
+
+  goToClass() {
+    const scheduleId = this.sessionForm.value.course;
+    // console.log(scheduleId);
+    this.router.navigate(['/classSession', scheduleId]);
   }
 
   loadClass(aclass) {

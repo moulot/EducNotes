@@ -6,34 +6,30 @@
 
   <div class="col-lg-5 col-md-12">
     <div class="row">
-
     <div class="col-md-12">
-
       <div class="card">
-        <div class="card-body">
+        <div class="card-body p-2">
           <div class="row">
-
-            <div class="col-md-12 mb-3">
+            <div class="col-md-12 mb-2">
               <form [formGroup]="sessionForm" (ngSubmit)="goToClass()">
-                <div class="p-2 border rounded">
-                  <div class="content">
-                    <p class="lead pt-0 mt-0 mb-1">session de cours</p>
-                    <div *ngIf="nextCourses?.length > 0">
-                      <div class="row">
-                        <div class="col-lg-10">
-                          <mdb-select [options]="optionsCourse" formControlName="course" name="course"
-                            placeholder="choisir le cours"></mdb-select>
-                        </div>
-                        <div class="col-lg-1">
-                          <button type="submit" mdbBtn [disabled]="!sessionForm.valid" size="sm"
-                            class="btnWhiteO p-2" mdbWavesEffect>ok</button>
-                        </div>
+                <div class="border rounded-lg p-2">
+                  <div class="card-title m-0">session de cours</div>
+                  <hr class="my-1">
+                  <div *ngIf="nextCourses?.length > 0">
+                    <div class="row">
+                      <div class="col-lg-9">
+                        <mdb-select [options]="optionsCourse" formControlName="course" name="course"
+                          placeholder="choisir le cours"></mdb-select>
+                      </div>
+                      <div class="col-lg-3 my-auto">
+                        <button type="submit" mdbBtn [disabled]="!sessionForm.valid" size="sm"
+                          class="btnBlue" block="true" mdbWavesEffect>ok</button>
                       </div>
                     </div>
-                    <div *ngIf="nextCourses?.length == 0">
-                      <p class="text-15 text-muted m-0">pas de cours aujourd'hui</p>
-                    </div>                      
                   </div>
+                  <div *ngIf="nextCourses?.length == 0">
+                    <div class="text-15 text-muted">pas de cours aujourd'hui</div>
+                  </div>                      
                 </div>
               </form>
             </div>
@@ -41,7 +37,8 @@
             <div *ngFor="let class of teacherClasses" class="col-md-12 mb-3">
               <div class="p-2 border rounded">
                 <div>
-                  <h3 class="lead mb-2">classe {{class.className}}</h3>
+                  <div class="text-15 mb-2"><b>classe {{class.className}}</b></div>
+                  <hr class="my-1">
                   <div class="row">
                     <div class="col-md-6 mb-2">
                       <a [routerLink]="['/studentsClass', class.classId]">
@@ -67,7 +64,7 @@
                       <a [routerLink]="['/grades']">
                         <div class="card mb-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
-                            <i class="fad fa-pen-alt fa-2x" style="--fa-primary-opacity: 1;--fa-secondary-opacity: 1; --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
+                            <i class="fad fa-user-chart fa-2x" style="--fa-primary-opacity: 1;--fa-secondary-opacity: 1; --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
                             <p class="text-15 text-muted my-1">notes</p>
                           </div>
                         </div>
@@ -103,55 +100,52 @@
 
       <div class="col-md-12">
         <div class="card mb-2">
-          <div class="card-body">
-            <div class="lead mb-1">évaluations</div>
+          <div class="card-body p-2">
+            <!-- <div class="card-title m-0">évaluations</div>
+            <hr class="my-1"> -->
             <div class="row">
-              
-              <div class="col-md-12 mb-2">
-                <button mdbBtn type="button" [routerLink]="['/addEval']" class="btnBlue"
+              <div class="col-md-12 mb-1">
+                <button mdbBtn type="button" [routerLink]="['/addEval']" class="btnBlue" size="sm"
                   block="true" mdbWavesEffect>nouvelle evaluation</button>
               </div>
-
               <div class="col-md-12 mb-2">
                 <div class="p-2 border rounded">
                   <div>
                     <h4 class="text-18 mb-1">évaluations à noter</h4>
-                    <p class="text-small text-muted">notes à renseigner pour ces évaluations</p>
+                    <!-- <div class="text-small text-muted">notes à renseigner pour ces évaluations</div> -->
                   </div>
-
+                  <hr class="my-1">
                   <div *ngFor="let class of evalsToBeGraded">
-                    <p class="text-20 font-weight-450 m-0">classe {{class.className}}</p>
+                    <div class="text-15 text-muted">classe {{class.className}}</div>
                     <div *ngIf="class.evals.length > 0">
                       <div *ngFor="let eval of class.evals">
-                        <div class="card mb-2">
-                          <div class="card-up" [ngStyle]="{'background-color':eval.courseColor}" style="height: 10px;
-                            border-top-left-radius: 10px;border-top-right-radius: 10px">
-                          </div>
-                          <div class="card-body p-2">
-                            <div class="row">
-                              <div class="col-md-12">
-                                <div class="d-flex">
-                                  <div class="flex-grow-1">
-                                    <p class="m-0"><b>{{eval.courseName}}</b></p>
-                                  </div>
-                                  <div class="m-0 text-13 text-muted">fait le {{eval.evalDate}}</div>    
-                                </div>
-                                <div class="m-0 text-14 p-0">{{eval.name}} - {{eval.evalTypeName}}</div>
-                                <div class="float-right">
-                                  <a class="text-14 text-primary" [routerLink]="['/AddUserGrades', eval.id]">saisir les notes</a>
-                                </div>
+                        <div class="border rounded-lg mb-2">
+                          <div class="rounded-top" [ngStyle]="{'background-color': eval.courseColor}" style="height: 10px;"></div>
+                          <div class="d-none d-md-block text-15 p-2">
+                            <div><b>{{eval.courseName}}</b> - {{eval.name}} ({{eval.evalTypeName}})</div>
+                            <div class="d-flex">
+                              <div class="flex-grow-1">effectué le {{eval.evalDate}}</div>
+                              <div class="text-right">
+                                <a class="text-15 text-primary" [routerLink]="['/AddUserGrades', eval.id]">saisir les notes</a>
                               </div>
+                            </div>
+                          </div>
+                          <div class="d-md-none text-15 p-2">
+                            <div><b>{{eval.courseName}}</b></div>
+                            <div>{{eval.name}} ({{eval.evalTypeName}})</div>
+                            <div>effectué le {{eval.evalDate}}</div>
+                            <hr class="my-1">
+                            <div class="text-center">
+                              <a class="text-15 text-primary" [routerLink]="['/AddUserGrades', eval.id]">saisir les notes</a>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div *ngIf="class.evals.length == 0">
-                      <div class="card mb-2">
-                        <div class="card-body p-2">
-                          <p class="lead m-0">pas d'évaluation à venir</p>
-                        </div>
-                      </div>  
+                      <div class="border rounded-lg p-2">
+                        <div class="text-15">pas d'évaluation à venir</div>
+                      </div>
                     </div>
                   </div>
       
@@ -162,38 +156,39 @@
                 <div class="p-2 border rounded">
                   <div>
                     <h4 class="text-18 mb-1">évaluations à venir</h4>
-                    <p class="text-small text-muted">évaluations programmées par le professeur</p>
+                    <!-- <div class="text-small text-muted">évaluations programmées par le professeur</div> -->
                   </div>
-
+                  <hr class="my-1">
                   <div *ngFor="let class of evalsToCome">
-                    <p class="text-20 font-weight-450 m-0">classe {{class.className}}</p>
+                    <div class="text-15 text-muted">classe {{class.className}}</div>
                     <div *ngIf="class.evals.length > 0">
                       <div *ngFor="let eval of class.evals">
-                        <div class="card mb-2">
-                          <div class="card-up" [ngStyle]="{'background-color': eval.courseColor}" style="height: 10px;
-                            border-top-left-radius: 10px;border-top-right-radius: 10px">
-                          </div>
-                          <div class="card-body p-2">
-                            <div class="row">
-                              <div class="col-md-12">
-                                <div class="d-flex">
-                                  <div class="flex-grow-1">
-                                    <p class="m-0"><b>{{eval.courseName}}</b></p>
-                                  </div>
-                                  <div class="m-0 text-12 text-muted">prévue le {{eval.evalDate}}</div>    
-                                </div>
-                                <div class="m-0 text-14 p-0">{{eval.name}} - {{eval.evalTypeName}}</div>
+                        <div class="border rounded-lg mb-2">
+                          <div class="rounded-top" [ngStyle]="{'background-color': eval.courseColor}" style="height: 10px;"></div>
+                          <div class="d-none d-md-block text-15 p-2">
+                            <div><b>{{eval.courseName}}</b> - {{eval.name}} ({{eval.evalTypeName}})</div>
+                            <div class="d-flex">
+                              <div class="flex-grow-1">effectué le {{eval.evalDate}}</div>
+                              <div class="text-right">
+                                <a class="text-15 text-primary" [routerLink]="['/AddUserGrades', eval.id]">saisir les notes</a>
+                              </div>
                             </div>
+                          </div>
+                          <div class="d-md-none text-15 p-2">
+                            <div><b>{{eval.courseName}}</b></div>
+                            <div>{{eval.name}} ({{eval.evalTypeName}})</div>
+                            <div>effectué le {{eval.evalDate}}</div>
+                            <hr class="my-1">
+                            <div class="text-center">
+                              <a class="text-15 text-primary" [routerLink]="['/AddUserGrades', eval.id]">saisir les notes</a>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div *ngIf="class.evals.length == 0">
-                      <div class="card mb-2">
-                        <div class="card-body p-2">
-                          <p class="lead m-0">pas d'évaluation à venir</p>
-                        </div>
+                      <div class="border rounded-lg p-2">
+                        <div class="text-15">pas d'évaluation à venir</div>
                       </div>
                     </div>
                   </div>

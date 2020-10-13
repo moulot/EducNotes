@@ -114,7 +114,7 @@
                 editer
               </button>
               <button mdbBtn class="btnBlue ml-2" size="sm" mdbWavesEffect [routerLink]="['/teacherAssignment',teacher.id]"
-                [disabled]="teacher.courseClasses.length === 0 || !teacher.validated" (click)="assignment(teacher)">
+                [disabled]="teacher.courseClasses.length === 0 || !teacher.validated" >
                 <i class="fad fa-users-class fa-1x mr-1" style="--fa-secondary-opacity: 1;
                   --fa-primary-color:#192C47;--fa-secondary-color:#192C47;"></i>
                 affecter
@@ -195,7 +195,7 @@
               editer
             </button>
             <button mdbBtn class="btnBlue ml-1" size="sm" mdbWavesEffect [routerLink]="['/teacherAssignment',teacher.id]"
-            [disabled]="teacher.courseClasses.length === 0 || !teacher.validated" (click)="assignment(teacher)">
+            [disabled]="teacher.courseClasses.length === 0 || !teacher.validated" >
               <i class="fad fa-users-class fa-1x mr-1" style="--fa-secondary-opacity: 1;
                 --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
               affecter

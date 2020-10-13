@@ -5,6 +5,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { AuthService } from 'src/app/_services/auth.service';
+import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-teacher-assignment',
@@ -28,7 +29,7 @@ export class TeacherAssignmentComponent implements OnInit {
   classOptions: any = [];
 
   constructor(private classService: ClassService, private alertify: AlertifyService, private authService: AuthService,
-    private route: ActivatedRoute, private fb: FormBuilder, private router: Router) { }
+    private userService: UserService, private route: ActivatedRoute, private fb: FormBuilder, private router: Router) { }
 
   ngOnInit() {
     this.createForm();
@@ -99,20 +100,12 @@ export class TeacherAssignmentComponent implements OnInit {
 
   assignment() {
     const courses = this.teacherForm.value.courses;
-    // console.log(courses);
-    this.classService.assignClasses(this.teacher.id, courses).subscribe(() => {
+    this.userService.assignClasses(this.teacher.id, courses).subscribe(() => {
       this.alertify.success('affectation des classes enregistrée');
       this.router.navigate(['/teachers']);
     }, error => {
       this.alertify.error(error);
     });
-    // this.classIds = this.teacherForm.value.classes;
-    // this.classService.saveTeacherAffectation(this.teacher.id, this.courseId, this.levelId, this.classIds).subscribe(() => {
-    //   this.alertify.success('affectation terminée...');
-    //   this.router.navigate(['/teachers']);
-    // }, error => {
-    //   this.alertify.error(error);
-    // });
   }
 
 }

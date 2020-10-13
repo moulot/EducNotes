@@ -37,6 +37,7 @@ namespace EducNotes.API.Controllers
         private Cloudinary _cloudinary;
         private readonly UserManager<User> _userManager;
         int tuitionId, nextYearTuitionId;
+        int absenceTypeId, lateTypeId;
 
 
         public UsersController(IConfiguration config,DataContext context, IEducNotesRepository repo,
@@ -59,6 +60,8 @@ namespace EducNotes.API.Controllers
             professorRoleName = _config.GetValue<String>("AppSettings:professorRoleName");
             tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
             nextYearTuitionId = _config.GetValue<int>("AppSettings:nextYearTuitionId");
+            absenceTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
+            lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
 
             _cloudinaryConfig = cloudinaryConfig;
             Account acc = new Account(
@@ -337,6 +340,11 @@ namespace EducNotes.API.Controllers
             userIdEvents = parentId;
           var events = await _repo.GetUserEvents(userIdEvents);
 
+          // //absences & late arrivals
+          // var userAbsences = await _context.Absences.Where(a => a.UserId == user.Id).ToListAsync();
+          // var absences = userAbsences.Where(a => a.AbsenceTypeId == absenceTypeId).Count();
+          // var lateArrivals = userAbsences.Where(a => a.AbsenceTypeId == lateTypeId).Count();
+
           return Ok(new
           {
             agendaItems,
@@ -560,9 +568,13 @@ namespace EducNotes.API.Controllers
               courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
               courseCoeffSum += course.CourseCoeff;
             }
-            user.Avg =  Math.Round(courseAvgSum / courseCoeffSum, 2);
 
+            user.Avg =  Math.Round(courseAvgSum / courseCoeffSum, 2);
             user.AgendaItems = await _repo.GetUserClassAgenda(user.ClassId, startDate, endDate);
+            //absences & late arrivals
+            var userAbsences = await _context.Absences.Where(a => a.UserId == user.Id).ToListAsync();
+            user.NbAbsences = userAbsences.Where(a => a.AbsenceTypeId == absenceTypeId).Count();
+            user.NbLateArrivals = userAbsences.Where(a => a.AbsenceTypeId == lateTypeId).Count();
           }
 
           return Ok(usersToReturn);
@@ -677,39 +689,46 @@ namespace EducNotes.API.Controllers
         [HttpGet("{teacherId}/NextCourses")]
         public async Task<IActionResult> GetTeacherNextCourses(int teacherId)
         {
-            var nextCourses = 10; // next coming courses
-            var today = DateTime.Now;
+          var nextCourses = 10; // next coming courses
+          var today = DateTime.Now;
 
-            // monday=1, tue=2, ...
-            var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;            
-            var todayHourMin = today.TimeOfDay;
+          // monday=1, tue=2, ...
+          var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;            
+          var todayHourMin = today.TimeOfDay;
 
-            var teacherCourses = await (from courses in _context.ClassCourses
-                                        join Schedule in _context.Schedules
-                                        on courses.CourseId equals Schedule.CourseId
-                                        select new
-                                        {
-                                            ScheduleId = Schedule.Id,
-                                            TeacherId = courses.TeacherId,
-                                            TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
-                                            CourseId = courses.CourseId,
-                                            CourseName = courses.Course.Name,
-                                            ClassId = Schedule.ClassId,
-                                            ClassName = Schedule.Class.Name,
-                                            Day = Schedule.Day,
-                                            CourseStartHM = Schedule.StartHourMin,
-                                            CourseEndHM = Schedule.EndHourMin,
-                                            StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
-                                            EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
-                                        })
-                                        .Where(w => w.TeacherId == teacherId && w.Day == todayDay)
-                                          //&& w.CourseStartHM.TimeOfDay >= todayHourMin)
-                                        .OrderBy(o => o.StartHourMin)
-                                        .Distinct()
-                                        .Take(nextCourses)
-                                        .ToListAsync();
+          var teacherCourses = await (from courses in _context.ClassCourses
+                                      join Schedule in _context.Schedules
+                                      on courses.CourseId equals Schedule.CourseId
+                                      select new
+                                      {
+                                        ScheduleId = Schedule.Id,
+                                        TeacherId = courses.TeacherId,
+                                        TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
+                                        CourseId = courses.CourseId,
+                                        CourseName = courses.Course.Name,
+                                        ClassId = Schedule.ClassId,
+                                        ClassName = Schedule.Class.Name,
+                                        Day = Schedule.Day,
+                                        CourseStartHM = Schedule.StartHourMin,
+                                        CourseEndHM = Schedule.EndHourMin,
+                                        StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
+                                        EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
+                                      })
+                                      .Where(w => w.TeacherId == teacherId && w.Day == todayDay)
+                                        //&& w.CourseStartHM.TimeOfDay >= todayHourMin)
+                                      .OrderBy(o => o.StartHourMin)
+                                      .Distinct()
+                                      .Take(nextCourses)
+                                      .ToListAsync();
 
-            return Ok(teacherCourses);
+          return Ok(teacherCourses);
+        }
+
+        [HttpGet("{teacherId}/NextCoursesByClass")]
+        public async Task<IActionResult> GetTeacherNextCoursesByClass(int teacherId)
+        {
+          var teacherCourses = await _repo.GetNextCoursesByClass(teacherId);
+          return Ok(teacherCourses);
         }
 
         [HttpGet("{teacherId}/ScheduleToday")]
@@ -1320,6 +1339,56 @@ namespace EducNotes.API.Controllers
           }
 
           return BadRequest("l'enseignant est introuvable!");
+        }
+
+        [HttpPost("{teacherId}/AssignClasses")]
+        public async Task<IActionResult> AssignClasses(int teacherId, [FromBody] List<AssignedClassesDto> courses)
+        {
+          Boolean dataToBeSaved = false;
+
+          foreach (var course in courses)
+          {
+            foreach (var level in course.Levels)
+            {
+              //delete previous classes selection
+              List<ClassCourse> prevClasses = await _context.ClassCourses
+                                              .Include(c => c.Class)
+                                              .Where(c => c.CourseId == course.CourseId && c.Class.ClassLevelId == level.LevelId)
+                                              .ToListAsync();
+              if (prevClasses.Count() > 0)
+              {
+                _repo.DeleteAll(prevClasses);
+                dataToBeSaved = true;
+              }
+
+              // add new classes selection
+              List<ClassCourse> newSelection = new List<ClassCourse>();
+              foreach (var aclass in level.Classes)
+              {
+                if (aclass.Active == true)
+                {
+                  ClassCourse classCourse = new ClassCourse()
+                  {
+                    ClassId = aclass.ClassId,
+                    CourseId = course.CourseId,
+                    TeacherId = teacherId
+                  };
+
+                  _repo.Add(classCourse);
+                  dataToBeSaved = true;
+                }
+              }
+            }
+          }
+
+          if (dataToBeSaved && await _repo.SaveAll())
+          {
+            return Ok();
+          }
+          else
+          {
+            return NoContent();
+          }
         }
 
         [HttpPost("{id}/course/{courseId}/level/{levelId}/AddClasses")]
