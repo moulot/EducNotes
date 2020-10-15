@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-md-12 d-flex">
-    <i class="fad fa-pen-alt fa-2x mr-2" style="--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+    <i class="fad fa-user-chart fa-2x mr-2" style="--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
       --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
     <div class="lead m-0 pb-2">ajout d'une évaluation</div>
   </div>
@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-md-3">
                   <div class="md-form mt-1 mb-0">
-                    <mdb-date-picker name="evalDate" [options]="myDatePickerOptions" [placeholder]="'date évaluation'"
+                    <mdb-date-picker #datePicker name="evalDate" [options]="myDatePickerOptions" [placeholder]="'date évaluation'"
                       formControlName="evalDate"></mdb-date-picker>
                     <div *ngIf="newEvalForm.get('evalDate').errors && newEvalForm.get('evalDate').touched"
                       class="text-small text-danger">saisir la date svp</div>
@@ -103,16 +103,16 @@
             <div class="col-md-12"><hr class="my-2"></div>
             <div class="col-md-12 d-none d-md-block">
               <button type="submit" mdbBtn size="sm" class="btnBlue"
-                [disabled]="newEvalForm.hasError('formNOK') || !newEvalForm.valid" mdbWavesEffect>valider</button>
-              <button type="button" mdbBtn size="sm" class="btnBlue" [disabled]="newEvalForm.hasError('formNOK') ||!newEvalForm.valid"
-                (click)="createEvaluation(true)">valider et nouveau</button>
+                [disabled]="newEvalForm.hasError('formNOK') || !newEvalForm.valid || wait" mdbWavesEffect>valider</button>
+              <button type="button" mdbBtn size="sm" class="btnBlue" (click)="createEvaluation(true)"
+              [disabled]="newEvalForm.hasError('formNOK') ||!newEvalForm.valid || wait">valider et nouveau</button>
               <button type="button" mdbBtn size="sm" class="btnOrange" (click)="newCancel()">annuler</button>
             </div>
             <div class="col-md-12 d-md-none">
               <button type="submit" mdbBtn size="sm" class="btnBlue mb-2" block="true"
-                [disabled]="newEvalForm.hasError('formNOK') || !newEvalForm.valid" mdbWavesEffect>valider</button>
+                [disabled]="newEvalForm.hasError('formNOK') || !newEvalForm.valid || wait" mdbWavesEffect>valider</button>
               <button type="button" mdbBtn size="sm" class="btnBlue mb-2" block="true" (click)="createEvaluation(true)"
-                [disabled]="newEvalForm.hasError('formNOK') ||!newEvalForm.valid">valider et nouveau</button>
+                [disabled]="newEvalForm.hasError('formNOK') || !newEvalForm.valid || wait">valider et nouveau</button>
               <button type="button" mdbBtn size="sm" block="true" class="btnOrange" (click)="newCancel()">annuler</button>
             </div>
           </div>

@@ -256,7 +256,7 @@ namespace EducNotes.API.Controllers
                               .Include(i => i.Course)
                               .Include(i => i.Class)
                               .Include(i => i.EvalType)
-                              .Where(e => e.UserId == teacherId && e.ClassId == aclass.Id && e.EvalDate.Date >= today)
+                              .Where(e => e.UserId == teacherId && e.ClassId == aclass.Id && e.EvalDate.Date > today)
                               .ToListAsync();
               
               cefl.Evals = _mapper.Map<List<EvaluationForListDto>>(classEvals).OrderBy(e => e.EvalDate);
@@ -274,8 +274,8 @@ namespace EducNotes.API.Controllers
                               .Include(i => i.Course)
                               .Include(i => i.Class)
                               .Include(i => i.EvalType)
-                              .Where(e => e.UserId == teacherId && e.ClassId == aclass.Id && e.EvalDate.Date <= today &&
-                                  e.Closed == false).ToListAsync();
+                              .Where(e => e.UserId == teacherId && e.ClassId == aclass.Id &&
+                                e.EvalDate.Date <= today && e.Closed == false).ToListAsync();
               
               cefl.Evals = _mapper.Map<List<EvaluationForListDto>>(classEvals).OrderBy(e => e.EvalDate);
               evalsToBeGraded.Add(cefl);

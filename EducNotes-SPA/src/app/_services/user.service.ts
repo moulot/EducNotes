@@ -267,7 +267,7 @@ constructor(private http: HttpClient) {}
   }
 
   assignClasses(teacherId, courses) {
-    return this.http.post(this.baseUrl + 'classes/' + teacherId + '/AssignClasses', courses);
+    return this.http.post(this.baseUrl + teacherId + '/AssignClasses', courses);
   }
 
   getUserByTypeId(id: number) {

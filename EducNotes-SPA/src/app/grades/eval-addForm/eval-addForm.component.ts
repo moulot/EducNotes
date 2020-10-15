@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Period } from 'src/app/_models/period';
 import { UserService } from 'src/app/_services/user.service';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/_services/auth.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { SkillsModalComponent } from '../skills-modal/skills-modal.component';
@@ -11,8 +11,7 @@ import { Evaluation } from 'src/app/_models/evaluation';
 import { User } from 'src/app/_models/user';
 import { Router } from '@angular/router';
 import { Utils } from 'src/app/shared/utils';
-import { MDBModalService, MDBModalRef } from 'ng-uikit-pro-standard';
-import { utils } from 'protractor';
+import { MDBModalService, MDBModalRef, MDBDatePickerComponent } from 'ng-uikit-pro-standard';
 import { ClassService } from 'src/app/_services/class.service';
 
 @Component({
@@ -21,6 +20,7 @@ import { ClassService } from 'src/app/_services/class.service';
   styleUrls: ['./eval-addForm.component.scss']
 })
 export class EvalAddFormComponent implements OnInit {
+  @ViewChild('datePicker', {static: false}) datePicker: MDBDatePickerComponent;
   myDatePickerOptions = Utils.myDatePickerOptions;
   teacher: User;
   currentPeriod: Period;
@@ -41,6 +41,7 @@ export class EvalAddFormComponent implements OnInit {
   optionsPeriod: any[] = [];
   optionsEvalType: any[] = [];
   modalRef: MDBModalRef;
+  wait = false;
 
   constructor(private userService: UserService, private evalService: EvaluationService,
     private fb: FormBuilder, private authService: AuthService, private router: Router, private classService: ClassService,
@@ -145,15 +146,20 @@ export class EvalAddFormComponent implements OnInit {
     }
 
     this.evalService.saveEvaluation(this.newEval, this.progEltIds).subscribe(() => {
+      this.wait = true;
       this.alertify.success('ajout de l\'évaluation validé.');
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     }, () => {
       this.newEvalForm.reset();
+      this.datePicker.clearDate();
       this.skillsSelected = [];
       if (this.isGradedOn) {
         this.isGradedOn = false;
       }
+      this.wait = false;
       if (more === false) {
         this.router.navigate(['/teacher']);
       }

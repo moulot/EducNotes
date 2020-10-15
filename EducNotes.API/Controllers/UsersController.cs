@@ -37,7 +37,7 @@ namespace EducNotes.API.Controllers
         private Cloudinary _cloudinary;
         private readonly UserManager<User> _userManager;
         int tuitionId, nextYearTuitionId;
-        int absenceTypeId, lateTypeId;
+        int absenceTypeId, lateTypeId, educLevelPrimary, educLevelSecondary;
 
 
         public UsersController(IConfiguration config,DataContext context, IEducNotesRepository repo,
@@ -62,6 +62,8 @@ namespace EducNotes.API.Controllers
             nextYearTuitionId = _config.GetValue<int>("AppSettings:nextYearTuitionId");
             absenceTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
             lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
+            educLevelPrimary = _config.GetValue<int>("AppSettings:educLevelPrimary");
+            educLevelSecondary = _config.GetValue<int>("AppSettings:educLevelSecondary");
 
             _cloudinaryConfig = cloudinaryConfig;
             Account acc = new Account(
@@ -1309,7 +1311,6 @@ namespace EducNotes.API.Controllers
               foreach (var level in levels)
               {
                 LevelWithClassesDto lwcd = new LevelWithClassesDto();
-
                 var selectedIds = await _context.ClassCourses.Where(c => c.TeacherId == teacherId && c.CourseId == course.Id &&
                                           c.Class.ClassLevelId == level.Id).Select(t => t.ClassId).Distinct().ToListAsync();
                 var classesLevel = await _repo.GetClassesByLevelId(level.Id);
@@ -1320,11 +1321,21 @@ namespace EducNotes.API.Controllers
                   lwcd.Classes = new List<ClassIdAndNameDto>();
                   foreach (var aclass in classesLevel)
                   {
-                    ClassIdAndNameDto cd = new ClassIdAndNameDto();
-                    cd.ClassId = aclass.Id;
-                    cd.ClassName = aclass.Name;
-                    cd.Active = selectedIds.IndexOf(aclass.Id) != -1 ? true : false;
-                    lwcd.Classes.Add(cd);
+                    //is it a primary educLevel Class and does it already have a teacher?
+                    Boolean classHasTeacher = await _context.ClassCourses
+                                                    .Include(i => i.Class)
+                                                    .Include(i => i.Teacher)
+                                                    .Where(c => c.ClassId == aclass.Id && c.TeacherId != teacherId &&
+                                                      c.Class.ClassLevel.EducationLevelId == educLevelPrimary)
+                                                    .CountAsync() > 0;
+                    if(!classHasTeacher)
+                    {
+                      ClassIdAndNameDto cd = new ClassIdAndNameDto();
+                      cd.ClassId = aclass.Id;
+                      cd.ClassName = aclass.Name;
+                      cd.Active = selectedIds.IndexOf(aclass.Id) != -1 ? true : false;
+                      lwcd.Classes.Add(cd);
+                    }
                   }
                   acd.Levels.Add(lwcd);
                 }

@@ -617,15 +617,13 @@ namespace EducNotes.API.Data
 
         public async Task<List<EvaluationForListDto>> GetEvalsToCome(int classId)
         {
-            var today = DateTime.Now.Date;
-            var evals = await _context.Evaluations
-                        .Include(i => i.Course)
-                        .Include(i => i.EvalType)
-                        .Where(e => e.ClassId == classId && e.EvalDate.Date >= today).ToListAsync();
-
-            var evalsToReturn = _mapper.Map<List<EvaluationForListDto>>(evals);
-
-            return evalsToReturn;
+          var today = DateTime.Now.Date;
+          var evals = await _context.Evaluations
+                      .Include(i => i.Course)
+                      .Include(i => i.EvalType)
+                      .Where(e => e.ClassId == classId && e.EvalDate.Date > today).ToListAsync();
+          var evalsToReturn = _mapper.Map<List<EvaluationForListDto>>(evals);
+          return evalsToReturn;
         }
 
 
@@ -2479,6 +2477,43 @@ namespace EducNotes.API.Data
           int val = userId * 2 + randomVal;
           string idNum = lastName.Substring(0, 1).ToUpper() + firstName.Substring(0,1).ToUpper() + val.ToString().To5Digits();
           return idNum;
+        }
+
+        public async Task<List<UserScheduleNDaysDto>> GetTeacherScheduleNDays(int teacherId, int nbDays)
+        {
+          var today = DateTime.Now.Date;
+          // var todayHourMin = today.TimeOfDay;
+
+          var teacher = await GetUser(teacherId, true);
+          List<UserScheduleNDaysDto> eventsForNDays = new List<UserScheduleNDaysDto>();
+          //courses on the schedule
+          for (int i = 0; i < nbDays; i++)
+          {
+            var date = today.AddDays(i);
+            var dayDate = ((int)date.DayOfWeek == 0) ? 7 : (int)date.DayOfWeek;
+            UserScheduleNDaysDto usdd = new UserScheduleNDaysDto();
+            usdd.UserId = teacherId;
+            usdd.DayDate = date;
+            var dayCourses = await _context.Schedules
+                                    .Include(c => c.Class)
+                                    .Include(c => c.Course)
+                                    .Where(s => s.Day == dayDate && s.TeacherId == teacherId)
+                                    .ToListAsync();
+            
+            usdd.Events = new List<UserDayEventsDto>();
+            foreach (var course in dayCourses)
+            {
+              UserDayEventsDto uded = new UserDayEventsDto();
+              uded.EventDate = date;
+              uded.strEventDate = date.ToString("dd/MM/yy", frC);
+              uded.Title = course.Course.Abbreviation;
+              uded.StartHourMin = course.StartHourMin.ToString("hh:MMM");
+              uded.EndHourMin = course.EndHourMin.ToString("hh:MMM");
+              usdd.Events.Add(uded);
+            }
+          }
+
+          return eventsForNDays;
         }
 
         public async Task<List<EventDto>> GetUserEvents(int userId)
