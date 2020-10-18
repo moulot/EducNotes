@@ -8,6 +8,7 @@ import { Subject } from 'rxjs';
 import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
 import { Router } from '@angular/router';
 import { Setting } from './_models/setting';
+import { AlertifyService } from './_services/alertify.service';
 
 @Component({
   selector: 'app-root',
@@ -20,17 +21,18 @@ export class AppComponent implements OnInit {
   userActivity;
   userInactive: Subject<any> = new Subject();
 
-  constructor(private mdbSpinningPreloader: MDBSpinningPreloader, private authService: AuthService, private router: Router) {
+  constructor(private mdbSpinningPreloader: MDBSpinningPreloader, private authService: AuthService,
+    private router: Router, private alertify: AlertifyService) {
     this.setTimeout();
     this.userInactive.subscribe(() => {
-      if (this.authService.loggedIn()) {
-      // this.authService.redirectUrl = state.url;
-      this.authService.redirectUrl = this.router.url;
-      localStorage.setItem('url', this.authService.redirectUrl);
-        alert('votre session a expiré');
-        this.authService.logout();
+        if (this.authService.loggedIn()) {
+          // this.authService.redirectUrl = state.url;
+          this.authService.redirectUrl = this.router.url;
+          localStorage.setItem('url', this.authService.redirectUrl);
+          alert('votre session a expiré');
+          this.authService.logout();
+        }
       }
-    }
     );
   }
 
@@ -49,6 +51,13 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    // // setup the client connection string
+    // this.authService.setClientDB().subscribe((data: any) => {
+    //   this.alertify.success('bienvenue sur la plateforme ' + data.name);
+    // }, error => {
+    //   this.alertify.error('problème de configuration. contactez l\'administrateur si l\'erreur persiste');
+    // });
+
     const token = localStorage.getItem('token');
     const user: User = JSON.parse(localStorage.getItem('user'));
     const settings: Setting[] = JSON.parse(localStorage.getItem('settings'));

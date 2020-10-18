@@ -5,9 +5,8 @@ import { User } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
 import { CourseUser } from 'src/app/_models/courseUser';
 import { Period } from 'src/app/_models/period';
-import { AdminService } from 'src/app/_services/admin.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
 
 @Component({
@@ -25,21 +24,27 @@ export class TeacherDashboardComponent implements OnInit {
   students: User[];
   currentPeriod: Period;
   nextCourses: any;
+  nextCoursesByClass: any;
   evalsToCome: any;
   evalsToBeGraded: any;
   optionsCourse: any[] = [];
   sessionForm: FormGroup;
+  schedule: any;
+  dayIndex: number;
+  courseOptions = [];
 
   constructor(private userService: UserService, private authService: AuthService,
     public alertify: AlertifyService, private router: Router, private fb: FormBuilder,
     private evalService: EvaluationService, private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.dayIndex = 0;
     this.createSessionForm();
     this.teacher = this.authService.currentUser;
     this.getTeacherClasses(this.teacher.id);
     this.getTeacherNextCourses(this.teacher.id);
     this.getEvals(this.teacher.id);
+    this.getTeacherScheduleNDays(this.teacher.id);
   }
 
   createSessionForm() {
@@ -59,6 +64,7 @@ export class TeacherDashboardComponent implements OnInit {
   getTeacherClasses(teacherId) {
     this.userService.getTeacherClasses(teacherId).subscribe((courses: CourseUser[]) => {
       this.teacherClasses = courses;
+      this.getNextCoursesByClass(this.teacher.id);
     }, error => {
       this.alertify.error(error);
     });
@@ -68,6 +74,15 @@ export class TeacherDashboardComponent implements OnInit {
     this.evalService.getTeacherEvalsToCome(teacherId).subscribe((evals: any) => {
       this.evalsToCome = evals.evalsToCome;
       this.evalsToBeGraded = evals.evalsToBeGraded;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getTeacherScheduleNDays(teacherId) {
+    this.userService.getTeacherScheduleNDays(teacherId).subscribe(data => {
+      this.schedule = data;
+      // console.log(data);
     }, error => {
       this.alertify.error(error);
     });
@@ -85,8 +100,39 @@ export class TeacherDashboardComponent implements OnInit {
     });
   }
 
+  getNextCoursesByClass(teacherId) {
+    this.userService.getNextCoursesByClass(teacherId).subscribe((data: any) => {
+      this.nextCoursesByClass = data;
+      for (let i = 0; i < this.teacherClasses.length; i++) {
+        const aclass = this.teacherClasses[i];
+        const index = this.nextCoursesByClass.findIndex(item => item.classId === aclass.classId);
+        const coursesByClass = this.nextCoursesByClass[index];
+        let classOptions = [];
+        for (let j = 0; j < coursesByClass.courses.length; j++) {
+          const course = coursesByClass.courses[j];
+          const option = {value: course.scheduleId, label: aclass.className + '. ' + course.courseName + '. '
+            + course.startHourMin + ' à ' + course.endHourMin};
+          classOptions = [...classOptions, option];
+        }
+        this.courseOptions = [...this.courseOptions, classOptions];
+      }
+    });
+  }
+
   goToClass() {
     const scheduleId = this.sessionForm.value.course;
     this.router.navigate(['/classSession', scheduleId]);
+  }
+
+  prevDay() {
+    if (this.dayIndex > 0) {
+      this.dayIndex--;
+    }
+  }
+
+  nextDay() {
+    if (this.dayIndex < Number(this.schedule.length) - 1) {
+      this.dayIndex++;
+    }
   }
 }

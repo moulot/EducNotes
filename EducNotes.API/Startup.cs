@@ -37,12 +37,7 @@ namespace EducNotes.API
         {
           services.AddDbContext<DataContext>(Options => Options.UseSqlServer(Configuration
             .GetConnectionString("DefaultConnection"))
-            );
-
-          // services.AddDefaultIdentity<IdentityUser>(config =>
-          // {
-          //     config.SignIn.RequireConfirmedEmail = true;
-          // });
+          );
           
           IdentityBuilder builder = services.AddIdentityCore<User>(opt =>
           {
@@ -98,7 +93,6 @@ namespace EducNotes.API
               opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
 
-          services.BuildServiceProvider().GetService<DataContext>().Database.Migrate();
           services.AddCors();
           services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
           //Mapper.Reset();
@@ -141,7 +135,6 @@ namespace EducNotes.API
             }
             app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
-            // seeder.SeedUsers();
             // app.UseCors(x => x.WithOrigins("http://localhost:4200")
             //      .AllowAnyHeader().AllowAnyMethod().AllowCredentials());
             app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());

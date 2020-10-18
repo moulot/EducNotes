@@ -322,4 +322,8 @@ export class AuthService {
     return this.http.get(this.baseUrl + 'LoginPageInfos');
   }
 
+  setClientDB() {
+    return this.http.post(this.baseUrl + 'setClientDB', {});
+  }
+
 }

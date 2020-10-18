@@ -5,8 +5,6 @@ import { Router, RouteConfigLoadStart, ResolveStart, RouteConfigLoadEnd, Resolve
 import { User } from 'src/app/_models/user';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { AuthService } from 'src/app/_services/auth.service';
-import { AdminService } from 'src/app/_services/admin.service';
-
 
 @Component({
     selector: 'app-signin',

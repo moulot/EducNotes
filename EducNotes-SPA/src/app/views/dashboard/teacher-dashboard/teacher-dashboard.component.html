@@ -1,7 +1,41 @@
 <div class="row d-flex align-items-stretch">
 
-  <div class="col-lg-3 col-md-12">
-    <app-timeline></app-timeline>
+  <div class="col-lg-3 col-md-12 mb-2">
+    <div class="card">
+      <div class="card-body p-2">
+        <div class="card-title text-center m-0">mon agenda</div>
+        <hr class="my-1">
+        <div class="d-flex justify-content-center mb-2">
+          <div class="text-center my-auto" style="width: 16%">
+            <a (click)="prevDay()">
+              <i class="text-25 fad fa-caret-circle-left" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+            </a>
+          </div>
+          <div class="" style="width: 60%">
+            <div *ngIf="schedule" class="text-17 text-center border rounded-lg p-2">{{schedule[dayIndex].strDayDate}}</div>
+          </div>
+          <div class="text-center my-auto" style="width: 16%">
+            <a (click)="nextDay()">
+              <i class="text-25 fad fa-caret-circle-right" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+            </a>
+          </div>
+        </div>
+        <div *ngIf="schedule">
+          <div class="border rounded-lg p-2 mb-1" *ngFor="let event of schedule[dayIndex]?.events">
+            <div class="text-13 text-primary"><b>{{event.eventTypeName}} de {{event.strStartHourMin}} à {{event.strEndHourMin}}</b></div>
+            <hr class="my-1">
+            <div class="text-15">{{event.title}} - classe {{event.className}}</div>
+          </div>
+          <div *ngIf="schedule[dayIndex].events.length === 0">
+            <div class="border rounded-lg p-2 text-15 text-center mb-1">
+              pas d'évènements aujourd'hui
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="col-lg-5 col-md-12">
@@ -34,13 +68,13 @@
               </form>
             </div>
 
-            <div *ngFor="let class of teacherClasses" class="col-md-12 mb-3">
+            <div *ngFor="let class of teacherClasses; let i = index" class="col-md-12 mb-3">
               <div class="p-2 border rounded">
                 <div>
                   <div class="text-15 mb-2"><b>classe {{class.className}}</b></div>
                   <hr class="my-1">
                   <div class="row">
-                    <div class="col-md-6 mb-2">
+                    <div class="col-md-4 mb-2">
                       <a [routerLink]="['/studentsClass', class.classId]">
                         <div class="card m-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
@@ -50,7 +84,7 @@
                         </div>
                       </a>
                     </div>
-                    <div class="col-md-6 mb-2">
+                    <div class="col-md-4 mb-2">
                       <a [routerLink]="['/agendas', class.classId]">
                         <div class="card m-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
@@ -60,7 +94,7 @@
                         </div>
                       </a>
                     </div>
-                    <div class="col-md-6 mb-2">
+                    <div class="col-md-4 mb-2">
                       <a [routerLink]="['/grades']">
                         <div class="card mb-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
@@ -70,7 +104,7 @@
                         </div>
                       </a>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                       <a [routerLink]="['/classLife', class.classId]">
                         <div class="card mb-0 ">
                           <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
@@ -80,17 +114,68 @@
                       </div>
                       </a>
                     </div>
+                    <div class="col-md-4">
+                      <a [routerLink]="['/classSchedule', class.classId]">
+                        <div class="card mb-0 ">
+                          <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                            <i class="fad fa-calendar-alt fa-2x" style="--fa-primary-opacity: 1; --fa-secondary-opacity: 1; --fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
+                          <p class="text-15 text-muted my-1">emploi du temps</p>
+                        </div>
+                      </div>
+                      </a>
+                    </div>
+                    <div class="col-md-4">
+                      <a (click)="frame.show()">
+                        <div class="card mb-0 ">
+                          <div class="card-body pt-1 pr-0 pb-0 pl-0 text-center">
+                            <i class="fad fa-chalkboard-teacher fa-2x" style="--fa-primary-opacity: 1; --fa-secondary-opacity: 1; --fa-primary-color: #f89f20; --fa-secondary-color:#192C47;"></i>
+                          <p class="text-15 text-muted my-1">session de cours</p>
+                        </div>
+                      </div>
+                      </a>
+                      <div mdbModal #frame="mdbModal" class="modal fade left" id="frameModalTop+{{i}}" tabindex="-1" role="dialog"
+                        aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header text-center">
+                            <h4 class="modal-title w-100 font-weight-bold">classe de {{class.className}} - session de cours</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="frame.hide()">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body mx-3">
+                            <form [formGroup]="sessionForm" (ngSubmit)="goToClass()">
+                              <div class="border rounded-lg p-2">
+                                <div *ngIf="courseOptions[i]?.length > 0">
+                                  <div class="row">
+                                    <div class="col-lg-9">
+                                      <mdb-select [options]="courseOptions[i]" formControlName="course" name="course"
+                                        placeholder="choisir le cours"></mdb-select>
+                                    </div>
+                                    <div class="col-lg-3 my-auto">
+                                      <button type="submit" mdbBtn [disabled]="!sessionForm.valid" size="sm"
+                                        class="btnBlue" block="true" mdbWavesEffect>ok</button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div *ngIf="courseOptions[i]?.length == 0">
+                                  <div class="text-15 text-muted">pas de cours aujourd'hui</div>
+                                </div>                      
+                              </div>
+                            </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-                  
           </div>
         </div>
       </div>
-
     </div>
-
     </div>    
   </div>
 

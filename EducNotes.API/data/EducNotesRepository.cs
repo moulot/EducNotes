@@ -2479,10 +2479,10 @@ namespace EducNotes.API.Data
           return idNum;
         }
 
-        public async Task<List<UserScheduleNDaysDto>> GetTeacherScheduleNDays(int teacherId, int nbDays)
+        public async Task<List<UserScheduleNDaysDto>> GetTeacherScheduleNDays(int teacherId)
         {
+          int nbDays = 7;
           var today = DateTime.Now.Date;
-          // var todayHourMin = today.TimeOfDay;
 
           var teacher = await GetUser(teacherId, true);
           List<UserScheduleNDaysDto> eventsForNDays = new List<UserScheduleNDaysDto>();
@@ -2493,7 +2493,9 @@ namespace EducNotes.API.Data
             var dayDate = ((int)date.DayOfWeek == 0) ? 7 : (int)date.DayOfWeek;
             UserScheduleNDaysDto usdd = new UserScheduleNDaysDto();
             usdd.UserId = teacherId;
+            usdd.Day = dayDate;
             usdd.DayDate = date;
+            usdd.strDayDate = date.ToString("ddd dd MMM", frC);
             var dayCourses = await _context.Schedules
                                     .Include(c => c.Class)
                                     .Include(c => c.Course)
@@ -2506,11 +2508,18 @@ namespace EducNotes.API.Data
               UserDayEventsDto uded = new UserDayEventsDto();
               uded.EventDate = date;
               uded.strEventDate = date.ToString("dd/MM/yy", frC);
-              uded.Title = course.Course.Abbreviation;
-              uded.StartHourMin = course.StartHourMin.ToString("hh:MMM");
-              uded.EndHourMin = course.EndHourMin.ToString("hh:MMM");
+              uded.Title = course.Course.Name;
+              uded.EventTypeName = "cours";
+              uded.ClassName = course.Class.Name;
+              uded.StartHour = course.StartHourMin.Hour;
+              uded.StartMin = course.StartHourMin.Minute;
+              uded.strStartHourMin = course.StartHourMin.ToString("hh:MM");
+              uded.strEndHourMin = course.EndHourMin.ToString("hh:MM");
               usdd.Events.Add(uded);
             }
+
+            usdd.Events = usdd.Events.OrderBy(e => e.StartHour).ThenBy(e => e.StartMin).ToList();
+            eventsForNDays.Add(usdd);
           }
 
           return eventsForNDays;

@@ -950,6 +950,13 @@ namespace EducNotes.API.Controllers
           });
         }
 
+        [HttpGet("{teacherId}/ScheduleNDays")]
+        public async Task<IActionResult> GetScheduleNDays(int teacherId)
+        {
+          var events = await _repo.GetTeacherScheduleNDays(teacherId);
+          return Ok(events);
+        }
+
         [HttpGet("{teacherId}/SessionsFromToday/{classId}")]
         public async Task<IActionResult> GetTeacherSessionsFromToday(int teacherId, int classId)
         {

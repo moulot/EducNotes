@@ -75,18 +75,6 @@ export class ClassPanelComponent implements OnInit {
     });
   }
 
-  // getTeacherNextCourses(teacherId) {
-  //   this.userService.getTeacherNextCourses(teacherId).subscribe((data: any) => {
-  //     this.nextCourses = data;
-  //     for (let i = 0; i < data.length; i++) {
-  //       const elt = data[i];
-  //       const option = {value: elt.scheduleId, label: elt.className + ' ' + elt.courseName + ' ' +
-  //         elt.startHourMin + ' - ' + elt.endHourMin};
-  //       this.optionsCourse = [...this.optionsCourse, option];
-  //     }
-  //   });
-  // }
-
   getNextCoursesByClass(teacherId) {
     this.userService.getNextCoursesByClass(teacherId).subscribe((data: any) => {
       this.nextCourses = data;

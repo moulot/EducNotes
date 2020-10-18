@@ -265,5 +265,15 @@ namespace EducNotes.API.Helpers
           return Convert.ToInt32(data);
         }
 
+        public static string GetSubDomain(string url)
+        {
+          if (url.Split('.').Length > 2)
+          {
+            int lastIndex = url.LastIndexOf(".");
+            int index = url.LastIndexOf(".", lastIndex - 1);
+            return url.Substring(0, index).ToLower();
+          }
+          return null;
+        }
     }
 }

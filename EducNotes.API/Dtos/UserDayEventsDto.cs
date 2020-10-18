@@ -9,10 +9,12 @@ namespace EducNotes.API.Dtos
     public string strEventDate { get; set; }
     public string Title { get; set; }
     public string Desc { get; set; }
-    public int EventTypeId { get; set; }
-    public EventType EventType { get; set; }
-    public string StartHourMin { get; set; }
-    public string EndHourMin { get; set; }
+    public string EventTypeName { get; set; }
+    public string ClassName { get; set; }
+    public int StartHour { get; set; }
+    public int StartMin { get; set; }
+    public string strStartHourMin { get; set; }
+    public string strEndHourMin { get; set; }
     
   }
 }

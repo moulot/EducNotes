@@ -351,4 +351,8 @@ constructor(private http: HttpClient) {}
   getUserInfos(userId, parentId) {
     return this.http.get(this.baseUrl + 'UserInfos/' + userId + '/' + parentId);
   }
+
+  getTeacherScheduleNDays(teacherId) {
+    return this.http.get(this.baseUrl + teacherId + '/ScheduleNDays');
+  }
 }
