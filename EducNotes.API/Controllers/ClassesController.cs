@@ -92,49 +92,81 @@ namespace EducNotes.API.Controllers
         [HttpGet("{classId}/schedule")]
         public async Task<IActionResult> GetClassSchedule(int classId)
         {
-            DateTime today = DateTime.Now.Date;
-            var dayInt = (int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
-            var monday = today.AddDays(1 - dayInt);
-            var sunday = monday.AddDays(6);
+          var settings = await _context.Settings.ToListAsync();
+          var startCourseHourMin = settings.FirstOrDefault(s => s.Name.ToLower() == "starthourmin").Value;
+          var endCourseHourMin = settings.FirstOrDefault(s => s.Name.ToLower() == "endhourmin").Value;
 
-            var itemsFromRepo = await _repo.GetClassSchedule(classId);
-            var itemsToReturn = _mapper.Map<IEnumerable<ScheduleForTimeTableDto>>(itemsFromRepo);
+          List<int> schoolHours = new List<int>();
+          if(startCourseHourMin != null)
+          {
+            var startHM = startCourseHourMin.Split(":");
+            schoolHours.Add(Convert.ToInt32(startHM[0]));
+            schoolHours.Add(Convert.ToInt32(startHM[1]));
+          }
+          if(endCourseHourMin != null)
+          {
+            var endHM = endCourseHourMin.Split(":");
+            schoolHours.Add(Convert.ToInt32(endHM[0]));
+            schoolHours.Add(Convert.ToInt32(endHM[1]));
+          }
 
-            var days = new List<string>();
-            for (int i = 0; i <= 6; i++)
+          var scheduleHourSize =  Convert.ToDouble(Startup.StaticConfig.GetSection("AppSettings:DimHourSchedule").Value);
+          var startToEndHeigth = ((schoolHours[2]*60 + schoolHours[3]) - (schoolHours[0]*60 + schoolHours[1])) * scheduleHourSize/60;
+          var height = Convert.ToDouble(Math.Round(startToEndHeigth, 2));
+          var scheduleHeight = (height + "px").Replace(",", ".");
+
+          DateTime today = DateTime.Now.Date;
+          var dayInt = (int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
+          var monday = today.AddDays(1 - dayInt);
+          var sunday = monday.AddDays(6);
+
+          var itemsFromRepo = await _repo.GetClassSchedule(classId);
+          var itemsToReturn = _mapper.Map<List<ScheduleForTimeTableDto>>(itemsFromRepo);
+          //setup course box top in schedule
+          for(int i = 0; i < itemsToReturn.Count(); i++)
+          {
+            itemsToReturn[i].Top = _repo.CalculateCourseTop(itemsToReturn[i].StartHourMin, startCourseHourMin);
+          }
+
+          var days = new List<string>();
+          for (int i = 0; i <= 6; i++)
+          {
+            DateTime dt = monday.AddDays(i);
+            var shortdate = dt.ToString("ddd dd MMM", frC);
+            days.Add(shortdate);
+          }
+
+          if (itemsToReturn != null)
+          {
+            return Ok(new
             {
-                DateTime dt = monday.AddDays(i);
-                var shortdate = dt.ToString("ddd dd MMM", frC);
-                days.Add(shortdate);
-            }
+              scheduleItems = itemsToReturn,
+              firstDayWeek = monday,
+              strMonday = monday.ToLongDateString(),
+              strSunday = sunday.ToLongDateString(),
+              strShortMonday = monday.ToString("ddd dd MMM", frC),
+              strShortSunday = sunday.ToString("ddd dd MMM", frC),
+              weekDays = days,
+              schoolHours,
+              scheduleHeight
+            });
+          }
 
-            if (itemsToReturn != null)
-            {
-                return Ok(new
-                {
-                    scheduleItems = itemsToReturn,
-                    firstDayWeek = monday,
-                    strMonday = monday.ToLongDateString(),
-                    strSunday = sunday.ToLongDateString(),
-                    weekDays = days
-                });
-            }
-
-            return BadRequest("Aucun emploi du temps trouvé");
+          return BadRequest("Aucun emploi du temps trouvé");
         }
 
         [HttpPut("DelCourseFromSchedule/{scheduleId}")]
         public async Task<IActionResult> DeleteScheduleItem(int scheduleId)
         {
-            var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == scheduleId);
-            if (schedule != null)
-            {
-                _repo.Delete(schedule);
-                if (await _repo.SaveAll())
-                    return Ok();
-            }
+          var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == scheduleId);
+          if (schedule != null)
+          {
+            _repo.Delete(schedule);
+            if (await _repo.SaveAll())
+              return Ok();
+          }
 
-            return BadRequest("problème pour supprimer le cours de l'emploi du temps");
+          return BadRequest("problème pour supprimer le cours de l'emploi du temps");
         }
 
         [HttpGet("{classId}/getClassScheduleMovedWeek")]
@@ -1284,13 +1316,10 @@ namespace EducNotes.API.Controllers
             int lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
 
             //set absence sms data
-            var sessionFromDB = await _context.Sessions.FirstAsync(s => s.Id == sessionId);
+            var sessionFromDB = await _context.Sessions
+                                      .Include(i => i.Course)
+                                      .FirstAsync(s => s.Id == sessionId);
             var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
-            // var scheduleFromDB = await _context.Schedules
-            //                         .Include(c => c.Class)
-            //                         .Include(c => c.Course)
-            //                         .FirstAsync(s => s.Id == session.ScheduleId);
-            // var schedule = _mapper.Map<ScheduleToReturnDto>(scheduleFromDB);
 
             var dateData = session.strSessionDate.Split("/");
             string day = dateData[0];
@@ -1304,59 +1333,59 @@ namespace EducNotes.API.Controllers
             //add new absents
             for (int i = 0; i < absences.Length; i++)
             {
-                Absence absence = absences[i];
-                absence.PeriodId = currPeriod.Id;
-                _repo.Add(absence);
+              Absence absence = absences[i];
+              absence.PeriodId = currPeriod.Id;
+              _repo.Add(absence);
 
-                int childId = absence.UserId;
-                var child = await _context.Users.FirstAsync(u => u.Id == childId);
-                List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
-                foreach (var parentId in parentIds)
+              int childId = absence.UserId;
+              var child = await _context.Users.FirstAsync(u => u.Id == childId);
+              List<int> parentIds = parents.Where(p => p.UserId == childId).Select(p => p.UserPId).ToList();
+              foreach (var parentId in parentIds)
+              {
+                //did we already add the sms to DB? if yes remove it (updated one is coming...)
+                Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == parentId &&
+                                    s.StudentId == childId && s.StatusFlag == 0);
+                if (oldSms != null)
+                  _repo.Delete(oldSms);
+
+                // is the parent subscribed to the Absence/Late sms?
+                var userTemplate = new UserSmsTemplate();
+                if (absence.AbsenceTypeId == absTypeId)
                 {
-                  //did we already add the sms to DB? if yes remove it (updated one is coming...)
-                  Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == parentId &&
-                                      s.StudentId == childId && s.StatusFlag == 0);
-                  if (oldSms != null)
-                      _repo.Delete(oldSms);
-
-                  // is the parent subscribed to the Absence/Late sms?
-                  var userTemplate = new UserSmsTemplate();
-                  if (absence.AbsenceTypeId == absTypeId)
-                  {
-                      userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
-                                            u => u.ParentId == parentId && u.SmsTemplateId == absenceSmsId &&
-                                            u.ChildId == childId);
-                  }
-                  else
-                  {
-                      userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
-                                              u => u.ParentId == parentId && u.SmsTemplateId == lateSmsId &&
-                                              u.ChildId == childId);
-                  }
-
-                  //set sms data
-                  if (userTemplate != null)
-                  {
-                    var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
-                    AbsenceSmsDto asd = new AbsenceSmsDto();
-                    asd.ChildId = childId;
-                    asd.AbsenceTypeId = absence.AbsenceTypeId;
-                    asd.ChildFirstName = child.FirstName;
-                    asd.ChildLastName = child.LastName;
-                    asd.ParentId = parent.Id;
-                    asd.ParentFirstName = parent.FirstName;
-                    asd.ParentLastName = parent.LastName.FirstLetterToUpper();
-                    asd.ParentGender = parent.Gender;
-                    asd.CourseName = session.CourseAbbrev;
-                    asd.SessionDate = session.SessionDate.ToString("dd/MM/yyyy", frC);
-                    asd.CourseStartHour = session.StartHourMin;
-                    asd.CourseEndHour = session.EndHourMin;
-                    asd.ParentCellPhone = parent.PhoneNumber;
-                    asd.LateInMin = (absence.EndDate - absence.StartDate).TotalMinutes.ToString();
-                    //asd.scheduledDeliveryTime = deliveryTime;
-                    absSmsData.Add(asd);
-                  }
+                  userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
+                                        u => u.ParentId == parentId && u.SmsTemplateId == absenceSmsId &&
+                                        u.ChildId == childId);
                 }
+                else
+                {
+                  userTemplate = await _context.UserSmsTemplates.FirstOrDefaultAsync(
+                                          u => u.ParentId == parentId && u.SmsTemplateId == lateSmsId &&
+                                          u.ChildId == childId);
+                }
+
+                //set sms data
+                if (userTemplate != null)
+                {
+                  var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
+                  AbsenceSmsDto asd = new AbsenceSmsDto();
+                  asd.ChildId = childId;
+                  asd.AbsenceTypeId = absence.AbsenceTypeId;
+                  asd.ChildFirstName = child.FirstName;
+                  asd.ChildLastName = child.LastName;
+                  asd.ParentId = parent.Id;
+                  asd.ParentFirstName = parent.FirstName;
+                  asd.ParentLastName = parent.LastName.FirstLetterToUpper();
+                  asd.ParentGender = parent.Gender;
+                  asd.CourseName = session.CourseAbbrev;
+                  asd.SessionDate = session.SessionDate.ToString("dd/MM/yyyy", frC);
+                  asd.CourseStartHour = session.StartHourMin;
+                  asd.CourseEndHour = session.EndHourMin;
+                  asd.ParentCellPhone = parent.PhoneNumber;
+                  asd.LateInMin = (absence.EndDate - absence.StartDate).TotalMinutes.ToString();
+                  //asd.scheduledDeliveryTime = deliveryTime;
+                  absSmsData.Add(asd);
+                }
+              }
             }
 
             int currentTeacherId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);

@@ -113,5 +113,6 @@ namespace EducNotes.API.Data
     Task<List<EventDto>> GetUserEvents(int userId);
     Task<List<NextCoursesByClassDto>> GetNextCoursesByClass(int teacherId);
     Task<List<UserScheduleNDaysDto>> GetTeacherScheduleNDays(int teacherId);
+    string CalculateCourseTop(DateTime startHourMin, string startCourseHourMin);
   }
 }

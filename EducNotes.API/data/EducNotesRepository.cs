@@ -326,12 +326,12 @@ namespace EducNotes.API.Data
 
         public async Task<IEnumerable<Schedule>> GetClassSchedule(int classId)
         {
-            return await _context.Schedules
-                .Include(i => i.Class)
-                .Include(i => i.Course)
-                .Include(i => i.Teacher)
-                .Where(s => s.ClassId == classId)
-                .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin).ToListAsync();
+          return await _context.Schedules
+                        .Include(i => i.Class)
+                        .Include(i => i.Course)
+                        .Include(i => i.Teacher)
+                        .Where(s => s.ClassId == classId)
+                        .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin).ToListAsync();
         }
 
         public async Task<IEnumerable<ClassLevelSchedule>> GetClassLevelSchedule(int classLevelId)
@@ -1807,7 +1807,6 @@ namespace EducNotes.API.Data
                 continue;
 
               Sms newSms = new Sms();
-              //newSms.AbsenceTypeId = abs.AbsenceTypeId;
               newSms.SmsTypeId = smsAbsTypeId;
               newSms.To = abs.ParentCellPhone;
               newSms.StudentId = abs.ChildId;
@@ -2856,6 +2855,21 @@ namespace EducNotes.API.Data
             linesPaid.Add(olpd);
           }
           return linesPaid;
+        }
+
+        public string CalculateCourseTop(DateTime startHourMin, string startCourseHourMin)
+        {
+          var scheduleHourSize = Convert.ToDouble(Startup.StaticConfig.GetSection("AppSettings:DimHourSchedule").Value);
+
+          var startData = startCourseHourMin.Split(":");
+          int startCourseHour = Convert.ToInt32(startData[0]);
+          int startCourseMin = Convert.ToInt32(startData[1]);
+
+          var netHours = startHourMin.Hour - startCourseHour;
+          var netMins = startHourMin.Minute - startCourseMin;
+          var top = scheduleHourSize * (netHours + (double)netMins/60);
+          top = Math.Round(top, 2);
+          return (top + "px").Replace(",", ".");
         }
     }
 }

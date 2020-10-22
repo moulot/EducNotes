@@ -124,7 +124,7 @@ namespace EducNotes.API.Data
       //To get subdomain
       string[] fullAddress = _httpContext.HttpContext?.Request?.Headers?["Host"].ToString()?.Split('.');
       string subdomain = fullAddress[0].ToLower();
-      if(subdomain == "localhost:5000" || subdomain == "www" || subdomain == "educnotes")
+      if(subdomain == "localhost:5000" || subdomain == "www" || subdomain == "educnotes" || subdomain == "demo")
         subdomain = "EducNotes";
       string tenantConnString = string.Format(_config.GetConnectionString("DefaultConnection"), $"{subdomain}");
       optionsBuilder.UseSqlServer(tenantConnString);

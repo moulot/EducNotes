@@ -14,9 +14,6 @@ namespace EducNotes.API.Dtos
     public string CourseColor { get; set; }
     public int ClassId { get; set; }
     public string ClassName { get; set; }
-    // public int Day { get; set; }
-    // public string strDayDate { get; set; }
-    // public DateTime DayDate { get; set; }
     public DateTime SessionDate { get; set; }
     public string strSessionDate { get; set; }
     public string StartHourMin { get; set; }

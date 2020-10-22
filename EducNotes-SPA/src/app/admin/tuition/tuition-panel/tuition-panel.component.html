@@ -79,13 +79,13 @@
     </div>
   </div>
 
-  <div *ngIf="regActive" class="col-md-7 my-2">
+  <div *ngIf="regActive" class="col-md-6 my-2">
     <div class="card">
       <div class="card-body p-2">
         <div class="d-flex">
-          <div class="text-17 flex-grow-1">situation des inscriptions</div>
+          <div class="text-15 flex-grow-1">situation des inscriptions</div>
           <div>
-            <button type="button" mdbBtn [routerLink]="['/tuitionList']" class="btnBlue" size="sm" mdbWavesEffect>voir les details</button>
+            <a [routerLink]="['/tuitionList']" class="text-15">voir les details</a>
           </div>
         </div>
         <hr class="my-1">
@@ -100,12 +100,12 @@
       </div>
     </div>
   </div>
-  <div *ngIf="regActive" class="col-md-5 my-2">
+  <div *ngIf="regActive" class="col-md-6 my-2">
     <div class="card">
       <div class="card-body p-2">
-        <div class="text-17">tâches à effectuer</div>
+        <div class="text-15">dernières inscripitons</div>
         <hr class="my-1">
-        <div class="text-15 text-muted">envoyer emails pour les ré-inscriptions</div>
+        <div class="text-15 text-muted">liste des n dernières inscriptions</div>
         <div class="text-15 text-muted"></div>
       </div>
     </div>

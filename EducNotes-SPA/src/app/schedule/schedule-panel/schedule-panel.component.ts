@@ -19,7 +19,15 @@ export class SchedulePanelComponent implements OnInit {
   monday: Date;
   strMonday: string;
   strSunday: string;
+  strShortMonday: string;
+  strShortSunday: string;
   scheduleItems: any;
+  schoolHours: any;
+  tableHeight: any;
+  scheduleHours: number;
+  firstHour: number;
+  firstMin: number;
+  hourSize = 60;
   monCourses = [];
   tueCourses = [];
   wedCourses = [];
@@ -54,12 +62,19 @@ export class SchedulePanelComponent implements OnInit {
   loadWeekSchedule(classId) {
 
     this.resetSchedule();
-    this.classService.getClassSchedule(classId).subscribe((response: any) => {
-      this.scheduleItems = response.scheduleItems;
-      // this.monday = response.firstDayWeek;
-      this.strMonday = response.strMonday;
-      this.strSunday = response.strSunday;
-      this.weekDays = response.weekDays;
+    this.classService.getClassSchedule(classId).subscribe((data: any) => {
+      this.scheduleItems = data.scheduleItems;
+      this.strMonday = data.strMonday;
+      this.strSunday = data.strSunday;
+      this.strShortMonday = data.strShortMonday;
+      this.strShortSunday = data.strShortSunday;
+      this.weekDays = data.weekDays;
+      this.schoolHours = data.schoolHours;
+      this.tableHeight = data.scheduleHeight;
+
+      this.scheduleHours = Number(this.schoolHours[2]) - Number(this.schoolHours[0]);
+      this.firstHour = Number(this.schoolHours[0]);
+      this.firstMin = Number(this.schoolHours[1]);
 
       // add courses on the schedule
       for (let i = 1; i <= 7; i++) {
@@ -108,6 +123,17 @@ export class SchedulePanelComponent implements OnInit {
     this.friCourses = [];
     this.satCourses = [];
     this.sunCourses = [];
-    }
+  }
 
+  prevWeek() {
+
+  }
+
+  nextWeek() {
+
+  }
+
+  counter(i: number) {
+    return new Array(i);
+  }
 }
