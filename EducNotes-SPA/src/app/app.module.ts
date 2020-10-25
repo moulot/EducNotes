@@ -262,6 +262,8 @@ import { RecoveryListComponent } from './admin/recovery-list/recovery-list.compo
 import { PaymentLevelChildComponent } from './admin/payment-level-child/payment-level-child.component';
 import { PaymentLevelChildResolver } from './_resolvers/payment-level-child-resolver';
 import { UserFileNotesComponent } from './admin/user-file-notes/user-file-notes.component';
+import { AbsencesComponent } from './admin/classLife/absences/absences.component';
+import { AbsenceDayComponent } from './admin/classLife/absence-day/absence-day.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -439,7 +441,9 @@ export function tokenGetter() {
       TuitionFeesComponent,
       RecoveryListComponent,
       PaymentLevelChildComponent,
-      UserFileNotesComponent
+      UserFileNotesComponent,
+      AbsencesComponent,
+      AbsenceDayComponent
    ],
    imports: [
       FormWizardModule,

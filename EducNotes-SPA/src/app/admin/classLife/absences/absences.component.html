@@ -1,0 +1,151 @@
+<div class="d-flex mb-2">
+  <a *ngIf="showDetails" (click)="goBack()">
+    <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+  </a>
+  <i class="fad fa-users-class fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+  <div class="text-19">absences</div>
+</div>
+<div *ngIf="!showDetails">
+  <div class="row">
+    <div class="col-4 my-auto text-right mb-1">
+      <a (click)="prevWeek()">
+        <i class="text-25 fad fa-caret-circle-left" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      </a>
+    </div>
+    <div class="col-4 mb-2">
+      <div class="border rounded-lg p-2 text-15 text-center">{{weeklyAbs?.startDate}} - {{weeklyAbs?.endDate}}</div>
+    </div>
+    <div class="col-4 my-auto text-left mb-2">
+      <a (click)="nextWeek()">
+        <i class="text-25 fad fa-caret-circle-right" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      </a>
+    </div>
+    <div *ngFor="let day of weeklyAbs?.days" class="col-md-12 mb-2">
+      <div class="border rounded-lg p-1">
+        <div class="text-15">
+          <b>{{day.strDayLong}}</b>
+          <a *ngIf="day.classes.length > 0" class="text-13 ml-3" (click)="goToDayPage(day)" >voir détails</a>
+        </div>
+        <hr class="my-1">
+        <div *ngIf="day.classes.length > 0">
+          <div class="row">
+            <div *ngFor="let class of day.classes; let i = index" class="col-md-2 mb-1">
+              <a (click)="frame.show()">
+                <div class="border rounded p-1">
+                  <div class="text-13">
+                    <b>{{class.className}}</b>
+                    <span *ngIf="class.totalLates <= 1" class="ml-3">{{class.totalAbs}} abs. / {{class.totalLates}} retard</span>
+                    <span *ngIf="class.totalLates > 1" class="ml-3">{{class.totalAbs}} abs. / {{class.totalLates}} retards</span>
+                  </div>
+                </div>
+              </a>
+              <div mdbModal #frame="mdbModal" class="modal fade left" id="frameModalTop+{{i}}" tabindex="-1" role="dialog"
+                aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header text-center">
+                    <div class="text-15 w-100"><b>classe de {{class.className}} - absences du {{day.strDayLong}}</b></div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="frame.hide()">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body mx-3">
+                    <div *ngFor="let child of class.children">
+                      <div class="border rounded-lg p-1 mb-1">
+                        <div class="row">
+                          <div class="col-md-2 pr-0 my-auto text-center">
+                            <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="" width="60" class="rounded-circle img-responsive">
+                          </div>
+                          <div class="col-md-10 my-auto pl-2">
+                            <div class="d-flex">
+                              <div class="text-14 text-capitalize flex-grow-1">{{child.lastName}} {{child.firstName}}</div>
+                              <div><a [routerLink]="['/userFile', child.id]">voir le dossier</a></div>
+                            </div>
+                            <div *ngFor="let abs of child.absences">
+                              <div class="text-13">
+                                <b>{{abs.absenceType}}<span *ngIf="abs.absenceTypeId == lateType"> de {{abs.lateMins}} mn</span>.</b>
+                                <span *ngIf="abs.justified" class="ml-1"> justifié</span>
+                                <span *ngIf="!abs.justified" class="text-danger ml-1">non justifié</span>
+                              </div>
+                              <div class="text-13">cours : {{abs.courseAbbrev}} de {{abs.startTime}} à {{abs.endTime}}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="day.classes.length == 0">
+          <div class="text-13 text-danger">aucune absence</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="showDetails">
+  <!-- <app-absence-day [dayData]="dayData"></app-absence-day> -->
+  <div class="row">
+    <div class="col-12 text-17 mb-2">absences du {{day.strDayLong}}</div>
+    <div *ngFor="let class of day.classes; let i = index" class="col-12 mb-2">
+      <div class="border rounded-lg p-2">
+        <div class="text-15">
+          <div class="d-flex">
+            <a *ngIf="!showData[i]" (click)="showHideDetails(i)">
+              <i class="fad fa-plus-square fa-1x mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+              <b>classe {{class.className}}</b>
+            </a>
+            <a *ngIf="showData[i]" (click)="showHideDetails(i)">
+              <i class="fad fa-minus-square fa-1x mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+              <b>classe {{class.className}}</b>
+            </a>
+            <div>
+              <span class="mx-2" *ngIf="class.totalAbs <= 1">- {{class.totalAbs}} absence.</span>
+              <span class="mx-2" *ngIf="class.totalAbs > 1">- {{class.totalAbs}} absences.</span>
+              <span *ngIf="class.totalLates <= 1">{{class.totalLates}} retard</span>
+              <span *ngIf="class.totalLates > 1">{{class.totalLates}} retards</span>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="showData[i]">
+          <hr class="my-1">
+          <div class="row">
+            <div class="col-4" *ngFor="let child of class.children">
+              <div class="border rounded-lg p-1 mb-1">
+              <div class="row">
+                <div class="col-md-2 pr-0 my-auto text-center">
+                  <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="" width="60" class="rounded-circle img-responsive">
+                </div>
+                <div class="col-md-10 my-auto pl-2">
+                  <div class="d-flex">
+                    <div class="text-14 text-capitalize flex-grow-1">{{child.lastName}} {{child.firstName}}</div>
+                    <div><a [routerLink]="['/userFile', child.id]">voir le dossier</a></div>
+                  </div>
+                  <div *ngFor="let abs of child.absences">
+                    <div class="text-13">
+                      <b>{{abs.absenceType}}<span *ngIf="abs.absenceTypeId == lateType"> de {{abs.lateMins}} mn</span>.</b>
+                      <span *ngIf="abs.justified" class="ml-1"> justifié</span>
+                      <span *ngIf="!abs.justified" class="text-danger ml-1">non justifié</span>
+                    </div>
+                    <div class="text-13">cours : {{abs.courseAbbrev}} de {{abs.startTime}} à {{abs.endTime}}</div>
+                    <div class="text-13">raison : {{abs.reason}}</div>
+                    <!-- <div class="text-13">commentaire : {{abs.comment}}</div> -->
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -119,17 +119,17 @@ namespace EducNotes.API.Data
     public DbSet<Cheque> Cheques { get; set; }
     public DbSet<LoginPageInfo> LoginPageInfos { get; set; }
 
-    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    // {
-    //   //To get subdomain
-    //   string[] fullAddress = _httpContext.HttpContext?.Request?.Headers?["Host"].ToString()?.Split('.');
-    //   string subdomain = fullAddress[0].ToLower();
-    //   if(subdomain == "localhost:5000" || subdomain == "www" || subdomain == "educnotes" || subdomain == "demo")
-    //     subdomain = "EducNotes";
-    //   string tenantConnString = string.Format(_config.GetConnectionString("DefaultConnection"), $"{subdomain}");
-    //   optionsBuilder.UseSqlServer(tenantConnString);
-    //   base.OnConfiguring(optionsBuilder);
-    // }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+      //To get subdomain
+      string[] fullAddress = _httpContext.HttpContext?.Request?.Headers?["Host"].ToString()?.Split('.');
+      string subdomain = fullAddress[0].ToLower();
+      if(subdomain == "localhost:5000" || subdomain == "www" || subdomain == "educnotes" || subdomain == "demo")
+        subdomain = "EducNotes";
+      string tenantConnString = string.Format(_config.GetConnectionString("DefaultConnection"), $"{subdomain}");
+      optionsBuilder.UseSqlServer(tenantConnString);
+      base.OnConfiguring(optionsBuilder);
+    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

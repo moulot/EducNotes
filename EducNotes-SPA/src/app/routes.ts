@@ -142,6 +142,7 @@ import { TuitionFeesResolver } from './_resolvers/tuition-fees-resolver';
 import { RecoveryListComponent } from './admin/recovery-list/recovery-list.component';
 import { PaymentLevelChildComponent } from './admin/payment-level-child/payment-level-child.component';
 import { PaymentLevelChildResolver } from './_resolvers/payment-level-child-resolver';
+import { AbsencesComponent } from './admin/classLife/absences/absences.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -261,7 +262,8 @@ export const appRoutes: Routes = [
         { path: 'tuitionDetails/:levelId', component: TuitionDetailsComponent, resolve: {users: TuitionDetailsResolver}},
         { path: 'tuitionFees', component: TuitionFeesComponent, resolve: {fees: TuitionFeesResolver}},
         { path: 'latePayments', component: RecoveryListComponent},
-        { path: 'paymentLevelChild/:id', component: PaymentLevelChildComponent, resolve: {children: PaymentLevelChildResolver}}
+        { path: 'paymentLevelChild/:id', component: PaymentLevelChildComponent, resolve: {children: PaymentLevelChildResolver}},
+        { path: 'absences', component: AbsencesComponent}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

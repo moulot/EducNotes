@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Class } from 'src/app/_models/class';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';

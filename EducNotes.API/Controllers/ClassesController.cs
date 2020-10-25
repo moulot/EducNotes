@@ -27,6 +27,7 @@ namespace EducNotes.API.Controllers
         private readonly IConfiguration _config;
         CultureInfo frC = new CultureInfo("fr-FR");
         int parentRoleId, memberRoleId;
+        int absenceTypeId, lateTypeId;
 
 
         public ClassesController(DataContext context, IMapper mapper, IEducNotesRepository repo, IConfiguration config)
@@ -41,6 +42,8 @@ namespace EducNotes.API.Controllers
             studentTypeId = _config.GetValue<int>("AppSettings:studentTypeId");
             parentRoleId = _config.GetValue<int>("AppSettings:parentRoleId");
             memberRoleId = _config.GetValue<int>("AppSettings:memberRoleId");
+            absenceTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
+            lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
         }
 
         [HttpGet("{id}")]
@@ -1053,76 +1056,6 @@ namespace EducNotes.API.Controllers
             return Ok(classStudents);
         }
 
-        // [HttpGet("SessionData/{scheduleId}")]
-        // public async Task<IActionResult> GetSessionData(int scheduleId)
-        // {
-        //   var schedule = await _context.Schedules
-        //                         .Include(i => i.Class)
-        //                         .Include(i => i.Course)
-        //                         .FirstOrDefaultAsync(s => s.Id == scheduleId);
-
-        //   if (schedule == null)
-        //     return BadRequest("problème pour créer la session du cours.");
-
-        //   var scheduleDay = schedule.Day;
-
-        //   var today = DateTime.Now.Date;
-        //   // monday=1, tue=2, ...
-        //   var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
-
-        //   if (todayDay != scheduleDay)
-        //     return BadRequest("l'emploi du temps du jour est incohérent.");
-
-        //   // get session by schedule and date
-        //   var sessionFromRepo = await _context.Sessions.FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id &&
-        //     s.SessionDate.Date == today);
-        //   var session = _mapper.Map<SessionForCallSheetDto>(sessionFromRepo);
-
-        //   var studentsFromRepo = await _repo.GetClassStudents(schedule.ClassId);
-        //   var classStudents = _mapper.Map<IEnumerable<UserForCallSheetDto>>(studentsFromRepo);
-
-        //   var sessionSchedule = _mapper.Map<ScheduleToReturnDto>(schedule);
-
-        //   IEnumerable<AbsenceForCallSheetDto> sessionAbsences = new List<AbsenceForCallSheetDto>();
-        //   if (session != null)
-        //   {
-        //     var absences = await _context.Absences.Where(a => a.SessionId == session.Id).ToListAsync();
-        //     sessionAbsences = _mapper.Map<IEnumerable<AbsenceForCallSheetDto>>(absences);
-        //   }
-
-        //   if (session != null)
-        //   {
-        //     return Ok(new
-        //     {
-        //       session,
-        //       sessionSchedule,
-        //       classStudents,
-        //       sessionAbsences
-        //     });
-        //   }
-        //   else
-        //   {
-        //     var newSession = _context.Add(new Session
-        //     {
-        //       ScheduleId = schedule.Id,
-        //       SessionDate = today
-        //     });
-
-        //     if (await _repo.SaveAll())
-        //     {
-        //       return Ok(new
-        //       {
-        //         session = newSession,
-        //         sessionSchedule,
-        //         classStudents,
-        //         sessionAbsences
-        //       });
-        //     }
-
-        //     return BadRequest("problème pour récupérer la session");
-        //   }
-        // }
-
         [HttpGet("Schedule/{id}")]
         public async Task<IActionResult> GetSchedule(int id)
         {
@@ -1708,47 +1641,46 @@ namespace EducNotes.API.Controllers
             int themeId = 0;
             if (!string.IsNullOrEmpty(newThemeDto.Name))
             {
-                //enregistrement du theme
-                var theme = new Theme
-                {
-                    Name = newThemeDto.Name,
-                    Desc = newThemeDto.Desc,
-                    CourseId = newThemeDto.CourseId,
-                    ClassLevelId = newThemeDto.ClassLevelId
-                };
-                _context.Add(theme);
-                themeId = theme.Id;
+              //enregistrement du theme
+              var theme = new Theme
+              {
+                Name = newThemeDto.Name,
+                Desc = newThemeDto.Desc,
+                CourseId = newThemeDto.CourseId,
+                ClassLevelId = newThemeDto.ClassLevelId
+              };
+              _context.Add(theme);
+              themeId = theme.Id;
             }
 
             foreach (var less in newThemeDto.lessons)
             {
-                var lesson = new Lesson { Name = less.Name, Desc = less.Desc, DsplSeq = less.DsplSeq };
+              var lesson = new Lesson { Name = less.Name, Desc = less.Desc, DsplSeq = less.DsplSeq };
 
-                if (themeId != 0)
-                {
-                    lesson.ThemeId = themeId;
-                }
-                else
-                {
-                    lesson.CourseId = newThemeDto.CourseId;
-                    lesson.ClassLevelId = newThemeDto.ClassLevelId;
-                }
-                _context.Add(lesson);
+              if (themeId != 0)
+              {
+                  lesson.ThemeId = themeId;
+              }
+              else
+              {
+                  lesson.CourseId = newThemeDto.CourseId;
+                  lesson.ClassLevelId = newThemeDto.ClassLevelId;
+              }
+              _context.Add(lesson);
 
-
-                // enregistrement des contents
-                foreach (var cont in less.contents)
-                {
-                    var content = new LessonContent
-                    {
-                        Name = cont.Name,
-                        Desc = cont.Desc,
-                        NbHours = cont.NbHours,
-                        LessonId = lesson.Id,
-                        DsplSeq = cont.DsplSeq
-                    };
-                    _context.Add(content);
-                }
+              // enregistrement des contents
+              foreach (var cont in less.contents)
+              {
+                  var content = new LessonContent
+                  {
+                      Name = cont.Name,
+                      Desc = cont.Desc,
+                      NbHours = cont.NbHours,
+                      LessonId = lesson.Id,
+                      DsplSeq = cont.DsplSeq
+                  };
+                  _context.Add(content);
+              }
             }
 
             if (await _repo.SaveAll())
@@ -1771,29 +1703,6 @@ namespace EducNotes.API.Controllers
                 return Ok();
         }
 
-        // [HttpGet("SearchThemesOrLessons/{classLevelId}/{courseId}")]
-        // public async Task<IActionResult> SearchThemesOrLessons(int classLevelId, int courseId)
-        // {
-        //   // ClassWithThemesDto cwtd = new ClassWithThemesDto();
-        //   // List<ClassWithThemesDto> classesWithProgram = new List<ClassWithThemesDto>();
-        //   var themesToReturn = new List<Theme>();
-        //   themesToReturn = await _context.Themes
-        //                       .Include(a => a.Lessons)
-        //                       .ThenInclude(a => a.LessonContents)
-        //                       .Where(t => t.ClassLevelId == classLevelId && t.CourseId == courseId)
-        //                       .ToListAsync();
-
-        //   //Progeam from Lessons (when lessons don't come from themes)
-        //   var LessonsFromDB = await _context.Lessons
-        //                             .Include(a => a.LessonContents)
-        //                             .Where(t => t.ClassLevelId == classLevelId && t.CourseId == courseId)
-        //                             .ToListAsync();
-        //   var tt = new Theme { Id = 0, Lessons = LessonsFromDB };
-        //   themesToReturn.Add(tt);
-
-        //   return Ok(themesToReturn);
-        // }
-
         [HttpGet("Periods")]
         public async Task<IActionResult> GetPeriods()
         {
@@ -1811,65 +1720,212 @@ namespace EducNotes.API.Controllers
         [HttpPost("classStudentsAssignment/{classId}")]
         public async Task<IActionResult> classStudentsAssignment(int classId, List<QuickStudentAssignmentDto> studentsListDto)
         {
-            //    using (var identityContextTransaction = _context.Database.BeginTransaction())
-            // {
-            bool isItOk = false;
-            try
+          //using (var identityContextTransaction = _context.Database.BeginTransaction())
+          //{
+          bool isItOk = false;
+          try
+          {
+            var StudentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
+            var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentRoleId);
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            foreach (var importUser in studentsListDto)
             {
-                var StudentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
-                var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentRoleId);
-                var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+              var studentCode = Guid.NewGuid().ToString();
+              var student = _mapper.Map<User>(importUser);
+              student.UserName = studentCode;
+              student.ValidationCode = studentCode;
+              student.ClassId = classId;
 
-                foreach (var importUser in studentsListDto)
-                {
-                    var studentCode = Guid.NewGuid().ToString();
-                    var student = _mapper.Map<User>(importUser);
-                    student.UserName = studentCode;
-                    student.ValidationCode = studentCode;
-                    student.ClassId = classId;
-
-                    var parentCode = Guid.NewGuid().ToString();
-                    var parent = _mapper.Map<User>(importUser.Parent);
-                    parent.UserName = parentCode;
-                    parent.ValidationCode = parentCode;
-                    // enregistrement du professeur
-                    int studentId = await _repo.AddSelfRegister(student, StudentRole.Name, importUser.SendEmail, currentUserId);
-                    int parentId = await _repo.AddSelfRegister(parent, ParentRole.Name, importUser.SendEmail, currentUserId);
-                    _repo.Add(new UserLink
-                    {
-                        UserPId = parentId,
-                        UserId = studentId
-                    });
-                }
-
-                if (await _repo.SaveAll())
-                    // identityContextTransaction.Commit();
-                    isItOk = true;
+              var parentCode = Guid.NewGuid().ToString();
+              var parent = _mapper.Map<User>(importUser.Parent);
+              parent.UserName = parentCode;
+              parent.ValidationCode = parentCode;
+              // enregistrement du professeur
+              int studentId = await _repo.AddSelfRegister(student, StudentRole.Name, importUser.SendEmail, currentUserId);
+              int parentId = await _repo.AddSelfRegister(parent, ParentRole.Name, importUser.SendEmail, currentUserId);
+              _repo.Add(new UserLink
+              {
+                UserPId = parentId,
+                UserId = studentId
+              });
             }
-            catch (System.Exception)
-            {
-                // identityContextTransaction.Rollback();
-                isItOk = false;
-            }
-            if (isItOk)
-                return Ok();
 
-            return BadRequest();
+            if (await _repo.SaveAll())
+              // identityContextTransaction.Commit();
+              isItOk = true;
+          }
+          catch (System.Exception)
+          {
+            // identityContextTransaction.Rollback();
+            isItOk = false;
+          }
+          if (isItOk)
+            return Ok();
+
+          return BadRequest();
         }
 
         [HttpPost("courseShowing")]
         public async Task<IActionResult> courseShowing([FromForm]CourseShowingDto courseShowingDto)
         {
-            int res = await _repo.CreateLessonDoc(courseShowingDto);
-            if(res>0){
-                // envoi du lien aux élèves et au aux parents d'eleves
-                await _repo.SendCourseShowingLink(res);
+          int res = await _repo.CreateLessonDoc(courseShowingDto);
+          if(res>0){
+            // envoi du lien aux élèves et au aux parents d'eleves
+            await _repo.SendCourseShowingLink(res);
             return Ok();
-            }
+          }
 
-            return BadRequest();
+          return BadRequest();
         }
 
+        [HttpGet("CurrentWeekAbsences")]
+        public async Task<IActionResult> GetAbsences()
+        {
+          DateTime today = DateTime.Now.Date;
+          var dayInt = (int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
+          var monday = today.AddDays(1 - dayInt);
+          var saturday = monday.AddDays(5);
+          
+          AdminAbsenceDto absences = new AdminAbsenceDto();
+          absences.StartDate = monday.ToString("ddd dd MMM", frC);
+          absences.EndDate = saturday.ToString("ddd dd MMM", frC);
+          absences.LngStartDate = monday.ToString("dddd dd MMMM yyyy", frC);
+          absences.LngEndDate = saturday.ToString("dddd dd MMMM yyyy", frC);
+          
+          absences.Days = new List<AbsenceDayDto>();
+          for (int i = 0; i < 5; i++)
+          {
+            var day = monday.AddDays(i);
+            AbsenceDayDto add = new AbsenceDayDto();
+            add.Day = i + 1;
+            add.strDay = day.ToString("ddd dd MMM");
+            add.strDayLong = day.ToString("dddd dd MMMM yyyy", frC);
+
+            var allAbsences = await _context.Absences.ToListAsync();
+
+            add.Classes = new List<AbsenceClassDto>();
+            var absencesByDate = await _repo.GetAbsencesByDate(day);
+            var classes = absencesByDate.Select(a => a.User.Class).Distinct();
+            foreach (var aclass in classes)
+            {
+              AbsenceClassDto acd = new AbsenceClassDto();
+              acd.ClassId = aclass.Id;
+              acd.ClassName = aclass.Name;
+              acd.Children = new List<AbsenceChildDto>();
+              var childrenFromDB = absencesByDate.Where(a => a.User.ClassId == aclass.Id).Select(u => u.User);
+              var children = _mapper.Map<List<UserForDetailedDto>>(childrenFromDB);
+              int nbAbs = 0;
+              int nbLates = 0;
+              foreach (var child in children)
+              {
+                AbsenceChildDto childDto = new AbsenceChildDto();
+                childDto.Id = child.Id;
+                childDto.LastName = child.LastName;
+                childDto.FirstName = child.FirstName;
+                childDto.PhotoUrl = child.PhotoUrl;
+                childDto.TotalAbsences = allAbsences.Where(a => a.UserId == child.Id && a.AbsenceTypeId == absenceTypeId).Count();
+                childDto.TotalLates = allAbsences.Where(a => a.UserId == child.Id && a.AbsenceTypeId == lateTypeId).Count();
+                var childAbsences = absencesByDate.Where(a => a.UserId == child.Id).ToList();
+                nbAbs += childAbsences.Where(c => c.AbsenceTypeId == absenceTypeId).Count();
+                nbLates += childAbsences.Where(c => c.AbsenceTypeId == lateTypeId).Count();
+                childDto.Absences = new List<AbsenceChildDetailsDto>();
+                foreach (var abs in childAbsences)
+                {
+                  AbsenceChildDetailsDto childAbs = new AbsenceChildDetailsDto();
+                  childAbs.CourseName = abs.Session.Course.Name;
+                  childAbs.CourseAbbrev = abs.Session.Course.Abbreviation;
+                  childAbs.DoneBy = abs.DoneBy.LastName + ' ' + abs.DoneBy.FirstName;
+                  childAbs.AbsenceTypeId = abs.AbsenceTypeId;
+                  childAbs.AbsenceType = abs.AbsenceType.Name.ToLower();
+                  childAbs.StartTime = abs.StartDate.ToShortTimeString();
+                  childAbs.EndTime = abs.EndDate.ToShortTimeString();
+                  TimeSpan diff = abs.EndDate.Subtract(abs.StartDate);
+                  childAbs.LateMins = diff.TotalMinutes;
+                  childAbs.Justified = abs.Justified;
+                  childAbs.Reason = abs.Reason;
+                  childAbs.Comment = abs.Comment;
+                  childDto.Absences.Add(childAbs);
+                }
+
+                acd.Children.Add(childDto);
+              }
+
+              acd.TotalAbs = nbAbs;
+              acd.TotalLates = nbLates;
+              add.Classes.Add(acd);
+            }
+
+            absences.Days.Add(add);
+          }
+
+          return Ok(absences);
+        }
+
+        [HttpPost("DayAbsences")]
+        public async Task<IActionResult> GetDayAbsences(DateTime day)
+        {
+          var absences = new AbsenceDayDto();
+          absences.strDay = day.ToString("ddd dd MMM");
+          absences.strDayShort = day.ToString("dd/MM/yyyy", frC);
+          absences.strDayLong = day.ToString("dddd dd MMMM yyyy", frC);
+
+          var allAbsences = await _context.Absences.ToListAsync();
+
+          absences.Classes = new List<AbsenceClassDto>();
+          var absencesByDate = await _repo.GetAbsencesByDate(day);
+          var classes = absencesByDate.Select(a => a.User.Class).Distinct();
+          foreach (var aclass in classes)
+          {
+            AbsenceClassDto acd = new AbsenceClassDto();
+            acd.ClassId = aclass.Id;
+            acd.ClassName = aclass.Name;
+            acd.Children = new List<AbsenceChildDto>();
+            var childrenFromDB = absencesByDate.Where(a => a.User.ClassId == aclass.Id).Select(u => u.User);
+            var children = _mapper.Map<List<UserForDetailedDto>>(childrenFromDB);
+            int nbAbs = 0;
+            int nbLates = 0;
+            foreach (var child in children)
+            {
+              AbsenceChildDto childDto = new AbsenceChildDto();
+              childDto.Id = child.Id;
+              childDto.LastName = child.LastName;
+              childDto.FirstName = child.FirstName;
+              childDto.PhotoUrl = child.PhotoUrl;
+              childDto.TotalAbsences = allAbsences.Where(a => a.UserId == child.Id && a.AbsenceTypeId == absenceTypeId).Count();
+              childDto.TotalLates = allAbsences.Where(a => a.UserId == child.Id && a.AbsenceTypeId == lateTypeId).Count();
+              var childAbsences = absencesByDate.Where(a => a.UserId == child.Id).ToList();
+              nbAbs += childAbsences.Where(c => c.AbsenceTypeId == absenceTypeId).Count();
+              nbLates += childAbsences.Where(c => c.AbsenceTypeId == lateTypeId).Count();
+              childDto.Absences = new List<AbsenceChildDetailsDto>();
+              foreach (var abs in childAbsences)
+              {
+                AbsenceChildDetailsDto childAbs = new AbsenceChildDetailsDto();
+                childAbs.CourseName = abs.Session.Course.Name;
+                childAbs.CourseAbbrev = abs.Session.Course.Abbreviation;
+                childAbs.DoneBy = abs.DoneBy.LastName + ' ' + abs.DoneBy.FirstName;
+                childAbs.AbsenceTypeId = abs.AbsenceTypeId;
+                childAbs.AbsenceType = abs.AbsenceType.Name.ToLower();
+                childAbs.StartTime = abs.StartDate.ToShortTimeString();
+                childAbs.EndTime = abs.EndDate.ToShortTimeString();
+                TimeSpan diff = abs.EndDate.Subtract(abs.StartDate);
+                childAbs.LateMins = diff.TotalMinutes;
+                childAbs.Justified = abs.Justified;
+                childAbs.Reason = abs.Reason;
+                childAbs.Comment = abs.Comment;
+                childDto.Absences.Add(childAbs);
+              }
+
+              acd.Children.Add(childDto);
+            }
+
+            acd.TotalAbs = nbAbs;
+            acd.TotalLates = nbLates;
+            absences.Classes.Add(acd);
+          }
+
+          return Ok(absences);
+        }
 
     }
 }

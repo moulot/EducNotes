@@ -97,6 +97,38 @@ namespace EducNotes.API.Helpers
         return (height + "px").Replace(",", ".");
       }
 
+      public static string GetDayString(this int day)
+      {
+        var dayString = "";
+
+        switch (day)
+        {
+          case 1:
+            dayString = "lundi";
+            break;
+          case 2:
+            dayString = "mardi";
+            break;
+          case 3:
+            dayString = "mercredi";
+            break;
+          case 4:
+            dayString = "jeudi";
+            break;
+          case 5:
+            dayString = "vendredi";
+            break;
+          case 6:
+            dayString = "samedi";
+            break;
+          default:
+            dayString = "";
+            break;
+        }
+
+        return dayString;
+      }
+
       public static bool IsNumeric(this string str)
       {
         if (str == null)

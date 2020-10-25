@@ -331,4 +331,12 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/ActiveClasslevels');
   }
 
+  getCurrentWeekAbsences() {
+    return this.http.get(this.baseUrl + 'classes/CurrentWeekAbsences');
+  }
+
+  getDayAbsences(date: Date) {
+    return this.http.post(this.baseUrl + 'classes/DayAbsences', date);
+  }
+
 }

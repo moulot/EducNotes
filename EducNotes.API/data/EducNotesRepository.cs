@@ -1751,6 +1751,19 @@ namespace EducNotes.API.Data
           return result;
         }
 
+        public async Task<List<Absence>> GetAbsencesByDate(DateTime date)
+        {
+          var absences = await _context.Absences
+                                .Include(i => i.User).ThenInclude(i => i.Class)
+                                .Include(i => i.User).ThenInclude(i => i.Photos)
+                                .Include(i => i.DoneBy)
+                                .Include(i => i.AbsenceType)
+                                .Include(i => i.Session).ThenInclude(i => i.Course)
+                                .Where(a => a.StartDate.Date == date.Date)
+                                .ToListAsync();
+          return absences;
+        }
+
         public void Clickatell_SendSMS(clickatellParamsDto smsData)
         {
           Dictionary<string, string> Params = new Dictionary<string, string>();
