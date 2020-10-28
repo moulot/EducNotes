@@ -124,11 +124,9 @@ import { InvalidAccountComponent } from './registration/invalid-account/invalid-
 import { TreasuryComponent } from './admin/treso/treasury/treasury.component';
 import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
 import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
-import { UserFileComponent } from './admin/user-file/user-file.component';
 import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-email/confirm-teacher-email.component';
 import { RolesComponent } from './admin/roles/roles.component';
-import { PaymentsComponent } from './admin/payments/payments.component';
-import { UserFileResolver } from './_resolvers/user-file-resolver';
+import { ChildFileResolver } from './_resolvers/child-file-resolver';
 import { AddPaymentComponent } from './admin/add-payment/add-payment.component';
 import { AddPaymentResolver } from './_resolvers/add-payment-resolver';
 import { TuitionListComponent } from './admin/tuition/tuition-list/tuition-list.component';
@@ -143,6 +141,9 @@ import { RecoveryListComponent } from './admin/recovery-list/recovery-list.compo
 import { PaymentLevelChildComponent } from './admin/payment-level-child/payment-level-child.component';
 import { PaymentLevelChildResolver } from './_resolvers/payment-level-child-resolver';
 import { AbsencesComponent } from './admin/classLife/absences/absences.component';
+import { ChildFileComponent } from './admin/userFiles/child-file/child-file.component';
+import { ParentFileComponent } from './admin/userFiles/parent-file/parent-file.component';
+import { TeacherFileComponent } from './admin/userFiles/teacher-file/teacher-file.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -253,8 +254,10 @@ export const appRoutes: Routes = [
         { path: 'invalidAccount', component: InvalidAccountComponent},
         { path: 'editChildren/:id', component: EditChildrenComponent, resolve: {users: EditChildrenResolver}},
         { path: 'settings', component: SchoolSettingsComponent, resolve: {settings: SchoolSettingsResolver}},
-        { path: 'userFile/:id', component: UserFileComponent, resolve: {file: UserFileResolver} },
-        { path: 'fileUser/:id', component: UserFileComponent, resolve: {file: UserFileResolver} },
+        { path: 'childFile/:id', component: ChildFileComponent, resolve: {file: ChildFileResolver} },
+        { path: 'fileUser/:id', component: ChildFileComponent, resolve: {file: ChildFileResolver} },
+        { path: 'parentFile/:id', component: ParentFileComponent}, // resolve: {file: ChildFileResolver} },
+        { path: 'teacherFile/:id', component: TeacherFileComponent}, // resolve: {file: ChildFileResolver} },
         { path: 'roles', component: RolesComponent},
         { path: 'addFinOp/:id', component: AddPaymentComponent, resolve: {file: AddPaymentResolver} },
         { path: 'validatePayments', component: ValidatePaymentsComponent, resolve: {payments: ValidatePaymentsResolver}},

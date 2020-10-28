@@ -4,11 +4,11 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
-  selector: 'app-user-file',
-  templateUrl: './user-file.component.html',
-  styleUrls: ['./user-file.component.scss']
+  selector: 'app-child-file',
+  templateUrl: './child-file.component.html',
+  styleUrls: ['./child-file.component.scss']
 })
-export class UserFileComponent implements OnInit {
+export class ChildFileComponent implements OnInit {
   userFile: any;
   showInfos = true;
   toggle = false;

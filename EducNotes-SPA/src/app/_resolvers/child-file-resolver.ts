@@ -7,12 +7,12 @@ import { catchError } from 'rxjs/operators';
 import { AuthService } from '../_services/auth.service';
 
 @Injectable()
-export class UserFileResolver implements Resolve<any> {
+export class ChildFileResolver implements Resolve<any> {
   constructor(private userService: UserService, private authService: AuthService,
     private router: Router, private alertify: AlertifyService) {}
 
   resolve(route: ActivatedRouteSnapshot): any {
-    return this.userService.getUserFile(route.params['id']).pipe(
+    return this.userService.getChildFile(route.params['id']).pipe(
       catchError(error => {
         this.alertify.error('problème de récupération de données');
         this.router.navigate(['/home']);

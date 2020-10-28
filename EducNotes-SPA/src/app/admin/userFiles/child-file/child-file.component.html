@@ -3,9 +3,7 @@
     <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
   </a>
   <i class="fad fa-file-user fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-  <div class="text-19">
-    dossier {{userFile.idNum}} - enfant <span class="text-capitalize">{{userFile.lastName}} {{userFile.firstName}}</span>
-  </div>
+  <div class="text-19">dossier {{userFile.idNum}}</div>
 </div>
 <div class="d-none d-md-block border rounded-lg p-2">
   <div *ngIf="showInfos" class="row animated zoomIn">
@@ -24,13 +22,13 @@
       <div class="text-20 font-weight-500" style="color: #192C47;">
         <span class="text-capitalize">{{userFile.lastName}} {{userFile.firstName}}</span> ({{userFile.age}} ans) - classe de {{userFile.className || userFile.classLevelName}}.
       </div>
-      <div class="text-15 text-muted">
-        père:<span class="text-capitalize pl-1" style="color: #192C47;">{{userFile.fatherLastName}} {{userFile.fatherFirstName}}.</span>
+      <div class="text-16 text-muted">
+        <b>père:</b><span class="text-capitalize pl-1" style="color: #192C47;">{{userFile.fatherLastName}} {{userFile.fatherFirstName}}.</span>
         <span class="pl-2">mobile: <span style="color: #192C47;">{{userFile.fatherPhoneNumber}}</span></span>
         <span class="pl-2">email: <span style="color: #192C47;">{{userFile.fatherEmail}}</span></span>
       </div>
-      <div class="text-15 text-muted">
-        mère:<span class="text-capitalize pl-1" style="color: #192C47;">{{userFile.motherLastName}} {{userFile.motherFirstName}}.</span>
+      <div class="text-16 text-muted">
+        <b>mère:</b><span class="text-capitalize pl-1" style="color: #192C47;">{{userFile.motherLastName}} {{userFile.motherFirstName}}.</span>
         <span class="pl-2">mobile: <span style="color: #192C47;">{{userFile.motherPhoneNumber}}</span></span>
         <span class="pl-2">email: <span style="color: #192C47;">{{userFile.motherEmail}}</span></span>
       </div>
@@ -40,15 +38,16 @@
     <div class="col-md-4 mb-1" *ngFor="let child of userFile.siblings">
       <div class="border rounded-lg p-1">
         <div class="row">
-          <div class="col-md-2 d-none d-md-block">
+          <div class="col-md-3 d-none d-md-block">
             <img src="{{child.photoUrl || '../../../../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
           </div>
-          <div class="col-md-10 my-auto pl-1 d-none d-md-block">
-            <span class="text-16 font-weight-500 text-capitalize" style="color: #192C47;">
-              {{child.lastName}} {{child.firstName}}</span> ({{child.age}} ans) - classe de {{child.className || child.classLevelName}}.
-            <div class="col-md-12 d-none d-md-block text-right">
+          <div class="col-md-9 my-auto pl-1 d-none d-md-block">
+            <div class="">
               <a (click)="changeUserFile(child.id)"><u class="text-small text-danger">voir dossier</u></a> 
             </div>  
+            <div class="text-15 font-weight-500 text-capitalize">
+              {{child.lastName}} {{child.firstName}} ({{child.age}} ans)</div>
+            <div class="text-15">classe de {{child.className || child.classLevelName}}.</div>
           </div>
         </div>
       </div>

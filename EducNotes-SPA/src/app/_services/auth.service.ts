@@ -206,8 +206,8 @@ export class AuthService {
   roleMatch(allowedRoles): boolean {
     let isMatch = false;
     const userRoles = this.decodedToken.role as Array<string>;
-    allowedRoles.forEach(element => {
-      if (userRoles.includes(element)) {
+    allowedRoles.forEach(elt => {
+      if (userRoles.includes(elt)) {
         isMatch = true;
         return;
       }
@@ -221,7 +221,6 @@ export class AuthService {
     this.decodedToken = null;
     this.currentUser = null;
     return this.http.get(this.baseUrl + 'emailValidation/' + token);
-
   }
 
   resetPassword(token: string) {

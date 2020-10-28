@@ -335,6 +335,10 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/CurrentWeekAbsences');
   }
 
+  getWeekAbsences(data: any) {
+    return this.http.post(this.baseUrl + 'classes/WeekAbsences', data);
+  }
+
   getDayAbsences(date: Date) {
     return this.http.post(this.baseUrl + 'classes/DayAbsences', date);
   }

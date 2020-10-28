@@ -27,6 +27,7 @@ export class AdminDashboardComponent implements OnInit {
   searchText = new Subject();
   results: Observable<any[]>;
   data: any = [];
+  userTypeId: any;
 
   constructor(private adminService: AdminService, private fb: FormBuilder, private router: Router,
     private userService: UserService, private alertify: AlertifyService) { }
@@ -49,7 +50,8 @@ export class AdminDashboardComponent implements OnInit {
       return this.data.filter((item: any) =>
         item.lastName.toLowerCase().includes(filterValue) ||
         item.firstName.toLowerCase().includes(filterValue) ||
-        item.idNum.toLowerCase().includes(filterValue));
+        item.idNum.toLowerCase().includes(filterValue) ||
+        item.userType.toLowerCase().includes(filterValue));
     }
   }
 
@@ -86,7 +88,19 @@ export class AdminDashboardComponent implements OnInit {
     userFileData.userId = userid;
     userFileData.searchData = searchData;
     if (userid) {
-      this.router.navigate(['userFile', userFileData.userId]);
+      switch (this.userTypeId) {
+        case this.studentTypeId:
+          this.router.navigate(['childFile', userFileData.userId]);
+          break;
+        case this.parentTypeId:
+          this.router.navigate(['parentFile', userFileData.userId]);
+          break;
+        case this.teacherTypeId:
+          this.router.navigate(['teacherFile', userFileData.userId]);
+          break;
+        default:
+          break;
+      }
     } else {
       if (searchData !== '') {
         this.userService.loadUserFile(userFileData).subscribe((userData: any) => {
@@ -97,8 +111,9 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  selectUserId(userid) {
+  selectUserId(userid, userTypeId) {
     this.searchForm.patchValue({userid: userid});
+    this.userTypeId = userTypeId;
   }
 
 }

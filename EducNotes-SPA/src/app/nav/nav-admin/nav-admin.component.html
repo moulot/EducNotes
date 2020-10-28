@@ -1,9 +1,9 @@
 <ul class="navbar-nav">
   <li class="nav-item waves-light" mdbWavesEffect>
-    <a class="nav-link text-16 text-muted" (click)="closeNavOnClick()" [routerLink]="['/home']">accueil</a>
+    <a class="nav-link text-16" (click)="closeNavOnClick()" [routerLink]="['/home']">accueil</a>
   </li>
   <li class="nav-item dropdown btn-group" dropdown>
-    <a dropdownToggle type="button" class="nav-link text-16 text-muted dropdown-toggle waves-light" mdbWavesEffect>
+    <a dropdownToggle type="button" class="nav-link text-16 dropdown-toggle waves-light" mdbWavesEffect>
       inscriptions
     </a>
     <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
@@ -16,7 +16,7 @@
     </div>
   </li>
   <li class="nav-item dropdown btn-group" dropdown>
-    <a dropdownToggle type="button" class="nav-link text-16 text-muted dropdown-toggle waves-light" mdbWavesEffect>
+    <a dropdownToggle type="button" class="nav-link text-16 dropdown-toggle waves-light" mdbWavesEffect>
       scolarité
     </a>
     <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
@@ -27,29 +27,8 @@
       <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/themesList']">prog. scolaire</a>
     </div>
   </li>
-  <!-- <li class="nav-item waves-light" mdbWavesEffect>
-    <a class="nav-link text-16 text-muted" (click)="closeNavOnClick()" [routerLink]="['/teachers']">enseignants</a>
-  </li>
   <li class="nav-item dropdown btn-group" dropdown>
-    <a dropdownToggle type="button" class="nav-link text-16 text-muted dropdown-toggle waves-light" mdbWavesEffect>
-      classes
-    </a>
-    <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/classesPanel']">classes</a>
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/classScheduleEdit']">emploi du temps</a>
-    </div>
-  </li>
-  <li class="nav-item dropdown btn-group" dropdown>
-    <a dropdownToggle type="button" class="nav-link text-16 text-muted dropdown-toggle waves-light" mdbWavesEffect>
-      cours
-    </a>
-    <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/courses']">liste des cours</a>
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/coefficients']">coéfficient des cours</a>
-    </div>
-  </li> -->
-  <li class="nav-item dropdown btn-group" dropdown>
-    <a dropdownToggle type="button" class="nav-link text-16 text-muted dropdown-toggle waves-light" mdbWavesEffect>
+    <a dropdownToggle type="button" class="nav-link text-16 dropdown-toggle waves-light" mdbWavesEffect>
       trésorerie
     </a>
     <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
@@ -58,14 +37,8 @@
       <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/tuitionFees']">frais de scolarité</a>
     </div>
   </li>
-  <!-- <li class="nav-item waves-light" mdbWavesEffect>
-    <a class="nav-link text-16 text-muted" (click)="closeNavOnClick()" [routerLink]="['/treasury']">trésorerie</a>
-  </li> -->
-  <!-- <li class="nav-item waves-light" mdbWavesEffect>
-    <a class="nav-link text-16 text-muted" (click)="closeNavOnClick()" [routerLink]="['/productsList']">services</a>
-  </li> -->
   <li class="nav-item dropdown btn-group" dropdown>
-    <a dropdownToggle type="button" class="nav-link text-16 text-muted dropdown-toggle waves-light" mdbWavesEffect>
+    <a dropdownToggle type="button" class="nav-link text-16 dropdown-toggle waves-light" mdbWavesEffect>
       services
     </a>
     <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
@@ -75,38 +48,36 @@
     </div>
   </li>
   <li class="nav-item dropdown btn-group" dropdown>
-    <a dropdownToggle type="button" class="nav-link text-16 text-muted dropdown-toggle waves-light" mdbWavesEffect>
-      communication
+    <a dropdownToggle type="button" class="nav-link text-16 dropdown-toggle waves-light" mdbWavesEffect>
+      communication<span class="caret-down"></span>
     </a>
-    <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/broadcast']"  class="dropdown-item">emails de diffusion</a>
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/sendEmail']" class="dropdown-item">envoyer un email</a>
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/createPDF']" class="dropdown-item">créer PDF</a>
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/sendSms']" class="dropdown-item">envoyer des SMS</a>
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/SmsTemplates']" class="dropdown-item">modèles de Sms</a>
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/EmailTemplates']" class="dropdown-item">modèles de emails</a>
+    <div *dropdownMenu class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
+      <a class="dropdown-item waves-light" (click)="closeNavOnClick()" [routerLink]="['/broadcast']">emails de diffusion</a>
+      <a class="dropdown-item waves-light" (click)="closeNavOnClick()" [routerLink]="['/sendEmail']">envoyer un email</a>
+      <a class="dropdown-item waves-light" (click)="closeNavOnClick()" [routerLink]="['/createPDF']">créer PDF</a>
+      <a class="dropdown-item waves-light" (click)="closeNavOnClick()" [routerLink]="['/sendSms']">envoyer des SMS</a>
+      <a class="dropdown-item waves-light" (click)="closeNavOnClick()" [routerLink]="['/SmsTemplates']">modèles de Sms</a>
+      <a class="dropdown-item waves-light" (click)="closeNavOnClick()" [routerLink]="['/EmailTemplates']">modèles de emails</a>
     </div>
   </li>
   <li class="nav-item dropdown btn-group" dropdown>
-    <a dropdownToggle type="button" class="nav-link text-16 text-muted dropdown-toggle waves-light" mdbWavesEffect>
+    <a dropdownToggle type="button" class="nav-link text-16 dropdown-toggle waves-light" mdbWavesEffect>
       vie scolaire
     </a>
     <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/absences']"  class="dropdown-item">absences</a>
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/absences']">absences</a>
     </div>
   </li>
   <li class="nav-item dropdown btn-group" dropdown>
-    <a dropdownToggle type="button" class="nav-link text-16 text-muted dropdown-toggle waves-light" mdbWavesEffect>
+    <a dropdownToggle type="button" class="nav-link text-16 dropdown-toggle waves-light" mdbWavesEffect>
       paramètres
     </a>
     <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/settings']"  class="dropdown-item">données initiales</a>
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/loginInfos']" class="dropdown-item">infos générales</a>
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/settings']">données initiales</a>
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/loginInfos']">infos générales</a>
       <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/periodicities']">périodes</a>
       <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/payableAts']">périodes d'alerte</a>
       <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/coefficients']">coeff. des cours</a>
-      <!-- <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/roles']" class="dropdown-item">rôles</a>
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/menu']" class="dropdown-item">menu</a> -->
     </div>
   </li>
 </ul>

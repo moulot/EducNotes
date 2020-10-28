@@ -16,6 +16,7 @@ export class AbsencesComponent implements OnInit {
   showDetails = false;
   day: any;
   showData = [];
+  moveWeekData: any;
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
     private router: Router) { }
@@ -45,17 +46,29 @@ export class AbsencesComponent implements OnInit {
   }
 
   showHideDetails(index) {
-    console.log(index);
-    console.log(this.showData);
     this.showData[index] = !this.showData[index];
   }
 
   prevWeek() {
-
+    const moveData = <any>{};
+    moveData.startDate = this.weeklyAbs.startDate;
+    moveData.moveDays = -7;
+    this.classService.getWeekAbsences(moveData).subscribe(data => {
+      this.weeklyAbs = data;
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
   nextWeek() {
-
+    const moveData = <any>{};
+    moveData.startDate = this.weeklyAbs.startDate;
+    moveData.moveDays = 7;
+    this.classService.getWeekAbsences(moveData).subscribe(data => {
+      this.weeklyAbs = data;
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
 }

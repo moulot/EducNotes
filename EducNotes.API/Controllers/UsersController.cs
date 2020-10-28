@@ -171,8 +171,14 @@ namespace EducNotes.API.Controllers
           });
         }
 
-        [HttpGet("UserFile/{childId}")]
-        public async Task<IActionResult> GetUserFile(int childId)
+        [HttpGet("ParentFile/parentId")]
+        public async Task<IActionResult> GetParentFile(int parentId)
+        {
+
+        }
+
+        [HttpGet("ChildFile/{childId}")]
+        public async Task<IActionResult> GetChildFile(int childId)
         {
           var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == childId;
           if(!isCurrentUser)
@@ -181,7 +187,7 @@ namespace EducNotes.API.Controllers
           var childFromRepo = await _repo.GetUser(childId, false);
           var child = _mapper.Map<UserForDetailedDto>(childFromRepo);
 
-          UserForFileDto userFile = new UserForFileDto();
+          ChildForFileDto userFile = new ChildForFileDto();
           userFile.Id = childId;
           userFile.LastName = child.LastName;
           userFile.FirstName = child.FirstName;
@@ -245,9 +251,12 @@ namespace EducNotes.API.Controllers
           var line = await _context.OrderLines
                             .Include(i => i.Order)
                             .Where(l => l.Order.isReg && l.ChildId == childId)
-                            .FirstAsync();
-          userFile.OrderId = line.OrderId;
-          userFile.OrderLineId = line.Id;
+                            .FirstOrDefaultAsync();
+          if(line != null)
+          {
+            userFile.OrderId = line.OrderId;
+            userFile.OrderLineId = line.Id;
+          }
 
           return Ok(userFile);
         }
@@ -1843,7 +1852,7 @@ namespace EducNotes.API.Controllers
           if(userOK)
             return Ok();
           else
-            return BadRequest("problème pour ajouter l'utilisateur");
+            return BadRequest("problème pour ajouter l'enseigant");
         }
 
         [HttpGet("GetAdminUserTypes")]
@@ -1980,25 +1989,25 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpGet("LoadStudents")]
-        public async Task<IActionResult> loadStuentData()
+        public async Task<IActionResult> loadStudentData()
         {
           var users = await _context.Users
-                            .Where(u => u.UserTypeId == studentTypeId && u.AccountDataValidated)
                             .Include(i => i.Photos)
                             .Include(i => i.Class)
+                            .Include(i => i.UserType)
                             .Include(i => i.ClassLevel)
-                            .Where(u => u.UserTypeId == studentTypeId)
+                            .Where(u => u.AccountDataValidated && (u.UserTypeId == studentTypeId || u.UserTypeId == parentTypeId ||
+                              u.UserTypeId == teacherTypeId))
                             .ToListAsync();
 
           List<SearchUsersDataDto> data = new List<SearchUsersDataDto>();
           foreach (var user in users)
           {
-            int userid = user.Id;
             string fname = user.FirstName == null ? "" : user.FirstName.ToLower().FirstLetterToUpper();
             string lname = user.LastName == null ? "" : user.LastName.ToLower().FirstLetterToUpper();
             string idNum = user.IdNum == null ? "" : user.IdNum;
-            int age = user.DateOfBirth.CalculateAge();
-            string levelname = user.ClassLevel.Name;
+            int age = user.DateOfBirth == null ? 0 : user.DateOfBirth.CalculateAge();
+            string levelname = user.ClassLevel == null? "" : user.ClassLevel.Name;
             string className = "";
             if(user.Class != null)
               className = user.Class.Name;
@@ -2006,7 +2015,9 @@ namespace EducNotes.API.Controllers
             if(user.Photos.Count() > 0)
               photoUrl = user.Photos.FirstOrDefault(p => p.IsMain).Url;
             SearchUsersDataDto sudd = new SearchUsersDataDto();
-            sudd.UserId = userid;
+            sudd.UserId = user.Id;
+            sudd.UserTypeId = user.UserTypeId;
+            sudd.UserType = user.UserType.Name;
             sudd.FirstName = fname;
             sudd.LastName = lname;
             sudd.IDNum = idNum;
@@ -2029,7 +2040,7 @@ namespace EducNotes.API.Controllers
           var childFromRepo = await _repo.GetUser(childId, false);
           var child = _mapper.Map<UserForDetailedDto>(childFromRepo);
 
-          UserForFileDto userFile = new UserForFileDto();
+          ChildForFileDto userFile = new ChildForFileDto();
           userFile.Id = childId;
           userFile.LastName = child.LastName;
           userFile.FirstName = child.FirstName;

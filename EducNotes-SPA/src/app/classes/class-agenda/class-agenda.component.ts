@@ -50,7 +50,6 @@ export class ClassAgendaComponent implements OnInit {
   }
 
   loadWeekAgenda(classId) {
-
     this.classService.getClassCurrWeekAgenda(classId).subscribe((res: any) => {
       this.classAgendaDays = res.agendaItems;
       this.filteredAgenda = res.agendaItems;
@@ -66,7 +65,6 @@ export class ClassAgendaComponent implements OnInit {
   }
 
   loadWeekSchedule(classId) {
-
     this.resetSchedule();
     this.classService.getClassSchedule(classId).subscribe((response: any) => {
       this.scheduleItems = response.scheduleItems;
@@ -112,12 +110,10 @@ export class ClassAgendaComponent implements OnInit {
   }
 
   loadMovedWeek(move: number) {
-
     this.allCourses = true;
     this.agendaParams.dueDate = this.monday;
     this.agendaParams.moveWeek = move;
     this.classService.getClassMovedWeekAgenda(this.classRoom.id, this.agendaParams).subscribe((res: any) => {
-
       this.classAgendaDays = res.agendaItems;
       this.filteredAgenda = res.agendaItems;
       this.monday = res.firstDayWeek;

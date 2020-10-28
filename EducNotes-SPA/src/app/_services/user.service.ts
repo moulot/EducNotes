@@ -108,8 +108,8 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'Account/' + id);
   }
 
-  getUserFile(id) {
-    return this.http.get(this.baseUrl + 'UserFile/' + id);
+  getChildFile(id) {
+    return this.http.get(this.baseUrl + 'ChildFile/' + id);
   }
 
   saveUserSms(parentId, sms: any) {

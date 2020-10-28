@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace EducNotes.API.Dtos
 {
-  public class UserForFileDto
+  public class ChildForFileDto
   {
     public int Id { get; set; }
     public int OrderId { get; set; }

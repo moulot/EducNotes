@@ -241,13 +241,12 @@ import { ActivateChildrenComponent } from './registration/activate-children/acti
 import { TreasuryComponent } from './admin/treso/treasury/treasury.component';
 import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
 import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
-import { UserFileComponent } from './admin/user-file/user-file.component';
 import { SpacedAmountDirective } from './_directives/spacedAmount.directive';
 import { TuitionDetailsComponent } from './admin/tuition/tuition-details/tuition-details.component';
 import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-email/confirm-teacher-email.component';
 import { RolesComponent } from './admin/roles/roles.component';
 import { PaymentsComponent } from './admin/payments/payments.component';
-import { UserFileResolver } from './_resolvers/user-file-resolver';
+import { ChildFileResolver } from './_resolvers/child-file-resolver';
 import { UserFileTuitionComponent } from './admin/user-file-tuition/user-file-tuition.component';
 import { AddPaymentComponent } from './admin/add-payment/add-payment.component';
 import { AddPaymentResolver } from './_resolvers/add-payment-resolver';
@@ -264,6 +263,9 @@ import { PaymentLevelChildResolver } from './_resolvers/payment-level-child-reso
 import { UserFileNotesComponent } from './admin/user-file-notes/user-file-notes.component';
 import { AbsencesComponent } from './admin/classLife/absences/absences.component';
 import { AbsenceDayComponent } from './admin/classLife/absence-day/absence-day.component';
+import { ChildFileComponent } from './admin/userFiles/child-file/child-file.component';
+import { ParentFileComponent } from './admin/userFiles/parent-file/parent-file.component';
+import { TeacherFileComponent } from './admin/userFiles/teacher-file/teacher-file.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -428,7 +430,6 @@ export function tokenGetter() {
       ActivateChildrenComponent,
       TreasuryComponent,
       SchoolSettingsComponent,
-      UserFileComponent,
       TuitionDetailsComponent,
       TuitionDetailsComponent,
       ConfirmTeacherEmailComponent,
@@ -443,7 +444,10 @@ export function tokenGetter() {
       PaymentLevelChildComponent,
       UserFileNotesComponent,
       AbsencesComponent,
-      AbsenceDayComponent
+      AbsenceDayComponent,
+      ChildFileComponent,
+      ParentFileComponent,
+      TeacherFileComponent
    ],
    imports: [
       FormWizardModule,
@@ -547,7 +551,7 @@ export function tokenGetter() {
       CheckoutResolver,
       EditChildrenResolver,
       SchoolSettingsResolver,
-      UserFileResolver,
+      ChildFileResolver,
       AddPaymentResolver,
       TuitionListResolver,
       TuitionFeesResolver,

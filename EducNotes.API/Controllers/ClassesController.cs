@@ -1779,6 +1779,91 @@ namespace EducNotes.API.Controllers
           return BadRequest();
         }
 
+        [HttpPost("WeekAbsences")]
+        public async Task<IActionResult> GetWeekAbsences(WeeklyAbsenceDto data)
+        {
+          var fromDate = data.StartDate;
+          var dateDay = (int)fromDate.DayOfWeek;
+          int move = data.MoveDays;
+          var startDate = fromDate.AddDays(move);
+          var endDate = startDate.AddDays(5);
+          
+          AdminAbsenceDto absences = new AdminAbsenceDto();
+          absences.StartDate = startDate;
+          absences.strStartDate = startDate.ToString("ddd dd MMM", frC);
+          absences.EndDate = endDate.ToString("ddd dd MMM", frC);
+          absences.LngStartDate = startDate.ToString("dddd dd MMMM yyyy", frC);
+          absences.LngEndDate = endDate.ToString("dddd dd MMMM yyyy", frC);
+          
+          absences.Days = new List<AbsenceDayDto>();
+          for (int i = 0; i < 5; i++)
+          {
+            var day = startDate.AddDays(i);
+            AbsenceDayDto add = new AbsenceDayDto();
+            add.Day = i + 1;
+            add.strDay = day.ToString("ddd dd MMM yyyy");
+            add.strDayLong = day.ToString("dddd dd MMMM yyyy", frC);
+
+            var allAbsences = await _context.Absences.ToListAsync();
+
+            add.Classes = new List<AbsenceClassDto>();
+            var absencesByDate = await _repo.GetAbsencesByDate(day);
+            var classes = absencesByDate.Select(a => a.User.Class).Distinct();
+            foreach (var aclass in classes)
+            {
+              AbsenceClassDto acd = new AbsenceClassDto();
+              acd.ClassId = aclass.Id;
+              acd.ClassName = aclass.Name;
+              acd.Children = new List<AbsenceChildDto>();
+              var childrenFromDB = absencesByDate.Where(a => a.User.ClassId == aclass.Id).Select(u => u.User);
+              var children = _mapper.Map<List<UserForDetailedDto>>(childrenFromDB);
+              int nbAbs = 0;
+              int nbLates = 0;
+              foreach (var child in children)
+              {
+                AbsenceChildDto childDto = new AbsenceChildDto();
+                childDto.Id = child.Id;
+                childDto.LastName = child.LastName;
+                childDto.FirstName = child.FirstName;
+                childDto.PhotoUrl = child.PhotoUrl;
+                childDto.TotalAbsences = allAbsences.Where(a => a.UserId == child.Id && a.AbsenceTypeId == absenceTypeId).Count();
+                childDto.TotalLates = allAbsences.Where(a => a.UserId == child.Id && a.AbsenceTypeId == lateTypeId).Count();
+                var childAbsences = absencesByDate.Where(a => a.UserId == child.Id).ToList();
+                nbAbs += childAbsences.Where(c => c.AbsenceTypeId == absenceTypeId).Count();
+                nbLates += childAbsences.Where(c => c.AbsenceTypeId == lateTypeId).Count();
+                childDto.Absences = new List<AbsenceChildDetailsDto>();
+                foreach (var abs in childAbsences)
+                {
+                  AbsenceChildDetailsDto childAbs = new AbsenceChildDetailsDto();
+                  childAbs.CourseName = abs.Session.Course.Name;
+                  childAbs.CourseAbbrev = abs.Session.Course.Abbreviation;
+                  childAbs.DoneBy = abs.DoneBy.LastName + ' ' + abs.DoneBy.FirstName;
+                  childAbs.AbsenceTypeId = abs.AbsenceTypeId;
+                  childAbs.AbsenceType = abs.AbsenceType.Name.ToLower();
+                  childAbs.StartTime = abs.StartDate.ToShortTimeString();
+                  childAbs.EndTime = abs.EndDate.ToShortTimeString();
+                  TimeSpan diff = abs.EndDate.Subtract(abs.StartDate);
+                  childAbs.LateMins = diff.TotalMinutes;
+                  childAbs.Justified = abs.Justified;
+                  childAbs.Reason = abs.Reason;
+                  childAbs.Comment = abs.Comment;
+                  childDto.Absences.Add(childAbs);
+                }
+
+                acd.Children.Add(childDto);
+              }
+
+              acd.TotalAbs = nbAbs;
+              acd.TotalLates = nbLates;
+              add.Classes.Add(acd);
+            }
+
+            absences.Days.Add(add);
+          }
+
+          return Ok(absences);
+        }
+
         [HttpGet("CurrentWeekAbsences")]
         public async Task<IActionResult> GetAbsences()
         {
@@ -1788,7 +1873,8 @@ namespace EducNotes.API.Controllers
           var saturday = monday.AddDays(5);
           
           AdminAbsenceDto absences = new AdminAbsenceDto();
-          absences.StartDate = monday.ToString("ddd dd MMM", frC);
+          absences.StartDate = monday;
+          absences.strStartDate = monday.ToString("ddd dd MMM", frC);
           absences.EndDate = saturday.ToString("ddd dd MMM", frC);
           absences.LngStartDate = monday.ToString("dddd dd MMMM yyyy", frC);
           absences.LngEndDate = saturday.ToString("dddd dd MMMM yyyy", frC);
@@ -1799,7 +1885,7 @@ namespace EducNotes.API.Controllers
             var day = monday.AddDays(i);
             AbsenceDayDto add = new AbsenceDayDto();
             add.Day = i + 1;
-            add.strDay = day.ToString("ddd dd MMM");
+            add.strDay = day.ToString("ddd dd MMM yyyy");
             add.strDayLong = day.ToString("dddd dd MMMM yyyy", frC);
 
             var allAbsences = await _context.Absences.ToListAsync();

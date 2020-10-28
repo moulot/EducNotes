@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { UserFileComponent } from './user-file.component';
+import { ParentFileComponent } from './parent-file.component';
 
-describe('UserFileComponent', () => {
-  let component: UserFileComponent;
-  let fixture: ComponentFixture<UserFileComponent>;
+describe('ParentFileComponent', () => {
+  let component: ParentFileComponent;
+  let fixture: ComponentFixture<ParentFileComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UserFileComponent ]
+      declarations: [ ParentFileComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UserFileComponent);
+    fixture = TestBed.createComponent(ParentFileComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -32,19 +32,26 @@
       <div class="md-form mb-1">
         <input type="hidden" id="userid" formControlName="userid" />
         <input type="text" id="searchData" class="completer-input form-control mdb-autocomplete mb-0"
-        [mdbAutoCompleter]="auto"
-        autocomplete="off"
-        placeholder="rechercher un dossier"
-          formControlName="searchData" />
+          [mdbAutoCompleter]="auto" autocomplete="off" placeholder="rechercher un dossier" formControlName="searchData" />
         <mdb-auto-completer #auto="mdbAutoCompleter" textNoResults="aucun résultat trouvé :(">
-        <mdb-option (click)="selectUserId(option.userId)" *ngFor="let option of results | async" [value]="option.lastName + ' ' + option.firstName">
+        <mdb-option (click)="selectUserId(option.userId, option.userTypeId)" *ngFor="let option of results | async"
+          [value]="option.lastName + ' ' + option.firstName">
           <div class="d-flex">
             <div class="mr-1">
               <img src="{{option.photoUrl || '../../../../../../assets/user.png'}}" alt="" style="width: 40px;" class="rounded-circle z-depth-0">
             </div>
             <div class="d-flex flex-column">
-              <strong>nom: {{ option.lastName }} {{ option.firstName }} ({{option.className || option.classLevelName}}) - {{option.age}} ans</strong>
-              <small>matricule: {{ option.idNum }}</small>
+              <div *ngIf="option.userTypeId == studentTypeId">
+                <strong>nom: {{ option.lastName }} {{ option.firstName }} ({{option.className || option.classLevelName}}) - {{option.age}} ans</strong>
+              </div>
+              <div *ngIf="option.userTypeId == parentTypeId">
+                <strong>nom: {{ option.lastName }} {{ option.firstName }}</strong>
+              </div>
+              <div *ngIf="option.userTypeId == teacherTypeId">
+                <strong>nom: {{ option.lastName }} {{ option.firstName }}</strong>
+              </div>
+              <strong>{{option.userType}}</strong>
+              <div>matricule: {{ option.idNum }}</div>
             </div>
           </div>
         </mdb-option>
