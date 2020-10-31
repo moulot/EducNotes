@@ -6,11 +6,11 @@ import { OrderService } from 'src/app/_services/order.service';
 import { PaymentService } from 'src/app/_services/payment.service';
 
 @Component({
-  selector: 'app-user-file-tuition',
-  templateUrl: './user-file-tuition.component.html',
-  styleUrls: ['./user-file-tuition.component.scss']
+  selector: 'app-child-file-tuition',
+  templateUrl: './child-file-tuition.component.html',
+  styleUrls: ['./child-file-tuition.component.scss']
 })
-export class UserFileTuitionComponent implements OnInit {
+export class ChildFileTuitionComponent implements OnInit {
   @Input() id: any;
   @Input() showBtn: Boolean = true;
   tuition: any;

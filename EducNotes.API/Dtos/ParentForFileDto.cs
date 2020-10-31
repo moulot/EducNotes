@@ -14,8 +14,7 @@ namespace EducNotes.API.Dtos
     public int Age { get; set; }
     public string PhotoUrl { get; set; }
     public string PhoneNumber { get; set; }
-    public List<UserForDetailedDto> Children { get; set; }
-    public List<EmailForListDto> EmailSent { get; set; }
-    public List<SmsForListDto> SmsSent { get; set; }
+    public List<ParentFileChildDto> Children { get; set; }
+    public List<CommForListDto> SmsAndEmails { get; set; }
   }
 }

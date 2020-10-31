@@ -112,6 +112,10 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + 'ChildFile/' + id);
   }
 
+  getParentFile(id) {
+    return this.http.get(this.baseUrl + 'ParentFile/' + id);
+  }
+
   saveUserSms(parentId, sms: any) {
     return this.http.put(this.baseUrl + parentId + '/saveSms', sms);
   }
@@ -332,8 +336,8 @@ constructor(private http: HttpClient) {}
     return this.http.post(this.baseUrl + 'ValidateRegistration', order);
   }
 
-  loadStudentData() {
-    return this.http.get(this.baseUrl + 'LoadStudents');
+  loadUsersData() {
+    return this.http.get(this.baseUrl + 'LoadUsers');
   }
 
   loadUserFile(userFileData: UserFileData) {

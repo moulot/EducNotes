@@ -171,10 +171,85 @@ namespace EducNotes.API.Controllers
           });
         }
 
-        [HttpGet("ParentFile/parentId")]
+        [HttpGet("ParentFile/{parentId}")]
         public async Task<IActionResult> GetParentFile(int parentId)
         {
+          var parentFromRepo = await _repo.GetUser(parentId, false);
+          var parent = _mapper.Map<UserForDetailedDto>(parentFromRepo);
+          
+          ParentForFileDto userFile = new ParentForFileDto();
+          userFile.Id = parentId;
+          userFile.LastName = parent.LastName;
+          userFile.FirstName = parent.FirstName;
+          userFile.idNum = parent.idNum;
+          userFile.Email = parent.Email;
+          userFile.Gender = parent.Gender;
+          userFile.strDateOfBirth = parent.strDateOfBirth;
+          userFile.Age = parent.Age;
+          userFile.PhotoUrl = parent.PhotoUrl;
+          userFile.PhoneNumber = parent.PhoneNumber;
 
+          var childrenFromRepo = await _repo.GetChildren(parentId);
+          var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(childrenFromRepo);
+            userFile.Children = new List<ParentFileChildDto>();
+          foreach (var child in children)
+          {
+            ParentFileChildDto pfcd = new ParentFileChildDto();
+            pfcd.Child = child;
+            var line = await _context.OrderLines
+                              .Include(i => i.Order)
+                              .Where(l => l.Order.isReg && l.ChildId == child.Id)
+                              .FirstOrDefaultAsync();
+            if(line != null)
+            {
+              pfcd.OrderId = line.OrderId;
+              pfcd.OrderLineId = line.Id;
+            }
+            userFile.Children.Add(pfcd);
+          }
+
+          var emails = await _context.Emails
+                                  .Include(i => i.EmailType)
+                                  .Include(i => i.InsertUser)
+                                  .Where(u => u.ToUserId == parentId)
+                                  .ToListAsync();
+          // var userEmails = _mapper.Map<List<EmailForListDto>>(emailFromDB);
+          userFile.SmsAndEmails = new List<CommForListDto>();
+          foreach (var email in emails)
+          {
+            CommForListDto commForList = new CommForListDto();
+            commForList.CommType = "email";
+            commForList.DateSent = email.InsertDate.ToString("dd/MM/yyyy", frC);
+            commForList.SentBy = email.InsertUser.LastName + " " + email.InsertUser.FirstName;
+            commForList.EmailType = email.EmailType.Name;
+            commForList.Recipient = email.ToUser.LastName + " " + email.ToUser.FirstName;
+            commForList.ToAddress = email.ToAddress;
+            commForList.Subject = email.Subject;//.Substring(0, 30);
+            commForList.Body = email.Body;//.Substring(0, 50);
+            userFile.SmsAndEmails.Add(commForList);
+          }
+
+          var smses= await _context.Sms
+                                  .Include(i => i.SmsType)
+                                  .Include(i => i.InsertUser)
+                                  .Where(u => u.ToUserId == parentId)
+                                  .ToListAsync();
+          foreach (var sms in smses)
+          {
+            CommForListDto commForList = new CommForListDto();
+            commForList.CommType = "sms";
+            commForList.DateSent = sms.InsertDate.ToString("dd/MM/yyyy", frC);
+            commForList.SentBy = sms.InsertUser.LastName + " " + sms.InsertUser.FirstName;
+            commForList.SmsType = sms.SmsType.Name;
+            commForList.Recipient = sms.ToUser.LastName + " " + sms.ToUser.FirstName;
+            commForList.To = sms.To.FormatPhoneNumber();
+            commForList.Content = sms.Content;//.Substring(0, 50);
+            userFile.SmsAndEmails.Add(commForList);
+          }
+
+          userFile.SmsAndEmails = userFile.SmsAndEmails.OrderByDescending(o => o.DateSent).ToList();
+
+          return Ok(userFile);
         }
 
         [HttpGet("ChildFile/{childId}")]
@@ -1988,8 +2063,8 @@ namespace EducNotes.API.Controllers
           return BadRequest("problème pour valider l'inscription");
         }
 
-        [HttpGet("LoadStudents")]
-        public async Task<IActionResult> loadStudentData()
+        [HttpGet("LoadUsers")]
+        public async Task<IActionResult> loadUsersData()
         {
           var users = await _context.Users
                             .Include(i => i.Photos)

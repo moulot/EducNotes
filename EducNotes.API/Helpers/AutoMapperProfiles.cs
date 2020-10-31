@@ -60,6 +60,9 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.Age, opt => {
                     opt.MapFrom(d => d.DateOfBirth.CalculateAge());
                 })
+                .ForMember(dest => dest.PhoneNumber, opt => {
+                    opt.MapFrom(d => d.PhoneNumber.FormatPhoneNumber());
+                })
                 .ForMember(dest => dest.ClassLevelId, opt => {
                     opt.MapFrom(src => src.Class.ClassLevelId);
                 })
@@ -221,6 +224,16 @@ namespace EducNotes.API.Helpers {
                 })
                 .ForMember(dest => dest.EndHourMin, opt => {
                   opt.MapFrom(d => d.EndHourMin.ToString("HH:mm", frC));
+                });
+            CreateMap<Email, EmailForListDto>()
+                .ForMember(dest => dest.EmailType, opt => {
+                  opt.MapFrom(d => d.EmailType.Name);
+                })
+                .ForMember(dest => dest.SentBy, opt => {
+                  opt.MapFrom(d => d.InsertUser.LastName + ' ' + d.InsertUser.FirstName);
+                })
+                .ForMember(dest => dest.DateSent, opt => {
+                  opt.MapFrom(d => d.InsertDate.ToString("dd/MM/yyyy", frC));
                 });
             CreateMap<AgendaForSaveDto, Agenda>();
             CreateMap<SmsTemplateForSaveDto, SmsTemplate>(); 

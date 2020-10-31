@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UserFileTuitionComponent } from './user-file-tuition.component';
+import { ParentFileTuitionComponent } from './parent-file-tuition.component';
 
-describe('UserFileTuitionComponent', () => {
-  let component: UserFileTuitionComponent;
-  let fixture: ComponentFixture<UserFileTuitionComponent>;
+describe('ParentFileTuitionComponent', () => {
+  let component: ParentFileTuitionComponent;
+  let fixture: ComponentFixture<ParentFileTuitionComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UserFileTuitionComponent ]
+      declarations: [ ParentFileTuitionComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UserFileTuitionComponent);
+    fixture = TestBed.createComponent(ParentFileTuitionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

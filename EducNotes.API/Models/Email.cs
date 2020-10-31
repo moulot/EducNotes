@@ -13,6 +13,10 @@ namespace EducNotes.API.Models
         public int Id { get; set; }
         public int EmailTypeId { get; set; }
         public EmailType EmailType { get; set; }
+        public int? StudentId { get; set; }
+        public User Student { get; set; }
+        public int ToUserId { get; set; }
+        public User ToUser { get; set; }
         public string ToAddress { get; set; }
         public string CCAddress { get; set; }
         public string BCCAddress { get; set; }

@@ -247,7 +247,7 @@ import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-ema
 import { RolesComponent } from './admin/roles/roles.component';
 import { PaymentsComponent } from './admin/payments/payments.component';
 import { ChildFileResolver } from './_resolvers/child-file-resolver';
-import { UserFileTuitionComponent } from './admin/user-file-tuition/user-file-tuition.component';
+import { ChildFileTuitionComponent } from './admin/userFiles/child-file-tuition/child-file-tuition.component';
 import { AddPaymentComponent } from './admin/add-payment/add-payment.component';
 import { AddPaymentResolver } from './_resolvers/add-payment-resolver';
 import { TuitionListComponent } from './admin/tuition/tuition-list/tuition-list.component';
@@ -266,6 +266,8 @@ import { AbsenceDayComponent } from './admin/classLife/absence-day/absence-day.c
 import { ChildFileComponent } from './admin/userFiles/child-file/child-file.component';
 import { ParentFileComponent } from './admin/userFiles/parent-file/parent-file.component';
 import { TeacherFileComponent } from './admin/userFiles/teacher-file/teacher-file.component';
+import { ParentFileResolver } from './_resolvers/parent-file-resolver';
+import { ParentFileTuitionComponent } from './admin/userFiles/parent-file-tuition/parent-file-tuition.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -435,7 +437,7 @@ export function tokenGetter() {
       ConfirmTeacherEmailComponent,
       RolesComponent,
       PaymentsComponent,
-      UserFileTuitionComponent,
+      ChildFileTuitionComponent,
       AddPaymentComponent,
       TuitionListComponent,
       ValidatePaymentsComponent,
@@ -447,7 +449,8 @@ export function tokenGetter() {
       AbsenceDayComponent,
       ChildFileComponent,
       ParentFileComponent,
-      TeacherFileComponent
+      TeacherFileComponent,
+      ParentFileTuitionComponent
    ],
    imports: [
       FormWizardModule,
@@ -560,6 +563,7 @@ export function tokenGetter() {
       PaymentLevelChildResolver,
       OrderService,
       AccountService,
+      ParentFileResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

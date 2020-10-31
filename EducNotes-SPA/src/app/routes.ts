@@ -144,6 +144,7 @@ import { AbsencesComponent } from './admin/classLife/absences/absences.component
 import { ChildFileComponent } from './admin/userFiles/child-file/child-file.component';
 import { ParentFileComponent } from './admin/userFiles/parent-file/parent-file.component';
 import { TeacherFileComponent } from './admin/userFiles/teacher-file/teacher-file.component';
+import { ParentFileResolver } from './_resolvers/parent-file-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -256,7 +257,7 @@ export const appRoutes: Routes = [
         { path: 'settings', component: SchoolSettingsComponent, resolve: {settings: SchoolSettingsResolver}},
         { path: 'childFile/:id', component: ChildFileComponent, resolve: {file: ChildFileResolver} },
         { path: 'fileUser/:id', component: ChildFileComponent, resolve: {file: ChildFileResolver} },
-        { path: 'parentFile/:id', component: ParentFileComponent}, // resolve: {file: ChildFileResolver} },
+        { path: 'parentFile/:id', component: ParentFileComponent, resolve: {file: ParentFileResolver} },
         { path: 'teacherFile/:id', component: TeacherFileComponent}, // resolve: {file: ChildFileResolver} },
         { path: 'roles', component: RolesComponent},
         { path: 'addFinOp/:id', component: AddPaymentComponent, resolve: {file: AddPaymentResolver} },

@@ -98,7 +98,7 @@
           <div class="">mobile: <span style="color: #192C47;">{{userFile.motherPhoneNumber}}</span></div>
           <div class="overflow-auto">email: <span style="color: #192C47;">{{userFile.motherEmail}}</span></div>
         </div>
-        <div class="col-md-12 text-16 mb-1"><b>frères et soeurs</b></div>
+        <div *ngIf="userFile.siblings.length > 0" class="col-md-12 text-16 mb-1"><b>frères et soeurs</b></div>
         <div class="col-md-4 mb-1" *ngFor="let child of userFile.siblings">
           <div class="border rounded-lg p-1">
             <div class="row d-md-none">
@@ -139,5 +139,5 @@
     </div>
   </div>
 </div>
-<app-user-file-tuition [id]="userFile.id"></app-user-file-tuition>
+<app-child-file-tuition [id]="userFile.id"></app-child-file-tuition>
 <app-user-file-notes [id]="userFile.id"></app-user-file-notes>

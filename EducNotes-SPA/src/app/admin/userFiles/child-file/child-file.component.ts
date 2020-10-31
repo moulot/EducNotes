@@ -33,7 +33,7 @@ export class ChildFileComponent implements OnInit {
     if (url.includes('userFile')) {
       this.router.navigate(['fileUser', id]);
     } else {
-      this.router.navigate(['userFile', id]);
+      this.router.navigate(['childFile', id]);
     }
   }
 

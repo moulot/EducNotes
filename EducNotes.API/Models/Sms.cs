@@ -19,8 +19,6 @@ namespace EducNotes.API.Models
     public User Student { get; set; }
     public int ToUserId { get; set; }
     public User ToUser { get; set; }
-    // public int? AbsenceTypeId { get; set; }
-    // public AbsenceType AbsenceType { get; set; }
     public int? SessionId { get; set; }
     public Session Session { get; set; }
     public int? EvaluationId { get; set; }

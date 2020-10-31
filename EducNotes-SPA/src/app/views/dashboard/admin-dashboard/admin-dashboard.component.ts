@@ -56,7 +56,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   loadStudentData() {
-    this.userService.loadStudentData().subscribe((data: any) => {
+    this.userService.loadUsersData().subscribe((data: any) => {
       this.data = data;
     }, error => {
       this.alertify.error(error);
