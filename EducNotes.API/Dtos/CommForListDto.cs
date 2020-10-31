@@ -4,6 +4,7 @@ namespace EducNotes.API.Dtos
   {
     public string CommType { get; set; }
     public string DateSent { get; set; }
+    public string HourMinSent { get; set; }
     public string SentBy { get; set; }
     public string EmailType { get; set; }
     public string Recipient { get; set; }

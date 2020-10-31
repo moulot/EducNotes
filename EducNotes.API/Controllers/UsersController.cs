@@ -220,6 +220,7 @@ namespace EducNotes.API.Controllers
             CommForListDto commForList = new CommForListDto();
             commForList.CommType = "email";
             commForList.DateSent = email.InsertDate.ToString("dd/MM/yyyy", frC);
+            commForList.HourMinSent = email.InsertDate.ToString("HH:MM", frC);
             commForList.SentBy = email.InsertUser.LastName + " " + email.InsertUser.FirstName;
             commForList.EmailType = email.EmailType.Name;
             commForList.Recipient = email.ToUser.LastName + " " + email.ToUser.FirstName;
@@ -239,6 +240,7 @@ namespace EducNotes.API.Controllers
             CommForListDto commForList = new CommForListDto();
             commForList.CommType = "sms";
             commForList.DateSent = sms.InsertDate.ToString("dd/MM/yyyy", frC);
+            commForList.HourMinSent = sms.InsertDate.ToString("HH:MM", frC);
             commForList.SentBy = sms.InsertUser.LastName + " " + sms.InsertUser.FirstName;
             commForList.SmsType = sms.SmsType.Name;
             commForList.Recipient = sms.ToUser.LastName + " " + sms.ToUser.FirstName;

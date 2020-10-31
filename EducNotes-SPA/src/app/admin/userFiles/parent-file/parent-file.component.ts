@@ -13,7 +13,7 @@ export class ParentFileComponent implements OnInit {
   constructor(private userService: UserService, private alertify: AlertifyService,
     private route: ActivatedRoute) { }
   parentFile: any;
-  showInfos = [true, true, true];
+  showInfos = [true, false, false];
 
   ngOnInit() {
     this.route.data.subscribe((data: any) => {
