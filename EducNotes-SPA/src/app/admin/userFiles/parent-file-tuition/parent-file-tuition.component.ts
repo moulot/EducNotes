@@ -15,7 +15,7 @@ export class ParentFileTuitionComponent implements OnInit {
   @Input() childid: any;
   @Input() childFName: any;
   tuition: any;
-  showInfos = false;
+  showInfos = true;
   payCash = environment.payCash;
   payCheque = environment.payCheque;
   payWire = environment.payWire;

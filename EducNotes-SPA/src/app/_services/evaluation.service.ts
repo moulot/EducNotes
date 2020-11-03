@@ -11,7 +11,7 @@ import { UserEvaluation } from '../_models/userEvaluation';
   providedIn: 'root'
 })
 export class EvaluationService {
-  baseUrl = environment.apiUrl;
+  baseUrl = environment.apiUrl + 'evaluation/';
   currentEval: any;
   userGrades: any = [];
   gradeIndex: number;
@@ -19,51 +19,53 @@ export class EvaluationService {
   constructor(private http: HttpClient) { }
 
   getEvalTypes(): Observable<EvalType[]> {
-    return this.http.get<EvalType[]>(this.baseUrl + 'evaluation/EvalTypes');
+    return this.http.get<EvalType[]>(this.baseUrl + 'EvalTypes');
   }
 
   getFormData() {
-    return this.http.get(this.baseUrl + 'evaluation/FormData');
+    return this.http.get(this.baseUrl + 'FormData');
   }
 
   getCoursesSkills() {
-    return this.http.get(this.baseUrl + 'evaluation/CoursesSkills');
+    return this.http.get(this.baseUrl + 'CoursesSkills');
   }
 
   saveEvaluation(evaluation: Evaluation, evalProgEltIds: string) {
-
     let params = new HttpParams();
     params = params.append('progEltIds', evalProgEltIds);
-
-    return this.http.put(this.baseUrl + 'evaluation/saveEvaluation', evaluation, {params});
+    return this.http.put(this.baseUrl + 'saveEvaluation', evaluation, {params});
   }
 
   saveUserGrades(userGrades: UserEvaluation[], evalClosed: boolean) {
-    return this.http.put(this.baseUrl + 'evaluation/' + evalClosed + '/saveUserGrades', userGrades);
+    return this.http.put(this.baseUrl + evalClosed + '/saveUserGrades', userGrades);
   }
 
   getUserEvals(classId, courseId, periodId) {
-    return this.http.get(this.baseUrl + 'evaluation/class/' + classId + '/course/' + courseId + '/period/' + periodId);
+    return this.http.get(this.baseUrl + 'class/' + classId + '/course/' + courseId + '/period/' + periodId);
   }
 
   getClassEval(id) {
-    return this.http.get(this.baseUrl + 'evaluation/ClassEval/' + id);
+    return this.http.get(this.baseUrl + 'ClassEval/' + id);
   }
 
   getUserCoursesWithEvals(classId, userId) {
-    return this.http.get(this.baseUrl + 'evaluation/class/' + classId + '/CoursesWithEvals/' + userId);
+    return this.http.get(this.baseUrl + 'class/' + classId + '/CoursesWithEvals/' + userId);
+  }
+
+  getUserGrades(userId) {
+    return this.http.get(this.baseUrl + 'UserGrades/' + userId);
   }
 
   getTeacherEvalsToCome(teacherId) {
-    return this.http.get(this.baseUrl + 'evaluation/teacher/' + teacherId + '/evalsToCome');
+    return this.http.get(this.baseUrl + 'teacher/' + teacherId + '/evalsToCome');
   }
 
   getClassEvalsToCome(classId) {
-    return this.http.get(this.baseUrl + 'evaluation/class/' + classId + '/evalsToCome');
+    return this.http.get(this.baseUrl + 'class/' + classId + '/evalsToCome');
   }
 
   getClassEvals(classId) {
-    return this.http.get(this.baseUrl + 'evaluation/class/' + classId + '/AllEvaluations');
+    return this.http.get(this.baseUrl + 'class/' + classId + '/AllEvaluations');
   }
 
   setCurrentCurrentEval(evaluation, userGrades) {
@@ -72,7 +74,7 @@ export class EvaluationService {
   }
 
   setEvalClosed(evalId: number) {
-    return this.http.get(this.baseUrl + 'evaluation/' + evalId + '/closeEval');
+    return this.http.get(this.baseUrl + '' + evalId + '/closeEval');
   }
 
   setColIndex(index: number) {

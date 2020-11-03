@@ -132,6 +132,34 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.StudentName, opt => {
                     opt.MapFrom(src => src.User.LastName + " " + src.User.FirstName);
                 });
+            CreateMap<UserEvaluation, GradeDto>()
+                .ForMember(dest => dest.CourseName, opt => {
+                    opt.MapFrom(src => src.Evaluation.Course.Name);
+                })
+                .ForMember(dest => dest.CourseAbbrev, opt => {
+                    opt.MapFrom(src => src.Evaluation.Course.Abbreviation);
+                })
+                .ForMember(dest => dest.EvalDate, opt => {
+                    opt.MapFrom(src => src.Evaluation.EvalDate.ToString("dd/MM/yy", frC));
+                })
+                .ForMember(dest => dest.EvalType, opt => {
+                    opt.MapFrom(src => src.Evaluation.EvalType.Name);
+                })
+                .ForMember(dest => dest.EvalTypeAbbrev, opt => {
+                    opt.MapFrom(src => src.Evaluation.EvalType.Abbrev);
+                })
+                .ForMember(dest => dest.EvalName, opt => {
+                    opt.MapFrom(src => src.Evaluation.Name);
+                })
+                .ForMember(dest => dest.Grade, opt => {
+                    opt.MapFrom(src => src.Grade);
+                })
+                .ForMember(dest => dest.GradeMax, opt => {
+                    opt.MapFrom(src => src.Evaluation.MaxGrade);
+                })
+                .ForMember(dest => dest.Coeff, opt => {
+                    opt.MapFrom(src => src.Evaluation.Coeff);
+                });
             CreateMap<Photo, PhotosForDetailedDto>();
             CreateMap<UserForUpdateDto, User>();
             CreateMap<Photo, PhotoForReturnDto>();

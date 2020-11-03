@@ -5,65 +5,66 @@
   <i class="fad fa-file-user fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
   <div class="text-19">dossier {{userFile.idNum}}</div>
 </div>
-<div class="d-none d-md-block border rounded-lg p-2">
-  <div *ngIf="showInfos" class="row animated zoomIn">
-    <div class="col-md-12">
-      <a class="d-flex" (click)="toggleInfos()">
-        <i class="fad fa-minus-square fa-&x mr-1 my-1" style="--fa-secondary-opacity: 1;
-          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-        <div class="text-14"><b>infos du compte</b></div>
-      </a>
-    </div>
-    <div class="col-md-12"><hr class="my-1"></div>
-    <div class="col-md-1">
-      <img src="{{userFile.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
-    </div>
-    <div class="col-md-11">
-      <div class="text-20 font-weight-500" style="color: #192C47;">
-        <span class="text-capitalize">{{userFile.lastName}} {{userFile.firstName}}</span> ({{userFile.age}} ans) - classe de {{userFile.className || userFile.classLevelName}}.
+<div class="d-none d-md-block card">
+  <div class="card-body p-2">
+    <div *ngIf="showInfos" class="row animated fadeIn">
+      <div class="col-md-12">
+        <a class="d-flex" (click)="toggleInfos()">
+          <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16 text-primary"><b>infos du compte</b></div>
+        </a>
       </div>
-      <div class="text-16 text-muted">
-        <b>père:</b><span class="text-capitalize pl-1" style="color: #192C47;">{{userFile.fatherLastName}} {{userFile.fatherFirstName}}.</span>
-        <span class="pl-2">mobile: <span style="color: #192C47;">{{userFile.fatherPhoneNumber}}</span></span>
-        <span class="pl-2">email: <span style="color: #192C47;">{{userFile.fatherEmail}}</span></span>
+      <div class="col-md-12"><hr class="my-1"></div>
+      <div class="col-md-1">
+        <img src="{{userFile.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
       </div>
-      <div class="text-16 text-muted">
-        <b>mère:</b><span class="text-capitalize pl-1" style="color: #192C47;">{{userFile.motherLastName}} {{userFile.motherFirstName}}.</span>
-        <span class="pl-2">mobile: <span style="color: #192C47;">{{userFile.motherPhoneNumber}}</span></span>
-        <span class="pl-2">email: <span style="color: #192C47;">{{userFile.motherEmail}}</span></span>
+      <div class="col-md-11">
+        <div class="text-18 font-weight-500">
+          <span class="text-capitalize">{{userFile.lastName}} {{userFile.firstName}}</span> ({{userFile.age}} ans) - classe de {{userFile.className || userFile.classLevelName}}.
+        </div>
+        <div class="text-15">
+          <b>père:</b><span class="text-capitalize pl-1">{{userFile.fatherLastName}} {{userFile.fatherFirstName}}.</span>
+          <span class="pl-2">mobile: <span>{{userFile.fatherPhoneNumber}}</span></span>
+          <span class="pl-2">email: <span>{{userFile.fatherEmail}}</span></span>
+        </div>
+        <div class="text-15">
+          <b>mère:</b><span class="text-capitalize pl-1">{{userFile.motherLastName}} {{userFile.motherFirstName}}.</span>
+          <span class="pl-2">mobile: <span>{{userFile.motherPhoneNumber}}</span></span>
+          <span class="pl-2">email: <span>{{userFile.motherEmail}}</span></span>
+        </div>
       </div>
-    </div>
-    <div *ngIf="userFile.siblings.length > 0" class="col-md-12"><hr class="my-1"></div>
-    <div *ngIf="userFile.siblings.length > 0" class="col-md-12 text-14 text-muted mb-1">frères et soeurs</div>
-    <div class="col-md-4 mb-1" *ngFor="let child of userFile.siblings">
-      <div class="border rounded-lg p-1">
-        <div class="row">
-          <div class="col-md-3 d-none d-md-block">
-            <img src="{{child.photoUrl || '../../../../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
-          </div>
-          <div class="col-md-9 my-auto pl-1 d-none d-md-block">
-            <div class="">
-              <a (click)="changeUserFile(child.id)"><u class="text-small text-danger">voir dossier</u></a> 
-            </div>  
-            <div class="text-15 font-weight-500 text-capitalize">
-              {{child.lastName}} {{child.firstName}} ({{child.age}} ans)</div>
-            <div class="text-15">classe de {{child.className || child.classLevelName}}.</div>
+      <div *ngIf="userFile.siblings.length > 0" class="col-md-12"><hr class="my-1"></div>
+      <div *ngIf="userFile.siblings.length > 0" class="col-md-12 text-15 mb-1"><b>frères et soeurs</b></div>
+      <div class="col-md-4 mb-1" *ngFor="let child of userFile.siblings">
+        <div class="border rounded-lg p-1">
+          <div class="d-flex">
+            <div>
+              <img src="{{child.photoUrl || '../../../../../assets/user.png'}}" alt="" width="50" class="rounded-circle img-responsive">
+            </div>
+            <div class="my-auto pl-2">
+              <div>
+                <a (click)="changeUserFile(child.id)"><u class="text-13 text-danger">voir dossier</u></a> 
+              </div>  
+              <div class="text-15 font-weight-500 text-capitalize">
+                {{child.lastName}} {{child.firstName}} ({{child.age}} ans). {{child.className || child.classLevelName}}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div *ngIf="!showInfos" class="row animated zoomIn">
-    <div class="col-md-12 d-flex">
-      <a class="d-flex" (click)="toggleInfos()">
-        <i class="fad fa-plus-square fa-1x mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
-          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-        <div class="text-14">
-          <b>voir détails du dossier</b>
+    <div *ngIf="!showInfos" class="row animated fadeIn">
+      <div class="col-md-12 d-flex">
+        <a class="d-flex" (click)="toggleInfos()">
+          <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16 text-primary"><b>voir détails du dossier</b></div>
+        </a>
+        <div class="text-15">
+          <span class="text-capitalize ml-2 mt-0">{{userFile.lastName}} {{userFile.firstName}}</span>
+          ({{userFile.age}} ans) - classe de {{userFile.className || userFile.classLevelName}}
         </div>
-      </a>
-      <div class="text-15">
-        <span class="text-capitalize ml-2 mt-0">{{userFile.lastName}} {{userFile.firstName}}</span> ({{userFile.age}} ans) - classe de {{userFile.className || userFile.classLevelName}}
       </div>
     </div>
   </div>
@@ -139,5 +140,12 @@
     </div>
   </div>
 </div>
+<div class="row">
+  <div class="col-md-7">
+    <app-user-file-notes [childid]="userFile.id"></app-user-file-notes>
+  </div>
+  <div class="col-md-5">
+    <app-child-file-class-life [id]="userFile.id"></app-child-file-class-life>
+  </div>
+</div>
 <app-child-file-tuition [id]="userFile.id"></app-child-file-tuition>
-<app-user-file-notes [id]="userFile.id"></app-user-file-notes>

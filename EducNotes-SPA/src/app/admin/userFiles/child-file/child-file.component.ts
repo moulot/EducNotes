@@ -30,7 +30,7 @@ export class ChildFileComponent implements OnInit {
 
   changeUserFile(id) {
     const url = this.router.url;
-    if (url.includes('userFile')) {
+    if (url.includes('childFile')) {
       this.router.navigate(['fileUser', id]);
     } else {
       this.router.navigate(['childFile', id]);

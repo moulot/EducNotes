@@ -58,7 +58,7 @@ namespace EducNotes.API.Data
     Task<bool> SendResetPasswordLink(User user, string code);
     Task<User> GetUserByCode(string code);
     Task<User> GetSingleUser(string userName);
-    Task<List<UserEvalsDto>> GetUserGrades(int userId, int classId);
+    Task<List<UserCourseEvalsDto>> GetUserGrades(int userId, int classId);
     IEnumerable<ClassAgendaToReturnDto> GetAgendaListByDueDate(IEnumerable<Agenda> agendaItems);
     Task<List<TeacherClassesDto>> GetTeacherClasses(int teacherId);
     Task<List<Course>> GetTeacherCourses(int teacherId);
@@ -115,5 +115,11 @@ namespace EducNotes.API.Data
     Task<List<UserScheduleNDaysDto>> GetTeacherScheduleNDays(int teacherId);
     string CalculateCourseTop(DateTime startHourMin, string startCourseHourMin);
     Task<List<Absence>> GetAbsencesByDate(DateTime date);
+    Task<double> GetStudentAvg(int userId, int classId);
+    Task<double> GetEvalMin(int evalId);
+    Task<double> GetEvalMax(int evalId);
+    Task<double> GetClassAvg(int classId);
+    Task<ClassAvgDto> GetClassAvgs(int classId);
+    Task<ClassAvgDto> GetClassCourseAvgs(int courseId, int classId);
   }
 }

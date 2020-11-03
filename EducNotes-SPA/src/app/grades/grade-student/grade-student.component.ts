@@ -135,7 +135,6 @@ export class GradeStudentComponent implements OnInit {
 
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
-
     this.student = user;
 
     const loggedUser = this.authService.currentUser;

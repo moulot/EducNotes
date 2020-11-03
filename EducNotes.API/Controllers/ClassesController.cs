@@ -997,28 +997,29 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPost("AddCourse")]
-        public async Task<IActionResult> AddCourse([FromBody] CourseDto newCourseDto)
+        public async Task<IActionResult> AddCourse([FromBody] CourseDto courseDto)
         {
-          int id = newCourseDto.Id;
+          int id = courseDto.Id;
           if(id == 0)
           {
             var course = new Course {
-              Name = newCourseDto.Name,
-              Abbreviation = newCourseDto.Abbrev,
-              Color = newCourseDto.Color
+              Name = courseDto.Name,
+              Abbreviation = courseDto.Abbrev,
+              Color = courseDto.Color
             };
             _repo.Add(course);
           }
           else
           {
             var course = await _context.Courses.FirstAsync(c => c.Id == id);
-            course.Name = newCourseDto.Name;
-            course.Abbreviation = newCourseDto.Abbrev;
-            course.Color = newCourseDto.Color;
+            course.Name = courseDto.Name;
+            course.Abbreviation = courseDto.Abbrev;
+            course.Color = courseDto.Color;
             _repo.Update(course);
           }
+
           if (await _repo.SaveAll())
-              return Ok();
+            return Ok();
 
           return BadRequest("impossible d'ajouter ce cours");
         }
@@ -1343,18 +1344,18 @@ namespace EducNotes.API.Controllers
         public async Task<IActionResult> GetAllCoursesDetails()
         {
             var data = new List<CoursesDetailsDto>();
-            var allCourses = await _context.Courses.OrderBy(c => c.Name).ToListAsync();
-            foreach (var cours in allCourses)
+            var courses = await _context.Courses.OrderBy(c => c.Name).ToListAsync();
+            foreach (var course in courses)
             {
                 var c = new CoursesDetailsDto
                 {
-                    Id = cours.Id,
-                    Name = cours.Name,
-                    Abbreviation = cours.Abbreviation,
-                    Color = cours.Color
+                  Id = course.Id,
+                  Name = course.Name,
+                  Abbreviation = course.Abbreviation,
+                  Color = course.Color
                 };
-                c.TeachersNumber = await _context.ClassCourses.Where(a => a.CourseId == cours.Id).Distinct().CountAsync();
-                List<int> classIds = await _context.ClassCourses.Where(a => a.CourseId == cours.Id).Select(a => a.ClassId).ToListAsync();
+                c.TeachersNumber = await _context.ClassCourses.Where(a => a.CourseId == course.Id).Distinct().CountAsync();
+                List<int> classIds = await _context.ClassCourses.Where(a => a.CourseId == course.Id).Select(a => a.ClassId).ToListAsync();
                 c.ClassesNumber = classIds.Count();
                 c.StudentsNumber = await _context.Users.Where(a => classIds.Contains(Convert.ToInt32(a.ClassId))).CountAsync();
                 data.Add(c);
@@ -1862,6 +1863,26 @@ namespace EducNotes.API.Controllers
           }
 
           return Ok(absences);
+        }
+
+        [HttpGet("UserClassLife/{childId}")]
+        public async Task<IActionResult> GetChildClassLife(int childId)
+        {
+          var absencesFromDB = await _context.Absences.Where(a => a.UserId == childId).ToListAsync();
+          int nbAbs = absencesFromDB.Where(a => a.AbsenceTypeId == absenceTypeId).Count();
+          int nbLates = absencesFromDB.Where(a => a.AbsenceTypeId == lateTypeId).Count();
+
+          var nbRewards = await _context.UserRewards.Where(r => r.UserId == childId).CountAsync();
+          var nbSanctions = await _context.UserSanctions.Where(r => r.UserId == childId).CountAsync();
+
+          ChildClassLifeDto userLife = new ChildClassLifeDto();
+          userLife.Id = childId;
+          userLife.TotalAbsences = nbAbs;
+          userLife.TotalLates = nbLates;
+          userLife.TotalRewards = nbRewards;
+          userLife.TotalSanctions = nbSanctions;
+
+          return Ok(userLife);
         }
 
         [HttpGet("CurrentWeekAbsences")]

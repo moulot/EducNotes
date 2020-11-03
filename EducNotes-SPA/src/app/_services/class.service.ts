@@ -343,4 +343,8 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'classes/DayAbsences', date);
   }
 
+  getUserClassLife(childId) {
+    return this.http.get(this.baseUrl + 'classes/UserClassLife/' + childId);
+  }
+
 }

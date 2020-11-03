@@ -354,7 +354,7 @@ namespace EducNotes.API.Controllers
 
           //student grades
           var periods = await _context.Periods.OrderBy(o => o.Abbrev).ToListAsync();
-          List<UserEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, classid);
+          List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, classid);
           double courseAvgSum = 0;
           double courseCoeffSum = 0;
           double GeneralAvg = -1000;
@@ -649,7 +649,7 @@ namespace EducNotes.API.Controllers
             double courseAvgSum = 0;
             double courseCoeffSum = 0;
 
-            List<UserEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, user.ClassId);
+            List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, user.ClassId);
 
             foreach (var course in coursesWithEvals)
             {

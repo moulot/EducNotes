@@ -260,7 +260,7 @@ import { TuitionFeesResolver } from './_resolvers/tuition-fees-resolver';
 import { RecoveryListComponent } from './admin/recovery-list/recovery-list.component';
 import { PaymentLevelChildComponent } from './admin/payment-level-child/payment-level-child.component';
 import { PaymentLevelChildResolver } from './_resolvers/payment-level-child-resolver';
-import { UserFileNotesComponent } from './admin/user-file-notes/user-file-notes.component';
+import { UserFileNotesComponent } from './admin/userFiles/user-file-notes/user-file-notes.component';
 import { AbsencesComponent } from './admin/classLife/absences/absences.component';
 import { AbsenceDayComponent } from './admin/classLife/absence-day/absence-day.component';
 import { ChildFileComponent } from './admin/userFiles/child-file/child-file.component';
@@ -268,6 +268,7 @@ import { ParentFileComponent } from './admin/userFiles/parent-file/parent-file.c
 import { TeacherFileComponent } from './admin/userFiles/teacher-file/teacher-file.component';
 import { ParentFileResolver } from './_resolvers/parent-file-resolver';
 import { ParentFileTuitionComponent } from './admin/userFiles/parent-file-tuition/parent-file-tuition.component';
+import { ChildFileClassLifeComponent } from './admin/userFiles/child-file-class-life/child-file-class-life.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -450,7 +451,8 @@ export function tokenGetter() {
       ChildFileComponent,
       ParentFileComponent,
       TeacherFileComponent,
-      ParentFileTuitionComponent
+      ParentFileTuitionComponent,
+      ChildFileClassLifeComponent
    ],
    imports: [
       FormWizardModule,

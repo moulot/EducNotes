@@ -1,0 +1,93 @@
+<div class="d-none d-md-block card mt-2">
+  <div class="card-body p-2">
+    <div *ngIf="showInfos" class="row animated fadeIn">
+      <div class="col-8 my-auto">
+        <a class="d-flex" (click)="toggleInfos()">
+          <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16 text-primary">
+            <b>carnet de notes</b> - moyenne générale: 
+            <span *ngIf="!userGrades?.avgOK" class="text-danger"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
+            <span *ngIf="userGrades?.avgOK" class="text-primary"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-12"><hr class="my-1"></div>
+      <div class="col-md-12 text-15 font-weight-bold">dernières notes</div>
+      <div class="col-md-4" *ngFor="let grade of userGrades?.lastGrades">
+        <div class="border rounded-lg p-1">
+          <div class="text-13">
+            <span>{{grade.evalDate}}.</span>
+            <span class="ml-1">{{grade.courseAbbrev}}:</span>
+            <span *ngIf="!grade.gradeOK" class="ml-1 text-danger">{{grade.grade}}/{{grade.gradeMax}}</span>
+            <span *ngIf="grade.gradeOK" class="ml-1 text-success">{{grade.grade}}/{{grade.gradeMax}}</span>
+          </div>
+          <div class="text-13">
+            <span>(-) {{grade.classGradeMin}}/{{grade.gradeMax}}</span>
+            <span class="ml-3">(+) {{grade.classGradeMax}}/{{grade.gradeMax}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 mt-1">
+        <div class="border rounded-lg p-1">
+          <div class="text-15 font-weight-bold">moyennes des cours</div>
+          <hr class="my-1">
+          <div class="row">
+            <div class="col-md-6 mb-1" *ngFor="let course of userGrades?.courses">
+              <div class="border rounded-lg p-1">
+                <div *ngIf="course.userAvg < 0" class="text-13">
+                  {{course.abbrev}}: <span *ngIf="!course.userAvgOK && course.userAvg < 0">N/D</span>
+                </div>
+                <div *ngIf="course.userAvg >= 0" class="text-13">
+                  {{course.abbrev}}:
+                  <span *ngIf="!course.userAvgOK" class="text-danger">{{course.userAvg}}/{{course.gradedOutOf}}</span>
+                  <span *ngIf="course.userAvgOK" class="text-success">{{course.userAvg}}/{{course.gradedOutOf}}</span>
+                  <span class="ml-1">(-) {{course.classAvgMin}}</span>
+                  <span class="ml-1">(moy.) {{course.classAvg}}</span>
+                  <span class="ml-1">(+) {{course.classAvgMax}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!showInfos" class="row animated fadeIn">
+      <div class="col-8">
+        <a class="d-flex" (click)="toggleInfos()">
+          <i class="text-16 fad fa-plus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16 text-primary">
+            <b>carnet de notes</b> - moyenne générale: 
+            <span *ngIf="!userGrades.avgOK" class="text-danger"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
+            <span *ngIf="userGrades.avgOK" class="text-primary"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-md-none card mt-2">
+  <div class="card-body p-2">
+    <div *ngIf="!showInfos" class="row animated zoomIn">
+      <div class="col-8">
+        <a class="d-flex" (click)="toggleInfos()">
+          <i class="text-16 fad fa-plus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16 text-primary"><b>carnet de notes</b> - moyenne générale: <b>12,5/20</b></div>
+        </a>
+      </div>
+    </div>
+    <div *ngIf="showInfos" class="row animated zoomIn">
+      <div class="col-8 my-auto">
+        <a class="d-flex" (click)="toggleInfos()">
+          <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16 text-primary"><b>carnet de notes</b> - moyenne générale: <b>12,5/20</b></div>
+        </a>
+      </div>
+      <div class="col-md-12"><hr class="my-1"></div>
+    </div>
+  </div>
+</div>
