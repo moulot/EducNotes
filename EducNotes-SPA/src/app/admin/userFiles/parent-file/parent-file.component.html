@@ -12,7 +12,7 @@
         <a class="d-flex" (click)="toggleInfos(0)">
           <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary"><b>infos du compte</b></div>
+          <div class="text-16"><b>infos du compte</b></div>
         </a>
       </div>
       <div class="col-md-12"><hr class="my-1"></div>
@@ -51,7 +51,7 @@
         <a class="d-flex" (click)="toggleInfos(0)">
           <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
+          <div class="text-16">
             <b>voir détails du dossier <span>{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
           </div>
         </a>
@@ -63,11 +63,11 @@
       <a class="d-flex" (click)="toggleInfos(1)">
         <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
           --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-        <div class="text-16 text-primary"><b>frais de scolarité</b></div>
+        <div class="text-16"><b>frais de scolarité</b></div>
       </a>
       <hr class="my-1">
       <div *ngFor="let child of parentFile.children">
-        <div class="border rounded-lg p-2 mb-1" style="background-color: #fafafa;">
+        <div class="border rounded-lg p-2 mb-3" style="background-color: #fafafa;">
           <app-parent-file-tuition [childid]="child.child.id" [childFName]="child.child.firstName" [id]="child.child.id"></app-parent-file-tuition>
         </div>
       </div>
@@ -77,7 +77,7 @@
         <a class="d-flex" (click)="toggleInfos(1)">
           <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary"><b>voir détails des frais de scolarité</b></div>
+          <div class="text-16"><b>frais de scolarité</b></div>
         </a>
       </div>
     </div>
@@ -88,7 +88,7 @@
         <a class="d-flex" (click)="toggleInfos(2)">
           <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
+          <div class="text-16">
             <b>communications avec <span class="text-capitalize">{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
           </div>
         </a>
@@ -154,7 +154,7 @@
         <a class="d-flex" (click)="toggleInfos(2)">
           <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
+          <div class="text-16">
             <b>communications avec <span class="text-capitalize">{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
           </div>
         </a>
@@ -169,7 +169,7 @@
         <a class="d-flex" (click)="toggleInfos(0)">
           <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary"><b>infos du compte</b></div>
+          <div class="text-16"><b>infos du compte</b></div>
         </a>
       </div>
       <div class="col-md-12"><hr class="my-1"></div>
@@ -205,9 +205,7 @@
         <a class="d-flex" (click)="toggleInfos(0)">
           <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
-            <b>voir détails du dossier <span>{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
-          </div>
+          <div class="text-16"><b>infos du compte</b></div>
         </a>
       </div>
     </div>
@@ -217,7 +215,7 @@
       <a class="d-flex" (click)="toggleInfos(1)">
         <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
           --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-        <div class="text-16 text-primary"><b>frais de scolarité</b></div>
+        <div class="text-16"><b>frais de scolarité</b></div>
       </a>
       <hr class="my-1">
       <div *ngFor="let child of parentFile.children">
@@ -231,7 +229,7 @@
         <a class="d-flex" (click)="toggleInfos(1)">
           <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary"><b>voir détails des frais de scolarité</b></div>
+          <div class="text-16"><b>frais de scolarité</b></div>
         </a>
       </div>
     </div>
@@ -242,8 +240,9 @@
         <a class="d-flex" (click)="toggleInfos(2)">
           <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
-            <b>communications avec <span class="text-capitalize">{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
+          <div class="text-16">
+            <!-- <b>communications avec <span class="text-capitalize">{{parentFile.lastName}} {{parentFile.firstName}}</span></b> -->
+            <b>communications</b>
           </div>
         </a>
       </div>
@@ -300,8 +299,8 @@
         <a class="d-flex" (click)="toggleInfos(2)">
           <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
-            <b>communications avec <span class="text-capitalize">{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
+          <div class="text-16">
+            <b>communications</b>
           </div>
         </a>
       </div>

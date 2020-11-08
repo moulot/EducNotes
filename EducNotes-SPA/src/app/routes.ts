@@ -145,6 +145,8 @@ import { ChildFileComponent } from './admin/userFiles/child-file/child-file.comp
 import { ParentFileComponent } from './admin/userFiles/parent-file/parent-file.component';
 import { TeacherFileComponent } from './admin/userFiles/teacher-file/teacher-file.component';
 import { ParentFileResolver } from './_resolvers/parent-file-resolver';
+import { UserValidationComponent } from './admin/user-validation/user-validation.component';
+import { UserValidationResolver } from './_resolvers/user-validation-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -267,7 +269,8 @@ export const appRoutes: Routes = [
         { path: 'tuitionFees', component: TuitionFeesComponent, resolve: {fees: TuitionFeesResolver}},
         { path: 'latePayments', component: RecoveryListComponent},
         { path: 'paymentLevelChild/:id', component: PaymentLevelChildComponent, resolve: {children: PaymentLevelChildResolver}},
-        { path: 'absences', component: AbsencesComponent}
+        { path: 'absences', component: AbsencesComponent},
+        { path: 'usersValidation', component: UserValidationComponent, resolve: {users: UserValidationResolver}}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

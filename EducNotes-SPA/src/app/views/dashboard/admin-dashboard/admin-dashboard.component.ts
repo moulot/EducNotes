@@ -102,6 +102,7 @@ export class AdminDashboardComponent implements OnInit {
           break;
       }
     } else {
+      console.log(searchData);
       if (searchData !== '') {
         this.userService.loadUserFile(userFileData).subscribe((userData: any) => {
         }, error => {

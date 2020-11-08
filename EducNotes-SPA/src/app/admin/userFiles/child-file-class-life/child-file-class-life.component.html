@@ -1,25 +1,25 @@
-<div class="d-none d-md-block card mt-2">
+<div class=" card mt-2">
   <div class="card-body p-2">
     <div *ngIf="showInfos" class="row animated fadeIn">
       <div class="col-8 my-auto">
         <a class="d-flex" (click)="toggleInfos()">
           <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary"><b>vide de la classe</b></div>
+          <div class="text-16"><b>vie de la classe</b></div>
         </a>
       </div>
       <div class="col-md-12"><hr class="my-1"></div>
-      <div class="col-md-6 text-13 mb-1">
-        <div class="border rounded-lg p-2">absences : {{userLife?.totalAbsences}}</div>
+      <div class="col-md-6 text-15 mb-1">
+        <div class="border rounded-lg p-1">absences : {{userLife?.totalAbsences}}</div>
       </div>
-      <div class="col-md-6 text-13 mb-1">
-        <div class="border rounded-lg p-2">retards : {{userLife?.totalLates}}</div>
+      <div class="col-md-6 text-15 mb-1">
+        <div class="border rounded-lg p-1">retards : {{userLife?.totalLates}}</div>
       </div>
-      <div class="col-md-6 text-13">
-        <div class="border rounded-lg p-2">sanctions : {{userLife?.totalSanctions}}</div>
+      <div class="col-md-6 text-15 mb-1">
+        <div class="border rounded-lg p-1">sanctions : {{userLife?.totalSanctions}}</div>
       </div>
-      <div class="col-md-6 text-13">
-        <div class="border rounded-lg p-2">compliments : {{userLife?.totalRewards}}</div>
+      <div class="col-md-6 text-15 mb-1">
+        <div class="border rounded-lg p-1">compliments : {{userLife?.totalRewards}}</div>
       </div>
     </div>
     <div *ngIf="!showInfos" class="row animated fadeIn">
@@ -27,7 +27,7 @@
         <a class="d-flex" (click)="toggleInfos()">
           <i class="text-16 fad fa-plus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
+          <div class="text-16">
             <b>vie de la classe</b>
           </div>
         </a>
@@ -36,7 +36,7 @@
   </div>
 </div>
 
-<div class="d-md-none card mt-2">
+<!-- <div class="d-md-none card mt-2">
   <div class="card-body p-2">
   <div *ngIf="!showInfos" class="row animated zoomIn">
     <div class="col-8">
@@ -58,4 +58,4 @@
     <div class="col-md-12"><hr class="my-1"></div>
   </div>
   </div>
-</div>
+</div> -->

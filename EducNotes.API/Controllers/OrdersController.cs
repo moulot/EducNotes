@@ -284,7 +284,7 @@ namespace EducNotes.API.Controllers
           order.TotalHT = newTuition.OrderAmount;
           order.AmountHT = order.TotalHT - order.Discount;
           order.AmountTTC = order.TotalHT;
-          order.Created = true;
+          // order.Created = true;
           order.isReg = true;
           order.InsertUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
           order.UpdateUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);

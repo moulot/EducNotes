@@ -269,6 +269,8 @@ import { TeacherFileComponent } from './admin/userFiles/teacher-file/teacher-fil
 import { ParentFileResolver } from './_resolvers/parent-file-resolver';
 import { ParentFileTuitionComponent } from './admin/userFiles/parent-file-tuition/parent-file-tuition.component';
 import { ChildFileClassLifeComponent } from './admin/userFiles/child-file-class-life/child-file-class-life.component';
+import { UserValidationComponent } from './admin/user-validation/user-validation.component';
+import { UserValidationResolver } from './_resolvers/user-validation-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -452,7 +454,8 @@ export function tokenGetter() {
       ParentFileComponent,
       TeacherFileComponent,
       ParentFileTuitionComponent,
-      ChildFileClassLifeComponent
+      ChildFileClassLifeComponent,
+      UserValidationComponent
    ],
    imports: [
       FormWizardModule,
@@ -566,6 +569,7 @@ export function tokenGetter() {
       OrderService,
       AccountService,
       ParentFileResolver,
+      UserValidationResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

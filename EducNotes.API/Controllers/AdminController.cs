@@ -21,8 +21,6 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Net;
 using System.Text;
-using Newtonsoft.Json;
-using System.IO;
 
 namespace EducNotes.API.Controllers
 {

@@ -12,7 +12,7 @@
         <a class="d-flex" (click)="toggleInfos()">
           <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary"><b>infos du compte</b></div>
+          <div class="text-16"><b>infos du compte</b></div>
         </a>
       </div>
       <div class="col-md-12"><hr class="my-1"></div>
@@ -59,7 +59,7 @@
         <a class="d-flex" (click)="toggleInfos()">
           <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary"><b>voir détails du dossier</b></div>
+          <div class="text-16"><b>infos du compte</b></div>
         </a>
         <div class="text-15">
           <span class="text-capitalize ml-2 mt-0">{{userFile.lastName}} {{userFile.firstName}}</span>
@@ -70,23 +70,24 @@
   </div>
 </div>
 <div class="d-md-none border rounded-lg p-2">
-  <div *ngIf="showInfos" class="row animated zoomIn">
-    <div class="col-md-12 d-flex my-1">
-      <div class="">
-        <a (click)="toggleInfos()">
-          <i class="fad fa-minus-square fa-1x mr-1" style="--fa-secondary-opacity: 1;
-            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-        </a>
-      </div>
-      <div class="text-14"><b>infos du compte</b></div>
+  <div *ngIf="showInfos" class="row animated fadeIn">
+    <div class="col-md-12 mb-2">
+      <a class=" d-flex" (click)="toggleInfos()">
+        <i class="text-15 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <div class="text-15"><b>infos du compte</b></div>
+      </a>
     </div>
-    <div class="col-md-1 text-center">
+    <div class="col-12 text-center">
       <img src="{{userFile.photoUrl || '../../assets/user.png'}}" alt="" width="80" class="rounded-circle img-responsive">
     </div>
-    <div class="col-md-11">
+    <div class="col-12">
       <div class="row">
-        <div class="col-md-12 text-20 text-center font-weight-500 text-capitalize" style="color: #192C47;">{{userFile.lastName}} {{userFile.firstName}}</div>
-        <div class="col-md-12 text-20 text-center">{{userFile.age}} ans - classe de {{userFile.className || userFile.classLevelName}}</div>
+        <div class="col-md-12 my-1 text-20 text-center font-weight-500 text-capitalize" style="color: #192C47;">
+          {{userFile.lastName}} {{userFile.firstName}} - {{userFile.age}} ans
+        </div>
+        <div class="col-md-12 my-1 text-20 text-center">classe de {{userFile.className || userFile.classLevelName}}</div>
+        <div class="col-12"><hr class="my-1"></div>
         <div class="col-md-12 text-16">
           <div><b>père:</b></div>
           <div class="text-capitalize">{{userFile.fatherLastName}} {{userFile.fatherFirstName}}.</div>
@@ -117,26 +118,13 @@
       </div>
     </div>
   </div>
-  <div *ngIf="!showInfos" class="row animated zoomIn">
-    <div class="col-md-12 d-flex my-1">
-      <div class="">
-        <a (click)="toggleInfos()">
-          <i class="fad fa-plus-square fa-1x my-1 mr-1" style="--fa-secondary-opacity: 1;
-            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-        </a>
-      </div>
-      <div>
-        <b>voir détails du dossier</b>
-      </div>
-    </div>
-    <div class="col-md-1 text-center">
-      <img src="{{userFile.photoUrl || '../../assets/user.png'}}" alt="" width="80" class="rounded-circle img-responsive">
-    </div>
-    <div class="col-md-11">
-      <div class="row">
-        <div class="col-md-12 text-20 text-center font-weight-500 text-capitalize" style="color: #192C47;">{{userFile.lastName}} {{userFile.firstName}}</div>
-        <div class="col-md-12 text-20 text-center">{{userFile.age}} ans - classe de {{userFile.className || userFile.classLevelName}}</div>
-      </div>
+  <div *ngIf="!showInfos" class="row animated fadeIn">
+    <div class="col-md-12">
+      <a class="d-flex" (click)="toggleInfos()">
+        <i class="text-15 fad fa-plus-square my-1 mr-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <div class="text-15"><b>voir détails du dossier</b></div>
+      </a>
     </div>
   </div>
 </div>

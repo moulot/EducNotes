@@ -2035,7 +2035,7 @@ namespace EducNotes.API.Controllers
             }
           }
           order.Validated = true;
-          order.Created = false;
+          // order.Created = false;
           _repo.Update(order);
           updatedOrder = _mapper.Map<OrderDto>(order);
 
@@ -2195,5 +2195,78 @@ namespace EducNotes.API.Controllers
           var users = _mapper.Map<IEnumerable<UserForDetailedDto>>(usersFromRepo);
           return Ok(users);
         }
+
+        [HttpGet("UsersToValidate")]
+        public async Task<IActionResult> GetUsersToValidate()
+        {
+          var usersFromDB = await _context.Users
+                                    .Include(i => i.UserType)
+                                    .Where(u => u.AccountDataValidated == false)
+                                    .ToListAsync();
+          var activeTuitions = await _context.Orders
+                                      .Include(i => i.Father).ThenInclude(i => i.UserType)
+                                      .Include(i => i.Mother).ThenInclude(i => i.UserType)
+                                      .Where(t => t.isReg == true && t.Expired == false || t.Cancelled == false)
+                                      .ToListAsync();
+
+          var userTypes = await _context.UserTypes.OrderBy(o => o.Name).ToListAsync();
+          List<UserTypeToValidateDto> types = new List<UserTypeToValidateDto>();
+          foreach (var type in userTypes)
+          {
+            if(type.Name.ToLower() == "admin") { continue; }
+
+            UserTypeToValidateDto userType = new UserTypeToValidateDto();
+            userType.Id = type.Id;
+            userType.Name = type.Name;
+            userType.Users = new List<UserToValidateDto>();
+            var users = usersFromDB.OrderBy(o => o.LastName).ThenBy(o => o.FirstName).Where(u => u.UserTypeId == type.Id).ToList();
+            foreach (var user in users)
+            {
+              UserToValidateDto userToValidate = new UserToValidateDto();
+              userToValidate.Id = user.Id;
+              userToValidate.LastName = user.LastName;
+              userToValidate.FirstName = user.FirstName;
+              userToValidate.UserType = user.UserType.Name;
+              userToValidate.Email = user.Email;
+              userToValidate.Cell = user.PhoneNumber;
+              Order userTuition = new Order();
+              if(type.Id == parentTypeId)
+              {
+                userTuition = activeTuitions.FirstOrDefault(t => t.MotherId == user.Id || t.FatherId == user.Id);
+              }
+              else if(type.Id == studentTypeId)
+              {
+                var parents = await _repo.GetParents(user.Id);
+                userTuition = activeTuitions.FirstOrDefault(t => t.MotherId == parents[0].Id || t.FatherId == parents[0].Id);
+              }
+
+              if(userTuition != null)
+              {
+                userToValidate.Tuition = _mapper.Map<OrderUserToValidateDto>(userTuition);
+                var lines = await _repo.GetOrderLines(userToValidate.Tuition.Id);
+                userToValidate.Tuition.Lines = _mapper.Map<List<LineUserToValidateDto>>(lines);
+              }
+              userType.Users.Add(userToValidate);
+            }
+
+            types.Add(userType);
+          }
+
+          return Ok(types);
+        }
+
+        [HttpPost("EditUserToValidate")]
+        public async Task<IActionResult> EditUserToValidate(EditUserToValidateDto userData)
+        {
+          var user = await _context.Users.FirstAsync(u => u.Id == userData.Id);
+          user.Email = userData.Email;
+          user.PhoneNumber = userData.Cell;
+          _context.Update(user);
+          if(await _repo.SaveAll())
+            return Ok();
+          else
+            return BadRequest("problème pour mettre à jour les données");
+        }
+
     }
 }

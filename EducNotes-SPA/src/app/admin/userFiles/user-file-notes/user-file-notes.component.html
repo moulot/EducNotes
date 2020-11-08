@@ -1,20 +1,35 @@
-<div class="d-none d-md-block card mt-2">
+<div class="card mt-2">
   <div class="card-body p-2">
     <div *ngIf="showInfos" class="row animated fadeIn">
-      <div class="col-8 my-auto">
+      <div class="col-12 my-auto">
         <a class="d-flex" (click)="toggleInfos()">
           <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
-            <b>carnet de notes</b> - moyenne générale: 
-            <span *ngIf="!userGrades?.avgOK" class="text-danger"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
-            <span *ngIf="userGrades?.avgOK" class="text-primary"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
-          </div>
+          <div class="text-16"><b>carnet de notes</b></div>
         </a>
+        <div *ngIf="userGrades?.avg > 0" class="text-15 mt-1">
+          <span>moy. générale:</span>
+          <span *ngIf="!userGrades?.avgOK" class="ml-1 text-danger"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
+          <span *ngIf="userGrades?.avgOK" class="ml-1"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
+        </div>
+        <div *ngIf="userGrades?.avg < 0" class="text-15 mt-1">
+          <span>moy. générale: N/D</span>
+        </div>
       </div>
       <div class="col-md-12"><hr class="my-1"></div>
+      <div class="col-md-12 d-none d-md-block text-13 text-danger my-1">
+        <span>(-): plus faible note</span>
+        <span class="ml-2">(moy.): moyenne de la classe</span>
+        <span class="ml-2">(+) plus forte note</span>
+      </div>
+      <div class="col-md-12 d-md-none text-13 text-danger my-1">
+        <div>(-): plus faible note</div>
+        <div>(moy.): moyenne de la classe</div>
+        <div>(+) plus forte note</div>
+      </div>
       <div class="col-md-12 text-15 font-weight-bold">dernières notes</div>
-      <div class="col-md-4" *ngFor="let grade of userGrades?.lastGrades">
+      <div *ngIf="userGrades?.lastGrades.length == 0" class="col-md-4 mb-1 text-15 text-muted">aucune note disponible</div>
+      <div class="col-md-4 mb-1" *ngFor="let grade of userGrades?.lastGrades">
         <div class="border rounded-lg p-1">
           <div class="text-13">
             <span>{{grade.evalDate}}.</span>
@@ -28,7 +43,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-12 mt-1">
+      <div class="col-md-12 mt-3">
         <div class="border rounded-lg p-1">
           <div class="text-15 font-weight-bold">moyennes des cours</div>
           <hr class="my-1">
@@ -38,13 +53,27 @@
                 <div *ngIf="course.userAvg < 0" class="text-13">
                   {{course.abbrev}}: <span *ngIf="!course.userAvgOK && course.userAvg < 0">N/D</span>
                 </div>
-                <div *ngIf="course.userAvg >= 0" class="text-13">
+                <div *ngIf="course.userAvg >= 0" class="text-13 d-none d-md-block">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      {{course.abbrev}}:
+                      <span *ngIf="!course.userAvgOK" class="text-danger">{{course.userAvg}}/{{course.gradedOutOf}}</span>
+                      <span *ngIf="course.userAvgOK" class="text-success">{{course.userAvg}}/{{course.gradedOutOf}}</span>
+                    </div>
+                    <div>(-) {{course.classAvgMin}}</div>
+                    <div>(moy.) {{course.classAvg}}</div>
+                    <div>(+) {{course.classAvgMax}}</div>
+                  </div>
+                </div>
+                <div *ngIf="course.userAvg >= 0" class="text-15 d-md-none">
                   {{course.abbrev}}:
                   <span *ngIf="!course.userAvgOK" class="text-danger">{{course.userAvg}}/{{course.gradedOutOf}}</span>
                   <span *ngIf="course.userAvgOK" class="text-success">{{course.userAvg}}/{{course.gradedOutOf}}</span>
-                  <span class="ml-1">(-) {{course.classAvgMin}}</span>
-                  <span class="ml-1">(moy.) {{course.classAvg}}</span>
-                  <span class="ml-1">(+) {{course.classAvgMax}}</span>
+                  <div class="d-flex justify-content-between">
+                    <div>(-) {{course.classAvgMin}}</div>
+                    <div>(moy.) {{course.classAvg}}</div>
+                    <div>(+) {{course.classAvgMax}}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -53,22 +82,23 @@
       </div>
     </div>
     <div *ngIf="!showInfos" class="row animated fadeIn">
-      <div class="col-8">
+      <div class="col-12">
         <a class="d-flex" (click)="toggleInfos()">
           <i class="text-16 fad fa-plus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
-            <b>carnet de notes</b> - moyenne générale: 
-            <span *ngIf="!userGrades.avgOK" class="text-danger"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
-            <span *ngIf="userGrades.avgOK" class="text-primary"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
-          </div>
+          <div class="text-16"><b>carnet de notes</b></div>
         </a>
+        <div class="text-15">
+          <span>moyenne générale:</span>
+          <span *ngIf="!userGrades?.avgOK" class="ml-1 text-danger"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
+          <span *ngIf="userGrades?.avgOK" class="ml-1"><b>{{userGrades?.avg}}/{{userGrades?.gradedOutOf}}</b></span>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="d-md-none card mt-2">
+<!-- <div class="d-md-none card mt-2">
   <div class="card-body p-2">
     <div *ngIf="!showInfos" class="row animated zoomIn">
       <div class="col-8">
@@ -90,4 +120,4 @@
       <div class="col-md-12"><hr class="my-1"></div>
     </div>
   </div>
-</div>
+</div> -->

@@ -1,0 +1,113 @@
+<!-- <div class="container" *ngIf="!userTypes">
+  <h4>chargement en cours...</h4>
+  <mdb-progress-bar class="progress primary-color-dark" mode="indeterminate"></mdb-progress-bar>
+</div> -->
+
+<div class="d-flex">
+  <a appBtnBack>
+    <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+  </a>
+  <i class="fad fa-file-user fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+  <div class="text-19">validation des utilisateurs</div>
+</div>
+<div class="row my-2">
+  <div class="col-md-3 mb-1">
+    <button type="button" mdbBtn class="btnBlue" size="sm" block="true" mdbWavesEffect>tous utilisateurs</button>
+  </div>
+  <div class="col-md-3 mb-1" *ngFor="let type of userTypes">
+    <button type="button" mdbBtn class="btnBlue" size="sm" block="true" mdbWavesEffect>voir les {{type.name}}s</button>
+  </div>
+</div>
+<div class="row">
+  <form [formGroup]="usersForm">
+    <div class="col-md-12" *ngFor="let type of userTypes">
+      <div class="text-16"><b>{{type.name}}s</b></div>
+      <hr class="my-1">
+      <div *ngIf="type.id == studentTypeId" class="row">
+        <div class="col-md-4 my-2" formArrayName="students" *ngFor="let child of usersForm.get('students')['controls']; let i = index;">
+          <div class="card" [formGroupName]="i">
+            <div class="card-body p-2">
+              <div class="d-md-flex">
+                <div class="text-15 my-auto flex-grow-1 text-capitalize">{{child.value.lname}} {{child.value.fname}}</div>
+                <div *ngIf="child.value.email && !usersDivs[type.id].editDiv[i]" class="blue-text">
+                  <a>confirmer données</a>
+                </div>
+                <div *ngIf="!child.value.email && !usersDivs[type.id].editDiv[i]" class="blue-text">
+                  <a (click)="toggleEditDiv(type.id, i)">saisir email & cell</a>
+                </div>
+              </div>
+              <hr class="my-1">
+              <div *ngIf="!usersDivs[type.id].editDiv[i]">
+                <div *ngIf="child.value.email" class="text-15">email : {{child.value.email}}</div>
+                <div *ngIf="!child.value.email" class="text-15">email : N/D</div>
+                <div *ngIf="child.value.cell" class="text-15">cell : {{child.value.cell}}</div>
+                <div *ngIf="!child.value.cell" class="text-15">cell : N/D</div>
+              </div>
+              <div *ngIf="usersDivs[type.id].editDiv[i]">
+                <div class="row">
+                  <div class="col-md-12 text-13 text-danger">saisir le email afin de valider ses infos</div>
+                  <div class="col-md-12">
+                    <div class="md-form my-0">
+                      <input mdbInput type="text" id="email" class="form-control" formControlName="email">
+                      <label for="email" class="">email</label>
+                      <div *ngIf="child.value.email === '' && child.get('email').touched"
+                        class="text-small text-danger">l'email est incorrect</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="md-form my-0">
+                      <input mdbInput type="text" id="cell" class="form-control" formControlName="cell" mdbValidate>
+                      <label for="cell" class="">mobile</label>
+                    </div>          
+                  </div>
+                  <div class="col-6 mt-1">
+                    <button type="button" mdbBtn (click)="toggleEditDiv(type.id, i)"
+                      class="btnBlue" size="sm" block="true" mdbWavesEffect>annuler</button>
+                  </div>
+                  <div class="col-6 mt-1">
+                    <button type="button" mdbBtn (click)="editUser(type.id, i)"
+                      class="btnBlue" size="sm" block="true" mdbWavesEffect>OK</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="type.id == parentTypeId" class="row">
+        <div class="col-md-6 mb-2" *ngFor="let user of type.users">
+          <div class="card">
+            <div class="card-body p-2">
+              <div class="row">
+                <div class="col-md-12 text-15">
+                  <div class="d-md-flex">
+                    <div class="text-15 my-auto flex-grow-1 text-capitalize">{{user.lastName}} {{user.firstName}}</div>
+                    <div class="blue-text"><a>confirmer données</a></div>
+                  </div>
+                </div>
+                <div class="col-md-12"><hr class="my-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="type.id == teacherTypeId" class="row">
+        <div class="col-md-6 mb-2" *ngFor="let user of type.users">
+          <div class="card">
+            <div class="card-body p-2">
+              <div class="row">
+                <div class="col-md-12 text-15">
+                  <div class="d-md-flex">
+                    <div class="text-15 my-auto flex-grow-1 text-capitalize">{{user.lastName}} {{user.firstName}}</div>
+                    <div class="blue-text"><a>confirmer données</a></div>
+                  </div>
+                </div>
+                <div class="col-md-12"><hr class="my-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

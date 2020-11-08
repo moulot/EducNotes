@@ -13,8 +13,7 @@ export class ChildFileComponent implements OnInit {
   showInfos = true;
   toggle = false;
 
-  constructor(private userService: UserService, private route: ActivatedRoute,
-    private router: Router, private alertify: AlertifyService) { }
+  constructor(private route: ActivatedRoute, private router: Router, private alertify: AlertifyService) { }
 
   ngOnInit() {
     this.route.data.subscribe((data: any) => {

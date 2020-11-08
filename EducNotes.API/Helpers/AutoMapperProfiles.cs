@@ -263,6 +263,10 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.DateSent, opt => {
                   opt.MapFrom(d => d.InsertDate.ToString("dd/MM/yyyy", frC));
                 });
+            CreateMap<User, UserToValidateDto>()
+                .ForMember(dest => dest.UserType, opt => {
+                  opt.MapFrom(d => d.UserType.Name);
+                });
             CreateMap<AgendaForSaveDto, Agenda>();
             CreateMap<SmsTemplateForSaveDto, SmsTemplate>(); 
             CreateMap<SmsTemplate, SmsTemplateForListDto>();
@@ -502,6 +506,31 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.Rejected, opt => {
                   opt.MapFrom(src => src.FinOp.Rejected);
                 });
+            CreateMap<OrderLine, LineUserToValidateDto>()
+                .ForMember(dest => dest.LastName, opt => {
+                  opt.MapFrom(src => src.Child.LastName.FirstLetterToUpper());
+                })
+                .ForMember(dest => dest.FirstName, opt => {
+                  opt.MapFrom(src => src.Child.FirstName.FirstLetterToUpper());
+                })
+                .ForMember(dest => dest.ClassLevelName, opt => {
+                  opt.MapFrom(src => src.ClassLevel.Name);
+                })
+                .ForMember(dest => dest.ClassName, opt => {
+                  opt.MapFrom(src => src.Child.Class.Name);
+                })
+                .ForMember(dest => dest.Age, opt => {
+                  opt.MapFrom(src => src.Child.DateOfBirth.CalculateAge());
+                })
+                .ForMember(dest => dest.PhotoUrl, opt => {
+                  opt.MapFrom(src => src.Child.Photos.FirstOrDefault(p => p.IsMain).Url);
+                })
+                .ForMember(dest => dest.NbDaysLate, opt => {
+                  opt.MapFrom(src => (src.Validity - DateTime.Now).TotalDays + 1);
+                })
+                .ForMember(dest => dest.strAmountTTC, opt => {
+                  opt.MapFrom(src => src.AmountTTC.ToString("N0") + " F");
+                });
             CreateMap<OrderLine, OrderLineDto>()
                 .ForMember(dest => dest.ProductName, opt => {
                   opt.MapFrom(src => src.Product.Name);
@@ -529,6 +558,28 @@ namespace EducNotes.API.Helpers {
                 })
                 .ForMember(dest => dest.strAmountHT, opt => {
                   opt.MapFrom(src => src.AmountHT.ToString("N0") + " F");
+                })
+                .ForMember(dest => dest.strAmountTTC, opt => {
+                  opt.MapFrom(src => src.AmountTTC.ToString("N0") + " F");
+                });
+            CreateMap<Order, OrderUserToValidateDto>()
+                .ForMember(dest => dest.strOrderDate, opt => {
+                  opt.MapFrom(src => src.OrderDate.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.strDeadline, opt => {
+                  opt.MapFrom(src => src.Deadline.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.strDeadline, opt => {
+                  opt.MapFrom(src => src.Deadline.ToString("dd/MM/yyyy", frC));
+                })
+                .ForMember(dest => dest.NbDaysLate, opt => {
+                  opt.MapFrom(src => (src.Validity - DateTime.Now).TotalDays + 1);
+                })
+                .ForMember(dest => dest.NbChildren, opt => {
+                  opt.MapFrom(src => src.Lines.Count());
+                })
+                .ForMember(dest => dest.strValidity, opt => {
+                  opt.MapFrom(src => src.Validity.ToString("dd/MM/yyyy", frC));
                 })
                 .ForMember(dest => dest.strAmountTTC, opt => {
                   opt.MapFrom(src => src.AmountTTC.ToString("N0") + " F");

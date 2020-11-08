@@ -161,7 +161,7 @@ namespace EducNotes.API.Data
                         .Where(u => userIds.Contains(u.Id)).ToListAsync();
         }
 
-        public async Task<IEnumerable<User>> GetParents(int ChildId)
+        public async Task<List<User>> GetParents(int ChildId)
         {
             var links = await _context.UserLinks.Where(u => u.UserId == ChildId).ToListAsync();
 

@@ -359,4 +359,12 @@ constructor(private http: HttpClient) {}
   getTeacherScheduleNDays(teacherId) {
     return this.http.get(this.baseUrl + teacherId + '/ScheduleNDays');
   }
+
+  getUsersToValidate() {
+    return this.http.get(this.baseUrl + 'UsersToValidate');
+  }
+
+  editUserToValidate(userData) {
+    return this.http.post(this.baseUrl + 'EditUserToValidate', userData);
+  }
 }

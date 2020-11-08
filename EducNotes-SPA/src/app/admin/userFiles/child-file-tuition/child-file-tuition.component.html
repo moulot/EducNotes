@@ -5,13 +5,13 @@
         <a class="d-flex" (click)="toggleInfos()">
           <i class="text-16 fad fa-plus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
+          <div class="text-16">
             <b>frais de scolarité</b> - montant: <b>{{tuition?.amountInvoiced | number:'':'fr-FR'}} F</b>. solde à payer: 
               <span class="text-danger"><b>{{tuition?.balance | number:'':'fr-FR'}} F</b></span>
           </div>
         </a>
       </div>
-      <div *ngIf="showBtn && tuition?.balance > 0" class="col-md-4 text-right">
+      <div *ngIf="showBtn && tuition?.balance > 0" class="col-4 text-right">
         <button type="button" mdbBtn (click)="addPayment()" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement</button>
       </div>      
     </div>
@@ -20,7 +20,7 @@
         <a class="d-flex" (click)="toggleInfos()">
           <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16 text-primary">
+          <div class="text-16">
             <b>frais de scolarité</b> - montant: <b>{{tuition?.amountInvoiced | number:'':'fr-FR'}} F</b>. solde à payer: 
               <span class="text-danger"><b>{{tuition?.balance | number:'':'fr-FR'}} F</b></span>
           </div>
@@ -103,9 +103,26 @@
   </div>
 </div>
 <div class="d-md-none mt-2">
-  <div class="card mt-2">
+  <div class="card">
     <div class="card-body p-2">
-      <div class="row">
+      <div *ngIf="!showInfos" class="row animated fadeIn">
+        <div class="col-12">
+          <a class="d-flex" (click)="toggleInfos()">
+            <i class="text-16 fad fa-plus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+            <div class="text-16"><b>frais de scolarité</b></div>
+          </a>
+        </div>
+      </div>
+      <div *ngIf="showInfos" class="row animated fadeIn">
+        <div class="col-12">
+          <a class="d-flex" (click)="toggleInfos()">
+            <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+            <div class="text-16"><b>frais de scolarité</b></div>
+          </a>
+        </div>
+        <div class="col-12"><hr class="my-1"></div>
         <div *ngIf="tuition?.balance > 0" class="col-12 text-15 mb-0">
           frais de scolarité <b>{{tuition?.amountInvoiced | number:'':'fr-FR'}} F</b>
         </div>

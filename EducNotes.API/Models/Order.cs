@@ -15,7 +15,6 @@ namespace EducNotes.API.Models {
       TVAAmount = 0;
       isReg = false;
       isNextReg = false;
-      Created = false;
       Validated = false;
       Expired = false;
       Cancelled = false;
@@ -52,7 +51,6 @@ namespace EducNotes.API.Models {
     public User Father { get; set; }
     public int? MotherId { get; set; }
     public User Mother { get; set; }
-    public Boolean Created { get; set; }
     public Boolean Validated { get; set; }
     public Boolean Expired { get; set; }
     public Boolean Cancelled { get; set; }

@@ -35,7 +35,7 @@
           [mdbAutoCompleter]="auto" autocomplete="off" placeholder="rechercher un dossier" formControlName="searchData" />
         <mdb-auto-completer #auto="mdbAutoCompleter" textNoResults="aucun résultat trouvé :(">
         <mdb-option (click)="selectUserId(option.userId, option.userTypeId)" *ngFor="let option of results | async"
-          [value]="option.lastName + ' ' + option.firstName">
+        (ngModelChange)="selectUserId(option.userId, option.userTypeId)" [value]="option.lastName + ' ' + option.firstName">
           <div class="d-flex">
             <div class="mr-1">
               <img src="{{option.photoUrl || '../../../../../../assets/user.png'}}" alt="" style="width: 40px;" class="rounded-circle z-depth-0">
