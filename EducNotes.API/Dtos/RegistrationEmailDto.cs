@@ -14,8 +14,8 @@ namespace EducNotes.API.Dtos
     public int OrderId { get; set; }
     public int OrderNum { get; set; }
     public string Token { get; set; }
-    public List<ChildRegistrationDto> Children { get; set; }
     public string TotalAmount { get; set; }
     public string DueDate { get; set; }
+    public List<ChildRegistrationDto> Children { get; set; }
   }
 }

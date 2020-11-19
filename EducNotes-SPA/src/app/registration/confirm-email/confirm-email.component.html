@@ -16,8 +16,8 @@
 <div class="text-20" *ngIf="user && !emailOK">
   <div class="text-20 text-center mt-2">CONFIRMATION DE EMAIL</div>
   <div *ngIf="user">Bonjour
-    <span  *ngIf="user.gender == 0">Mme</span>
-    <span  *ngIf="user.gender == 1">Mr</span>
+    <span  *ngIf="user.gender == 0">Madame</span>
+    <span  *ngIf="user.gender == 1">Monsieur</span>
     {{user.lastName | titlecase}},
   </div>
   <div class="border rounded-lg p-2">
@@ -44,22 +44,22 @@
 
 <div class="row" *ngIf="emailOK">
   <div class="col-md-12 text-16 mb-2">Bonjour
-    <span  *ngIf="user.gender == 0">Mme</span>
-    <span  *ngIf="user.gender == 1">Mr</span>
+    <span  *ngIf="user.gender == 0">Madame</span>
+    <span  *ngIf="user.gender == 1">Monsieur</span>
     {{user.lastName | titlecase}},
   </div>
   <div *ngIf="!validAccount">
     <div class="col-md-12 text-16 my-2">finaliser svp la création de votre compte sur la plateforme Educ'Notes. 
       Vous pourrez alors effectuer des paiements et accéder à votre inscription.</div>
   </div>
-  <div class="col-md-10 mx-auto">
+  <div class="col-md-11 mx-auto">
     <div class="card mb-2">
       <div class="card-body">
         <div class="text-16">votre email, <b>'{{user.email}}'</b>, est maintenant confirmé. merci!</div>
       </div>
     </div>
   </div>
-  <div class="col-md-10 mx-auto">
+  <div class="col-md-11 mx-auto">
     <div class="card mb-2">
       <div class="card-body">
         <div *ngIf="!user.phoneNumberConfirmed">
@@ -112,8 +112,8 @@
       </div>
     </div>
   </div>
-  <div *ngIf="user.phoneNumberConfirmed">
-    <div class="col-md-10 mx-auto">
+  <div class="col-md-11 mx-auto" *ngIf="user.phoneNumberConfirmed">
+    <div>
       <div class="card mb-2">
         <div class="card-body">
           <div *ngIf="!parentOk">
@@ -154,7 +154,7 @@
                 <div class="col-md-4">
                   <div class="md-form my-0">
                     <input mdbInput type="text" id="userName" class="form-control" formControlName="userName"
-                      (blur)="userNameVerification()" mdbValidate>
+                      (keyup)="userNameVerification()" mdbValidate>
                     <label for="userName" class="">identifiant</label>
                     <div *ngIf="userForm.get('userName').errors && userForm.get('userName').touched"
                       class="text-small text-danger">saisir un identifiant svp</div>
@@ -190,7 +190,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="parentOk && !childrenOk" class="col-md-10 mx-auto">
+    <div *ngIf="parentOk && !childrenOk">
       <div class="card">
         <div class="card-body">
           <div *ngIf="!childrenOk">
@@ -202,15 +202,15 @@
         </div>
       </div>
     </div>
-    <div *ngIf="childrenOk" class="col-md-10 mx-auto">
+    <div *ngIf="childrenOk">
       <div class="card">
         <div class="card-body">
           <div class="text-16">les comptes de vos enfants sont validés et actifs. merci!</div>
         </div>
       </div>
     </div>
-    <div *ngIf="parentOk && childrenOk" class="mt-4 mx-auto">
-      <button type="button" mdbBtn [routerLink]="['/signIn']"  class="btnBlue" mdbWavesEffect>connecter vous à votre compte</button>
+    <div *ngIf="parentOk && childrenOk" class="mt-3 mx-auto text-center">
+      <button type="button" mdbBtn [routerLink]="['/signIn']"  class="btnBlue" mdbWavesEffect>connecter vous a votre compte</button>
     </div>
   </div>
 </div>

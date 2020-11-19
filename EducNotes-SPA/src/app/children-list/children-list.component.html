@@ -1,90 +1,101 @@
 <div class="row">
-  <div class="col-md-4 my-5" *ngFor="let child of children; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
+  <div class="col-md-12 mb-2" *ngFor="let child of children; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
     <a (click)="goToChildPage(child)" class="text-17 text-primary">
-      <mdb-card class="testimonial-card">
-      <div class="avatar mx-auto">
+      <mdb-card>
+      <!-- <div class="avatar mx-auto">
         <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" class="rounded-circle">
-      </div>
-      <mdb-card-body class="text-left p-2">
-          <div class="text-center text-16 text-capitalize font-weight-400 m-0">{{child.lastName}} {{child.firstName}}</div>
-          <div class="text-center text-14 font-weight-400 m-0">classe {{child.className || child.classLevelName}}</div>
-          <hr class="my-1">
-          <div class="d-none d-md-block">
-            <div class="row">
-              <div class="col-md-12">
-                <i class="fad fa-user-chart fa-1x mr-2" style="--fa-secondary-opacity: 1;
-                  --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                <a class="text-15"><span class="text-muted text-14">moyenne</span> : {{child.avg}} / 20</a>
+      </div> -->
+      <mdb-card-body class="text-left p-2 d-md-flex">
+        <div class=" text-center mr-3">
+          <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" width="100" class="rounded-circle">
+        </div>
+        <div class="flex-grow-1">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="d-md-flex">
+                <div class="text-center text-16 text-capitalize mr-md-2"><b>{{child.lastName}} {{child.firstName}}</b></div>
+                <div class="text-center text-16 font-weight-400">classe {{child.className || child.classLevelName}}</div>
               </div>
-              <div class="col-md-12">
-                <i class="fad fa-tasks fa-1x mr-2" style="--fa-secondary-opacity: 1;
-                  --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                <span class="text-15">devoirs de maison:</span>
-                <span class="text-15 text-muted ml-2" *ngIf="child.agendaItems.length == 0">pas de devoirs</span>
-              </div>
-              <div class="col-md-12 ml-4" *ngIf="child.agendaItems.length > 0">
-                <span *ngFor="let item of child.agendaItems">
-                  <ng-template #hoverItems>
-                    <p *ngFor="let ai of item.agendaItems; let i = index" class="text-13 m-0"><b>{{i+1}}.
-                        {{ai.courseName}}</b>. {{ai.taskDesc}}</p>
-                  </ng-template>
-                  <a [mdbPopover]="hoverItems" placement="top" triggers="hover"
-                    class=" text-13 mr-2"><u>{{item.dueDateAbbrev}}</u></a>
-                </span>
-              </div>
-              <div class="col-md-12 mb-0">
-                <i class="fad fa-times-circle fa-1x mr-2" style="--fa-secondary-opacity: 1;
-                  --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                <label class=" text-muted text-15 mr-1">absences : </label><a class=" text-15 mr-1" href="">{{child.nbAbsences}}</a>
-                <label class=" text-muted text-15 mr-1">retards : </label><a class=" text-15 mr-1" href="">{{child.nbLateArrivals}}</a>
-              </div>
-            </div>  
-          </div>
-          <div class="d-md-none">
-            <div class="row">
-              <div class="col-md-12">
-                <div class="text-center">
+              <div class=""><hr class="my-1"></div>
+              <div class="d-none d-md-block">
+                <div class=" mb-1">
                   <i class="fad fa-user-chart fa-1x mr-2" style="--fa-secondary-opacity: 1;
-                  --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                  <span class="text-muted text-14">moyenne</span>
-                  <div text-15>{{child.avg}} / 20</div>
+                    --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                  <a class="text-15"><span class="text-muted text-14">moyenne</span> : {{child.avg}} / 20</a>
                 </div>
-              </div>
-              <div class="col-12"><hr class="my-1"></div>
-              <div class="col-md-12">
-                <div class="text-center">
+                <div class="  mb-1">
                   <i class="fad fa-tasks fa-1x mr-2" style="--fa-secondary-opacity: 1;
-                  --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                  <span class="text-15">devoirs à faire:</span>
-                  <div class="text-15 text-muted" *ngIf="child.agendaItems.length == 0">pas de devoirs</div>
+                    --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                  <span class="text-15">devoirs de maison:</span>
+                  <span class="text-15 text-muted ml-2" *ngIf="child.agendaItems.length == 0">pas de devoirs</span>
+                </div>
+                <div class=" ml-4 mb-1" *ngIf="child.agendaItems.length > 0">
+                  <span *ngFor="let item of child.agendaItems">
+                    <ng-template #hoverItems>
+                      <p *ngFor="let ai of item.agendaItems; let i = index" class="text-13 m-0"><b>{{i+1}}.
+                          {{ai.courseName}}</b>. {{ai.taskDesc}}</p>
+                    </ng-template>
+                    <a [mdbPopover]="hoverItems" placement="top" triggers="hover"
+                      class=" text-13 mr-2"><u>{{item.dueDateAbbrev}}</u></a>
+                  </span>
+                </div>
+                <div class=" mb-0">
+                  <i class="fad fa-times-circle fa-1x mr-2" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                  <label class=" text-muted text-15 mr-1">absences : </label><a class=" text-15 mr-1" href="">{{child.nbAbsences}}</a>
+                  <label class=" text-muted text-15 mr-1">retards : </label><a class=" text-15 mr-1" href="">{{child.nbLateArrivals}}</a>
                 </div>
               </div>
-              <div class="col-md-12 ml-4" *ngIf="child.agendaItems.length > 0">
-                <span *ngFor="let item of child.agendaItems">
-                  <ng-template #hoverItems>
-                    <p *ngFor="let ai of item.agendaItems; let i = index" class="text-13 m-0"><b>{{i+1}}.
-                        {{ai.courseName}}</b>. {{ai.taskDesc}}</p>
-                  </ng-template>
-                  <a [mdbPopover]="hoverItems" placement="top" triggers="hover"
-                    class=" text-13 mr-2"><u>{{item.dueDateAbbrev}}</u></a>
-                </span>
+              <div class="d-md-none">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="text-center">
+                      <i class="fad fa-user-chart fa-1x mr-2" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                      <span class="text-muted text-14">moyenne</span>
+                      <div text-15>{{child.avg}} / 20</div>
+                    </div>
+                  </div>
+                  <div class="col-12"><hr class="my-1"></div>
+                  <div class="col-md-12">
+                    <div class="text-center">
+                      <i class="fad fa-tasks fa-1x mr-2" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                      <span class="text-15">devoirs à faire:</span>
+                      <div class="text-15 text-muted" *ngIf="child.agendaItems.length == 0">pas de devoirs</div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 ml-4" *ngIf="child.agendaItems.length > 0">
+                    <span *ngFor="let item of child.agendaItems">
+                      <ng-template #hoverItems>
+                        <p *ngFor="let ai of item.agendaItems; let i = index" class="text-13 m-0"><b>{{i+1}}.
+                            {{ai.courseName}}</b>. {{ai.taskDesc}}</p>
+                      </ng-template>
+                      <a [mdbPopover]="hoverItems" placement="top" triggers="hover"
+                        class=" text-13 mr-2"><u>{{item.dueDateAbbrev}}</u></a>
+                    </span>
+                  </div>
+                  <div class="col-12"><hr class="my-1"></div>
+                  <div class="col-md-12 mb-0">
+                    <div class="text-center">
+                      <i class="fad fa-times-circle fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i><span class="text-15">vie scolaire</span>
+                      <div class="text-muted text-15">absences : <a class=" text-15 mr-1" href="">{{child.nbAbsences}}</a></div>
+                      <div class="text-muted text-15">retards : <a class=" text-15 mr-1" href="">{{child.nbLateArrivals}}</a></div>
+                    </div>
+                  </div>
+                </div>  
               </div>
-              <div class="col-12"><hr class="my-1"></div>
-              <div class="col-md-12 mb-0">
-                <div class="text-center">
-                  <i class="fad fa-times-circle fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                  --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i><span class="text-15">vie scolaire</span>
-                  <div class="text-muted text-15">absences : <a class=" text-15 mr-1" href="">{{child.nbAbsences}}</a></div>
-                  <div class="text-muted text-15">retards : <a class=" text-15 mr-1" href="">{{child.nbLateArrivals}}</a></div>
-                </div>
-              </div>
-            </div>  
+            </div>
+            <div class="col-md-5">
+              <div class="text-15"><b>informations</b></div>
+              <hr class="my-1">
+              <div class="text-15">rendez-vous le 19/11/20. prof de math.</div>
+              <div class="text-15">réunion le 22/11/20 des parents délégués</div>
+              <div class="text-15">vacances de noel le 18/12/20</div>
+            </div>
           </div>
-          <!-- <div class="col-md-12 text-small text-danger p-0">détails : pointez/clicker sur les infos</div> -->
-          <!-- <div><hr class="mt-2 mb-2" style="background-color: #f89f20;"></div>
-          <div class="col-md-12 text-center mt-2">
-            <a (click)="goToChildPage(child)" class="text-17 text-primary">sélectionner {{child.firstName}}</a>
-          </div> -->
+        </div>
       </mdb-card-body>
       </mdb-card>
     </a>

@@ -3,7 +3,7 @@
     <app-navGPanel *ngIf="loggedIn() && accountValidated()"></app-navGPanel>
     <app-navNotLogged *ngIf="!loggedIn() || !accountValidated()"></app-navNotLogged>
   </div>
-  <div class="main-content-wrap">
+  <div class="main-content">
     <div class="">
       <router-outlet></router-outlet>
     </div>

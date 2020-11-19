@@ -367,4 +367,8 @@ constructor(private http: HttpClient) {}
   editUserToValidate(userData) {
     return this.http.post(this.baseUrl + 'EditUserToValidate', userData);
   }
+
+  resendConfirmEmail(usersData) {
+    return this.http.post(this.baseUrl + 'ResendConfirmEmail', usersData);
+  }
 }

@@ -540,8 +540,9 @@ namespace EducNotes.API.Controllers
             });
           }
         }
-        catch (System.Exception)
+        catch (Exception ex)
         {
+          var err = ex.Message;
           identityContextTransaction.Rollback();
           return BadRequest("erreur lors de l'ajout de l'inscription.");
         }

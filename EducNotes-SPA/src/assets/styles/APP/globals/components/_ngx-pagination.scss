@@ -82,14 +82,14 @@
 }
 
 .ngx-pagination .pagination-previous a::before, 
-.ngx-pagination .pagination-previous.disabled::before {
-    content: "\f077" !important;
-}
+// .ngx-pagination .pagination-previous.disabled::before {
+//     content: "\f077" !important;
+// }
 
 .ngx-pagination .pagination-next a::after, 
-.ngx-pagination .pagination-next.disabled::after {
-    content: "\f07d" !important;
-}
+// .ngx-pagination .pagination-next.disabled::after {
+//     content: "\f07d" !important;
+// }
 
 [dir="rtl"] {
     .pagination-next, .pagination-previous {

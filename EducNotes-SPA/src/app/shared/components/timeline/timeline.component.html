@@ -1,22 +1,18 @@
-<div class="row">
-  <div class="col-md-12">
-    <div class="card">
-      <div class="card-body p-2">
-        <div class="card-title m-0">mon agenda</div>
-        <hr class="my-1">
-        <ul class="timeline">
-          <li class="ml-4" *ngFor="let event of events">
-            <div>
-              <div><a class="text-16" href="#">{{event.title}}</a></div>
-              <div class="text-14 font-weight-400">{{event.strEventDate}}</div>
-              <div *ngIf="isParentConnected">
-                <div class="text-15">{{event.childLastName}} {{event.childFirstName}}</div>
-              </div>
-            </div>
-            <p>{{event.desc}}</p>
-          </li>
-        </ul>
-      </div>
-    </div>
+<div class="card">
+  <div class="card-body p-2">
+    <div class="card-title m-0">mon agenda</div>
+    <hr class="my-1">
+    <ul class="timeline">
+      <li class="ml-4" *ngFor="let event of events">
+        <div>
+          <div><a class="text-16" href="#">{{event.title}}</a></div>
+          <div class="text-14 font-weight-400">{{event.strEventDate}}</div>
+          <div *ngIf="isParentConnected">
+            <div class="text-15">{{event.childLastName}} {{event.childFirstName}}</div>
+          </div>
+        </div>
+        <p>{{event.desc}}</p>
+      </li>
+    </ul>
   </div>
 </div>

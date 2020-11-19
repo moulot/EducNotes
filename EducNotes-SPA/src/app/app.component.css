@@ -1,4 +1,15 @@
 @import url('https://fonts.googleapis.com/css?family=Amatic+SC&display=swap');
+.main-content {
+  width: 100%;
+  float: right;
+  margin-top: 80px;
+  transition: all .24s ease-in-out;
+  padding: 1rem  1rem 0;
+  position: relative;
+  /* min-height: calc(100vh - #{$topbar-height}); */
+  background: #ffffff;
+}
+
 .card:hover img {
     transform: scale(1.2,1.2);
     transition-duration: 500ms;

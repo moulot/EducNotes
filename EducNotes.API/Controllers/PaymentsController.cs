@@ -132,7 +132,7 @@ namespace EducNotes.API.Controllers
                                         .Where(d => d.OrderLineId == line.Id)
                                         .OrderBy(o => o.DueDate)
                                         .ToListAsync();
-                // var lineDueAmount = deadlines.Sum(s => s.Amount + s.ProductFee);
+
                 var allPaid = await _context.FinOpOrderLines
                                     .Where(f => f.FinOp.Cashed && f.FinOp.FinOpTypeId == finOpTypePayment && f.OrderLineId == line.Id)
                                     .SumAsync(s => s.Amount);

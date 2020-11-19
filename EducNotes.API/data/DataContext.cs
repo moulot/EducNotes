@@ -127,7 +127,7 @@ namespace EducNotes.API.Data
       if(fullAddress != null)
       {
         subdomain = fullAddress[0].ToLower();
-        if(subdomain == "localhost:5000" || subdomain == "www" || subdomain == "educnotes" || subdomain == "demo")
+        if(subdomain == "localhost:5000" || subdomain == "www" || subdomain == "educnotes")
           subdomain = "EducNotes";
       }
       string tenantConnString = string.Format(_config.GetConnectionString("DefaultConnection"), $"{subdomain}");

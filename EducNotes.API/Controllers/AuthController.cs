@@ -44,7 +44,6 @@ namespace EducNotes.API.Controllers
       UserManager<User> userManager, SignInManager<User> signInManager, DataContext context,
       IOptions<CloudinarySettings> cloudinaryConfig)
     {
-      // _context1 = context1;
       _context = context;
       _repo = repo;
       _config = config;
@@ -73,30 +72,6 @@ namespace EducNotes.API.Controllers
 
       _cloudinary = new Cloudinary(acc);
     }
-
-    // [HttpPost("setClientDB")]
-    // public async Task<IActionResult> SetClientDB()
-    // {
-    //   //get domain from httpcontext
-      // var url = Convert.ToString(this.HttpContext.Request.Host);
-    //   //get sub domain from url
-    //   var subDomain = Extensions.GetSubDomain(url);
-    //   if(string.IsNullOrEmpty(subDomain))
-    //     subDomain = url.ToLower();
-    //   // get connection string from database according to sub domain
-    //   var client = await _context1.Client
-    //                         .FirstOrDefaultAsync(x => x.SubDomain.ToLower() == subDomain);
-    //   ConnStrings.ClientConnString = client.ConnectionString;
-    //   // check connection string if it's not null then create the new context and get role.
-    //   if (!string.IsNullOrEmpty(ConnStrings.ClientConnString))
-    //   {
-    //     // DataContext _context = new DataContext(ConnStrings.ClientConnString);
-    //     DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
-        
-    //   }
-
-    //   return Ok(client);
-    // }
 
     [HttpPost("{id}/setPassword/{password}")] // edition du mot de passe apres validation du code
     public async Task<IActionResult> setPassword(int id, string password)
@@ -172,15 +147,15 @@ namespace EducNotes.API.Controllers
     public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
     {
       // verification de l'existence du userName
-      if (await _repo.UserNameExist(userForLoginDto.Username.ToLower(), 0))
+      if(await _repo.UserNameExist(userForLoginDto.Username.ToLower(), 0))
       {
         var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
-        if (!user.Validated)
+        if(!user.AccountDataValidated)
           return BadRequest("Compte non validé pour l'instant...");
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
-        if (result.Succeeded)
+        if(result.Succeeded)
         {
           var appUser = await _userManager.Users.Include(p => p.Photos)
             .FirstOrDefaultAsync(u => u.NormalizedUserName == userForLoginDto.Username.ToUpper());
@@ -203,9 +178,10 @@ namespace EducNotes.API.Controllers
           });
         }
 
-        return BadRequest("login ou mot de passe incorrecte...");
+        return BadRequest("login ou mot de passe incorrect...");
       }
-      return BadRequest("login ou mot de passe incorrecte...");
+
+      return BadRequest("login ou mot de passe incorrect...");
     }
 
     private async Task<string> GenerateJwtToken(User user)
@@ -315,44 +291,6 @@ namespace EducNotes.API.Controllers
 
     }
 
-    // [HttpGet("emailValidation/{code}")]
-    // public async Task<IActionResult> emailValidation(string code)
-    // {
-
-    //     // int id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-    //     var user = await _repo.GetUserByCode(code);
-
-    //     if (user != null)
-    //     {
-    //         if (user.EmailConfirmed == true)
-    //             return BadRequest("cet compte a déja été confirmé...");
-    //         int maxChild = 0;
-    //         if (user.UserTypeId == _config.GetValue<int>("AppSettings:parentTypeId") && user.ValidationCode == user.ValidationCode)
-    //         {
-    //             maxChild = await _repo.GetAssignedChildrenCount(user.Id);
-
-    //             return Ok(new
-    //             {
-    //                 user = _mapper.Map<UserForDetailedDto>(user),
-    //                 maxChild = maxChild
-    //             });
-    //         }
-
-    //         else if (user.UserTypeId == _config.GetValue<int>("AppSettings:TeacherTypeId") && user.UserName == user.ValidationCode)
-    //         {
-    //           return Ok(new
-    //           {
-    //               user = _mapper.Map<UserForDetailedDto>(user)
-    //           });
-    //         }
-    //         else
-    //           return BadRequest("ce lien n'existe pas");
-    //     }
-
-    //     return BadRequest("ce lien ,'existe pas");
-
-    // }
-
     [HttpGet("ResetPassword/{code}")]
     public async Task<IActionResult> ResetPassword(string code)
     {
@@ -392,18 +330,6 @@ namespace EducNotes.API.Controllers
       }
       return BadRequest("Compte introuvable");
     }
-
-    // [HttpGet("GetEmails")] 
-    // public async Task<IActionResult> GetEmails()
-    // {
-    //     return Ok(await _repo.GetEmails());
-    // }
-
-    // [HttpGet("GetUserNames")] 
-    // public async Task<IActionResult> GetUserNames()
-    // {
-    //     return Ok(await _repo.GetUserNames());
-    // }
 
     [HttpGet("GetAllCities")]
     public async Task<IActionResult> GetAllCities()
@@ -543,7 +469,7 @@ namespace EducNotes.API.Controllers
         {
           var template = await _context.EmailTemplates.FirstAsync(t => t.Id == updateAccountEmailId);
           var email = await _repo.SetEmailForAccountUpdated(template.Subject, template.Body,
-            user.LastName, user.Gender, user.Email);
+            user.LastName, user.Gender, user.Email, user.Id);
           _context.Add(email);
 
           var userToReturn = _mapper.Map<UserForListDto>(user);
@@ -556,6 +482,7 @@ namespace EducNotes.API.Controllers
             });
           }
         }
+
         return BadRequest("problème pour mettre à jour les données");
       }
 

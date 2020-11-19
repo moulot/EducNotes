@@ -36,7 +36,7 @@ namespace EducNotes.API.Controllers
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private Cloudinary _cloudinary;
         private readonly UserManager<User> _userManager;
-        int tuitionId, nextYearTuitionId;
+        int tuitionId, nextYearTuitionId, newRegToBePaidEmailId;
         int absenceTypeId, lateTypeId, educLevelPrimary, educLevelSecondary;
 
 
@@ -59,6 +59,7 @@ namespace EducNotes.API.Controllers
             adminRoleName = _config.GetValue<String>("AppSettings:adminRoleName");
             professorRoleName = _config.GetValue<String>("AppSettings:professorRoleName");
             tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
+            newRegToBePaidEmailId = _config.GetValue<int>("AppSettings:newRegToBePaidEmailId");
             nextYearTuitionId = _config.GetValue<int>("AppSettings:nextYearTuitionId");
             absenceTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
             lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
@@ -2201,6 +2202,8 @@ namespace EducNotes.API.Controllers
         {
           var usersFromDB = await _context.Users
                                     .Include(i => i.UserType)
+                                    .Include(i => i.Class)
+                                    .Include(i => i.ClassLevel)
                                     .Where(u => u.AccountDataValidated == false)
                                     .ToListAsync();
           var activeTuitions = await _context.Orders
@@ -2226,9 +2229,42 @@ namespace EducNotes.API.Controllers
               userToValidate.Id = user.Id;
               userToValidate.LastName = user.LastName;
               userToValidate.FirstName = user.FirstName;
+              userToValidate.ClassName = user.Class != null ? user.Class.Name : "";
+              userToValidate.ClassLevelName = user.ClassLevel != null ? user.ClassLevel.Name : "";
               userToValidate.UserType = user.UserType.Name;
               userToValidate.Email = user.Email;
               userToValidate.Cell = user.PhoneNumber;
+              if(user.UserTypeId == studentTypeId)
+              {
+                var parents = await _repo.GetParents(user.Id);
+                var mother = parents.FirstOrDefault(m => m.Gender == 0);
+                if(mother != null)
+                {
+                  userToValidate.MotherId = mother.Id;
+                  userToValidate.MotherLastName = mother.LastName;
+                  userToValidate.MotherFirstName = mother.FirstName;
+                  userToValidate.MotherEmail = mother.Email;
+                  userToValidate.MotherCell = mother.PhoneNumber.FormatPhoneNumber();
+                }
+                var father = parents.FirstOrDefault(m => m.Gender == 1);
+                if(father != null)
+                {
+                  userToValidate.FatherId = father.Id;
+                  userToValidate.FatherLastName = father.LastName;
+                  userToValidate.FatherFirstName = father.FirstName;
+                  userToValidate.FatherEmail = father.Email;
+                  userToValidate.FatherCell = father.PhoneNumber.FormatPhoneNumber();
+                }
+              }
+
+              if(user.UserTypeId == parentTypeId)
+              {
+                var childrenFromDB = await _repo.GetChildren(user.Id);
+                var children = _mapper.Map<List<ChildParentDto>>(childrenFromDB);
+                userToValidate.Children = new List<ChildParentDto>();
+                userToValidate.Children = children;
+              }
+              
               Order userTuition = new Order();
               if(type.Id == parentTypeId)
               {
@@ -2266,6 +2302,80 @@ namespace EducNotes.API.Controllers
             return Ok();
           else
             return BadRequest("problème pour mettre à jour les données");
+        }
+
+        [HttpPost("ResendConfirmEmail")]
+        public async Task<IActionResult> ResendConfirmEmail(List<SendConfirmEmailDto> usersData)
+        {
+          List<RegistrationEmailDto> emails = new List<RegistrationEmailDto>();
+
+          var settings = await _context.Settings.ToListAsync();
+          var schoolName = settings.First(s => s.Name == "SchoolName").Value;
+          string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
+
+          foreach (var data in usersData)
+          {
+            var userType = data.UserTypeId;
+            if(userType == parentTypeId)
+            {
+              foreach (var userid in data.UserIds)
+              {
+                var order = await _context.Orders.FirstAsync(o => o.isReg && (o.MotherId == userid || o.FatherId == userid));
+                var reg = await _repo.GetOrder(order.Id);
+                var user = reg.Mother != null ? reg.Mother : reg.Father;
+
+                var firstDeadline = (await _context.ProductDeadLines
+                                                .OrderBy(o => o.DueDate)
+                                                .FirstAsync(p => p.ProductId == tuitionId));
+                var firstDeadlineDate = firstDeadline.DueDate;
+                decimal DPPct = firstDeadline.Percentage;
+                
+                decimal orderDueAmount = 0;
+                List<ChildRegistrationDto> children = new List<ChildRegistrationDto>();
+                foreach (var line in reg.Lines)
+                {
+                  ChildRegistrationDto crd = new ChildRegistrationDto();
+                  crd.LastName = line.Child.LastName;
+                  crd.FirstName = line.Child.FirstName;
+                  crd.NextClass = line.ClassLevel.Name;
+                  crd.RegistrationFee = line.ProductFee.ToString("N0");
+                  crd.TuitionAmount = line.UnitPrice.ToString("N0");
+                  crd.DueAmountPct = (DPPct * 100).ToString("N0") + "%";
+                  var downPayment = DPPct * line.UnitPrice;
+                  crd.DueAmount = downPayment.ToString("N0");
+                  orderDueAmount += downPayment + line.ProductFee;
+                  crd.TotalDueForChild = (line.ProductFee + downPayment).ToString("N0");
+                  children.Add(crd);
+                }
+
+                RegistrationEmailDto email = new RegistrationEmailDto();
+                email.ParentId = userid;
+                email.ParentLastName = user.LastName;
+                email.ParentFirstName = user.FirstName;
+                email.ParentEmail = user.Email;
+                email.ParentCellPhone = user.PhoneNumber;
+                email.ParentGender = user.Gender;
+                email.EmailSubject = schoolName + " - inscription pour l'année scolaire prochaine";
+                email.OrderId = order.Id;
+                email.OrderNum = order.OrderNum;
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                email.Token = token;
+                email.DueDate = firstDeadlineDate.ToString("dd/MM/yyyy", frC);
+                email.TotalAmount = orderDueAmount.ToString("N0");
+                email.Children = children;
+                emails.Add(email);
+              }
+
+              var template = await _context.EmailTemplates.FirstAsync(t => t.Id == newRegToBePaidEmailId);
+              var RegEmails = await _repo.SetEmailDataForRegistration(emails, template.Body, RegDeadLine);
+              _context.AddRange(RegEmails);
+            }
+          }
+
+          if(!await _repo.SaveAll())
+            return BadRequest("problème pour envoyer les emails de confirmaiton");
+
+          return Ok();
         }
 
     }

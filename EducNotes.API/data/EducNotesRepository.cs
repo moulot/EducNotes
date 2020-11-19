@@ -1283,6 +1283,7 @@ namespace EducNotes.API.Data
                                     " </b> a bien été enregistré(s) dans la classe de <b>" + student.Class.Name;
                     email.FromAddress = "no-reply@educnotes.com";
                     email.EmailTypeId = _config.GetValue<int>("AppSettings:confirmedEmailtypeId");
+                    email.ToUserId = parent.Id;
                     Add(email);
                 }
 
@@ -2057,6 +2058,7 @@ namespace EducNotes.API.Data
           newEmail.InsertDate = DateTime.Now;
           newEmail.UpdateUserId = 1;
           newEmail.UpdateDate = DateTime.Now;
+          newEmail.ToUserId = emailData.Id;
 
           return newEmail;
         }
@@ -2081,6 +2083,7 @@ namespace EducNotes.API.Data
             newEmail.InsertDate = DateTime.Now;
             newEmail.UpdateUserId = 1;
             newEmail.UpdateDate = DateTime.Now;
+            newEmail.ToUserId = data.ParentId;
             RegEmails.Add(newEmail);
           }
 
@@ -2214,7 +2217,7 @@ namespace EducNotes.API.Data
         }
 
         public async Task<Email> SetEmailForAccountUpdated(string subject, string content, string lastName,
-          byte gender, string parentEmail)
+          byte gender, string parentEmail, int userId)
         {
           var schoolName = _context.Settings.First(s => s.Name == "SchoolName").Value;
           var tokens = await GetTokens();
@@ -2230,6 +2233,7 @@ namespace EducNotes.API.Data
           newEmail.InsertDate = DateTime.Now;
           newEmail.UpdateUserId = 1;
           newEmail.UpdateDate = DateTime.Now;
+          newEmail.ToUserId = userId;
 
           return newEmail;
         }
@@ -2887,7 +2891,10 @@ namespace EducNotes.API.Data
                               .FirstOrDefaultAsync(o => o.Id == id);
           if(order != null)
           {
-            order.Lines = await _context.OrderLines.Where(o => o.OrderId == order.Id).ToListAsync();
+            order.Lines = await _context.OrderLines
+                                .Include(i => i.Child)
+                                .Include(i => i.ClassLevel)
+                                .Where(o => o.OrderId == order.Id).ToListAsync();
             foreach (var line in order.Lines)
             {
               line.Deadlines = await _context.OrderLineDeadlines.Where(d => d.OrderLineId == line.Id).ToListAsync();

@@ -42,6 +42,7 @@ export class ConfirmEmailComponent implements OnInit {
     this.createUserForm();
 
     const id: string = this.route.snapshot.queryParamMap.get('id');
+    this.parentid = Number(id);
     const orderid: string = this.route.snapshot.queryParamMap.get('orderid');
     const token: string = this.route.snapshot.queryParamMap.get('token');
     if (id !== null && token !== null) {
@@ -109,7 +110,7 @@ export class ConfirmEmailComponent implements OnInit {
       this.emailOK = data.emailOK;
       this.user = data.user;
       this.children = data.children;
-      this.parentOk = this.user.validated;
+      this.parentOk = this.user.accountDataValidated;
       this.validAccount = data.accountValidated;
       this.childrenOk = data.childrenValidated;
       this.initialValues();

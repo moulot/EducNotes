@@ -643,6 +643,20 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.strDueDate, opt => {
                   opt.MapFrom(src => src.DueDate.ToString("dd/MM/yyyy", frC));
                 });
+            CreateMap<User, ParentUserDto>()
+                .ForMember(dest => dest.Cell, opt => {
+                  opt.MapFrom(src => src.PhoneNumber);
+                });
+            CreateMap<User, ChildParentDto>()
+                .ForMember(dest => dest.ClassName, opt => {
+                  opt.MapFrom(src => src.Class.Name);
+                })
+                .ForMember(dest => dest.ClassLevelName, opt => {
+                  opt.MapFrom(src => src.ClassLevel.Name);
+                })
+                .ForMember(dest => dest.Cell, opt => {
+                  opt.MapFrom(src => src.PhoneNumber);
+                });
         }
     }
 }

@@ -99,10 +99,10 @@ namespace EducNotes.API.Controllers
 
     [AllowAnonymous]
     [HttpPost("ConfirmEmail")]
-    public async Task<IActionResult> ConfirmEmail(ConfirmEmailPhoneDto confirmEmailPhoneDto)
+    public async Task<IActionResult> ConfirmEmail(ConfirmEmailPhoneDto userData)
     {
-      string userId = confirmEmailPhoneDto.UserId;
-      string token = confirmEmailPhoneDto.Token;
+      string userId = userData.UserId;
+      string token = userData.Token;
       Boolean success = false;
       Boolean validated = false;
 
