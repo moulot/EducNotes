@@ -1,0 +1,190 @@
+<div class="mb-2" *ngIf="showUsersList && !showChildrenList">
+  <app-users-header [student]="student" (getUser)="getUser($event)"></app-users-header>
+</div>
+
+<div class="row">
+  <!-- <div class="col-md-12 text-16 mb-1">
+    <span  *ngIf="parent.gender == 0">bienvenue madame</span>
+    <span  *ngIf="parent.gender == 1">bienvenue monsieur</span>
+    {{parent.lastName | titlecase}},
+  </div> -->
+  <div class="col-md-12" *ngIf="showChildrenList">
+    <p class="text-13 text-danger mb-1">clicker sur la carte de l'enfant pour accéder à ses informations</p>
+    <app-children-list [url]="url" [children]="children" (getUser)="getUser($event)"></app-children-list>
+  </div>
+
+  <div class="col-md-9 mb-2" *ngIf="!showChildrenList">
+    <div class="row">
+      <div class="col-md-3 mb-2">
+        <div class="card">
+          <div class="card-body p-2">
+            <div class="text-15 text-center">cours du jour</div>
+            <hr class="my-1" style="background-color: #f89f20;">
+            <div class="d-flex">
+              <div class="mr-1" style="width: 25px">
+                <div style="border-top: 1px solid #cccccc"></div>
+                <div class="hour-div" *ngFor="let i of hourCols; let i = index">{{i + 7}}h</div>
+              </div>
+              <div class="card-body dayCol" style="height: 360px;">
+                <app-day-schedule [items]="scheduleDay" [dayName]="'jourSem'"></app-day-schedule>
+              </div>    
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card mb-2">
+              <div class="card-body p-2">
+                <div class="row mb-2">
+                  <div class="col-md-6 text-15">devoirs à faire</div>
+                  <div class="col-md-6">
+                    <button type="button" mdbBtn size="sm" block="true" class="btnWhiteO" mdbWavesEffect>détails</button>
+                  </div>
+                </div>
+                <div *ngIf="agendaItems?.length == 0">
+                  <div class="card py-3 px-2">
+                    <h6 class="text-muted">pas de devoirs à faire cette semaine...</h6>
+                  </div>
+                </div>
+                <div *ngIf="agendaItems?.length != 0">
+                  <div *ngFor="let items of agendaItems">
+                    <div class="p-2 border rounded mb-1">
+                      <div class="text-15 mb-1">{{items.dueDate}}</div>
+                      <div *ngFor="let course of items.courses">
+                        <div class="card mb-1">
+                          <div class="card-up" [ngStyle]="{'background-color': course.courseColor}" style="height: 10px;
+                            border-top-left-radius: 10px;border-top-right-radius: 10px">
+                          </div>            
+                          <div class="card-body p-2">
+                            <div class="row">
+                              <div class="col-md-12 text-15"><b>{{course.courseName}}</b></div>
+                              <div class="col-md-12 text-14 text-muted">donné le {{course.shortDateAdded}}</div>
+                              <div class="col-md-12 text-14 pt-1">{{course.taskDesc}}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="card">
+          <div class="card-body p-2">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="row mb-2">
+                  <div class="col-md-6 mb-1">
+                    <div class="d-flex border rounded-lg align-items-center">
+                      <div class="text-center ml-3">
+                        <i class="fad fa-user-chart fa-3x mr-2" style="--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                          --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
+                      </div>
+                      <div class="flex-grow-1 text-center">
+                        <p class="text-muted mt-2 mb-0">moyenne</p>
+                        <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-danger text-20 line-height-1 mb-2">{{studentAvg}}</p>
+                        <p *ngIf="studentAvg >= 10 && studentAvg > -1000" class="text-success text-20 line-height-1 mb-2">{{studentAvg}}</p>
+                        <p *ngIf="studentAvg === -1000" class="text-primary text-20 line-height-1 m-0">N/A</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-1">
+                    <div class="d-flex border rounded-lg align-items-center">
+                      <div class="text-center ml-3">
+                        <i class="fad fa-grin fa-3x" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
+                          --fa-secondary-color:#f89f20;"></i>
+                      </div>
+                      <div class="flex-grow-1 text-center">
+                        <p class="text-muted mt-2 mb-0">compliments</p>
+                        <p class="text-primary text-20 line-height-1 mb-2">3</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-1">
+                    <div class="d-flex border rounded-lg align-items-center">
+                      <div class="text-center ml-3">
+                        <i class="fad fa-times-circle fa-3x" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
+                          --fa-secondary-color:#f89f20;"></i>
+                      </div>
+                      <div class="flex-grow-1 text-center">
+                        <p class="text-muted mt-2 mb-0">absences</p>
+                        <p class="text-primary text-20 line-height-1 mb-2">4</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="d-flex border rounded-lg align-items-center">
+                      <div class="text-center ml-3">
+                        <i class="fad fa-frown-open fa-3x" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
+                          --fa-secondary-color:#f89f20;"></i>
+                      </div>
+                      <div class="flex-grow-1 text-center">
+                        <p class="text-muted mt-2 mb-0">sanctions</p>
+                        <p class="text-primary text-20 line-height-1 mb-2">0</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="border rounded-lg p-2">
+                  <div class="row mb-2">
+                    <div class="col-md-7 text-15">notes</div>
+                    <div class="col-md-5">
+                      <button type="button" mdbBtn size="sm" block="true" [routerLink]="['/studentGrades', student?.id]"
+                        class="btnWhiteO" mdbWavesEffect>détails</button>
+                    </div>
+                  </div>
+                  <div class="row mx-1">
+                    <div *ngFor="let course of userCourses" class="col-md-4 border rounded-lg p-1 mb-2 text-center">
+                      <p class="text-muted text-15 my-1">{{course.courseAbbrev}}</p>
+                      <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000"
+                        class="text-primary text-danger text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                      <p *ngIf="course.userCourseAvg >= 10"
+                        class="text-primary text-success text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
+                      <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="border rounded-lg p-2">
+                  <div class="row mb-2">
+                    <div class="col-md-7 text-15">évaluations à venir</div>
+                    <div class="col-md-5">
+                      <button type="button" mdbBtn size="sm" block="true" class="btnWhiteO" mdbWavesEffect>détails</button>
+                    </div>
+                  </div>
+                  <div *ngFor="let eval of evalsToCome">
+                    <div class="card mb-2">
+                      <div class="card-up" [ngStyle]="{'background-color': eval.courseColor}" style="height: 10px;
+                        border-top-left-radius: 10px;border-top-right-radius: 10px">
+                      </div>            
+                      <div class="card-body p-2">
+                        <div class="row">
+                          <div class="col-md-7 text-15"><b>{{eval.courseName}}</b></div>
+                          <div class="col-md-5 text-small text-muted">prévue le {{eval.evalDate}}</div>
+                          <div class="col-md-12 text-14 pt-1">{{eval.evalTypeName}}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3" *ngIf="!showChildrenList">
+    <app-timeline [events]="events" [isParentConnected]="isParentConnected"></app-timeline>
+  </div>
+</div>

@@ -143,8 +143,8 @@ export class AuthService {
 
   }
 
-  setUserLoginPassword(id: number, userData: any) {
-    return this.http.post(this.baseUrl + id + '/setLoginPassword', userData)
+  setUserAccountData(id: number, userData: any) {
+    return this.http.post(this.baseUrl + id + '/setUserAccountData', userData)
       .pipe(
         map((response: any) => {
           const user = response;

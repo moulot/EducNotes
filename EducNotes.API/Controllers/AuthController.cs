@@ -151,7 +151,7 @@ namespace EducNotes.API.Controllers
       {
         var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
         if(!user.AccountDataValidated)
-          return BadRequest("Compte non validé pour l'instant...");
+          return BadRequest("l'utilisateur n'a pas confirmer son email/mobile.");
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
@@ -450,8 +450,8 @@ namespace EducNotes.API.Controllers
       return Ok(await _repo.UserNameExist(userName, currentUserId));
     }
 
-    [HttpPost("{id}/setLoginPassword")]
-    public async Task<IActionResult> setLoginPassword(int id, UserDataToUpdateDto userData)
+    [HttpPost("{id}/setUserAccountData")]
+    public async Task<IActionResult> setUserAccountData(int id, UserDataToUpdateDto userData)
     {
       var user = await _repo.GetUser(id, false);
       if (user != null)
@@ -461,7 +461,7 @@ namespace EducNotes.API.Controllers
         user.NormalizedUserName = userData.UserName.ToUpper();
         user.PasswordHash = newPassword;
         user.AccountDataValidated = true;
-        if (user.UserTypeId == teacherTypeId)
+        if (user.UserTypeId != studentTypeId)
           user.Validated = true;
         user.ValidationDate = DateTime.Now;
         var res = await _userManager.UpdateAsync(user);

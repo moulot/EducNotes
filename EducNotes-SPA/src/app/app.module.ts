@@ -94,10 +94,10 @@ import { FilterTableComponent } from './views/data-tables/filter-table/filter-ta
 import { AgendaModalComponent } from './agenda/agenda-modal/agenda-modal.component';
 import { ClassStudentsComponent } from './classes/class-students/class-students.component';
 import { ClassAgendaComponent } from './classes/class-agenda/class-agenda.component';
-import { StudentDashboardComponent } from './views/dashboard/student-dashboard/student-dashboard.component';
-import { TeacherDashboardComponent } from './views/dashboard/teacher-dashboard/teacher-dashboard.component';
+import { StudentDashboardComponent } from './dashboard/student-dashboard/student-dashboard.component';
+import { TeacherDashboardComponent } from './dashboard/teacher-dashboard/teacher-dashboard.component';
 import { UserHomeResolver } from './_resolvers/user-home-resolver';
-import { AdminDashboardComponent } from './views/dashboard/admin-dashboard/admin-dashboard.component';
+import { AdminDashboardComponent } from './dashboard/admin-dashboard/admin-dashboard.component';
 import { InscriptionComponent } from './views/forms/inscription/inscription.component';
 import { WizardComponent } from './views/forms/wizard/wizard.component';
 import { FormWizardModule } from './shared/components/form-wizard/form-wizard.module';
@@ -226,7 +226,7 @@ import { ClassCardComponent } from './admin/class-managemet/class-card/class-car
 import { BtnBackDirective } from './_directives/btnBack.directive';
 import { ClassStudentsAssignmentComponent } from './classes/class-students-assignment/class-students-assignment.component';
 import { CourseCardComponent } from './admin/class-managemet/course-card/course-card.component';
-import { DayScheduleComponent } from './views/dashboard/day-schedule/day-schedule.component';
+import { DayScheduleComponent } from './dashboard/day-schedule/day-schedule.component';
 import { TuitionPanelComponent } from './admin/tuition/tuition-panel/tuition-panel.component';
 import { CheckoutComponent } from './tuition/checkout/checkout.component';
 import { CheckoutResolver } from './_resolvers/checkout-resolver';
@@ -271,6 +271,7 @@ import { ParentFileTuitionComponent } from './admin/userFiles/parent-file-tuitio
 import { ChildFileClassLifeComponent } from './admin/userFiles/child-file-class-life/child-file-class-life.component';
 import { UserValidationComponent } from './admin/user-validation/user-validation.component';
 import { UserValidationResolver } from './_resolvers/user-validation-resolver';
+import { ParentDashboardComponent } from './dashboard/parent-dashboard/parent-dashboard.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -455,7 +456,8 @@ export function tokenGetter() {
       TeacherFileComponent,
       ParentFileTuitionComponent,
       ChildFileClassLifeComponent,
-      UserValidationComponent
+      UserValidationComponent,
+      ParentDashboardComponent
    ],
    imports: [
       FormWizardModule,

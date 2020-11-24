@@ -381,6 +381,7 @@ namespace EducNotes.API.Data
                 Email = "adminUser@educnotes.com",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
+                AccountDataValidated = true,
                 Validated = true,
                 UserTypeId = 4
               };

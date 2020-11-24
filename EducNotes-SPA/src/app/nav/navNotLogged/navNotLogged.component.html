@@ -19,6 +19,14 @@
           <i class="fad fa-sign-out-alt" style="font-size:25px;--fa-primary-color: #f89f20; --fa-secondary-color: #192C47; --fa-secondary-opacity: 1"></i>
         </a>
       </li>
+      <li class="nav-item waves-light" mdbWavesEffect>
+        <div class="nav-link text-15 text-capitalize">{{acc_name}}</div>
+      </li>
+      <li class="nav-item  waves-light" mdbWavesEffect>
+        <div class="">
+          <img [src]="photoUrl || '../../../assets/user.png'" alt="" style="width: 35px;" class="rounded-circle z-depth-0">
+        </div>
+      </li>
     </ul>
 </links>
 </mdb-navbar>

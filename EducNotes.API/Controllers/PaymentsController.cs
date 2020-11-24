@@ -114,14 +114,14 @@ namespace EducNotes.API.Controllers
           {
             foreach (var payment in finOpDataDto.Payments)
             {
-              FinOpOrderLine fool = new FinOpOrderLine();
-              fool.FinOpId = finOp.Id;
-              fool.OrderLineId = payment.OrderLineId;
+              FinOpOrderLine finOpLine = new FinOpOrderLine();
+              finOpLine.FinOpId = finOp.Id;
+              finOpLine.OrderLineId = payment.OrderLineId;
               var invoice = await _context.Invoices.FirstOrDefaultAsync(i => i.OrderLineId == payment.OrderLineId);
               if(invoice != null)
-                fool.InvoiceId = invoice.Id;
-              fool.Amount = payment.Amount;
-              _repo.Add(fool);
+                finOpLine.InvoiceId = invoice.Id;
+              finOpLine.Amount = payment.Amount;
+              _repo.Add(finOpLine);
               _context.SaveChanges();
 
               var orderPaid = true;

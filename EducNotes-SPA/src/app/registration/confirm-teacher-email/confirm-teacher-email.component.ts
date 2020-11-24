@@ -159,7 +159,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   }
 
   updateUser(): void {
-    this.authService.setUserLoginPassword(this.user.id, this.userForm.value).subscribe(() => {
+    this.authService.setUserAccountData(this.user.id, this.userForm.value).subscribe(() => {
       this.teacherOk = true;
       this.validAccount = this.user.validated;
     }, error => {

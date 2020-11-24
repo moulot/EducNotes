@@ -1,7 +1,18 @@
 .child-img {
-  float: left;
-  // margin: 0 8px 0 -12px;
-  height: 45px;
-  width: 45px;
+  // float: left;
+  height: 30px;
+  width: 30px;
   border-radius: 50%;
+}
+
+.unselected {
+  color: #192C47;
+  background-color: #ffffff;
+  // size: 15px;
+}
+
+.selected {
+  color: #f89f20;
+  background-color: #192C47;
+  // size: 15px;
 }

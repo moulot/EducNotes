@@ -3,8 +3,13 @@
 </div>
 
 <div class="row">
+  <div class="col-md-12 text-16 mb-1">
+    <span  *ngIf="parent.gender == 0">bienvenue madame</span>
+    <span  *ngIf="parent.gender == 1">bienvenue monsieur</span>
+    {{parent.lastName | titlecase}},
+  </div>
   <div class="col-md-12" *ngIf="showChildrenList">
-    <p class="text-17 mb-3">clicker sur la carte de l'enfant pour accéder à ses informations</p>
+    <p class="text-13 text-danger mb-1">clicker sur la carte de l'enfant pour accéder à ses informations</p>
     <app-children-list [url]="url" [children]="children" (getUser)="getUser($event)"></app-children-list>
   </div>
 

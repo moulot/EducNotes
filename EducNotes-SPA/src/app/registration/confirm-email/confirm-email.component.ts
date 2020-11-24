@@ -178,7 +178,7 @@ export class ConfirmEmailComponent implements OnInit {
 
   updateUser(): void {
     this.wait = true;
-    this.authService.setUserLoginPassword(this.user.id, this.userForm.value).subscribe(() => {
+    this.authService.setUserAccountData(this.user.id, this.userForm.value).subscribe(() => {
       this.parentOk = true;
       this.childrenOk = true;
       this.validAccount = this.user.accountDataValidated;

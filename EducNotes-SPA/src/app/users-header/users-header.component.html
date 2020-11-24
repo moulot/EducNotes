@@ -1,7 +1,21 @@
 <div class="row">
-  <div class="col-md-3 d-flex">
-    <img class="child-img mr-2" src="{{selectedUser?.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
-    <mdb-select [options]="childrenOptions" [formControl]="childrenCtrl" placeholder="sélectionner l'enfant"></mdb-select>
+  <div class="col-md-3" *ngFor="let child of children">
+    <!-- <img class="child-img mr-2" src="{{selectedUser?.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
+    <mdb-select [options]="childrenOptions" [formControl]="childrenCtrl" placeholder="sélectionner l'enfant"></mdb-select> -->
+    <a (click)="selectUser(child.id)">
+      <div *ngIf="selectedUser.id == child.id" class="border selected rounded-pill p-1">
+        <div class="d-flex">
+          <img class="child-img mr-2" src="{{selectedUser?.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
+          <div class="text-17 my-auto">{{child.lastName}} {{child.firstName}}</div>
+        </div>
+      </div>
+      <div *ngIf="selectedUser.id != child.id" class="border unselected rounded-pill p-1">
+        <div class="d-flex">
+          <img class="child-img mr-2" src="{{selectedUser?.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
+          <div class="text-17 my-auto">{{child.lastName}} {{child.firstName}}</div>
+        </div>
+      </div>
+    </a>
   </div>
-  <div class="col-md-12"><hr class="my-1" style="background-color: #f89f20;"></div>
+  <!-- <div class="col-md-12"><hr class="my-1"></div> -->
 </div>

@@ -17,14 +17,14 @@
           <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="" width="60" class="rounded-circle img-responsive">
         </div>
         <div class="col-md-9 my-auto pl-0 d-none d-md-block">
-          <div><a [routerLink]="['/userFile', child.id]">voir le dossier</a></div>
+          <div><a [routerLink]="['/childFile', child.id]">voir le dossier</a></div>
           <span class="text-14 text-capitalize" style="color: #192C47;">
             {{child.lastName}} {{child.firstName}} ({{child.age}} ans).</span>
           </div>
         <div class="col-md-9 text-center d-md-none">
           <span class="text-14 text-capitalize" style="color: #192C47;">
             {{child.lastName}} {{child.firstName}}</span> ({{child.age}} ans).
-          <div><a [routerLink]="['/userFile', child.id]">voir le dossier</a></div>
+          <div><a [routerLink]="['/childFile', child.id]">voir le dossier</a></div>
         </div>
       </div>
     </div>
