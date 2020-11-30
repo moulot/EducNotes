@@ -184,6 +184,30 @@ namespace EducNotes.API.Helpers {
                   .MapFrom(u => u.Sender.Photos.FirstOrDefault(p => p.IsMain).Url))
                 .ForMember(m => m.RecipientPhotoUrl, opt => opt
                   .MapFrom(u => u.Recipient.Photos.FirstOrDefault(p => p.IsMain).Url));
+            CreateMap<Schedule, ClassDayCoursesDto>()
+                .ForMember(dest => dest.TeacherName, opt => {
+                  opt.MapFrom(src => src.Teacher.LastName + ' ' + src.Teacher.FirstName);
+                })
+                .ForMember(dest => dest.StartHourMin, opt => {
+                  opt.MapFrom(d => d.StartHourMin.ToString("HH:mm", frC));
+                })
+                .ForMember(dest => dest.EndHourMin, opt => {
+                  opt.MapFrom(d => d.EndHourMin.ToString("HH:mm", frC));
+                })
+                .ForMember(dest => dest.StartHourMinNum, opt => {
+                  opt.MapFrom(d => Convert.ToInt32(d.StartHourMin.Hour.ToString() + d.StartHourMin.Minute.ToString()));
+                })
+                .ForMember(dest => dest.EndHourMinNum, opt => {
+                  opt.MapFrom(d => Convert.ToInt32(d.EndHourMin.Hour.ToString() + d.EndHourMin.Minute.ToString()));
+                })
+                .ForMember(dest => dest.CourseName, opt => {
+                  opt.MapFrom(d => d.Course.Name);
+                })
+                .ForMember(dest => dest.CourseAbbrev, opt => {
+                  opt.MapFrom(d => d.Course.Abbreviation);
+                })
+                .ForMember(dest => dest.Color, opt => opt
+                  .MapFrom(src => src.Course.Color));
             CreateMap<Schedule, ScheduleForTimeTableDto>()
                 .ForMember(dest => dest.TeacherName, opt => {
                   opt.MapFrom(src => src.Teacher.LastName + ' ' + src.Teacher.FirstName);

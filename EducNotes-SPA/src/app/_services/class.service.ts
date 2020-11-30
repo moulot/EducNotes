@@ -98,8 +98,12 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/' + classId + '/ClassSanctions');
   }
 
-  getClassSchedule(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/Schedule');
+  getClassTimeTable(classId) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/TimeTable');
+  }
+
+  getClassScheduleByDay(classId) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/ScheduleByDay');
   }
 
   delCourseFromSchedule(scheduleId) {

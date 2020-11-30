@@ -82,7 +82,6 @@ export class TeacherDashboardComponent implements OnInit {
   getTeacherScheduleNDays(teacherId) {
     this.userService.getTeacherScheduleNDays(teacherId).subscribe(data => {
       this.schedule = data;
-      // console.log(data);
     }, error => {
       this.alertify.error(error);
     });

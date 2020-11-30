@@ -19,7 +19,7 @@ export class ParentDashboardComponent implements OnInit {
   strFirstDay: string;
   strLastDay: string;
   agendaItems: any;
-  scheduleDay: any;
+  scheduleDays: any;
   evalsToCome: any;
   nbDayTasks = [];
   weekDays = [];
@@ -43,12 +43,14 @@ export class ParentDashboardComponent implements OnInit {
   events: any;
   periodAvgs: any;
   nbChildren: number;
+  dayIndex: number;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
     private evalService: EvaluationService, private userService: UserService) { }
 
   ngOnInit() {
+    this.dayIndex = 0;
     this.isParentConnected = true;
     this.parent = this.authService.currentUser;
     this.getChildren(this.parent.id);
@@ -116,13 +118,21 @@ export class ParentDashboardComponent implements OnInit {
     });
   }
 
+  // getClassSchedule(classId) {
+  //   this.classService.getClassScheduleByDay(classId).subscribe(data => {
+
+  //   })
+  // }
+
   getUserInfos(userId, parentId) {
     this.userService.getUserInfos(userId, parentId).subscribe((data: any) => {
       this.agendaItems = data.agendaItems;
       this.evalsToCome = data.evalsToCome;
       this.studentAvg = data.studentAvg;
       this.periodAvgs = data.periodAvgs;
-      this.scheduleDay = data.coursesToday;
+      this.scheduleDays = data.scheduleDays;
+      this.dayIndex = data.todayIndex;
+      // console.log(this.scheduleDays);
     }, error => {
       this.alertify.error(error);
     });
@@ -163,7 +173,7 @@ export class ParentDashboardComponent implements OnInit {
 
   getScheduleDay(classId) {
     this.classService.getScheduleToday(classId).subscribe(data => {
-      this.scheduleDay = data;
+      this.scheduleDays = data;
     }, error => {
       this.alertify.error(error);
     });
@@ -181,6 +191,20 @@ export class ParentDashboardComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  prevDay() {
+    if (this.dayIndex > 0) {
+      this.dayIndex--;
+      console.log('prev: ' + this.dayIndex);
+    }
+  }
+
+  nextDay() {
+    if (this.dayIndex < this.scheduleDays.length - 1) {
+      this.dayIndex++;
+      console.log('next: ' + this.dayIndex);
+    }
   }
 
 }

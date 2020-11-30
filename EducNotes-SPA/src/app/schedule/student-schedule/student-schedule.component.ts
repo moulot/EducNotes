@@ -77,7 +77,7 @@ export class StudentScheduleComponent implements OnInit {
   loadWeekSchedule(classId) {
 
     this.resetSchedule();
-    this.classService.getClassSchedule(classId).subscribe((data: any) => {
+    this.classService.getClassTimeTable(classId).subscribe((data: any) => {
       this.scheduleItems = data.scheduleItems;
       // add courses on the schedule
       for (let i = 1; i <= 7; i++) {

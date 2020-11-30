@@ -346,16 +346,16 @@ namespace EducNotes.API.Controllers
           var toNbDays = 7;
           var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
           var user = await _repo.GetUser(id, isCurrentUser);
-          var classid = Convert.ToInt32(user.ClassId);
-          var agendasFromRepo = await _repo.GetClassAgendaTodayToNDays(classid, toNbDays);
+          var classId = Convert.ToInt32(user.ClassId);
+          var agendasFromRepo = await _repo.GetClassAgendaTodayToNDays(classId, toNbDays);
           var agendaItems = _repo.GetAgendaListByDueDate(agendasFromRepo);
 
           // evaluations to come
-          var evalsToCome = await _repo.GetEvalsToCome(classid);
+          var evalsToCome = await _repo.GetEvalsToCome(classId);
 
           //student grades
           var periods = await _context.Periods.OrderBy(o => o.Abbrev).ToListAsync();
-          List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, classid);
+          List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, classId);
           double courseAvgSum = 0;
           double courseCoeffSum = 0;
           double GeneralAvg = -1000;
@@ -416,12 +416,38 @@ namespace EducNotes.API.Controllers
           }
 
           // today courses
-          var today = ((int)DateTime.Now.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
-          //if saturday or sunday goes to monday schedule
-          if (today == 6 || today == 7)
-            today = 1;
-          var coursesFromRepo = await _repo.GetScheduleDay(classid, today);
-          var coursesToday = _mapper.Map<IEnumerable<ScheduleForTimeTableDto>>(coursesFromRepo);
+          // var today = ((int)DateTime.Now.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
+          // //if saturday or sunday goes to monday schedule
+          // if (today == 6 || today == 7)
+          //   today = 1;
+          // var coursesFromRepo = await _repo.GetScheduleDay(classid, today);
+          // var coursesToday = _mapper.Map<IEnumerable<ScheduleForTimeTableDto>>(coursesFromRepo);
+          int daysRange = 14;
+          DateTime today = DateTime.Now.Date;
+          var startDate = today.AddDays(-daysRange);
+          var endDate = today.AddDays(daysRange);
+          var itemsFromRepo = await _repo.GetClassSchedule(classId);
+
+          int todayIndex = 0;
+          List<ClassScheduleNDaysDto> scheduleDays = new List<ClassScheduleNDaysDto>();
+          for (int i = 0; i < 2 * daysRange; i++)
+          {
+            ClassScheduleNDaysDto item = new ClassScheduleNDaysDto();
+            var currentDate = startDate.AddDays(i);
+            if(currentDate.Date == today)
+            {
+              todayIndex = i;
+            }
+            var dayInt = (int)currentDate.DayOfWeek == 0 ? 7 : (int)currentDate.DayOfWeek;
+            item.Day = dayInt;
+            item.DayDate = currentDate;
+            item.strDayDate = currentDate.ToString("ddd dd MMM", frC);
+            item.Courses = new List<ClassDayCoursesDto>();
+            var dayCourses = itemsFromRepo.Where(s => s.Day == dayInt);
+            var courses = _mapper.Map<List<ClassDayCoursesDto>>(dayCourses);
+            item.Courses = courses;
+            scheduleDays.Add(item);
+          }
 
           // user events
           var userIdEvents = user.Id;
@@ -440,8 +466,9 @@ namespace EducNotes.API.Controllers
             evalsToCome,
             StudentAvg = GeneralAvg,
             periodAvgs = periodAvgs,
-            coursesToday,
-            events
+            scheduleDays,
+            events,
+            todayIndex
           });
         }
 

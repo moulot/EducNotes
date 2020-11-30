@@ -264,12 +264,12 @@ namespace EducNotes.API.Data
 
         public async Task<IEnumerable<Schedule>> GetScheduleDay(int classId, int day)
         {
-            return await _context.Schedules
-                .Include(i => i.Class)
-                .Include(c => c.Course)
-                .Include(i => i.Teacher)
-                .Where(d => d.Day == day && d.Class.Id == classId)
-                .OrderBy(s => s.StartHourMin).ToListAsync();
+          return await _context.Schedules
+                      .Include(i => i.Class)
+                      .Include(c => c.Course)
+                      .Include(i => i.Teacher)
+                      .Where(d => d.Day == day && d.Class.Id == classId)
+                      .OrderBy(s => s.StartHourMin).ToListAsync();
         }
 
         public async Task<Agenda> GetAgenda(int agendaId)

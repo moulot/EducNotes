@@ -62,7 +62,7 @@ export class SchedulePanelComponent implements OnInit {
   loadWeekSchedule(classId) {
 
     this.resetSchedule();
-    this.classService.getClassSchedule(classId).subscribe((data: any) => {
+    this.classService.getClassTimeTable(classId).subscribe((data: any) => {
       this.scheduleItems = data.scheduleItems;
       this.strMonday = data.strMonday;
       this.strSunday = data.strSunday;

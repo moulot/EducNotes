@@ -75,19 +75,6 @@ export class ActivateChildrenComponent implements OnInit {
     });
   }
 
-  // getClassLevels() {
-  //   this.classService.getLevels().subscribe(data => {
-  //     this.levels = data;
-  //     for (let i = 0; i < this.levels.length; i++) {
-  //       const elt = this.levels[i];
-  //       const level = {value: elt.id, label: elt.name};
-  //       this.levelOptions = [...this.levelOptions, level];
-  //     }
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
-
   pwdValidator(index) {
     const pwd = this.childrenForm.value.children[index].pwd;
     const checkpwd = this.childrenForm.value.children[index].checkpwd;

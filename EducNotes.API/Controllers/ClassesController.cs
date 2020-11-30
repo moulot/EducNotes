@@ -92,8 +92,36 @@ namespace EducNotes.API.Controllers
             return Ok(coursesToReturn);
         }
 
-        [HttpGet("{classId}/schedule")]
-        public async Task<IActionResult> GetClassSchedule(int classId)
+        [HttpGet("{classId}/ScheduleByDay")]
+        public async Task<IActionResult> GetClassScheduleByDay(int classId)
+        {
+          int daysRange = 14;
+          DateTime today = DateTime.Now.Date;
+          var startDate = today.AddDays(-daysRange);
+          var endDate = today.AddDays(daysRange);
+          var itemsFromRepo = await _repo.GetClassSchedule(classId);
+
+          List<ClassScheduleNDaysDto> items = new List<ClassScheduleNDaysDto>();
+          for (int i = 0; i < 2 * daysRange; i++)
+          {
+            ClassScheduleNDaysDto item = new ClassScheduleNDaysDto();
+            var currentDate = startDate.AddDays(i);
+            var dayInt = (int)currentDate.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
+            item.Day = dayInt;
+            item.DayDate = currentDate;
+            item.strDayDate = currentDate.ToString("ddd dd MMM", frC);
+            item.Courses = new List<ClassDayCoursesDto>();
+            var dayCourses = itemsFromRepo.Where(s => s.Day == dayInt);
+            var courses = _mapper.Map<List<ClassDayCoursesDto>>(dayCourses);
+            item.Courses = courses;
+            items.Add(item);
+          }
+
+          return Ok(items);
+        }
+
+        [HttpGet("{classId}/TimeTable")]
+        public async Task<IActionResult> GetClassTimeTable(int classId)
         {
           var settings = await _context.Settings.ToListAsync();
           var startCourseHourMin = settings.FirstOrDefault(s => s.Name.ToLower() == "starthourmin").Value;

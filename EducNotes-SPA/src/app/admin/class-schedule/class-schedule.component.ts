@@ -81,7 +81,7 @@ export class ClassScheduleComponent implements OnInit {
   loadWeekSchedule(classId) {
 
     this.resetSchedule();
-    this.classService.getClassSchedule(classId).subscribe((data: any) => {
+    this.classService.getClassTimeTable(classId).subscribe((data: any) => {
 
       this.scheduleItems = data.scheduleItems;
 

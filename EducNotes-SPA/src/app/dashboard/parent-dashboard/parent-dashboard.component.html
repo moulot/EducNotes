@@ -3,36 +3,79 @@
 </div>
 
 <div class="row">
-  <!-- <div class="col-md-12 text-16 mb-1">
-    <span  *ngIf="parent.gender == 0">bienvenue madame</span>
-    <span  *ngIf="parent.gender == 1">bienvenue monsieur</span>
-    {{parent.lastName | titlecase}},
-  </div> -->
   <div class="col-md-12" *ngIf="showChildrenList">
     <p class="text-13 text-danger mb-1">clicker sur la carte de l'enfant pour accéder à ses informations</p>
     <app-children-list [url]="url" [children]="children" (getUser)="getUser($event)"></app-children-list>
   </div>
 
-  <div class="col-md-9 mb-2" *ngIf="!showChildrenList">
+  <div class="col-md-12 mb-2" *ngIf="!showChildrenList">
     <div class="row">
-      <div class="col-md-3 mb-2">
-        <div class="card">
-          <div class="card-body p-2">
-            <div class="text-15 text-center">cours du jour</div>
-            <hr class="my-1" style="background-color: #f89f20;">
-            <div class="d-flex">
-              <div class="mr-1" style="width: 25px">
-                <div style="border-top: 1px solid #cccccc"></div>
-                <div class="hour-div" *ngFor="let i of hourCols; let i = index">{{i + 7}}h</div>
+      <div class="col-md-12 mb-2">
+        <mdb-card>
+          <mdb-card-body class="text-left p-2 d-md-flex">
+            <div class="text-center mr-3 my-auto">
+              <img src="{{student?.photoUrl || '../../../../../../assets/user.png'}}" width="40" class="rounded-circle">
+            </div>
+            <div class="flex-grow-1 my-auto">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="d-md-flex">
+                    <div class="text-center text-16 text-capitalize mr-md-2">
+                      <b>{{student?.lastName}} {{student?.firstName}}</b> - {{student?.className}}</div>
+                    <div class="text-center">
+                      <i class="fad fa-user-chart fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                      <a><span class="text-muted text-15">moyenne</span> : {{studentAvg}} / 20</a>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="card-body dayCol" style="height: 360px;">
-                <app-day-schedule [items]="scheduleDay" [dayName]="'jourSem'"></app-day-schedule>
-              </div>    
+            </div>
+          </mdb-card-body>
+        </mdb-card>
+      </div>
+      <div class="col-md-3 mb-2">
+        <!-- <app-timeline [events]="events" [isParentConnected]="isParentConnected"></app-timeline> -->
+        <div class="card mt-2">
+          <div class="card-body p-2">
+            <!-- <div class="text-15 text-center">cours du jour</div>
+            <hr class="my-1"> -->
+            <div class="">
+              <div class="d-flex justify-content-center mb-2">
+                <div class="text-center my-auto" style="width: 16%">
+                  <a (click)="prevDay()">
+                    <i class="text-25 fad fa-caret-circle-left" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                  </a>
+                </div>
+                <div class="" style="width: 60%">
+                  <div *ngIf="scheduleDays" class="text-13 text-center border rounded-lg p-1">{{scheduleDays[dayIndex]?.strDayDate}}</div>
+                </div>
+                <div class="text-center my-auto" style="width: 16%">
+                  <a (click)="nextDay()">
+                    <i class="text-25 fad fa-caret-circle-right" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                  </a>
+                </div>
+              </div>
+              <hr class="my-1">
+              <div *ngIf="scheduleDays">
+                <div class="border rounded-lg text-center p-1 mb-1" *ngFor="let course of scheduleDays[dayIndex]?.courses">
+                  <div class="text-13"><b>{{course.courseAbbrev}} de {{course.startHourMin}} à {{course.endHourMin}}</b></div>
+                  <!-- <hr class="my-1"> -->
+                  <div class="text-13 text-capitalize">{{course.teacherName}}</div>
+                </div>
+                <div *ngIf="scheduleDays[dayIndex]?.courses.length === 0">
+                  <div class="border rounded-lg p-2 text-15 text-center mb-1">
+                    pas de cours aujourd'hui
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-5">
         <div class="row">
           <div class="col-md-12">
             <div class="card mb-2">
@@ -74,7 +117,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-5">
+      <div class="col-md-4">
         <div class="card">
           <div class="card-body p-2">
             <div class="row">
@@ -153,7 +196,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-12">
+              <div class="col-md-12 mt-1">
                 <div class="border rounded-lg p-2">
                   <div class="row mb-2">
                     <div class="col-md-7 text-15">évaluations à venir</div>
@@ -184,7 +227,7 @@
     </div>
   </div>
 
-  <div class="col-md-3" *ngIf="!showChildrenList">
+  <!-- <div class="col-md-3" *ngIf="!showChildrenList">
     <app-timeline [events]="events" [isParentConnected]="isParentConnected"></app-timeline>
-  </div>
+  </div> -->
 </div>
