@@ -79,12 +79,9 @@ export class ClassScheduleComponent implements OnInit {
   }
 
   loadWeekSchedule(classId) {
-
     this.resetSchedule();
     this.classService.getClassTimeTable(classId).subscribe((data: any) => {
-
       this.scheduleItems = data.scheduleItems;
-
       // add courses on the schedule
       for (let i = 1; i <= 7; i++) {
         const filtered = this.scheduleItems.filter(items => items.day === i);
@@ -136,7 +133,6 @@ export class ClassScheduleComponent implements OnInit {
       animated: true,
       data: { classId: this.classId }
     };
-
     this.modalRef = this.modalService1.show(ModalScheduleComponent, modalOptions);
     this.modalRef.content.saveSchedule.subscribe((data) => {
       this.saveSchedules(data);
@@ -144,7 +140,6 @@ export class ClassScheduleComponent implements OnInit {
   }
 
   saveSchedules(schedules: Schedule[]) {
-
     this.classService.saveSchedules(schedules).subscribe(() => {
       this.alertify.success('cours de l\'emploi du temps enregistrés');
       this.loadWeekSchedule(this.classId);
@@ -152,7 +147,6 @@ export class ClassScheduleComponent implements OnInit {
       this.alertify.error(error);
       this.router.navigate(['/home']);
     });
-
   }
 
   resetSchedule() {
@@ -163,6 +157,6 @@ export class ClassScheduleComponent implements OnInit {
     this.friCourses = [];
     this.satCourses = [];
     this.sunCourses = [];
-    }
+  }
 
 }

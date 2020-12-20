@@ -52,6 +52,10 @@ export class EvaluationService {
     return this.http.get(this.baseUrl + 'class/' + classId + '/CoursesWithEvals/' + userId);
   }
 
+  getStudentLastGrades(userId, classId) {
+    return this.http.get(this.baseUrl + 'Class/' + classId + '/User/' + userId + '/LastGrades');
+  }
+
   getUserGrades(userId) {
     return this.http.get(this.baseUrl + 'UserGrades/' + userId);
   }

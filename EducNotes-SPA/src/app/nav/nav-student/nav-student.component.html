@@ -33,7 +33,7 @@
       vie scolaire
     </a>
     <div class="dropdown-menu dropdown-primary dropdown-menu-left" role="menu">
-      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/studentSchedule', user.id]">emploi du temps</a>
+      <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/classSchedule', user.classId]">emploi du temps</a>
       <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/studentLife', user.id]">absences/sanctions</a>
       <a class="dropdown-item" (click)="closeNavOnClick()" [routerLink]="['/classStaff', user.id]">équipe pédagogique</a>
     </div>

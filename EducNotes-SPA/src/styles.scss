@@ -36,59 +36,32 @@
   background-color: #ffffff !important;
 }
 
-// #wrapper {
-//   width: 95%;
-//   margin: auto;
-// }
-// #wrapper .container {
-//   max-width: 100%; display: block;
-// }
+.block-title {
+  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+  color: #192C47 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
 
-// .tab-panel {
-//     border: 1px solid #ddd;
-//     padding: 10px;
-//     border-radius: 4px;
-//   }
+.day-title {
+  color: #ffffff !important;
+  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+  background-color: #192C47 !important;
+}
 
-//   .nav-tabs > li.open, .member-tabset > .nav-tabs > li:hover {
-//     border-bottom: 4px solid #fbcdcf;
-//   }
+.day-title50 {
+  color: #ffffff !important;
+  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+  width: 50% !important;
+  background-color: #192C47 !important;
+}
 
-//   .member-tabset > .nav-tabs > li.open > a, .member-tabset > .nav-tabs > li:hover > a {
-//     border: 0;
-//     background: none !important;
-//     color: #333333;
-//   }
-
-//   .member-tabset > .nav-tabs > li.open > a > i, .member-tabset > .nav-tabs > li:hover > a > i {
-//     color: #a6a6a6;
-//   }
-
-//   .member-tabset > .nav-tabs > li.open .dropdown-menu, .member-tabset > .nav-tabs > li:hover .dropdown-menu {
-//     margin-top: 0px;
-//   }
-
-//   .member-tabset > .nav-tabs > li.active {
-//     border-bottom: 4px solid #E95420;
-//     position: relative;
-//   }
-
-//   .member-tabset > .nav-tabs > li.active > a {
-//     border: 0 !important;
-//     color: #333333;
-//   }
-
-//   .member-tabset > .nav-tabs > li.active > a > i {
-//     color: #404040;
-//   }
-
-//   .member-tabset > .tab-content {
-//     margin-top: -3px;
-//     background-color: #fff;
-//     border: 0;
-//     border-top: 1px solid #eee;
-//     padding: 15px 0;
-//   }
+.day-title25 {
+  color: #ffffff !important;
+  font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+  width: 25% !important;
+  background-color: #192C47 !important;
+}
 
 .md-form input[type="text"]:focus {
   box-shadow: 0 1px 0 0 #f89f20 !important;

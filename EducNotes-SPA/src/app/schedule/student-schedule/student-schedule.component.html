@@ -1,37 +1,24 @@
 <div class="row">
-
   <div class="col-md-12" *ngIf="showChildrenList">
-
     <p class="text-15 text-muted m-1">sélectionner un enfant pour voir ses évènements</p>
-
     <div class="row">
-
       <div class="col-md-9 col-sm-12">
         <app-children-list [url]="url" [children]="children"></app-children-list>
       </div>
-
       <div class="col-md-3 col-sm-12">
         <app-timeline></app-timeline>
       </div>
-
     </div>
-
   </div>
 
-
   <div class="col-md-12" *ngIf="showChildrenList">
-
     <p class="text-15 text-muted m-1">sélectionner un enfant pour voir ses évènements</p>
-
     <div class="row">
-
       <div class="col-md-9 col-sm-12">
         <app-children-list [url]="url" [children]="children"></app-children-list>
       </div>
-
       <div class="col-md-3 col-sm-12">
         <div class="row">
-
           <div class="col-md-12 col-sm-12">
             <div class="card mb-4 p-2">
               <div class="card-body">
@@ -71,26 +58,19 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
-
     </div>
-
   </div>
-
 </div>
 
 <div *ngIf="!showChildrenList" class="row mb-2">
-
   <div class="col-md-12 mb-2">
     <p class="lead m-0">vie de la classe - emploi du temps</p>
   </div>
-
   <div *ngIf="isParentConnected" class="col-md-12 mb-2">
     <app-users-header [student]="student" (getUser)="getUser($event)"></app-users-header>
   </div>
-    
   <div *ngFor="let i of weekdays" class="card p-0 col-md-2">
     <div class="card-body p-0 m-0 dayCol">
       <div class="text-16 text-center">{{weekDays[i]}}</div>
@@ -105,5 +85,4 @@
       </div>
     </div>
   </div>
-  
 </div>

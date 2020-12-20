@@ -66,7 +66,7 @@ export class ClassAgendaComponent implements OnInit {
 
   loadWeekSchedule(classId) {
     this.resetSchedule();
-    this.classService.getClassSchedule(classId).subscribe((response: any) => {
+    this.classService.getClassTimeTable(classId).subscribe((response: any) => {
       this.scheduleItems = response.scheduleItems;
       this.strMonday = response.strMonday;
       this.strSunday = response.strSunday;

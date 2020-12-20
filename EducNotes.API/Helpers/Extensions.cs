@@ -75,9 +75,10 @@ namespace EducNotes.API.Helpers
 
       public static string CalculateTop(this DateTime startHourMin)
       {
-        // to be retrieved from appSettings
+        //to be retrieved from appSettings
         var scheduleHourSize = Convert.ToDouble(Startup.StaticConfig.GetSection("AppSettings:DimHourSchedule").Value);
         var startCourseHour = Convert.ToDouble(Startup.StaticConfig.GetSection("AppSettings:CoursesHourStart").Value);
+        // var startCourseMin = Convert.ToDouble(Startup.StaticConfig.GetSection("AppSettings:CoursesMinStart").Value);
 
         var netHours = startHourMin.Hour - startCourseHour;
         var mins = startHourMin.Minute;

@@ -1,5 +1,5 @@
-<div class="" style="position:absolute; width: 100%" *ngFor="let item of items"
+<div style="position:absolute; width: 100%" *ngFor="let item of items"
   [ngStyle]="{'top': item.top, 'height': item.height, 'background-color': item.color}">
     <div class="text-12"><b>{{item.courseName | uppercase}} de {{item.strStartHourMin}} à {{item.strEndHourMin}}</b></div>
-    <div class="text-12 text-capitalize">{{item.teacherName}}</div>
+    <div class="text-12">{{item.teacherName | uppercase}}</div>
 </div>

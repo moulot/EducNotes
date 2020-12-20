@@ -354,13 +354,13 @@ namespace EducNotes.API.Data
 
         public async Task<IEnumerable<Agenda>> GetClassAgendaTodayToNDays(int classId, int toNbDays)
         {
-            DateTime today = DateTime.Now.Date;
-            DateTime EndDate = today.AddDays(toNbDays).Date;
+          DateTime today = DateTime.Now.Date;
+          DateTime EndDate = today.AddDays(toNbDays).Date;
 
-            return await _context.Agendas
-                .Include(i => i.Session.Course)
-                .Where(a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= today && a.Session.SessionDate.Date <= EndDate)
-                .OrderBy(o => o.Session.SessionDate).ToListAsync();
+          return await _context.Agendas
+            .Include(i => i.Session).ThenInclude(i => i.Course)
+            .Where(a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= today && a.Session.SessionDate.Date <= EndDate)
+            .OrderBy(o => o.Session.SessionDate).ToListAsync();
         }
 
         public async Task<IEnumerable<User>> GetClassStudents(int classId)
@@ -1139,6 +1139,7 @@ namespace EducNotes.API.Data
                 var agenda = new ClassAgendaToReturnDto();
                 agenda.dtDueDate = currDate;
                 agenda.DueDate = currDate.ToLongDateString();
+                agenda.ShortDueDate = currDate.ToString("ddd dd MMM", frC);
                 agenda.DueDateDay = currDate.Day;
                 agenda.NbTasks = currentDateAgendas.Count();
                 var dayInt = (int)currDate.DayOfWeek;
@@ -1163,9 +1164,6 @@ namespace EducNotes.API.Data
             return agendasToReturn;
         }
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////// DATA FROM MOHAMED KABORE ////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
         public async Task<IEnumerable<ClassType>> GetClassTypes()
         {
             return await _context.ClassTypes.OrderBy(a => a.Name).ToListAsync();
@@ -1512,6 +1510,30 @@ namespace EducNotes.API.Data
           return courseAvg;
         }
 
+        public async Task<List<GradeDto>> GetStudentLastGrades(int userId, int nbOfGrades)
+        {
+          var lastGradesFromDB = await _context.UserEvaluations
+                                        .Include(i => i.Evaluation).ThenInclude(i => i.EvalType)
+                                        .Include(i => i.Evaluation).ThenInclude(i => i.Course)
+                                        .OrderByDescending(o => o.Evaluation.EvalDate)
+                                        .Where(e => e.UserId == userId && e.Grade.IsNumeric() && e.Evaluation.Closed)
+                                        .Take(nbOfGrades)
+                                        .ToListAsync();
+          var lastGrades = _mapper.Map<List<GradeDto>>(lastGradesFromDB);
+          for (int i = 0; i < lastGrades.Count(); i++)
+          {
+            var grade = lastGrades[i];
+            int evalId = lastGradesFromDB[i].EvaluationId;
+            var gradeMin = await GetEvalMin(evalId);
+            var gradeMax = await GetEvalMax(evalId);
+            grade.ClassGradeMin = gradeMin;
+            grade.ClassGradeMax = gradeMax;
+            grade.GradeOK = Convert.ToDouble(grade.Grade) >= Convert.ToDouble(grade.GradeMax)/2;
+          }
+
+          return lastGrades;
+        }
+
         public async Task<double> GetStudentAvg(int userId, int classId)
         {
           List<UserCourseEvalsDto> coursesWithEvals = await GetUserGrades(userId, classId);
@@ -1766,7 +1788,7 @@ namespace EducNotes.API.Data
         public async Task<List<AgendaForListDto>> GetUserClassAgenda(int classId, DateTime startDate, DateTime endDate)
         {
           List<Agenda> classAgenda = await _context.Agendas
-              .Include(i => i.Session.Course)
+              .Include(i => i.Session).ThenInclude(i => i.Course)
               .OrderBy(o => o.Session.SessionDate)
               .Where(a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= startDate &&
                 a.Session.SessionDate <= endDate)
@@ -1779,10 +1801,9 @@ namespace EducNotes.API.Data
           {
             AgendaForListDto afld = new AgendaForListDto();
             afld.DueDate = date;
-            //CultureInfo frC = new CultureInfo("fr-FR");
-            var shortDueDate = date.ToString("ddd dd MMM");
-            var longDueDate = date.ToString("dd MMMM yyyy");
-            var dueDateAbbrev = date.ToString("ddd dd").Replace(".", "");
+            var shortDueDate = date.ToString("ddd dd MMM", frC);
+            var longDueDate = date.ToString("dd MMMM yyyy", frC);
+            var dueDateAbbrev = date.ToString("ddd dd", frC).Replace(".", "");
 
             afld.ShortDueDate = shortDueDate;
             afld.LongDueDate = longDueDate;
@@ -1791,6 +1812,7 @@ namespace EducNotes.API.Data
             //get agenda tasks Done Status
             afld.AgendaItems = new List<AgendaItemDto>();
             var agendaItems = classAgenda.Where(a => a.Session.SessionDate.Date == date.Date).ToList();
+            afld.NbItems = agendaItems.Count();
             foreach (var item in agendaItems)
             {
               AgendaItemDto aid = new AgendaItemDto();
@@ -1804,7 +1826,6 @@ namespace EducNotes.API.Data
               aid.Done = item.Done;
               afld.AgendaItems.Add(aid);
             }
-            afld.NbItems = agendaItems.Count();
 
             AgendaList.Add(afld);
           }
@@ -3031,10 +3052,13 @@ namespace EducNotes.API.Data
           var startData = startCourseHourMin.Split(":");
           int startCourseHour = Convert.ToInt32(startData[0]);
           int startCourseMin = Convert.ToInt32(startData[1]);
+          DateTime startCourseHM = new DateTime(1, 01, 01, Convert.ToInt32(startCourseHour), Convert.ToInt32(startCourseMin), 0);
 
-          var netHours = startHourMin.Hour - startCourseHour;
-          var netMins = startHourMin.Minute - startCourseMin;
-          var top = scheduleHourSize * (netHours + (double)netMins/60);
+          TimeSpan span = startHourMin.Subtract(startCourseHM);
+          double totalMins = span.TotalMinutes;
+          // var netHours = Math.Abs(startHourMin.Hour - startCourseHour);
+          // var netMins = Math.Abs(startCourseMin - startHourMin.Minute);
+          var top = scheduleHourSize * (totalMins/60);// + 1 * netHours;
           top = Math.Round(top, 2);
           return (top + "px").Replace(",", ".");
         }

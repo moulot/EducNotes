@@ -20,7 +20,7 @@ export class StudentDashboardComponent implements OnInit {
   strFirstDay: string;
   strLastDay: string;
   agendaItems: any;
-  scheduleDay: any;
+  scheduleDays: any;
   evalsToCome: any;
   nbDayTasks = [];
   weekDays = [];
@@ -30,6 +30,7 @@ export class StudentDashboardComponent implements OnInit {
   studentAvg: any;
   isParentConnected = false;
   showChildrenList = false;
+  showUsersList = false;
   currentChild: User;
   children: any[];
   url = '/home';
@@ -39,57 +40,31 @@ export class StudentDashboardComponent implements OnInit {
   searchText1 = '';
   previous: string;
   previous1: string;
-  showUsersList = false;
   hourCols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   events: any;
   periodAvgs: any;
+  nbChildren: number;
+  dayIndex: number;
+  todayIndex: number;
+  lastGrades: any;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
     private evalService: EvaluationService, private userService: UserService) { }
 
   ngOnInit() {
-    if (this.authService.studentLoggedIn()) {
-      this.showChildrenList = false;
-      this.showUsersList = false;
-      this.getUser(this.authService.currentUser.id);
-    } else {
-      this.isParentConnected = true;
-      this.parent = this.authService.currentUser;
-      this.showUsersList = true;
-      this.authService.currentChild.subscribe(child => this.currentChild = child);
-      if (this.currentChild.id === 0) {
-        this.showChildrenList = true;
-        this.getChildren(this.parent.id);
-      } else {
-        this.showChildrenList = false;
-        this.getUser(this.currentChild.id);
-      }
-    }
-  }
-
-  getChildren(parentId: number) {
-    this.userService.getChildren(parentId).subscribe((users: User[]) => {
-      this.children = users;
-    }, error => {
-      this.alertify.error(error);
-    });
+    this.dayIndex = 0;
+    this.isParentConnected = true;
+    this.student = this.authService.currentUser;
+    this.getUser(this.student.id);
   }
 
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
-      let parentId = 0;
-      if (this.isParentConnected === true) {
-        parentId = this.parent.id;
-      }
-      this.getUserInfos(this.student.id, parentId);
-      // this.getAgenda(this.student.classId, this.toNbDays);
-      // this.getEvalsToCome(this.student.classId);
-      // this.getCoursesWithEvals(this.student.id, this.student.classId);
-      // this.getScheduleDay(this.student.classId);
-      // this.getEvents();
-      this.showChildrenList = false;
+      this.getUserInfos(this.student.id, 0);
+      this.getCoursesWithEvals(this.student.id, this.student.classId);
+      this.getStudentLastGrades(this.student.id, this.student.classId);
     }, error => {
       this.alertify.error(error);
     });
@@ -101,23 +76,31 @@ export class StudentDashboardComponent implements OnInit {
       this.evalsToCome = data.evalsToCome;
       this.studentAvg = data.studentAvg;
       this.periodAvgs = data.periodAvgs;
-      this.scheduleDay = data.coursesToday;
+      this.scheduleDays = data.scheduleDays;
+      this.dayIndex = data.todayIndex;
+      this.todayIndex = data.todayIndex;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getStudentLastGrades(studentId, classId) {
+    this.evalService.getStudentLastGrades(studentId, classId).subscribe((data: any) => {
+      this.lastGrades = data.lastGrades;
+      this.studentAvg = data.studentAvg;
     }, error => {
       this.alertify.error(error);
     });
   }
 
   getAgenda(classId, toNbDays) {
-
     this.classService.getTodayToNDaysAgenda(classId, toNbDays).subscribe((res: any) => {
-
       this.agendaItems = res.agendaItems;
       this.firstDay = res.firstDay;
       this.strFirstDay = res.strFirstDayy;
       this.strLastDay = res.strLastDay;
       this.weekDays = res.weekDays;
       this.nbDayTasks = res.nbDayTasks;
-
     }, error => {
       this.alertify.error(error);
     });
@@ -134,7 +117,7 @@ export class StudentDashboardComponent implements OnInit {
   getCoursesWithEvals(studentId, classId) {
     this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
       this.userCourses = data.coursesWithEvals;
-      this.studentAvg = data.studentAvg;
+      // this.studentAvg = data.studentAvg;
     }, error => {
       this.alertify.error(error);
     });
@@ -142,7 +125,7 @@ export class StudentDashboardComponent implements OnInit {
 
   getScheduleDay(classId) {
     this.classService.getScheduleToday(classId).subscribe(data => {
-      this.scheduleDay = data;
+      this.scheduleDays = data;
     }, error => {
       this.alertify.error(error);
     });
@@ -162,8 +145,20 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  parentLoggedIn() {
-    return this.authService.parentLoggedIn();
+  prevDay() {
+    if (this.dayIndex > 0) {
+      this.dayIndex--;
+    }
+  }
+
+  nextDay() {
+    if (this.dayIndex < this.scheduleDays.length - 1) {
+      this.dayIndex++;
+    }
+  }
+
+  goToToday() {
+    this.dayIndex = this.todayIndex;
   }
 
 }

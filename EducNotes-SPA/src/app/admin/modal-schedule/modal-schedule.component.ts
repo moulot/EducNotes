@@ -305,8 +305,8 @@ export class ModalScheduleComponent implements OnInit {
         sch.day = this.scheduleForm.controls['item' + i].get('day' + i).value;
         const hStart = this.scheduleForm.controls['item' + i].get('hourStart' + i).value.split(':');
         const hEnd = this.scheduleForm.controls['item' + i].get('hourEnd' + i).value.split(':');
-        const hourStart = new Date(2019, 0, 1, hStart[0], hStart[1]);
-        const hourEnd = new Date(2019, 0, 1, hEnd[0], hEnd[1]);
+        const hourStart = new Date(1, 0, 1, hStart[0], hStart[1]);
+        const hourEnd = new Date(1, 0, 1, hEnd[0], hEnd[1]);
         sch.startHourMin = hourStart;
         sch.endHourMin = hourEnd;
         this.agendaItems = [...this.agendaItems, sch];

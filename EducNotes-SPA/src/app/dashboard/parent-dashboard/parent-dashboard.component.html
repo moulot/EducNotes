@@ -12,21 +12,67 @@
     <div class="row">
       <div class="col-md-12 mb-2">
         <mdb-card>
-          <mdb-card-body class="text-left p-2 d-md-flex">
-            <div class="text-center mr-3 my-auto">
-              <img src="{{student?.photoUrl || '../../../../../../assets/user.png'}}" width="40" class="rounded-circle">
-            </div>
-            <div class="flex-grow-1 my-auto">
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="d-md-flex">
-                    <div class="text-center text-16 text-capitalize mr-md-2">
-                      <b>{{student?.lastName}} {{student?.firstName}}</b> - {{student?.className}}</div>
-                    <div class="text-center">
-                      <i class="fad fa-user-chart fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                      <a><span class="text-muted text-15">moyenne</span> : {{studentAvg}} / 20</a>
+          <mdb-card-body class="p-1">
+            <div class="row">
+              <div class="col-md-4 my-1">
+                <div class="d-md-flex">
+                  <div class="text-center mr-3 my-auto">
+                    <img src="{{student?.photoUrl || '../../../../../../assets/user.png'}}" width="60" class="rounded-circle">
+                  </div>
+                  <div class="my-auto">
+                    <div class="text-center text-16 text-capitalize">
+                      <b>{{student?.lastName}} {{student?.firstName}}</b> - {{student?.className}}
                     </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2 my-1">
+                <div class="d-flex border rounded-lg align-items-center">
+                  <div class="text-center ml-3">
+                    <i class="fad fa-user-chart fa-3x mr-2" style="--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                      --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
+                  </div>
+                  <div class="flex-grow-1 text-center">
+                    <p class="text-muted mt-2 mb-0">moyenne</p>
+                    <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-danger text-20 line-height-1 mb-2">{{studentAvg}}</p>
+                    <p *ngIf="studentAvg >= 10 && studentAvg > -1000" class="text-success text-20 line-height-1 mb-2">{{studentAvg}}</p>
+                    <p *ngIf="studentAvg === -1000" class="text-primary text-20 line-height-1 m-0">N/A</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2 my-1">
+                <div class="d-flex border rounded-lg align-items-center">
+                  <div class="text-center ml-3">
+                    <i class="fad fa-grin fa-3x" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
+                      --fa-secondary-color:#f89f20;"></i>
+                  </div>
+                  <div class="flex-grow-1 text-center">
+                    <p class="text-muted mt-2 mb-0">compliments</p>
+                    <p class="text-primary text-20 line-height-1 mb-2">3</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2 my-1">
+                <div class="d-flex border rounded-lg align-items-center">
+                  <div class="text-center ml-3">
+                    <i class="fad fa-times-circle fa-3x" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
+                      --fa-secondary-color:#f89f20;"></i>
+                  </div>
+                  <div class="flex-grow-1 text-center">
+                    <p class="text-muted mt-2 mb-0">absences</p>
+                    <p class="text-primary text-20 line-height-1 mb-2">4</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2 my-1">
+                <div class="d-flex border rounded-lg align-items-center">
+                  <div class="text-center ml-3">
+                    <i class="fad fa-frown-open fa-3x" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
+                      --fa-secondary-color:#f89f20;"></i>
+                  </div>
+                  <div class="flex-grow-1 text-center">
+                    <p class="text-muted mt-2 mb-0">sanctions</p>
+                    <p class="text-primary text-20 line-height-1 mb-2">0</p>
                   </div>
                 </div>
               </div>
@@ -36,38 +82,78 @@
       </div>
       <div class="col-md-3 mb-2">
         <!-- <app-timeline [events]="events" [isParentConnected]="isParentConnected"></app-timeline> -->
-        <div class="card mt-2">
+        <div class="card">
           <div class="card-body p-2">
-            <!-- <div class="text-15 text-center">cours du jour</div>
-            <hr class="my-1"> -->
-            <div class="">
-              <div class="d-flex justify-content-center mb-2">
-                <div class="text-center my-auto" style="width: 16%">
-                  <a (click)="prevDay()">
-                    <i class="text-25 fad fa-caret-circle-left" style="--fa-secondary-opacity: 1;
-                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                  </a>
-                </div>
-                <div class="" style="width: 60%">
-                  <div *ngIf="scheduleDays" class="text-13 text-center border rounded-lg p-1">{{scheduleDays[dayIndex]?.strDayDate}}</div>
-                </div>
-                <div class="text-center my-auto" style="width: 16%">
-                  <a (click)="nextDay()">
-                    <i class="text-25 fad fa-caret-circle-right" style="--fa-secondary-opacity: 1;
-                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                  </a>
+            <div class="d-flex mb-2">
+              <div class="flex-grow-1 block-title">emploi du temps</div>
+              <i class="fad fa-external-link text-18" style="--fa-secondary-opacity: 1;
+                --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
+            </div>
+            <a (click)="goToToday()"><div class="text-center text-13 blue-text">aujourd'hui</div></a>
+            <div class="d-flex justify-content-center mb-2">
+              <div class="text-center my-auto" style="width: 16%">
+                <a (click)="prevDay()">
+                  <i class="text-25 fad fa-caret-circle-left" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                </a>
+              </div>
+              <div class="" style="width: 60%">
+                <div *ngIf="scheduleDays" class="text-13 text-center border rounded-lg p-1">{{scheduleDays[dayIndex]?.strDayDate}}</div>
+              </div>
+              <div class="text-center my-auto" style="width: 16%">
+                <a (click)="nextDay()">
+                  <i class="text-25 fad fa-caret-circle-right" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                </a>
+              </div>
+            </div>
+            <hr class="my-1">
+            <div *ngIf="scheduleDays">
+              <div class="border rounded-lg text-center p-1 mb-1" [ngStyle]="{'background-color': course.color}" *ngFor="let course of scheduleDays[dayIndex]?.courses">
+                <div class="text-13"><b>{{course.courseAbbrev}} de {{course.startHourMin}} à {{course.endHourMin}}</b></div>
+                <!-- <hr class="my-1"> -->
+                <div class="text-13 text-capitalize">{{course.teacherName}}</div>
+              </div>
+              <div *ngIf="scheduleDays[dayIndex]?.courses.length === 0">
+                <div class="border rounded-lg p-2 text-15 text-center mb-1">
+                  pas de cours aujourd'hui
                 </div>
               </div>
-              <hr class="my-1">
-              <div *ngIf="scheduleDays">
-                <div class="border rounded-lg text-center p-1 mb-1" *ngFor="let course of scheduleDays[dayIndex]?.courses">
-                  <div class="text-13"><b>{{course.courseAbbrev}} de {{course.startHourMin}} à {{course.endHourMin}}</b></div>
-                  <!-- <hr class="my-1"> -->
-                  <div class="text-13 text-capitalize">{{course.teacherName}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card mb-2">
+              <div class="card-body p-2">
+                <div class="d-flex mb-2">
+                  <div class="flex-grow-1 block-title">devoirs à faire</div>
+                  <i class="fad fa-external-link text-18 mr-2" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
                 </div>
-                <div *ngIf="scheduleDays[dayIndex]?.courses.length === 0">
-                  <div class="border rounded-lg p-2 text-15 text-center mb-1">
-                    pas de cours aujourd'hui
+                <div *ngIf="agendaItems?.length == 0">
+                  <div class="border rounded-lg py-3 px-2">
+                    <h6 class="text-muted">pas de devoirs à faire cette semaine...</h6>
+                  </div>
+                </div>
+                <div *ngIf="agendaItems?.length != 0">
+                  <div *ngFor="let items of agendaItems">
+                    <div class="border rounded-lg day-title50 text-14 mb-1 p-1">{{items.shortDueDate}}</div>
+                    <div class="clearfix"></div>
+                    <div *ngFor="let course of items.courses">
+                      <div class="border rounded-lg p-0 mb-1">
+                        <div [ngStyle]="{'background-color': course.courseColor}" style="height: 5px;
+                          border-top-left-radius: 5px;border-top-right-radius: 5px">
+                        </div>            
+                        <div class="d-md-flex mx-1">
+                          <div class="flex-grow-1 text-14"><b>{{course.courseName}}</b></div>
+                          <div class="text-13 text-muted">donné le {{course.shortDateAdded}}</div>
+                        </div>
+                        <div class="text-14 mx-1">{{course.taskDesc}}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -76,148 +162,69 @@
         </div>
       </div>
       <div class="col-md-5">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="card mb-2">
-              <div class="card-body p-2">
-                <div class="row mb-2">
-                  <div class="col-md-6 text-15">devoirs à faire</div>
-                  <div class="col-md-6">
-                    <button type="button" mdbBtn size="sm" block="true" class="btnWhiteO" mdbWavesEffect>détails</button>
-                  </div>
+        <div class="card mb-2">
+          <div class="card-body p-2">
+            <div class="row">
+              <div class="col-md-12 mt-2">
+                <div class="d-flex mb-2">
+                  <div class="flex-grow-1 block-title">évaluations à venir</div>
+                  <i class="fad fa-external-link text-18" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
                 </div>
-                <div *ngIf="agendaItems?.length == 0">
-                  <div class="card py-3 px-2">
-                    <h6 class="text-muted">pas de devoirs à faire cette semaine...</h6>
-                  </div>
-                </div>
-                <div *ngIf="agendaItems?.length != 0">
-                  <div *ngFor="let items of agendaItems">
-                    <div class="p-2 border rounded mb-1">
-                      <div class="text-15 mb-1">{{items.dueDate}}</div>
-                      <div *ngFor="let course of items.courses">
-                        <div class="card mb-1">
-                          <div class="card-up" [ngStyle]="{'background-color': course.courseColor}" style="height: 10px;
-                            border-top-left-radius: 10px;border-top-right-radius: 10px">
-                          </div>            
-                          <div class="card-body p-2">
-                            <div class="row">
-                              <div class="col-md-12 text-15"><b>{{course.courseName}}</b></div>
-                              <div class="col-md-12 text-14 text-muted">donné le {{course.shortDateAdded}}</div>
-                              <div class="col-md-12 text-14 pt-1">{{course.taskDesc}}</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                <div *ngFor="let eval of evalsToCome">
+                  <div class="border rounded-lg p-0 mb-1">
+                    <div [ngStyle]="{'background-color': eval.courseColor}" style="height: 5px;
+                      border-top-left-radius: 5px;border-top-right-radius: 5px">
+                    </div>            
+                    <div class="d-md-flex mx-1">
+                      <div class="flex-grow-1 text-14"><b>{{eval.courseName}}</b></div>
+                      <div class="text-13 text-muted">prévue le {{eval.evalDate}}</div>
                     </div>
+                    <div class="text-14 mx-1">{{eval.evalTypeName}}</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="col-md-4">
         <div class="card">
           <div class="card-body p-2">
             <div class="row">
               <div class="col-md-12">
-                <div class="row mb-2">
-                  <div class="col-md-6 mb-1">
-                    <div class="d-flex border rounded-lg align-items-center">
-                      <div class="text-center ml-3">
-                        <i class="fad fa-user-chart fa-3x mr-2" style="--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                          --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
-                      </div>
-                      <div class="flex-grow-1 text-center">
-                        <p class="text-muted mt-2 mb-0">moyenne</p>
-                        <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-danger text-20 line-height-1 mb-2">{{studentAvg}}</p>
-                        <p *ngIf="studentAvg >= 10 && studentAvg > -1000" class="text-success text-20 line-height-1 mb-2">{{studentAvg}}</p>
-                        <p *ngIf="studentAvg === -1000" class="text-primary text-20 line-height-1 m-0">N/A</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="d-flex border rounded-lg align-items-center">
-                      <div class="text-center ml-3">
-                        <i class="fad fa-grin fa-3x" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
-                          --fa-secondary-color:#f89f20;"></i>
-                      </div>
-                      <div class="flex-grow-1 text-center">
-                        <p class="text-muted mt-2 mb-0">compliments</p>
-                        <p class="text-primary text-20 line-height-1 mb-2">3</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="d-flex border rounded-lg align-items-center">
-                      <div class="text-center ml-3">
-                        <i class="fad fa-times-circle fa-3x" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
-                          --fa-secondary-color:#f89f20;"></i>
-                      </div>
-                      <div class="flex-grow-1 text-center">
-                        <p class="text-muted mt-2 mb-0">absences</p>
-                        <p class="text-primary text-20 line-height-1 mb-2">4</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="d-flex border rounded-lg align-items-center">
-                      <div class="text-center ml-3">
-                        <i class="fad fa-frown-open fa-3x" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
-                          --fa-secondary-color:#f89f20;"></i>
-                      </div>
-                      <div class="flex-grow-1 text-center">
-                        <p class="text-muted mt-2 mb-0">sanctions</p>
-                        <p class="text-primary text-20 line-height-1 mb-2">0</p>
-                      </div>
-                    </div>
+                <div class="d-flex mb-2">
+                  <div class="flex-grow-1 block-title">notes</div>
+                  <i class="fad fa-external-link text-20 mr-2" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
+                </div>
+              </div>
+              <div class="col-md-12 text-14 font-weight-bold">dernières notes</div>
+              <div class="col-md-12 d-md-flex text-13 text-danger my-1">
+                <div>(-): plus faible note</div>
+                <!-- <div class="ml-md-2">(moy.): moyenne de la classe</div> -->
+                <div class="ml-md-2">(+) plus forte note</div>
+              </div>
+              <div *ngIf="lastGrades?.length == 0" class="col-md-12 mb-1 text-15 text-muted">aucune note disponible</div>
+              <div class="col-md-12 mb-1" *ngFor="let grade of lastGrades">
+                <div class="border rounded-lg p-1">
+                  <div class="d-md-flex text-13">
+                    <div class="w-100 w-md-20">{{grade.evalDate}}</div>
+                    <div class="w-100 w-md-20"><b>{{grade.courseAbbrev}}</b></div>
+                    <div *ngIf="!grade.gradeOK" class="w-100 w-md-20 text-danger">{{grade.grade}}/{{grade.gradeMax}}</div>
+                    <div *ngIf="grade.gradeOK" class="w-100 w-md-20 text-success">{{grade.grade}}/{{grade.gradeMax}}</div>
+                    <div class="w-100 w-md-20">(-) {{grade.classGradeMin}}/{{grade.gradeMax}}</div>
+                    <div class="w-100 w-md-20">(+) {{grade.classGradeMax}}/{{grade.gradeMax}}</div>
                   </div>
                 </div>
               </div>
-              <div class="col-md-12">
-                <div class="border rounded-lg p-2">
-                  <div class="row mb-2">
-                    <div class="col-md-7 text-15">notes</div>
-                    <div class="col-md-5">
-                      <button type="button" mdbBtn size="sm" block="true" [routerLink]="['/studentGrades', student?.id]"
-                        class="btnWhiteO" mdbWavesEffect>détails</button>
-                    </div>
-                  </div>
-                  <div class="row mx-1">
-                    <div *ngFor="let course of userCourses" class="col-md-4 border rounded-lg p-1 mb-2 text-center">
-                      <p class="text-muted text-15 my-1">{{course.courseAbbrev}}</p>
-                      <p *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000"
-                        class="text-primary text-danger text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                      <p *ngIf="course.userCourseAvg >= 10"
-                        class="text-primary text-success text-16 line-height-1 m-0">{{course.userCourseAvg}}</p>
-                      <p *ngIf="course.userCourseAvg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-12 mt-1">
-                <div class="border rounded-lg p-2">
-                  <div class="row mb-2">
-                    <div class="col-md-7 text-15">évaluations à venir</div>
-                    <div class="col-md-5">
-                      <button type="button" mdbBtn size="sm" block="true" class="btnWhiteO" mdbWavesEffect>détails</button>
-                    </div>
-                  </div>
-                  <div *ngFor="let eval of evalsToCome">
-                    <div class="card mb-2">
-                      <div class="card-up" [ngStyle]="{'background-color': eval.courseColor}" style="height: 10px;
-                        border-top-left-radius: 10px;border-top-right-radius: 10px">
-                      </div>            
-                      <div class="card-body p-2">
-                        <div class="row">
-                          <div class="col-md-7 text-15"><b>{{eval.courseName}}</b></div>
-                          <div class="col-md-5 text-small text-muted">prévue le {{eval.evalDate}}</div>
-                          <div class="col-md-12 text-14 pt-1">{{eval.evalTypeName}}</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div class="col-md-12 text-14 font-weight-bold mt-2">moyennes</div>
+              <div *ngFor="let course of userCourses" class="col-md-4 mb-1">
+                <div class="border rounded-lg my-auto text-muted text-13 p-1">
+                  {{course.courseAbbrev}} :
+                  <span *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000"
+                    class="text-primary text-danger text-14 mr-3">{{course.userCourseAvg}}</span>
+                  <span *ngIf="course.userCourseAvg >= 10"
+                    class="text-primary text-success text-14 mr-3">{{course.userCourseAvg}}</span>
+                  <span *ngIf="course.userCourseAvg === -1000" class="text-14 mr-3">N/A</span>
                 </div>
               </div>
             </div>

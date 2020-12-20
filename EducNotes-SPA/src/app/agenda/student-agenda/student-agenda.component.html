@@ -1,12 +1,10 @@
 <div class="row">
-
-  <div class="col-md-12 mb-1">
+  <!-- <div class="col-md-12 mb-1">
     <p class="text-17">cahier de textes - travail à faire à la maison</p>
-  </div>
+  </div> -->
   <div class="col-md-12" *ngIf="showChildrenList">
     <app-children-list [url]="url" [children]="children" (getUser)="getUser($event)"></app-children-list>
   </div>
-
   <div class="col-md-12" *ngIf="!showChildrenList">
     <div class="row">
       <div *ngIf="isParentConnected" class="col-md-12 mb-2">
@@ -15,9 +13,8 @@
       <div class="col-md-9">
         <div class="row">
           <div class="col-md-4">
-
             <div class="card">
-              <div class="card-body">
+              <div class="card-body p-2">
                 <div class="mb-2">
                   <label class="switch switch-primary mr-3">
                     <span>afficher tous les cours</span>
@@ -25,21 +22,29 @@
                     <span class="slider"></span>
                   </label>
                 </div>
-                <hr class="my-1">
-                <div class="d-flex align-items-center">
-                  <button type="button" mdbBtn size="sm" class="p-2" (click)="movePeriod(-7)" color="primary"
-                    mdbWavesEffect><i class="fal fa-angle-left fa-2x"></i></button>
-                  <p class="flex-grow-1 text-center text-15 m-0">{{strStartDate}} - {{strEndDate}}</p>
-                  <button type="button" mdbBtn size="sm" class="p-2" (click)="movePeriod(7)" color="primary"
-                    mdbWavesEffect><i class="fal fa-angle-right fa-2x"></i></button>
+                <div class="d-flex justify-content-center">
+                  <div class="text-center my-auto" style="width: 16%">
+                    <a (click)="movePeriod(-7)">
+                      <i class="text-25 fad fa-caret-circle-left" style="--fa-secondary-opacity: 1;
+                        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                    </a>
+                  </div>
+                  <div class="" style="width: 60%">
+                    <div class="text-13 text-center border rounded-lg p-1">{{strStartDate}} - {{strEndDate}}</div>
+                  </div>
+                  <div class="text-center my-auto" style="width: 16%">
+                    <a (click)="movePeriod(7)">
+                      <i class="text-25 fad fa-caret-circle-right" style="--fa-secondary-opacity: 1;
+                        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                    </a>
+                  </div>
                 </div>
-                <hr class="my-1">
-                <p class="text-danger text-15 mt-2 mb-2">clicker sur le cours pour filtrer</p>
+                <div class="text-danger text-center text-15 my-1">clicker sur le cours pour filtrer</div>
                 <div class="card mb-2" *ngFor="let course of coursesWithTasks">
                   <div class="card-up" [ngStyle]="{'background-color': course.courseColor}" style="height: 10px;
                     border-top-left-radius: 10px;border-top-right-radius: 10px">
                   </div>            
-                  <div *ngIf="course.nbTasks > 0">
+                  <div>
                     <a (click)="showCourseItems(course.courseId)" style="cursor: pointer;">
                       <div class="card-body p-2">
                         <div class="row">
@@ -51,63 +56,41 @@
                       </div>
                     </a>
                   </div>
-                  <div *ngIf="course.nbTasks <= 0">
-                    <div class="card-body p-2">
-                      <div class="row">
-                        <div class="col-md-12 d-flex">
-                          <div class="flex-grow-1 text-17">{{course.courseName}}</div>
-                          <div class="text-17">{{course.nbTasks}}</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
     
           </div>
           <div class="col-md-8">
-    
             <div class="card">
-              <div class="card-body">
+              <div class="card-body p-2">
                 <div class="row">
                   <div class="col-md-12">
                     <div *ngIf="filteredAgenda.length > 0">
                       <div *ngFor="let item of filteredAgenda; let i = index">
-                        <div class="lead m-0 p-0 d-flex">
-                          <div>à remettre le {{item.longDueDate}}</div>
-                          <div class="ml-2">
-                            <mdb-badge pill="true" class="badge-pill p-1" primary="true">{{item.nbItems}}</mdb-badge>
-                          </div>
+                        <div class="d-flex border rounded-lg day-title text-14 p-1 mb-1">
+                          <div class="flex-grow-1">{{item.shortDueDate}}</div>
+                          <div class="" *ngIf="item.nbItems > 1">{{item.nbItems}} tâches</div>
+                          <div class="" *ngIf="item.nbItems == 1">{{item.nbItems}} tâche</div>
                         </div>
-                        <div class="card mb-2" *ngFor="let ai of item.agendaItems; let j = index">
-                          <div class="card-up" [ngStyle]="{'background-color': ai.courseColor}" style="height: 10px;
-                            border-top-left-radius: 10px;border-top-right-radius: 10px">
-                          </div>
-                          <div class="card-body p-2">
-                            <div class="row">
-                              <div class="col-md-12 d-flex">
-                                <div class="flex-grow-1">
-                                  <div class="d-flex">
-                                    <div class="flex-grow-1 text-17">{{ai.courseName}}</div>
-                                    <div class="switch">
-                                      <label>
-                                        <input (change)="setCourseTask(i, ai.agendaId)"
-                                          [(ngModel)]="model[(i * item.agendaItems.length) + j]" type="checkbox">
-                                        <span class="lever"></span>fait
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <p class="text-15 text-muted m-0 mt-1">{{ai.taskDesc}}</p>
-                                  </div>
-                                </div>
-                              </div>
+                        <div class="mb-1" *ngFor="let ai of item.agendaItems; let j = index">
+                          <div class="border rounded-lg p-0">
+                            <div [ngStyle]="{'background-color': ai.courseColor}" style="height: 5px;
+                              border-top-left-radius: 5px;border-top-right-radius: 5px">
+                            </div>            
+                            <div class="d-md-flex mx-1">
+                              <div class="flex-grow-1 text-15"><b>{{ai.courseName}}</b></div>
+                              <div class="text-14 text-muted">donné le {{ai.strDateAdded}}</div>
                             </div>
-                            <div class="d-flex">
-                              <div class="flex-grow-1"></div>
-                              <div>
-                                <p class="text-12 mt-2 m-0">donné le {{ai.strDateAdded}}</p>
+                            <div class="mx-1">
+                              <div class=" text-15">{{ai.taskDesc}}</div>
+                              <div class="text-right mt-1">
+                                <label class="switch switch-primary">
+                                  <span>fait</span>
+                                  <input (change)="setCourseTask(i, ai.agendaId)"
+                                    [(ngModel)]="model[(i * item.agendaItems.length) + j]" type="checkbox">
+                                  <span class="slider"></span>
+                                </label>
                               </div>
                             </div>
                           </div>
@@ -121,9 +104,7 @@
                   </div>
                 </div>
               </div>
-    
             </div>
-    
           </div>
         </div>
       </div>
@@ -132,5 +113,4 @@
       </div>    
     </div>
   </div>
-
 </div>

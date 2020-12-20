@@ -6,7 +6,6 @@ import { ActivatedRoute } from '@angular/router';
 import { UserService } from 'src/app/_services/user.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { AuthService } from 'src/app/_services/auth.service';
-import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 
 @Component({
   selector: 'app-student-agenda',
@@ -110,7 +109,9 @@ export class StudentAgendaComponent implements OnInit {
     this.classService.getClassAgendaByDate(classId, agendaParams).subscribe((agenda: any) => {
       this.classAgendaByDate = agenda.agendaList;
       this.filteredAgenda = agenda.agendaList;
+      // console.log(this.filteredAgenda);
       this.coursesWithTasks = agenda.coursesWithTasks;
+      // console.log(this.coursesWithTasks);
       this.model = agenda.dones;
       this.startDate = agenda.startDate;
       this.strStartDate = agenda.strStartDate;

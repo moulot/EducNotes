@@ -63,7 +63,6 @@ export class StudentScheduleComponent implements OnInit {
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
-
       const loggedUser = this.authService.currentUser;
       if (loggedUser.id !== this.student.id) {
         this.isParentConnected = true;
@@ -75,7 +74,6 @@ export class StudentScheduleComponent implements OnInit {
   }
 
   loadWeekSchedule(classId) {
-
     this.resetSchedule();
     this.classService.getClassTimeTable(classId).subscribe((data: any) => {
       this.scheduleItems = data.scheduleItems;

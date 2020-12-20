@@ -292,6 +292,7 @@ export class GradeStudentComponent implements OnInit {
       this.periodAvg = periodData.avg;
     } else {
       // get the active (default) period name & avg
+      console.log(this.periodAvg);
       const periodData = this.periodAvgs.find(item => item.active === true);
       this.periodName = periodData.periodName;
       this.periodAvg = periodData.avg;

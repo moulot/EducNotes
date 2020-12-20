@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-
 import { UserService } from 'src/app/_services/user.service';
 import { AuthService } from 'src/app/_services/auth.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
@@ -34,7 +33,6 @@ export class AgendaListComponent implements OnInit {
   sessions: any[] = [];
   filteredSessions;
   optionsClass: any[] = [];
-
   allCourses = true;
   coursesWithTasks: any = [];
   nbDayTasks = [0, 0, 0, 0, 0, 0];

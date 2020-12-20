@@ -8,6 +8,7 @@ namespace EducNotes.API.Dtos
         public List<CourseTask> Courses { get; set; }
         public DateTime dtDueDate { get; set; }
         public string DueDate { get; set; }
+        public string ShortDueDate { get; set; }
         public int DueDateDay { get; set; }
         public int DayInt { get; set; }
         public int NbTasks { get; set; }

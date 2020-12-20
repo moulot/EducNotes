@@ -26,6 +26,7 @@ export class ParentDashboardComponent implements OnInit {
   firstDay: Date;
   toNbDays = 7;
   userCourses: any;
+  lastGrades: any;
   studentAvg: any;
   isParentConnected = false;
   showChildrenList = false;
@@ -44,6 +45,7 @@ export class ParentDashboardComponent implements OnInit {
   periodAvgs: any;
   nbChildren: number;
   dayIndex: number;
+  todayIndex: number;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -54,25 +56,6 @@ export class ParentDashboardComponent implements OnInit {
     this.isParentConnected = true;
     this.parent = this.authService.currentUser;
     this.getChildren(this.parent.id);
-    // console.log(this.children);
-    // console.log(this.nbChildren);
-    // if (this.nbChildren === 1) {
-    //   this.showUsersList = false;
-    //   this.showChildrenList = false;
-    //   this.authService.currentChild.subscribe(child => this.currentChild = this.getChildren[0]);
-    //   this.getUser(this.getChildren[0].id);
-    // } else {
-    //   this.showUsersList = true;
-    //   this.showChildrenList = true;
-    // }
-    // this.authService.currentChild.subscribe(child => this.currentChild = child);
-    // if (this.currentChild.id === 0) {
-    //   this.showChildrenList = true;
-    //   this.getChildren(this.parent.id);
-    // } else {
-    //   this.showChildrenList = false;
-    //   this.getUser(this.currentChild.id);
-    // }
   }
 
   getChildren(parentId: number) {
@@ -82,8 +65,9 @@ export class ParentDashboardComponent implements OnInit {
       if (this.nbChildren === 1) {
         this.showUsersList = false;
         this.showChildrenList = false;
-        this.authService.changeCurrentChild(this.children[0]);
-        this.getUser(this.children[0].id);
+        const child = this.children[0];
+        this.authService.changeCurrentChild(child);
+        this.getUser(child.id);
       } else {
         this.authService.currentChild.subscribe(child => this.currentChild = child);
         if (this.currentChild.id === 0) {
@@ -104,11 +88,9 @@ export class ParentDashboardComponent implements OnInit {
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
-      // let parentId = 0;
-      // if (this.isParentConnected === true) {
-      //   parentId = this.parent.id;
-      // }
       this.getUserInfos(this.student.id, this.parent.id);
+      this.getCoursesWithEvals(this.student.id, this.student.classId);
+      this.getStudentLastGrades(this.student.id, this.student.classId);
       this.showChildrenList = false;
       if (this.nbChildren > 1) {
         this.showUsersList = true;
@@ -118,12 +100,6 @@ export class ParentDashboardComponent implements OnInit {
     });
   }
 
-  // getClassSchedule(classId) {
-  //   this.classService.getClassScheduleByDay(classId).subscribe(data => {
-
-  //   })
-  // }
-
   getUserInfos(userId, parentId) {
     this.userService.getUserInfos(userId, parentId).subscribe((data: any) => {
       this.agendaItems = data.agendaItems;
@@ -132,52 +108,58 @@ export class ParentDashboardComponent implements OnInit {
       this.periodAvgs = data.periodAvgs;
       this.scheduleDays = data.scheduleDays;
       this.dayIndex = data.todayIndex;
-      // console.log(this.scheduleDays);
+      this.todayIndex = data.todayIndex;
     }, error => {
       this.alertify.error(error);
     });
   }
 
-  getAgenda(classId, toNbDays) {
+  // getAgenda(classId, toNbDays) {
+  //   this.classService.getTodayToNDaysAgenda(classId, toNbDays).subscribe((res: any) => {
+  //     this.agendaItems = res.agendaItems;
+  //     this.firstDay = res.firstDay;
+  //     this.strFirstDay = res.strFirstDayy;
+  //     this.strLastDay = res.strLastDay;
+  //     this.weekDays = res.weekDays;
+  //     this.nbDayTasks = res.nbDayTasks;
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
 
-    this.classService.getTodayToNDaysAgenda(classId, toNbDays).subscribe((res: any) => {
-
-      this.agendaItems = res.agendaItems;
-      this.firstDay = res.firstDay;
-      this.strFirstDay = res.strFirstDayy;
-      this.strLastDay = res.strLastDay;
-      this.weekDays = res.weekDays;
-      this.nbDayTasks = res.nbDayTasks;
-
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
-  getEvalsToCome(classId) {
-    this.evalService.getClassEvalsToCome(classId).subscribe(evals => {
-      this.evalsToCome = evals;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
+  // getEvalsToCome(classId) {
+  //   this.evalService.getClassEvalsToCome(classId).subscribe(evals => {
+  //     this.evalsToCome = evals;
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
 
   getCoursesWithEvals(studentId, classId) {
     this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
       this.userCourses = data.coursesWithEvals;
+      // this.studentAvg = data.studentAvg;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getStudentLastGrades(studentId, classId) {
+    this.evalService.getStudentLastGrades(studentId, classId).subscribe((data: any) => {
+      this.lastGrades = data.lastGrades;
       this.studentAvg = data.studentAvg;
     }, error => {
       this.alertify.error(error);
     });
   }
 
-  getScheduleDay(classId) {
-    this.classService.getScheduleToday(classId).subscribe(data => {
-      this.scheduleDays = data;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
+  // getScheduleDay(classId) {
+  //   this.classService.getScheduleToday(classId).subscribe(data => {
+  //     this.scheduleDays = data;
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
 
   getEvents() {
     let userId = 0;
@@ -196,15 +178,17 @@ export class ParentDashboardComponent implements OnInit {
   prevDay() {
     if (this.dayIndex > 0) {
       this.dayIndex--;
-      console.log('prev: ' + this.dayIndex);
     }
   }
 
   nextDay() {
     if (this.dayIndex < this.scheduleDays.length - 1) {
       this.dayIndex++;
-      console.log('next: ' + this.dayIndex);
     }
+  }
+
+  goToToday() {
+    this.dayIndex = this.todayIndex;
   }
 
 }

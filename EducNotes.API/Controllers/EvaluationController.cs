@@ -129,11 +129,38 @@ namespace EducNotes.API.Controllers
             });
         }
 
+        [HttpGet("Class/{classId}/User/{userId}/LastGrades")]
+        public async Task<IActionResult> GetUserLastGrades(int userId, int classId)
+        {
+          List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(userId, classId);
+          double courseAvgSum = 0;
+          double courseCoeffSum = 0;
+          double StudentAvg = -1000;
+
+          if(coursesWithEvals.Count() > 0)
+          {
+            foreach (var course in coursesWithEvals)
+            {
+              courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
+              courseCoeffSum += course.CourseCoeff;
+            }
+
+            if(courseCoeffSum > 0)
+              StudentAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
+          }
+
+          int nbOfGrades = 6;
+          var lastGrades = await _repo.GetStudentLastGrades(userId, nbOfGrades);
+          return Ok(new {
+            lastGrades,
+            StudentAvg
+          });
+        }
+
         [HttpGet("Class/{classId}/CoursesWithEvals/{userId}")]
         public async Task<IActionResult> GetCoursesWithEvals(int userId, int classId)
         {
           var periods = await _context.Periods.OrderBy(o => o.Abbrev).ToListAsync();
-
           List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(userId, classId);
 
           double courseAvgSum = 0;
@@ -480,24 +507,7 @@ namespace EducNotes.API.Controllers
           userGrades.ClassAvgMin = classAvgs.ClassAvgMin;
           userGrades.ClassAvgMax = classAvgs.ClassAvgMax;
           
-          var lastGradesFromDB = await _context.UserEvaluations
-                                        .Include(i => i.Evaluation).ThenInclude(i => i.EvalType)
-                                        .Include(i => i.Evaluation).ThenInclude(i => i.Course)
-                                        .OrderByDescending(o => o.Evaluation.EvalDate)
-                                        .Where(e => e.UserId == userId && e.Grade.IsNumeric() && e.Evaluation.Closed)
-                                        .Take(nbLastGrades)
-                                        .ToListAsync();
-          var lastGrades = _mapper.Map<List<GradeDto>>(lastGradesFromDB);
-          for (int i = 0; i < lastGrades.Count(); i++)
-          {
-            var grade = lastGrades[i];
-            int evalId = lastGradesFromDB[i].EvaluationId;
-            var gradeMin = await _repo.GetEvalMin(evalId);
-            var gradeMax = await _repo.GetEvalMax(evalId);
-            grade.ClassGradeMin = gradeMin;
-            grade.ClassGradeMax = gradeMax;
-            grade.GradeOK = Convert.ToDouble(grade.Grade) >= Convert.ToDouble(grade.GradeMax)/2;
-          }
+          var lastGrades = await _repo.GetStudentLastGrades(userId, nbLastGrades);
           userGrades.LastGrades = lastGrades;
 
           var periods = await _context.Periods.OrderBy(o => o.Abbrev).ToListAsync();
