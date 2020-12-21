@@ -56,7 +56,12 @@ export class StudentDashboardComponent implements OnInit {
     this.dayIndex = 0;
     this.isParentConnected = true;
     this.student = this.authService.currentUser;
-    this.getUser(this.student.id);
+    this.getAgendaItems(this.student.classId);
+    this.getEvalsToCome(this.student.classId);
+    this.getScheduleDays(this.student.classId);
+    this.getCoursesWithEvals(this.student.id, this.student.classId);
+    this.getStudentLastGrades(this.student.id, this.student.classId);
+    // this.getUser(this.student.id);
   }
 
   getUser(id) {
