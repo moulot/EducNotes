@@ -62,11 +62,30 @@ export class StudentDashboardComponent implements OnInit {
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
-      this.getUserInfos(this.student.id, 0);
+      // this.getUserInfos(this.student.id, 0);
+      this.getAgendaItems(this.student.classId);
+      this.getEvalsToCome(this.student.classId);
+      this.getScheduleDays(this.student.classId);
       this.getCoursesWithEvals(this.student.id, this.student.classId);
       this.getStudentLastGrades(this.student.id, this.student.classId);
     }, error => {
       this.alertify.error(error);
+    });
+  }
+
+  getEvalsToCome(classId) {
+    this.evalService.getClassEvalsToCome(classId).subscribe(evals => {
+      this.evalsToCome = evals;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getScheduleDays(classId) {
+    this.classService.getScheduleNDays(classId).subscribe((data: any) => {
+      this.scheduleDays = data.scheduleDays;
+      this.dayIndex = data.todayIndex;
+      this.todayIndex = data.todayIndex;
     });
   }
 
@@ -93,6 +112,14 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
+  getAgendaItems(classId) {
+    this.classService.getClassAgendaNbDays(classId).subscribe(items => {
+      this.agendaItems = items;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
   getAgenda(classId, toNbDays) {
     this.classService.getTodayToNDaysAgenda(classId, toNbDays).subscribe((res: any) => {
       this.agendaItems = res.agendaItems;
@@ -101,14 +128,6 @@ export class StudentDashboardComponent implements OnInit {
       this.strLastDay = res.strLastDay;
       this.weekDays = res.weekDays;
       this.nbDayTasks = res.nbDayTasks;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
-  getEvalsToCome(classId) {
-    this.evalService.getClassEvalsToCome(classId).subscribe(evals => {
-      this.evalsToCome = evals;
     }, error => {
       this.alertify.error(error);
     });

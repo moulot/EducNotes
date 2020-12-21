@@ -68,10 +68,19 @@
                   <div class="col-md-12">
                     <div *ngIf="filteredAgenda.length > 0">
                       <div *ngFor="let item of filteredAgenda; let i = index">
-                        <div class="d-flex border rounded-lg day-title text-14 p-1 mb-1">
-                          <div class="flex-grow-1">{{item.shortDueDate}}</div>
-                          <div class="" *ngIf="item.nbItems > 1">{{item.nbItems}} tâches</div>
-                          <div class="" *ngIf="item.nbItems == 1">{{item.nbItems}} tâche</div>
+                        <div class="d-none d-md-block">
+                          <div class="d-flex border rounded-lg day-title w-50 text-14 p-1 mb-1">
+                            <div class="flex-grow-1">{{item.shortDueDate}}</div>
+                            <div class="" *ngIf="item.nbItems > 1">{{item.nbItems}} tâches</div>
+                            <div class="" *ngIf="item.nbItems == 1">{{item.nbItems}} tâche</div>
+                          </div>
+                        </div>
+                        <div class="d-md-none">
+                          <div class="d-flex border rounded-lg day-title text-14 p-1 mb-1">
+                            <div class="flex-grow-1">{{item.shortDueDate}}</div>
+                            <div class="" *ngIf="item.nbItems > 1">{{item.nbItems}} tâches</div>
+                            <div class="" *ngIf="item.nbItems == 1">{{item.nbItems}} tâche</div>
+                          </div>
                         </div>
                         <div class="mb-1" *ngFor="let ai of item.agendaItems; let j = index">
                           <div class="border rounded-lg p-0">

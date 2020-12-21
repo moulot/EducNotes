@@ -317,8 +317,8 @@ namespace EducNotes.API.Controllers
         [HttpGet("Class/{classId}/EvalsToCome")]
         public async Task<IActionResult> GetEvalsToCome(int classId)
         {
-          var evalsToReturn = await _repo.GetEvalsToCome(classId);
-          return Ok(evalsToReturn);
+          var evalsToCome = await _repo.GetEvalsToCome(classId);
+          return Ok(evalsToCome);
         }
 
         [HttpGet("Class/{classId}/AllEvaluations")]

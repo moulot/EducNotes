@@ -415,13 +415,6 @@ namespace EducNotes.API.Controllers
             }
           }
 
-          // today courses
-          // var today = ((int)DateTime.Now.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
-          // //if saturday or sunday goes to monday schedule
-          // if (today == 6 || today == 7)
-          //   today = 1;
-          // var coursesFromRepo = await _repo.GetScheduleDay(classid, today);
-          // var coursesToday = _mapper.Map<IEnumerable<ScheduleForTimeTableDto>>(coursesFromRepo);
           int daysRange = 14;
           DateTime today = DateTime.Now.Date;
           var startDate = today.AddDays(-daysRange);

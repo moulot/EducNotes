@@ -378,44 +378,42 @@ namespace EducNotes.API.Controllers
         [HttpGet("{classId}/TodayToNDaysAgenda/{toNbDays}")]
         public async Task<IActionResult> getTodayToNDaysAgenda(int classId, int toNbDays)
         {
-            var agendasFromRepo = await _repo.GetClassAgendaTodayToNDays(classId, toNbDays);
-            var items = _repo.GetAgendaListByDueDate(agendasFromRepo);
+          var agendasFromRepo = await _repo.GetClassAgendaTodayToNDays(classId, toNbDays);
+          var items = _repo.GetAgendaListByDueDate(agendasFromRepo);
 
-            var days = new List<string>();
-            var nbTasks = new List<int>();
+          var days = new List<string>();
+          var nbTasks = new List<int>();
+          var today = DateTime.Now.Date;
+          for (int i = 0; i < toNbDays; i++)
+          {
+            DateTime dt = today.AddDays(i);
+            CultureInfo frC = new CultureInfo("fr-FR");
+            var shortdate = dt.ToString("ddd dd MMM", frC);
+            days.Add(shortdate);
 
-            var today = DateTime.Now.Date;
+            var item = items.FirstOrDefault(a => a.dtDueDate == dt);
+            if (item != null)
+              nbTasks.Add(item.NbTasks);
+            else
+              nbTasks.Add(0);
+          }
 
-            for (int i = 0; i < toNbDays; i++)
+          var lastDay = today.AddDays(toNbDays);
+
+          if (agendasFromRepo != null)
+          {
+            return Ok(new
             {
-                DateTime dt = today.AddDays(i);
-                CultureInfo frC = new CultureInfo("fr-FR");
-                var shortdate = dt.ToString("ddd dd MMM", frC);
-                days.Add(shortdate);
+              agendaItems = items,
+              firstDay = today,
+              strFirstDay = today.ToLongDateString(),
+              strLastDayay = lastDay.ToLongDateString(),
+              weekDays = days,
+              nbDayTasks = nbTasks
+            });
+          }
 
-                var item = items.FirstOrDefault(a => a.dtDueDate == dt);
-                if (item != null)
-                    nbTasks.Add(item.NbTasks);
-                else
-                    nbTasks.Add(0);
-            }
-
-            var lastDay = today.AddDays(toNbDays);
-
-            if (agendasFromRepo != null)
-            {
-                return Ok(new
-                {
-                    agendaItems = items,
-                    firstDay = today,
-                    strFirstDay = today.ToLongDateString(),
-                    strLastDayay = lastDay.ToLongDateString(),
-                    weekDays = days,
-                    nbDayTasks = nbTasks
-                });
-            }
-
-            return BadRequest("Aucun agenda trouvé");
+          return BadRequest("Aucun agenda trouvé");
         }
 
         [HttpGet("{classId}/CurrWeekAgenda")]
@@ -658,7 +656,7 @@ namespace EducNotes.API.Controllers
             });
         }
 
-        [HttpGet("{classId}/GetClassAgenda")]
+        [HttpGet("{classId}/ClassAgenda")]
         public async Task<IActionResult> GetClassAgenda(int classId, DateTime StartDate, DateTime EndDate)
         {
             var agendaItems = await _repo.GetClassAgenda(classId, StartDate, EndDate);
@@ -836,6 +834,15 @@ namespace EducNotes.API.Controllers
             }
 
             return Ok(coursesWithAgenda.OrderBy(c => c.Name));
+        }
+
+        [HttpGet("{classId}/AgendaNbDays")]
+        public async Task<IActionResult> GetClassAgendaNbDays(int classId)
+        {
+          var toNbDays = 7;
+          var agendasFromRepo = await _repo.GetClassAgendaTodayToNDays(classId, toNbDays);
+          var agendaItems = _repo.GetAgendaListByDueDate(agendasFromRepo);
+          return Ok(agendaItems);
         }
 
         [HttpGet("{classId}/AgendaByDate")]
@@ -1093,6 +1100,41 @@ namespace EducNotes.API.Controllers
             var studentsFromRepo = await _repo.GetClassStudents(classId);
             var classStudents = _mapper.Map<IEnumerable<UserForCallSheetDto>>(studentsFromRepo);
             return Ok(classStudents);
+        }
+
+        [HttpGet("{classId}/ScheduleNDays")]
+        public async Task<IActionResult> GetScheduleNDays(int classId)
+        {
+          int daysRange = 14;
+          DateTime today = DateTime.Now.Date;
+          var startDate = today.AddDays(-daysRange);
+          var endDate = today.AddDays(daysRange);
+          var itemsFromRepo = await _repo.GetClassSchedule(classId);
+
+          int todayIndex = 0;
+          List<ClassScheduleNDaysDto> scheduleDays = new List<ClassScheduleNDaysDto>();
+          for (int i = 0; i < 2 * daysRange; i++)
+          {
+            ClassScheduleNDaysDto item = new ClassScheduleNDaysDto();
+            var currentDate = startDate.AddDays(i);
+            if(currentDate.Date == today)
+            {
+              todayIndex = i;
+            }
+            var dayInt = (int)currentDate.DayOfWeek == 0 ? 7 : (int)currentDate.DayOfWeek;
+            item.Day = dayInt;
+            item.DayDate = currentDate;
+            item.strDayDate = currentDate.ToString("ddd dd MMM", frC);
+            item.Courses = new List<ClassDayCoursesDto>();
+            var dayCourses = itemsFromRepo.Where(s => s.Day == dayInt);
+            var courses = _mapper.Map<List<ClassDayCoursesDto>>(dayCourses);
+            item.Courses = courses;
+            scheduleDays.Add(item);
+          }
+          return Ok(new {
+            scheduleDays,
+            todayIndex
+          });
         }
 
         [HttpGet("Schedule/{id}")]
