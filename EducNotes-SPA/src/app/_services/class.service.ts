@@ -58,6 +58,10 @@ export class ClassService {
     return this.http.get<number[]>(this.baseUrl + 'classes/GetWeekDays', { params });
   }
 
+  getScheduleNDays(classId) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/ScheduleNDays');
+  }
+
   getSchedule(id) {
     return this.http.get(this.baseUrl + 'classes/Schedule/' + id);
   }
@@ -139,7 +143,7 @@ export class ClassService {
   }
 
   getClassAgenda(classId): Observable<Agenda[]> {
-    return this.http.get<Agenda[]>(this.baseUrl + 'classes/' + classId + '/GetClassAgenda');
+    return this.http.get<Agenda[]>(this.baseUrl + 'classes/' + classId + '/ClassAgenda');
   }
 
   // saveAgendaItem(id: number, agendaItem: Agenda) {
@@ -156,6 +160,10 @@ export class ClassService {
 
   getClassCoursesWithAgenda(classId, daysToNow, daysFromNow) {
     return this.http.get(this.baseUrl + 'classes/' + classId + '/CoursesWithAgenda/f/' + daysToNow + '/t/' + daysFromNow);
+  }
+
+  getClassAgendaNbDays(classId) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/AgendaNbDays');
   }
 
   getClassAgendaByDate(classId, agendaParams) {
