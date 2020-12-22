@@ -132,30 +132,84 @@ namespace EducNotes.API.Controllers
         [HttpGet("Class/{classId}/User/{userId}/LastGrades")]
         public async Task<IActionResult> GetUserLastGrades(int userId, int classId)
         {
-          List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(userId, classId);
-          double courseAvgSum = 0;
-          double courseCoeffSum = 0;
+          // List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(userId, classId);
+          // double courseAvgSum = 0;
+          // double courseCoeffSum = 0;
           double StudentAvg = -1000;
 
-          if(coursesWithEvals.Count() > 0)
-          {
-            foreach (var course in coursesWithEvals)
+          // if(coursesWithEvals.Count() > 0)
+          // {
+          //   foreach (var course in coursesWithEvals)
+          //   {
+          //     courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
+          //     courseCoeffSum += course.CourseCoeff;
+          //   }
+
+          //   if(courseCoeffSum > 0)
+          //     StudentAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
+          // }
+
+            var userCourses = await _repo.GetUserCourses(classId);
+            var userClass = await _repo.GetClass(classId);
+            double courseAvgSum1 = 0;
+            double courseCoeffSum1 = 0;
+            foreach (var course in userCourses)
             {
-              courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
-              courseCoeffSum += course.CourseCoeff;
+              //get all evaluations of the selected course and current userId
+              var userEvals = await _context.UserEvaluations
+                                    // .Include(e => e.Evaluation).ThenInclude(e => e.EvalType)
+                                    .Include(e => e.Evaluation)//.ThenInclude(e => e.Course)
+                                    .OrderBy(o => o.Evaluation.EvalDate)
+                                    .Where(e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
+                                      e.Evaluation.CourseId == course.Id && e.Evaluation.Graded == true && e.Grade.IsNumeric())
+                                    .Distinct().ToListAsync();
+
+              double gradesSum = 0;
+              double coeffSum = 0;
+              foreach (var userEval in userEvals)
+              {
+                if(userEval.Grade.IsNumeric())
+                {
+                  double maxGrade = Convert.ToDouble(userEval.Evaluation.MaxGrade);
+                  double gradeValue = Convert.ToDouble(userEval.Grade.Replace(".", ","));
+                  // grade are ajusted to 20 as MAx. Avg is on 20
+                  double ajustedGrade = Math.Round(20 * gradeValue / maxGrade, 2);
+                  double coeff = userEval.Evaluation.Coeff;
+                  //data for course average
+                  gradesSum += ajustedGrade * coeff;
+                  coeffSum += coeff;
+                }
+              }
+              double courseAvg = Math.Round(gradesSum / coeffSum, 2);
+            
+              //get course coeff
+              var courseCoeffData = await _context.CourseCoefficients
+                                          .FirstOrDefaultAsync(c => c.ClassLevelid == userClass.ClassLevelId &&
+                                            c.CourseId == course.Id && c.ClassTypeId == userClass.ClassTypeId);
+              double courseCoeff = 1;
+              if (courseCoeffData != null)
+                courseCoeff = courseCoeffData.Coefficient;
+
+              courseAvgSum1 += courseAvg * courseCoeff;
+              courseCoeffSum1 += courseCoeff;
             }
 
-            if(courseCoeffSum > 0)
-              StudentAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
-          }
+          StudentAvg = Math.Round(courseAvgSum1 / courseCoeffSum1, 2);
 
           int nbOfGrades = 6;
           var lastGrades = await _repo.GetStudentLastGrades(userId, nbOfGrades);
+          
           return Ok(new {
             lastGrades,
             StudentAvg
           });
         }
+
+        // [HttpGet("Class/{classId}/User/{userId}/CoursesAvg")]
+        // public async Task<IActionResult> GetUserCoursesAvg(int classId, int userId)
+        // {
+
+        // }
 
         [HttpGet("Class/{classId}/CoursesWithEvals/{userId}")]
         public async Task<IActionResult> GetCoursesWithEvals(int userId, int classId)

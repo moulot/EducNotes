@@ -1290,123 +1290,127 @@ namespace EducNotes.API.Data
 
         public async Task<List<UserSpaCodeDto>> ParentSelfInscription(int parentId, List<UserForUpdateDto> userToUpdate)
         {
-            var usersSpaCode = new List<UserSpaCodeDto>();
-            var children = await _context.UserLinks.Where(u => u.UserPId == parentId).Select(u => u.User).ToListAsync();
-            int cpt = 0;
-            using (var identityContextTransaction = _context.Database.BeginTransaction())
+          var usersSpaCode = new List<UserSpaCodeDto>();
+          var children = await _context.UserLinks.Where(u => u.UserPId == parentId).Select(u => u.User).ToListAsync();
+          int cpt = 0;
+          using (var identityContextTransaction = _context.Database.BeginTransaction())
+          {
+            try
             {
-                try
-                {
-                    foreach (var user in userToUpdate)
-                    {
-                        if (user.UserTypeId == parentTypeId)
-                        {
-                            var parentFromRepo = await GetUser(parentId, true);
-                            parentFromRepo.UserName = user.UserName.ToLower();
-                            parentFromRepo.LastName = user.LastName;
-                            parentFromRepo.FirstName = user.FirstName;
-                            parentFromRepo.Gender = Convert.ToByte(user.Gender);
-                            if (user.DateOfBirth != null)
-                                parentFromRepo.DateOfBirth = Convert.ToDateTime(user.DateOfBirth);
-                            parentFromRepo.CityId = user.CityId;
-                            parentFromRepo.DistrictId = user.DistrictId;
-                            parentFromRepo.PhoneNumber = user.PhoneNumber;
-                            parentFromRepo.SecondPhoneNumber = user.SecondPhoneNumber;
-                            // configuration du nouveau mot de passe
-                            var newPassword = _userManager.PasswordHasher.HashPassword(parentFromRepo, user.Password);
-                            parentFromRepo.PasswordHash = newPassword;
-                            parentFromRepo.Validated = true;
-                            parentFromRepo.EmailConfirmed = true;
-                            parentFromRepo.ValidationDate = DateTime.Now;
-                            var res = await _userManager.UpdateAsync(parentFromRepo);
+              foreach (var user in userToUpdate)
+              {
+                  if (user.UserTypeId == parentTypeId)
+                  {
+                      var parentFromRepo = await GetUser(parentId, true);
+                      parentFromRepo.UserName = user.UserName.ToLower();
+                      parentFromRepo.LastName = user.LastName;
+                      parentFromRepo.FirstName = user.FirstName;
+                      parentFromRepo.Gender = Convert.ToByte(user.Gender);
+                      if (user.DateOfBirth != null)
+                          parentFromRepo.DateOfBirth = Convert.ToDateTime(user.DateOfBirth);
+                      parentFromRepo.CityId = user.CityId;
+                      parentFromRepo.DistrictId = user.DistrictId;
+                      parentFromRepo.PhoneNumber = user.PhoneNumber;
+                      parentFromRepo.SecondPhoneNumber = user.SecondPhoneNumber;
+                      // configuration du nouveau mot de passe
+                      var newPassword = _userManager.PasswordHasher.HashPassword(parentFromRepo, user.Password);
+                      parentFromRepo.PasswordHash = newPassword;
+                      parentFromRepo.Validated = true;
+                      parentFromRepo.EmailConfirmed = true;
+                      parentFromRepo.ValidationDate = DateTime.Now;
+                      var res = await _userManager.UpdateAsync(parentFromRepo);
 
-                            if (res.Succeeded)
-                            {
-                                // ajout dans la table Email
-                                var email = new Email();
-                                email.InsertDate = DateTime.Now;
-                                email.InsertUserId = parentId;
-                                email.UpdateUserId = parentId;
-                                email.StatusFlag = 0;
-                                email.Subject = "Compte confirmé";
-                                email.ToAddress = parentFromRepo.Email;
-                                email.Body = "<b> " + parentFromRepo.LastName + " " + parentFromRepo.FirstName + "</b>, votre compte a bien été enregistré";
-                                email.FromAddress = "no-reply@educnotes.com";
-                                email.EmailTypeId = _config.GetValue<int>("AppSettings:confirmedEmailtypeId");
-                                Add(email);
-                                // retour du code du userId et du codeSpa
-                                usersSpaCode.Add(new UserSpaCodeDto { UserId = parentFromRepo.Id, SpaCode = Convert.ToInt32(user.SpaCode) });
-                            }
+                      if (res.Succeeded)
+                      {
+                          // ajout dans la table Email
+                          var email = new Email();
+                          email.InsertDate = DateTime.Now;
+                          email.InsertUserId = parentId;
+                          email.UpdateUserId = parentId;
+                          email.StatusFlag = 0;
+                          email.Subject = "Compte confirmé";
+                          email.ToAddress = parentFromRepo.Email;
+                          email.Body = "<b> " + parentFromRepo.LastName + " " + parentFromRepo.FirstName + "</b>, votre compte a bien été enregistré";
+                          email.FromAddress = "no-reply@educnotes.com";
+                          email.EmailTypeId = _config.GetValue<int>("AppSettings:confirmedEmailtypeId");
+                          Add(email);
+                          // retour du code du userId et du codeSpa
+                          usersSpaCode.Add(new UserSpaCodeDto { UserId = parentFromRepo.Id, SpaCode = Convert.ToInt32(user.SpaCode) });
+                      }
 
-                        }
-                        if (user.UserTypeId == studentTypeId)
-                        {
-                            var child = children[cpt];
-                            int classLevelId = Convert.ToInt32(user.LevelId);
-                            child.UserName = user.UserName.ToLower();
-                            child.LastName = user.LastName;
-                            child.FirstName = user.FirstName;
-                            child.Gender = Convert.ToByte(user.Gender);
-                            if (child.DateOfBirth != null)
-                                child.DateOfBirth = Convert.ToDateTime(user.DateOfBirth);
-                            child.CityId = user.CityId;
-                            child.DistrictId = user.DistrictId;
-                            child.PhoneNumber = user.PhoneNumber;
-                            child.SecondPhoneNumber = user.SecondPhoneNumber;
-                            // configuration du mot de passe
-                            var newPass = _userManager.PasswordHasher.HashPassword(child, user.Password);
-                            child.PasswordHash = newPass;
-                            child.Validated = true;
-                            child.EmailConfirmed = false;
-                            if (!string.IsNullOrEmpty(child.Email))
-                                child.EmailConfirmed = true;
-                            child.ValidationDate = DateTime.Now;
-                            child.TempData = 1;
-                            var res = await _userManager.UpdateAsync(child);
+                  }
+                  if (user.UserTypeId == studentTypeId)
+                  {
+                      var child = children[cpt];
+                      int classLevelId = Convert.ToInt32(user.LevelId);
+                      child.UserName = user.UserName.ToLower();
+                      child.LastName = user.LastName;
+                      child.FirstName = user.FirstName;
+                      child.Gender = Convert.ToByte(user.Gender);
+                      if (child.DateOfBirth != null)
+                          child.DateOfBirth = Convert.ToDateTime(user.DateOfBirth);
+                      child.CityId = user.CityId;
+                      child.DistrictId = user.DistrictId;
+                      child.PhoneNumber = user.PhoneNumber;
+                      child.SecondPhoneNumber = user.SecondPhoneNumber;
+                      // configuration du mot de passe
+                      var newPass = _userManager.PasswordHasher.HashPassword(child, user.Password);
+                      child.PasswordHash = newPass;
+                      child.Validated = true;
+                      child.EmailConfirmed = false;
+                      if (!string.IsNullOrEmpty(child.Email))
+                          child.EmailConfirmed = true;
+                      child.ValidationDate = DateTime.Now;
+                      child.TempData = 1;
+                      var res = await _userManager.UpdateAsync(child);
 
-                            if (res.Succeeded)
-                            {
-                                //enregistrement de l inscription
-                                var insc = new Inscription
-                                {
-                                    InsertDate = DateTime.Now,
-                                    ClassLevelId = classLevelId,
-                                    UserId = child.Id,
-                                    InsertUserId = parentId,
-                                    InscriptionTypeId = _config.GetValue<int>("AppSettings:parentInscTypeId"),
+                      if (res.Succeeded)
+                      {
+                          //enregistrement de l inscription
+                          var insc = new Inscription
+                          {
+                              InsertDate = DateTime.Now,
+                              ClassLevelId = classLevelId,
+                              UserId = child.Id,
+                              InsertUserId = parentId,
+                              InscriptionTypeId = _config.GetValue<int>("AppSettings:parentInscTypeId"),
 
-                                    Validated = false
-                                };
-                                Add(insc);
-                                usersSpaCode.Add(new UserSpaCodeDto { UserId = child.Id, SpaCode = Convert.ToInt32(user.SpaCode) });
-                                cpt = cpt + 1;
-                            }
+                              Validated = false
+                          };
+                          Add(insc);
+                          usersSpaCode.Add(new UserSpaCodeDto { UserId = child.Id, SpaCode = Convert.ToInt32(user.SpaCode) });
+                          cpt = cpt + 1;
+                      }
 
-                        }
-                    }
+                  }
+              }
 
-                    if (await SaveAll())
-                        identityContextTransaction.Commit();
-                }
-                catch (System.Exception)
-                {
-                    identityContextTransaction.Rollback();
-                    usersSpaCode = new List<UserSpaCodeDto>();
-                }
+              if (await SaveAll())
+                identityContextTransaction.Commit();
             }
-            return usersSpaCode;
-
+            catch (System.Exception)
+            {
+              identityContextTransaction.Rollback();
+              usersSpaCode = new List<UserSpaCodeDto>();
+            }
+          }
+          return usersSpaCode;
         }
 
-        public async Task<List<UserCourseEvalsDto>> GetUserGrades(int userId, int classId)
+        public async Task<List<Course>> GetUserCourses(int classId)
         {
-          //get user courses
           var userCourses = await (from course in _context.ClassCourses
                                     join user in _context.Users on course.ClassId equals user.ClassId
                                     where user.ClassId == classId
                                     orderby course.Course.Name
                                     select course.Course).Distinct().ToListAsync();
+          return userCourses;
+        }
 
+        public async Task<List<UserCourseEvalsDto>> GetUserGrades(int userId, int classId)
+        {
+          //get user courses
+          var userCourses = await GetUserCourses(classId);
           var aclass = await _context.Classes.FirstOrDefaultAsync(c => c.Id == classId);
           var periods = await _context.Periods.OrderBy(p => p.StartDate).ToListAsync();
           List<UserCourseEvalsDto> coursesWithEvals = new List<UserCourseEvalsDto>();
@@ -1558,9 +1562,8 @@ namespace EducNotes.API.Data
 
         public EvalSmsDto GetUSerSmsEvalData(int ChildId, List<UserEvaluation> ClassEvals)
         {
-            EvalSmsDto smsData = new EvalSmsDto();
-
-            return smsData;
+          EvalSmsDto smsData = new EvalSmsDto();
+          return smsData;
         }
 
         public async Task<UserCourseEvalsDto> GetUserCourseEvals(List<UserEvaluation> userEvals, Course acourse, Class aclass)
@@ -1574,12 +1577,10 @@ namespace EducNotes.API.Data
 
           double gradesSum = 0;
           double coeffSum = 0;
-
           // are evals evailable for the current course?
           if (userEvals.Count() > 0)
           {
             List<GradeDto> grades = new List<GradeDto>();
-
             for (int j = 0; j < userEvals.Count(); j++)
             {
               // calculate each grade of the selected course

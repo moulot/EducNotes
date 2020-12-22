@@ -71,8 +71,8 @@ export class StudentDashboardComponent implements OnInit {
       this.getAgendaItems(this.student.classId);
       this.getEvalsToCome(this.student.classId);
       this.getScheduleDays(this.student.classId);
-      this.getCoursesWithEvals(this.student.id, this.student.classId);
       this.getStudentLastGrades(this.student.id, this.student.classId);
+      this.getCoursesWithEvals(this.student.id, this.student.classId);
     }, error => {
       this.alertify.error(error);
     });
@@ -94,19 +94,19 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  getUserInfos(userId, parentId) {
-    this.userService.getUserInfos(userId, parentId).subscribe((data: any) => {
-      this.agendaItems = data.agendaItems;
-      this.evalsToCome = data.evalsToCome;
-      this.studentAvg = data.studentAvg;
-      this.periodAvgs = data.periodAvgs;
-      this.scheduleDays = data.scheduleDays;
-      this.dayIndex = data.todayIndex;
-      this.todayIndex = data.todayIndex;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
+  // getUserInfos(userId, parentId) {
+  //   this.userService.getUserInfos(userId, parentId).subscribe((data: any) => {
+  //     this.agendaItems = data.agendaItems;
+  //     this.evalsToCome = data.evalsToCome;
+  //     this.studentAvg = data.studentAvg;
+  //     this.periodAvgs = data.periodAvgs;
+  //     this.scheduleDays = data.scheduleDays;
+  //     this.dayIndex = data.todayIndex;
+  //     this.todayIndex = data.todayIndex;
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
 
   getStudentLastGrades(studentId, classId) {
     this.evalService.getStudentLastGrades(studentId, classId).subscribe((data: any) => {
@@ -125,18 +125,18 @@ export class StudentDashboardComponent implements OnInit {
     });
   }
 
-  getAgenda(classId, toNbDays) {
-    this.classService.getTodayToNDaysAgenda(classId, toNbDays).subscribe((res: any) => {
-      this.agendaItems = res.agendaItems;
-      this.firstDay = res.firstDay;
-      this.strFirstDay = res.strFirstDayy;
-      this.strLastDay = res.strLastDay;
-      this.weekDays = res.weekDays;
-      this.nbDayTasks = res.nbDayTasks;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
+  // getAgenda(classId, toNbDays) {
+  //   this.classService.getTodayToNDaysAgenda(classId, toNbDays).subscribe((res: any) => {
+  //     this.agendaItems = res.agendaItems;
+  //     this.firstDay = res.firstDay;
+  //     this.strFirstDay = res.strFirstDayy;
+  //     this.strLastDay = res.strLastDay;
+  //     this.weekDays = res.weekDays;
+  //     this.nbDayTasks = res.nbDayTasks;
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
 
   getCoursesWithEvals(studentId, classId) {
     this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
