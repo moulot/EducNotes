@@ -8,7 +8,6 @@ import { EvaluationService } from 'src/app/_services/evaluation.service';
 import { Class } from 'src/app/_models/class';
 import { UserService } from 'src/app/_services/user.service';
 
-
 @Component({
   selector: 'app-student-dashboard',
   templateUrl: './student-dashboard.component.html',
@@ -62,17 +61,26 @@ export class StudentDashboardComponent implements OnInit {
     this.getCoursesWithEvals(this.student.id, this.student.classId);
     this.getStudentLastGrades(this.student.id, this.student.classId);
     // this.getUser(this.student.id);
+    this.getClass(this.student.classId);
   }
 
   getUser(id) {
     this.userService.getUser(id).subscribe((user: User) => {
       this.student = user;
       // this.getUserInfos(this.student.id, 0);
-      this.getAgendaItems(this.student.classId);
-      this.getEvalsToCome(this.student.classId);
-      this.getScheduleDays(this.student.classId);
-      this.getStudentLastGrades(this.student.id, this.student.classId);
-      this.getCoursesWithEvals(this.student.id, this.student.classId);
+      // this.getAgendaItems(this.student.classId);
+      // this.getEvalsToCome(this.student.classId);
+      // this.getScheduleDays(this.student.classId);
+      // this.getStudentLastGrades(this.student.id, this.student.classId);
+      // this.getCoursesWithEvals(this.student.id, this.student.classId);
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getClass(id) {
+    this.classService.getClass(id).subscribe((aclass: Class) => {
+      this.classRoom = aclass;
     }, error => {
       this.alertify.error(error);
     });
