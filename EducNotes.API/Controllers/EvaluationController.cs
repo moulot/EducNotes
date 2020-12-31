@@ -132,27 +132,13 @@ namespace EducNotes.API.Controllers
         [HttpGet("Class/{classId}/User/{userId}/LastGrades")]
         public async Task<IActionResult> GetUserLastGrades(int userId, int classId)
         {
-          // List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(userId, classId);
-          // double courseAvgSum = 0;
-          // double courseCoeffSum = 0;
+          double courseAvgSum = 0;
+          double courseCoeffSum = 0;
           double StudentAvg = -1000;
-
-          // if(coursesWithEvals.Count() > 0)
-          // {
-          //   foreach (var course in coursesWithEvals)
-          //   {
-          //     courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
-          //     courseCoeffSum += course.CourseCoeff;
-          //   }
-
-          //   if(courseCoeffSum > 0)
-          //     StudentAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
-          // }
-
+          List<CourseAvgDto> coursesAvg = new List<CourseAvgDto>();
           var userCourses = await _repo.GetUserCourses(classId);
           var userClass = await _repo.GetClass(classId);
-          double courseAvgSum1 = 0;
-          double courseCoeffSum1 = 0;
+          
           foreach (var course in userCourses)
           {
             //get all evaluations of the selected course and current userId
@@ -185,6 +171,11 @@ namespace EducNotes.API.Controllers
             if(coeffSum > 0)
             {
               courseAvg = Math.Round(gradesSum / coeffSum, 2);
+              CourseAvgDto courseAvgDto = new CourseAvgDto();
+              courseAvgDto.Name = course.Name;
+              courseAvgDto.Abbrev = course.Abbreviation;
+              courseAvgDto.Avg = courseAvg;
+              coursesAvg.Add(courseAvgDto);
           
               //get course coeff
               var courseCoeffData = await _context.CourseCoefficients
@@ -194,20 +185,21 @@ namespace EducNotes.API.Controllers
               if (courseCoeffData != null)
                 courseCoeff = courseCoeffData.Coefficient;
 
-              courseAvgSum1 += courseAvg * courseCoeff;
-              courseCoeffSum1 += courseCoeff;
+              courseAvgSum += courseAvg * courseCoeff;
+              courseCoeffSum += courseCoeff;
             }
           }
 
-          if(courseCoeffSum1 > 0)
-            StudentAvg = Math.Round(courseAvgSum1 / courseCoeffSum1, 2);
+          if(courseCoeffSum > 0)
+            StudentAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
 
           int nbOfGrades = 6;
           var lastGrades = await _repo.GetStudentLastGrades(userId, nbOfGrades);
           
           return Ok(new {
             lastGrades,
-            StudentAvg
+            StudentAvg,
+            coursesAvg
           });
         }
 

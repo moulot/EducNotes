@@ -212,12 +212,12 @@
           <div class="col-md-12 text-14 font-weight-bold mt-2">moyennes</div>
           <div *ngFor="let course of userCourses" class="col-md-4 mb-1">
             <div class="border rounded-lg my-auto text-muted text-13 p-1">
-              {{course.courseAbbrev}} :
-              <span *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000"
-                class="text-primary text-danger text-14 mr-3">{{course.userCourseAvg}}</span>
-              <span *ngIf="course.userCourseAvg >= 10"
-                class="text-primary text-success text-14 mr-3">{{course.userCourseAvg}}</span>
-              <span *ngIf="course.userCourseAvg === -1000" class="text-14 mr-3">N/A</span>
+              {{course.abbrev}} :
+              <span *ngIf="course.avg < 10 && course.avg > -1000"
+                class="text-primary text-danger text-14 mr-3">{{course.avg}}</span>
+              <span *ngIf="course.avg >= 10"
+                class="text-primary text-success text-14 mr-3">{{course.avg}}</span>
+              <span *ngIf="course.avg === -1000" class="text-14 mr-3">N/A</span>
             </div>
           </div>
         </div>

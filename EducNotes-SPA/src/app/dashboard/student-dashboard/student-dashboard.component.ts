@@ -58,7 +58,7 @@ export class StudentDashboardComponent implements OnInit {
     this.getAgendaItems(this.student.classId);
     this.getEvalsToCome(this.student.classId);
     this.getScheduleDays(this.student.classId);
-    this.getCoursesWithEvals(this.student.id, this.student.classId);
+    // this.getCoursesWithEvals(this.student.id, this.student.classId);
     this.getStudentLastGrades(this.student.id, this.student.classId);
     // this.getUser(this.student.id);
     this.getClass(this.student.classId);
@@ -120,6 +120,7 @@ export class StudentDashboardComponent implements OnInit {
     this.evalService.getStudentLastGrades(studentId, classId).subscribe((data: any) => {
       this.lastGrades = data.lastGrades;
       this.studentAvg = data.studentAvg;
+      this.userCourses = data.coursesAvg;
     }, error => {
       this.alertify.error(error);
     });

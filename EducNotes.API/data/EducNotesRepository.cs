@@ -1528,10 +1528,10 @@ namespace EducNotes.API.Data
           {
             var grade = lastGrades[i];
             int evalId = lastGradesFromDB[i].EvaluationId;
-            var gradeMin = await GetEvalMin(evalId);
-            var gradeMax = await GetEvalMax(evalId);
-            grade.ClassGradeMin = gradeMin;
-            grade.ClassGradeMax = gradeMax;
+            var gradeMinMax = await GetEvalMinMax(evalId);
+            // var gradeMax = await GetEvalMax(evalId);
+            grade.ClassGradeMin = gradeMinMax[0];
+            grade.ClassGradeMax = gradeMinMax[1];
             grade.GradeOK = Convert.ToDouble(grade.Grade) >= Convert.ToDouble(grade.GradeMax)/2;
           }
 
@@ -1658,13 +1658,17 @@ namespace EducNotes.API.Data
           return userEvalsDto;
         }
 
-        public async Task<double> GetEvalMin(int evalId)
+        public async Task<List<double>> GetEvalMinMax(int evalId)
         {
           var evalFromDB = await _context.UserEvaluations
                                   .Where(e => e.EvaluationId == evalId && e.Grade.IsNumeric())
                                   .ToListAsync();
           var gradeMin = evalFromDB.Min(e => Convert.ToDouble(e.Grade));
-          return Convert.ToDouble(gradeMin);
+          var gradeMax = evalFromDB.Max(e => Convert.ToDouble(e.Grade));
+          List<double> minmax = new List<double>();
+          minmax.Add(gradeMin);
+          minmax.Add(gradeMax);
+          return minmax;
         }
 
         public async Task<double> GetEvalMax(int evalId)

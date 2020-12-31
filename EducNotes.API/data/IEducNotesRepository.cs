@@ -116,7 +116,7 @@ namespace EducNotes.API.Data
     string CalculateCourseTop(DateTime startHourMin, string startCourseHourMin);
     Task<List<Absence>> GetAbsencesByDate(DateTime date);
     Task<double> GetStudentAvg(int userId, int classId);
-    Task<double> GetEvalMin(int evalId);
+    Task<List<double>> GetEvalMinMax(int evalId);
     Task<double> GetEvalMax(int evalId);
     Task<double> GetClassAvg(int classId);
     Task<ClassAvgDto> GetClassAvgs(int classId);
