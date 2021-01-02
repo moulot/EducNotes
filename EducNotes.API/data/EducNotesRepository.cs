@@ -1541,16 +1541,63 @@ namespace EducNotes.API.Data
         public async Task<double> GetStudentAvg(int userId, int classId)
         {
           List<UserCourseEvalsDto> coursesWithEvals = await GetUserGrades(userId, classId);
+          var userCourses = await GetUserCourses(classId);
+          var userClass = await GetClass(classId);
 
           double courseAvgSum = 0;
           double courseCoeffSum = 0;
           double GeneralAvg = -1000;
+          List<CourseAvgDto> coursesAvg = new List<CourseAvgDto>();
           if(coursesWithEvals.Count() > 0)
           {
-            foreach (var course in coursesWithEvals)
+            foreach (var course in userCourses)
             {
-              courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
-              courseCoeffSum += course.CourseCoeff;
+              var userEvals = await _context.UserEvaluations
+                                    // .Include(e => e.Evaluation).ThenInclude(e => e.EvalType)
+                                    .Include(e => e.Evaluation)//.ThenInclude(e => e.Course)
+                                    .OrderBy(o => o.Evaluation.EvalDate)
+                                    .Where(e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
+                                      e.Evaluation.CourseId == course.Id && e.Evaluation.Graded == true && e.Grade.IsNumeric())
+                                    .Distinct().ToListAsync();
+
+              double gradesSum = 0;
+              double coeffSum = 0;
+              foreach (var userEval in userEvals)
+              {
+                if(userEval.Grade.IsNumeric())
+                {
+                  double maxGrade = Convert.ToDouble(userEval.Evaluation.MaxGrade);
+                  double gradeValue = Convert.ToDouble(userEval.Grade.Replace(".", ","));
+                  // grade are ajusted to 20 as MAx. Avg is on 20
+                  double ajustedGrade = Math.Round(20 * gradeValue / maxGrade, 2);
+                  double coeff = userEval.Evaluation.Coeff;
+                  //data for course average
+                  gradesSum += ajustedGrade * coeff;
+                  coeffSum += coeff;
+                }
+              }
+              
+              double courseAvg = 0;
+              if(coeffSum > 0)
+              {
+                courseAvg = Math.Round(gradesSum / coeffSum, 2);
+                CourseAvgDto courseAvgDto = new CourseAvgDto();
+                courseAvgDto.Name = course.Name;
+                courseAvgDto.Abbrev = course.Abbreviation;
+                courseAvgDto.Avg = courseAvg;
+                coursesAvg.Add(courseAvgDto);
+            
+                //get course coeff
+                var courseCoeffData = await _context.CourseCoefficients
+                                            .FirstOrDefaultAsync(c => c.ClassLevelid == userClass.ClassLevelId &&
+                                              c.CourseId == course.Id && c.ClassTypeId == userClass.ClassTypeId);
+                double courseCoeff = 1;
+                if (courseCoeffData != null)
+                  courseCoeff = courseCoeffData.Coefficient;
+
+                courseAvgSum += courseAvg * courseCoeff;
+                courseCoeffSum += courseCoeff;
+              }
             }
 
             if(courseCoeffSum > 0)

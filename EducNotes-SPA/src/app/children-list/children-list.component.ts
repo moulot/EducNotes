@@ -22,7 +22,7 @@ export class ChildrenListComponent implements OnInit {
 
   goToChildPage(child) {
     this.authService.changeCurrentChild(child);
-    this.getUser.emit(child.id);
+    this.getUser.emit(child);
   }
 
 }

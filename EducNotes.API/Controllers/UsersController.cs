@@ -658,27 +658,27 @@ namespace EducNotes.API.Controllers
         [HttpGet("{parentId}/Children")]
         public async Task<IActionResult> GetChildren(int parentId)
         {
-          var users = await _repo.GetChildren(parentId);
+          var usersFromDB = await _repo.GetChildren(parentId);
 
-          var usersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(users);
+          var users = _mapper.Map<IEnumerable<UserForDetailedDto>>(usersFromDB);
 
           var startDate = DateTime.Now.Date;
           var endDate = startDate.AddDays(7).Date;
           
-          foreach (var user in usersToReturn)
+          foreach (var user in users)
           {
-            double courseAvgSum = 0;
-            double courseCoeffSum = 0;
+            // double courseAvgSum = 0;
+            // double courseCoeffSum = 0;
 
-            List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, user.ClassId);
+            // List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, user.ClassId);
 
-            foreach (var course in coursesWithEvals)
-            {
-              courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
-              courseCoeffSum += course.CourseCoeff;
-            }
+            // foreach (var course in coursesWithEvals)
+            // {
+            //   courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
+            //   courseCoeffSum += course.CourseCoeff;
+            // }
 
-            user.Avg =  Math.Round(courseAvgSum / courseCoeffSum, 2);
+            user.Avg = await _repo.GetStudentAvg(user.Id, user.ClassId); //Math.Round(courseAvgSum / courseCoeffSum, 2);
             user.AgendaItems = await _repo.GetUserClassAgenda(user.ClassId, startDate, endDate);
             //absences & late arrivals
             var userAbsences = await _context.Absences.Where(a => a.UserId == user.Id).ToListAsync();
@@ -686,7 +686,7 @@ namespace EducNotes.API.Controllers
             user.NbLateArrivals = userAbsences.Where(a => a.AbsenceTypeId == lateTypeId).Count();
           }
 
-          return Ok(usersToReturn);
+          return Ok(users);
         }
 
         [HttpGet("{teacherId}/ScheduleByDay")]

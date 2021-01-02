@@ -21,7 +21,8 @@
                 <div class=" mb-1">
                   <i class="fad fa-user-chart fa-1x mr-2" style="--fa-secondary-opacity: 1;
                     --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                  <a class="text-15"><span class="text-muted text-14">moyenne</span> : {{child.avg}} / 20</a>
+                  <a *ngIf="child.avg > -1000" class="text-15"><span class="text-muted text-14">moyenne</span> : {{child.avg}} / 20</a>
+                  <a *ngIf="child.avg == -1000" class="text-15"><span class="text-muted text-14">moyenne</span> : N/A</a>
                 </div>
                 <div class="mb-1">
                   <i class="fad fa-tasks fa-1x mr-2" style="--fa-secondary-opacity: 1;

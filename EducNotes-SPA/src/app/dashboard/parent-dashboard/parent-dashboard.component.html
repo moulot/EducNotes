@@ -1,11 +1,11 @@
 <div class="mb-2" *ngIf="showUsersList && !showChildrenList">
-  <app-users-header [student]="student" (getUser)="getUser($event)"></app-users-header>
+  <app-users-header [student]="student" (getUser)="selectUser($event)"></app-users-header>
 </div>
 
 <div class="row">
   <div class="col-md-12" *ngIf="showChildrenList">
     <p class="text-13 text-danger mb-1">clicker sur la carte de l'enfant pour accéder à ses informations</p>
-    <app-children-list [url]="url" [children]="children" (getUser)="getUser($event)"></app-children-list>
+    <app-children-list [url]="url" [children]="children" (getUser)="selectUser($event)"></app-children-list>
   </div>
 
   <div class="col-md-12 mb-2" *ngIf="!showChildrenList">
@@ -21,7 +21,7 @@
                   </div>
                   <div class="my-auto">
                     <div class="text-center text-16 text-capitalize">
-                      <b>{{student?.lastName}} {{student?.firstName}}</b> - {{student?.className}}
+                      <b>{{student?.lastName}} {{student?.firstName}}</b> - {{classRoom?.name}}
                     </div>
                   </div>
                 </div>
@@ -219,12 +219,12 @@
               <div class="col-md-12 text-14 font-weight-bold mt-2">moyennes</div>
               <div *ngFor="let course of userCourses" class="col-md-4 mb-1">
                 <div class="border rounded-lg my-auto text-muted text-13 p-1">
-                  {{course.courseAbbrev}} :
-                  <span *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000"
-                    class="text-primary text-danger text-14 mr-3">{{course.userCourseAvg}}</span>
-                  <span *ngIf="course.userCourseAvg >= 10"
-                    class="text-primary text-success text-14 mr-3">{{course.userCourseAvg}}</span>
-                  <span *ngIf="course.userCourseAvg === -1000" class="text-14 mr-3">N/A</span>
+                  {{course.abbrev}} :
+                  <span *ngIf="course.avg < 10 && course.avg > -1000"
+                    class="text-primary text-danger text-14 mr-3">{{course.avg}}</span>
+                  <span *ngIf="course.avg >= 10"
+                    class="text-primary text-success text-14 mr-3">{{course.avg}}</span>
+                  <span *ngIf="course.avg === -1000" class="text-14 mr-3">N/A</span>
                 </div>
               </div>
             </div>
