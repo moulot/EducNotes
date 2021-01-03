@@ -23,8 +23,7 @@ export class ParentDashboardComponent implements OnInit {
   userCourses: any;
   lastGrades: any;
   studentAvg: any;
-  url = '/home';
-  showChildrenList = false;
+  showChildrenList: boolean;
   showUsersList = false;
   currentChild: User;
   children: any[];
@@ -33,6 +32,7 @@ export class ParentDashboardComponent implements OnInit {
   nbChildren: number;
   dayIndex: number;
   todayIndex: number;
+  loader = true;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -45,6 +45,7 @@ export class ParentDashboardComponent implements OnInit {
   }
 
   getChildren(parentId: number) {
+    this.loader = true;
     this.userService.getChildren(parentId).subscribe((users: User[]) => {
       this.children = users;
       this.nbChildren = users.length;
@@ -67,7 +68,8 @@ export class ParentDashboardComponent implements OnInit {
           this.getUserInfos(this.student.id, this.student.classId);
         }
       }
-    }, error => {
+      this.loader = false;
+      }, error => {
       this.alertify.error(error);
     });
   }

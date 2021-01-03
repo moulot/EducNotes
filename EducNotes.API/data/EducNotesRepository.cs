@@ -163,18 +163,18 @@ namespace EducNotes.API.Data
 
         public async Task<List<User>> GetParents(int ChildId)
         {
-            var links = await _context.UserLinks.Where(u => u.UserId == ChildId).ToListAsync();
+          var links = await _context.UserLinks.Where(u => u.UserId == ChildId).ToListAsync();
 
-            List<User> parents = new List<User>();
-            foreach (var link in links)
-            {
-              var parent = await _context.Users
-                              .Include(i => i.Photos)
-                              .FirstOrDefaultAsync(p => p.Id == link.UserPId);
-              parents.Add(parent);
-            }
-            
-            return parents;
+          List<User> parents = new List<User>();
+          foreach (var link in links)
+          {
+            var parent = await _context.Users
+                            .Include(i => i.Photos)
+                            .FirstOrDefaultAsync(p => p.Id == link.UserPId);
+            parents.Add(parent);
+          }
+          
+          return parents;
         }
 
         public async Task<PagedList<User>> GetUsers(UserParams userParams)

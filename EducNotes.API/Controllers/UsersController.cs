@@ -667,18 +667,7 @@ namespace EducNotes.API.Controllers
           
           foreach (var user in users)
           {
-            // double courseAvgSum = 0;
-            // double courseCoeffSum = 0;
-
-            // List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(user.Id, user.ClassId);
-
-            // foreach (var course in coursesWithEvals)
-            // {
-            //   courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
-            //   courseCoeffSum += course.CourseCoeff;
-            // }
-
-            user.Avg = await _repo.GetStudentAvg(user.Id, user.ClassId); //Math.Round(courseAvgSum / courseCoeffSum, 2);
+            user.Avg = await _repo.GetStudentAvg(user.Id, user.ClassId);
             user.AgendaItems = await _repo.GetUserClassAgenda(user.ClassId, startDate, endDate);
             //absences & late arrivals
             var userAbsences = await _context.Absences.Where(a => a.UserId == user.Id).ToListAsync();

@@ -12,7 +12,7 @@ import { AuthService } from '../_services/auth.service';
 export class ChildrenListComponent implements OnInit {
   // @Input() student: User;
   @Input() children: any[];
-  @Input() url: string;
+  // @Input() url: string;
   @Output() getUser = new EventEmitter<any>();
 
   constructor(private router: Router, private authService: AuthService) { }
