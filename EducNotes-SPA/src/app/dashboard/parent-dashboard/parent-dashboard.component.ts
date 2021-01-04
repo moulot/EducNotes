@@ -33,6 +33,7 @@ export class ParentDashboardComponent implements OnInit {
   dayIndex: number;
   todayIndex: number;
   loader = true;
+  loadingOk = 0;
 
   constructor(private authService: AuthService, private classService: ClassService,
     private alertify: AlertifyService, private route: ActivatedRoute,
@@ -45,7 +46,7 @@ export class ParentDashboardComponent implements OnInit {
   }
 
   getChildren(parentId: number) {
-    this.loader = true;
+    this.loadingOk = 0;
     this.userService.getChildren(parentId).subscribe((users: User[]) => {
       this.children = users;
       this.nbChildren = users.length;
@@ -68,45 +69,11 @@ export class ParentDashboardComponent implements OnInit {
           this.getUserInfos(this.student.id, this.student.classId);
         }
       }
-      this.loader = false;
+      this.loadingOk = 5;
       }, error => {
       this.alertify.error(error);
+      this.loadingOk = 5;
     });
-  }
-
-  // getUser(id) {
-  //   this.userService.getUser(id).subscribe((user: User) => {
-  //     this.student = user;
-  //     this.getUserInfos(this.student.id);
-  //     this.getCoursesWithEvals(this.student.id, this.student.classId);
-  //     this.getStudentLastGrades(this.student.id, this.student.classId);
-  //     this.showChildrenList = false;
-  //     if (this.nbChildren > 1) {
-  //       this.showUsersList = true;
-  //     }
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
-
-  getUserInfos(userId, classId) {
-    this.getAgendaItems(classId);
-    this.getEvalsToCome(classId);
-    this.getScheduleDays(classId);
-    this.getStudentLastGrades(userId, classId);
-    this.getClass(classId);
-    this.showUsersList = true;
-    this.showChildrenList = false;
-    // this.userService.getUserInfos(userId, parentId).subscribe((data: any) => {
-    //   this.agendaItems = data.agendaItems;
-    //   this.evalsToCome = data.evalsToCome;
-    //   this.studentAvg = data.studentAvg;
-    //   this.scheduleDays = data.scheduleDays;
-    //   this.dayIndex = data.todayIndex;
-    //   this.todayIndex = data.todayIndex;
-    // }, error => {
-    //   this.alertify.error(error);
-    // });
   }
 
   selectUser(user) {
@@ -114,11 +81,27 @@ export class ParentDashboardComponent implements OnInit {
     this.getUserInfos(user.id, user.classId);
   }
 
-  getClass(id) {
-    this.classService.getClass(id).subscribe((aclass: Class) => {
-      this.classRoom = aclass;
+  getUserInfos(userId, classId) {
+    // this.loader = true;
+    this.loadingOk = 0;
+    this.getAgendaItems(classId);
+    this.getEvalsToCome(classId);
+    this.getScheduleDays(classId);
+    this.getStudentLastGrades(userId, classId);
+    this.getClass(classId);
+    this.showUsersList = true;
+    this.showChildrenList = false;
+    // this.loader = false;
+  }
+
+  getAgendaItems(classId) {
+    this.classService.getClassAgendaNbDays(classId).subscribe(items => {
+      this.agendaItems = items;
     }, error => {
       this.alertify.error(error);
+    }, () => {
+      this.loadingOk += 1;
+      console.log('agendaItems:' + this.loadingOk);
     });
   }
 
@@ -127,6 +110,9 @@ export class ParentDashboardComponent implements OnInit {
       this.evalsToCome = evals;
     }, error => {
       this.alertify.error(error);
+    }, () => {
+      this.loadingOk += 1;
+      console.log('evalsToCome:' + this.loadingOk);
     });
   }
 
@@ -135,6 +121,11 @@ export class ParentDashboardComponent implements OnInit {
       this.scheduleDays = data.scheduleDays;
       this.dayIndex = data.todayIndex;
       this.todayIndex = data.todayIndex;
+    }, error => {
+      this.alertify.error(error);
+    }, () => {
+      this.loadingOk += 1;
+      console.log('scheduleDays:' + this.loadingOk);
     });
   }
 
@@ -145,34 +136,31 @@ export class ParentDashboardComponent implements OnInit {
       this.userCourses = data.coursesAvg;
     }, error => {
       this.alertify.error(error);
+    }, () => {
+      this.loadingOk += 1;
+      console.log('lastGrades:' + this.loadingOk);
     });
   }
 
-  getAgendaItems(classId) {
-    this.classService.getClassAgendaNbDays(classId).subscribe(items => {
-      this.agendaItems = items;
+  getClass(id) {
+    this.classService.getClass(id).subscribe((aclass: Class) => {
+      this.classRoom = aclass;
     }, error => {
       this.alertify.error(error);
+    }, () => {
+      this.loadingOk += 1;
+      console.log('getClass:' + this.loadingOk);
     });
   }
 
-  getCoursesWithEvals(studentId, classId) {
-    this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
-      this.userCourses = data.coursesWithEvals;
-      // this.studentAvg = data.studentAvg;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
-  getEvents() {
-    const userId = this.parent.id;
-    this.userService.getEvents(userId).subscribe(data => {
-      this.events = data;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
+  // getEvents() {
+  //   const userId = this.parent.id;
+  //   this.userService.getEvents(userId).subscribe(data => {
+  //     this.events = data;
+  //   }, error => {
+  //     this.alertify.error(error);
+  //   });
+  // }
 
   prevDay() {
     if (this.dayIndex > 0) {

@@ -10,45 +10,30 @@ import { FormControl } from '@angular/forms';
   styleUrls: ['./users-header.component.scss']
 })
 export class UsersHeaderComponent implements OnInit {
+  @Input() children: any;
   @Input() student: User;
   @Output() getUser = new EventEmitter<any>();
   // childrenCtrl: FormControl = new FormControl();
   // unSelectedUsers: User[];
   selectedUser: User;
-  children: User[];
+  // children: User[];
   // childrenOptions = [];
   parent: User;
 
   constructor(private userService: UserService, private authService: AuthService) { }
 
   ngOnInit() {
-    this.parent = this.authService.currentUser;
-    this.getChildren(this.parent.id);
-    // this.childrenCtrl.setValue(this.student.id);
-
-    // this.childrenCtrl.valueChanges.subscribe(value => {
-    //   this.selectedUser = this.children.find(c => c.id === value);
-    //   this.authService.changeCurrentChild(this.selectedUser);
-    //   this.getUser.emit(this.selectedUser.id);
-    // });
+    // this.parent = this.authService.currentUser;
+    // this.getChildren(this.parent.id);
+    this.selectedUser = this.student;
   }
 
-  getChildren(parentId) {
-    this.userService.getChildren(parentId).subscribe((users: User[]) => {
-      this.children = users;
-      this.selectedUser = this.student;
-      // this.unSelectedUsers = [];
-      // for (let i = 0; i < users.length; i++) {
-      //   const elt = users[i];
-      //   if (elt.id !== this.student.id) {
-      //     this.unSelectedUsers = [...this.unSelectedUsers, elt];
-      //   }
-      //   mdb-select options
-      //   const option = {value: elt.id, label: elt.lastName + ' ' + elt.firstName};
-      //   this.childrenOptions = [...this.childrenOptions, option];
-      // }
-    });
-  }
+  // getChildren(parentId) {
+  //   this.userService.getChildren(parentId).subscribe((users: User[]) => {
+  //     this.children = users;
+  //     this.selectedUser = this.student;
+  //   });
+  // }
 
   selectUser(childid) {
     this.selectedUser = this.children.find(c => c.id === childid);

@@ -132,6 +132,7 @@ namespace EducNotes.API.Controllers
         [HttpGet("Class/{classId}/User/{userId}/LastGrades")]
         public async Task<IActionResult> GetUserLastGrades(int userId, int classId)
         {
+          double gradeOutOf = 20;
           double courseAvgSum = 0;
           double courseCoeffSum = 0;
           double StudentAvg = -1000;
@@ -143,8 +144,7 @@ namespace EducNotes.API.Controllers
           {
             //get all evaluations of the selected course and current userId
             var userEvals = await _context.UserEvaluations
-                                  // .Include(e => e.Evaluation).ThenInclude(e => e.EvalType)
-                                  .Include(e => e.Evaluation)//.ThenInclude(e => e.Course)
+                                  .Include(e => e.Evaluation)
                                   .OrderBy(o => o.Evaluation.EvalDate)
                                   .Where(e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
                                     e.Evaluation.CourseId == course.Id && e.Evaluation.Graded == true && e.Grade.IsNumeric())
@@ -154,17 +154,14 @@ namespace EducNotes.API.Controllers
             double coeffSum = 0;
             foreach (var userEval in userEvals)
             {
-              if(userEval.Grade.IsNumeric())
-              {
-                double maxGrade = Convert.ToDouble(userEval.Evaluation.MaxGrade);
-                double gradeValue = Convert.ToDouble(userEval.Grade.Replace(".", ","));
-                // grade are ajusted to 20 as MAx. Avg is on 20
-                double ajustedGrade = Math.Round(20 * gradeValue / maxGrade, 2);
-                double coeff = userEval.Evaluation.Coeff;
-                //data for course average
-                gradesSum += ajustedGrade * coeff;
-                coeffSum += coeff;
-              }
+              double maxGrade = Convert.ToDouble(userEval.Evaluation.MaxGrade);
+              double gradeValue = Convert.ToDouble(userEval.Grade.Replace(".", ","));
+              // grade are ajusted to 'gradeOutOf' as MAx. Avg is on 20
+              double ajustedGrade = Math.Round(gradeOutOf * gradeValue / maxGrade, 2);
+              double coeff = userEval.Evaluation.Coeff;
+              //data for course average
+              gradesSum += ajustedGrade * coeff;
+              coeffSum += coeff;
             }
             
             double courseAvg = 0;

@@ -1,4 +1,4 @@
-<div *ngIf="loader" class="spinning-preloader-container">
+<div *ngIf="loadingOk < 5" class="spinning-preloader-container">
   <div class="preloader-wrapper big active">
   
     <div class="spinner-layer spinner-blue">
@@ -36,9 +36,9 @@
   </div>
 </div>
 
-<div *ngIf="!loader">
+<div *ngIf="loadingOk == 5">
   <div class="mb-2" *ngIf="showUsersList && !showChildrenList">
-    <app-users-header [student]="student" (getUser)="selectUser($event)"></app-users-header>
+    <app-users-header [children]="children" [student]="student" (getUser)="selectUser($event)"></app-users-header>
   </div>
 
   <div class="row">

@@ -1540,7 +1540,6 @@ namespace EducNotes.API.Data
 
         public async Task<double> GetStudentAvg(int userId, int classId)
         {
-          List<UserCourseEvalsDto> coursesWithEvals = await GetUserGrades(userId, classId);
           var userCourses = await GetUserCourses(classId);
           var userClass = await GetClass(classId);
 
@@ -1548,13 +1547,12 @@ namespace EducNotes.API.Data
           double courseCoeffSum = 0;
           double GeneralAvg = -1000;
           List<CourseAvgDto> coursesAvg = new List<CourseAvgDto>();
-          if(coursesWithEvals.Count() > 0)
+          if(userCourses.Count() > 0)
           {
             foreach (var course in userCourses)
             {
               var userEvals = await _context.UserEvaluations
-                                    // .Include(e => e.Evaluation).ThenInclude(e => e.EvalType)
-                                    .Include(e => e.Evaluation)//.ThenInclude(e => e.Course)
+                                    .Include(e => e.Evaluation)
                                     .OrderBy(o => o.Evaluation.EvalDate)
                                     .Where(e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
                                       e.Evaluation.CourseId == course.Id && e.Evaluation.Graded == true && e.Grade.IsNumeric())
