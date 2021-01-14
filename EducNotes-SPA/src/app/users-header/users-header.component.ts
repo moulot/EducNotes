@@ -13,27 +13,14 @@ export class UsersHeaderComponent implements OnInit {
   @Input() children: any;
   @Input() student: User;
   @Output() getUser = new EventEmitter<any>();
-  // childrenCtrl: FormControl = new FormControl();
-  // unSelectedUsers: User[];
   selectedUser: User;
-  // children: User[];
-  // childrenOptions = [];
   parent: User;
 
   constructor(private userService: UserService, private authService: AuthService) { }
 
   ngOnInit() {
-    // this.parent = this.authService.currentUser;
-    // this.getChildren(this.parent.id);
     this.selectedUser = this.student;
   }
-
-  // getChildren(parentId) {
-  //   this.userService.getChildren(parentId).subscribe((users: User[]) => {
-  //     this.children = users;
-  //     this.selectedUser = this.student;
-  //   });
-  // }
 
   selectUser(childid) {
     this.selectedUser = this.children.find(c => c.id === childid);

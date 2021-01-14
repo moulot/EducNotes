@@ -26,6 +26,7 @@ export class UserValidationComponent implements OnInit {
   parentpageSize = 4;
   teacherpage = 1;
   teacherpageSize = 4;
+  list = true;
 
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private alertify: AlertifyService,
     private userService: UserService) { }
@@ -54,11 +55,6 @@ export class UserValidationComponent implements OnInit {
               this.usersDivs[type.id].editDiv[j] = false;
               const user = type.users[j];
               this.addParentItem(user.id, user.email, user.cell, user.lastName, user.firstName, user.children);
-              // for (let k = 0; k < user.children.length; k++) {
-              //   const child = user.children[k];
-              //   this.addParentChildItem(user.id, user.email, user.cell, user.lastName, user.firstName,
-              //     user.className, user.classLevelName);
-              // }
             }
             break;
 
@@ -166,13 +162,11 @@ export class UserValidationComponent implements OnInit {
   }
 
   sendConfirmEmail() {
-    
+
   }
 
   sendUserConfirmEmail(typeid, id) {
-    console.log(typeid + ' - ' + id);
     const userData = [{ userTypeId: typeid, userIds: [id]}];
-    console.log(userData);
     this.userService.resendConfirmEmail(userData).subscribe(() => {
       this.alertify.success('les emails ont bien été envoyés.');
     }, error => {
@@ -254,6 +248,14 @@ export class UserValidationComponent implements OnInit {
       const elt = {typeid: 0, editDiv: []};
       this.usersDivs = [...this.usersDivs, elt];
     }
+  }
+
+  showList() {
+    this.list = true;
+  }
+
+  showGrid() {
+    this.list = false;
   }
 
 }

@@ -68,8 +68,8 @@ export class ParentDashboardComponent implements OnInit {
           this.student = this.currentChild;
           this.getUserInfos(this.student.id, this.student.classId);
         }
+        this.loadingOk = 5;
       }
-      this.loadingOk = 5;
       }, error => {
       this.alertify.error(error);
       this.loadingOk = 5;
@@ -82,7 +82,6 @@ export class ParentDashboardComponent implements OnInit {
   }
 
   getUserInfos(userId, classId) {
-    // this.loader = true;
     this.loadingOk = 0;
     this.getAgendaItems(classId);
     this.getEvalsToCome(classId);
@@ -91,7 +90,6 @@ export class ParentDashboardComponent implements OnInit {
     this.getClass(classId);
     this.showUsersList = true;
     this.showChildrenList = false;
-    // this.loader = false;
   }
 
   getAgendaItems(classId) {
@@ -101,7 +99,6 @@ export class ParentDashboardComponent implements OnInit {
       this.alertify.error(error);
     }, () => {
       this.loadingOk += 1;
-      console.log('agendaItems:' + this.loadingOk);
     });
   }
 
@@ -112,7 +109,6 @@ export class ParentDashboardComponent implements OnInit {
       this.alertify.error(error);
     }, () => {
       this.loadingOk += 1;
-      console.log('evalsToCome:' + this.loadingOk);
     });
   }
 
@@ -125,7 +121,6 @@ export class ParentDashboardComponent implements OnInit {
       this.alertify.error(error);
     }, () => {
       this.loadingOk += 1;
-      console.log('scheduleDays:' + this.loadingOk);
     });
   }
 
@@ -138,7 +133,6 @@ export class ParentDashboardComponent implements OnInit {
       this.alertify.error(error);
     }, () => {
       this.loadingOk += 1;
-      console.log('lastGrades:' + this.loadingOk);
     });
   }
 
@@ -149,7 +143,6 @@ export class ParentDashboardComponent implements OnInit {
       this.alertify.error(error);
     }, () => {
       this.loadingOk += 1;
-      console.log('getClass:' + this.loadingOk);
     });
   }
 

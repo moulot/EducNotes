@@ -19,7 +19,7 @@ export class TuitionPanelComponent implements OnInit {
   adminTypeId = environment.adminTypeId;
   settings: Setting[];
   regDate: Date;
-  regActive = false;
+  regActive = true;
   nbTuitionPays: number;
   tuitionBalance: string;
   admins: any;
@@ -40,11 +40,11 @@ export class TuitionPanelComponent implements OnInit {
     this.settings = this.authService.settings;
     const regDate = this.settings.find(s => s.name === 'RegistrationDate').value;
     this.regDate = Utils.inputDateDDMMYY(regDate, '/');
-    const today = new Date();
-    if (today >= this.regDate) {
-      this.regActive = true;
-    }
-    this.nbTuitionPays = Number(this.settings.find(s => s.name === 'NbTuitionPayments').value);
+    // const today = new Date();
+    // if (today >= this.regDate) {
+    //   this.regActive = true;
+    // }
+    // this.nbTuitionPays = Number(this.settings.find(s => s.name === 'NbTuitionPayments').value);
     this.orderService.getBalanceData().subscribe((data: any) => {
       this.tuitionBalance = data.openBalance;
     });

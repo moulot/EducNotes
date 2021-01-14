@@ -407,6 +407,8 @@ namespace EducNotes.API.Controllers
             children.Add(crd);
           }
 
+          var template = await _context.EmailTemplates.FirstAsync(t => t.Id == newRegToBePaidEmailId);
+
           //father
           if(newTuition.FEmail != "")
           {
@@ -456,7 +458,7 @@ namespace EducNotes.API.Controllers
             fatherEmail.ParentEmail = father.Email;
             fatherEmail.ParentCellPhone = father.PhoneNumber;
             fatherEmail.ParentGender = father.Gender;
-            fatherEmail.EmailSubject = schoolName + " - inscription pour l'année scolaire prochaine";
+            fatherEmail.EmailSubject = template.Subject.Replace("<NOM_ECOLE>", schoolName);// schoolName + " - inscription pour l'année scolaire prochaine";
             fatherEmail.OrderId = order.Id;
             fatherEmail.OrderNum = order.OrderNum;
             fatherEmail.Token = fathercode;
@@ -515,7 +517,7 @@ namespace EducNotes.API.Controllers
             motherEmail.ParentEmail = mother.Email;
             motherEmail.ParentCellPhone = mother.PhoneNumber;
             motherEmail.ParentGender = mother.Gender;
-            motherEmail.EmailSubject = schoolName + " - inscription pour l'année scolaire prochaine";
+            motherEmail.EmailSubject = template.Subject.Replace("<NOM_ECOLE>", schoolName);// schoolName + " - inscription pour l'année scolaire prochaine";
             motherEmail.OrderId = order.Id;
             motherEmail.OrderNum = order.OrderNum;
             motherEmail.Token = mothercode;
@@ -526,7 +528,6 @@ namespace EducNotes.API.Controllers
 
           _repo.Update(order);
 
-          var template = await _context.EmailTemplates.FirstAsync(t => t.Id == newRegToBePaidEmailId);
           var RegEmails = await _repo.SetEmailDataForRegistration(emails, template.Body, RegDeadLine);
           _context.AddRange(RegEmails);
 

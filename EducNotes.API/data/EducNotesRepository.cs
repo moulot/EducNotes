@@ -1110,21 +1110,19 @@ namespace EducNotes.API.Data
 
         public void AddUserLink(int userId, int parentId)
         {
-            var nouveau_link = new UserLink
-            {
-                UserId = userId,
-                UserPId = parentId
-            };
-            Add(nouveau_link);
+          var nouveau_link = new UserLink
+          {
+            UserId = userId,
+            UserPId = parentId
+          };
+          Add(nouveau_link);
         }
 
         private string EditValidationContent(string userName, string code)
         {
-            return "<h3><span>Educt'Notes</span></h3> <br>" +
-                "bonjour <b>" + userName + ",</b>" +
-                "<p>Merci de bien vouloir valider votre compte au lien suivant :" +
-                " <a href=" + _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + code + " /> cliquer ici</a></p> <br>";
-
+          return "<h3><span>Educt'Notes</span></h3> <br>" + "bonjour <b>" + userName + ",</b>" +
+            "<p>Merci de bien vouloir valider votre compte au lien suivant :" +
+            " <a href=" + _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + code + " /> cliquer ici</a></p> <br>";
         }
 
         public IEnumerable<ClassAgendaToReturnDto> GetAgendaListByDueDate(IEnumerable<Agenda> agendaItems)
@@ -2123,7 +2121,7 @@ namespace EducNotes.API.Data
           newEmail.ToAddress = emailData.Email;
           newEmail.FromAddress = "no-reply@educnotes.com";
           newEmail.Subject = subject.Replace("<NOM_ECOLE>", schoolName);
-          List<TokenDto> tags = GetTeacherEmailTokenValues(tokens.ToList(), emailData);
+          List<TokenDto> tags = await GetTeacherEmailTokenValues(tokens.ToList(), emailData);
           newEmail.Body = ReplaceTokens(tags, content);
           newEmail.InsertUserId = 1;
           newEmail.InsertDate = DateTime.Now;
@@ -2146,9 +2144,9 @@ namespace EducNotes.API.Data
             newEmail.EmailTypeId = 1;
             newEmail.OrderId = data.OrderId;
             newEmail.ToAddress = data.ParentEmail;
-            newEmail.FromAddress = "no-reply@educnotes.com";
+            newEmail.FromAddress = "georges.moulot@educnotes.com";
             newEmail.Subject = data.EmailSubject;
-            List<TokenDto> tags = GetRegistrationTokenValues(tokens, data, RegDeadLine);
+            List<TokenDto> tags = await GetRegistrationTokenValues(tokens, data, RegDeadLine);
             newEmail.Body = ReplaceTokens(tags, content);
             newEmail.InsertUserId = 1;
             newEmail.InsertDate = DateTime.Now;
@@ -2161,7 +2159,7 @@ namespace EducNotes.API.Data
           return RegEmails;
         }
 
-        public List<TokenDto> GetTeacherEmailTokenValues(List<Token> tokens, ConfirmTeacherEmailDto emailData)
+        public async Task<List<TokenDto>> GetTeacherEmailTokenValues(List<Token> tokens, ConfirmTeacherEmailDto emailData)
         {
           List<TokenDto> tokenValues = new List<TokenDto>();
 
@@ -2169,14 +2167,11 @@ namespace EducNotes.API.Data
           {
             TokenDto td = new TokenDto();
             td.TokenString = token.TokenString;
-
+            var subDomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower() == "subdomain")).Value;
             string teacherId = emailData.Id.ToString();
 
             switch (td.TokenString)
             {
-              // case "<USER_ID>":
-              //   td.Value = parentId;
-              //   break;
               case "<N_ENSEIGNANT>":
                 td.Value = emailData.LastName.FirstLetterToUpper();
                 break;
@@ -2196,7 +2191,12 @@ namespace EducNotes.API.Data
                 td.Value = emailData.Token;
                 break;
               case "<CONFIRM_LINK>":
-                td.Value = string.Format("{0}/confirmTeacherEmail?id={1}&token={2}", baseUrl,
+                string url = "";
+                if(subDomain != "")
+                  url = string.Format(baseUrl, subDomain + ".");
+                else
+                  url = string.Format(baseUrl, "");
+                td.Value = string.Format("{0}/confirmTeacherEmail?id={1}&token={2}", url,
                   teacherId, HttpUtility.UrlEncode(emailData.Token));
                 break;
               default:
@@ -2209,9 +2209,10 @@ namespace EducNotes.API.Data
           return tokenValues;
         }
 
-        public List<TokenDto> GetRegistrationTokenValues(IEnumerable<Token> tokens, RegistrationEmailDto regEmail, string RegDeadLine)
+        public async Task<List<TokenDto>> GetRegistrationTokenValues(IEnumerable<Token> tokens, RegistrationEmailDto regEmail, string RegDeadLine)
         {
           List<TokenDto> tokenValues = new List<TokenDto>();
+          var subDomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower() == "subdomain")).Value;
 
           //set children registration data
           string childrenInfos = "";
@@ -2274,7 +2275,12 @@ namespace EducNotes.API.Data
                 td.Value = regEmail.Token;
                 break;
               case "<CONFIRM_LINK>":
-                td.Value = string.Format("{0}/confirmEmail?id={1}&orderid={2}&token={3}", baseUrl,
+                string url = "";
+                if(subDomain != "")
+                  url = string.Format(baseUrl, subDomain + ".");
+                else
+                  url = string.Format(baseUrl, "");
+                td.Value = string.Format("{0}/confirmEmail?id={1}&orderid={2}&token={3}", url,
                   parentId, orderid, HttpUtility.UrlEncode(regEmail.Token));
                 break;
               default:
@@ -2290,7 +2296,7 @@ namespace EducNotes.API.Data
         public async Task<Email> SetEmailForAccountUpdated(string subject, string content, string lastName,
           byte gender, string parentEmail, int userId)
         {
-          var schoolName = _context.Settings.First(s => s.Name == "SchoolName").Value;
+          var schoolName = (await _context.Settings.FirstAsync(s => s.Name == "SchoolName")).Value;
           var tokens = await GetTokens();
 
           Email newEmail = new Email();
