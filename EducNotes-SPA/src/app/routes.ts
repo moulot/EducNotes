@@ -175,7 +175,7 @@ export const appRoutes: Routes = [
         },
         { path: 'messages', component: MessagesComponent, resolve: { messages: MessagesResolver } },
         { path: 'lists', component: ListsComponent, resolve: { users: ListsResolver } },
-        { path: 'agenda', component: AgendaPanelComponent },
+        { path: 'agenda/:classId', component: AgendaPanelComponent },
         { path: 'classes', component: ClassPanelComponent },
         { path: 'grades', component: GradePanelComponent },
         { path: 'classLife/:classId', component: ClassLifeComponent },

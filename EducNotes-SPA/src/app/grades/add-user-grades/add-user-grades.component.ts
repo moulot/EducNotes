@@ -28,6 +28,7 @@ export class AddUserGradesComponent implements OnInit {
   closed: boolean;
   gradeErrors = [];
   formNOK = false;
+  wait = false;
 
   constructor(private evalService: EvaluationService, private fb: FormBuilder,
     private alertify: AlertifyService, private route: ActivatedRoute, private router: Router) { }
@@ -79,6 +80,7 @@ export class AddUserGradesComponent implements OnInit {
   }
 
   saveNotes() {
+    this.wait = true;
     let formOK = true;
     let evalClosed = false;
     if (this.closed === true) {
@@ -104,8 +106,10 @@ export class AddUserGradesComponent implements OnInit {
         this.alertify.success('ajout des notes OK');
       }, error => {
         this.alertify.error(error);
+        this.wait = false;
       }, () => {
         this.router.navigate(['/grades']);
+        this.wait = false;
       });
     } else {
       this.alertify.error('des notes sont incorrectes. recommencez svp');

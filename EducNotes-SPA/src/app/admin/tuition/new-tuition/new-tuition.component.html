@@ -170,11 +170,12 @@
                         </div>          
                       </div>
                       <div class="col-md-2">
-                        <div class="md-form mt-1 mb-0">
-                          <input mdbInput type="text" id="dob" [textMask]="{mask: birthDateMask}"
+                        <div class="md-form my-0">
+                          <!-- <input mdbInput type="text" id="dob" [textMask]="{mask: birthDateMask}"
                             class="form-control" formControlName="dob" mdbValidate>
-                          <label for="dob" class="">date de naissance</label>
-                          <div *ngIf="child.value.dob === '' && child.get('dob').touched"
+                          <label for="dob" class="">date de naissance</label> -->
+                          <div class=""><mdb-date-picker name="dob" [placeholder]="'date de naissance'" [options]="myDatePickerOptions" formControlName="dob"></mdb-date-picker></div>
+                          <div *ngIf="child.get('dob').errors && child.get('dob').touched"
                             class="text-small text-danger">saisir la date de nais. svp</div>
                         </div>          
                       </div>
@@ -299,7 +300,7 @@
                         </div>                
                         <hr class="my-2">
                       </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-2">
                       <button mdbBtn type="submit" [disabled]="tuitionForm.hasError('formNOK') || !tuitionForm.valid || wait"
                         class="btnBlue p-4" size="sm" block="true" mdbWavesEffect>
                         <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -308,7 +309,10 @@
                     </div>
                     <div class="col-md-6">
                       <button mdbBtn type="button" [disabled]="tuitionForm.hasError('formNOK') || !tuitionForm.valid || wait"
-                        class="btnBlue p-4" (click)="saveTuitionAndPayment()" size="sm" block="true" mdbWavesEffect>proceder au paiement</button>
+                        class="btnBlue p-4" (click)="saveTuitionAndPayment()" size="sm" block="true" mdbWavesEffect>
+                        <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        proceder au paiement
+                      </button>
                     </div>
                   </div>
                 </div>

@@ -17,6 +17,7 @@ export interface User {
   lookingFor?: string;
   userTypeId: number;
   classLevelId?: number;
+  classLevelName: string;
   classId?: number;
   className: string;
   email: string;

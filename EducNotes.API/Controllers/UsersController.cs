@@ -789,35 +789,20 @@ namespace EducNotes.API.Controllers
         {
           var nextCourses = 10; // next coming courses
           var today = DateTime.Now;
-
           // monday=1, tue=2, ...
           var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;            
           var todayHourMin = today.TimeOfDay;
 
-          var teacherCourses = await (from courses in _context.ClassCourses
-                                      join Schedule in _context.Schedules
-                                      on courses.CourseId equals Schedule.CourseId
-                                      select new
-                                      {
-                                        ScheduleId = Schedule.Id,
-                                        TeacherId = courses.TeacherId,
-                                        TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
-                                        CourseId = courses.CourseId,
-                                        CourseName = courses.Course.Name,
-                                        ClassId = Schedule.ClassId,
-                                        ClassName = Schedule.Class.Name,
-                                        Day = Schedule.Day,
-                                        CourseStartHM = Schedule.StartHourMin,
-                                        CourseEndHM = Schedule.EndHourMin,
-                                        StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
-                                        EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
-                                      })
-                                      .Where(w => w.TeacherId == teacherId && w.Day == todayDay)
-                                        //&& w.CourseStartHM.TimeOfDay >= todayHourMin)
-                                      .OrderBy(o => o.StartHourMin)
-                                      .Distinct()
-                                      .Take(nextCourses)
-                                      .ToListAsync();
+          var CoursesFromDB = await _context.Schedules
+                                .Include(i => i.Class)
+                                .Include(i => i.Teacher)
+                                .Include(i => i.Course)
+                                .Where(c => c.TeacherId == teacherId && c.Day == todayDay)
+                                .OrderBy(o => o.StartHourMin)
+                                .Take(nextCourses)
+                                .ToListAsync();
+          
+          var teacherCourses = _mapper.Map<IEnumerable<TeacherClassSessionDto>>(CoursesFromDB);
 
           return Ok(teacherCourses);
         }
@@ -1574,22 +1559,22 @@ namespace EducNotes.API.Controllers
         [HttpGet("{teacherId}/Classes")]
         public async Task<IActionResult> GetTeacherClasses(int teacherId)
         {
-            // if(teacherId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-            //     return Unauthorized();
+          // if(teacherId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+          //     return Unauthorized();
 
-            var teacherClasses = await (from courses in _context.ClassCourses
-                                    join classes in _context.Classes
-                                    on courses.ClassId equals classes.Id
-                                    where courses.TeacherId == teacherId
-                                    select new {
-                                      ClassId = classes.Id,
-                                      ClassName = classes.Name,
-                                      NbStudents = _context.Users.Where(u => u.ClassId == classes.Id).Count()
-                                    })
-                                    .OrderBy(o => o.ClassName)
-                                    .Distinct().ToListAsync();
+          var teacherClasses = await (from courses in _context.ClassCourses
+                                      join classes in _context.Classes
+                                      on courses.ClassId equals classes.Id
+                                      where courses.TeacherId == teacherId
+                                      select new {
+                                        ClassId = classes.Id,
+                                        ClassName = classes.Name,
+                                        NbStudents = _context.Users.Where(u => u.ClassId == classes.Id).Count()
+                                      })
+                                      .OrderBy(o => o.ClassName)
+                                      .Distinct().ToListAsync();
 
-            return Ok(teacherClasses);
+          return Ok(teacherClasses);
         }
 
         [HttpGet("{TeacherId}/period/{periodId}/ClassesWithEvalsByPeriod")]

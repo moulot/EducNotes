@@ -518,104 +518,103 @@ namespace EducNotes.API.Controllers
         [HttpGet("{classId}/events")]
         public async Task<IActionResult> GetEvents(int classId)
         {
-            var absences = await _context.Absences
-                                  .Include(i => i.User).ThenInclude(p => p.Photos)
-                                  .Include(i => i.AbsenceType)
-                                  .Include(i => i.DoneBy)
-                                  .Where(a => a.User.ClassId == classId)
-                                  .OrderByDescending(o => o.StartDate).ToListAsync();
+          var absences = await _context.Absences
+                                .Include(i => i.User).ThenInclude(p => p.Photos)
+                                .Include(i => i.AbsenceType)
+                                .Include(i => i.DoneBy)
+                                .Where(a => a.User.ClassId == classId)
+                                .OrderByDescending(o => o.StartDate).ToListAsync();
 
-            List<UserClassEventForListDto> events = new List<UserClassEventForListDto>();
+          List<UserClassEventForListDto> events = new List<UserClassEventForListDto>();
 
-            foreach (var abs in absences)
+          foreach (var abs in absences)
+          {
+            //set the date data to be shown in reporting
+            string dateData = "";
+            if (abs.StartDate.Date == abs.EndDate.Date)
             {
-                //set the date data to be shown in reporting
-                string dateData = "";
-                if (abs.StartDate.Date == abs.EndDate.Date)
-                {
-                    dateData = abs.StartDate.ToString("dd/MM/yy", frC) + " de " +
-                      abs.StartDate.ToString("HH:mm", frC) + " à " + abs.EndDate.ToString("HH:mm", frC);
-                }
-                else
-                {
-                    dateData = "de " + abs.StartDate.ToString("dd/MM/yy", frC) + " " + abs.StartDate.ToString("HH:mm", frC) +
-                      " au " + abs.EndDate.ToString("dd/MM/yy", frC) + " " + abs.EndDate.ToString("HH:mm", frC);
-                }
-
-                UserClassEventForListDto userEvent = new UserClassEventForListDto();
-                userEvent.Id = abs.Id;
-                userEvent.UserId = abs.UserId;
-                userEvent.UserName = abs.User.LastName + " " + abs.User.FirstName;
-                if (abs.User.Photos.Count() > 0)
-                    userEvent.PhotoUrl = abs.User.Photos.FirstOrDefault(p => p.IsMain).Url;
-                userEvent.ClassEventName = "absence";
-                userEvent.ClassEventTypeId = abs.AbsenceTypeId;
-                userEvent.ClassEventType = abs.AbsenceType.Name;
-                userEvent.DoneByName = abs.DoneBy.LastName + " " + abs.DoneBy.FirstName;
-                userEvent.StartDate = abs.StartDate;
-                userEvent.strStartDate = dateData;
-                userEvent.EndDate = abs.EndDate;
-                userEvent.strEndDate = abs.EndDate.ToString("dd/MM/yy", frC);
-                userEvent.StartTime = abs.StartDate.ToString("HH:mm", frC);
-                userEvent.EndTime = abs.EndDate.ToString("HH:mm", frC);
-                userEvent.Justified = abs.Justified == true ? "OUI" : "NON";
-                userEvent.Reason = abs.Reason;
-                userEvent.Comment = abs.Comment;
-                events.Add(userEvent);
+              dateData = abs.StartDate.ToString("dd/MM/yy", frC) + " de " +
+                abs.StartDate.ToString("HH:mm", frC) + " à " + abs.EndDate.ToString("HH:mm", frC);
+            }
+            else
+            {
+              dateData = "de " + abs.StartDate.ToString("dd/MM/yy", frC) + " " + abs.StartDate.ToString("HH:mm", frC) +
+                " au " + abs.EndDate.ToString("dd/MM/yy", frC) + " " + abs.EndDate.ToString("HH:mm", frC);
             }
 
-            List<ClassEventWithNbDto> eventsWithNb = new List<ClassEventWithNbDto>();
-            int absTypeId = Convert.ToInt32(_config.GetSection("AppSettings:AbsenceTypeId").Value);
-            int lateTypeId = Convert.ToInt32(_config.GetSection("AppSettings:LateTypeId").Value);
-            int nbAbs = events.Where(e => e.ClassEventTypeId == absTypeId).Count();
-            int nbLate = events.Where(e => e.ClassEventTypeId == lateTypeId).Count();
-            eventsWithNb.Add(new ClassEventWithNbDto { Id = 0, Name = "absence", NbTimes = nbAbs });
-            eventsWithNb.Add(new ClassEventWithNbDto { Id = 0, Name = "retard", NbTimes = nbLate });
+            UserClassEventForListDto userEvent = new UserClassEventForListDto();
+            userEvent.Id = abs.Id;
+            userEvent.UserId = abs.UserId;
+            userEvent.UserName = abs.User.LastName + " " + abs.User.FirstName;
+            if (abs.User.Photos.Count() > 0)
+              userEvent.PhotoUrl = abs.User.Photos.FirstOrDefault(p => p.IsMain).Url;
+            userEvent.ClassEventName = "absence";
+            userEvent.ClassEventTypeId = 100 + abs.AbsenceTypeId;
+            userEvent.ClassEventType = abs.AbsenceType.Name;
+            userEvent.DoneByName = abs.DoneBy.LastName + " " + abs.DoneBy.FirstName;
+            userEvent.StartDate = abs.StartDate;
+            userEvent.strStartDate = dateData;
+            userEvent.EndDate = abs.EndDate;
+            userEvent.strEndDate = abs.EndDate.ToString("dd/MM/yy", frC);
+            userEvent.StartTime = abs.StartDate.ToString("HH:mm", frC);
+            userEvent.EndTime = abs.EndDate.ToString("HH:mm", frC);
+            userEvent.Justified = abs.Justified == true ? "OUI" : "NON";
+            userEvent.Reason = abs.Reason;
+            userEvent.Comment = abs.Comment;
+            events.Add(userEvent);
+          }
 
-            var otherEvents = await _context.UserClassEvents
-                              .Include(i => i.User).ThenInclude(p => p.Photos)
-                              .Include(i => i.ClassEvent)
-                              .Include(i => i.DoneBy)
-                              .Where(a => a.User.ClassId == classId)
-                              .OrderByDescending(o => o.StartDate).ToListAsync();
+          List<ClassEventWithNbDto> eventsWithNb = new List<ClassEventWithNbDto>();
+          int absTypeId = Convert.ToInt32(_config.GetSection("AppSettings:AbsenceTypeId").Value);
+          int lateTypeId = Convert.ToInt32(_config.GetSection("AppSettings:LateTypeId").Value);
+          int nbAbs = events.Where(e => e.ClassEventTypeId == 100 + absTypeId).Count();
+          int nbLate = events.Where(e => e.ClassEventTypeId == 100 + lateTypeId).Count();
+          eventsWithNb.Add(new ClassEventWithNbDto { Id = 100 + absTypeId, Name = "absence", NbTimes = nbAbs });
+          eventsWithNb.Add(new ClassEventWithNbDto { Id = 100 + lateTypeId, Name = "retard", NbTimes = nbLate });
 
-            foreach (var oe in otherEvents)
-            {
-                UserClassEventForListDto otherEvent = new UserClassEventForListDto();
-                otherEvent.Id = oe.Id;
-                otherEvent.UserId = oe.UserId;
-                otherEvent.UserName = oe.User.LastName + " " + oe.User.FirstName;
-                if (oe.User.Photos.Count() > 0)
-                    otherEvent.PhotoUrl = oe.User.Photos.FirstOrDefault(p => p.IsMain).Url;
-                otherEvent.ClassEventName = oe.ClassEvent.Name;
-                otherEvent.ClassEventType = oe.ClassEvent.Name;
-                otherEvent.DoneByName = oe.DoneBy.LastName + " " + oe.DoneBy.FirstName;
-                otherEvent.StartDate = oe.StartDate;
-                otherEvent.strStartDate = oe.StartDate.ToString("dd/MM/yy", frC);
-                otherEvent.EndDate = oe.EndDate;
-                otherEvent.strEndDate = oe.StartDate.ToString("dd/MM/yy", frC);
-                otherEvent.StartTime = oe.StartDate.ToString("HH:mm", frC);
-                otherEvent.EndTime = oe.EndDate.ToString("HH:mm", frC);
-                otherEvent.Justified = oe.Justified == true ? "OUI" : "NON";
-                otherEvent.Reason = oe.Reason;
-                otherEvent.Comment = oe.Comment;
-                events.Add(otherEvent);
-            }
+          var otherEvents = await _context.UserClassEvents
+                            .Include(i => i.User).ThenInclude(p => p.Photos)
+                            .Include(i => i.ClassEvent)
+                            .Include(i => i.DoneBy)
+                            .Where(a => a.User.ClassId == classId)
+                            .OrderByDescending(o => o.StartDate).ToListAsync();
 
-            var classEvents = await _context.ClassEvents.OrderBy(e => e.Name).ToListAsync();
-            foreach (var ce in classEvents)
-            {
-                int nb = otherEvents.Where(e => e.ClassEventId == ce.Id).ToList().Count();
-                eventsWithNb.Add(new ClassEventWithNbDto { Id = ce.Id, Name = ce.Name, NbTimes = nb });
-            }
+          foreach (var oe in otherEvents)
+          {
+            UserClassEventForListDto otherEvent = new UserClassEventForListDto();
+            otherEvent.Id = oe.Id;
+            otherEvent.UserId = oe.UserId;
+            otherEvent.UserName = oe.User.LastName + " " + oe.User.FirstName;
+            if (oe.User.Photos.Count() > 0)
+                otherEvent.PhotoUrl = oe.User.Photos.FirstOrDefault(p => p.IsMain).Url;
+            otherEvent.ClassEventName = oe.ClassEvent.Name;
+            otherEvent.ClassEventType = oe.ClassEvent.Name;
+            otherEvent.DoneByName = oe.DoneBy.LastName + " " + oe.DoneBy.FirstName;
+            otherEvent.StartDate = oe.StartDate;
+            otherEvent.strStartDate = oe.StartDate.ToString("dd/MM/yy", frC);
+            otherEvent.EndDate = oe.EndDate;
+            otherEvent.strEndDate = oe.StartDate.ToString("dd/MM/yy", frC);
+            otherEvent.StartTime = oe.StartDate.ToString("HH:mm", frC);
+            otherEvent.EndTime = oe.EndDate.ToString("HH:mm", frC);
+            otherEvent.Justified = oe.Justified == true ? "OUI" : "NON";
+            otherEvent.Reason = oe.Reason;
+            otherEvent.Comment = oe.Comment;
+            events.Add(otherEvent);
+          }
 
-            events = events.OrderByDescending(e => e.StartDate).ToList();
-            eventsWithNb = eventsWithNb.OrderBy(e => e.Name).ToList();
-            return Ok(new
-            {
-                events,
-                eventsWithNb
-            });
+          var classEvents = await _context.ClassEvents.OrderBy(e => e.Name).ToListAsync();
+          foreach (var ce in classEvents)
+          {
+            int nb = otherEvents.Where(e => e.ClassEventId == ce.Id).ToList().Count();
+            eventsWithNb.Add(new ClassEventWithNbDto { Id = ce.Id, Name = ce.Name, NbTimes = nb });
+          }
+
+          events = events.OrderByDescending(e => e.StartDate).ToList();
+          eventsWithNb = eventsWithNb.OrderBy(e => e.Name).ToList();
+          return Ok(new {
+            events,
+            eventsWithNb
+          });
         }
 
         [HttpGet("{classid}/Absences")]
@@ -1160,50 +1159,49 @@ namespace EducNotes.API.Controllers
         [HttpGet("Schedule/{scheduleId}/Session")]
         public async Task<IActionResult> GetSessionFromSchedule(int scheduleId)
         {
-            var schedule = _context.Schedules.Where(s => s.Id == scheduleId).FirstOrDefault();
-            if (schedule == null)
-                return BadRequest("problème pour créer la session du cours.");
+          var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == scheduleId);
+          if (schedule == null)
+            return BadRequest("problème pour créer la session du cours.");
 
-            var scheduleDay = schedule.Day;
+          var scheduleDay = schedule.Day;
+          var today = DateTime.Now.Date;
+          // monday=1, tue=2, ...
+          var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
 
-            var today = DateTime.Now.Date;
-            // monday=1, tue=2, ...
-            var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
+          // if (todayDay != scheduleDay)
+          //   return BadRequest("l'emploi du temps du jour est incohérent.");
 
-            // if (todayDay != scheduleDay)
-            //   return BadRequest("l'emploi du temps du jour est incohérent.");
-
-            // get session by schedule and date
-            var sessionFromDB = await _context.Sessions
-                                .Include(i => i.Class)
-                                .Include(i => i.Course)
-                                .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == today);
-            if (sessionFromDB != null)
+          // get session by schedule and date
+          var sessionFromDB = await _context.Sessions
+                              .Include(i => i.Class)
+                              .Include(i => i.Course)
+                              .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == today);
+          if (sessionFromDB != null)
+          {
+            var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
+            return Ok(session);
+          }
+          else
+          {
+            var newSession = _context.Add(new Session
             {
-              var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
+              ScheduleId = schedule.Id,
+              TeacherId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
+              ClassId = schedule.ClassId,
+              CourseId = schedule.CourseId,
+              StartHourMin = schedule.StartHourMin,
+              EndHourMin = schedule.EndHourMin,
+              SessionDate = today
+            });
+
+            if (await _repo.SaveAll())
+            {
+              var session = _mapper.Map<SessionToReturnDto>(newSession);
               return Ok(session);
             }
-            else
-            {
-              var newSession = _context.Add(new Session
-              {
-                ScheduleId = schedule.Id,
-                TeacherId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value),
-                ClassId = schedule.ClassId,
-                CourseId = schedule.CourseId,
-                StartHourMin = schedule.StartHourMin,
-                EndHourMin = schedule.EndHourMin,
-                SessionDate = today
-              });
 
-              if (await _repo.SaveAll())
-              {
-                var session = _mapper.Map<SessionToReturnDto>(newSession);
-                return Ok(session);
-              }
-
-              return BadRequest("problème pour récupérer la session");
-            }
+            return BadRequest("problème pour récupérer la session");
+          }
         }
 
         [HttpGet("courses/{courseId}/teacher/{teacherId}/Program")]

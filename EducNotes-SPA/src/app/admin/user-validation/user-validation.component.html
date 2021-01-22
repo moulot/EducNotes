@@ -12,15 +12,11 @@
 </div>
 <div class="row my-2">
   <div class="col-md-3 mb-1">
-    <button *ngIf="btnActive != 0" (click)="selectType(0)" type="button" mdbBtn class="btnWhiteB"
-      size="sm" block="true" mdbWavesEffect>tous utilisateurs</button>
-    <button *ngIf="btnActive == 0" (click)="selectType(0)" type="button" mdbBtn class="btnBlue"
+    <button (click)="selectType(0)" type="button" [ngClass]="(btnActive != 0)?'btnWhiteB':'btnBlue'" mdbBtn
       size="sm" block="true" mdbWavesEffect>tous utilisateurs</button>
   </div>
   <div class="col-md-3 mb-1" *ngFor="let type of userTypes">
-    <button *ngIf="btnActive != type.id" (click)="selectType(type.id)" type="button" mdbBtn class="btnWhiteB"
-      size="sm" block="true" mdbWavesEffect>voir les {{type.name}}s</button>
-    <button *ngIf="btnActive == type.id" (click)="selectType(type.id)" type="button" mdbBtn class="btnBlue"
+    <button (click)="selectType(type.id)" type="button" [ngClass]="(btnActive != type.id)?'btnWhiteB':'btnBlue'" mdbBtn
       size="sm" block="true" mdbWavesEffect>voir les {{type.name}}s</button>
   </div>
 </div>

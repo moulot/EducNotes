@@ -10,6 +10,7 @@ import { ClassService } from 'src/app/_services/class.service';
 import { CourseUser } from 'src/app/_models/courseUser';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AgendaModalComponent } from '../agenda-modal/agenda-modal.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-agenda-list',
@@ -18,7 +19,7 @@ import { AgendaModalComponent } from '../agenda-modal/agenda-modal.component';
   animations: [SharedAnimations]
 })
 export class AgendaListComponent implements OnInit {
-  @ViewChild('agendaForm', {static: false}) agendaForm: NgForm;
+  // @ViewChild('agendaForm', {static: false}) agendaForm: NgForm;
   classId: number;
   modalSession: any;
   allSessions: any = [];
@@ -32,26 +33,42 @@ export class AgendaListComponent implements OnInit {
   ngbModalRef: NgbModalRef;
   sessions: any[] = [];
   filteredSessions;
-  optionsClass: any[] = [];
+  optionsClass = [];
   allCourses = true;
   coursesWithTasks: any = [];
   nbDayTasks = [0, 0, 0, 0, 0, 0];
   weekDays = [];
   weekDates = [];
   classControl = new FormControl();
+  classForm: FormGroup;
   showSessionsData = false;
   agendaParams: any = {};
   startDate: Date;
   sessionsByDate = [];
   sessionsByCourse = [];
+  dayOfWeekActive = -1;
 
   constructor(private userService: UserService, private fb: FormBuilder, private classService: ClassService,
-    private authService: AuthService, public alertify: AlertifyService, private modalService: NgbModal) { }
+    private authService: AuthService, public alertify: AlertifyService, private modalService: NgbModal,
+    private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.teacher = this.authService.currentUser;
     this.getTeacherClasses(this.teacher.id);
     this.getTeacherCourses(this.teacher.id);
+    this.route.params.subscribe(params => {
+      this.classId = params['classId'];
+      if (this.classId > 0) {
+        this.classSelected(this.classId);
+      }
+      this.createClassForm();
+    });
+  }
+
+  createClassForm() {
+    this.classForm = this.fb.group({
+      classRoom: [this.classId]
+    });
   }
 
   resetSessions() {
@@ -114,6 +131,7 @@ export class AgendaListComponent implements OnInit {
         const element = {value: elt.classId, label: 'classe ' + elt.className};
         this.optionsClass = [...this.optionsClass, element];
       }
+      // this.optionsClass = [...this.optionsClass, {value: 2, label: 'classe XXX'}];
     }, error => {
       this.alertify.error(error);
     });
@@ -129,14 +147,22 @@ export class AgendaListComponent implements OnInit {
 
   showAllCourses() {
     if (this.allCourses === true) {
+      this.dayOfWeekActive = -1;
       this.filteredSessions = this.allSessions;
       this.setCoursesWithTasks(this.filteredSessions);
     }
   }
 
+  classSelected(classId) {
+    this.classId = classId;
+    this.getTeacherSessions(this.teacher.id, this.classId);
+    this.showSessionsData = true;
+  }
+
   classChanged() {
-    if (this.classControl.value !== '') {
-      this.classId = this.classControl.value;
+    const classId = this.classForm.value.classRoom;
+    if (classId !== '') {
+      this.classId = this.classForm.value.classRoom;
       this.getTeacherSessions(this.teacher.id, this.classId);
       this.showSessionsData = true;
     } else {
@@ -172,7 +198,8 @@ export class AgendaListComponent implements OnInit {
     this.setCoursesWithTasks(this.filteredSessions);
   }
 
-  showItemsByDate(selectedDate) {
+  showItemsByDate(selectedDate, index) {
+    this.dayOfWeekActive = index;
     this.allCourses = false;
     this.filteredSessions = [];
     this.sessionsByDate = [];
@@ -203,6 +230,7 @@ export class AgendaListComponent implements OnInit {
   }
 
   loadMovedWeek(move: number) {
+    this.dayOfWeekActive = -1;
     this.allCourses = true;
     this.agendaParams.dueDate = this.startDate;
     this.agendaParams.moveWeek = move;

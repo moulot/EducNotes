@@ -188,7 +188,6 @@ export class ClassCallSheetComponent implements OnInit {
         newAbsence.sessionId = this.session.id;
 
         const sessionDate = this.session.strSessionDate.split('/');
-        // console.log(sessionDate);
         const day = sessionDate[0];
         const month = sessionDate[1];
         const year = sessionDate[2];
@@ -196,10 +195,8 @@ export class ClassCallSheetComponent implements OnInit {
         const smin = this.session.startHourMin.split(':')[1];
         const ehour = this.session.endHourMin.split(':')[0];
         const emin = this.session.endHourMin.split(':')[1];
-        // console.log(day + '/' + month + '/' + year + '-' + shour + ':' + smin + '-' + ehour + ':' + emin);
 
         newAbsence.startDate = new Date(year, month - 1, day, shour, smin);
-        // console.log(newAbsence.startDate);
         if (student.absent) {
           newAbsence.absenceTypeId = this.absenceType;
           newAbsence.endDate = new Date(year, month - 1, day, ehour, emin);
@@ -208,14 +205,11 @@ export class ClassCallSheetComponent implements OnInit {
           const endLateMin = Number(smin) + Number(student.lateInMin);
           newAbsence.endDate = new Date(year, month - 1, day, shour, endLateMin);
         }
-        newAbsence.reason = 'absent lors de l\'appel';
-        // const justified = 0;
-        // newAbsence.comment = 'absent lors de l\'appel';
+        newAbsence.reason = 'absent lors de l\'appel du cours de ';
         newAbsence.doneById = this.authService.currentUser.id;
         this.absences = [...this.absences, newAbsence];
       }
     }
-    // console.log(this.absences);
 
     this.classService.saveCallSheet(this.session.id, this.absences).subscribe(() => {
       this.alertify.success('l\'appel est enregistré');

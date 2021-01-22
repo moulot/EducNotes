@@ -18,9 +18,6 @@ export class ClassLifeComponent implements OnInit {
   teacherClasses: any;
   selectedClass: Class;
   students: User[];
-  // nbAbsences = 0;
-  // nbSanctions = 0;
-  // nbRewards = 0;
   toggleFormAdd = false;
   absencesList: any = [];
   sanctionsList: any = [];
@@ -37,8 +34,7 @@ export class ClassLifeComponent implements OnInit {
   periodOptions: any[] = [];
   events: any;
   page = 1;
-  pageSize = 5;
-  // eventOptions: any[] = [];
+  pageSize = 10;
   nbByEvents = [];
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
@@ -84,8 +80,6 @@ export class ClassLifeComponent implements OnInit {
       const element = {value: elt.id, label: elt.lastName + ' ' + elt.firstName};
       this.studentOptions = [...this.studentOptions, element];
     }
-    // this.loadAbsences(classId);
-    // this.loadSanctions(classId);
     this.loadEvents(classId);
    }, error => {
      this.alertify.error(error);
@@ -126,55 +120,19 @@ export class ClassLifeComponent implements OnInit {
     });
   }
 
- getClass(classId) {
+  getClass(classId) {
   this.classService.getClass(classId).subscribe((aclass: Class) => {
     this.selectedClass = aclass;
   });
- }
-
-  showEventItems(courseId) {
-    this.allEvents = false;
-    this.filteredEvents = [];
-    // this.sessionsByCourse = [];
-
-    for (let i = 0; i < this.allEvents.length; i++) {
-      const elt = this.allEvents[i];
-      const result = elt.agendaItems.map(item => {
-        if (item.courseId === courseId) {
-          return item;
-        }
-      }).filter(item => !!item);
-      if (result.length > 0) {
-        const filteredElt = {
-          'dueDate': elt.dueDate,
-          'shortDueDate': elt.shortDueDate,
-          'longDueDate': elt.longDueDate,
-          'dueDateAbbrev': elt.DueDateAbbrev,
-          'nbItems': result.length,
-          'agendaItems': result
-        };
-        this.filteredEvents = [...this.filteredEvents, filteredElt];
-        // this.sessionsByCourse = [...this.sessionsByDate, filteredElt];
-      }
-    }
   }
 
-  // loadAbsences(classId) {
-  //   this.classService.getClassAbsences(classId).subscribe((data: any) => {
-  //     this.absencesList = data.absences;
-  //     // this.nbAbsences = data.nbAbsences;
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
-
-  // loadSanctions(classId) {
-  //   this.classService.getClassSanctions(classId).subscribe((data: any) => {
-  //     this.sanctionsList = data.sanctions;
-  //     // this.nbSanctions = data.nbSanctions;
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
+  showEventItems(eventId) {
+    if (eventId === 0) {
+      this.filteredEvents = this.allEvents;
+    } else {
+      this.filteredEvents = [];
+      this.filteredEvents = this.allEvents.filter(elt => elt.classEventTypeId === eventId);
+    }
+  }
 
 }

@@ -120,6 +120,7 @@ export class EvalAddFormComponent implements OnInit {
   }
 
   createEvaluation(more: boolean) {
+    this.wait = true;
     this.newEval.userId = this.teacher.id;
     this.newEval.name = this.newEvalForm.value.evalName;
     this.newEval.courseId = this.newEvalForm.value.newcourse;
@@ -146,7 +147,6 @@ export class EvalAddFormComponent implements OnInit {
     }
 
     this.evalService.saveEvaluation(this.newEval, this.progEltIds).subscribe(() => {
-      this.wait = true;
       this.alertify.success('ajout de l\'évaluation validé.');
       this.wait = false;
     }, error => {

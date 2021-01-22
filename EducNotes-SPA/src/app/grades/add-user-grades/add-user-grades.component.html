@@ -45,7 +45,6 @@
           </div>
         </div>
       </div>
-
       <!-- DATA LIST SM -->
       <div class="row d-md-none mt-2 animated zoomIn">
         <div class="col-md-12">
@@ -98,11 +97,13 @@
           <div>
             <div class="row">
               <div class="col-md-8 mb-1">
-                <button mdbBtn type="submit" block="true" [disabled]="formNOK"
-                  class="btnBlue" size="sm" mdbWavesEffect>saisir les notes</button>
+                <button mdbBtn type="submit" block="true" [disabled]="formNOK || wait" class="btnBlue" size="sm" mdbWavesEffect>
+                  <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  saisir les notes
+                </button>
               </div>
               <div class="col-md-4">
-                <button mdbBtn type="button" block="true" (click)="cancelForm()" class="btnBlue" size="sm" mdbWavesEffect>annuler</button>
+                <button mdbBtn type="button" [disabled]="wait" block="true" (click)="cancelForm()" class="btnBlue" size="sm" mdbWavesEffect>annuler</button>
               </div>
             </div>
           </div>

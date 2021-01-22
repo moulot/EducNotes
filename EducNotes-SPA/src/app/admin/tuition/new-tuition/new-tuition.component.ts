@@ -185,16 +185,6 @@ export class NewTuitionComponent implements OnInit {
       }
     }
 
-    // if (childerror === false && parenterror === true) {
-    //   return {'childNOK': false, 'parentNOK': true, 'formNOK': true,
-    //     'fatherNOK': fathererror, 'motherNOK': mothererror};
-    // } else if (childerror === true && parenterror === false) {
-    //   return {'childNOK': true, 'parentNOK': false, 'formNOK': true,
-    //     'fatherNOK': fathererror, 'motherNOK': mothererror};
-    // } else if (childerror === true && parenterror === true) {
-    //   return {'childNOK': true, 'parentNOK': true, 'formNOK': true,
-    //     'fatherNOK': fathererror, 'motherNOK': mothererror};
-    // }
     if (parenterror === true || childerror === true || (mothererror === true && fathererror === true)) {
       return {'formNOK': true, 'childNOK': childerror, 'parentNOK': parenterror, 'fatherNOK': fathererror, 'motherNOK': mothererror};
     }

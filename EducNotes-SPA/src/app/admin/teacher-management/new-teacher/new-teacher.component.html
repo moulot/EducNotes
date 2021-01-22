@@ -67,16 +67,10 @@
               </div>
               <div class="row">
                 <div class="col-md-3">
-                  <!-- <div class="md-form mt-1 mb-0">
-                    <i class="fad fa-birthday-cake prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                      --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <input mdbInput type="text" id="dateOfBirth" class="form-control" formControlName="dateOfBirth" [textMask]="{mask: birthDateMask}">
-                    <label for="dateOfBirth">date de naissance</label>
-                  </div> -->
-                  <div class="md-form mt-0 mb-0">
+                  <div class="md-form my-0">
                     <i class="fad fa-birthday-cake prefix" style="padding-top: 5px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
                       --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <div class="ml-5"><mdb-date-picker name="dateOfBirth" [options]="myDatePickerOptions" formControlName="dateOfBirth"></mdb-date-picker></div>
+                    <div class="ml-5"><mdb-date-picker name="dateOfBirth" [placeholder]="'date de naissance'" [options]="myDatePickerOptions" formControlName="dateOfBirth"></mdb-date-picker></div>
                     <div *ngIf="teacherForm.get('dateOfBirth').errors && teacherForm.get('dateOfBirth').touched"
                       class="text-small text-danger">la date de naissance est obligatoire</div>
                   </div>
@@ -156,7 +150,6 @@
                         --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
                       <span *ngIf="!editionMode">ajouter</span><span *ngIf="editionMode">editer</span>
                     </button>
-                    <!-- <button type="button" (click)="resetValues()" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>reset</button> -->
                     <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>annuler</button>
                   </div>
                 </div>

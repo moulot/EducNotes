@@ -34,6 +34,31 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.PhotoUrl, opt => {
                     opt.MapFrom(src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
                 });
+            CreateMap<Schedule, TeacherClassSessionDto>()
+                .ForMember(dest => dest.TeacherName, opt => {
+                  opt.MapFrom(src => src.Teacher.LastName + ' ' + src.Teacher.FirstName);
+                })
+                .ForMember(dest => dest.CourseName, opt => {
+                  opt.MapFrom(d => d.Course.Name);
+                })
+                .ForMember(dest => dest.ClassName, opt => {
+                    opt.MapFrom(d => d.Class.Name);
+                })
+                .ForMember(dest => dest.CourseStartHM, opt => {
+                    opt.MapFrom(src => src.StartHourMin);
+                })
+                .ForMember(dest => dest.CourseEndHM, opt => {
+                    opt.MapFrom(src => src.EndHourMin);
+                })
+                .ForMember(dest => dest.ScheduleId, opt => {
+                    opt.MapFrom(src => src.Id);
+                })
+                .ForMember(dest => dest.StartHourMin, opt => {
+                    opt.MapFrom(src => src.StartHourMin.ToString("HH:mm", frC));
+                })
+                .ForMember(dest => dest.EndHourMin, opt => {
+                    opt.MapFrom(src => src.EndHourMin.ToString("HH:mm", frC));
+                });
             CreateMap<User, UserForClassAllocationDto>()
                 .ForMember(dest => dest.LastName, opt => {
                     opt.MapFrom(src => src.LastName);
@@ -65,6 +90,9 @@ namespace EducNotes.API.Helpers {
                 })
                 .ForMember(dest => dest.ClassLevelId, opt => {
                     opt.MapFrom(src => src.Class.ClassLevelId);
+                })
+                .ForMember(dest => dest.ClassLevelName, opt => {
+                    opt.MapFrom(src => src.ClassLevel.Name);
                 })
                 .ForMember(dest => dest.strDateOfBirth, opt => {
                     opt.MapFrom(d => d.DateOfBirth.ToString("dd/MM/yyyy", frC));
