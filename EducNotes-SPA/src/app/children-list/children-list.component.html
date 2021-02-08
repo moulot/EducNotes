@@ -2,9 +2,6 @@
   <div class="col-md-12 mb-2" *ngFor="let child of children; let i = index" [@animate]="{value:'*',params:{delay: (i*100)+'ms', y:'50px'}}">
     <a (click)="goToChildPage(child)" class="text-17 text-primary">
       <mdb-card>
-      <!-- <div class="avatar mx-auto">
-        <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" class="rounded-circle">
-      </div> -->
       <mdb-card-body class="text-left p-2 d-md-flex">
         <div class=" text-center mr-3">
           <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" width="100" class="rounded-circle">

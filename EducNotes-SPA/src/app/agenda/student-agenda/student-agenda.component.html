@@ -8,7 +8,7 @@
   <div class="col-md-12" *ngIf="!showChildrenList">
     <div class="row">
       <div *ngIf="isParentConnected" class="col-md-12 mb-2">
-        <app-users-header [student]="currentChild" (getUser)="getUser($event)"></app-users-header>
+        <app-users-header [student]="currentChild" [children]="children" (getUser)="getUser($event)"></app-users-header>
       </div>
       <div class="col-md-9">
         <div class="row">

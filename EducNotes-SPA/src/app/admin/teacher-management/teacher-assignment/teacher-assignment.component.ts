@@ -78,7 +78,8 @@ export class TeacherAssignmentComponent implements OnInit {
       arr.push(this.fb.group({
         classId: y.classId,
         className: y.className,
-        active: y.active
+        active: y.active,
+        assigned: y.assigned
       }));
     });
     return arr;

@@ -158,6 +158,10 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/' + classId + '/ClassCourses');
   }
 
+  getEducLevels() {
+    return this.http.get(this.baseUrl + 'classes/EducLevels');
+  }
+
   getClassCoursesWithAgenda(classId, daysToNow, daysFromNow) {
     return this.http.get(this.baseUrl + 'classes/' + classId + '/CoursesWithAgenda/f/' + daysToNow + '/t/' + daysFromNow);
   }
@@ -182,6 +186,10 @@ export class ClassService {
 
   getClassesByLevel() {
     return this.http.get(this.baseUrl + 'classes/ClassesByLevel');
+  }
+
+  getFreePrimaryClasses() {
+    return this.http.get(this.baseUrl + 'classes/FreePrimaryClasses');
   }
 
   getAllClasses() {

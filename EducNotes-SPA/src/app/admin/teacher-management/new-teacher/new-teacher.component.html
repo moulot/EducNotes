@@ -15,108 +15,187 @@
       <div class="card-body p-2">
         <form [formGroup]="teacherForm" (ngSubmit)="addTeacher()">
           <div class="row">
-            <div class="col-md-2">
-              <div class="file-path-wrapper d-flex justify-content-center m-0 p-1">
-                <img [src]="photoUrl || '../../assets/user.png'" class="avatar-xl rounded-lg" alt="">
-              </div>
-              <div class="d-flex justify-content-center m-0">
-                <div class="file-field md-form m-0">
-                  <div mdbBtn class="btnBlue px-2 waves-light" size="sm" mdbWavesEffect>
-                    <span *ngIf="!photoUrl">ajouter la photo</span>
-                    <span *ngIf="photoUrl">editer la photo</span>
-                    <input type="file" accept='image/*' mdbFileSelect (change)="imgResult($event)">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-2">
+                  <div class="file-path-wrapper d-flex justify-content-center m-0 p-1">
+                    <img [src]="photoUrl || '../../assets/user.png'" class="avatar-xl rounded-lg" alt="">
                   </div>
+                  <div class="d-flex justify-content-center m-0">
+                    <div class="file-field md-form m-0">
+                      <div mdbBtn class="btnBlue px-2 waves-light" size="sm" mdbWavesEffect>
+                        <span *ngIf="!photoUrl">ajouter la photo</span>
+                        <span *ngIf="photoUrl">editer la photo</span>
+                        <input type="file" accept='image/*' mdbFileSelect (change)="imgResult($event)">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-10">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="md-form mt-1 mb-0">
+                        <!-- <i class="fad fa-id-card prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
+                        <input mdbInput type="text" id="lastName" class="form-control" formControlName="lastName" mdbValidate>
+                        <label for="lastName" class="">nom</label>
+                      </div>
+                      <div *ngIf="teacherForm.get('lastName').errors && teacherForm.get('lastName').touched" class="text-small text-danger">
+                        le nom est obligatoire
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="md-form mt-1 mb-0">
+                        <!-- <i class="fad fa-id-card prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
+                        <input mdbInput type="text" id="firstName" class="form-control" formControlName="firstName" mdbValidate>
+                        <label for="firstName" class="">prénom</label>
+                      </div>
+                      <div *ngIf="teacherForm.get('firstName').errors && teacherForm.get('firstName').touched" class="text-small text-danger">
+                        le prénom est obligatoire
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="d-flex">
+                        <!-- <i class="fad fa-venus-mars fa-2x pt-3 mr-2 prefix" style="padding-top: 10px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
+                        <mdb-select id="gender" [options]="gender" placeholder="sexe" formControlName="gender"></mdb-select>
+                      </div>
+                      <div *ngIf="teacherForm.get('gender').errors && teacherForm.get('gender').touched"
+                        class="text-small text-danger ml-2">le sexe est obligatoire</div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="md-form my-0">
+                        <!-- <i class="fad fa-birthday-cake prefix" style="padding-top: 5px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
+                        <mdb-date-picker name="dateOfBirth" [placeholder]="'date de naissance'" [options]="myDatePickerOptions" formControlName="dateOfBirth"></mdb-date-picker>
+                        <div *ngIf="teacherForm.get('dateOfBirth').errors && teacherForm.get('dateOfBirth').touched"
+                          class="text-small text-danger">la date de naissance est obligatoire</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="md-form mt-1 mb-0">
+                        <!-- <i class="fad fa-mobile-alt prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
+                        <input mdbInput type="text" id="cell" class="form-control" formControlName="cell">
+                        <label for="cell" class="">portable</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="md-form mt-1 mb-0">
+                        <!-- <i class="fad fa-phone-alt fa-1x prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
+                        <input mdbInput type="text" id="phone2" class="form-control" formControlName="phone2">
+                        <label for="phone2" class="">autre</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="md-form mt-1 mb-0">
+                        <!-- <i class="fad fa-at fa-1x prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
+                        <input mdbInput type="text" id="email" class="form-control" formControlName="email">
+                        <label for="email" class="">email</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="md-form mt-1 mb-0">
+                        <!-- <i class="fad fa-users-class fa-1x mr-2 prefix" style="padding-top: 10px;--fa-primary-opacity: 1;
+                          --fa-secondary-opacity: 1;--fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
+                        <mdb-select id="educlevelId" [options]="educlevelOptions" (ngModelChange)="changeEducLevel()"
+                          placeholder="niveau d'éducation" formControlName="educLevelId"></mdb-select>
+                        <div *ngIf="teacherForm.get('educLevelId').errors && teacherForm.get('educLevelId').touched"
+                          class="text-small text-danger ml-2">le niveau d'éducation est obligatoire</div>
+                      </div>
+                    </div>
+                    <div *ngIf="showClasses" class="col-md-3">
+                      <div class="md-form mt-1 mb-0">
+                        <mdb-select id="classId" [options]="classOptions" placeholder="classe"
+                          [visibleOptions]="10" formControlName="classId"></mdb-select>
+                        <div *ngIf="teacherForm.hasError('classNOK') && teacherForm.get('classId').touched"
+                          class="text-small text-danger">la classe est obligatoire</div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <hr class="mt-3 mb-2">
+                  <div class="text-15 d-flex align-items-center mb-2">
+                    <i class="fad fa-books fa-2x mr-2" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
+                      --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
+                    <b>cours du professeur</b>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3 my-2" formArrayName="courses" *ngFor="let course of teacherForm.get('courses')['controls']; let i = index;">
+                      <div [formGroupName]="i">
+                        <div *ngIf="course.value.classAssigned">
+                          <div class="switch logo-switch">
+                            <label>
+                              <input type="checkbox" disabled formControlName="active">
+                              <span class="slider"></span>
+                              <span class="text-15 text-muted">{{course.value.name}}</span>
+                            </label>
+                          </div>
+                        </div>
+                        <div *ngIf="!course.value.classAssigned">
+                          <div class="switch">
+                            <label>
+                              <input type="checkbox" formControlName="active">
+                              <span class="slider"></span>
+                              <span class="text-15 text-muted">{{course.value.name}}</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <hr class="my-1">
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="d-flex">
+                        <div class="mr-2 my-auto">
+                          <div style="width: 15px; height: 15px; background-color: #f89f20;"></div>
+                        </div>
+                        <div class="text-13">des classes sont attribuées aux cours sélectionnés en orange (non modifiable)</div>
+                      </div>
+                    </div>
+                    <div class="col-md-2 mb-1">
+                      <button type="submit" mdbBtn class="btnBlue" size="sm" mdbWavesEffect
+                        block="true" [disabled]="!teacherForm.valid || wait">
+                        <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                          --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                        <span *ngIf="!editionMode">ajouter</span><span *ngIf="editionMode">editer</span>
+                      </button>
+                    </div>
+                    <div class="col-md-2 mb-1">
+                      <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
+                      block="true" [disabled]="wait">
+                        <i class="fad fa-times-circle fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                          --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+                        <span>annuler</span>
+                      </button>
+                    </div>
+                  </div> -->
                 </div>
               </div>
             </div>
-            <div class="col-md-10">
-              <div class="row">
-                <div class="col-md-3">
-                  <div class="md-form mt-1 mb-0">
-                    <i class="fad fa-id-card prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                      --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <input mdbInput type="text" id="lastName" class="form-control" formControlName="lastName" mdbValidate>
-                    <label for="lastName" class="">nom</label>
-                  </div>
-                  <div *ngIf="teacherForm.get('lastName').errors && teacherForm.get('lastName').touched" class="text-small text-danger">
-                    le nom est obligatoire
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="md-form mt-1 mb-0">
-                    <i class="fad fa-id-card prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                      --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <input mdbInput type="text" id="firstName" class="form-control" formControlName="firstName" mdbValidate>
-                    <label for="firstName" class="">prénom</label>
-                  </div>
-                  <div *ngIf="teacherForm.get('firstName').errors && teacherForm.get('firstName').touched" class="text-small text-danger">
-                    le prénom est obligatoire
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3">
-                  <div class="d-flex">
-                    <i class="fad fa-venus-mars fa-2x pt-3 mr-2 prefix" style="padding-top: 10px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                      --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <mdb-select id="gender" [options]="gender" placeholder="sexe" formControlName="gender"></mdb-select>
-                  </div>
-                  <div *ngIf="teacherForm.get('gender').errors && teacherForm.get('gender').touched"
-                    class="text-small text-danger ml-2">le sexe est obligatoire</div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3">
-                  <div class="md-form my-0">
-                    <i class="fad fa-birthday-cake prefix" style="padding-top: 5px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                      --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <div class="ml-5"><mdb-date-picker name="dateOfBirth" [placeholder]="'date de naissance'" [options]="myDatePickerOptions" formControlName="dateOfBirth"></mdb-date-picker></div>
-                    <div *ngIf="teacherForm.get('dateOfBirth').errors && teacherForm.get('dateOfBirth').touched"
-                      class="text-small text-danger">la date de naissance est obligatoire</div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="md-form mt-1 mb-0">
-                    <i class="fad fa-at prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                      --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <input mdbInput type="text" id="email" class="form-control" formControlName="email">
-                    <label for="email" class="">email</label>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3">
-                  <div class="md-form mt-1 mb-0">
-                    <i class="fad fa-mobile-alt prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                      --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <input mdbInput type="text" id="cell" class="form-control" formControlName="cell">
-                    <label for="cell" class="">portable</label>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="md-form mt-1 mb-0">
-                    <i class="fad fa-phone-alt prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                      --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <input mdbInput type="text" id="phone2" class="form-control" formControlName="phone2">
-                    <label for="phone2" class="">autre</label>
-                  </div>
-                </div>
-              </div>
-              <hr class="mt-3 mb-2" style="background-color: #f89f20;">
+            <div class="col-md-12">
+              <hr class="mt-3 mb-2">
               <div class="text-15 d-flex align-items-center mb-2">
                 <i class="fad fa-books fa-2x mr-2" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
                   --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
                 <b>cours du professeur</b>
               </div>
               <div class="row">
-                <div class="col-md-3 my-2" formArrayName="courses" *ngFor="let course of teacherForm.get('courses')['controls']; let i = index;">
+                <div class="col-md-2 my-2" formArrayName="courses" *ngFor="let course of teacherForm.get('courses')['controls']; let i = index;">
                   <div [formGroupName]="i">
                     <div *ngIf="course.value.classAssigned">
                       <div class="switch logo-switch">
                         <label>
                           <input type="checkbox" disabled formControlName="active">
                           <span class="slider"></span>
-                          <span class="text-15 text-muted">{{course.value.name}}</span>
+                          <span class="text-15 text-muted">{{course.value.abbrev}}</span>
                         </label>
                       </div>
                     </div>
@@ -125,33 +204,38 @@
                         <label>
                           <input type="checkbox" formControlName="active">
                           <span class="slider"></span>
-                          <span class="text-15 text-muted">{{course.value.name}}</span>
+                          <span class="text-15 text-muted">{{course.value.abbrev}}</span>
                         </label>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <hr class="my-1" style="background-color: #f89f20;">
+              <hr class="my-1">
               <div class="row">
-                <div class="col-md-7">
+                <div class="col-md-8">
                   <div class="d-flex">
                     <div class="mr-2 my-auto">
                       <div style="width: 15px; height: 15px; background-color: #f89f20;"></div>
                     </div>
-                    <div class="text-13">désactivé: des classes sont attribuées à ce cours</div>
+                    <div class="text-13">des classes sont attribuées aux cours sélectionnés en orange (non modifiable)</div>
                   </div>
                 </div>
-                <div class="col-md-5 float-right">
-                  <div class="float-right">
-                    <button type="submit" mdbBtn class="btnBlue ml-2" size="sm" mdbWavesEffect
-                      [disabled]="!teacherForm.valid || wait">
-                      <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                        --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
-                      <span *ngIf="!editionMode">ajouter</span><span *ngIf="editionMode">editer</span>
-                    </button>
-                    <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect>annuler</button>
-                  </div>
+                <div class="col-md-2 mb-1">
+                  <button type="submit" mdbBtn class="btnBlue" size="sm" mdbWavesEffect
+                    block="true" [disabled]="!teacherForm.valid || wait">
+                    <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                    <span *ngIf="!editionMode">ajouter</span><span *ngIf="editionMode">editer</span>
+                  </button>
+                </div>
+                <div class="col-md-2 mb-1">
+                  <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
+                  block="true" [disabled]="wait">
+                    <i class="fad fa-times-circle fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+                    <span>annuler</span>
+                  </button>
                 </div>
               </div>
             </div>

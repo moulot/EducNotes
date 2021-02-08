@@ -120,6 +120,10 @@ constructor(private http: HttpClient) {}
     return this.http.put(this.baseUrl + parentId + '/saveSms', sms);
   }
 
+  getSiblings(childId): Observable<User[]> {
+    return this.http.get<User[]>(this.baseUrl + childId + '/Siblings');
+  }
+
   getChildren(parentId): Observable<User[]> {
     return this.http.get<User[]>(this.baseUrl + parentId + '/Children');
   }

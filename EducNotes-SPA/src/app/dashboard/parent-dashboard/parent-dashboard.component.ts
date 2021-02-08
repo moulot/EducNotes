@@ -62,13 +62,13 @@ export class ParentDashboardComponent implements OnInit {
         if (this.currentChild.id === 0) {
           this.showUsersList = false;
           this.showChildrenList = true;
+          this.loadingOk = 5;
         } else {
           this.showUsersList = true;
           this.showChildrenList = false;
           this.student = this.currentChild;
           this.getUserInfos(this.student.id, this.student.classId);
         }
-        this.loadingOk = 5;
       }
       }, error => {
       this.alertify.error(error);
@@ -76,13 +76,18 @@ export class ParentDashboardComponent implements OnInit {
     });
   }
 
-  selectUser(user) {
-    this.student = user;
-    this.getUserInfos(user.id, user.classId);
+  selectUser(childId) {
+    this.userService.getUser(childId).subscribe((user: User) => {
+      this.student = user;
+      this.getUserInfos(user.id, user.classId);
+    }, error => {
+      this.alertify.error(error);
+    });
   }
 
   getUserInfos(userId, classId) {
     this.loadingOk = 0;
+    // console.log('userInfos: ' + this.loadingOk);
     this.getAgendaItems(classId);
     this.getEvalsToCome(classId);
     this.getScheduleDays(classId);
@@ -99,6 +104,7 @@ export class ParentDashboardComponent implements OnInit {
       this.alertify.error(error);
     }, () => {
       this.loadingOk += 1;
+      // console.log('getAgendaItems: ' + this.loadingOk);
     });
   }
 
@@ -109,6 +115,7 @@ export class ParentDashboardComponent implements OnInit {
       this.alertify.error(error);
     }, () => {
       this.loadingOk += 1;
+      // console.log('getEvalsToCome: ' + this.loadingOk);
     });
   }
 
@@ -121,6 +128,7 @@ export class ParentDashboardComponent implements OnInit {
       this.alertify.error(error);
     }, () => {
       this.loadingOk += 1;
+      // console.log('getScheduleDays: ' + this.loadingOk);
     });
   }
 
@@ -133,6 +141,7 @@ export class ParentDashboardComponent implements OnInit {
       this.alertify.error(error);
     }, () => {
       this.loadingOk += 1;
+      // console.log('getStudentLastGrades: ' + this.loadingOk);
     });
   }
 
@@ -143,6 +152,7 @@ export class ParentDashboardComponent implements OnInit {
       this.alertify.error(error);
     }, () => {
       this.loadingOk += 1;
+      // console.log('getClass: ' + this.loadingOk);
     });
   }
 

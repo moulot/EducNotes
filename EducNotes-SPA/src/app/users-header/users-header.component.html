@@ -1,17 +1,9 @@
-<!-- <i class="fad fa-home-alt fa-2x" style="--fa-secondary-opacity: 1;
-  --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i> -->
 <div class="row">
   <div class="col-md-3 mb-2" *ngFor="let child of children">
     <a (click)="selectUser(child.id)">
-      <div *ngIf="selectedUser.id == child.id" class="border selected rounded-pill p-1">
+      <div [ngClass]="(selectedUser.id == child.id)?'selected':'unselected'" class="border rounded-pill p-1">
         <div class="d-flex">
-          <img class="child-img mr-2" src="{{selectedUser?.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
-          <div class="text-17 my-auto">{{child.lastName}} {{child.firstName}}</div>
-        </div>
-      </div>
-      <div *ngIf="selectedUser.id != child.id" class="border unselected rounded-pill p-1">
-        <div class="d-flex">
-          <img class="child-img mr-2" src="{{selectedUser?.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
+          <img class="child-img mr-2" src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
           <div class="text-17 my-auto">{{child.lastName}} {{child.firstName}}</div>
         </div>
       </div>

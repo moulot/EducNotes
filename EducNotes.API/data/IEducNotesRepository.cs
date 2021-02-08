@@ -18,6 +18,8 @@ namespace EducNotes.API.Data
     Task<PagedList<User>> GetUsers(UserParams userParams);
     Task<User> GetUser(int id, bool isCurrentUser);
     Task<IEnumerable<User>> GetChildren(int parentId);
+    Task<IEnumerable<User>> GetSiblings(int childId);
+    Task<List<User>> GetParentsChildren(int motherId, int fatherId);
     Task<List<User>> GetParents(int childId);
     Task<List<UserForDetailedDto>> GetAccountChildren(int parentId);
     Task<IEnumerable<User>> GetClassStudents(int classId);
@@ -89,7 +91,9 @@ namespace EducNotes.API.Data
     Task<int> CreateLessonDoc(CourseShowingDto courseShowingDto);
     Task<bool> SendCourseShowingLink(int lessonDocId);
     Task<IEnumerable<Setting>> GetSettings();
-    Task<IEnumerable<EducationLevelDto>> GetEducationLevels();
+    Task<IEnumerable<EducationLevelDto>> GetEducationLevelsWithClasses();
+    Task<List<EducationLevel>> GetEducationLevels();
+    Task<List<Class>> GetFreePrimaryClasses();
     Task<IEnumerable<SchoolDto>> GetSchools();
     Task<IEnumerable<CycleDto>> GetCycles();
     Task<IEnumerable<Email>> SetEmailDataForRegistration(IEnumerable<RegistrationEmailDto> emailData, string content, string RegDeadLine);

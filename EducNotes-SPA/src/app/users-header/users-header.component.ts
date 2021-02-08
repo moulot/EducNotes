@@ -25,7 +25,7 @@ export class UsersHeaderComponent implements OnInit {
   selectUser(childid) {
     this.selectedUser = this.children.find(c => c.id === childid);
     this.authService.changeCurrentChild(this.selectedUser);
-    this.getUser.emit(this.selectedUser);
+    this.getUser.emit(this.selectedUser.id);
   }
 
 }

@@ -1,0 +1,6 @@
+.switch.logo-switch label input[type=checkbox]:checked + .slider {
+  background-color: #f89f20;
+}
+.switch.logo-switch label input[type=checkbox]:checked + .slider:after {
+  background-color: #f89f20;
+}

@@ -16,6 +16,7 @@ export interface User {
   introduction?: string;
   lookingFor?: string;
   userTypeId: number;
+  educLevelId?: number;
   classLevelId?: number;
   classLevelName: string;
   classId?: number;
@@ -28,7 +29,6 @@ export interface User {
   phoneNumber: string;
   phoneNumberConfirmed: boolean;
   secondPhoneNumber: string;
-  // validatedCode: boolean;
   districtId: number;
   cityId?: number;
   active: number;

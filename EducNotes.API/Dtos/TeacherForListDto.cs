@@ -10,6 +10,10 @@ namespace EducNotes.API.Dtos
     public string LastName { get; set; }
     public string FirstName { get; set; }
     public byte Gender { get; set; }
+    public int EducLevelId { get; set; }
+    public string EducLevelName { get; set; }
+    public int ClassId { get; set; }
+    public string ClassName { get; set; }
     public string Email { get; set; }
     public string PhotoUrl { get; set; }
     public string PhoneNumber { get; set; }

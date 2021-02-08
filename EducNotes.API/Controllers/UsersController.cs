@@ -308,23 +308,28 @@ namespace EducNotes.API.Controllers
             }
           }
 
-          var motherChildren = await _repo.GetChildren(userFile.MotherId);
-          var fatherChildren = await _repo.GetChildren(userFile.FatherId);
-          var siblingsFromRepo = motherChildren.ToList();
-          if(fatherChildren.Count() > 0)
-          {
-            foreach (var item in fatherChildren)
-            {
-              var user = siblingsFromRepo.ToList().Find(s => s.Id == item.Id);
-              if(user == null)
-              {
-                siblingsFromRepo.Add(item);
-              }
-            }
-            
-            siblingsFromRepo.Remove(childFromRepo);
-            userFile.Siblings = _mapper.Map<List<UserForDetailedDto>>(siblingsFromRepo);
-          }
+          // var motherChildren = await _repo.GetChildren(userFile.MotherId);
+          // var fatherChildren = await _repo.GetChildren(userFile.FatherId);
+          // var siblingsFromRepo = motherChildren.ToList();
+          // if(fatherChildren.Count() > 0)
+          // {
+          //   foreach (var item in fatherChildren)
+          //   {
+          //     var user = siblingsFromRepo.ToList().Find(s => s.Id == item.Id);
+          //     if(user == null)
+          //     {
+          //       siblingsFromRepo.Add(item);
+          //     }
+          //   }
+
+          //   siblingsFromRepo.Remove(childFromRepo);
+          //   userFile.Siblings = _mapper.Map<List<UserForDetailedDto>>(siblingsFromRepo);
+          // }
+
+          var parentsChildren = await _repo.GetParentsChildren(userFile.MotherId, userFile.FatherId);
+          parentsChildren.Remove(childFromRepo);
+          var children = _mapper.Map<List<UserForDetailedDto>>(parentsChildren);
+          userFile.Siblings = children;
 
           var line = await _context.OrderLines
                             .Include(i => i.Order)
@@ -655,11 +660,18 @@ namespace EducNotes.API.Controllers
           });
         }
 
+        [HttpGet("{childId}/Siblings")]
+        public async Task<IActionResult> GetSiblings(int childId)
+        {
+          var siblingsFromRepo = await _repo.GetSiblings(childId);
+          var siblings = _mapper.Map<IEnumerable<UserForDetailedDto>>(siblingsFromRepo);
+          return Ok(siblings);
+        }
+
         [HttpGet("{parentId}/Children")]
         public async Task<IActionResult> GetChildren(int parentId)
         {
           var usersFromDB = await _repo.GetChildren(parentId);
-
           var users = _mapper.Map<IEnumerable<UserForDetailedDto>>(usersFromDB);
 
           var startDate = DateTime.Now.Date;
@@ -1390,11 +1402,11 @@ namespace EducNotes.API.Controllers
             var courses = await _context.TeacherCourses.Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToListAsync();
             foreach (var course in courses)
             {
-              AssignedClassesDto acd = new AssignedClassesDto();
-              acd.CourseId = course.Id;
-              acd.CourseName = course.Name;
+              AssignedClassesDto assignedClasses = new AssignedClassesDto();
+              assignedClasses.CourseId = course.Id;
+              assignedClasses.CourseName = course.Name;
 
-              acd.Levels = new List<LevelWithClassesDto>();
+              assignedClasses.Levels = new List<LevelWithClassesDto>();
               var levels = await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
               foreach (var level in levels)
               {
@@ -1416,19 +1428,29 @@ namespace EducNotes.API.Controllers
                                                     .Where(c => c.ClassId == aclass.Id && c.TeacherId != teacherId &&
                                                       c.Class.ClassLevel.EducationLevelId == educLevelPrimary)
                                                     .CountAsync() > 0;
-                    if(!classHasTeacher)
+                    // if(!classHasTeacher)
+                    // {
+                    //   ClassIdAndNameDto cd = new ClassIdAndNameDto();
+                    //   cd.ClassId = aclass.Id;
+                    //   cd.ClassName = aclass.Name;
+                    //   cd.Active = selectedIds.IndexOf(aclass.Id) != -1 ? true : false;
+                    //   lwcd.Classes.Add(cd);
+                    // }
+                    ClassIdAndNameDto cd = new ClassIdAndNameDto();
+                    cd.ClassId = aclass.Id;
+                    cd.ClassName = aclass.Name;
+                    cd.Active = selectedIds.IndexOf(aclass.Id) != -1 ? true : false;
+                    if(classHasTeacher)
                     {
-                      ClassIdAndNameDto cd = new ClassIdAndNameDto();
-                      cd.ClassId = aclass.Id;
-                      cd.ClassName = aclass.Name;
-                      cd.Active = selectedIds.IndexOf(aclass.Id) != -1 ? true : false;
-                      lwcd.Classes.Add(cd);
+                      cd.Assigned = classHasTeacher == true ? true : false;
+                      cd.Active = true;
                     }
+                    lwcd.Classes.Add(cd);
                   }
-                  acd.Levels.Add(lwcd);
+                  assignedClasses.Levels.Add(lwcd);
                 }
               }
-              classes.Add(acd);
+              classes.Add(assignedClasses);
             }
 
             return Ok(new {
@@ -1464,7 +1486,7 @@ namespace EducNotes.API.Controllers
               List<ClassCourse> newSelection = new List<ClassCourse>();
               foreach (var aclass in level.Classes)
               {
-                if (aclass.Active == true)
+                if (aclass.Active == true && !aclass.Assigned)
                 {
                   ClassCourse classCourse = new ClassCourse()
                   {

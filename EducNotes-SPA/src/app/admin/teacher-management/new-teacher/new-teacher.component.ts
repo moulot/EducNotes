@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ClassService } from 'src/app/_services/class.service';
 import { Course } from 'src/app/_models/course';
-import { Validators, FormGroup, FormBuilder, FormArray } from '@angular/forms';
+import { Validators, FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { AdminService } from 'src/app/_services/admin.service';
 import { environment } from 'src/environments/environment';
 import { AlertifyService } from 'src/app/_services/alertify.service';
@@ -22,7 +22,7 @@ export class NewTeacherComponent implements OnInit {
   courses: Course[] = [];
   teacherForm: FormGroup;
   teacherTypeId = environment.teacherTypeId;
-  teacher: any; // = <TeacherForEdit>{};
+  teacher: any;
   userId: number;
   editModel: any;
   editionMode = false;
@@ -34,6 +34,10 @@ export class NewTeacherComponent implements OnInit {
   selectedCourses = [];
   wait = false;
   gender = [{value: 0, label: 'femme'}, {value: 1, label: 'homme'}];
+  educLevels: any;
+  educlevelOptions = [];
+  classOptions = [];
+  showClasses = false;
   myDatePickerOptions = Utils.myDatePickerOptions;
 
   constructor(private classService: ClassService, private fb: FormBuilder, private authService: AuthService,
@@ -51,9 +55,51 @@ export class NewTeacherComponent implements OnInit {
         this.initValues();
       }
       this.getCourses();
+      this.getEducLevels();
+      this.getClasses();
     });
 
     this.createTeacherForm();
+  }
+
+  getEducLevels() {
+    this.classService.getEducLevels().subscribe(data => {
+      this.educLevels = data;
+      for (let i = 0; i < this.educLevels.length; i++) {
+        const elt = this.educLevels[i];
+        const educlevel = {value: elt.id, label: elt.name};
+        this.educlevelOptions = [...this.educlevelOptions, educlevel];
+      }
+    });
+  }
+
+  getClasses() {
+    this.classService.getFreePrimaryClasses().subscribe((data: any) => {
+      for (let i = 0; i < data.length; i++) {
+        const level = data[i];
+        if (level.classes.length > 0) {
+          const elt = {value: '', label: 'niveau ' + level.levelName, group: true};
+          this.classOptions = [...this.classOptions, elt];
+          for (let j = 0; j < level.classes.length; j++) {
+            const aclass = level.classes[j];
+            const elt1 = {value: aclass.id, label: 'classe ' + aclass.name};
+            this.classOptions = [...this.classOptions, elt1];
+          }
+        }
+      }
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  changeEducLevel() {
+    const educlevel = this.teacherForm.value.educLevelId;
+    if (educlevel === 1) {
+      this.showClasses = true;
+    } else {
+      this.showClasses = false;
+      this.teacherForm.patchValue({classId: null});
+    }
   }
 
   getCourses() {
@@ -75,7 +121,7 @@ export class NewTeacherComponent implements OnInit {
               courseAssigned = courseClass.classesAssigned;
             }
           }
-          this.addCourseItem(elt.id, elt.name, selected, courseAssigned);
+          this.addCourseItem(elt.id, elt.name, elt.abbreviation, selected, courseAssigned);
         }
       }, error => {
         this.alertify.error(error);
@@ -88,24 +134,36 @@ export class NewTeacherComponent implements OnInit {
       lastName: [this.teacher.lastName, Validators.required],
       firstName: [this.teacher.firstName, Validators.required],
       dateOfBirth: [this.teacher.strDateOfBirth, Validators.required],
+      educLevelId: [this.teacher.educLevelId, Validators.required],
+      classId: [this.teacher.classId],
       gender: [this.teacher.gender, Validators.required],
       email: [this.teacher.email, [Validators.required, Validators.email]],
       cell: [this.teacher.phoneNumber, Validators.nullValidator],
       phone2: [this.teacher.secondPhoneNumber, Validators.nullValidator],
       photoUrl: [this.teacher.photoUrl],
       courses: this.fb.array([])
-    });
+    }, {validator: this.formValidator});
   }
 
-  addCourseItem(id, name, active, assigned): void {
+  formValidator(g: FormGroup) {
+    const educlevel = g.get('educLevelId').value;
+    const classId = g.get('classId').value;
+    if (educlevel === 1 && classId == null) {
+      return {'classNOK': true};
+    }
+    return null;
+  }
+
+  addCourseItem(id, name, abbrev, active, assigned): void {
     const courses = this.teacherForm.get('courses') as FormArray;
-    courses.push(this.createCourseItem(id, name, active, assigned));
+    courses.push(this.createCourseItem(id, name, abbrev, active, assigned));
   }
 
-  createCourseItem(id, name, active, assigned): FormGroup {
+  createCourseItem(id, name, abbrev, active, assigned): FormGroup {
     return this.fb.group({
       courseId: id,
       name: name,
+      abbrev: abbrev,
       active: active,
       classAssigned: assigned
     });
@@ -122,6 +180,8 @@ export class NewTeacherComponent implements OnInit {
       gender: null,
       email: '',
       dateOfBirth: null,
+      educLevelId: null,
+      classId: null,
       strDateOfBirth: '',
       photoUrl: '',
       photoFile: null,
@@ -131,8 +191,8 @@ export class NewTeacherComponent implements OnInit {
   }
 
   resetValues() {
-    this.teacherForm.setValue({lastName: this.teacher.lastName, firstName: '', dateOfBirth: '', gender: null,
-      email: '', cell: '', phone2: '', photoUrl: '', courses: this.fb.array([this.getCourses()])});
+    this.teacherForm.setValue({lastName: this.teacher.lastName, firstName: '', dateOfBirth: '', educLevelId: null,
+      classId: null, gender: null, email: '', cell: '', phone2: '', photoUrl: '', courses: this.fb.array([this.getCourses()])});
   }
 
   imgResult(event) {
@@ -173,6 +233,8 @@ export class NewTeacherComponent implements OnInit {
     formData.append('firstName', this.teacherForm.value.firstName);
     formData.append('gender', this.teacherForm.value.gender);
     formData.append('strDateOfBirth', this.teacherForm.value.dateOfBirth);
+    formData.append('educLevelId', this.teacherForm.value.educLevelId);
+    formData.append('classId', this.teacherForm.value.classId);
     formData.append('email', this.teacherForm.value.email);
     formData.append('phoneNumber', this.teacherForm.value.cell);
     formData.append('secondPhoneNumber', this.teacherForm.value.phone2);

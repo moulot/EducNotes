@@ -13,6 +13,8 @@ namespace EducNotes.API.Dtos
     public string PhoneNumber { get; set; }
     public string SecondPhoneNumber { get; set; }
     public int UserTypeId { get; set; }
+    public int EducLevelId { get; set; }
+    public int ClassId { get; set; }
     public byte Gender { get; set; }
     public string Email { get; set; }
     public DateTime DateOfBirth { get; set; }

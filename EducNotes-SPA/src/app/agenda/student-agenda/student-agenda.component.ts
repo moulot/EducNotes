@@ -67,12 +67,21 @@ export class StudentAgendaComponent implements OnInit {
       } else {
         this.showChildrenList = false;
         this.getUser(this.currentChild.id);
+        this.getSiblings(this.currentChild.id);
       }
     }
   }
 
   getChildren(parentId: number) {
     this.userService.getChildren(parentId).subscribe((users: User[]) => {
+      this.children = users;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getSiblings(childId: number) {
+    this.userService.getSiblings(childId).subscribe((users: User[]) => {
       this.children = users;
     }, error => {
       this.alertify.error(error);

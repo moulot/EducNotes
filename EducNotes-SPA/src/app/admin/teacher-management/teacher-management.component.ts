@@ -17,6 +17,7 @@ import { debounceTime } from 'rxjs/operators';
   animations: [SharedAnimations]
 })
 export class TeacherManagementComponent implements OnInit {
+  educLevelPrimary = environment.educLevelPrimary;
   teachersCourses: any[];
   exportedTeachers: any[];
   teacherTypeId = environment.teacherTypeId;

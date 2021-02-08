@@ -140,7 +140,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   phoneValidator = (control: FormControl): { [ s: string ]: boolean } => {
     if (!control.value) {
       return { required: true };
-    } else if (control.value.length !== 8) {
+    } else if (control.value.length !== 10) {
       return { lenError: true };
     }
   }

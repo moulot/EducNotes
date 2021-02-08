@@ -38,6 +38,7 @@ export class GradeStudentComponent implements OnInit {
   periodAvg: number;
   periodName = '';
   url = '/studentGradesP';
+  loadingOk = true;
 
   headElts = ['date', 'type', 'note', '(-)', '(+)'];
 
@@ -104,7 +105,6 @@ export class GradeStudentComponent implements OnInit {
 
   public chartClicked(e: any): void { }
   public chartHovered(e: any): void { }
-
   radarchartClicked(e: any): void { }
   radarchartHovered(e: any): void { }
 
@@ -113,14 +113,9 @@ export class GradeStudentComponent implements OnInit {
     private authService: AuthService, private userService: UserService) { }
 
   ngOnInit() {
-    // this.route.data.subscribe(data => {
-    //   this.student = data['student'];
-    //   this.getUserGrades(this.student.id, this.student.classId);
-    // });
     this.route.params.subscribe(params => {
       this.userIdFromRoute = params['id'];
     });
-
     // is the parent connected?
     if (Number(this.userIdFromRoute) === 0) {
       this.showChildrenList = true;
@@ -130,27 +125,80 @@ export class GradeStudentComponent implements OnInit {
       this.showChildrenList = false;
       this.getUser(this.userIdFromRoute);
     }
-
   }
 
-  getUser(id) {
-    this.userService.getUser(id).subscribe((user: User) => {
-    this.student = user;
+  getUser(childId) {
+    this.loadingOk = false;
+    this.userService.getUser(childId).subscribe((user: User) => {
+      this.student = user;
+      this.getSiblings(this.student.id);
+      const loggedUser = this.authService.currentUser;
+      if (loggedUser.id !== this.student.id) {
+        this.isParentConnected = true;
+      }
+      this.getUserGrades(this.student.id, this.student.classId);
+      this.showChildrenList = false;
+    }, error => {
+        this.alertify.error(error);
+    });
+    // this.getUserGrades(this.student.id, this.student.classId);
+    // this.showChildrenList = false;
+  //   this.userService.getUser(child.id).subscribe((user: User) => {
+  //   this.student = user;
+  //   this.getSiblings(this.student.id);
+  //   const loggedUser = this.authService.currentUser;
+  //   if (loggedUser.id !== this.student.id) {
+  //     this.isParentConnected = true;
+  //   }
+  //   this.getUserGrades(this.student.id, this.student.classId);
+  //   this.showChildrenList = false;
+  // }, error => {
+  //     this.alertify.error(error);
+  // });
+  }
 
-    const loggedUser = this.authService.currentUser;
-    if (loggedUser.id !== this.student.id) {
-      this.isParentConnected = true;
-    }
-
-   this.getUserGrades(this.student.id, this.student.classId);
-    this.showChildrenList = false;
-  }, error => {
+  getUserGrades(studentId, classId) {
+    this.loadingOk = false;
+    this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
+      this.userCourses = data.coursesWithEvals;
+      this.studentAvg = data.studentAvg;
+      this.periodAvgs = data.periodAvgs;
+      this.periods = data.periods;
+      this.btnColor = [];
+      this.btnColor = [...this.btnColor, 'light'];
+      for (let i = 0; i < this.periodAvgs.length; i++) {
+        const elt = this.periodAvgs[i];
+        // set the color period buttons
+        const color = elt.active === true ? 'primary' : 'light';
+        this.btnColor = [...this.btnColor, color];
+        // disable period buttons without data. done with startDate of period
+        let disabled = true;
+        if (elt.activated === true) {
+          disabled = false;
+        }
+        this.btnDisabled = [...this.btnDisabled, disabled];
+      }
+      this.loadPeriodChart(0); // 0 for current period
+      // setTimeout(() => {
+      //   this.loadingOk = true;
+      // }, 1500);
+      this.loadingOk = true;
+    }, error => {
       this.alertify.error(error);
+      this.loadingOk = true;
     });
   }
 
   getChildren(parentId: number) {
     this.userService.getChildren(parentId).subscribe((users: User[]) => {
+      this.children = users;
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getSiblings(childId) {
+    this.userService.getSiblings(childId).subscribe((users: User[]) => {
       this.children = users;
     }, error => {
       this.alertify.error(error);
@@ -204,7 +252,6 @@ export class GradeStudentComponent implements OnInit {
   }
 
   loadChart() {
-
     this.chartLineOption3 = {
       ...echartStyles.lineNoAxis, ...{
         series: [{
@@ -230,7 +277,6 @@ export class GradeStudentComponent implements OnInit {
   }
 
   loadDefaultChart() {
-
     const nb = this.btnColor.length - 1;
     this.btnColor = [];
     this.btnColor = [...this.btnColor, 'primary'];
@@ -243,30 +289,23 @@ export class GradeStudentComponent implements OnInit {
 
     const data = this.userCourses;
     if (data.length > 0) {
-
       this.showDefaultChart = true;
-
       this.radarchartDatasets = [
         { data: [], label: 'notes de la classe' },
         { data: [], label: 'notes de ' + this.student.firstName}
       ];
       this.radarchartLabels = [];
-
       for (let i = 0; i < data.length; i++) {
-
         const elt = data[i];
         const userCourseGrade = elt.userCourseAvg;
         const classCourseGrade = elt.classCourseAvg;
         if (Number(userCourseGrade) !== -1000) { // -1000 (in the API) for a course that doesn't have grades
           this.radarchartLabels = [...this.radarchartLabels, elt.courseName];
-
           this.radarchartDatasets[0].data = [...this.radarchartDatasets[0].data, Number(classCourseGrade)];
           this.radarchartDatasets[1].data = [...this.radarchartDatasets[1].data, Number(userCourseGrade)];
         }
       }
-
     }
-
   }
 
   loadChartSetBtn(periodId: number, index: number) {
@@ -277,12 +316,10 @@ export class GradeStudentComponent implements OnInit {
       const elt = i + 1 === index ? 'primary' : 'light';
       this.btnColor = [...this.btnColor, elt];
     }
-
     this.loadPeriodChart(periodId);
   }
 
   loadPeriodChart(periodId: number) {
-
     if (periodId > 0) {
       // is a period selected?
       this.selectedPeriod = true;
@@ -292,7 +329,6 @@ export class GradeStudentComponent implements OnInit {
       this.periodAvg = periodData.avg;
     } else {
       // get the active (default) period name & avg
-      console.log(this.periodAvg);
       const periodData = this.periodAvgs.find(item => item.active === true);
       this.periodName = periodData.periodName;
       this.periodAvg = periodData.avg;
@@ -303,17 +339,13 @@ export class GradeStudentComponent implements OnInit {
     const data = this.userCourses;
 
     if (data.length > 0) {
-
       this.showDefaultChart = true;
-
       this.radarchartDatasets = [
         { data: [], label: 'notes de la classe' },
         { data: [], label: 'notes de ' + this.student.firstName}
       ];
       this.radarchartLabels = [];
-
       for (let i = 0; i < data.length; i++) {
-
         const course = data[i];
         let elt: any;
         if (periodId === 0) {
@@ -325,7 +357,6 @@ export class GradeStudentComponent implements OnInit {
         const classCourseGrade = elt.classCourseAvg;
         if (Number(userCourseGrade) !== -1000) { // -1000 (in the API) for a course that doesn't have grades
           this.radarchartLabels = [...this.radarchartLabels, course.courseName];
-
           this.radarchartDatasets[0].data = [...this.radarchartDatasets[0].data, Number(classCourseGrade)];
           this.radarchartDatasets[1].data = [...this.radarchartDatasets[1].data, Number(userCourseGrade)];
         }
@@ -334,38 +365,6 @@ export class GradeStudentComponent implements OnInit {
         const avg = {abbrev: course.courseAbbrev, avg: elt.userCourseAvg, grades: elt.grades};
         this.coursesAvgs = [...this.coursesAvgs, avg];
       }
-
     }
-
   }
-
-  getUserGrades(studentId, classId) {
-    this.evalService.getUserCoursesWithEvals(classId, studentId).subscribe((data: any) => {
-
-      this.userCourses = data.coursesWithEvals;
-      this.studentAvg = data.studentAvg;
-      this.periodAvgs = data.periodAvgs;
-      this.periods = data.periods;
-
-      this.btnColor = [];
-      this.btnColor = [...this.btnColor, 'light'];
-      for (let i = 0; i < this.periodAvgs.length; i++) {
-        const elt = this.periodAvgs[i];
-        // set the color period buttons
-        const color = elt.active === true ? 'primary' : 'light';
-        this.btnColor = [...this.btnColor, color];
-        // disable period buttons without data. done with startDate of period
-        let disabled = true;
-        if (elt.activated === true) {
-          disabled = false;
-        }
-        this.btnDisabled = [...this.btnDisabled, disabled];
-      }
-
-      this.loadPeriodChart(0); // 0 for current period
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
 }

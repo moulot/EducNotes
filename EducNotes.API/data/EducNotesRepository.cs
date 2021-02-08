@@ -150,6 +150,17 @@ namespace EducNotes.API.Data
           return children;
         }
 
+        public async Task<IEnumerable<User>> GetSiblings(int childId)
+        {
+          var childFromRepo = await GetUser(childId, false);
+          var parents= await GetParents(childId);
+          int motherId = parents.First(p => p.UserTypeId == parentTypeId && p.Gender == 0).Id;
+          int fatherId = parents.First(p => p.UserTypeId == parentTypeId && p.Gender == 1).Id;
+          var siblings = await GetParentsChildren(motherId, fatherId);
+          // siblings.Remove(childFromRepo);
+          return siblings;
+        }
+
         public async Task<IEnumerable<User>> GetChildren(int parentId)
         {
           var userIds = await _context.UserLinks.Where(u => u.UserPId == parentId).Select(s => s.UserId).ToListAsync();
@@ -159,6 +170,18 @@ namespace EducNotes.API.Data
                         .Include(i => i.ClassLevel)
                         .Include(i => i.UserType)
                         .Where(u => userIds.Contains(u.Id)).ToListAsync();
+        }
+
+        public async Task<List<User>> GetParentsChildren(int motherId, int fatherId)
+        {
+          var userIds = await _context.UserLinks.Where(u => u.UserPId == motherId || u.UserPId == fatherId)
+                                                .Select(s => s.UserId).ToListAsync();
+          return await _context.Users
+                        .Include(i => i.Photos)
+                        .Include(i => i.Class)
+                        .Include(i => i.ClassLevel)
+                        .Include(i => i.UserType)
+                        .Where(u => userIds.Contains(u.Id)).Distinct().ToListAsync();
         }
 
         public async Task<List<User>> GetParents(int ChildId)
@@ -251,15 +274,22 @@ namespace EducNotes.API.Data
 
         public async Task<Class> GetClass(int Id)
         {
-            return await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
+          return await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
         }
 
         public async Task<List<Class>> GetClassesByLevelId(int levelId)
         {
-            return await _context.Classes
-                          .Where(c => c.ClassLevelId == levelId)
-                          .OrderBy(o => o.Name)
-                          .ToListAsync();
+          return await _context.Classes
+                        .Where(c => c.ClassLevelId == levelId)
+                        .OrderBy(o => o.Name)
+                        .ToListAsync();
+        }
+
+        public async Task<List<Class>> GetFreePrimaryClasses()
+        {
+          var assignedClassIds = await _context.ClassCourses.Select(c => c.ClassId).ToListAsync();
+          var availableClasses = await _context.Classes.Where(c => !assignedClassIds.Contains(c.Id)).ToListAsync();
+          return availableClasses;
         }
 
         public async Task<IEnumerable<Schedule>> GetScheduleDay(int classId, int day)
@@ -809,7 +839,6 @@ namespace EducNotes.API.Data
         public async Task<bool> AddTeacher(TeacherForEditDto user, int insertUserId)
         {
           bool resultStatus = false;
-
           using (var identityContextTransaction = _context.Database.BeginTransaction())
           {
             try
@@ -821,10 +850,8 @@ namespace EducNotes.API.Data
                 var userToSave = _mapper.Map<User>(user);
                 var code = Guid.NewGuid();
                 userToSave.UserName = code.ToString();
-                userToSave.ValidationCode = code.ToString();
                 userToSave.Validated = false;
                 userToSave.EmailConfirmed = false;
-                userToSave.UserName = code.ToString();
 
                 var result = await _userManager.CreateAsync(userToSave, password);
                 var teacherCode = "";
@@ -872,6 +899,8 @@ namespace EducNotes.API.Data
                 int day = Convert.ToInt32(dateArray[0]);
                 DateTime birthDay = new DateTime(year, month, day);
                 appUser.DateOfBirth = birthDay;
+                appUser.EducLevelId = user.EducLevelId;
+                appUser.ClassId = user.ClassId;
                 appUser.PhoneNumber = user.PhoneNumber;
                 appUser.SecondPhoneNumber = user.SecondPhoneNumber;
                 appUser.Email = user.Email;
@@ -888,10 +917,10 @@ namespace EducNotes.API.Data
               {
                 foreach (var courseId in ids)
                   {
-                      TeacherCourse tc = new TeacherCourse();
-                      tc.CourseId = Convert.ToInt32(courseId);
-                      tc.TeacherId = appUser.Id;
-                      Add(tc);
+                    TeacherCourse tc = new TeacherCourse();
+                    tc.CourseId = Convert.ToInt32(courseId);
+                    tc.TeacherId = appUser.Id;
+                    Add(tc);
                   }
               }
 
@@ -901,40 +930,39 @@ namespace EducNotes.API.Data
               {
                 if (photoFile.Length > 0)
                 {
-                    var uploadResult = new ImageUploadResult();
-                    // var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
-                    using (var stream = photoFile.OpenReadStream())
+                  var uploadResult = new ImageUploadResult();
+                  using (var stream = photoFile.OpenReadStream())
+                  {
+                    var uploadParams = new ImageUploadParams()
                     {
-                        var uploadParams = new ImageUploadParams()
-                        {
-                            File = new FileDescription(photoFile.Name, stream),
-                            Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
-                        };
+                      File = new FileDescription(photoFile.Name, stream),
+                      Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+                    };
 
-                        uploadResult = _cloudinary.Upload(uploadParams);
-                        if (uploadResult.StatusCode == HttpStatusCode.OK)
-                        {
-                            Photo photo = new Photo();
-                            photo.Url = uploadResult.SecureUri.ToString();
-                            photo.PublicId = uploadResult.PublicId;
-                            photo.UserId = appUser.Id;
-                            photo.DateAdded = DateTime.Now;
-                            if (appUser.Photos.Any(u => u.IsMain))
-                            {
-                              var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
-                              oldPhoto.IsMain = false;
-                              Update(oldPhoto);
-                            }
-                            photo.IsMain = true;
-                            photo.IsApproved = true;
-                            Add(photo);
-                        }
+                    uploadResult = _cloudinary.Upload(uploadParams);
+                    if (uploadResult.StatusCode == HttpStatusCode.OK)
+                    {
+                      Photo photo = new Photo();
+                      photo.Url = uploadResult.SecureUri.ToString();
+                      photo.PublicId = uploadResult.PublicId;
+                      photo.UserId = appUser.Id;
+                      photo.DateAdded = DateTime.Now;
+                      if (appUser.Photos.Any(u => u.IsMain))
+                      {
+                        var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                        oldPhoto.IsMain = false;
+                        Update(oldPhoto);
+                      }
+                      photo.IsMain = true;
+                      photo.IsApproved = true;
+                      Add(photo);
                     }
+                  }
                 }
               }
               else
               {
-                  resultStatus = true;
+                resultStatus = true;
               }
 
               if (await SaveAll())
@@ -1411,6 +1439,7 @@ namespace EducNotes.API.Data
           var userCourses = await GetUserCourses(classId);
           var aclass = await _context.Classes.FirstOrDefaultAsync(c => c.Id == classId);
           var periods = await _context.Periods.OrderBy(p => p.StartDate).ToListAsync();
+          Period currPeriod = await GetPeriodFromDate(DateTime.Now);
           List<UserCourseEvalsDto> coursesWithEvals = new List<UserCourseEvalsDto>();
 
           //loop on user courses - get data for each course 
@@ -1430,7 +1459,6 @@ namespace EducNotes.API.Data
             // get general Evals data for the current user course
             UserCourseEvalsDto userEvalsDto = await GetUserCourseEvals(userEvals, acourse, aclass);
 
-            Period currPeriod = await GetPeriodFromDate(DateTime.Now);
             // get evals by period for the current user course
             userEvalsDto.PeriodEvals = new List<PeriodEvalsDto>();
             foreach (var period in periods)
@@ -1635,7 +1663,7 @@ namespace EducNotes.API.Data
                 var evalName = elt.Evaluation.Name;
                 double maxGrade = Convert.ToDouble(elt.Evaluation.MaxGrade);
                 double gradeValue = Convert.ToDouble(elt.Grade.Replace(".", ","));
-                // grade are ajusted to 20 as MAx. Avg is on 20
+                // grade are ajusted to 20 as MAX. Avg is on 20
                 double ajustedGrade = Math.Round(20 * gradeValue / maxGrade, 2);
                 double coeff = elt.Evaluation.Coeff;
                 //data for course average
@@ -1644,9 +1672,9 @@ namespace EducNotes.API.Data
 
                 // get class grades for the current user grade (evaluation)
                 var evalClassGrades = await _context.UserEvaluations
-                    .Where(e => e.EvaluationId == elt.EvaluationId &&
-                        e.Evaluation.GradeInLetter == false && e.Evaluation.Graded == true && e.Grade.IsNumeric())
-                    .Select(e => e.Grade).ToListAsync();
+                            .Where(e => e.EvaluationId == elt.EvaluationId &&
+                              e.Evaluation.GradeInLetter == false && e.Evaluation.Graded == true && e.Grade.IsNumeric())
+                            .Select(e => e.Grade).ToListAsync();
 
                 double classMin = 999999;
                 double classMax = -999999;
@@ -2845,7 +2873,13 @@ namespace EducNotes.API.Data
           return settings;
         }
 
-        public async Task<IEnumerable<EducationLevelDto>> GetEducationLevels()
+        public async Task<List<EducationLevel>> GetEducationLevels()
+        {
+          var educlevels = await _context.EducationLevels.OrderBy(s => s.Name).ToListAsync();
+          return educlevels;
+        }
+
+        public async Task<IEnumerable<EducationLevelDto>> GetEducationLevelsWithClasses()
         {
           var educLevelsFromDB = await _context.EducationLevels.OrderBy(s => s.Name).ToListAsync();
 

@@ -805,7 +805,7 @@ namespace EducNotes.API.Controllers
         {
           var schools = await _repo.GetSchools();
           var cycles = await _repo.GetCycles();
-          var educLevels = await _repo.GetEducationLevels();
+          var educLevels = await _repo.GetEducationLevelsWithClasses();
           return Ok( new {
             schools,
             cycles,

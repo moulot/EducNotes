@@ -17,5 +17,7 @@ export const environment = {
   payWire: 3,
   payMobile: 4,
   finOpTypeInvoice: 1,
-  finOpTypePayment: 2
+  finOpTypePayment: 2,
+  educLevelPrimary: 1,
+  educLevelSecondary: 2
 };

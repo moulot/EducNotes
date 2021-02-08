@@ -750,29 +750,53 @@ namespace EducNotes.API.Controllers
             return Ok(await les_classes.ToListAsync());
         }
 
+        [HttpGet("FreePrimaryClasses")]
+        public async Task<IActionResult> GetFreePrimaryClasses()
+        {
+          List<ClassByLevelDto> classesByLevel = new List<ClassByLevelDto>();
+          var levels = await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
+          foreach (var level in levels)
+          {
+            ClassByLevelDto cbl = new ClassByLevelDto();
+            cbl.ClassLevelId = level.Id;
+            cbl.LevelName = level.Name;
+
+            cbl.Classes = new List<Class>();
+            var availableClasses = await _repo.GetFreePrimaryClasses();
+            var classes = availableClasses.Where(c => c.ClassLevelId == level.Id);
+            foreach (var aclass in classes)
+            {
+              cbl.Classes.Add(aclass);
+            }
+
+            classesByLevel.Add(cbl);
+          }
+
+          return Ok(classesByLevel);
+        }
+
         [HttpGet("ClassesByLevel")]
         public async Task<IActionResult> GetClassesByLevel()
         {
-            List<ClassByLevelDto> classesByLevel = new List<ClassByLevelDto>();
-            var levels = await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
-            foreach (var level in levels)
+          List<ClassByLevelDto> classesByLevel = new List<ClassByLevelDto>();
+          var levels = await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
+          foreach (var level in levels)
+          {
+            ClassByLevelDto cbl = new ClassByLevelDto();
+            cbl.ClassLevelId = level.Id;
+            cbl.LevelName = level.Name;
+
+            cbl.Classes = new List<Class>();
+            var classes = await _repo.GetClassesByLevelId(level.Id);
+            foreach (var aclass in classes)
             {
-                ClassByLevelDto cbl = new ClassByLevelDto();
-                cbl.ClassLevelId = level.Id;
-                cbl.LevelName = level.Name;
-
-                cbl.Classes = new List<Class>();
-                //var classes = await _context.Classes.Where(c => c.ClassLevelId == level.Id).OrderBy(o => o.Name).ToListAsync();
-                var classes = await _repo.GetClassesByLevelId(level.Id);
-                foreach (var aclass in classes)
-                {
-                    cbl.Classes.Add(aclass);
-                }
-
-                classesByLevel.Add(cbl);
+                cbl.Classes.Add(aclass);
             }
 
-            return Ok(classesByLevel);
+            classesByLevel.Add(cbl);
+          }
+
+          return Ok(classesByLevel);
         }
 
         [HttpGet("{classId}/classCourses")]
@@ -954,6 +978,13 @@ namespace EducNotes.API.Controllers
         {
           var classLevels = await _repo.GetActiveClassLevels();
           return Ok(classLevels);
+        }
+
+        [HttpGet("EducLevels")]
+        public async Task<IActionResult> GetEducLevels()
+        {
+          var educlevels = await _repo.GetEducationLevels();
+          return Ok(educlevels);
         }
 
         [HttpGet("LevelsWithClasses")]
@@ -1517,6 +1548,8 @@ namespace EducNotes.API.Controllers
             //recuperation de tous les professeurs ainsi que les cours affectés
             var teachers = await _context.Users
                                   .Include(p => p.Photos)
+                                  .Include(c => c.Class)
+                                  .Include(i => i.EducLevel)
                                   .Where(u => u.UserTypeId == teacherTypeId)
                                   .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
 
@@ -1527,6 +1560,16 @@ namespace EducNotes.API.Controllers
                 tdetails.PhoneNumber = teacher.PhoneNumber;
                 tdetails.SecondPhoneNumber = teacher.SecondPhoneNumber;
                 tdetails.Email = teacher.Email;
+                if(teacher.EducLevelId != null)
+                {
+                  tdetails.EducLevelId = Convert.ToInt32(teacher.EducLevelId);
+                  tdetails.EducLevelName = teacher.EducLevel.Name;
+                }
+                if(teacher.ClassId != null)
+                {
+                  tdetails.ClassId = Convert.ToInt32(teacher.ClassId);
+                  tdetails.ClassName = teacher.Class.Name;
+                }
                 tdetails.Id = teacher.Id;
                 tdetails.LastName = teacher.LastName;
                 tdetails.FirstName = teacher.FirstName;
