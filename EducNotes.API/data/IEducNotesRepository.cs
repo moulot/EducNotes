@@ -93,7 +93,7 @@ namespace EducNotes.API.Data
     Task<IEnumerable<Setting>> GetSettings();
     Task<IEnumerable<EducationLevelDto>> GetEducationLevelsWithClasses();
     Task<List<EducationLevel>> GetEducationLevels();
-    Task<List<Class>> GetFreePrimaryClasses();
+    Task<List<Class>> GetFreePrimaryClasses(int teacherId);
     Task<IEnumerable<SchoolDto>> GetSchools();
     Task<IEnumerable<CycleDto>> GetCycles();
     Task<IEnumerable<Email>> SetEmailDataForRegistration(IEnumerable<RegistrationEmailDto> emailData, string content, string RegDeadLine);

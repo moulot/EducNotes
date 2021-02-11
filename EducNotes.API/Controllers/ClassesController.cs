@@ -750,26 +750,35 @@ namespace EducNotes.API.Controllers
             return Ok(await les_classes.ToListAsync());
         }
 
-        [HttpGet("FreePrimaryClasses")]
-        public async Task<IActionResult> GetFreePrimaryClasses()
+        [HttpGet("{teacherId}/FreePrimaryClasses/{educLevelId}")]
+        public async Task<IActionResult> GetFreePrimaryClasses(int teacherId, int educLevelId)
         {
           List<ClassByLevelDto> classesByLevel = new List<ClassByLevelDto>();
           var levels = await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
+          if(teacherId != 0)
+          {
+            levels = levels.Where(c => c.EducationLevelId == educLevelId).OrderBy(c => c.DsplSeq).ToList();
+          }
+          
+          var availableClasses = await _repo.GetFreePrimaryClasses(teacherId);
           foreach (var level in levels)
           {
             ClassByLevelDto cbl = new ClassByLevelDto();
             cbl.ClassLevelId = level.Id;
             cbl.LevelName = level.Name;
+            cbl.EducLevelId = Convert.ToInt32(level.EducationLevelId);
 
             cbl.Classes = new List<Class>();
-            var availableClasses = await _repo.GetFreePrimaryClasses();
             var classes = availableClasses.Where(c => c.ClassLevelId == level.Id);
             foreach (var aclass in classes)
             {
               cbl.Classes.Add(aclass);
             }
 
-            classesByLevel.Add(cbl);
+            if(cbl.Classes.Count() > 0)
+            {
+              classesByLevel.Add(cbl);
+            }
           }
 
           return Ok(classesByLevel);

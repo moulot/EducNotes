@@ -21,6 +21,7 @@ import { UserService } from 'src/app/_services/user.service';
 export class NewTeacherComponent implements OnInit {
   courses: Course[] = [];
   teacherForm: FormGroup;
+  educLevelPrimary = environment.educLevelPrimary;
   teacherTypeId = environment.teacherTypeId;
   teacher: any;
   userId: number;
@@ -51,12 +52,16 @@ export class NewTeacherComponent implements OnInit {
       if (this.teacher) {
         this.photoUrl = this.teacher.photoUrl;
         this.editionMode = true;
+        if (this.teacher.educLevelId === this.educLevelPrimary) {
+          this.showClasses = true;
+          this.getFreeClasses(this.teacher.id, this.teacher.educLevelId);
+        }
       } else {
         this.initValues();
+        this.getFreeClasses(0, 0);
       }
       this.getCourses();
       this.getEducLevels();
-      this.getClasses();
     });
 
     this.createTeacherForm();
@@ -73,11 +78,11 @@ export class NewTeacherComponent implements OnInit {
     });
   }
 
-  getClasses() {
-    this.classService.getFreePrimaryClasses().subscribe((data: any) => {
+  getFreeClasses(teacherId, educLevelId) {
+    this.classService.getFreePrimaryClasses(teacherId, educLevelId).subscribe((data: any) => {
       for (let i = 0; i < data.length; i++) {
         const level = data[i];
-        if (level.classes.length > 0) {
+        if (level.classes.length > 0 && level.educLevelId === environment.educLevelPrimary) {
           const elt = {value: '', label: 'niveau ' + level.levelName, group: true};
           this.classOptions = [...this.classOptions, elt];
           for (let j = 0; j < level.classes.length; j++) {
@@ -116,9 +121,13 @@ export class NewTeacherComponent implements OnInit {
             if (ids.findIndex((value) => value === elt.id.toString()) !== -1) {
               selected = true;
             }
-            const courseClass = assigned.find(c => c.id === elt.id);
-            if (courseClass) {
-              courseAssigned = courseClass.classesAssigned;
+            if (this.teacher.educLevelId === this.educLevelPrimary) {
+              courseAssigned = false;
+            } else {
+              const courseClass = assigned.find(c => c.id === elt.id);
+              if (courseClass) {
+                courseAssigned = courseClass.classesAssigned;
+              }
             }
           }
           this.addCourseItem(elt.id, elt.name, elt.abbreviation, selected, courseAssigned);
@@ -234,7 +243,11 @@ export class NewTeacherComponent implements OnInit {
     formData.append('gender', this.teacherForm.value.gender);
     formData.append('strDateOfBirth', this.teacherForm.value.dateOfBirth);
     formData.append('educLevelId', this.teacherForm.value.educLevelId);
-    formData.append('classId', this.teacherForm.value.classId);
+    if (this.teacherForm.value.classId != null) {
+      formData.append('classId', this.teacherForm.value.classId);
+    } else {
+      formData.append('classId', '0');
+    }
     formData.append('email', this.teacherForm.value.email);
     formData.append('phoneNumber', this.teacherForm.value.cell);
     formData.append('secondPhoneNumber', this.teacherForm.value.phone2);

@@ -188,8 +188,8 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'classes/ClassesByLevel');
   }
 
-  getFreePrimaryClasses() {
-    return this.http.get(this.baseUrl + 'classes/FreePrimaryClasses');
+  getFreePrimaryClasses(teacherId, educLevelId) {
+    return this.http.get(this.baseUrl + 'classes/' + teacherId + '/FreePrimaryClasses/' + educLevelId);
   }
 
   getAllClasses() {

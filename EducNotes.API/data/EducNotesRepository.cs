@@ -285,21 +285,25 @@ namespace EducNotes.API.Data
                         .ToListAsync();
         }
 
-        public async Task<List<Class>> GetFreePrimaryClasses()
+        public async Task<List<Class>> GetFreePrimaryClasses(int teacherId)
         {
-          var assignedClassIds = await _context.ClassCourses.Select(c => c.ClassId).ToListAsync();
-          var availableClasses = await _context.Classes.Where(c => !assignedClassIds.Contains(c.Id)).ToListAsync();
+          var classes = await _context.ClassCourses.ToListAsync();
+          var assignedClassIds = classes.Select(c => c.ClassId).Distinct().ToList();
+          var teacherClassIds = classes.Where(c => c.TeacherId == teacherId).Select(c => c.ClassId).Distinct().ToList();
+          var availableClasses = await _context.Classes
+                                        .Where(c => !assignedClassIds.Contains(c.Id) || teacherClassIds.Contains(c.Id))
+                                        .ToListAsync();
           return availableClasses;
         }
 
         public async Task<IEnumerable<Schedule>> GetScheduleDay(int classId, int day)
         {
           return await _context.Schedules
-                      .Include(i => i.Class)
-                      .Include(c => c.Course)
-                      .Include(i => i.Teacher)
-                      .Where(d => d.Day == day && d.Class.Id == classId)
-                      .OrderBy(s => s.StartHourMin).ToListAsync();
+                        .Include(i => i.Class)
+                        .Include(c => c.Course)
+                        .Include(i => i.Teacher)
+                        .Where(d => d.Day == day && d.Class.Id == classId)
+                        .OrderBy(s => s.StartHourMin).ToListAsync();
         }
 
         public async Task<Agenda> GetAgenda(int agendaId)
@@ -900,7 +904,8 @@ namespace EducNotes.API.Data
                 DateTime birthDay = new DateTime(year, month, day);
                 appUser.DateOfBirth = birthDay;
                 appUser.EducLevelId = user.EducLevelId;
-                appUser.ClassId = user.ClassId;
+                if(user.ClassId != 0)
+                  appUser.ClassId = user.ClassId;
                 appUser.PhoneNumber = user.PhoneNumber;
                 appUser.SecondPhoneNumber = user.SecondPhoneNumber;
                 appUser.Email = user.Email;
@@ -909,19 +914,32 @@ namespace EducNotes.API.Data
                 // delete previous teacher courses
                 List<TeacherCourse> prevCourses = await _context.TeacherCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
                 DeleteAll(prevCourses);
+                // delete previous class courses
+                List<ClassCourse> prevClassCourses = await _context.ClassCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
+                DeleteAll(prevClassCourses);
               }
 
-              // add new selected courses
               var ids = user.CourseIds.Split(",");
               if (ids.Count() > 0)
               {
                 foreach (var courseId in ids)
+                {
+                  // add new selected courses
+                  TeacherCourse tc = new TeacherCourse();
+                  tc.CourseId = Convert.ToInt32(courseId);
+                  tc.TeacherId = appUser.Id;
+                  Add(tc);
+
+                  // add class courses if it's a primary class
+                  if(user.EducLevelId == 1)
                   {
-                    TeacherCourse tc = new TeacherCourse();
-                    tc.CourseId = Convert.ToInt32(courseId);
-                    tc.TeacherId = appUser.Id;
-                    Add(tc);
+                    ClassCourse cc = new ClassCourse();
+                    cc.ClassId = Convert.ToInt32(appUser.ClassId);
+                    cc.TeacherId = appUser.Id;
+                    cc.CourseId = Convert.ToInt32(courseId);
+                    Add(cc);
                   }
+                }
               }
 
               //add user photo

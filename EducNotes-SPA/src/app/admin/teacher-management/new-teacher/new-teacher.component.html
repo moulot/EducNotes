@@ -114,7 +114,7 @@
                     <div *ngIf="showClasses" class="col-md-3">
                       <div class="md-form mt-1 mb-0">
                         <mdb-select id="classId" [options]="classOptions" placeholder="classe"
-                          [visibleOptions]="10" formControlName="classId"></mdb-select>
+                          [visibleOptions]="6" formControlName="classId"></mdb-select>
                         <div *ngIf="teacherForm.hasError('classNOK') && teacherForm.get('classId').touched"
                           class="text-small text-danger">la classe est obligatoire</div>
                       </div>
@@ -189,7 +189,7 @@
               </div>
               <div class="row">
                 <div class="col-md-2 my-2" formArrayName="courses" *ngFor="let course of teacherForm.get('courses')['controls']; let i = index;">
-                  <div [formGroupName]="i">
+                  <div [formGroupName]="i">{{course.value.classAssigned}}-{{course.value.active}}
                     <div *ngIf="course.value.classAssigned">
                       <div class="switch logo-switch">
                         <label>
@@ -214,7 +214,7 @@
               <hr class="my-1">
               <div class="row">
                 <div class="col-md-8">
-                  <div class="d-flex">
+                  <div *ngIf="teacher.educLevelId != educLevelPrimary" class="d-flex">
                     <div class="mr-2 my-auto">
                       <div style="width: 15px; height: 15px; background-color: #f89f20;"></div>
                     </div>

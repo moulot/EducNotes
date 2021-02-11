@@ -7,6 +7,7 @@ namespace EducNotes.API.Dtos
   {
     public int ClassLevelId { get; set; }
     public string LevelName { get; set; }
+    public int EducLevelId { get; set; }
     public List<Class>  Classes { get; set; }
   }
 }

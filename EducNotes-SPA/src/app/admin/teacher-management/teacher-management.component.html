@@ -1,17 +1,20 @@
 <div class="row">
-  <div class="col-md-12 d-none d-md-block">
-    <div class="d-flex">
-      <i class="fad fa-chalkboard-teacher fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-      <p class="text-17 flex-grow-1">liste des enseignants</p>
+  <div class="col-md-12">
+    <div class="d-md-flex">
+      <div class="d-flex flex-grow-1">
+        <i class="fad fa-chalkboard-teacher fa-2x mr-2" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <p class="text-17">liste des enseignants</p>
+      </div>
       <div>
-        <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']" routerLinkActive="router-link-active">
+        <button mdbBtn class="btnBlue" block="true" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']" routerLinkActive="router-link-active">
           <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
           ajouter un enseignant
         </button>
       </div>
     </div>
   </div>
-  <div class="d-md-none">
+  <!-- <div class="d-md-none">
     <div class="row">
       <div class="col-md-12">
         <div class="d-flex">
@@ -28,7 +31,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div class="col-md-12">
     <div class="row">
@@ -41,9 +44,9 @@
     </div>
   </div>
 
-  <div class="col-md-12">
+  <div class="col-md-12 d-none d-md-block">
     <div class="card mb-2" *ngFor="let teacher of filteredTeachers">
-      <div class="card-body p-2 d-none d-md-block">
+      <div class="card-body p-2">
         <div class="row">
           <div class="col-md-1 mb-1">
             <img class="avatar-lg rounded-lg mr-3" src="{{teacher.photoUrl || '../../assets/user.png'}}" alt="">
@@ -112,7 +115,9 @@
                 <div *ngIf="teacher.educLevelId != educLevelPrimary">
                   <div *ngFor="let course of teacher.courseClasses">
                     <div class="d-flex">
-                      <div class="text-16 mr-1">{{course.course.name}} :</div>
+                      <i class="fad fa-circle mr-2 my-auto" style="--fa-primary-opacity: 1;
+                        --fa-secondary-opacity: 1; --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
+                      <div class="text-15 mr-1 my-auto"><b>{{course.course.name}}</b> :</div>
                       <div *ngFor="let class of course.classes; let i = index">
                         <div class="text-16 text-muted mr-1" *ngIf="i < course.classes.length - 1">{{class.name}},</div>
                         <div class="text-16 text-muted mr-1" *ngIf="i == course.classes.length - 1">{{class.name}}</div>
@@ -125,13 +130,13 @@
             <div>
               <button mdbBtn class="btnBlue" [disabled]="!teacher.validated" size="sm" mdbWavesEffect [routerLink]="['/editTeacher',teacher.id]">
                 <i class="fad fa-user-edit fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                  --fa-primary-color:#192C47;--fa-secondary-color:#192C47;"></i>
+                  --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
                 editer
               </button>
               <button mdbBtn class="btnBlue ml-2" size="sm" mdbWavesEffect [routerLink]="['/teacherAssignment',teacher.id]"
-              *ngIf="teacher.educLevelId != educLevelPrimary" [disabled]="teacher.courseClasses.length === 0 || !teacher.validated" >
+                *ngIf="teacher.educLevelId != educLevelPrimary" [disabled]="teacher.courseClasses.length === 0 || !teacher.validated">
                 <i class="fad fa-users-class fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                  --fa-primary-color:#192C47;--fa-secondary-color:#192C47;"></i>
+                  --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
                 affecter
               </button>
             </div>
@@ -140,11 +145,9 @@
       </div>
     </div>
   </div>
-</div>
 
-<div class="d-md-none">
-  <div class="" *ngFor="let teacher of filteredTeachers">
-    <mdb-card class="testimonial-card my-5 p-3">
+  <div class="col-md-12 d-md-none">
+    <mdb-card *ngFor="let teacher of filteredTeachers" class="testimonial-card" style="margin-top: 70px; margin-bottom: 70px;">
       <div class="avatar mx-auto">
         <img src="{{teacher.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
       </div>
@@ -192,7 +195,26 @@
           <div class="text-15"><b>cours de l'enseignant</b></div>
           <div class="text-17 text-danger" *ngIf="teacher.courseClasses.length == 0">aucun cours pour {{teacher.lastName}} {{teacher.firstName}}</div>
           <div *ngIf="teacher.courseClasses.length > 0">
-            <div class="text-16 mr-1" *ngFor="let course of teacher.courseClasses">{{course.course.name}}</div>
+            <div *ngFor="let course of teacher.courseClasses">
+              <div *ngIf="teacher.educLevelId == educLevelPrimary">
+                <div class="d-flex">
+                  <i class="fad fa-circle mr-2 my-auto" style="--fa-primary-opacity: 1;
+                    --fa-secondary-opacity: 1; --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
+                  <div class="text-15 mr-1"><b>{{course.course.abbreviation}}</b></div>
+                </div>
+              </div>
+              <div *ngIf="teacher.educLevelId != educLevelPrimary">
+                <div class="d-flex">
+                  <i class="fad fa-circle mr-2 my-auto" style="--fa-primary-opacity: 1;
+                    --fa-secondary-opacity: 1; --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
+                  <div class="text-15 mr-1"><b>{{course.course.abbreviation}}</b> :</div>
+                  <div *ngFor="let class of course.classes; let i = index">
+                    <div class="text-15 text-muted mr-1" *ngIf="i < course.classes.length - 1">{{class.name}},</div>
+                    <div class="text-15 text-muted mr-1" *ngIf="i == course.classes.length - 1">{{class.name}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class=""><hr class="my-1"></div>
@@ -215,4 +237,6 @@
       </mdb-card-body>
     </mdb-card>
   </div>
+
 </div>
+

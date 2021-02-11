@@ -1407,7 +1407,8 @@ namespace EducNotes.API.Controllers
               assignedClasses.CourseName = course.Name;
 
               assignedClasses.Levels = new List<LevelWithClassesDto>();
-              var levels = await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
+              var levels = await _context.ClassLevels.Where(c => c.EducationLevelId == teacher.EducLevelId)
+                                                     .OrderBy(c => c.DsplSeq).ToListAsync();
               foreach (var level in levels)
               {
                 LevelWithClassesDto lwcd = new LevelWithClassesDto();
