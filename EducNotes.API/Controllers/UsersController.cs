@@ -308,24 +308,6 @@ namespace EducNotes.API.Controllers
             }
           }
 
-          // var motherChildren = await _repo.GetChildren(userFile.MotherId);
-          // var fatherChildren = await _repo.GetChildren(userFile.FatherId);
-          // var siblingsFromRepo = motherChildren.ToList();
-          // if(fatherChildren.Count() > 0)
-          // {
-          //   foreach (var item in fatherChildren)
-          //   {
-          //     var user = siblingsFromRepo.ToList().Find(s => s.Id == item.Id);
-          //     if(user == null)
-          //     {
-          //       siblingsFromRepo.Add(item);
-          //     }
-          //   }
-
-          //   siblingsFromRepo.Remove(childFromRepo);
-          //   userFile.Siblings = _mapper.Map<List<UserForDetailedDto>>(siblingsFromRepo);
-          // }
-
           var parentsChildren = await _repo.GetParentsChildren(userFile.MotherId, userFile.FatherId);
           parentsChildren.Remove(childFromRepo);
           var children = _mapper.Map<List<UserForDetailedDto>>(parentsChildren);

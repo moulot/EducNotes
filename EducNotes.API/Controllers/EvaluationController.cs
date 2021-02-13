@@ -555,7 +555,7 @@ namespace EducNotes.API.Controllers
           var classAvgs = await _repo.GetClassAvgs(Convert.ToInt32(user.ClassId));
           userGrades.ClassAvgMin = classAvgs.ClassAvgMin;
           userGrades.ClassAvgMax = classAvgs.ClassAvgMax;
-          
+
           var lastGrades = await _repo.GetStudentLastGrades(userId, nbLastGrades);
           userGrades.LastGrades = lastGrades;
 

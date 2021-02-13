@@ -11,6 +11,7 @@ import { UserService } from 'src/app/_services/user.service';
 })
 export class UserFileNotesComponent implements OnInit {
   @Input() childid: any;
+  @Input() classid: any;
   showInfos = true;
   userGrades: any;
 
@@ -18,7 +19,9 @@ export class UserFileNotesComponent implements OnInit {
     private alertify: AlertifyService) { }
 
   ngOnInit() {
-    this.getUserGrades(this.childid);
+    if (this.classid !== 0) {
+      this.getUserGrades(this.childid);
+    }
   }
 
   getUserGrades(userId) {

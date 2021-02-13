@@ -93,8 +93,14 @@ namespace EducNotes.API.Controllers
     public async Task<IActionResult> GetTuitionFromChild(int id)
     {
       var parents = await _repo.GetParents(id);
-      var fatherId = parents.FirstOrDefault(p => p.Gender == 1).Id;
-      var motherId = parents.FirstOrDefault(p => p.Gender == 0).Id;
+      int fatherId = 0;
+      int motherId = 0;
+      var father = parents.FirstOrDefault(p => p.Gender == 1);
+      if(father != null)
+        fatherId = father.Id;
+      var mother = parents.FirstOrDefault(p => p.Gender == 0);
+      if(mother != null)
+        motherId = mother.Id;
       var order = await _context.Orders
                           .Include(i => i.Child)
                           .Include(i => i.Father)

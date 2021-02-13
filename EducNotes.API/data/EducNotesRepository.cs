@@ -856,6 +856,8 @@ namespace EducNotes.API.Data
                 userToSave.UserName = code.ToString();
                 userToSave.Validated = false;
                 userToSave.EmailConfirmed = false;
+                if(userToSave.ClassId == 0)
+                  userToSave.ClassId = null;
 
                 var result = await _userManager.CreateAsync(userToSave, password);
                 var teacherCode = "";
@@ -993,7 +995,7 @@ namespace EducNotes.API.Data
                 resultStatus = false;
 
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
               identityContextTransaction.Rollback();
               return resultStatus = false;

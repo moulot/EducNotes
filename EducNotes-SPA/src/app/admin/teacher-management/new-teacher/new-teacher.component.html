@@ -189,7 +189,7 @@
               </div>
               <div class="row">
                 <div class="col-md-2 my-2" formArrayName="courses" *ngFor="let course of teacherForm.get('courses')['controls']; let i = index;">
-                  <div [formGroupName]="i">{{course.value.classAssigned}}-{{course.value.active}}
+                  <div [formGroupName]="i">
                     <div *ngIf="course.value.classAssigned">
                       <div class="switch logo-switch">
                         <label>
