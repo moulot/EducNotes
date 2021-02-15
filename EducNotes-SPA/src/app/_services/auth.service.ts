@@ -167,8 +167,8 @@ export class AuthService {
       );
   }
 
-  forgotPassord(email: string) {
-    return this.http.get(this.baseUrl + email + '/ForgotPassword');
+  forgotPassord(model: any) {
+    return this.http.post(this.baseUrl + 'ForgotPassword', model);
   }
 
   codeValidation(model: any) {

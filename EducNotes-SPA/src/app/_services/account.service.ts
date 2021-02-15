@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { ConfirmEmailPhone } from '../_models/confirmEmailPhone';
+import { ConfirmToken } from '../_models/confirmToken';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,11 @@ export class AccountService {
 
   constructor(private http: HttpClient) { }
 
-  confirmEmail(confirmEmail: ConfirmEmailPhone) {
+  resetPassword(userData: ConfirmToken) {
+    return this.http.post(this.baseUrl + 'ResetPassword', userData);
+  }
+
+  confirmEmail(confirmEmail: ConfirmToken) {
     return this.http.post(this.baseUrl + 'ConfirmEmail', confirmEmail);
   }
 
@@ -19,7 +23,7 @@ export class AccountService {
     return this.http.get(this.baseUrl + 'PhoneCode/' + userId + '/' + num);
   }
 
-  validatePhone(confirmEmail: ConfirmEmailPhone) {
+  validatePhone(confirmEmail: ConfirmToken) {
     return this.http.post(this.baseUrl + 'ConfirmPhoneNumber', confirmEmail);
   }
 

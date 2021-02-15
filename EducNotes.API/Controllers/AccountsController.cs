@@ -77,10 +77,10 @@ namespace EducNotes.API.Controllers
 
     [AllowAnonymous]
     [HttpPost("ConfirmPhoneNumber")]
-    public async Task<IActionResult> ConfirmPhoneNumber(ConfirmEmailPhoneDto confirmEmailPhoneDto)
+    public async Task<IActionResult> ConfirmPhoneNumber(ConfirmTokenDto confirmTokenDto)
     {
-      int userId = Convert.ToInt32(confirmEmailPhoneDto.UserId);
-      string token = confirmEmailPhoneDto.Token;
+      int userId = Convert.ToInt32(confirmTokenDto.UserId);
+      string token = confirmTokenDto.Token;
 
       bool phoneNumValidated = false;
       var user = await _context.Users.FirstAsync(u => u.Id == userId);
@@ -98,8 +98,27 @@ namespace EducNotes.API.Controllers
     }
 
     [AllowAnonymous]
+    [HttpPost("ResetPassword")]
+    public async Task<IActionResult> ResetPassword(ConfirmTokenDto userData)
+    {
+      string userId = userData.UserId;
+      string token = userData.Token;
+      string pwd = userData.Password;
+      Boolean success = false;
+
+      var user = await _userManager.FindByIdAsync(userId);
+      var result = await _userManager.ConfirmEmailAsync(user, token);
+      if(result.Succeeded)
+      {
+        success = true;
+      }
+
+      return Ok(success);
+    }
+
+    [AllowAnonymous]
     [HttpPost("ConfirmEmail")]
-    public async Task<IActionResult> ConfirmEmail(ConfirmEmailPhoneDto userData)
+    public async Task<IActionResult> ConfirmEmail(ConfirmTokenDto userData)
     {
       string userId = userData.UserId;
       string token = userData.Token;

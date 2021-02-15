@@ -6,7 +6,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AccountService } from 'src/app/_services/account.service';
-import { ConfirmEmailPhone } from 'src/app/_models/confirmEmailPhone';
+import { ConfirmToken } from 'src/app/_models/confirmToken';
 import { Utils } from 'src/app/shared/utils';
 
 @Component({
@@ -40,12 +40,12 @@ export class ConfirmTeacherEmailComponent implements OnInit {
 
     const id: string = this.route.snapshot.queryParamMap.get('id');
     const token: string = this.route.snapshot.queryParamMap.get('token');
-    console.log('id:' + id);
-    console.log('token:' + token);
-  if (id !== null && token !== null) {
-      console.log('in validation');
+    // console.log('id:' + id);
+    // console.log('token:' + token);
+    if (id !== null && token !== null) {
+      // console.log('in validation');
       this.userid = id;
-      const confirmEmail = <ConfirmEmailPhone>{};
+      const confirmEmail = <ConfirmToken>{};
       confirmEmail.userId = id;
       confirmEmail.token = token;
       this.validateEmail(confirmEmail);
@@ -95,7 +95,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
 
   }
 
-  validateEmail(confirmEmail: ConfirmEmailPhone) {
+  validateEmail(confirmEmail: ConfirmToken) {
     this.accountService.confirmEmail(confirmEmail).subscribe((data: any) => {
       this.emailOK = data.emailOK;
       this.user = data.user;
@@ -108,7 +108,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   }
 
   validatePhone() {
-    const confirmPhone = <ConfirmEmailPhone>{};
+    const confirmPhone = <ConfirmToken>{};
     confirmPhone.userId = this.user.id.toString();
     confirmPhone.token = this.phoneForm.value.code;
     this.accountService.validatePhone(confirmPhone).subscribe((data: any) => {

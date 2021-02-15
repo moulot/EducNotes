@@ -155,7 +155,8 @@ export const appRoutes: Routes = [
     {path: 'confirmTeacherEmail', component: ConfirmTeacherEmailComponent},
     {path: 'contactus', component: ContactUsComponent},
     // { path: 'confirmEmail/:code', component: ConfirmEmailComponent, resolve: { user: EmailConfirmResolver } },
-    { path: 'resetPassword/:code', component: ResetPasswordComponent, resolve: { user: ResetPasswordResolver } },
+    // { path: 'resetPassword/:code', component: ResetPasswordComponent, resolve: { user: ResetPasswordResolver } },
+    { path: 'resetPassword', component: ResetPasswordComponent}, // resolve: { user: ResetPasswordResolver } },
     { path: 'selfRegister/:code', component: SelfRegisterComponent, resolve: { user: EmailConfirmResolver } },
 
     {

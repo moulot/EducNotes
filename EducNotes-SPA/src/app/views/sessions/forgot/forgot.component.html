@@ -1,28 +1,35 @@
 <div class="row mt-3 row justify-content-center align-items-center animated zoomInUp">
-
-  <div class="col-md-8">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="">
-          <div class="auth-logo text-center mb-4">
-            <img src="assets/images/hat_logo.png" alt="">
-          </div>
-          <h1 class="mb-3 text-18">Mot de passe oublié</h1>
-
-          <div class="md-form">
-            <input type="email" id="email" class="form-control" [(ngModel)]="email" mdbInput>
-            <label for="email">Entrer votre email</label>
-          </div>
-          <button type="submit" class="btn-block mt-2" (click)="sendLink()" mdbBtn color="info" size="sm" mdbWavesEffect>réinitialiser le mot de passe</button>
-          <!-- <button class="btn btn-primary btn-block mt-2" (click)="sendLink()">réinitialiser le mot de passe</button> -->
-
-          <div class="mt-3 text-center">
-            <a href="" class="text-muted" routerLink="/sessions/signin"><u>se connecter</u></a>
-          </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card body p-4">
+        <div class="text-center">
+          <i class="fad fa-user-unlock fa-4x mx-auto" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          <!-- <div class="my-2 text-20">mot de passe oublié</div> -->
+          <div class="d-none d-md-block my-2 text-20">reinitialiser votre mot de passe</div>
+          <div class="d-md-none my-2 text-15">reinitialiser votre mot de passe</div>
         </div>
-      </div>
-      <div class="col-md-6 text-center "
-        style="background-size: cover;background-image: url(./assets/images/photo-long-3.jpg)">
+        <form [formGroup]="resetPwdForm" (ngSubmit)="sendLink()">
+          <div class="md-form mt-0">
+            <input type="text" id="username" class="form-control" formControlName="username" mdbInput>
+            <label for="username">entrer votre login</label>
+            <div *ngIf="resetPwdForm.get('username').errors && resetPwdForm.get('username').touched" class="text-small text-danger">
+              le login est obligatoire
+            </div>
+          </div>
+          <div class="md-form">
+            <input type="email" id="email" class="form-control" formControlName="email" mdbInput>
+            <label for="email">entrer votre email</label>
+            <div *ngIf="resetPwdForm.get('email').errors && resetPwdForm.get('email').touched" class="text-small text-danger">
+              l'email est obligatoire
+            </div>
+          </div>
+          <button type="submit" class="btnBlue" block="true" [disabled]="!resetPwdForm.valid"
+            mdbBtn size="sm" mdbWavesEffect>reinitialiser votre mot de passe</button>
+        </form>
+        <div class="mt-3 text-center">
+          <a href="" class="text-muted text-17" routerLink="/sessions/signin"><u>se connecter</u></a>
+        </div>
       </div>
     </div>
   </div>

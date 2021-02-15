@@ -127,5 +127,6 @@ namespace EducNotes.API.Data
     Task<ClassAvgDto> GetClassCourseAvgs(int courseId, int classId);
     Task<List<GradeDto>> GetStudentLastGrades(int userId, int nbOfGrades);
     Task<List<Course>> GetUserCourses(int classId);
+    Task<User> GetUserByEmailAndLogin(string username, string email);
   }
 }

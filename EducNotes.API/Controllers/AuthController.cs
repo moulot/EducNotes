@@ -38,7 +38,7 @@ namespace EducNotes.API.Controllers
     private Cloudinary _cloudinary;
     int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId;
     int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
-    int parentIsncrTypeId, schoolInscrTypeId, updateAccountEmailId;
+    int parentIsncrTypeId, schoolInscrTypeId, updateAccountEmailId, resetPwdEmailId;
 
     public AuthController(IConfiguration config, IMapper mapper, IEducNotesRepository repo,
       UserManager<User> userManager, SignInManager<User> signInManager, DataContext context,
@@ -62,6 +62,7 @@ namespace EducNotes.API.Controllers
       parentIsncrTypeId = _config.GetValue<int>("AppSettings:parentInscTypeId");
       schoolInscrTypeId = _config.GetValue<int>("AppSettings:schoolInscTypeId");
       updateAccountEmailId = _config.GetValue<int>("AppSettings:updateAccountEmailId");
+      resetPwdEmailId = _config.GetValue<int>("AppSettings:resetPwdEmailId");
 
       _cloudinaryConfig = cloudinaryConfig;
       Account acc = new Account(
@@ -117,25 +118,27 @@ namespace EducNotes.API.Controllers
       return NotFound();
     }
 
-    [HttpGet("{email}/ForgotPassword")]
-    public async Task<IActionResult> ForgotPassword(string email)
+    [HttpPost("ForgotPassword")]
+    public async Task<IActionResult> ForgotPassword(UserForResetPwdDto userData)
     {
-      // recherche du compte de l 'email
-      var user = await _repo.GetUserByEmail(email);
+      var username = userData.Username;
+      var email = userData.Email;
+      // find user with username and email as inputs
+      var user = await _repo.GetUserByEmailAndLogin(username, email);
       if (user != null)
       {
         if (!user.EmailConfirmed)
           return BadRequest("compte pas encore activé....");
-        // envoi du mail pour le reset du password
-        user.ValidationCode = Guid.NewGuid().ToString();
-        if (await _repo.SendResetPasswordLink(user, user.ValidationCode))
+        // send 'token for password reset' email
+        string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        // var result = await _userManager.ResetPasswordAsync(model.Id, resetToken, model.NewPassword);
+        if (await _repo.SendResetPasswordLink(user, resetToken))
         {
-          // envoi effectuer
+          // envoi effectué
           user.ForgotPasswordCount += 1;
           user.ForgotPasswordDate = DateTime.Now;
           await _repo.SaveAll();
           return Ok();
-
         }
         return BadRequest("echec d'envoi du mail");
       }
@@ -151,7 +154,7 @@ namespace EducNotes.API.Controllers
       {
         var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
         if(!user.AccountDataValidated)
-          return BadRequest("l'utilisateur n'a pas confirmer son email/mobile.");
+          return BadRequest("l'utilisateur n'a pas confirmé son email/mobile.");
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
@@ -304,7 +307,6 @@ namespace EducNotes.API.Controllers
           {
             user = _mapper.Map<UserForDetailedDto>(user)
           });
-
       }
       return BadRequest("lien introuvable");
     }

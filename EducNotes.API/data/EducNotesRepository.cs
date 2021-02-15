@@ -34,7 +34,7 @@ namespace EducNotes.API.Data
         private readonly UserManager<User> _userManager;
         private Cloudinary _cloudinary;
         string password, baseUrl;
-        int teacherTypeId, parentTypeId, studentTypeId, adminTypeId, teacherConfirmEmailId;
+        int teacherTypeId, parentTypeId, studentTypeId, adminTypeId, teacherConfirmEmailId, resetPwdEmailId;
         int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId, schoolInscTypeId;
         CultureInfo frC = new CultureInfo("fr-FR");
 
@@ -60,6 +60,7 @@ namespace EducNotes.API.Data
             teacherRoleId = _config.GetValue<int>("AppSettings:teacherRoleId");
             teacherConfirmEmailId = _config.GetValue<int>("AppSettings:teacherConfirmEmailId");
             baseUrl = _config.GetValue<String>("AppSettings:DefaultLink");
+            resetPwdEmailId = _config.GetValue<int>("AppSettings:resetPwdEmailId");
 
             _cloudinaryConfig = cloudinaryConfig;
             Account acc = new Account(
@@ -417,7 +418,13 @@ namespace EducNotes.API.Data
         }
         public async Task<User> GetUserByEmail(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToUpper() == email.ToUpper());
+          return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToUpper() == email.ToUpper());
+        }
+
+        public async Task<User> GetUserByEmailAndLogin(string username, string email)
+        {
+          return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToUpper() == email.ToUpper() && 
+                                                                u.UserName.ToUpper() == username.ToUpper());
         }
 
         // public async Task<IEnumerable<IGrouping<DateTime, Agenda>>> GetClassAgenda(int classId)
@@ -995,7 +1002,7 @@ namespace EducNotes.API.Data
                 resultStatus = false;
 
             }
-            catch (System.Exception ex)
+            catch
             {
               identityContextTransaction.Rollback();
               return resultStatus = false;
@@ -1048,41 +1055,39 @@ namespace EducNotes.API.Data
 
         public async Task<Course> GetCourse(int Id)
         {
-            return await _context.Courses.FirstOrDefaultAsync(c => c.Id == Id);
+          return await _context.Courses.FirstOrDefaultAsync(c => c.Id == Id);
         }
-        public async Task<bool> SendResetPasswordLink(User user, string code)
+
+        public async Task<bool> SendResetPasswordLink(User user, string token)
         {
-            var emailform = new EmailFormDto
-            {
-                // toEmail = email,
-                subject = "Réinitialisation de mot passe ",
-                //content ="Votre code de validation: "+ "<b>"+code.ToString()+"</b>"
-                content = ResetPasswordContent(code)
-            };
+          // var emailform = new EmailFormDto
+          // {
+          //   subject = "Réinitialisation de mot passe ",
+          //   content = ResetPasswordContent(token)
+          // };
 
-            var callbackUrl = _config.GetValue<String>("AppSettings:DefaultResetPasswordLink") + code;
-            var email = new Email
-            {
-                InsertUserId = user.Id,
-                UpdateUserId = user.Id,
-                StatusFlag = 0,
-                Subject = "Réinitialisation de mot passe ",
-                ToAddress = user.Email,
-                Body = $"veuillez cliquer sur le lien suivant pour réinitiliser votre mot de passe : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                FromAddress = "no-reply@educnotes.com",
-                EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
-            };
-            Add(email);
+          // var callbackUrl = _config.GetValue<String>("AppSettings:ResetPasswordLink") + token;
+          var template = await _context.EmailTemplates.FirstAsync(t => t.Id == resetPwdEmailId);
+          var email = await SetEmailForResetPwdLink(template.Subject, template.Body, user.Id,
+            user.LastName, user.FirstName, user.Gender, user.Email, token);
+          _context.Add(email);
+          // var email = new Email
+          // {
+          //     InsertUserId = user.Id,
+          //     UpdateUserId = user.Id,
+          //     StatusFlag = 0,
+          //     Subject = "Réinitialisation de mot passe ",
+          //     ToAddress = user.Email,
+          //     Body = $"veuillez cliquer sur le lien suivant pour réinitiliser votre mot de passe : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+          //     FromAddress = "no-reply@educnotes.com",
+          //     EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
+          // };
+          // Add(email);
 
-            try
-            {
-                var res = await SendEmail(emailform);
-                return true;
-            }
-            catch (System.Exception)
-            {
-                return false;
-            }
+          if(!await SaveAll())
+            return false;
+          else
+            return true;
         }
 
         public async Task<bool> SendEmail(EmailFormDto emailFormDto)
@@ -1098,16 +1103,16 @@ namespace EducNotes.API.Data
             }
         }
 
-        private string ResetPasswordContent(string code)
-        {
-            return "<b>EducNotes</b> a bien enrgistré votre demande de réinitialisation de mot de passe !<br>" +
-                "Vous pouvez utiliser le lien suivant pour réinitialiser votre mot de passe: <br>" +
-                " <a href=" + _config.GetValue<String>("AppSettings:DefaultResetPasswordLink") + code + "/>cliquer ici</a><br>" +
-                "Si vous n'utilisez pas ce lien dans les 3 heures, il expirera." +
-                "Pour obtenir un nouveau lien de réinitialisation de mot de passe, visitez" +
-                " <a href=" + _config.GetValue<String>("AppSettings:DefaultforgotPasswordLink") + "/>réinitialiser son mot de passe</a>.<br>" +
-                "Merci,";
-        }
+        // private string ResetPasswordContent(string code)
+        // {
+        //     return "<b>EducNotes</b> a bien enrgistré votre demande de réinitialisation de mot de passe !<br>" +
+        //         "Vous pouvez utiliser le lien suivant pour réinitialiser votre mot de passe: <br>" +
+        //         " <a href=" + _config.GetValue<String>("AppSettings:ResetPasswordLink") + code + "/>cliquer ici</a><br>" +
+        //         "Si vous n'utilisez pas ce lien dans les 3 heures, il expirera." +
+        //         "Pour obtenir un nouveau lien de réinitialisation de mot de passe, visitez" +
+        //         " <a href=" + _config.GetValue<String>("AppSettings:DefaultforgotPasswordLink") + "/>réinitialiser son mot de passe</a>.<br>" +
+        //         "Merci,";
+        // }
 
         public bool SendSms(List<string> phoneNumbers, string content)
         {
@@ -2363,6 +2368,27 @@ namespace EducNotes.API.Data
           return newEmail;
         }
 
+        public async Task<Email> SetEmailForResetPwdLink(string subject, string content, int userId, string lastName,
+          string firstName, byte gender, string userEmail, string resetToken)
+        {
+          var tokens = await GetTokens();
+
+          Email newEmail = new Email();
+          newEmail.EmailTypeId = 1;
+          newEmail.ToAddress = userEmail;
+          newEmail.FromAddress = "no-reply@educnotes.com";
+          newEmail.Subject = subject;
+          List<TokenDto> tags = await GetResetPwdLinkTokenValues(tokens, userId, lastName, firstName, gender, resetToken);
+          newEmail.Body = ReplaceTokens(tags, content);
+          newEmail.InsertUserId = 1;
+          newEmail.InsertDate = DateTime.Now;
+          newEmail.UpdateUserId = 1;
+          newEmail.UpdateDate = DateTime.Now;
+          newEmail.ToUserId = userId;
+
+          return newEmail;
+        }
+
         public List<TokenDto> GetAccountUpdatedTokenValues(IEnumerable<Token> tokens, string lastName, byte gender)
         {
           List<TokenDto> tokenValues = new List<TokenDto>();
@@ -2378,6 +2404,48 @@ namespace EducNotes.API.Data
                 break;
               case "<M_MME>":
                 td.Value = gender == 0 ? "Mme" : "M.";
+                break;
+              default:
+                break;
+            }
+
+            tokenValues.Add(td);
+          }
+
+          return tokenValues;
+        }
+
+        public async Task<List<TokenDto>> GetResetPwdLinkTokenValues(IEnumerable<Token> tokens, int userId, string lastName, 
+          string firstName, byte gender, string resetToken)
+        {
+          var subDomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower() == "subdomain")).Value;
+          List<TokenDto> tokenValues = new List<TokenDto>();
+
+          foreach (var token in tokens)
+          {
+            TokenDto td = new TokenDto();
+            td.TokenString = token.TokenString;
+            switch (td.TokenString)
+            {
+              case "<N_USER>":
+                td.Value = lastName;
+                break;
+              case "<P_USER>":
+                td.Value = firstName;
+                break;
+              case "<M_MME>":
+                td.Value = gender == 0 ? "Mme" : "M.";
+                break;
+              case "<SUBDOMAIN>":
+                td.Value = subDomain == "" ? "" : subDomain + ".";
+                break;
+              case "<CONFIRM_LINK>":
+                string url = "";
+                if(subDomain != "")
+                  url = string.Format(baseUrl, subDomain + ".");
+                else
+                  url = string.Format(baseUrl, "");
+                td.Value = string.Format("{0}/resetPassword?id={1}&token={2}", url, userId, HttpUtility.UrlEncode(resetToken));
                 break;
               default:
                 break;
