@@ -156,7 +156,7 @@ namespace EducNotes.API.Controllers
         if(!user.AccountDataValidated)
           return BadRequest("l'utilisateur n'a pas confirmé son email/mobile.");
 
-        var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
+        var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, true);
 
         if(result.Succeeded)
         {
@@ -166,7 +166,6 @@ namespace EducNotes.API.Controllers
           var userToReturn = _mapper.Map<UserForListDto>(appUser);
 
           //get the current period
-          //Period CurrentPeriod = await _context.Periods.Where(p => p.Active == true).FirstOrDefaultAsync();
           Period CurrentPeriod = await _repo.GetPeriodFromDate(DateTime.Now);
 
           //get school settings
@@ -181,10 +180,25 @@ namespace EducNotes.API.Controllers
           });
         }
 
-        return BadRequest("login ou mot de passe incorrect...");
+        var lockedOut = false;
+        if (result.IsLockedOut)
+        {
+          lockedOut = true;
+          return Ok(new {
+            userName = user.LastName + " " + user.FirstName,
+            lockedOut
+          });
+        }
+        // else
+        // {
+        //   return BadRequest("login ou mot de passe incorrect...");
+        // }
       }
 
-      return BadRequest("login ou mot de passe incorrect...");
+      var loginPwdFailed = true;
+      return Ok(new {
+        failed = loginPwdFailed
+      });
     }
 
     private async Task<string> GenerateJwtToken(User user)

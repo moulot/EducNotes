@@ -68,14 +68,20 @@ export class SigninComponent implements OnInit {
     this.loading = true;
     this.notConfirmed = false;
     this.authService.login(this.signinForm.value).subscribe(() => {
-      this.user = this.authService.currentUser;
-      if (this.user.emailConfirmed && this.user.phoneNumberConfirmed && this.user.validated) {
-        this.router.navigate(['/home']);
+      if (this.authService.lockedOut) {
+        this.router.navigate(['/lockout']);
+      } else if (this.authService.loginPwdFailed) {
+        this.alertify.error('login ou mot de passe incorrect...');
       } else {
-        // this.router.navigate(['invalidAccount']);
-        this.router.navigate(['/home']);
+        this.user = this.authService.currentUser;
+        if (this.user.emailConfirmed && this.user.phoneNumberConfirmed && this.user.validated) {
+          this.router.navigate(['/home']);
+        } else {
+          // this.router.navigate(['invalidAccount']);
+          this.router.navigate(['/home']);
+        }
+        this.loading = false;
       }
-      this.loading = false;
     }, error => {
       this.alertify.error(error);
       this.loading = false;

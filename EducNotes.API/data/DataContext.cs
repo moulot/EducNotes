@@ -1,6 +1,4 @@
-﻿using System;
-using EducNotes.API.Helpers;
-using EducNotes.API.Models;
+﻿using EducNotes.API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -12,11 +10,6 @@ namespace EducNotes.API.Data
   public class DataContext : IdentityDbContext<User, Role, int, IdentityUserClaim<int>,
     UserRole, IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>
   {
-    // private string connectionString;
-    // public DataContext(string _connectionString)
-    // {
-    //   this.connectionString = _connectionString;
-    // }
     private readonly IConfiguration _config;
     private readonly IHttpContextAccessor _httpContext;
 

@@ -18,6 +18,10 @@ export class ResetPasswordComponent implements OnInit {
   userid: string;
   token: string;
   resetPwdForm: FormGroup;
+  resetPwdError = false;
+  pwdConfirmed = false;
+  userName: string;
+  userGender: number;
   wait = false;
 
   constructor(private accountService: AccountService, private fb: FormBuilder, private route: ActivatedRoute,
@@ -36,8 +40,9 @@ export class ResetPasswordComponent implements OnInit {
 
   createResetPwdForm() {
     this.resetPwdForm = this.fb.group({
+      userName: ['', Validators.required],
       password: ['', Validators.required],
-      confirm: ['', [Validators.required, this.confirmationValidator]]
+      confirmPwd: ['', [Validators.required, this.confirmationValidator]]
     });
   }
 
@@ -45,24 +50,27 @@ export class ResetPasswordComponent implements OnInit {
     if (!control.value) {
       return { required: true };
     } else if (control.value !== this.resetPwdForm.controls.password.value) {
-      return { confirm: true, error: true };
+      return { confirmNOK: true, error: true };
     }
   }
 
-  savePassword() {
+  resetPassword() {
     const resetPwdData = <ConfirmToken>{};
     resetPwdData.userId = this.userid;
     resetPwdData.token = this.token;
+    resetPwdData.userName = this.resetPwdForm.value.userName;
     resetPwdData.password = this.resetPwdForm.value.password;
-    this.accountService.resetPassword(resetPwdData).subscribe((valid: boolean) => {
-      
+    this.accountService.resetPassword(resetPwdData).subscribe((data: any) => {
+      this.pwdConfirmed = data.success;
+      this.userName = data.userName;
+      this.userGender = data.gender;
+      if (!this.pwdConfirmed) {
+        this.alertify.error('problème pour enregistrer le nouveau mot de passe');
+        this.resetPwdError = true;
+      }
     }, error => {
       this.alertify.error(error);
     });
-  }
-
-  resetPassword() {
-
   }
 
   resultMode(val: boolean) {

@@ -8,6 +8,7 @@ import { ForgotComponent } from './forgot/forgot.component';
 import { SharedModule } from '../../shared/shared.module';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { SharedComponentsModule } from 'src/app/shared/components/shared-components.module';
+import { LockedOutComponent } from './locked-out/locked-out.component';
 
 @NgModule({
   imports: [
@@ -17,7 +18,7 @@ import { SharedComponentsModule } from 'src/app/shared/components/shared-compone
     SharedComponentsModule,
     SessionsRoutingModule
   ],
-  declarations: [SignupComponent]
+  declarations: [SignupComponent, LockedOutComponent]
   // SigninComponent, ForgotComponent removed
 })
 export class SessionsModule { }

@@ -22,6 +22,8 @@ export class AuthService {
   jwtHelper = new JwtHelperService();
   decodedToken: any;
   currentUser: User;
+  lockedOut = false;
+  loginPwdFailed = false;
   settings: any;
   newUser = <User>{ id: 0 };
   currentPeriod: Period;
@@ -55,20 +57,28 @@ export class AuthService {
       .pipe(
         map((response: any) => {
           const user = response;
+          this.lockedOut = false;
+          this.loginPwdFailed = false;
           if (user) {
-            localStorage.setItem('token', user.token);
-            localStorage.setItem('user', JSON.stringify(user.user));
-            localStorage.setItem('settings', JSON.stringify(user.settings));
-            localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
-            localStorage.setItem('currentChild', JSON.stringify(this.newUser));
-            localStorage.setItem('currentClassId', '0');
-            this.decodedToken = this.jwtHelper.decodeToken(user.token);
-            this.currentUser = user.user;
-            this.currentPeriod = user.currentPeriod;
-            this.settings = user.settings;
-            this.changeCurrentChild(this.newUser);
-            this.changeCurrentClassId(0);
-            this.changeUserPhoto(this.currentUser.photoUrl);
+            if (user.lockedOut) {
+              this.lockedOut = true;
+            } else if (user.failed) {
+              this.loginPwdFailed = true;
+            } else {
+              localStorage.setItem('token', user.token);
+              localStorage.setItem('user', JSON.stringify(user.user));
+              localStorage.setItem('settings', JSON.stringify(user.settings));
+              localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
+              localStorage.setItem('currentChild', JSON.stringify(this.newUser));
+              localStorage.setItem('currentClassId', '0');
+              this.decodedToken = this.jwtHelper.decodeToken(user.token);
+              this.currentUser = user.user;
+              this.currentPeriod = user.currentPeriod;
+              this.settings = user.settings;
+              this.changeCurrentChild(this.newUser);
+              this.changeCurrentClassId(0);
+              this.changeUserPhoto(this.currentUser.photoUrl);
+            }
           }
         })
       );
@@ -176,7 +186,10 @@ export class AuthService {
   }
   loggedIn() {
     const token = localStorage.getItem('token');
-    return !this.jwtHelper.isTokenExpired(token);
+    if (token !== 'undefined') {
+      return !this.jwtHelper.isTokenExpired(token);
+    }
+    return false;
   }
 
   accountValidated() {

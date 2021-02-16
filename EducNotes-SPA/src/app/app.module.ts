@@ -272,6 +272,7 @@ import { ChildFileClassLifeComponent } from './admin/userFiles/child-file-class-
 import { UserValidationComponent } from './admin/user-validation/user-validation.component';
 import { UserValidationResolver } from './_resolvers/user-validation-resolver';
 import { ParentDashboardComponent } from './dashboard/parent-dashboard/parent-dashboard.component';
+import { LockedOutComponent } from './views/sessions/locked-out/locked-out.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -457,7 +458,8 @@ export function tokenGetter() {
       ParentFileTuitionComponent,
       ChildFileClassLifeComponent,
       UserValidationComponent,
-      ParentDashboardComponent
+      ParentDashboardComponent,
+      LockedOutComponent
    ],
    imports: [
       FormWizardModule,

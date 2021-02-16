@@ -57,7 +57,6 @@ export class AppComponent implements OnInit {
     // }, error => {
     //   this.alertify.error('problème de configuration. contactez l\'administrateur si l\'erreur persiste');
     // });
-
     const token = localStorage.getItem('token');
     const user: User = JSON.parse(localStorage.getItem('user'));
     const settings: Setting[] = JSON.parse(localStorage.getItem('settings'));

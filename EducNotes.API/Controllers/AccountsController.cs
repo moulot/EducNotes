@@ -103,17 +103,22 @@ namespace EducNotes.API.Controllers
     {
       string userId = userData.UserId;
       string token = userData.Token;
+      string userName = userData.UserName;
       string pwd = userData.Password;
       Boolean success = false;
 
       var user = await _userManager.FindByIdAsync(userId);
-      var result = await _userManager.ConfirmEmailAsync(user, token);
+      var result = await _userManager.ResetPasswordAsync(user, token, pwd);
       if(result.Succeeded)
       {
         success = true;
       }
 
-      return Ok(success);
+      return Ok(new {
+        success,
+        userName = user.LastName + " " + user.FirstName,
+        gender = user.Gender
+      });
     }
 
     [AllowAnonymous]
