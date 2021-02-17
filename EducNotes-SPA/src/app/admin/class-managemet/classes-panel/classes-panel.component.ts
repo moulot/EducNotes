@@ -19,23 +19,23 @@ export class ClassesPanelComponent implements OnInit {
   constructor(private adminService: AdminService, private route: ActivatedRoute,
     private alertify: AlertifyService) {}
 
-   ngOnInit() {
-      this.route.data.subscribe(data => {
-        this.levels = data.levels;
-        for (let i = 0; i < this.levels.length; i++) {
-          const elt = this.levels[i];
-          if (elt.classes.length > 0) {
-            this.filledLevels = [... this.filledLevels, elt];
-          }
+  ngOnInit() {
+    this.route.data.subscribe(data => {
+      this.levels = data.levels;
+      for (let i = 0; i < this.levels.length; i++) {
+        const elt = this.levels[i];
+        if (elt.classes.length > 0) {
+          this.filledLevels = [... this.filledLevels, elt];
         }
-      });
-      for (let index = 0; index < this.levels.length; index++) {
-        const element: any = {
-          id: this.levels[index].id,
-          name: this.levels[index].name
-        };
-        this.lev = [...this.lev, element];
       }
+    });
+    for (let index = 0; index < this.levels.length; index++) {
+      const element: any = {
+        id: this.levels[index].id,
+        name: this.levels[index].name
+      };
+      this.lev = [...this.lev, element];
+    }
   }
 
   newClass() {

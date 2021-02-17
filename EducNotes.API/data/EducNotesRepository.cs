@@ -103,10 +103,8 @@ namespace EducNotes.API.Data
 
         public async Task<Photo> GetPhoto(int id)
         {
-            var photo = await _context.Photos.IgnoreQueryFilters()
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            return photo;
+          var photo = await _context.Photos.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.Id == id);
+          return photo;
         }
 
         public async Task<Photo> GetMainPhotoForUser(int userId)
@@ -116,17 +114,17 @@ namespace EducNotes.API.Data
 
         public async Task<User> GetUser(int id, bool isCurrentUser)
         {
-            var query = _context.Users
-                .Include(c => c.Class)
-                .Include(c => c.ClassLevel)
-                .Include(p => p.Photos).AsQueryable();
+          var query = _context.Users
+              .Include(c => c.Class)
+              .Include(c => c.ClassLevel)
+              .Include(p => p.Photos).AsQueryable();
 
-            if (isCurrentUser)
-                query = query.IgnoreQueryFilters();
+          if (isCurrentUser)
+            query = query.IgnoreQueryFilters();
 
-            var user = await query.FirstOrDefaultAsync(u => u.Id == id);
+          var user = await query.FirstOrDefaultAsync(u => u.Id == id);
 
-            return user;
+          return user;
         }
 
         public async Task<List<UserForDetailedDto>> GetAccountChildren(int parentId)
@@ -403,7 +401,7 @@ namespace EducNotes.API.Data
             return await _context.Users
                 .Include(i => i.Photos)
                 //.Include (i => i.Class)
-                .Where(u => u.ClassId == classId)
+                .Where(u => u.ClassId == classId && u.UserTypeId == studentTypeId)
                 .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
                 .ToListAsync();
         }

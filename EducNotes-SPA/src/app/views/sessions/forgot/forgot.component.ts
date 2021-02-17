@@ -11,8 +11,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   animations: [SharedAnimations]
 })
 export class ForgotComponent implements OnInit {
-  email: string;
   resetPwdForm: FormGroup;
+  emailSent = false;
 
   constructor(private authService: AuthService, private alertify: AlertifyService, private fb: FormBuilder) { }
 
@@ -30,6 +30,7 @@ export class ForgotComponent implements OnInit {
   sendLink() {
     this.authService.forgotPassord(this.resetPwdForm.value).subscribe(res => {
       this.alertify.success('email de re-initialisation envoyé');
+      this.emailSent = true;
     }, error => {
       this.alertify.error(error);
     });

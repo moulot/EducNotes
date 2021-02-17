@@ -6,6 +6,7 @@ import { UserService } from 'src/app/_services/user.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { ConfirmToken } from 'src/app/_models/confirmToken';
 import { AccountService } from 'src/app/_services/account.service';
+import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -22,10 +23,11 @@ export class ResetPasswordComponent implements OnInit {
   pwdConfirmed = false;
   userName: string;
   userGender: number;
+  userNameExist = false;
   wait = false;
 
   constructor(private accountService: AccountService, private fb: FormBuilder, private route: ActivatedRoute,
-     private alertify: AlertifyService,  private router: Router, private userService: UserService) { }
+     private alertify: AlertifyService, private router: Router, private authService: AuthService) { }
 
   ngOnInit() {
     this.userid = this.route.snapshot.queryParamMap.get('id');
@@ -52,6 +54,16 @@ export class ResetPasswordComponent implements OnInit {
     } else if (control.value !== this.resetPwdForm.controls.password.value) {
       return { confirmNOK: true, error: true };
     }
+  }
+
+  userNameVerification() {
+    const userName = this.resetPwdForm.value.userName;
+    this.userNameExist = false;
+    this.authService.userNameExist(userName, Number(this.userid)).subscribe((res: boolean) => {
+      if (res === true) {
+        this.userNameExist = true;
+      }
+    });
   }
 
   resetPassword() {

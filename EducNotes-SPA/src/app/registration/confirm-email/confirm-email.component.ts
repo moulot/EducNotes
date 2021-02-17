@@ -25,7 +25,7 @@ export class ConfirmEmailComponent implements OnInit {
   phoneMask = Utils.phoneMask;
   validAccount = false;
   phoneValidationSteps = 0;
-  phoneOk = false;
+  phoneOk = true;
   parentOk = false;
   childrenOk = false;
   initialUserName: string;
@@ -158,7 +158,7 @@ export class ConfirmEmailComponent implements OnInit {
   phoneValidator = (control: FormControl): { [ s: string ]: boolean } => {
     if (!control.value) {
       return { required: true };
-    } else if (control.value.length !== 8) {
+    } else if (control.value.length !== 10) {
       return { lenError: true };
     }
   }

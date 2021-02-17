@@ -24,7 +24,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   phoneMask = Utils.phoneMask;
   validAccount = false;
   phoneValidationSteps = 0;
-  phoneOk = false;
+  phoneOk = true;
   teacherOk = false;
   userid: any;
   username: string;

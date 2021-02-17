@@ -14,24 +14,6 @@
       </div>
     </div>
   </div>
-  <!-- <div class="d-md-none">
-    <div class="row">
-      <div class="col-md-12">
-        <div class="d-flex">
-          <i class="fad fa-chalkboard-teacher fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-          <p class="text-17 flex-grow-1">liste des enseignants</p>
-        </div>
-      </div>
-      <div class="col-md-12">
-        <div class="">
-          <button mdbBtn class="btnBlue" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']" routerLinkActive="router-link-active">
-            <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
-            ajouter un enseignant
-          </button>
-        </div>
-      </div>
-    </div>
-  </div> -->
 
   <div class="col-md-12">
     <div class="row">
@@ -99,7 +81,9 @@
           <div class="d-flex align-items-end">
             <div class="flex-grow-1">
               <div class="text-15 mb-2"><b>cours de l'enseignant</b></div>
-              <div class="text-17 text-danger" *ngIf="teacher.courseClasses.length == 0">aucun cours pour {{teacher.lastName}} {{teacher.firstName}}</div>
+              <div class="text-17 text-danger" *ngIf="teacher.courseClasses.length == 0">
+                aucun cours pour {{teacher.lastName}} {{teacher.firstName}}
+              </div>
               <div *ngIf="teacher.courseClasses.length > 0">
                 <div *ngIf="teacher.educLevelId == educLevelPrimary">
                   <div class="row">

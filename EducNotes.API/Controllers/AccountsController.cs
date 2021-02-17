@@ -111,6 +111,12 @@ namespace EducNotes.API.Controllers
       var result = await _userManager.ResetPasswordAsync(user, token, pwd);
       if(result.Succeeded)
       {
+        await _userManager.SetLockoutEndDateAsync(user, null);
+        user.UserName = userName;
+        user.NormalizedUserName = userName.ToUpper();
+        _repo.Update(user);
+        if(!await _repo.SaveAll())
+          return BadRequest("'problème lors de la reinitialisation du compte");
         success = true;
       }
 

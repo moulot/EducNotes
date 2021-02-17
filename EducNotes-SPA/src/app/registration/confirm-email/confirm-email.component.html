@@ -73,7 +73,7 @@
                   <label for="phone" class="">numéro de téléphone à valider</label>
                   <div *ngIf="phoneForm.get('phone').hasError('required')" class="text-small text-danger">saisir le mobile svp</div>
                   <div *ngIf="phoneForm.get('phone').hasError('lenError')"
-                    class="text-small text-danger">le numéro doit avoir 8 chiffres</div>
+                    class="text-small text-danger">le numéro doit avoir 10 chiffres</div>
                 </div>                
               </div>
               <div class="col-md-6 mt-3">
@@ -83,7 +83,7 @@
             </div>
             <div *ngIf="phoneValidationSteps == 1" class="row">
               <div class="col-md-12 text-15 text-danger">saisir le code reçu par sms sur votre mobile.</div>
-              <div class="col-md-12 text-13 border rounded-lg" *ngIf="!phoneOk && phoneForm.get('code').touched"
+              <div class="col-md-12 text-13 border rounded-lg" *ngIf="!phoneOk"
                 style="background-color: red;color: white">le code de validation est incorrect. recommencez svp</div>
               <div class="col-md-6">
                 <div>
@@ -142,7 +142,7 @@
                     <label for="cell" class="">mobile</label>
                     <div *ngIf="userForm.get('cell').hasError('required')" class="text-small text-danger">saisir le mobile svp</div>
                     <div *ngIf="userForm.get('cell').hasError('lenError')"
-                      class="text-small text-danger">le numéro doit avoir 8 chiffres</div>
+                      class="text-small text-danger">le numéro doit avoir 10 chiffres</div>
                   </div>
                 </div>
                 <div class="col-md-8">

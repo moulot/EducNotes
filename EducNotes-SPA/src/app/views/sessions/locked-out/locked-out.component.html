@@ -1,20 +1,57 @@
-<div class="d-md-flex justify-content-center align-items-center my-2">
-  <i class="fad fa-user-unlock text-30 mr-2" style="--fa-secondary-opacity: 1;
-  --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-  <div class="text-30">compte utilisateur vérrouillé</div>
-</div>
-<!-- <div class="text-15">
-  <span  *ngIf="userGender == 0">Madame</span>
-  <span  *ngIf="userGender == 1">Monsieur</span>
-  {{userName | titlecase}},
-</div> -->
-<div class="d-md-flex">
-  <i class="fad fa-check-circle text-25 my-auto mr-2" style="--fa-secondary-opacity: 1;
+<div *ngIf="!emailSent" class="text-center mb-2">
+  <div class="my-3">
+    <i class="fad fa-user-lock fa-4x" style="--fa-secondary-opacity: 1;
     --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-  <div class="text-25 my-auto">votre nouveau mot de passe est validé!</div>
+    <div class="text-30">compte utilisateur vérrouillé</div>
+  </div>
+  <!-- <div class="text-15">
+    <span  *ngIf="userGender == 0">Madame</span>
+    <span  *ngIf="userGender == 1">Monsieur</span>
+    {{userName | titlecase}},
+  </div> -->
+  <div class="d-md-flex justify-content-center align-items-center">
+    <i class="fad fa-exclamation-triangle text-25 my-auto mr-2" style="--fa-secondary-opacity: 1;
+      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+    <div class="text-20 my-auto">votre compte a été vérouillé après plusieurs tentatives incorrectes de connexion!</div>
+  </div>
+  <div class="row mt-3 row justify-content-center align-items-center animated zoomInUp">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card body p-4">
+          <div class="text-center">
+            <i class="fad fa-user-unlock fa-4x mx-auto" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+            <div class="d-none d-md-block my-2 text-20">reinitialiser votre mot de passe</div>
+            <div class="d-md-none my-2 text-15">reinitialiser votre mot de passe</div>
+          </div>
+          <form [formGroup]="resetPwdForm" (ngSubmit)="sendLink()">
+            <div class="md-form mt-0">
+              <input type="text" id="username" class="form-control" formControlName="username" mdbInput>
+              <label for="username">entrer votre login</label>
+              <div *ngIf="resetPwdForm.get('username').errors && resetPwdForm.get('username').touched" class="text-small text-danger">
+                le login est obligatoire
+              </div>
+            </div>
+            <div class="md-form">
+              <input type="email" id="email" class="form-control" formControlName="email" mdbInput>
+              <label for="email">entrer votre email</label>
+              <div *ngIf="resetPwdForm.get('email').errors && resetPwdForm.get('email').touched" class="text-small text-danger">
+                l'email est obligatoire
+              </div>
+            </div>
+            <button type="submit" class="btnBlue" block="true" [disabled]="!resetPwdForm.valid"
+              mdbBtn size="sm" mdbWavesEffect>reinitialiser votre mot de passe</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="row justify-content-center align-items-center my-3">
-  <div class="col-md-6">
-    <button type="button" mdbBtn block="true" class="btnBlue" size="sm" mdbWavesEffect>connectez vous</button>
+
+<div *ngIf="emailSent" class="text-center">
+  <div class="d-md-flex justify-content-center align-items-center">
+    <i class="fad fa-exclamation-triangle text-25 my-auto mr-2" style="--fa-secondary-opacity: 1;
+      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+    <div class="text-20 my-auto">un email vous a été envoyé à l'adresse email spécifiée. clicker sur le lien qui s'y trouve pour reinitialiser votre mot de passe et débloquer votre compte. merci</div>
   </div>
 </div>

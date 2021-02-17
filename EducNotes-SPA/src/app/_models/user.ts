@@ -20,6 +20,7 @@ export interface User {
   classLevelId?: number;
   classLevelName: string;
   classId?: number;
+  teacherClassId?: number;
   className: string;
   email: string;
   emailConfirmed: boolean;

@@ -403,13 +403,15 @@ namespace EducNotes.API.Controllers
                 res.Classes = new List<ClassDetailDto>();
                 foreach (var c in item.Classes)
                 {
-                  res.TotalStudents += c.Students.Count();
+                  var students = c.Students.Where(s => s.UserTypeId == studentTypeId);
+                  var nbStudents = students.Count();
+                  res.TotalStudents += nbStudents;
                   //add class data
                   ClassDetailDto cdd = new ClassDetailDto();
                   cdd.Id = c.Id;
                   cdd.Name = c.Name;
                   cdd.MaxStudent = c.MaxStudent;
-                  cdd.TotalStudents = c.Students.Count();
+                  cdd.TotalStudents = nbStudents;
                   res.Classes.Add(cdd);
                 }
 
