@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LockedOutComponent } from './locked-out.component';
+import { LockoutComponent } from './lockout.component';
 
-describe('LockedOutComponent', () => {
-  let component: LockedOutComponent;
-  let fixture: ComponentFixture<LockedOutComponent>;
+describe('LockoutComponent', () => {
+  let component: LockoutComponent;
+  let fixture: ComponentFixture<LockoutComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LockedOutComponent ]
+      declarations: [ LockoutComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LockedOutComponent);
+    fixture = TestBed.createComponent(LockoutComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

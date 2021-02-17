@@ -146,7 +146,7 @@ import { TeacherFileComponent } from './admin/userFiles/teacher-file/teacher-fil
 import { ParentFileResolver } from './_resolvers/parent-file-resolver';
 import { UserValidationComponent } from './admin/user-validation/user-validation.component';
 import { UserValidationResolver } from './_resolvers/user-validation-resolver';
-import { LockedOutComponent } from './views/sessions/locked-out/locked-out.component';
+import { LockoutComponent } from './views/sessions/lockout/lockout.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -156,7 +156,7 @@ export const appRoutes: Routes = [
     {path: 'confirmTeacherEmail', component: ConfirmTeacherEmailComponent},
     {path: 'contactus', component: ContactUsComponent},
     { path: 'resetPassword', component: ResetPasswordComponent},
-    { path: 'lockout', component: LockedOutComponent},
+    { path: 'lockout', component: LockoutComponent},
     { path: 'selfRegister/:code', component: SelfRegisterComponent, resolve: { user: EmailConfirmResolver } },
 
     {

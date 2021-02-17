@@ -4,11 +4,11 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
-  selector: 'app-locked-out',
-  templateUrl: './locked-out.component.html',
-  styleUrls: ['./locked-out.component.scss']
+  selector: 'app-lockout',
+  templateUrl: './lockout.component.html',
+  styleUrls: ['./lockout.component.scss']
 })
-export class LockedOutComponent implements OnInit {
+export class LockoutComponent implements OnInit {
   resetPwdForm: FormGroup;
   emailSent = false;
 

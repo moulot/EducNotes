@@ -4,7 +4,7 @@
     <p class="text-20 font-weight-300">classes - emplois du temps</p>
   </div>
   <div class="col-md-3">
-    <mdb-select [options]="optionsClass" [formControl]="classControl" [visibleOptions]="10"
+    <mdb-select [options]="optionsClass" [formControl]="classControl" [visibleOptions]="6"
       (ngModelChange)="classChanged()" placeholder="choisir la classe"></mdb-select>
   </div>
   <div class="col-md-9">
@@ -15,16 +15,28 @@
 </div>
 
 <div *ngIf="showTimeline" class="row mb-2">
-  <div *ngFor="let i of weekdays; let i = index" class="card p-0 col-md-2">
-    <div class="card-body p-0 m-0 dayCol">
-      <div class="text-16 text-center" style="height: 25px;">{{weekDays[i]}}</div>
-      <div class="d-flex">
-        <div *ngIf="i == 0" style="width: 25px">
-          <div style="border-top: 1px solid #cccccc"></div>
-          <div class="hour-div" *ngFor="let i of hourCols; let i = index">{{i + 7}}h</div>
+  <div class="col-12 mb-1">
+    <div class="d-none d-md-block">
+      <div *ngIf="scheduleHours" class="d-md-flex justify-content-center">
+        <div class="d-flex justify-content-end" style="position: relative;top:10px;left:0px;width: 45px">
+          <div class="text-11 mt-1 mr-1" *ngFor="let item of counter(scheduleHours + 1); let i = index"
+            style="position: absolute" [ngStyle]="{'top': i*41 + 'px'}">{{i+firstHour}}h{{firstMin}}</div>
         </div>
-        <div class="card-body p-0 m-0 dayCol" style="height: 360px; border-top: 1px solid #cccccc">
-          <app-classday-schedule [items]="dayItems[i]" [dayName]="weekDays[i]" (reloadSchedule)="reloadSchedule()"></app-classday-schedule>
+        <div *ngFor="let i of [0, 1, 2, 3, 4]" [ngStyle]="{'width': '20%'}">
+          <div class="text-15 day-title mt-0 text-center">{{weekDays[i]}}</div>
+          <div class="text-15 text-center dayCol" [ngStyle]="{'height': tableHeight}" style="border: 1px solid #192C47">
+          <app-schedule-day [items]="dayItems[i]"></app-schedule-day>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="d-md-none">
+      <div *ngIf="scheduleHours">
+        <div *ngFor="let i of [0, 1, 2, 3, 4]" class="mb-2">
+          <div class="text-15 day-title mt-0 text-center">{{weekDays[i]}}</div>
+          <div class="text-15 text-center dayCol" [ngStyle]="{'height': tableHeight}" style="border: 1px solid #192C47">
+          <app-schedule-day [items]="dayItems[i]"></app-schedule-day>
+          </div>
         </div>
       </div>
     </div>

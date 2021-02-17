@@ -272,7 +272,7 @@ import { ChildFileClassLifeComponent } from './admin/userFiles/child-file-class-
 import { UserValidationComponent } from './admin/user-validation/user-validation.component';
 import { UserValidationResolver } from './_resolvers/user-validation-resolver';
 import { ParentDashboardComponent } from './dashboard/parent-dashboard/parent-dashboard.component';
-import { LockedOutComponent } from './views/sessions/locked-out/locked-out.component';
+import { LockoutComponent } from './views/sessions/lockout/lockout.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -297,7 +297,6 @@ export function tokenGetter() {
       PhotoEditorComponent,
       TimeAgoPipe,
       MemberMessagesComponent,
-      // AdminPanelComponent,
       HasRoleDirective,
       FullScreenDirective,
       BtnBackDirective,
@@ -335,10 +334,6 @@ export function tokenGetter() {
       PreInscriptionComponent,
       MemberPasswordSettingComponent,
       TeacherManagementComponent,
-      // CoursClassesManagementComponent,
-      // UserTypesComponent,
-      // AdministrationUsersComponent,
-      // UserListComponent,
       SigninComponent,
       FullscreenTableComponent,
       PagingTableComponent,
@@ -459,7 +454,7 @@ export function tokenGetter() {
       ChildFileClassLifeComponent,
       UserValidationComponent,
       ParentDashboardComponent,
-      LockedOutComponent
+      LockoutComponent
    ],
    imports: [
       FormWizardModule,

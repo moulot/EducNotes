@@ -183,7 +183,7 @@ namespace EducNotes.API.Controllers
             });
           }
 
-          return BadRequest("Aucun emploi du temps trouvé");
+          return BadRequest("aucun emploi du temps trouvé");
         }
 
         [HttpPut("DelCourseFromSchedule/{scheduleId}")]
@@ -698,11 +698,27 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpPut("saveSchedules")]
-        public async Task<IActionResult> saveSchedules([FromBody] Schedule[] schedules)
+        public async Task<IActionResult> saveSchedules([FromBody] ScheduleDataDto[] schedules)
         {
           foreach (var sch in schedules)
           {
-            _repo.Add(sch);
+            Schedule schedule = new Schedule();
+            //set the dates proprerly
+            var StartHour = sch.StartHour;
+            var StartMin = sch.StartMin;
+            var StartHourMin = new DateTime(1, 1, 1, StartHour, StartMin, 0);
+            var EndHour = sch.EndHour;
+            var EndMin = sch.EndMin;
+            var EndHourMin = new DateTime(1, 1, 1, EndHour, EndMin, 0);
+
+            schedule.ClassId = sch.ClassId;
+            schedule.TeacherId = sch.TeacherId;
+            schedule.CourseId = sch.CourseId;
+            schedule.Day = sch.Day;
+            schedule.StartHourMin = StartHourMin;
+            schedule.EndHourMin = EndHourMin;
+
+            _repo.Add(schedule);
           }
 
           if (await _repo.SaveAll())

@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { Class } from 'src/app/_models/class';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Schedule } from 'src/app/_models/schedule';
 import { ModalScheduleComponent } from '../modal-schedule/modal-schedule.component';
@@ -19,6 +18,15 @@ export class ClassScheduleComponent implements OnInit {
   scheduleItems: any;
   scheduleForm: FormGroup;
   modalRef: MDBModalRef;
+  strMonday: string;
+  strSunday: string;
+  strShortMonday: string;
+  strShortSunday: string;
+  schoolHours: any;
+  tableHeight: any;
+  scheduleHours: number;
+  firstHour: number;
+  firstMin: number;
   dayItems = [];
   loading: boolean;
   monCourses = [];
@@ -33,8 +41,6 @@ export class ClassScheduleComponent implements OnInit {
   agendaItems: Schedule[] = [];
   showTimeline = false;
   classControl = new FormControl();
-  hourCols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-  weekdays = [0, 1, 2, 3, 4, 5];
   optionsClass: any[] = [];
 
   constructor(private classService: ClassService, public alertify: AlertifyService,
@@ -46,7 +52,6 @@ export class ClassScheduleComponent implements OnInit {
 
   getClasses() {
     this.classService.getClassesByLevel().subscribe((data: any) => {
-      // this.classes = data;
       for (let i = 0; i < data.length; i++) {
         const level = data[i];
         if (level.classes.length > 0) {
@@ -82,6 +87,18 @@ export class ClassScheduleComponent implements OnInit {
     this.resetSchedule();
     this.classService.getClassTimeTable(classId).subscribe((data: any) => {
       this.scheduleItems = data.scheduleItems;
+      this.strMonday = data.strMonday;
+      this.strSunday = data.strSunday;
+      this.strShortMonday = data.strShortMonday;
+      this.strShortSunday = data.strShortSunday;
+      // this.weekDays = data.weekDays;
+      this.schoolHours = data.schoolHours;
+      this.tableHeight = data.scheduleHeight;
+
+      this.scheduleHours = Number(this.schoolHours[2]) - Number(this.schoolHours[0]);
+      this.firstHour = Number(this.schoolHours[0]);
+      this.firstMin = Number(this.schoolHours[1]);
+
       // add courses on the schedule
       for (let i = 1; i <= 7; i++) {
         const filtered = this.scheduleItems.filter(items => items.day === i);
@@ -159,4 +176,7 @@ export class ClassScheduleComponent implements OnInit {
     this.sunCourses = [];
   }
 
+  counter(i: number) {
+    return new Array(i);
+  }
 }

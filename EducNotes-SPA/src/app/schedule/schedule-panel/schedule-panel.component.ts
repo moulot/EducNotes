@@ -27,7 +27,7 @@ export class SchedulePanelComponent implements OnInit {
   scheduleHours: number;
   firstHour: number;
   firstMin: number;
-  hourSize = 60;
+  // hourSize = 60;
   monCourses = [];
   tueCourses = [];
   wedCourses = [];
@@ -101,7 +101,6 @@ export class SchedulePanelComponent implements OnInit {
       }
 
       this.dayItems = [this.monCourses, this.tueCourses, this.wedCourses, this.thuCourses, this.friCourses, this.satCourses];
-
     }, error => {
       this.alertify.error(error);
     });

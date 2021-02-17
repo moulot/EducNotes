@@ -7,6 +7,7 @@ import { User } from 'src/app/_models/user';
 import { Course } from 'src/app/_models/course';
 import { Schedule } from 'src/app/_models/schedule';
 import { MDBModalRef } from 'ng-uikit-pro-standard';
+import { ScheduleData } from 'src/app/_models/scheduleData';
 
 @Component({
   selector: 'app-modal-schedule',
@@ -23,7 +24,7 @@ export class ModalScheduleComponent implements OnInit {
   periodConflict = false;
   teacherSchedule: any;
   timeMask = [/\d/, /\d/, ':', /\d/, /\d/];
-  agendaItems: Schedule[] = [];
+  agendaItems: ScheduleData[] = [];
   teacherOptions: any = [];
   courseOptions: any = [];
   courseConflicts: any = [];
@@ -298,17 +299,17 @@ export class ModalScheduleComponent implements OnInit {
     for (let i = 1; i <= 5; i++) {
       // is the schedule item line empty?
       if (this.scheduleForm.controls['item' + i].get('day' + i).value !== null) {
-        const sch = <Schedule>{};
+        const sch = <ScheduleData>{};
         sch.classId = this.classId;
         sch.teacherId = this.scheduleForm.value.teacher;
         sch.courseId = this.scheduleForm.value.course;
         sch.day = this.scheduleForm.controls['item' + i].get('day' + i).value;
         const hStart = this.scheduleForm.controls['item' + i].get('hourStart' + i).value.split(':');
         const hEnd = this.scheduleForm.controls['item' + i].get('hourEnd' + i).value.split(':');
-        const hourStart = new Date(1, 0, 1, hStart[0], hStart[1]);
-        const hourEnd = new Date(1, 0, 1, hEnd[0], hEnd[1]);
-        sch.startHourMin = hourStart;
-        sch.endHourMin = hourEnd;
+        sch.startHour = hStart[0];
+        sch.startMin = hStart[1];
+        sch.endHour = hEnd[0];
+        sch.endMin = hEnd[1];
         this.agendaItems = [...this.agendaItems, sch];
       }
     }

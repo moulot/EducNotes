@@ -13,7 +13,7 @@
     </a>
   </div>
   <div class="col-md-4 mb-2">
-    <div class="border rounded-lg p-1 text-13 text-center">{{strMonday}} - {{strSunday}}</div>
+    <div class="border rounded-lg p-1 text-13 text-center">{{strShortMonday}} - {{strShortSunday}}</div>
   </div>
   <div class="col-md-4 my-auto text-center text-md-left mb-2">
     <a (click)="nextWeek()">
@@ -28,28 +28,28 @@
   </div>
   <div class="col-12 mb-1">
     <div class="d-none d-md-block">
-    <div *ngIf="scheduleHours" class="d-md-flex justify-content-center">
-      <div class="d-flex justify-content-end" style="position: relative;top:10px;left:0px;width: 45px">
-        <div class="text-11 mt-1 mr-1" *ngFor="let item of counter(scheduleHours + 1); let i = index"
-          style="position: absolute" [ngStyle]="{'top': i*41 + 'px'}">{{i+firstHour}}h{{firstMin}}</div>
-      </div>
-      <div *ngFor="let i of [0, 1, 2, 3, 4]" [ngStyle]="{'width': '20%'}">
-        <div class="text-15 day-title mt-0 text-center">{{weekDays[i]}}</div>
-        <div class="text-15 text-center dayCol" [ngStyle]="{'height': tableHeight}" style="border: 1px solid #192C47">
-        <app-schedule-day [items]="dayItems[i]"></app-schedule-day>
+      <div *ngIf="scheduleHours" class="d-md-flex justify-content-center">
+        <div class="d-flex justify-content-end" style="position: relative;top:10px;left:0px;width: 45px">
+          <div class="text-11 mt-1 mr-1" *ngFor="let item of counter(scheduleHours + 1); let i = index"
+            style="position: absolute" [ngStyle]="{'top': i*41 + 'px'}">{{i+firstHour}}h{{firstMin}}</div>
+        </div>
+        <div *ngFor="let i of [0, 1, 2, 3, 4]" [ngStyle]="{'width': '20%'}">
+          <div class="text-15 day-title mt-0 text-center">{{weekDays[i]}}</div>
+          <div class="text-15 text-center dayCol" [ngStyle]="{'height': tableHeight}" style="border: 1px solid #192C47">
+          <app-schedule-day [items]="dayItems[i]"></app-schedule-day>
+          </div>
         </div>
       </div>
-    </div>
     </div>
     <div class="d-md-none">
-    <div *ngIf="scheduleHours">
-      <div *ngFor="let i of [0, 1, 2, 3, 4]" class="mb-2">
-        <div class="text-15 day-title mt-0 text-center">{{weekDays[i]}}</div>
-        <div class="text-15 text-center dayCol" [ngStyle]="{'height': tableHeight}" style="border: 1px solid #192C47">
-        <app-schedule-day [items]="dayItems[i]"></app-schedule-day>
+      <div *ngIf="scheduleHours">
+        <div *ngFor="let i of [0, 1, 2, 3, 4]" class="mb-2">
+          <div class="text-15 day-title mt-0 text-center">{{weekDays[i]}}</div>
+          <div class="text-15 text-center dayCol" [ngStyle]="{'height': tableHeight}" style="border: 1px solid #192C47">
+          <app-schedule-day [items]="dayItems[i]"></app-schedule-day>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   </div>
 </div>
