@@ -42,8 +42,8 @@ export class NewTeacherComponent implements OnInit {
   myDatePickerOptions = Utils.myDatePickerOptions;
 
   constructor(private classService: ClassService, private fb: FormBuilder, private authService: AuthService,
-    private router: Router, private adminService: AdminService, private userService: UserService,
-    private alertify: AlertifyService, private route: ActivatedRoute) { }
+    private router: Router, private userService: UserService, private alertify: AlertifyService,
+    private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.currentUserId = this.authService.currentUser.id;

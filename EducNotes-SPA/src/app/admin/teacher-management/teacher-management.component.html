@@ -47,8 +47,8 @@
                   </div>
                   <div class="text-20">
                     <span class="text-capitalize">{{teacher.lastName}} {{teacher.firstName}}</span>
-                    <span *ngIf="teacher.educLevelId == educLevelPrimary" class="ml-1" style="color: #2962ff;">- classe primaire {{teacher.className}}</span>
-                    <span *ngIf="teacher.educLevelId != educLevelPrimary" class="ml-1" style="color: #2962ff;">- niveau secondaire</span>
+                    <span *ngIf="teacher.educLevelId == educLevelPrimary" class="ml-1 textBlue">- classe primaire {{teacher.className}}</span>
+                    <span *ngIf="teacher.educLevelId != educLevelPrimary" class="ml-1 textBlue">- niveau secondaire</span>
                   </div>
                 </div>
               </div>

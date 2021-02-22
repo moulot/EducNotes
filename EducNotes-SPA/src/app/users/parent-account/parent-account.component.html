@@ -1,0 +1,206 @@
+<div class="d-none d-md-block">
+  <div class="card mb-2">
+    <div class="card-body p-2">
+      <div *ngIf="showInfos[0]" class="row animated zoomIn">
+        <div class="col-md-12">
+          <a class="d-flex" (click)="toggleInfos(0)">
+            <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+            <div class="text-16"><b>infos du compte</b></div>
+          </a>
+        </div>
+        <div class="col-md-12"><hr class="my-1"></div>
+        <div class="col-md-12 d-flex">
+          <div class="">
+            <img src="{{parent.photoUrl || '../../assets/user.png'}}" alt="" width="60" class="rounded-circle img-responsive">
+          </div>
+          <div class="ml-2 my-auto">
+            <div class="text-20 text-capitalize font-weight-500">{{parent.lastName}} {{parent.firstName}}</div>
+            <div class="text-16">{{parent.phoneNumber}} / {{parent.email}}</div>
+          </div>
+        </div>
+        <div class="col-md-12"><hr class="my-1"></div>
+        <div class="col-md-12 text-14 mb-1"><b>enfants</b></div>
+        <div class="col-md-4 mb-1" *ngFor="let child of parent.children">
+          <div class="border rounded-lg p-1">
+            <div class="row">
+              <div class="col-md-12 d-flex">
+                <div class="d-none d-md-block">
+                  <img src="{{child.child.photoUrl || '../../../../../assets/user.png'}}" alt="" width="45" class="rounded-circle img-responsive">
+                </div>
+                <div class="ml-2 my-auto d-none d-md-block">
+                  <a [routerLink]="['/childFile', child.child.id]"><u class="text-small text-danger">voir le dossier</u></a> 
+                  <div class="text-15 font-weight-500">
+                    <span class="text-capitalize">{{child.child.lastName}} {{child.child.firstName}}</span> ({{child.child.age}} ans).
+                    <span class="ml-1"><b>{{child.child.className || child.child.classLevelName}}</b></span>
+                  </div>
+                  <div *ngIf="!child.child.accountDataValidated" class="text-danger text-15">compte non validé</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!showInfos[0]" class="row animated fadeIn">
+        <div class="col-md-12 d-flex">
+          <a class="d-flex" (click)="toggleInfos(0)">
+            <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+            <div class="text-16">
+              <b>voir détails du dossier <span>{{parent.lastName}} {{parent.firstName}}</span></b>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card mb-2">
+    <div class="card-body p-2">
+      <div *ngIf="showInfos[1]">
+        <a class="d-flex" (click)="toggleInfos(1)">
+          <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16"><b>frais de scolarité</b></div>
+        </a>
+        <hr class="my-1">
+        <div *ngFor="let child of parent.children">
+          <div class="border rounded-lg p-2 mb-1" style="background-color: #fafafa;">
+            <app-parent-file-tuition [childid]="child.child.id" [childFName]="child.child.firstName"></app-parent-file-tuition>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!showInfos[1]" class="row animated fadeIn">
+        <div class="col-md-12 d-flex">
+          <a class="d-flex" (click)="toggleInfos(1)">
+            <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+            <div class="text-16"><b>frais de scolarité</b></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="d-md-none">
+  <div class="border rounded-lg p-2 mb-2">
+    <div *ngIf="showInfos[0]" class="row animated zoomIn">
+      <div class="col-md-12">
+        <a class="d-flex" (click)="toggleInfos(0)">
+          <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16"><b>infos du compte</b></div>
+        </a>
+      </div>
+      <div class="col-md-12"><hr class="my-1"></div>
+      <div class="col-md-12 text-center">
+        <div>
+          <img src="{{parent.photoUrl || '../../assets/user.png'}}" alt="" width="60" class="rounded-circle img-responsive">
+        </div>
+        <div>
+          <div class="text-18 text-capitalize font-weight-500">{{parent.lastName}} {{parent.firstName}}</div>
+          <div class="text-16">{{parent.phoneNumber}}</div>
+          <div class="text-16 o-hidden">{{parent.email}}</div>
+        </div>
+      </div>
+      <div class="col-md-12"><hr class="my-1"></div>
+      <div class="col-md-12 text-16 mb-1"><b>enfants</b></div>
+      <div class="col-md-4 mb-1" *ngFor="let child of parent.children">
+        <mdb-card class="testimonial-card pt-3 mt-5">
+          <div class="avatar mx-auto">
+            <img src="{{child.child.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
+          </div>
+          <mdb-card-body class="p-2">
+            <div>
+              <a [routerLink]="['/childFile', child.child.id]"><span class="text-15 text-danger">voir le dossier</span></a> 
+              <div class="text-15 font-weight-500 text-capitalize">{{child.child.lastName}} {{child.child.firstName}}. ({{child.child.age}} ans)</div>
+              <div><b>classe de {{child.child.className || child.child.classLevelName}}</b></div>
+              <div *ngIf="!child.child.accountDataValidated" class="text-danger text-15">compte non validé</div>
+            </div>
+          </mdb-card-body>
+        </mdb-card>
+      </div>
+    </div>
+    <div *ngIf="!showInfos[0]" class="row animated fadeIn">
+      <div class="col-md-12 d-flex">
+        <a class="d-flex" (click)="toggleInfos(0)">
+          <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16"><b>infos du compte</b></div>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="border rounded-lg p-2 mb-2">
+    <div *ngIf="showInfos[1]">
+      <a class="d-flex" (click)="toggleInfos(1)">
+        <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+        <div class="text-16"><b>frais de scolarité</b></div>
+      </a>
+      <hr class="my-1">
+      <div *ngFor="let child of parent.children">
+        <div class="border rounded-lg p-2 mb-1" style="background-color: #fafafa;">
+          <app-parent-file-tuition [childid]="child.child.id" [childFName]="child.child.firstName" [id]="child.child.id"></app-parent-file-tuition>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!showInfos[1]" class="row animated fadeIn">
+      <div class="col-md-12 d-flex">
+        <a class="d-flex" (click)="toggleInfos(1)">
+          <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16"><b>frais de scolarité</b></div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body p-2">
+    <div *ngIf="showInfos[2]" class="row animated zoomIn">
+      <div class="col-md-12">
+        <a class="d-flex" (click)="toggleInfos(2)">
+          <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16"><b>sms à recevoir</b></div>
+        </a>
+      </div>
+      <div class="col-md-12"><hr class="my-1"></div>
+      <div class="col-md-12 mb-1" *ngFor="let child of parent.children">
+        <div class="border rounded-lg p-2">
+          <div class="row">
+            <div class="col-md-12 d-flex">
+              <div class="d-none d-md-block">
+                <img src="{{child.child.photoUrl || '../../../../../assets/user.png'}}" alt="" width="45" class="rounded-circle img-responsive">
+              </div>
+              <div class="ml-2 my-auto d-none d-md-block">
+                <div class="text-15 font-weight-500">
+                  <span class="text-capitalize">{{child.child.lastName}} {{child.child.firstName}}</span> ({{child.child.age}} ans).
+                  <span class="ml-1"><b>{{child.child.className || child.child.classLevelName}}</b></span>
+                </div>
+                <div *ngIf="!child.child.accountDataValidated" class="text-danger text-15"><b>compte non validé</b></div>
+              </div>
+            </div>
+            <div class="col-md-12"><hr class="my-1"></div>
+            <div class="col-md-12 my-1">
+              <app-child-sms-card [children]="parent.children" [child]="child" (setSmsChoice)="setSmsChoice($event)" 
+                (saveUserSMS)="saveUserSMS()"></app-child-sms-card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!showInfos[2]" class="row animated fadeIn">
+      <div class="col-md-12 d-flex">
+        <a class="d-flex" (click)="toggleInfos(2)">
+          <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+          <div class="text-16">
+            <b>voir détails des sms à recevoir</b>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

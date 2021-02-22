@@ -89,7 +89,6 @@ import { ConvertToPDFComponent } from './admin/_docs/convertToPDF/convertToPDF.c
 import { ImportFichierComponent } from './admin/import-fichier/import-fichier.component';
 import { SendSmsComponent } from './admin/sendSms/sendSms.component';
 import { UserAccountComponent } from './users/user-account/user-account.component';
-import { UserAccountResolver } from './_resolvers/user-account-resolver';
 import { SmsTemplateComponent } from './admin/sms-template/sms-template.component';
 import { AddSmsTemplateComponent } from './admin/add-smsTemplate/add-smsTemplate.component';
 import { SmsTemplateResolver } from './_resolvers/sms-template-resolver';
@@ -147,6 +146,8 @@ import { ParentFileResolver } from './_resolvers/parent-file-resolver';
 import { UserValidationComponent } from './admin/user-validation/user-validation.component';
 import { UserValidationResolver } from './_resolvers/user-validation-resolver';
 import { LockoutComponent } from './views/sessions/lockout/lockout.component';
+import { EditAccountComponent } from './users/edit-account/edit-account.component';
+import { EditAccountResolver } from './_resolvers/edit-account-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -239,7 +240,7 @@ export const appRoutes: Routes = [
         { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }},
         { path: 'createPDF', component: ConvertToPDFComponent },
         { path: 'sendSms', component: SendSmsComponent},
-        { path: 'userAccount/:id', component: UserAccountComponent, resolve: { account: UserAccountResolver } },
+        { path: 'userAccount/:id', component: UserAccountComponent}, // , resolve: { account: UserAccountResolver } },
         { path: 'SmsTemplates', component: SmsTemplateComponent, resolve: { templates: SmsTemplateResolver} },
         { path: 'AddSmsTemplate', component: AddSmsTemplateComponent},
         { path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} },
@@ -270,6 +271,7 @@ export const appRoutes: Routes = [
         { path: 'latePayments', component: RecoveryListComponent},
         { path: 'paymentLevelChild/:id', component: PaymentLevelChildComponent, resolve: {children: PaymentLevelChildResolver}},
         { path: 'absences', component: AbsencesComponent},
+        { path: 'editAccount/:id', component: EditAccountComponent, resolve: {user: EditAccountResolver}},
         { path: 'usersValidation', component: UserValidationComponent, resolve: {users: UserValidationResolver}}
       ]
     },

@@ -117,6 +117,8 @@ namespace EducNotes.API.Data
           var query = _context.Users
               .Include(c => c.Class)
               .Include(c => c.ClassLevel)
+              .Include(c => c.District)
+              .Include(c => c.City)
               .Include(p => p.Photos).AsQueryable();
 
           if (isCurrentUser)
@@ -1011,44 +1013,44 @@ namespace EducNotes.API.Data
 
         public async Task<bool> AddPhoto(int userId, IFormFile photoFile)
         {
-            if (photoFile.Length > 0)
+          if (photoFile.Length > 0)
+          {
+            var uploadResult = new ImageUploadResult();
+            var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
+            using (var stream = photoFile.OpenReadStream())
             {
-                var uploadResult = new ImageUploadResult();
-                var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(a => a.Id == userId);
-                using (var stream = photoFile.OpenReadStream())
+              var uploadParams = new ImageUploadParams()
+              {
+                  File = new FileDescription(photoFile.Name, stream),
+                  Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+              };
+
+              uploadResult = _cloudinary.Upload(uploadParams);
+              if (uploadResult.StatusCode == HttpStatusCode.OK)
+              {
+                Photo photo = new Photo();
+                photo.Url = uploadResult.SecureUri.ToString();
+                photo.PublicId = uploadResult.PublicId;
+                photo.UserId = userId;
+                photo.DateAdded = DateTime.Now;
+                if (user.Photos.Any(u => u.IsMain))
                 {
-                    var uploadParams = new ImageUploadParams()
-                    {
-                        File = new FileDescription(photoFile.Name, stream),
-                        Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
-                    };
-
-                    uploadResult = _cloudinary.Upload(uploadParams);
-                    if (uploadResult.StatusCode == HttpStatusCode.OK)
-                    {
-                        Photo photo = new Photo();
-                        photo.Url = uploadResult.SecureUri.ToString();
-                        photo.PublicId = uploadResult.PublicId;
-                        photo.UserId = userId;
-                        photo.DateAdded = DateTime.Now;
-                        if (user.Photos.Any(u => u.IsMain))
-                        {
-                            var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
-                            oldPhoto.IsMain = false;
-                            Update(oldPhoto);
-                        }
-                        photo.IsMain = true;
-                        photo.IsApproved = true;
-                        Add(photo);
-
-                        if (await SaveAll())
-                            return true;
-                        else
-                            return false;
-                    }
+                  var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                  oldPhoto.IsMain = false;
+                  Update(oldPhoto);
                 }
+                photo.IsMain = true;
+                photo.IsApproved = true;
+                Add(photo);
+
+                if (await SaveAll())
+                  return true;
+                else
+                  return false;
+              }
             }
-            return true;
+          }
+          return true;
         }
 
         public async Task<Course> GetCourse(int Id)
@@ -1058,29 +1060,10 @@ namespace EducNotes.API.Data
 
         public async Task<bool> SendResetPasswordLink(User user, string token)
         {
-          // var emailform = new EmailFormDto
-          // {
-          //   subject = "Réinitialisation de mot passe ",
-          //   content = ResetPasswordContent(token)
-          // };
-
-          // var callbackUrl = _config.GetValue<String>("AppSettings:ResetPasswordLink") + token;
           var template = await _context.EmailTemplates.FirstAsync(t => t.Id == resetPwdEmailId);
           var email = await SetEmailForResetPwdLink(template.Subject, template.Body, user.Id,
             user.LastName, user.FirstName, user.Gender, user.Email, token);
           _context.Add(email);
-          // var email = new Email
-          // {
-          //     InsertUserId = user.Id,
-          //     UpdateUserId = user.Id,
-          //     StatusFlag = 0,
-          //     Subject = "Réinitialisation de mot passe ",
-          //     ToAddress = user.Email,
-          //     Body = $"veuillez cliquer sur le lien suivant pour réinitiliser votre mot de passe : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-          //     FromAddress = "no-reply@educnotes.com",
-          //     EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
-          // };
-          // Add(email);
 
           if(!await SaveAll())
             return false;
@@ -1090,15 +1073,15 @@ namespace EducNotes.API.Data
 
         public async Task<bool> SendEmail(EmailFormDto emailFormDto)
         {
-            try
-            {
-                await _emailSender.SendEmailAsync(emailFormDto.toEmail, emailFormDto.subject, emailFormDto.content);
-                return true;
-            }
-            catch (System.Exception)
-            {
-                return false;
-            }
+          try
+          {
+            await _emailSender.SendEmailAsync(emailFormDto.toEmail, emailFormDto.subject, emailFormDto.content);
+            return true;
+          }
+          catch (System.Exception)
+          {
+            return false;
+          }
         }
 
         // private string ResetPasswordContent(string code)
@@ -1139,25 +1122,25 @@ namespace EducNotes.API.Data
 
         public async Task<IEnumerable<City>> GetAllCities()
         {
-            return (await _context.Cities.OrderBy(c => c.Name).ToListAsync());
+          return (await _context.Cities.OrderBy(c => c.Name).ToListAsync());
         }
 
         public async Task<IEnumerable<District>> GetAllGetDistrictsByCityIdCities(int id)
         {
-            return (await _context.Districts.Where(c => c.CityId == id).OrderBy(c => c.Name).ToListAsync());
+          return (await _context.Districts.Where(c => c.CityId == id).OrderBy(c => c.Name).ToListAsync());
         }
 
-        public void AddInscription(int levelId, int userId)
-        {
-            var nouvelle_incrpition = new Inscription
-            {
-                InsertDate = DateTime.Now,
-                ClassLevelId = levelId,
-                UserId = userId,
-                Validated = false
-            };
-            Add(nouvelle_incrpition);
-        }
+        // public void AddInscription(int levelId, int userId)
+        // {
+        //     var nouvelle_incrpition = new Inscription
+        //     {
+        //         InsertDate = DateTime.Now,
+        //         ClassLevelId = levelId,
+        //         UserId = userId,
+        //         Validated = false
+        //     };
+        //     Add(nouvelle_incrpition);
+        // }
 
         public void AddUserLink(int userId, int parentId)
         {
@@ -2195,7 +2178,7 @@ namespace EducNotes.API.Data
             newEmail.EmailTypeId = 1;
             newEmail.OrderId = data.OrderId;
             newEmail.ToAddress = data.ParentEmail;
-            newEmail.FromAddress = "georges.moulot@educnotes.com";
+            newEmail.FromAddress = "no-reply@educnotes.com";
             newEmail.Subject = data.EmailSubject;
             List<TokenDto> tags = await GetRegistrationTokenValues(tokens, data, RegDeadLine);
             newEmail.Body = ReplaceTokens(tags, content);

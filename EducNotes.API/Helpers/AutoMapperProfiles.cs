@@ -99,6 +99,12 @@ namespace EducNotes.API.Helpers {
                 })
                 .ForMember(dest => dest.ClassName, opt => {
                     opt.MapFrom(src => src.Class.Name);
+                })
+                .ForMember(dest => dest.DistrictName, opt => {
+                    opt.MapFrom(src => src.District.Name);
+                })
+                .ForMember(dest => dest.CityName, opt => {
+                    opt.MapFrom(src => src.City.Name);
                 });
             CreateMap<User, UserForAccountDto>()
                 .ForMember(dest => dest.PhotoUrl, opt => {

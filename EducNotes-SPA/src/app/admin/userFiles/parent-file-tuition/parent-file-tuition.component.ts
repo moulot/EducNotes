@@ -11,7 +11,6 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./parent-file-tuition.component.scss']
 })
 export class ParentFileTuitionComponent implements OnInit {
-  @Input() id: any;
   @Input() childid: any;
   @Input() childFName: any;
   tuition: any;
@@ -26,7 +25,7 @@ export class ParentFileTuitionComponent implements OnInit {
     private orderService: OrderService, private paymentService: PaymentService) { }
 
   ngOnInit() {
-    this.getTuition(this.id);
+    this.getTuition(this.childid);
   }
 
   getTuition(id) {

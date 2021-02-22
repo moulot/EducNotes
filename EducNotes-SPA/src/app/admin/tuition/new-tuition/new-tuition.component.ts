@@ -350,7 +350,6 @@ export class NewTuitionComponent implements OnInit {
     this.tuitionFee[index] = price;
     const dp = this.dpPct * price;
     this.downPayment[index] = dp;
-    // console.log(this.downPayment);
     this.setAmountDue();
     this.setOrderAmount();
   }

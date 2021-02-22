@@ -1,145 +1,19 @@
-<div class="row">
-  <div class="col-md-12">
-    <div class="row">
-      <div class="col-md-1">
-        <img src="{{parent.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle img-responsive">
-      </div>
-      <div class="col-md-10">
-        <p class="text-20 text-muted font-weight-500 text-capitalize p-0 m-0">{{parent.lastName}} {{parent.firstName}}</p>
-        <p class="text-15 text-primary p-0 mx-1 my-0">{{parent.email}}</p>
-        <div class="p-0 m-0">
-          <label class="text-15 text-primary p-0 mx-1">tél: {{parent.phoneNumber}}</label>
-          <label *ngIf="parent.secondPhoneNumber" class="text-15 text-primary p-0 mx-1"> / {{parent.secondPhoneNumber}}</label>
-        </div>
-      </div>
-    </div>
+<div class="container-fluid">
+
+  <div *ngIf="parentLoggedIn()">
+    <app-parent-account [parentid]="userid"></app-parent-account>      
   </div>
-  <div *ngIf="ChildToBeConfirmed == 0" class="col-md-12">
-    <div class="alert alert-warning text-18" role="alert">
-      veuillez finaliser et confirmer le compte de vos enfants.
-      <button type="button" mdbBtn [routerLink]="['/editChildren', parent.id]" size="sm"
-        class="btnBlue" mdbWavesEffect>mettre à jour les infos enfants</button>
-    </div>
+
+  <div *ngIf="studentLoggedIn()">
+    <app-student-account></app-student-account>
   </div>
-</div>
 
-<div class="card mb-2">
-  <div class="card-body">
-    <div class="row">
-      <div class="col-md-12 text-20 font-weight-300">mes enfants</div>
-      <div class="col-md-12 mb-3"><hr class="my-1" style="background-color: #f89f20;"></div>
-      <div class="col-md-2 my-5" *ngFor="let child of parent.children">
-        <mdb-card class="testimonial-card">
-          <div class="avatar mx-auto">
-            <img src="{{child.child.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
-          </div>
-
-          <mdb-card-body class="p-2">
-            <mdb-card-title>
-              <p class="text-15 m-0">{{child.child.lastName | titlecase}} {{child.child.firstName | titlecase}}</p>
-              <p *ngIf="child.child.className" class="text-15 m-0">classe {{child.child.className}}</p>
-              <p *ngIf="!child.child.className" class="text-15 m-0">classe {{child.child.classLevelName}}</p>
-              <div *ngIf="!child.child.accountDataValidated">
-                <div class="text-danger text-15">enfant non confirmé</div>
-              </div>
-            </mdb-card-title>
-          </mdb-card-body>
-        </mdb-card>
-      </div>
-    </div>
+  <div *ngIf="teacherLoggedIn()">
+    <app-teacher-account></app-teacher-account>     
   </div>
-</div>
 
-<div class="card">
-  <div class="card-body">
-    <div class="row">
-      <div class="col-md-12 text-20 font-weight-300">frais de scolarité</div>
-      <div class="col-md-12 mb-1"><hr class="my-1" style="background-color: #f89f20;"></div>
-
-      <div *ngIf="registration.created" class="col-md-12">
-        <div class="alert alert-success" role="alert">
-          <div class="text-17">inscription</div>
-          <hr class="my-1">
-          <div *ngIf="regNbChild == 1" class="text-15">vous avez un enfant pré-inscrit pour l'année prochaine </div>
-          <div *ngIf="regNbChild > 1" class="text-15">vous avez {{regNbChild}} enfants pré-inscrits pour l'année prochaine </div>
-          <div class="text-15">valider les inscriptions en cochant les enfants que vous voulez incrire</div>
-        </div>
-        <form [formGroup]="regForm" (ngSubmit)="validateReg()">
-          <div formArrayName="lines" *ngFor="let line of regForm.get('lines')['controls']; let i = index;">
-            <div [formGroupName]="i" class="border rounded-lg p-2 my-1">
-              <mdb-checkbox class="d-none d-md-block" formControlName="selected">
-                <div class="text-15">
-                  <span class="text-capitalize"><b>{{line.value.firstName}}</b></span>. classe de {{line.value.className}}.
-                  frais de scolarité : {{line.value.amountTTC}}
-                </div>
-              </mdb-checkbox>
-              <div class="d-md-none d-flex align-items-center">
-                <mdb-checkbox formControlName="selected"></mdb-checkbox>
-                <div class="text-15">
-                  <div class="text-capitalize"><b>{{line.value.firstName}}</b></div>
-                  <div>classe de {{line.value.className}}</div>
-                  <div>scolarité : {{line.value.amountTTC}}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button type="submit" [disabled]="regForm.hasError('formNOK')" mdbBtn
-            class="btnBlue" size="sm" mdbWavesEffect>valider les inscriptions</button>
-        </form>
-      </div>
-
-      <div *ngIf="registration.validated" class="col-md-12">
-        <div class="alert alert-success" role="alert">
-          <div class="text-17">inscription - <b>fin des inscriptions le {{registration.strDeadline}}</b></div>
-          <hr class="my-1">
-          <div *ngIf="regNbChild == 1" class="text-15">vous avez confirmé l'inscription d'un enfant.</div>
-          <div *ngIf="regNbChild > 1" class="text-15">vous avez confirmé l'inscription de {{regNbChild}} enfants.</div>
-          <div class="text-15">votre inscription est <u>valide jusqu'au {{registration.strValidity}}</u>. Payez l'acompte avant cette date pour garantir la place de vos enfants</div>
-        </div>
-        <div *ngFor="let line of registration.lines; let i = index;">
-          <div class="border rounded-lg p-2 my-1">
-            <div class="text-15 d-none d-md-block">
-              <span class="text-capitalize">
-                <b>{{line.childFirstName}}</b></span>. classe de 
-                  <span *ngIf="line.childClassName">{{line.childClassName}}.</span> 
-                  <span *ngIf="!line.childClassName">{{line.classLevelName}}.</span> 
-                  frais de scolarité : {{line.strAmountTTC}}
-              <div class="text-15 my-1">
-                <hr class="my-1" style="background-color: #f89f20;">
-                montant dû :
-                acompte({{feeDetails[i].pct}}%) : {{feeDetails[i].amnt | number:'':'fr-FR'}} F.
-                frais inscription : {{feeDetails[i].tuitionfee | number:'':'fr-FR'}} F.
-                <i><b>total : {{feeDetails[i].total | number:'':'fr-FR'}} F</b></i>.
-                </div>
-            </div>
-            <div class="d-md-none d-flex align-items-center">
-              <div class="text-15">
-                <div class="text-capitalize"><b>{{line.childFirstName}}</b></div>
-                <div>classe de {{line.childClassName}}</div>
-                <div>scolarité : {{line.strAmountTTC}}</div>
-                <hr class="my-1" style="background-color: #f89f20;">
-                <div class="text-15"><b>montant dû</b></div>
-                <div class="text-15">acpte({{feeDetails[i].pct}}%) : {{feeDetails[i].amnt | number:'':'fr-FR'}} F.</div>
-                <div class="text-15">frais inscr. : {{feeDetails[i].tuitionfee | number:'':'fr-FR'}} F.</div>
-                <div class="text-15"><i><b>total : {{feeDetails[i].total | number:'':'fr-FR'}} F</b></i>.</div>
-                </div>
-            </div>
-          </div>
-        </div>
-        <div class="text-18 my-1">montant total dû: <b>{{downPayment | number:'':'fr-FR'}} F</b>.</div>
-        <button type="button" [routerLink]="['/checkout',registration.id]" mdbBtn
-          class="btnBlue" size="sm" mdbWavesEffect>procéder au paiement</button>
-    </div>
-
-    </div>
+  <div *ngIf="adminLoggedIn()">
+    <app-admin-account [adminid]="userid"></app-admin-account>
   </div>
-</div>
 
-<div class="row mt-3">
-  <div class="col-md-12 text-20 font-weight-300">mes sms à recevoir</div>
-  <div class="col-md-12 mb-3"><hr class="my-1" style="background-color: #f89f20;"></div>
-  <div class="col-md-12">
-    <app-child-sms-card [children]="parent.children" (setSmsChoice)="setSmsChoice($event)"
-    (saveUserSMS)="saveUserSMS()"></app-child-sms-card>
-  </div>
 </div>

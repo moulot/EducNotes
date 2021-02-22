@@ -53,7 +53,7 @@ namespace EducNotes.API.Data
     Task<IEnumerable<City>> GetAllCities();
     Task<IEnumerable<District>> GetAllGetDistrictsByCityIdCities(int id);
 
-    void AddInscription(int levelId, int userId);
+    // void AddInscription(int levelId, int userId);
     void AddUserLink(int userId, int parentId);
 
     Task<User> GetUserByEmail(string email);

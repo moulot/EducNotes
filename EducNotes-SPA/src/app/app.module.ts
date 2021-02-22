@@ -192,7 +192,6 @@ import { ImportFichierComponent } from './admin/import-fichier/import-fichier.co
 import { CallSheetCardComponent } from './classes/callSheet-card/callSheet-card.component';
 import { SendSmsComponent } from './admin/sendSms/sendSms.component';
 import { UserAccountComponent } from './users/user-account/user-account.component';
-import { UserAccountResolver } from './_resolvers/user-account-resolver';
 import { SmsTemplateComponent } from './admin/sms-template/sms-template.component';
 import { AddSmsTemplateComponent } from './admin/add-smsTemplate/add-smsTemplate.component';
 import { SmsTemplateResolver } from './_resolvers/sms-template-resolver';
@@ -273,6 +272,12 @@ import { UserValidationComponent } from './admin/user-validation/user-validation
 import { UserValidationResolver } from './_resolvers/user-validation-resolver';
 import { ParentDashboardComponent } from './dashboard/parent-dashboard/parent-dashboard.component';
 import { LockoutComponent } from './views/sessions/lockout/lockout.component';
+import { ParentAccountComponent } from './users/parent-account/parent-account.component';
+import { TeacherAccountComponent } from './users/teacher-account/teacher-account.component';
+import { AdminAccountComponent } from './users/admin-account/admin-account.component';
+import { StudentAccountComponent } from './users/student-account/student-account.component';
+import { EditAccountComponent } from './users/edit-account/edit-account.component';
+import { EditAccountResolver } from './_resolvers/edit-account-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -454,7 +459,12 @@ export function tokenGetter() {
       ChildFileClassLifeComponent,
       UserValidationComponent,
       ParentDashboardComponent,
-      LockoutComponent
+      LockoutComponent,
+      ParentAccountComponent,
+      TeacherAccountComponent,
+      AdminAccountComponent,
+      StudentAccountComponent,
+      EditAccountComponent
    ],
    imports: [
       FormWizardModule,
@@ -546,7 +556,6 @@ export function tokenGetter() {
       PeriodicityFormResolver,
       PayableAtListResolver,
       PayableFormResolver,
-      UserAccountResolver,
       SmsTemplateResolver,
       EditSmsTemplateResolver,
       ClassGradesResolver,
@@ -569,6 +578,7 @@ export function tokenGetter() {
       AccountService,
       ParentFileResolver,
       UserValidationResolver,
+      EditAccountResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

@@ -21,13 +21,6 @@ namespace EducNotes.API.Dtos
         public string strDateOfBirth { get; set; }
         public int Age { get; set; }
         public string KnownAs { get; set; }
-        // public DateTime Created { get; set; }
-        // public DateTime LastActive { get; set; }
-        // public string Introduction { get; set; }
-        // public string LookingFor { get; set; }
-        // public string Interests { get; set; }
-        // public string City { get; set; }
-        // public string Country { get; set; }
         public string PhotoUrl { get; set; }
           public string PhoneNumber { get; set; }
           public Boolean PhoneNumberConfirmed { get; set; }
@@ -37,6 +30,12 @@ namespace EducNotes.API.Dtos
         public bool ValidatedCode { get; set; }
         public bool Validated { get; set; }
         public bool AccountDataValidated { get; set; }
+        public int DistrictId { get; set; }
+        public District District { get; set; }
+        public string DistrictName { get; set; }
+        public int CityId { get; set; }
+        public City City { get; set; }
+        public string CityName { get; set; }
         public double Avg { get; set; }
         public int NbAbsences { get; set; }
         public int NbLateArrivals { get; set; }

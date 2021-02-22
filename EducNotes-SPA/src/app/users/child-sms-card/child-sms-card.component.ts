@@ -7,6 +7,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 })
 export class ChildSmsCardComponent implements OnInit {
   @Input() children: any;
+  @Input() child: any;
   @Output() setSmsChoice = new EventEmitter<any>();
   @Output() saveUserSMS = new EventEmitter();
   smsChoiceChanged = false;

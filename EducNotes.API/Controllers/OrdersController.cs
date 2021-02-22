@@ -537,7 +537,6 @@ namespace EducNotes.API.Controllers
           var RegEmails = await _repo.SetEmailDataForRegistration(emails, template.Body, RegDeadLine);
           _context.AddRange(RegEmails);
 
-          // var linesDto = _mapper.Map<IEnumerable<OrderLineDto>>(order.Lines);
           if(await _repo.SaveAll())
           {
             identityContextTransaction.Commit();

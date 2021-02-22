@@ -27,6 +27,8 @@ export class UserValidationComponent implements OnInit {
   teacherpage = 1;
   teacherpageSize = 4;
   list = true;
+  nbTeachers = 0;
+  nbParents = 0;
 
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private alertify: AlertifyService,
     private userService: UserService) { }
@@ -40,17 +42,18 @@ export class UserValidationComponent implements OnInit {
         const type = this.userTypes[i];
         this.usersDivs[type.id].typeid = type.id;
         switch (type.id) {
-          case this.studentTypeId:
-            for (let j = 0; j < type.users.length; j++) {
-              this.usersDivs[type.id].editDiv[j] = false;
-              const user = type.users[j];
-              this.addChildItem(user.id, user.email, user.cell, user.lastName, user.firstName, user.className,
-                user.classLevelName, user.motherLastName, user.motherFirstName, user.motherEmail, user.motherCell,
-                user.fatherLastName, user.fatherFirstName, user.fatherEmail, user.fatherCell);
-            }
-            break;
+          // case this.studentTypeId:
+          //   for (let j = 0; j < type.users.length; j++) {
+          //     this.usersDivs[type.id].editDiv[j] = false;
+          //     const user = type.users[j];
+          //     this.addChildItem(user.id, user.email, user.cell, user.lastName, user.firstName, user.className,
+          //       user.classLevelName, user.motherLastName, user.motherFirstName, user.motherEmail, user.motherCell,
+          //       user.fatherLastName, user.fatherFirstName, user.fatherEmail, user.fatherCell);
+          //   }
+          //   break;
 
           case this.parentTypeId:
+            this.nbParents = type.users.length;
             for (let j = 0; j < type.users.length; j++) {
               this.usersDivs[type.id].editDiv[j] = false;
               const user = type.users[j];
@@ -59,6 +62,7 @@ export class UserValidationComponent implements OnInit {
             break;
 
           case this.teacherTypeId:
+            this.nbTeachers = type.users.length;
             for (let j = 0; j < type.users.length; j++) {
               this.usersDivs[type.id].editDiv[j] = false;
               const user = type.users[j];
@@ -83,33 +87,33 @@ export class UserValidationComponent implements OnInit {
     });
   }
 
-  addChildItem(id, email, cell, lname, fname, className, levelName, mLastN, mFirstN, mEmail, mCell,
-    fLastN, fFirstN, fEmail, fCell): void {
-    const children = this.usersForm.get('students') as FormArray;
-    children.push(this.createChildItem(id, email, cell, lname, fname, className, levelName, mLastN, mFirstN, mEmail, mCell,
-      fLastN, fFirstN, fEmail, fCell));
-  }
+  // addChildItem(id, email, cell, lname, fname, className, levelName, mLastN, mFirstN, mEmail, mCell,
+  //   fLastN, fFirstN, fEmail, fCell): void {
+  //   const children = this.usersForm.get('students') as FormArray;
+  //   children.push(this.createChildItem(id, email, cell, lname, fname, className, levelName, mLastN, mFirstN, mEmail, mCell,
+  //     fLastN, fFirstN, fEmail, fCell));
+  // }
 
-  createChildItem(id, email, cell, lname, fname, className, levelName, mLastN, mFirstN, mEmail, mCell,
-    fLastN, fFirstN, fEmail, fCell): FormGroup {
-    return this.fb.group({
-      id: id,
-      lname: lname,
-      fname: fname,
-      className: className,
-      levelName: levelName,
-      email: [email, Validators.pattern(this.validEmailRegex)],
-      cell: cell,
-      mLastN: mLastN,
-      mFirstN: mFirstN,
-      mEmail: mEmail,
-      mCell: mCell,
-      fLastN: fLastN,
-      fFirstN: fFirstN,
-      fEmail: fEmail,
-      fCell: fCell
-    });
-  }
+  // createChildItem(id, email, cell, lname, fname, className, levelName, mLastN, mFirstN, mEmail, mCell,
+  //   fLastN, fFirstN, fEmail, fCell): FormGroup {
+  //   return this.fb.group({
+  //     id: id,
+  //     lname: lname,
+  //     fname: fname,
+  //     className: className,
+  //     levelName: levelName,
+  //     email: [email, Validators.pattern(this.validEmailRegex)],
+  //     cell: cell,
+  //     mLastN: mLastN,
+  //     mFirstN: mFirstN,
+  //     mEmail: mEmail,
+  //     mCell: mCell,
+  //     fLastN: fLastN,
+  //     fFirstN: fFirstN,
+  //     fEmail: fEmail,
+  //     fCell: fCell
+  //   });
+  // }
 
   addParentItem(id, email, cell, lname, fname, children): void {
     const parents = this.usersForm.get('parents') as FormArray;
@@ -161,11 +165,7 @@ export class UserValidationComponent implements OnInit {
     });
   }
 
-  sendConfirmEmail() {
-
-  }
-
-  sendUserConfirmEmail(typeid, id) {
+  sendUserConfirmEmail(typeid, id, email) {
     const userData = [{ userTypeId: typeid, userIds: [id]}];
     this.userService.resendConfirmEmail(userData).subscribe(() => {
       this.alertify.success('les emails ont bien été envoyés.');

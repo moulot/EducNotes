@@ -6,158 +6,164 @@
   <div class="text-19">dossier parent {{parentFile.idNum}}</div>
 </div>
 <div class="d-none d-md-block">
-  <div class="border rounded-lg p-2 mb-2">
-    <div *ngIf="showInfos[0]" class="row animated zoomIn">
-      <div class="col-md-12">
-        <a class="d-flex" (click)="toggleInfos(0)">
-          <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
-            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16"><b>infos du compte</b></div>
-        </a>
-      </div>
-      <div class="col-md-12"><hr class="my-1"></div>
-      <div class="col-md-12 d-flex">
-        <div class="">
-          <img src="{{parentFile.photoUrl || '../../assets/user.png'}}" alt="" width="60" class="rounded-circle img-responsive">
+  <div class="card mb-2">
+    <div class="card-body p-2">
+      <div *ngIf="showInfos[0]" class="row animated zoomIn">
+        <div class="col-md-12">
+          <a class="d-flex" (click)="toggleInfos(0)">
+            <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+            <div class="text-16"><b>infos du compte</b></div>
+          </a>
         </div>
-        <div class="ml-2 my-auto">
-          <div class="text-20 text-capitalize font-weight-500">{{parentFile.lastName}} {{parentFile.firstName}}</div>
-          <div class="text-16">{{parentFile.phoneNumber}} / {{parentFile.email}}</div>
+        <div class="col-md-12"><hr class="my-1"></div>
+        <div class="col-md-12 d-flex">
+          <div class="">
+            <img src="{{parentFile.photoUrl || '../../assets/user.png'}}" alt="" width="60" class="rounded-circle img-responsive">
+          </div>
+          <div class="ml-2 my-auto">
+            <div class="text-20 text-capitalize font-weight-500">{{parentFile.lastName}} {{parentFile.firstName}}</div>
+            <div class="text-16">{{parentFile.phoneNumber}} / {{parentFile.email}}</div>
+          </div>
         </div>
-      </div>
-      <div class="col-md-12"><hr class="my-1"></div>
-      <div class="col-md-12 text-14 mb-1"><b>enfants</b></div>
-      <div class="col-md-4 mb-1" *ngFor="let child of parentFile.children">
-        <div class="border rounded-lg p-1">
-          <div class="row">
-            <div class="col-md-12 d-flex">
-              <div class="d-none d-md-block">
-                <img src="{{child.child.photoUrl || '../../../../../assets/user.png'}}" alt="" width="45" class="rounded-circle img-responsive">
-              </div>
-              <div class="ml-2 my-auto d-none d-md-block">
-                <a [routerLink]="['/childFile', child.child.id]"><u class="text-small text-danger">voir le dossier</u></a> 
-                <div class="text-15 font-weight-500">
-                  <span class="text-capitalize">{{child.child.lastName}} {{child.child.firstName}}</span> ({{child.child.age}} ans).
-                  <span class="ml-1"><b>{{child.child.className || child.child.classLevelName}}</b></span>
+        <div class="col-md-12"><hr class="my-1"></div>
+        <div class="col-md-12 text-14 mb-1"><b>enfants</b></div>
+        <div class="col-md-4 mb-1" *ngFor="let child of parentFile.children">
+          <div class="border rounded-lg p-1">
+            <div class="row">
+              <div class="col-md-12 d-flex">
+                <div class="d-none d-md-block">
+                  <img src="{{child.child.photoUrl || '../../../../../assets/user.png'}}" alt="" width="45" class="rounded-circle img-responsive">
+                </div>
+                <div class="ml-2 my-auto d-none d-md-block">
+                  <a [routerLink]="['/childFile', child.child.id]"><u class="text-small text-danger">voir le dossier</u></a> 
+                  <div class="text-15 font-weight-500">
+                    <span class="text-capitalize">{{child.child.lastName}} {{child.child.firstName}}</span> ({{child.child.age}} ans).
+                    <span class="ml-1"><b>{{child.child.className || child.child.classLevelName}}</b></span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div *ngIf="!showInfos[0]" class="row animated fadeIn">
-      <div class="col-md-12 d-flex">
-        <a class="d-flex" (click)="toggleInfos(0)">
-          <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
-            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16">
-            <b>voir détails du dossier <span>{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
-          </div>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div class="border rounded-lg p-2 mb-2">
-    <div *ngIf="showInfos[1]">
-      <a class="d-flex" (click)="toggleInfos(1)">
-        <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
-          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-        <div class="text-16"><b>frais de scolarité</b></div>
-      </a>
-      <hr class="my-1">
-      <div *ngFor="let child of parentFile.children">
-        <div class="border rounded-lg p-2 mb-3" style="background-color: #fafafa;">
-          <app-parent-file-tuition [childid]="child.child.id" [childFName]="child.child.firstName" [id]="child.child.id"></app-parent-file-tuition>
+      <div *ngIf="!showInfos[0]" class="row animated fadeIn">
+        <div class="col-md-12 d-flex">
+          <a class="d-flex" (click)="toggleInfos(0)">
+            <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+            <div class="text-16">
+              <b>voir détails du dossier <span>{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
+            </div>
+          </a>
         </div>
       </div>
     </div>
-    <div *ngIf="!showInfos[1]" class="row animated fadeIn">
-      <div class="col-md-12 d-flex">
+  </div>
+  <div class="card mb-2">
+    <div class="card-body p-2">
+      <div *ngIf="showInfos[1]">
         <a class="d-flex" (click)="toggleInfos(1)">
-          <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+          <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
           <div class="text-16"><b>frais de scolarité</b></div>
         </a>
-      </div>
-    </div>
-  </div>
-  <div class="border rounded-lg p-2 mb-2">
-    <div *ngIf="showInfos[2]" class="row">
-      <div class="col-md-12">
-        <a class="d-flex" (click)="toggleInfos(2)">
-          <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
-            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16">
-            <b>communications avec <span class="text-capitalize">{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-12"><hr class="my-1"></div>
-      <div class="col-md-12 text-14 text-danger">clicker sur la ligne pour avoir le détails de la communicaiton</div>
-      <div class="col-md-12 text-14 mb-1">
-        <div class="border rounded-lg p-1">
-          <div class="row font-weight-bold">
-            <div class="col-md-1 text-14">date</div>
-            <div class="col-md-1 text-14">type</div>
-            <div class="col-md-2 text-14">destinataire</div>
-            <div class="col-md-3 text-14">objet</div>
-            <div class="col-md-3 text-14">contenu</div>
-            <div class="col-md-2 text-14">envoyé par</div>
+        <hr class="my-1">
+        <div *ngFor="let child of parentFile.children">
+          <div class="border rounded-lg p-2 mb-3" style="background-color: #fafafa;">
+            <app-parent-file-tuition [childid]="child.child.id" [childFName]="child.child.firstName"></app-parent-file-tuition>
           </div>
         </div>
       </div>
-      <div class="col-md-12 mb-1" *ngFor="let item of parentFile.smsAndEmails; let i = index">
-        <a (click)="frame.show()">
+      <div *ngIf="!showInfos[1]" class="row animated fadeIn">
+        <div class="col-md-12 d-flex">
+          <a class="d-flex" (click)="toggleInfos(1)">
+            <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+            <div class="text-16"><b>frais de scolarité</b></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card mb-2">
+    <div class="card-body p-2">
+      <div *ngIf="showInfos[2]" class="row">
+        <div class="col-md-12">
+          <a class="d-flex" (click)="toggleInfos(2)">
+            <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+            <div class="text-16">
+              <b>communications avec <span class="text-capitalize">{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-12"><hr class="my-1"></div>
+        <div class="col-md-12 text-14 text-danger">clicker sur la ligne pour avoir le détails de la communicaiton</div>
+        <div class="col-md-12 text-14 mb-1">
           <div class="border rounded-lg p-1">
-            <div class="row">
-              <div class="col-md-1 text-14">{{item.dateSent}}</div>
-              <div class="col-md-1 text-14">{{item.commType}}</div>
-              <div class="col-md-2 text-14 o-hidden">{{item.toAddress || item.to}}</div>
-              <div class="col-md-3 text-14 o-hidden">{{item.subject || 'N/A'}}</div>
-              <div *ngIf="item.content" class="col-md-3 text-14 o-hidden">{{item.content}}</div>
-              <div *ngIf="item.body" class="col-md-3 text-13 text-primary o-hidden"><a (click)="frame.show()">voir le email</a></div>
-              <div class="col-md-2 text-14 o-hidden">{{item.sentBy}}</div>
+            <div class="row font-weight-bold">
+              <div class="col-md-1 text-14">date</div>
+              <div class="col-md-1 text-14">type</div>
+              <div class="col-md-2 text-14">destinataire</div>
+              <div class="col-md-3 text-14">objet</div>
+              <div class="col-md-3 text-14">contenu</div>
+              <div class="col-md-2 text-14">envoyé par</div>
             </div>
           </div>
-        </a>
-        <div mdbModal #frame="mdbModal" style="overflow: auto;" class="modal fade left" id="frameModalTop" tabindex="-1" role="dialog"
-          aria-labelledby="myModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header text-center">
-                <div class="text-15 w-100"><b>{{item.commType}} du {{item.dateSent}}</b></div>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="frame.hide()">
-                  <span aria-hidden="true">&times;</span>
-                </button>
+        </div>
+        <div class="col-md-12 mb-1" *ngFor="let item of parentFile.smsAndEmails; let i = index">
+          <a (click)="frame.show()">
+            <div class="border rounded-lg p-1">
+              <div class="row">
+                <div class="col-md-1 text-14">{{item.dateSent}}</div>
+                <div class="col-md-1 text-14">{{item.commType}}</div>
+                <div class="col-md-2 text-14 o-hidden">{{item.toAddress || item.to}}</div>
+                <div class="col-md-3 text-14 o-hidden">{{item.subject || 'N/A'}}</div>
+                <div *ngIf="item.content" class="col-md-3 text-14 o-hidden">{{item.content}}</div>
+                <div *ngIf="item.body" class="col-md-3 text-13 text-primary o-hidden"><a (click)="frame.show()">voir le email</a></div>
+                <div class="col-md-2 text-14 o-hidden">{{item.sentBy}}</div>
               </div>
-              <div class="modal-body mx-3">
-                <div class="row">
-                  <div class="col-md-3 text-15 text-right">date</div>
-                  <div class="col-md-9 text-primary">{{item.dateSent}} {{item.hourMinSent}}</div>
-                  <div class="col-md-3 text-15 text-right">destinataire</div>
-                  <div class="col-md-9 text-primary">{{item.recipient}} / {{item.toAddress || item.to}}</div>
-                  <div *ngIf="item.subject" class="col-md-3 text-15 text-right">objet</div>
-                  <div class="col-md-9 text-primary">{{item.subject}}</div>
-                  <div class="col-md-12"><hr class="my-1"></div>
-                  <div class="col-md-12" *ngIf="item.body" [innerHTML]="item.body"></div>
-                  <div class="col-md-12 text-15 text-primary" *ngIf="item.content">{{item.content}}</div>
+            </div>
+          </a>
+          <div mdbModal #frame="mdbModal" style="overflow: auto;" class="modal fade left" id="frameModalTop" tabindex="-1" role="dialog"
+            aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header text-center">
+                  <div class="text-15 w-100"><b>{{item.commType}} du {{item.dateSent}}</b></div>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="frame.hide()">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body mx-3">
+                  <div class="row">
+                    <div class="col-md-3 text-15 text-right">date</div>
+                    <div class="col-md-9 text-primary">{{item.dateSent}} {{item.hourMinSent}}</div>
+                    <div class="col-md-3 text-15 text-right">destinataire</div>
+                    <div class="col-md-9 text-primary">{{item.recipient}} / {{item.toAddress || item.to}}</div>
+                    <div *ngIf="item.subject" class="col-md-3 text-15 text-right">objet</div>
+                    <div class="col-md-9 text-primary">{{item.subject}}</div>
+                    <div class="col-md-12"><hr class="my-1"></div>
+                    <div class="col-md-12" *ngIf="item.body" [innerHTML]="item.body"></div>
+                    <div class="col-md-12 text-15 text-primary" *ngIf="item.content">{{item.content}}</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div *ngIf="!showInfos[2]" class="row animated fadeIn">
-      <div class="col-md-12 d-flex">
-        <a class="d-flex" (click)="toggleInfos(2)">
-          <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
-            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-          <div class="text-16">
-            <b>communications avec <span class="text-capitalize">{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
-          </div>
-        </a>
+      <div *ngIf="!showInfos[2]" class="row animated fadeIn">
+        <div class="col-md-12 d-flex">
+          <a class="d-flex" (click)="toggleInfos(2)">
+            <i class="text-16 fad fa-plus-square mr-1 my-1 mb-0" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+            <div class="text-16">
+              <b>communications avec <span class="text-capitalize">{{parentFile.lastName}} {{parentFile.firstName}}</span></b>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
   </div>

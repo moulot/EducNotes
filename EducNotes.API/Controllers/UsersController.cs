@@ -36,7 +36,7 @@ namespace EducNotes.API.Controllers
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private Cloudinary _cloudinary;
         private readonly UserManager<User> _userManager;
-        int tuitionId, nextYearTuitionId, newRegToBePaidEmailId;
+        int tuitionId, nextYearTuitionId, newRegToBePaidEmailId, teacherConfirmEmailId;
         int absenceTypeId, lateTypeId, educLevelPrimary, educLevelSecondary;
 
 
@@ -60,6 +60,7 @@ namespace EducNotes.API.Controllers
             professorRoleName = _config.GetValue<String>("AppSettings:professorRoleName");
             tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
             newRegToBePaidEmailId = _config.GetValue<int>("AppSettings:newRegToBePaidEmailId");
+            teacherConfirmEmailId = _config.GetValue<int>("AppSettings:teacherConfirmEmailId");
             nextYearTuitionId = _config.GetValue<int>("AppSettings:nextYearTuitionId");
             absenceTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
             lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
@@ -136,19 +137,19 @@ namespace EducNotes.API.Controllers
         [HttpGet("usersWithRoles")]
         public async Task<IActionResult> GetUsersWithRoles()
         {
-            var userList = await (from user in _context.Users orderby user.UserName
-                                    select new
-                                    {
-                                        Id = user.Id,
-                                        UserName = user.UserName,
-                                        Roles = (from userRole in user.UserRoles
-                                                    join role in _context.Roles
-                                                    on userRole.RoleId
-                                                    equals role.Id
-                                                    select role.Name).ToList()
-                                    }).ToListAsync();
+          var userList = await (from user in _context.Users orderby user.UserName
+                                  select new
+                                  {
+                                    Id = user.Id,
+                                    UserName = user.UserName,
+                                    Roles = (from userRole in user.UserRoles
+                                                join role in _context.Roles
+                                                on userRole.RoleId
+                                                equals role.Id
+                                                select role.Name).ToList()
+                                  }).ToListAsync();
 
-            return Ok(userList);
+          return Ok(userList);
         }
 
         [HttpGet("{id}", Name = "GetUser")]
@@ -226,16 +227,16 @@ namespace EducNotes.API.Controllers
             commForList.EmailType = email.EmailType.Name;
             commForList.Recipient = email.ToUser.LastName + " " + email.ToUser.FirstName;
             commForList.ToAddress = email.ToAddress;
-            commForList.Subject = email.Subject;//.Substring(0, 30);
-            commForList.Body = email.Body;//.Substring(0, 50);
+            commForList.Subject = email.Subject;
+            commForList.Body = email.Body;
             userFile.SmsAndEmails.Add(commForList);
           }
 
           var smses= await _context.Sms
-                                  .Include(i => i.SmsType)
-                                  .Include(i => i.InsertUser)
-                                  .Where(u => u.ToUserId == parentId)
-                                  .ToListAsync();
+                            .Include(i => i.SmsType)
+                            .Include(i => i.InsertUser)
+                            .Where(u => u.ToUserId == parentId)
+                            .ToListAsync();
           foreach (var sms in smses)
           {
             CommForListDto commForList = new CommForListDto();
@@ -576,31 +577,31 @@ namespace EducNotes.API.Controllers
           });
         }
 
-        [HttpPut("{id}/saveSMS")]
-        public async Task<IActionResult> SaveUserSMS(int id, [FromBody] List<SmsDataDto> smsData)
+        [HttpPut("{parentId}/saveSMS")]
+        public async Task<IActionResult> SaveUserSMS(int parentId, [FromBody] List<SmsDataDto> smsData)
         {
-            List<UserSmsTemplate> newUserSMS = new List<UserSmsTemplate>();
-            foreach (var sms in smsData)
-            {
-                int childId = sms.ChildId;
-                int smsId = sms.SmsId;
+          List<UserSmsTemplate> newUserSMS = new List<UserSmsTemplate>();
+          foreach (var sms in smsData)
+          {
+            int childId = sms.ChildId;
+            int smsId = sms.SmsId;
 
-                List<UserSmsTemplate> oldUserSMS = await _context.UserSmsTemplates.Where(s => s.ChildId == childId).ToListAsync();
-                if(oldUserSMS.Count() > 0)
-                    _repo.DeleteAll(oldUserSMS);
+            List<UserSmsTemplate> oldUserSMS = await _context.UserSmsTemplates.Where(s => s.ChildId == childId).ToListAsync();
+            if(oldUserSMS.Count() > 0)
+              _repo.DeleteAll(oldUserSMS);
 
-                UserSmsTemplate ust = new UserSmsTemplate();
-                ust.ChildId = childId;
-                ust.SmsTemplateId = smsId;
-                ust.ParentId = id;
-                newUserSMS.Add(ust);
-            }
-            _context.AddRange(newUserSMS);
+            UserSmsTemplate ust = new UserSmsTemplate();
+            ust.ChildId = childId;
+            ust.SmsTemplateId = smsId;
+            ust.ParentId = parentId;
+            newUserSMS.Add(ust);
+          }
+          _context.AddRange(newUserSMS);
 
-            if (await _repo.SaveAll())
-                return Ok();
+          if (await _repo.SaveAll())
+            return Ok();
 
-            throw new Exception($"la validation des sms a échoué");
+          throw new Exception($"la validation des sms a échoué");
         }
 
         [HttpGet("Types")]
@@ -2199,11 +2200,12 @@ namespace EducNotes.API.Controllers
         [HttpGet("UsersToValidate")]
         public async Task<IActionResult> GetUsersToValidate()
         {
+          // users to validate exclude chidren/students as they are coped by parent on their account
           var usersFromDB = await _context.Users
                                     .Include(i => i.UserType)
                                     .Include(i => i.Class)
                                     .Include(i => i.ClassLevel)
-                                    .Where(u => u.AccountDataValidated == false)
+                                    .Where(u => u.AccountDataValidated == false && u.UserTypeId != studentTypeId)
                                     .ToListAsync();
           var activeTuitions = await _context.Orders
                                       .Include(i => i.Father).ThenInclude(i => i.UserType)
@@ -2211,7 +2213,7 @@ namespace EducNotes.API.Controllers
                                       .Where(t => t.isReg == true && t.Expired == false || t.Cancelled == false)
                                       .ToListAsync();
 
-          var userTypes = await _context.UserTypes.OrderBy(o => o.Name).ToListAsync();
+          var userTypes = await _context.UserTypes.Where(u => u.Id != studentTypeId).OrderBy(o => o.Name).ToListAsync();
           List<UserTypeToValidateDto> types = new List<UserTypeToValidateDto>();
           foreach (var type in userTypes)
           {
@@ -2315,6 +2317,7 @@ namespace EducNotes.API.Controllers
           foreach (var data in usersData)
           {
             var userType = data.UserTypeId;
+
             if(userType == parentTypeId)
             {
               foreach (var userid in data.UserIds)
@@ -2368,6 +2371,30 @@ namespace EducNotes.API.Controllers
               var template = await _context.EmailTemplates.FirstAsync(t => t.Id == newRegToBePaidEmailId);
               var RegEmails = await _repo.SetEmailDataForRegistration(emails, template.Body, RegDeadLine);
               _context.AddRange(RegEmails);
+            }
+
+            if(userType == teacherTypeId)
+            {
+              // send the mail to update userName/pwd - add to Email table
+              foreach (var userid in data.UserIds)
+              {
+                var appUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userid);
+                var teacherCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+
+                ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {
+                  Id = appUser.Id,
+                  LastName = appUser.LastName,
+                  FirstName = appUser.FirstName,
+                  Cell = appUser.PhoneNumber,
+                  Gender = appUser.Gender,
+                  Email = appUser.Email,
+                  Token = teacherCode
+                };
+
+                var template = await _context.EmailTemplates.FirstAsync(t => t.Id == teacherConfirmEmailId);
+                Email emailToSend = await _repo.SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
+                _repo.Add(emailToSend);
+              }
             }
           }
 
