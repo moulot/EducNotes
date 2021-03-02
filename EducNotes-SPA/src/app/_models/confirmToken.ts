@@ -3,4 +3,7 @@ export interface ConfirmToken {
   userName: string;
   token: string;
   password: string;
+  oldPassword: string;
+  phoneNumber: string;
+  email: string;
 }

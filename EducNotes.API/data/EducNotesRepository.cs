@@ -35,7 +35,8 @@ namespace EducNotes.API.Data
         private Cloudinary _cloudinary;
         string password, baseUrl;
         int teacherTypeId, parentTypeId, studentTypeId, adminTypeId, teacherConfirmEmailId, resetPwdEmailId;
-        int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId, schoolInscTypeId;
+        int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId,
+        schoolInscTypeId, updateAccountEmailId;
         CultureInfo frC = new CultureInfo("fr-FR");
 
         public EducNotesRepository(DataContext context, IConfiguration config, IEmailSender emailSender,
@@ -61,6 +62,8 @@ namespace EducNotes.API.Data
             teacherConfirmEmailId = _config.GetValue<int>("AppSettings:teacherConfirmEmailId");
             baseUrl = _config.GetValue<String>("AppSettings:DefaultLink");
             resetPwdEmailId = _config.GetValue<int>("AppSettings:resetPwdEmailId");
+            updateAccountEmailId = _config.GetValue<int>("AppSettings:updateAccountEmailId");
+
 
             _cloudinaryConfig = cloudinaryConfig;
             Account acc = new Account(
@@ -312,10 +315,10 @@ namespace EducNotes.API.Data
             return await _context.Agendas.FirstOrDefaultAsync(a => a.Id == agendaId);
         }
 
-        public async Task<User> GetUserByCode(string code)
-        {
-          return await _context.Users.FirstOrDefaultAsync(u => u.ValidationCode == code);
-        }
+        // public async Task<User> GetUserByCode(string code)
+        // {
+        //   return await _context.Users.FirstOrDefaultAsync(u => u.ValidationCode == code);
+        // }
 
         public async Task<List<User>> GetUsersByClasslevel(int levelId)
         {
@@ -668,80 +671,80 @@ namespace EducNotes.API.Data
         }
 
 
-        public async Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId)
-        {
-            var userToCreate = _mapper.Map<User>(userForRegister);
-            var code = Guid.NewGuid();
-            userToCreate.UserName = code.ToString();
-            userToCreate.ValidationCode = code.ToString();
-            userToCreate.Validated = false;
-            userToCreate.EmailConfirmed = false;
-            userToCreate.UserName = code.ToString();
-            bool resultStatus = false;
+        // public async Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId)
+        // {
+        //     var userToCreate = _mapper.Map<User>(userForRegister);
+        //     var code = Guid.NewGuid();
+        //     userToCreate.UserName = code.ToString();
+        //     userToCreate.ValidationCode = code.ToString();
+        //     userToCreate.Validated = false;
+        //     userToCreate.EmailConfirmed = false;
+        //     userToCreate.UserName = code.ToString();
+        //     bool resultStatus = false;
 
-            using (var identityContextTransaction = _context.Database.BeginTransaction())
-            {
-                try
-                {
-                    if (userToCreate.UserTypeId == teacherTypeId)
-                    {
-                        //enregistrement du teacher
-                        var result = await _userManager.CreateAsync(userToCreate, password);
-                        if (result.Succeeded)
-                        {
-                            // enregistrement du RoleTeacher
-                            var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
-                            var appUser = await _userManager.Users
-                                .FirstOrDefaultAsync(u => u.NormalizedUserName == userToCreate.UserName);
-                            _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+        //     using (var identityContextTransaction = _context.Database.BeginTransaction())
+        //     {
+        //         try
+        //         {
+        //             if (userToCreate.UserTypeId == teacherTypeId)
+        //             {
+        //                 //enregistrement du teacher
+        //                 var result = await _userManager.CreateAsync(userToCreate, password);
+        //                 if (result.Succeeded)
+        //                 {
+        //                     // enregistrement du RoleTeacher
+        //                     var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
+        //                     var appUser = await _userManager.Users
+        //                         .FirstOrDefaultAsync(u => u.NormalizedUserName == userToCreate.UserName);
+        //                     _userManager.AddToRoleAsync(appUser, role.Name).Wait();
 
-                            //enregistrement de des cours du professeur
-                            if (userForRegister.CourseIds != null)
-                            {
-                                foreach (var course in userForRegister.CourseIds)
-                                {
-                                    Add(new TeacherCourse { CourseId = course, TeacherId = userToCreate.Id });
-                                }
-                            }
+        //                     //enregistrement de des cours du professeur
+        //                     if (userForRegister.CourseIds != null)
+        //                     {
+        //                         foreach (var course in userForRegister.CourseIds)
+        //                         {
+        //                             Add(new TeacherCourse { CourseId = course, TeacherId = userToCreate.Id });
+        //                         }
+        //                     }
 
-                            // Enregistrement dans la table Email
-                            if (userToCreate.Email != null)
-                            {
-                                var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToCreate.ValidationCode;
+        //                     // Enregistrement dans la table Email
+        //                     if (userToCreate.Email != null)
+        //                     {
+        //                         var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToCreate.ValidationCode;
 
-                                var emailToSend = new Email
-                                {
-                                    InsertUserId = insertUserId,
-                                    UpdateUserId = userToCreate.Id,
-                                    StatusFlag = 0,
-                                    Subject = "Confirmation de compte",
-                                    ToAddress = userToCreate.Email,
-                                    Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                                    FromAddress = "no-reply@educnotes.com",
-                                    EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
-                                };
-                                Add(emailToSend);
-                            }
-                            if (await SaveAll())
-                            {
-                                // fin de la transaction
-                                identityContextTransaction.Commit();
-                                resultStatus = true;
-                            }
-                            else
-                                resultStatus = true;
-                        }
-                        else
-                            resultStatus = false;
-                    }
-                }
-                catch (System.Exception)
-                {
-                    return resultStatus = false;
-                }
-            }
-            return resultStatus;
-        }
+        //                         var emailToSend = new Email
+        //                         {
+        //                             InsertUserId = insertUserId,
+        //                             UpdateUserId = userToCreate.Id,
+        //                             StatusFlag = 0,
+        //                             Subject = "Confirmation de compte",
+        //                             ToAddress = userToCreate.Email,
+        //                             Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+        //                             FromAddress = "no-reply@educnotes.com",
+        //                             EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
+        //                         };
+        //                         Add(emailToSend);
+        //                     }
+        //                     if (await SaveAll())
+        //                     {
+        //                         // fin de la transaction
+        //                         identityContextTransaction.Commit();
+        //                         resultStatus = true;
+        //                     }
+        //                     else
+        //                         resultStatus = true;
+        //                 }
+        //                 else
+        //                     resultStatus = false;
+        //             }
+        //         }
+        //         catch (System.Exception)
+        //         {
+        //             return resultStatus = false;
+        //         }
+        //     }
+        //     return resultStatus;
+        // }
 
         public async Task<bool> UpdateChildren(ChildrenForEditDto users)
         {
@@ -847,7 +850,140 @@ namespace EducNotes.API.Data
           return resultStatus;
         }
 
-        public async Task<bool> AddTeacher(TeacherForEditDto user, int insertUserId)
+        public async Task<bool> EditUserAccount(UserAccountForEditDto user)
+        {
+          var oldEmail = user.OldEmail;
+          var OldPhoneNumber = user.OldPhoneNumber;
+
+          bool resultStatus = false;
+          using (var identityContextTransaction = _context.Database.BeginTransaction())
+          {
+            try
+            {
+              // User appUser = new User();
+              User appUser = await _context.Users.Include(i => i.Photos).FirstOrDefaultAsync(u => u.Id == user.Id);
+              appUser.LastName = user.LastName;
+              appUser.FirstName = user.FirstName;
+              appUser.Gender = user.Gender;
+              var dateArray = user.strDateOfBirth.Split("/");
+              int year = Convert.ToInt32(dateArray[2]);
+              int month = Convert.ToInt32(dateArray[1]);
+              int day = Convert.ToInt32(dateArray[0]);
+              DateTime birthDay = new DateTime(year, month, day);
+              appUser.DateOfBirth = birthDay;
+              appUser.SecondPhoneNumber = user.SecondPhoneNumber;
+              
+              //did we changed the email?
+              if(appUser.Email.ToLower() != user.Email.ToLower())
+              {
+                appUser.ToBeValidatedEmail = user.Email;
+              }
+
+              //did we changed the login/pwd?
+              if(user.PwdChanged)
+              {
+                var newPassword = _userManager.PasswordHasher.HashPassword(appUser, user.Password);
+                appUser.UserName = user.UserName.ToLower();
+                appUser.NormalizedUserName = user.UserName.ToUpper();
+                appUser.PasswordHash = newPassword;
+                var res = await _userManager.UpdateAsync(appUser);
+                if (res.Succeeded)
+                {
+                  var template = await _context.EmailTemplates.FirstAsync(t => t.Id == updateAccountEmailId);
+                  var email = await SetEmailForAccountUpdated(template.Subject, template.Body,
+                    user.LastName, user.Gender, user.Email, user.Id);
+                  _context.Add(email);
+
+                  if (await SaveAll())
+                    return true;
+                }
+
+                return false;
+              }
+
+              var userCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+              // send the mail to update userName/pwd - add to Email table
+              if (appUser.Email != null)
+              {
+                ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {
+                  Id = appUser.Id,
+                  LastName = appUser.LastName,
+                  FirstName = appUser.FirstName,
+                  Cell = appUser.PhoneNumber,
+                  Gender = appUser.Gender,
+                  Email = appUser.Email,
+                  Token = userCode
+                };
+
+                var template = await _context.EmailTemplates.FirstAsync(t => t.Id == teacherConfirmEmailId);
+                Email emailToSend = await SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
+                Add(emailToSend);
+              }
+
+              //add user photo
+              var photoFile = user.PhotoFile;
+              if (photoFile != null)
+              {
+                if (photoFile.Length > 0)
+                {
+                  var uploadResult = new ImageUploadResult();
+                  using (var stream = photoFile.OpenReadStream())
+                  {
+                    var uploadParams = new ImageUploadParams()
+                    {
+                      File = new FileDescription(photoFile.Name, stream),
+                      Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+                    };
+                    var subdomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower() == "subdomain")).Value;
+                    if(subdomain != "")
+                      uploadParams.Folder = subdomain + "/";
+                    else
+                      uploadParams.Folder = "localDemo/";
+
+                    uploadResult = _cloudinary.Upload(uploadParams);
+                    if (uploadResult.StatusCode == HttpStatusCode.OK)
+                    {
+                      Photo photo = new Photo();
+                      photo.Url = uploadResult.SecureUri.ToString();
+                      photo.PublicId = uploadResult.PublicId;
+                      photo.UserId = appUser.Id;
+                      photo.DateAdded = DateTime.Now;
+                      if (appUser.Photos.Any(u => u.IsMain))
+                      {
+                        var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                        oldPhoto.IsMain = false;
+                        Update(oldPhoto);
+                      }
+                      photo.IsMain = true;
+                      photo.IsApproved = true;
+                      Add(photo);
+                    }
+                  }
+                }
+              }
+              else
+              {
+                resultStatus = true;
+              }
+
+              if (await SaveAll())
+              {
+                // fin de la transaction
+                identityContextTransaction.Commit();
+                resultStatus = true;
+              }
+              else
+                resultStatus = false;
+            }
+            catch
+            {
+              identityContextTransaction.Rollback();
+              return resultStatus = false;
+            }
+          }
+          return resultStatus;
+        }
+        public async Task<bool> AddTeacher(TeacherForEditDto user)
         {
           bool resultStatus = false;
           using (var identityContextTransaction = _context.Database.BeginTransaction())
@@ -1000,7 +1136,6 @@ namespace EducNotes.API.Data
               }
               else
                 resultStatus = false;
-
             }
             catch
             {
@@ -1201,53 +1336,53 @@ namespace EducNotes.API.Data
             return await _context.ClassTypes.OrderBy(a => a.Name).ToListAsync();
         }
 
-        public async Task<int> AddSelfRegister(User user, string roleName, bool sendLink, int currentUserId)
-        {
-          var userIdToReturn = 0;
-          user.Created = DateTime.Now;
-          using (var identityContextTransaction = _context.Database.BeginTransaction())
-          {
-            try
-            {
-              var result = await _userManager.CreateAsync(user, password);
-              if (result.Succeeded)
-              {
-                  var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedUserName == user.UserName);
-                  userIdToReturn = appUser.Id;
+        // public async Task<int> AddSelfRegister(User user, string roleName, bool sendLink, int currentUserId)
+        // {
+        //   var userIdToReturn = 0;
+        //   user.Created = DateTime.Now;
+        //   using (var identityContextTransaction = _context.Database.BeginTransaction())
+        //   {
+        //     try
+        //     {
+        //       var result = await _userManager.CreateAsync(user, password);
+        //       if (result.Succeeded)
+        //       {
+        //           var appUser = await _userManager.Users.FirstOrDefaultAsync(u => u.NormalizedUserName == user.UserName);
+        //           userIdToReturn = appUser.Id;
 
-                  _userManager.AddToRoleAsync(appUser, roleName).Wait();
-                  if (sendLink)
-                  {
-                      // envoi du lien
-                      var callbackUrl = _config.GetValue<String>("AppSettings:DefaultSelRegisterLink") + appUser.ValidationCode;
-                      var email = new Email
-                      {
+        //           _userManager.AddToRoleAsync(appUser, roleName).Wait();
+        //           if (sendLink)
+        //           {
+        //               // envoi du lien
+        //               var callbackUrl = _config.GetValue<String>("AppSettings:DefaultSelRegisterLink") + appUser.ValidationCode;
+        //               var email = new Email
+        //               {
 
-                          InsertUserId = currentUserId,
-                          UpdateUserId = appUser.Id,
-                          StatusFlag = 0,
-                          Subject = "Confirmation de compte",
-                          ToAddress = appUser.Email,
-                          Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-                          FromAddress = "no-reply@educnotes.com",
-                          EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
-                      };
-                      Add(email);
-                      await SaveAll();
-                  }
-              }
+        //                   InsertUserId = currentUserId,
+        //                   UpdateUserId = appUser.Id,
+        //                   StatusFlag = 0,
+        //                   Subject = "Confirmation de compte",
+        //                   ToAddress = appUser.Email,
+        //                   Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
+        //                   FromAddress = "no-reply@educnotes.com",
+        //                   EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
+        //               };
+        //               Add(email);
+        //               await SaveAll();
+        //           }
+        //       }
 
-              identityContextTransaction.Commit();
-            }
-            catch (System.Exception)
-            {
-              identityContextTransaction.Rollback();
-              userIdToReturn = 0;
-            }
-          }
+        //       identityContextTransaction.Commit();
+        //     }
+        //     catch (System.Exception)
+        //     {
+        //       identityContextTransaction.Rollback();
+        //       userIdToReturn = 0;
+        //     }
+        //   }
 
-          return userIdToReturn;
-        }
+        //   return userIdToReturn;
+        // }
 
         public async Task<List<string>> GetEmails()
         {
@@ -2812,7 +2947,8 @@ namespace EducNotes.API.Data
         {
           int randomVal = 300631;
           int val = userId * 2 + randomVal;
-          string idNum = lastName.Substring(0, 1).ToUpper() + firstName.Substring(0,1).ToUpper() + val.ToString().To5Digits();
+          // string idNum = lastName.Substring(0, 1).ToUpper() + firstName.Substring(0,1).ToUpper() + val.ToString().To5Digits();
+          string idNum = val.ToString().To5Digits();
           return idNum;
         }
 

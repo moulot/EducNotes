@@ -131,7 +131,6 @@ namespace EducNotes.API.Controllers
           return BadRequest("compte pas encore activé....");
         // send 'token for password reset' email
         string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-        // var result = await _userManager.ResetPasswordAsync(model.Id, resetToken, model.NewPassword);
         if (await _repo.SendResetPasswordLink(user, resetToken))
         {
           // envoi effectué
@@ -308,22 +307,22 @@ namespace EducNotes.API.Controllers
 
     }
 
-    [HttpGet("ResetPassword/{code}")]
-    public async Task<IActionResult> ResetPassword(string code)
-    {
-      var user = await _repo.GetUserByCode(code);
-      if (user != null)
-      {
-        if (DateTime.Now.AddHours(-3) >= user.ForgotPasswordDate.Value) // le delai des 3 Heures a expiré
-          return BadRequest("Désolé ce lien a expiré....");
-        else
-          return Ok(new
-          {
-            user = _mapper.Map<UserForDetailedDto>(user)
-          });
-      }
-      return BadRequest("lien introuvable");
-    }
+    // [HttpGet("ResetPassword/{code}")]
+    // public async Task<IActionResult> ResetPassword(string code)
+    // {
+    //   var user = await _repo.GetUserByCode(code);
+    //   if (user != null)
+    //   {
+    //     if (DateTime.Now.AddHours(-3) >= user.ForgotPasswordDate.Value) // le delai des 3 Heures a expiré
+    //       return BadRequest("Désolé ce lien a expiré....");
+    //     else
+    //       return Ok(new
+    //       {
+    //         user = _mapper.Map<UserForDetailedDto>(user)
+    //       });
+    //   }
+    //   return BadRequest("lien introuvable");
+    // }
 
     [HttpPost("LastValidation")]
     public async Task<IActionResult> LastValidation(int id, UserForUpdateDto userForUpdateDto)

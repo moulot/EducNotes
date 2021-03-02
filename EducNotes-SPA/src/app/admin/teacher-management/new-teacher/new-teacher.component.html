@@ -120,63 +120,6 @@
                       </div>
                     </div>
                   </div>
-                  <!-- <hr class="mt-3 mb-2">
-                  <div class="text-15 d-flex align-items-center mb-2">
-                    <i class="fad fa-books fa-2x mr-2" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                      --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
-                    <b>cours du professeur</b>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-3 my-2" formArrayName="courses" *ngFor="let course of teacherForm.get('courses')['controls']; let i = index;">
-                      <div [formGroupName]="i">
-                        <div *ngIf="course.value.classAssigned">
-                          <div class="switch logo-switch">
-                            <label>
-                              <input type="checkbox" disabled formControlName="active">
-                              <span class="slider"></span>
-                              <span class="text-15 text-muted">{{course.value.name}}</span>
-                            </label>
-                          </div>
-                        </div>
-                        <div *ngIf="!course.value.classAssigned">
-                          <div class="switch">
-                            <label>
-                              <input type="checkbox" formControlName="active">
-                              <span class="slider"></span>
-                              <span class="text-15 text-muted">{{course.value.name}}</span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="my-1">
-                  <div class="row">
-                    <div class="col-md-8">
-                      <div class="d-flex">
-                        <div class="mr-2 my-auto">
-                          <div style="width: 15px; height: 15px; background-color: #f89f20;"></div>
-                        </div>
-                        <div class="text-13">des classes sont attribuées aux cours sélectionnés en orange (non modifiable)</div>
-                      </div>
-                    </div>
-                    <div class="col-md-2 mb-1">
-                      <button type="submit" mdbBtn class="btnBlue" size="sm" mdbWavesEffect
-                        block="true" [disabled]="!teacherForm.valid || wait">
-                        <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                          --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
-                        <span *ngIf="!editionMode">ajouter</span><span *ngIf="editionMode">editer</span>
-                      </button>
-                    </div>
-                    <div class="col-md-2 mb-1">
-                      <button type="button" [routerLink]="['/teachers']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
-                      block="true" [disabled]="wait">
-                        <i class="fad fa-times-circle fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                          --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-                        <span>annuler</span>
-                      </button>
-                    </div>
-                  </div> -->
                 </div>
               </div>
             </div>

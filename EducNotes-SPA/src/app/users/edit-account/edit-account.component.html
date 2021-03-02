@@ -1,118 +1,379 @@
-<div class="row m-2">
-  <div class="col-md-12">
-    <div class="d-flex mb-2">
-      <i class="fad fa-user-edit fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-      <div class="text-17">édition de l'enseignant <span class="text-capitalize">{{user.lastName}} {{user.firstName}}</span></div>
+<div *ngIf="wait" class="spinning-preloader-container">
+  <div class="preloader-wrapper big active">
+    <div class="spinner-layer spinner-blue">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-red">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-yellow">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-green">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
     </div>
   </div>
-
-  <div class="col-md-12">
-    <div class="card">
-      <div class="card-body p-2">
-        <form [formGroup]="userForm" (ngSubmit)="addUser()">
-          <div class="row">
-            <div class="col-md-12">
-              <div class="row">
-                <div class="col-md-2">
-                  <div class="file-path-wrapper d-flex justify-content-center m-0 p-1">
-                    <img [src]="photoUrl || '../../assets/user.png'" class="avatar-xl rounded-lg" alt="">
-                  </div>
-                  <div class="d-flex justify-content-center m-0">
-                    <div class="file-field md-form m-0">
-                      <div mdbBtn class="btnBlue px-2 waves-light" size="sm" mdbWavesEffect>
-                        <span *ngIf="!photoUrl">ajouter la photo</span>
-                        <span *ngIf="photoUrl">editer la photo</span>
-                        <input type="file" accept='image/*' mdbFileSelect (change)="imgResult($event)">
-                      </div>
-                    </div>
-                  </div>
+</div>
+<div *ngIf="!wait">
+  <form [formGroup]="userForm" (ngSubmit)="addUser()">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="d-flex mb-2">
+          <i class="fad fa-user-edit fa-2x mr-2" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          <div class="text-17">utilisateur <span class="text-capitalize">{{user.lastName}} {{user.firstName}}</span></div>
+        </div>
+      </div>
+      <div class="col-md-2 mb-1">
+        <button type="button" [routerLink]="['/userAccount', userid]" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
+        block="true" [disabled]="wait">
+          <i class="fad fa-times-circle fa-1x mr-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+          <span>annuler</span>
+        </button>
+      </div>
+      <div class="col-md-2 mb-1">
+        <button type="submit" mdbBtn class="btnBlue" size="sm" mdbWavesEffect
+          block="true" [disabled]="!userForm.valid || wait">
+          <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+          <span>editer</span>
+        </button>
+      </div>
+      <div class="col-md-12" *ngIf="showInfoBox">
+        <div class="alert alert-success" role="alert">
+          <h4 class="alert-heading">{{alertInfoTitle}}</h4>
+          <hr class="my-1">
+          <p class="mb-0">{{alertInfo}}</p>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="card mb-2">
+          <div class="card-body p-2">
+            <div class="text-16 mb-2"><b>photo & noms</b></div>
+            <hr class="my-1">
+            <div class="row">
+              <div class="col-md-2">
+                <div class="file-path-wrapper d-flex justify-content-center m-0 p-1">
+                  <img [src]="photoUrl || '../../assets/user.png'" class="avatar-xl rounded-lg" alt="">
                 </div>
-                <div class="col-md-10">
-                  <div class="row">
-                    <div class="col-md-3">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="lastName" class="form-control" formControlName="lastName" mdbValidate>
-                        <label for="lastName" class="">nom</label>
-                      </div>
-                      <div *ngIf="userForm.get('lastName').errors && userForm.get('lastName').touched" class="text-small text-danger">
-                        le nom est obligatoire
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="firstName" class="form-control" formControlName="firstName" mdbValidate>
-                        <label for="firstName" class="">prénom</label>
-                      </div>
-                      <div *ngIf="userForm.get('firstName').errors && userForm.get('firstName').touched" class="text-small text-danger">
-                        le prénom est obligatoire
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="d-flex">
-                        <mdb-select id="gender" [options]="gender" placeholder="sexe" formControlName="gender"></mdb-select>
-                      </div>
-                      <div *ngIf="userForm.get('gender').errors && userForm.get('gender').touched"
-                        class="text-small text-danger ml-2">le sexe est obligatoire</div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="md-form my-0">
-                        <mdb-date-picker name="dateOfBirth" [placeholder]="'date de naissance'" [options]="myDatePickerOptions" formControlName="dateOfBirth"></mdb-date-picker>
-                        <div *ngIf="userForm.get('dateOfBirth').errors && userForm.get('dateOfBirth').touched"
-                          class="text-small text-danger">la date de naissance est obligatoire</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    
-                  </div>
-                  <div class="row">
-                    <div class="col-md-3">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="cell" class="form-control" formControlName="cell">
-                        <label for="cell" class="">portable</label>
-                      </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="phone2" class="form-control" formControlName="phone2">
-                        <label for="phone2" class="">autre contact</label>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="md-form mt-1 mb-0">
-                        <input mdbInput type="text" id="email" class="form-control" formControlName="email">
-                        <label for="email" class="">email</label>
-                      </div>
+                <div class="d-flex justify-content-center m-0">
+                  <div class="file-field md-form m-0">
+                    <div mdbBtn class="btnBlue px-2 waves-light" size="sm" mdbWavesEffect>
+                      <span *ngIf="!photoUrl">ajouter la photo</span>
+                      <span *ngIf="photoUrl">editer la photo</span>
+                      <input type="file" accept='image/*' mdbFileSelect (change)="imgResult($event)">
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="col-md-12">
-              <hr class="my-1">
-              <div class="row">
-                <div class="col-md-8"></div>
-                <div class="col-md-2 mb-1">
-                  <button type="button" [routerLink]="['/users']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
-                  block="true" [disabled]="wait">
-                    <i class="fad fa-times-circle fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                      --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-                    <span>annuler</span>
-                  </button>
+              <div class="col-md-10">
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="md-form mt-1 mb-0">
+                      <input mdbInput type="text" id="lastName" class="form-control" formControlName="lastName" mdbValidate>
+                      <label for="lastName" class="">nom</label>
+                    </div>
+                    <div *ngIf="userForm.get('lastName').errors && userForm.get('lastName').touched" class="text-small text-danger">
+                      le nom est obligatoire
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="md-form mt-1 mb-0">
+                      <input mdbInput type="text" id="firstName" class="form-control" formControlName="firstName" mdbValidate>
+                      <label for="firstName" class="">prénom</label>
+                    </div>
+                    <div *ngIf="userForm.get('firstName').errors && userForm.get('firstName').touched" class="text-small text-danger">
+                      le prénom est obligatoire
+                    </div>
+                  </div>
                 </div>
-                <div class="col-md-2 mb-1">
-                  <button type="submit" mdbBtn class="btnBlue" size="sm" mdbWavesEffect
-                    block="true" [disabled]="!userForm.valid || wait">
-                    <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
-                      --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
-                    <span>editer</span>
-                  </button>
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="d-flex">
+                      <mdb-select id="gender" [options]="gender" placeholder="sexe" formControlName="gender"></mdb-select>
+                    </div>
+                    <div *ngIf="userForm.get('gender').errors && userForm.get('gender').touched"
+                      class="text-small text-danger ml-2">le sexe est obligatoire</div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="md-form my-0">
+                      <mdb-date-picker name="dateOfBirth" [placeholder]="'date de naissance'" [options]="myDatePickerOptions" formControlName="dateOfBirth"></mdb-date-picker>
+                      <div *ngIf="userForm.get('dateOfBirth').errors && userForm.get('dateOfBirth').touched"
+                        class="text-small text-danger">la date de naissance est obligatoire</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="md-form form-sm mt-2 mb-0">
+                      <mdb-select id="cityId" [options]="cityOptions" placeholder="ville de résidence" (ngModelChange)="getCityDistricts()" formControlName="cityId"></mdb-select>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="md-form form-sm mt-2 mb-0">
+                      <mdb-select id="districtId" [options]="districtOptions" placeholder="quartier/commune" formControlName="districtId">
+                      </mdb-select>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </form>
+        </div>
+        <div class="card mb-2">
+          <div class="card-body p-2">
+            <div class="text-16 mb-2"><b>mobile</b></div>
+            <hr class="my-1">
+            <div class="row">
+              <div class="col-md-3">
+                <div class="md-form mt-1 mb-0">
+                  <input mdbInput type="text" id="cell" (keyup)="phoneChanged()" class="form-control" formControlName="cell">
+                  <label for="cell" class="">portable</label>
+                  <div *ngIf="userForm.get('cell').hasError('required')" class="text-small text-danger">saisir le mobile svp</div>
+                  <div *ngIf="userForm.get('cell').hasError('lenError')"
+                    class="text-small text-danger">le numéro doit avoir 10 chiffres</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="md-form mt-1 mb-0">
+                  <input mdbInput type="text" id="phone2" class="form-control" formControlName="phone2">
+                  <label for="phone2" class="">autre contact</label>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div *ngIf="phoneEdited" class="border rounded-lg p-2 mb-2">
+                  <div *ngIf="phoneValidationSteps == 0" class="row">
+                    <div class="col-md-12 text-15 text-danger">votre numéro de mobile a changé. Un code de validation vous sera envoyé pour validation à ce numéro.</div>
+                    <div class="col-md-12 text-15 text-danger">clicker sur le bouton ci-dessous pour recevoir le code de validation.</div>
+                    <div class="col-md-3 mt-1">
+                      <button type="button" [disabled]="wait" mdbBtn size="sm" (click)="sendPhoneNumber()"
+                        class="btnBlue" mdbWavesEffect>envoyer le code de validation</button>
+                   </div>
+                  </div>
+                  <div *ngIf="phoneValidationSteps == 1" class="row">
+                    <div class="col-md-12 text-15 text-danger">saisir le code reçu par sms sur votre mobile.</div>
+                    <div class="col-md-12 text-13 border rounded-lg" *ngIf="!phoneOk"
+                      style="background-color: red;color: white">le code de validation est incorrect. recommencez svp</div>
+                    <div class="col-md-3">
+                      <div>
+                        <div class="md-form mt-3 mb-0">
+                          <input mdbInput type="text" id="code" class="form-control" formControlName="code" mdbValidate>
+                          <label for="code" class="">saisir le code</label>
+                          <div *ngIf="userForm.get('code').hasError('empty') && userForm.get('code').touched"
+                            class="text-small text-danger">saisir le code de validation svp</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3 mt-3">
+                      <button type="button" (click)="validatePhone()" [disabled]="wait || userForm.get('code').hasError('empty')"
+                        mdbBtn size="sm" class="btnBlue" mdbWavesEffect>valider mon numero</button>
+                    </div>
+                  </div>
+                  <div *ngIf="phoneValidationSteps == 2" class="d-md-flex">
+                    <i class="fad fa-thumbs-up fa-2x my-auto mr-2" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                    <div class="text-15 textDarkRed my-auto"><b>votre numéro de mobile est validé. merci.</b></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card mb-2">
+          <div class="card-body p-2">
+            <div class="text-16 mb-2"><b>email</b></div>
+            <hr class="my-1">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="md-form mt-1 mb-0">
+                      <input mdbInput type="text" id="email" (keyup)="emailChanged()" class="form-control" formControlName="email">
+                      <label for="email" class="">email</label>
+                    </div>
+                    <div *ngIf="userForm.get('email').hasError('required')" class="text-small text-danger">saisir votre email svp</div>
+                    <div *ngIf="userForm.get('email').hasError('email')" class="text-small text-danger">l'email est incorrect</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div *ngIf="emailEdited" class="border rounded-lg p-2 mb-2">
+                  <div *ngIf="emailValidationSteps == 0" class="row">
+                    <div class="col-md-12 text-15 text-danger">votre email a changé. Un code de validation vous sera envoyé pour validation à cet email.</div>
+                    <div class="col-md-12 text-15 text-danger">clicker sur le bouton ci-dessous pour recevoir par email le code de validation.</div>
+                    <div class="col-md-4 mt-1">
+                      <button type="button" [disabled]="wait" mdbBtn size="sm" (click)="sendCodeToEmail()"
+                        class="btnBlue" mdbWavesEffect>envoyer par email le code de validation</button>
+                    </div>
+                  </div>
+                  <div *ngIf="emailValidationSteps == 1" class="row">
+                    <div class="col-md-12 text-15 text-danger">saisir le code reçu par sms sur votre mobile.</div>
+                    <div class="col-md-12 text-13 border rounded-lg" *ngIf="!phoneOk"
+                      style="background-color: red;color: white">le code de validation est incorrect. recommencez svp</div>
+                    <div class="col-md-3">
+                      <div>
+                        <div class="md-form mt-3 mb-0">
+                          <input mdbInput type="text" id="emailCode" class="form-control" formControlName="emailCode" mdbValidate>
+                          <label for="emailCode" class="">saisir le code</label>
+                          <div *ngIf="userForm.get('emailCode').hasError('empty') && userForm.get('emailCode').touched"
+                            class="text-small text-danger">saisir le code de validation svp</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3 mt-3">
+                      <button type="button" (click)="validateEmail()" [disabled]="wait || userForm.get('emailCode').hasError('empty')"
+                        mdbBtn size="sm" class="btnBlue" mdbWavesEffect>valider mon email</button>
+                    </div>
+                  </div>
+                  <div *ngIf="emailValidationSteps == 2" class="d-md-flex">
+                    <i class="fad fa-thumbs-up fa-2x my-auto mr-2" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                    <div class="text-15 textDarkRed my-auto"><b>votre nouveau email est validé. merci.</b></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="login"></div>
+        <div class="card mb-2">
+          <div class="card-body p-2">
+            <div class="text-16 mb-2"><b>infos de connexion</b></div>
+            <div>
+              <mdb-checkbox (change)="showHidePwdEdit()">modifier le login/mot de passe</mdb-checkbox>
+            </div>
+            <hr class="my-1">
+            <div *ngIf="!updatePwd" class="row text-15">
+              <div class="col-md-2 text-15">nom utilisateur</div>
+              <div class="col-md-1 d-none d-md-block text-15">:</div>
+              <div class="col-md-9 text-15 textBlue">{{user.userName}}</div>
+              <div class="col-md-2 text-15">mot de passe</div>
+              <div class="col-md-1 d-none d-md-block text-15">:</div>
+              <div class="col-md-9 text-15 textBlue">xxxxxxxxxxx</div>
+            </div>
+            <div *ngIf="updatePwd" class="row">
+              <div class="col-md-3">
+                <div class="md-form mt-1 mb-0">
+                  <input mdbInput type="text" id="Name"user class="form-control" (blur)="userNameVerification()"
+                    (keyup)="pwdChanged()" formControlName="userName" mdbValidate>
+                  <label for="userName" class="">identifiant</label>
+                <div *ngIf="userNameExist" class="text-small text-danger">cet identifiant existe déjà. choisir un autre svp</div>
+                </div>
+                <div *ngIf="userForm.get('userName').errors && userForm.get('userName').touched" class="text-small text-danger">
+                  le nom utilisateur est obligatoire
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="md-form mt-1 mb-0">
+                  <input mdbInput type="password" id="oldPassword"user class="form-control" formControlName="oldPassword" mdbValidate>
+                  <label for="oldPassword" class="">mot de passe actuel</label>
+                  <div class="text-small text-danger" *ngIf="userForm.get('oldPassword').errors &&
+                    userForm.get('oldPassword').touched">saisir l'ancien mot de passe svp</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="md-form mt-1 mb-0">
+                  <input mdbInput type="password" id="password"user class="form-control"
+                    (keyup)="pwdChanged()" formControlName="password" mdbValidate>
+                  <label for="password" class="">nouveau mot de passe</label>
+                  <div class="text-small text-danger" *ngIf="userForm.get('password').errors &&
+                    userForm.get('password').touched">saisir le nouveau mot de passe svp</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="md-form mt-1 mb-0">
+                  <input mdbInput type="password" id="checkpwd"user class="form-control"
+                    (keyup)="pwdChanged()" formControlName="checkpwd" mdbValidate>
+                  <label for="checkpwd" class="">confirmer nouveau mot de passe</label>
+                  <div class="text-small text-danger" *ngIf="userForm.get('checkpwd').hasError('required') &&
+                    userForm.get('checkpwd').touched">confirmer le mot de passe svp</div>
+                <div class="text-small text-danger" *ngIf="userForm.get('checkpwd').hasError('confirmNOK')">
+                  les deux mots de passe sont differents!
+                </div>
+              </div>
+              </div>
+              <div class="col-md-12">
+                <div *ngIf="pwdEdited" class="border rounded-lg p-2 mb-2">
+                  <div *ngIf="pwdValidationSteps == 0" class="row">
+                    <div class="col-md-12 text-15 text-danger">vous souhaitez changer de mot de passe. Un code de validation vous sera envoyé sur votre mobile.</div>
+                    <div class="col-md-12 text-15 text-danger">clicker sur le bouton ci-dessous pour recevoir par sms le code de validation.</div>
+                    <div class="col-md-4 mt-1">
+                      <button type="button" [disabled]="wait" mdbBtn size="sm" (click)="sendPwdCodeToMobile()"
+                        class="btnBlue" mdbWavesEffect>envoyer par sms le code de validation</button>
+                    </div>
+                  </div>
+                  <div *ngIf="pwdValidationSteps == 1" class="row">
+                    <div class="col-md-12 text-15 text-danger">saisir le code reçu par sms sur votre mobile.</div>
+                    <div class="col-md-12 text-13 border rounded-lg" *ngIf="!phoneOk"
+                      style="background-color: red;color: white">le code de validation est incorrect. recommencez svp</div>
+                    <div class="col-md-3">
+                      <div>
+                        <div class="md-form mt-3 mb-0">
+                          <input mdbInput type="text" id="pwdCode" class="form-control" formControlName="pwdCode" mdbValidate>
+                          <label for="pwdCode" class="">saisir le code</label>
+                          <div *ngIf="userForm.get('pwdCode').hasError('empty') && userForm.get('pwdCode').touched"
+                            class="text-small text-danger">saisir le code de validation svp</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3 mt-3">
+                      <button type="button" (click)="validatePwd()" mdbBtn size="sm" class="btnBlue"
+                        [disabled]="wait || userForm.get('pwdCode').hasError('empty') || userForm.get('checkpwd').hasError('confirmNOK')"
+                        mdbWavesEffect>valider mon mot de passe</button>
+                    </div>
+                  </div>
+                  <div *ngIf="pwdValidationSteps == 2" class="d-md-flex">
+                    <i class="fad fa-thumbs-up fa-2x my-auto mr-2" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                    <div class="text-15 textDarkRed my-auto"><b>votre nouveau mot de passe est validé. merci.</b></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <hr class="my-1">
+            <div class="row">
+              <div class="col-md-8"></div>
+              <div class="col-md-2 mb-1">
+                <button type="button" [routerLink]="['/userAccount', userid]" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
+                block="true" [disabled]="wait">
+                  <i class="fad fa-times-circle fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+                  <span>annuler</span>
+                </button>
+              </div>
+              <div class="col-md-2 mb-1">
+                <button type="submit" mdbBtn class="btnBlue" size="sm" mdbWavesEffect
+                  block="true" [disabled]="!userForm.valid || wait">
+                  <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                    --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                  <span>editer</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </form>
 </div>

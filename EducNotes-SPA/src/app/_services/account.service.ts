@@ -23,8 +23,28 @@ export class AccountService {
     return this.http.get(this.baseUrl + 'PhoneCode/' + userId + '/' + num);
   }
 
+  sendCodeToEmail(confirmEmail: ConfirmToken) {
+    return this.http.post(this.baseUrl + 'EmailCode', confirmEmail);
+  }
+
+  sendPwdCodeToSms(confirmEmail: ConfirmToken) {
+    return this.http.post(this.baseUrl + 'PwdCode', confirmEmail);
+  }
+
   validatePhone(confirmEmail: ConfirmToken) {
     return this.http.post(this.baseUrl + 'ConfirmPhoneNumber', confirmEmail);
+  }
+
+  editPhoneNumber(confirmToken: ConfirmToken) {
+    return this.http.post(this.baseUrl + 'EditPhoneNumber', confirmToken);
+  }
+
+  editEmail(confirmToken: ConfirmToken) {
+    return this.http.post(this.baseUrl + 'EditEmail', confirmToken);
+  }
+
+  editPwd(confirmToken: ConfirmToken) {
+    return this.http.post(this.baseUrl + 'EditPwd', confirmToken);
   }
 
 }

@@ -37,9 +37,10 @@ namespace EducNotes.API.Data
     Task<Like> GetLike(int userId, int recipientId);
     Task<bool> EmailExist(string email);
     Task<bool> UserNameExist(string userName, int currentUserId);
-    Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId);
+    // Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId);
     Task<bool> UpdateChildren(ChildrenForEditDto users);
-    Task<bool> AddTeacher(TeacherForEditDto userForRegister, int insertUserId);
+    Task<bool> AddTeacher(TeacherForEditDto userForRegister);
+    Task<bool> EditUserAccount(UserAccountForEditDto user);
     Task<IEnumerable<User>> GetStudentsForClass(int classId);
     Task<IEnumerable<Agenda>> GetClassAgenda(int classId);
     Task<List<AgendaForListDto>> GetUserClassAgenda(int classId, DateTime startDate, DateTime endDate);
@@ -58,7 +59,7 @@ namespace EducNotes.API.Data
 
     Task<User> GetUserByEmail(string email);
     Task<bool> SendResetPasswordLink(User user, string code);
-    Task<User> GetUserByCode(string code);
+    // Task<User> GetUserByCode(string code);
     Task<User> GetSingleUser(string userName);
     Task<List<UserCourseEvalsDto>> GetUserGrades(int userId, int classId);
     IEnumerable<ClassAgendaToReturnDto> GetAgendaListByDueDate(IEnumerable<Agenda> agendaItems);
@@ -74,7 +75,7 @@ namespace EducNotes.API.Data
     List<string> SendBatchSMS(List<Sms> smsData);
     double GetClassEvalAvg(List<UserEvaluation> classGrades, double maxGrade);
     Task<IEnumerable<ClassType>> GetClassTypes();
-    Task<int> AddSelfRegister(User user, string roleName, bool sendLink, int currentUserId);
+    // Task<int> AddSelfRegister(User user, string roleName, bool sendLink, int currentUserId);
     Task<List<string>> GetEmails();
     Task<List<string>> GetUserNames();
     Task<List<ClassLevel>> GetLevels();

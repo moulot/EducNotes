@@ -37,7 +37,7 @@ export class ActivateChildrenComponent implements OnInit {
     this.createChildrenForm();
     for (let i = 0; i < this.children.length; i++) {
       const elt = this.children[i];
-      this.addChildItem('', elt.lastName, elt.firstName, elt.strDateOfBirth, elt.gender, elt.email, elt.phoneNumber);
+      this.addChildItem(elt.id, '', elt.lastName, elt.firstName, elt.strDateOfBirth, elt.gender, elt.email, elt.phoneNumber);
       // initialize photo file data
       this.photoFile[i] = null;
     }
@@ -50,8 +50,14 @@ export class ActivateChildrenComponent implements OnInit {
     });
   }
 
-  createChildItem(username, lname, fname, dob, sex, email, cell): FormGroup {
+  addChildItem(id, username, lname, fname, dob, sex, email, cell): void {
+    const children = this.childrenForm.get('children') as FormArray;
+    children.push(this.createChildItem(id, username, lname, fname, dob, sex, email, cell));
+  }
+
+  createChildItem(id, username, lname, fname, dob, sex, email, cell): FormGroup {
     return this.fb.group({
+      childid: id,
       username: [username, Validators.required],
       lname: [lname, Validators.required],
       fname: [fname, Validators.required],
@@ -62,11 +68,6 @@ export class ActivateChildrenComponent implements OnInit {
       pwd: ['', Validators.required],
       checkpwd: ['', Validators.required]
     });
-  }
-
-  addChildItem(username, lname, fname, dob, sex, email, cell): void {
-    const children = this.childrenForm.get('children') as FormArray;
-    children.push(this.createChildItem(username, lname, fname, dob, sex, email, cell));
   }
 
   getParentChildren() {
@@ -90,7 +91,7 @@ export class ActivateChildrenComponent implements OnInit {
 
   userNameVerification(index) {
     const userName = this.childrenForm.value.children[index].username;
-    const userid = this.childrenForm.value.children[index].id;
+    const userid = this.childrenForm.value.children[index].childid;
     this.userNameExist = false;
     this.authService.userNameExist(userName, userid).subscribe((res: boolean) => {
       if (res === true) {

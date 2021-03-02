@@ -318,14 +318,14 @@ namespace EducNotes.API.Controllers
           return NotFound();
         }
 
-        [HttpPost("{insertUserId}/AddUser")]
-        public async Task<IActionResult> AddUser(int insertUserId, UserForRegisterDto userForRegisterDto)
-        {
-          if (await _repo.AddUserPreInscription(userForRegisterDto, insertUserId))
-            return Ok();
+        // [HttpPost("{insertUserId}/AddUser")]
+        // public async Task<IActionResult> AddUser(int insertUserId, UserForRegisterDto userForRegisterDto)
+        // {
+        //   if (await _repo.AddUserPreInscription(userForRegisterDto, insertUserId))
+        //     return Ok();
 
-          return BadRequest("impossible de termier l'enregistrement");
-        }
+        //   return BadRequest("impossible de termier l'enregistrement");
+        // }
 
         [HttpGet("ClassLevelDetails")]
         public async Task<IActionResult> ClassLevelDetails()
@@ -502,89 +502,89 @@ namespace EducNotes.API.Controllers
             return Ok(await _repo.EmailExist(email));
         }
 
-        [HttpPost("{currentUserId}/SendRegisterEmail")]
-        public async Task<IActionResult> SendRegisterEmail(int currentUserId, SelfRegisterDto model)
-        {
-          if (model.UserTypeId == teacherTypeId)
-            {
-                var TeacherRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
+        // [HttpPost("{currentUserId}/SendRegisterEmail")]
+        // public async Task<IActionResult> SendRegisterEmail(int currentUserId, SelfRegisterDto model)
+        // {
+        //   if (model.UserTypeId == teacherTypeId)
+        //     {
+        //         var TeacherRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
 
-                string code = Guid.NewGuid().ToString();
-                var teacher = new User
-                {
-                    ValidationCode = code,
-                    Email = model.Email,
-                    UserName = code,
-                    UserTypeId = teacherTypeId
-                };
-                // enregistrement du professeur
-                int userId = await _repo.AddSelfRegister(teacher, TeacherRole.Name, true, currentUserId);
-                if (userId > 0)
-                {
-                    foreach (var courseId in model.CourseIds)
-                    {
-                        var ClassCourse = new TeacherCourse
-                        {
-                            TeacherId = userId,
-                            CourseId = courseId
-                        };
+        //         string code = Guid.NewGuid().ToString();
+        //         var teacher = new User
+        //         {
+        //             //ValidationCode = code,
+        //             Email = model.Email,
+        //             UserName = code,
+        //             UserTypeId = teacherTypeId
+        //         };
+        //         // enregistrement du professeur
+        //         int userId = await _repo.AddSelfRegister(teacher, TeacherRole.Name, true, currentUserId);
+        //         if (userId > 0)
+        //         {
+        //             foreach (var courseId in model.CourseIds)
+        //             {
+        //                 var ClassCourse = new TeacherCourse
+        //                 {
+        //                     TeacherId = userId,
+        //                     CourseId = courseId
+        //                 };
 
-                        _repo.Add(ClassCourse);
-                    }
-                }
-                else
-                    return BadRequest("impossible d'ajouter cet utlisateur");
+        //                 _repo.Add(ClassCourse);
+        //             }
+        //         }
+        //         else
+        //             return BadRequest("impossible d'ajouter cet utlisateur");
 
-            }
+        //     }
 
-          if (model.UserTypeId == parentTypeId)
-            {
-                var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentTypeId);
-                string code = Guid.NewGuid().ToString();
+        //   if (model.UserTypeId == parentTypeId)
+        //     {
+        //         var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentTypeId);
+        //         string code = Guid.NewGuid().ToString();
 
-                var parent = new User
-                {
-                    ValidationCode = code,
-                    Email = model.Email,
-                    UserName = code,
-                    UserTypeId = parentTypeId
-                };
+        //         var parent = new User
+        //         {
+        //             ValidationCode = code,
+        //             Email = model.Email,
+        //             UserName = code,
+        //             UserTypeId = parentTypeId
+        //         };
 
-                int parentId = await _repo.AddSelfRegister(parent, ParentRole.Name, true, currentUserId);
+        //         int parentId = await _repo.AddSelfRegister(parent, ParentRole.Name, true, currentUserId);
 
-                if (parentId > 0)
-                {
-                    for (int i = 0; i < model.TotalChild; i++)
-                    {
-                        var MemberRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
-                        code = Guid.NewGuid().ToString();
-                        var child = new User
-                        {
-                            ValidationCode = code,
-                            UserName = code,
-                            UserTypeId = studentTypeId
-                        };
-                        int childId = await _repo.AddSelfRegister(child, MemberRole.Name, false, currentUserId);
-                        if (childId > 0)
-                        {
-                            var userLink = new UserLink
-                            {
-                                UserPId = parentId,
-                                UserId = childId
-                            };
-                            _repo.Add(userLink);
-                        }
-                    }
-                }
-                else // le parent n a pas pu etre inséré
-                    return BadRequest("impossible d'ajouter ce compte");
-            }
+        //         if (parentId > 0)
+        //         {
+        //             for (int i = 0; i < model.TotalChild; i++)
+        //             {
+        //                 var MemberRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
+        //                 code = Guid.NewGuid().ToString();
+        //                 var child = new User
+        //                 {
+        //                     ValidationCode = code,
+        //                     UserName = code,
+        //                     UserTypeId = studentTypeId
+        //                 };
+        //                 int childId = await _repo.AddSelfRegister(child, MemberRole.Name, false, currentUserId);
+        //                 if (childId > 0)
+        //                 {
+        //                     var userLink = new UserLink
+        //                     {
+        //                         UserPId = parentId,
+        //                         UserId = childId
+        //                     };
+        //                     _repo.Add(userLink);
+        //                 }
+        //             }
+        //         }
+        //         else // le parent n a pas pu etre inséré
+        //             return BadRequest("impossible d'ajouter ce compte");
+        //     }
 
-          if (await _repo.SaveAll())
-            return NoContent();
+        //   if (await _repo.SaveAll())
+        //     return NoContent();
 
-          return BadRequest();
-        }
+        //   return BadRequest();
+        // }
 
         [HttpPost("SendEmail")]
         public async Task<IActionResult> SendEmail(EmailFormDto model)
@@ -1120,67 +1120,67 @@ namespace EducNotes.API.Controllers
           return BadRequest("impossible de trouver l'utilisateur");
         }
 
-        [HttpPost("ImportedUsers/{insertUserId}")]
-        public async Task<IActionResult> Importedteachers(int insertUserId, List<ImportUserDto> importedUsers)
-        {
-            if (importedUsers[0].UserTypeId == teacherTypeId)
-            {
-                var TeacherRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
-                foreach (var importUser in importedUsers)
-                {
-                    string code = Guid.NewGuid().ToString();
-                    var teacher = _mapper.Map<User>(importUser);
-                    teacher.UserName = code;
-                    teacher.ValidationCode = code;
-                    // enregistrement du professeur
-                    int userId = await _repo.AddSelfRegister(teacher, TeacherRole.Name, true, insertUserId);
-                }
-                return NoContent();
-            }
+        // [HttpPost("ImportedUsers/{insertUserId}")]
+        // public async Task<IActionResult> Importedteachers(int insertUserId, List<ImportUserDto> importedUsers)
+        // {
+        //     if (importedUsers[0].UserTypeId == teacherTypeId)
+        //     {
+        //         var TeacherRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
+        //         foreach (var importUser in importedUsers)
+        //         {
+        //             string code = Guid.NewGuid().ToString();
+        //             var teacher = _mapper.Map<User>(importUser);
+        //             teacher.UserName = code;
+        //             //teacher.ValidationCode = code;
+        //             // enregistrement du professeur
+        //             int userId = await _repo.AddSelfRegister(teacher, TeacherRole.Name, true, insertUserId);
+        //         }
+        //         return NoContent();
+        //     }
 
-            if (importedUsers[0].UserTypeId == parentTypeId)
-            {
-                var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentTypeId);
-                foreach (var importUser in importedUsers)
-                {
-                    string code = Guid.NewGuid().ToString();
-                    var parent = _mapper.Map<User>(importUser);
-                    parent.UserName = code;
-                    parent.ValidationCode = code;
+        //     if (importedUsers[0].UserTypeId == parentTypeId)
+        //     {
+        //         var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentTypeId);
+        //         foreach (var importUser in importedUsers)
+        //         {
+        //             string code = Guid.NewGuid().ToString();
+        //             var parent = _mapper.Map<User>(importUser);
+        //             parent.UserName = code;
+        //             // parent.ValidationCode = code;
 
-                    int parentId = await _repo.AddSelfRegister(parent, ParentRole.Name, true, insertUserId);
+        //             int parentId = await _repo.AddSelfRegister(parent, ParentRole.Name, true, insertUserId);
 
-                    if (parentId > 0)
-                    {
-                        for (int i = 0; i < importUser.MaxChild; i++)
-                        {
-                            var MemberRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
-                            code = Guid.NewGuid().ToString();
-                            var child = new User
-                            {
-                                ValidationCode = code,
-                                UserName = code,
-                                UserTypeId = studentTypeId
-                            };
-                            int childId = await _repo.AddSelfRegister(child, MemberRole.Name, false, insertUserId);
-                            if (childId > 0)
-                            {
-                                var userLink = new UserLink
-                                {
-                                    UserPId = parentId,
-                                    UserId = childId
-                                };
-                                _repo.Add(userLink);
-                            }
-                        }
-                    }
-                }
-                if (await _repo.SaveAll())
-                    return NoContent();
-            }
+        //             if (parentId > 0)
+        //             {
+        //                 for (int i = 0; i < importUser.MaxChild; i++)
+        //                 {
+        //                     var MemberRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
+        //                     code = Guid.NewGuid().ToString();
+        //                     var child = new User
+        //                     {
+        //                         // ValidationCode = code,
+        //                         UserName = code,
+        //                         UserTypeId = studentTypeId
+        //                     };
+        //                     int childId = await _repo.AddSelfRegister(child, MemberRole.Name, false, insertUserId);
+        //                     if (childId > 0)
+        //                     {
+        //                         var userLink = new UserLink
+        //                         {
+        //                             UserPId = parentId,
+        //                             UserId = childId
+        //                         };
+        //                         _repo.Add(userLink);
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //         if (await _repo.SaveAll())
+        //             return NoContent();
+        //     }
 
-            return BadRequest();
-        }
+        //     return BadRequest();
+        // }
 
         [HttpGet("Settings")]
         public async Task<IActionResult> GetSettings()

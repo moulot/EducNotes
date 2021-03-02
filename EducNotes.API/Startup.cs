@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text;
 using AutoMapper;
+using EducNotes.API.data;
 using EducNotes.API.Data;
 using EducNotes.API.Helpers;
 using EducNotes.API.Models;
@@ -56,6 +57,7 @@ namespace EducNotes.API
           builder.AddRoleManager<RoleManager<Role>>();
           builder.AddSignInManager<SignInManager<User>>();
           builder.AddDefaultTokenProviders();
+          builder.AddTokenProvider<ChangeDataTotpTokenProvider<User>>("ChangeDataTotpTokenProvider");
 
           services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(Options => {

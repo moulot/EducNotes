@@ -139,6 +139,7 @@ export class ParentRegisterComponent implements OnInit {
 
     });
   }
+
   getLevels() {
     this.authService.getLevels().subscribe((res: any[]) => {
       for (let i = 0; i < res.length; i++) {
@@ -458,7 +459,6 @@ export class ParentRegisterComponent implements OnInit {
       });
     }
   }
-
 
   emailsVerification() {
     this.errorMessage = [];

@@ -24,7 +24,6 @@ namespace EducNotes.API.Models
     public int? DistrictId { get; set; }
     public District District { get; set; }
     public string SecondPhoneNumber { get; set; }
-    public string ValidationCode { get; set; }
     public DateTime? ValidationDate { get; set; }
     public int? ClassLevelId { get; set; }
     public ClassLevel ClassLevel { get; set; }
@@ -48,6 +47,7 @@ namespace EducNotes.API.Models
     public Boolean NextRegCreated { get; set; }
     public byte Active { get; set; }
     public Boolean Validated { get; set; }
+    public string ToBeValidatedEmail { get; set; }
     public ICollection<UserRole> UserRoles { get; set; }
     public Boolean AccountDataValidated { get; set; }
     public DateTime? ResetPasswordDate { get; set; }

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-child-file',

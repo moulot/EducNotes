@@ -1864,54 +1864,54 @@ namespace EducNotes.API.Controllers
             return Ok(events);
         }
 
-        [HttpPost("classStudentsAssignment/{classId}")]
-        public async Task<IActionResult> classStudentsAssignment(int classId, List<QuickStudentAssignmentDto> studentsListDto)
-        {
-          //using (var identityContextTransaction = _context.Database.BeginTransaction())
-          //{
-          bool isItOk = false;
-          try
-          {
-            var StudentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
-            var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentRoleId);
-            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+        // [HttpPost("classStudentsAssignment/{classId}")]
+        // public async Task<IActionResult> classStudentsAssignment(int classId, List<QuickStudentAssignmentDto> studentsListDto)
+        // {
+        //   //using (var identityContextTransaction = _context.Database.BeginTransaction())
+        //   //{
+        //   bool isItOk = false;
+        //   try
+        //   {
+        //     var StudentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
+        //     var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentRoleId);
+        //     var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            foreach (var importUser in studentsListDto)
-            {
-              var studentCode = Guid.NewGuid().ToString();
-              var student = _mapper.Map<User>(importUser);
-              student.UserName = studentCode;
-              student.ValidationCode = studentCode;
-              student.ClassId = classId;
+        //     foreach (var importUser in studentsListDto)
+        //     {
+        //       var studentCode = Guid.NewGuid().ToString();
+        //       var student = _mapper.Map<User>(importUser);
+        //       student.UserName = studentCode;
+        //       // student.ValidationCode = studentCode;
+        //       student.ClassId = classId;
 
-              var parentCode = Guid.NewGuid().ToString();
-              var parent = _mapper.Map<User>(importUser.Parent);
-              parent.UserName = parentCode;
-              parent.ValidationCode = parentCode;
-              // enregistrement du professeur
-              int studentId = await _repo.AddSelfRegister(student, StudentRole.Name, importUser.SendEmail, currentUserId);
-              int parentId = await _repo.AddSelfRegister(parent, ParentRole.Name, importUser.SendEmail, currentUserId);
-              _repo.Add(new UserLink
-              {
-                UserPId = parentId,
-                UserId = studentId
-              });
-            }
+        //       var parentCode = Guid.NewGuid().ToString();
+        //       var parent = _mapper.Map<User>(importUser.Parent);
+        //       parent.UserName = parentCode;
+        //       // parent.ValidationCode = parentCode;
+        //       // enregistrement du professeur
+        //       int studentId = await _repo.AddSelfRegister(student, StudentRole.Name, importUser.SendEmail, currentUserId);
+        //       int parentId = await _repo.AddSelfRegister(parent, ParentRole.Name, importUser.SendEmail, currentUserId);
+        //       _repo.Add(new UserLink
+        //       {
+        //         UserPId = parentId,
+        //         UserId = studentId
+        //       });
+        //     }
 
-            if (await _repo.SaveAll())
-              // identityContextTransaction.Commit();
-              isItOk = true;
-          }
-          catch (System.Exception)
-          {
-            // identityContextTransaction.Rollback();
-            isItOk = false;
-          }
-          if (isItOk)
-            return Ok();
+        //     if (await _repo.SaveAll())
+        //       // identityContextTransaction.Commit();
+        //       isItOk = true;
+        //   }
+        //   catch (System.Exception)
+        //   {
+        //     // identityContextTransaction.Rollback();
+        //     isItOk = false;
+        //   }
+        //   if (isItOk)
+        //     return Ok();
 
-          return BadRequest();
-        }
+        //   return BadRequest();
+        // }
 
         [HttpPost("courseShowing")]
         public async Task<IActionResult> courseShowing([FromForm]CourseShowingDto courseShowingDto)

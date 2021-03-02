@@ -266,6 +266,10 @@ constructor(private http: HttpClient) {}
     return this.http.get<User[]>(this.baseUrl + 'GetAllTeachers');
   }
 
+  editUserAccountr(user: FormData) {
+    return this.http.post(this.baseUrl + 'EditUserAccount', user);
+  }
+
   addTeacher(user: FormData) {
     return this.http.post(this.baseUrl + 'AddTeacher', user);
   }

@@ -46,21 +46,23 @@ namespace EducNotes.API.Controllers
       password = _config.GetValue<String>("AppSettings:defaultPassword");
     }
 
-    [AllowAnonymous]
-    [HttpGet("PhoneCode/{userId}/{num}")]
-    public async Task<IActionResult> PhoneCode(int userId, string num)
+    [HttpPost("PwdCode")]
+    public async Task<IActionResult> SendPwdValidationCode(ConfirmTokenDto confirmTokenDto)
     {
       bool codeSent = false;
+      var userId = Convert.ToInt32(confirmTokenDto.UserId);
+      var phoneNumber = confirmTokenDto.PhoneNumber;
+
       var user = await _context.Users.FirstAsync(u => u.Id == userId);
-      user.PhoneNumber = num;
-      _repo.Update(user);
-      var token = await _userManager.GenerateChangePhoneNumberTokenAsync(user, num);
+      var token = await _userManager.GenerateUserTokenAsync(user,"ChangeDataTotpTokenProvider","ChangeDataTotpTokenProvider");
+
       Sms sms = new Sms();
-      sms.To = num;
+      sms.To = phoneNumber;
       sms.ToUserId = user.Id;
       sms.SmsTypeId = _config.GetValue<int>("AppSettings:SmsValidationTypeId");
-      sms.Content = "SVP saisir le code " + token + " pour valider votre numéro sur Educ'Notes. " +
-      "Vous ne serez jamais contacter pour ce code. Ne le révéler à persone.";
+      var smsTemplateId = _config.GetValue<int>("AppSettings:PwdEditCodeSms");
+      var smsTemplate = await _context.SmsTemplates.FirstAsync(t => t.Id == smsTemplateId);
+      sms.Content = string.Format(smsTemplate.Content, token);
       sms.InsertUserId = _config.GetValue<int>("AppSettings:Admin");
       sms.InsertDate = DateTime.Now;
       sms.UpdateDate = DateTime.Now;
@@ -73,6 +75,133 @@ namespace EducNotes.API.Controllers
       }
 
       return BadRequest("problème lors de l'envoi du sms de validation");
+    }
+
+    [HttpPost("EmailCode")]
+    public async Task<IActionResult> SendEmailValidationCode(ConfirmTokenDto confirmTokenDto)
+    {
+      var email = confirmTokenDto.Email;
+      var userId = Convert.ToInt32(confirmTokenDto.UserId);
+      bool codeSent = false;
+      var user = await _context.Users.FirstAsync(u => u.Id == userId);
+      var token = await _userManager.GenerateUserTokenAsync(user,"ChangeDataTotpTokenProvider","ChangeDataTotpTokenProvider");
+
+      var emailTemplateId = _config.GetValue<int>("AppSettings:emailEditCodeEmailId");
+      var emailTemplate = await _context.EmailTemplates.FirstAsync(t => t.Id == emailTemplateId);
+      Email newEmail = new Email();
+      newEmail.EmailTypeId = 1;
+      newEmail.ToAddress = email;
+      newEmail.FromAddress = "no-reply@educnotes.com";
+      newEmail.Subject = emailTemplate.Subject;
+      newEmail.Body = string.Format(emailTemplate.Body, token);
+      newEmail.InsertUserId = 1;
+      newEmail.InsertDate = DateTime.Now;
+      newEmail.UpdateUserId = 1;
+      newEmail.UpdateDate = DateTime.Now;
+      newEmail.ToUserId = userId;
+      _repo.Add(newEmail);
+
+      if(await _repo.SaveAll())
+      {
+        codeSent = true;
+        return Ok(codeSent);
+      }
+
+      return BadRequest("problème lors de l'envoi du sms de validation");
+    }
+
+    [AllowAnonymous]
+    [HttpGet("PhoneCode/{userId}/{num}")]
+    public async Task<IActionResult> GetPhoneValidationCode(int userId, string num)
+    {
+      bool codeSent = false;
+      var user = await _context.Users.FirstAsync(u => u.Id == userId);
+      user.PhoneNumber = num;
+      var token = await _userManager.GenerateChangePhoneNumberTokenAsync(user, num);
+      Sms sms = new Sms();
+      sms.To = num;
+      sms.ToUserId = user.Id;
+      sms.SmsTypeId = _config.GetValue<int>("AppSettings:SmsValidationTypeId");
+      var smsTemplateId = _config.GetValue<int>("AppSettings:PhoneEditCodeSms");
+      var smsTemplate = await _context.SmsTemplates.FirstAsync(t => t.Id == smsTemplateId);
+      sms.Content = string.Format(smsTemplate.Content, token);
+      sms.InsertUserId = _config.GetValue<int>("AppSettings:Admin");
+      sms.InsertDate = DateTime.Now;
+      sms.UpdateDate = DateTime.Now;
+      _repo.Add(sms);
+
+      if(await _repo.SaveAll())
+      {
+        codeSent = true;
+        return Ok(codeSent);
+      }
+
+      return BadRequest("problème lors de l'envoi du sms de validation");
+    }
+
+    [HttpPost("EditPhoneNumber")]
+    public async Task<IActionResult> EditPhoneNumber(ConfirmTokenDto confirmTokenDto)
+    {
+      int userId = Convert.ToInt32(confirmTokenDto.UserId);
+      string token = confirmTokenDto.Token;
+      string phoneNumber = confirmTokenDto.PhoneNumber;
+
+      bool phoneNumOk = false;
+      var user = await _context.Users.FirstAsync(u => u.Id == userId);
+      user.PhoneNumber = phoneNumber;
+      var result = await _userManager.ChangePhoneNumberAsync(user, user.PhoneNumber, token);
+      if(result.Succeeded)
+      {
+        await _userManager.UpdateAsync(user);
+        phoneNumOk = true;
+      }
+
+      return Ok(phoneNumOk);
+    }
+
+    [HttpPost("EditEmail")]
+    public async Task<IActionResult> EditEmail(ConfirmTokenDto confirmTokenDto)
+    {
+      int userId = Convert.ToInt32(confirmTokenDto.UserId);
+      string token = confirmTokenDto.Token;
+      string email = confirmTokenDto.Email;
+
+      bool emailOk = false;
+      var user = await _context.Users.FirstAsync(u => u.Id == userId);
+      user.Email = email.ToLower();
+      user.NormalizedEmail = email.ToUpper();
+      var result = await _userManager.VerifyUserTokenAsync(user, "ChangeDataTotpTokenProvider", "ChangeDataTotpTokenProvider", token);
+      if(result)
+      {
+        await _userManager.UpdateAsync(user);
+        emailOk = true;
+      }
+
+      return Ok(emailOk);
+    }
+
+    [HttpPost("EditPwd")]
+    public async Task<IActionResult> EditPwd(ConfirmTokenDto confirmTokenDto)
+    {
+      int userId = Convert.ToInt32(confirmTokenDto.UserId);
+      string userName = confirmTokenDto.UserName;
+      string token = confirmTokenDto.Token;
+      string oldPwd = confirmTokenDto.OldPassword;
+      string pwd = confirmTokenDto.Password;
+
+      bool pwdOk = false;
+      var user = await _context.Users.FirstAsync(u => u.Id == userId);
+      var result = await _userManager.VerifyUserTokenAsync(user, "ChangeDataTotpTokenProvider", "ChangeDataTotpTokenProvider", token);
+      if(result)
+      {
+        await _userManager.ChangePasswordAsync(user, oldPwd, pwd);
+        user.UserName = userName.ToLower();
+        user.NormalizedUserName = userName.ToUpper();
+        await _userManager.UpdateAsync(user);
+        pwdOk = true;
+      }
+
+      return Ok(pwdOk);
     }
 
     [AllowAnonymous]

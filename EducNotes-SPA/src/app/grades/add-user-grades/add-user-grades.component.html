@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-12">
     <div class="text-17 m-0 pb-2">
-      saisie des notes - classe : {{eval.className}}. {{eval.name}} du {{eval.evalDate}}</div>
+      saisie des notes - classe {{eval.className}}. {{eval.name}} du {{eval.evalDate}}</div>
   </div>
   <div class="col-md-12">
     <form #evalForm="ngForm" (ngSubmit)="saveNotes()">
@@ -9,7 +9,7 @@
         <div class="col-md-4">
           <div class="md-form form-sm m-0">
             <input mdbInput type="text" id="search" class="form-control" [formControl]="searchControl" mdbValidate>
-            <label for="search" class="">rechercher élève</label>
+            <label for="search" class="">rechercher des élèves</label>
           </div>
         </div>
       </div>
@@ -17,27 +17,29 @@
       <div class="row d-none d-md-block animated zoomIn">
         <div class="col-md-12">
           <div *ngFor="let student of filteredUserGrades; let i = index">
-            <div class="border rounded-lg p-2 mb-1">
-              <div class="row">
-                <div class="col-4 my-auto">
-                  <div class="div-thumb">
-                    <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle">
-                    <label class="text-17 text-capitalize ml-2">{{student.studentName}}</label>
+            <div class="card mb-1">
+              <div class="card-body p-2">
+                <div class="row">
+                  <div class="col-4 my-auto">
+                    <div class="div-thumb">
+                      <img src="{{student.photoUrl || '../../assets/user.png'}}" alt="" class="rounded-circle">
+                      <label class="text-17 text-capitalize ml-2">{{student.studentName}}</label>
+                    </div>
                   </div>
-                </div>
-                <div class="col-2 my-auto">
-                  <div class="md-form form-sm m-0">
-                    <input mdbInput type="text" (blur)="checkGrade(i, eval.maxGrade)" class="form-control form-control-sm"
-                      id="note + {{i}}" [(ngModel)]="student.grade" name="note + {{i}}">
-                    <label for="note + {{i}}" class="">note / {{eval.maxGrade}}</label>
-                    <div class="text-small text-danger" *ngIf="gradeErrors[i] == true">la note est incorrecte</div>
+                  <div class="col-2 my-auto">
+                    <div class="md-form form-sm m-0">
+                      <input mdbInput type="text" (blur)="checkGrade(i, eval.maxGrade)" class="form-control form-control-sm"
+                        id="note + {{i}}" [(ngModel)]="student.grade" name="note + {{i}}">
+                      <label for="note + {{i}}" class="">note / {{eval.maxGrade}}</label>
+                      <div class="text-small text-danger" *ngIf="gradeErrors[i] == true">la note est incorrecte</div>
+                    </div>
                   </div>
-                </div>
-                <div class="col-6 my-auto">
-                  <div class="md-form form-sm m-0">
-                    <input mdbInput type="text" id="comment + {{i}}" class="form-control form-control-sm"
-                      [(ngModel)]="student.comment" name="comment + {{i}}">
-                    <label for="comment + {{i}}" class="">commentaire</label>
+                  <div class="col-6 my-auto">
+                    <div class="md-form form-sm m-0">
+                      <input mdbInput type="text" id="comment + {{i}}" class="form-control form-control-sm"
+                        [(ngModel)]="student.comment" name="comment + {{i}}">
+                      <label for="comment + {{i}}" class="">commentaire</label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -50,7 +52,8 @@
         <div class="col-md-12">
           <div *ngFor="let student of filteredUserGrades; let i = index">
             <div class="row">
-              <mdb-card class="col-md-12 testimonial-card my-5">
+              <div class="col-12">
+              <mdb-card class="testimonial-card my-5">
                 <div class="avatar mx-auto">
                   <img src="{{student.photoUrl || '../../assets/user.png'}}" class="rounded-circle">
                 </div>
@@ -73,6 +76,7 @@
                   </div>
                 </mdb-card-body>
               </mdb-card>
+              </div>
             </div>
           </div>
         </div>

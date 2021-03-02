@@ -1921,11 +1921,18 @@ namespace EducNotes.API.Controllers
           return BadRequest("Could not add the photo");
         }
 
+        [HttpPost("EditUserAccount")]
+        public async Task<IActionResult> EditUserAccount([FromForm] UserAccountForEditDto user)
+        {
+          bool userOK = await _repo.EditUserAccount(user);
+          return Ok(userOK);
+        }
+
         [HttpPost("AddTeacher")]
         public async Task<IActionResult> AddTeacher([FromForm]TeacherForEditDto user)
         {
-          int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-          bool userOK = await _repo.AddTeacher(user, userId);
+          // int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+          bool userOK = await _repo.AddTeacher(user);
 
           if(userOK)
             return Ok();

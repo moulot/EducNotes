@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, HostListener, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { MdbTableDirective, MdbTablePaginationComponent } from 'ng-uikit-pro-standard';
+import { MdbTableDirective } from 'ng-uikit-pro-standard';
 import { UserService } from 'src/app/_services/user.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { User } from 'src/app/_models/user';

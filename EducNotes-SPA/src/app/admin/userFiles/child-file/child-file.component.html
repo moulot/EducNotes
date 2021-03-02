@@ -23,12 +23,12 @@
         <div class="text-18 font-weight-500">
           <span class="text-capitalize">{{userFile.lastName}} {{userFile.firstName}}</span> ({{userFile.age}} ans) - classe de {{userFile.className || userFile.classLevelName}}.
         </div>
-        <div class="text-15">
+        <div *ngIf="userFile.fatherLastName" class="text-15">
           <b>père:</b><span class="text-capitalize pl-1">{{userFile.fatherLastName}} {{userFile.fatherFirstName}}.</span>
           <span class="pl-2">mobile: <span>{{userFile.fatherPhoneNumber}}</span></span>
           <span class="pl-2">email: <span>{{userFile.fatherEmail}}</span></span>
         </div>
-        <div class="text-15">
+        <div *ngIf="userFile.motherLastName" class="text-15">
           <b>mère:</b><span class="text-capitalize pl-1">{{userFile.motherLastName}} {{userFile.motherFirstName}}.</span>
           <span class="pl-2">mobile: <span>{{userFile.motherPhoneNumber}}</span></span>
           <span class="pl-2">email: <span>{{userFile.motherEmail}}</span></span>

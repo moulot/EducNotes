@@ -35,6 +35,7 @@ export interface User {
   active: number;
   validated: boolean;
   accountDataValidated: boolean;
+  toBeValidatedEmail: string;
 
   photos?: Photo[];
   roles?: string[];

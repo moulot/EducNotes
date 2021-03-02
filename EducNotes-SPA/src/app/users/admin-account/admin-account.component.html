@@ -1,9 +1,9 @@
 <div class="card animated zoomIn mb-2">
   <div class="card-body p-2">
     <div class="d-md-flex">
-      <div class="text-center text-md-left text-16"><b>infos du compte</b></div>
+      <div class="text-center text-md-left text-16 my-auto"><b>infos du compte</b></div>
       <div class="text-center text-md-left text-16 ml-md-2">
-        <a [routerLink]="['/editAccount', adminid]" class="textBlue"><u>editer le compte</u></a>
+        <button type="button" mdbBtn size="sm" class="btnBlue" [routerLink]="['/editAccount', adminid]">editer le compte</button>
       </div>
     </div>
     <hr class="my-1">
@@ -13,18 +13,19 @@
       </div>
       <div class="ml-2 text-md-left text-center my-auto">
         <div class="text-20 text-capitalize font-weight-500">{{admin?.lastName}} {{admin?.firstName}}</div>
-        <div class="text-16"><span *ngIf="admin?.phoneNumber">{{admin?.phoneNumber}} /</span> {{admin?.email}}</div>
       </div>
     </div>
     <hr class="my-1">
-    <div class="text-16 mb-2"><b>infos de connexion</b></div>
-    <div class="row">
-      <div class="col-md-2 text-15">nom utilisateur</div>
-      <div class="col-md-1 d-none d-md-block text-15">:</div>
-      <div class="col-md-9 text-15 textBlue">{{admin?.userName}}</div>
-      <div class="col-md-2 text-15">mot de passe</div>
-      <div class="col-md-1 d-none d-md-block text-15">:</div>
-      <div class="col-md-9 text-15 textBlue">xxxxxxxxxxx</div>
+    <div class="text-16 mb-2"><b>contacts</b></div>
+    <div class="row text-15">
+      <div class="col-md-2">mobile & autre</div>
+      <div class="col-md-1 d-none d-md-block">:</div>
+      <div class="col-md-9 textBlue">{{admin?.phoneNumber || 'N/D'}}
+        <span *ngIf="admin?.secondPhoneNumber"> / {{admin?.secondPhoneNumber}}</span>
+      </div>
+      <div class="col-md-2">email</div>
+      <div class="col-md-1 d-none d-md-block">:</div>
+      <div class="col-md-9 textBlue">{{admin?.email || 'N/D'}}</div>
     </div>
     <hr class="my-1">
     <div class="text-16 mb-2"><b>détails des informations</b></div>
@@ -41,6 +42,16 @@
         <span *ngIf="admin?.districtId">{{admin?.districtName || 'N/A'}} / {{admin?.cityName || 'N/A'}}</span>
         <span *ngIf="!admin?.districtId">N/A</span>
       </div>
+    </div>
+    <hr class="my-1">
+    <div class="text-16 mb-2"><b>infos de connexion</b></div>
+    <div class="row">
+      <div class="col-md-2 text-15">nom utilisateur</div>
+      <div class="col-md-1 d-none d-md-block text-15">:</div>
+      <div class="col-md-9 text-15 textBlue">{{admin?.userName}}</div>
+      <div class="col-md-2 text-15">mot de passe</div>
+      <div class="col-md-1 d-none d-md-block text-15">:</div>
+      <div class="col-md-9 text-15 textBlue">xxxxxxxxxxx</div>
     </div>
   </div>
 </div>

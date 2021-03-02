@@ -30,6 +30,7 @@
                   <div class="row">
                     <div class="col-md-12">
                       <div class="text-18">
+                        <input type="hidden" id="childid" formControlName="childid" />
                         <b>{{i+1}}. {{children[i].lastName | titlecase}} {{children[i].firstName | titlecase}}.</b> classe de {{children[i].classLevelName}}
                       </div>
                     </div>
@@ -84,15 +85,6 @@
                               class="text-small text-danger">saisir la date de naiss. svp</div>
                           </div>
                         </div>
-                        <!-- <div class="col-md-4">
-                          <div class="md-form mt-2 mb-0">
-                            <input mdbInput type="text" id="'dob'+{{i}}" [textMask]="{mask: birthDateMask}"
-                              class="form-control" formControlName="dob" mdbValidate>
-                            <label for="'dob'+{{i}}" class="">date de naissance</label>
-                            <div *ngIf="child.get('dob').errors && child.get('dob').touched"
-                              class="text-small text-danger">saisir la date de naiss. svp</div>
-                          </div>          
-                        </div> -->
                         <div class="col-md-4">
                           <div class="md-form mt-2 mb-0">
                             <input mdbInput type="text" id="'email'+{{i}}" class="form-control" formControlName="email" mdbValidate>
