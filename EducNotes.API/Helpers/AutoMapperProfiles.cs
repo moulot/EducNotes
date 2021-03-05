@@ -97,6 +97,9 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.strDateOfBirth, opt => {
                     opt.MapFrom(d => d.DateOfBirth.ToString("dd/MM/yyyy", frC));
                 })
+                .ForMember(dest => dest.strGender, opt => {
+                    opt.MapFrom(src => src.Gender == 0 ? "femme" : "homme");
+                })
                 .ForMember(dest => dest.ClassName, opt => {
                     opt.MapFrom(src => src.Class.Name);
                 })

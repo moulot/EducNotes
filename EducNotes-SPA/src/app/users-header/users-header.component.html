@@ -4,7 +4,7 @@
       <div [ngClass]="(selectedUser.id == child.id)?'selected':'unselected'" class="border rounded-pill p-1">
         <div class="d-flex">
           <img class="child-img mr-2" src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
-          <div class="text-17 my-auto">{{child.lastName}} {{child.firstName}}</div>
+          <div class="text-17 my-auto">{{child.lastName}} {{child.firstName}} - {{child.className || child.classLevelName}}</div>
         </div>
       </div>
     </a>

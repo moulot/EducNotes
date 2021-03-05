@@ -19,6 +19,7 @@ export class EditAccountComponent implements OnInit {
   user: any;
   userNameExist = false;
   userForm: FormGroup;
+  credentialsForm: FormGroup;
   validEmailRegex = Utils.validEmailRegex;
   wait = false;
   gender = [{value: 0, label: 'femme'}, {value: 1, label: 'homme'}];
@@ -66,31 +67,39 @@ export class EditAccountComponent implements OnInit {
       } else {
         this.dob = this.user.strDateOfBirth;
       }
+      if (this.user.cityId) {
+        this.getCityDistricts(this.user.cityId);
+      }
     });
 
     this.createUserForm();
+    this.createCredentialsForm();
   }
 
   createUserForm() {
     this.userForm = this.fb.group({
       lastName: [this.user.lastName, Validators.required],
       firstName: [this.user.firstName, Validators.required],
+      dateOfBirth: [this.dob, Validators.required],
+      gender: [this.user.gender, Validators.required],
+      cityId: [this.user.cityId],
+      districtId: [this.user.districtId],
+      phone2: [this.user.secondPhoneNumber, Validators.nullValidator],
+      photoUrl: [this.user.photoUrl],
+    });
+  }
+
+  createCredentialsForm() {
+    this.credentialsForm = this.fb.group({
       userName: [this.user.userName, Validators.required],
       password: ['', Validators.required],
       oldPassword: ['', Validators.required],
       checkpwd: ['', [ Validators.required, this.pwdValidator ] ],
-      dateOfBirth: [this.dob, Validators.required],
-      gender: [this.user.gender, Validators.required],
       email: [this.user.email, [Validators.required, Validators.email ] ],
       cell: [this.user.phoneNumber, [Validators.required, this.phoneValidator] ],
-      cityId: [''],
-      districtId: [''],
       code: ['', [ this.codeValidator ] ],
       emailCode: ['', [ this.codeValidator ] ],
       pwdCode: ['', [ this.codeValidator ] ],
-      phone2: [this.user.secondPhoneNumber, Validators.nullValidator],
-      photoUrl: [this.user.photoUrl],
-      pwdActive: [false]
     });
   }
 
@@ -103,11 +112,12 @@ export class EditAccountComponent implements OnInit {
     });
   }
 
-  getCityDistricts() {
-    const id = this.userForm.value.cityId;
-    if (id) {
-      this.userForm.value.cityId = '';
-      this.authService.getDistrictsByCityId(id).subscribe((res: any[]) => {
+  getCityDistricts(cityId) {
+    // const id = cityId; // this.userForm.value.cityId;
+    if (cityId) {
+      // this.userForm.value.cityId = '';
+      this.districtOptions = [];
+      this.authService.getDistrictsByCityId(cityId).subscribe((res: any[]) => {
         for (let i = 0; i < res.length; i++) {
           const elt = { value: res[i].id, label: res[i].name };
           this.districtOptions = [...this.districtOptions, elt];
@@ -119,7 +129,7 @@ export class EditAccountComponent implements OnInit {
   }
 
   userNameVerification() {
-    const userName = this.userForm.value.userName;
+    const userName = this.credentialsForm.value.userName;
     this.userNameExist = false;
     this.authService.userNameExist(userName, this.userid).subscribe((res: boolean) => {
       if (res === true) {
@@ -131,7 +141,7 @@ export class EditAccountComponent implements OnInit {
   pwdValidator = (control: FormControl): { [ s: string ]: boolean } => {
     if (!control.value) {
       return { required: true };
-    } else if (control.value !== this.userForm.controls.password.value) {
+    } else if (control.value !== this.credentialsForm.controls.password.value) {
       return { confirmNOK: true };
     }
     return null;
@@ -171,8 +181,8 @@ export class EditAccountComponent implements OnInit {
 
   emailChanged() {
     const oldEmail = this.user.email;
-    const newEmail = this.userForm.value.email;
-    if (oldEmail !== newEmail && !this.userForm.get('email').errors) {
+    const newEmail = this.credentialsForm.value.email;
+    if (oldEmail !== newEmail && !this.credentialsForm.get('email').errors) {
       this.emailValidationSteps = 0;
       this.emailEdited = true;
     } else {
@@ -182,7 +192,7 @@ export class EditAccountComponent implements OnInit {
 
   phoneChanged() {
     const oldPhone = this.user.phoneNumber;
-    const newPhone = this.userForm.value.cell;
+    const newPhone = this.credentialsForm.value.cell;
     if (oldPhone !== newPhone && newPhone.length === 10) {
       this.phoneValidationSteps = 0;
       this.phoneEdited = true;
@@ -192,8 +202,8 @@ export class EditAccountComponent implements OnInit {
   }
 
   pwdChanged() {
-    if (!this.userNameExist && !this.userForm.get('password').errors && !this.userForm.get('oldPassword').errors &&
-      ((this.userForm.value.password).toLowerCase() === (this.userForm.value.checkpwd).toLowerCase())) {
+    if (!this.userNameExist && !this.credentialsForm.get('password').errors && !this.credentialsForm.get('oldPassword').errors &&
+      ((this.credentialsForm.value.password).toLowerCase() === (this.credentialsForm.value.checkpwd).toLowerCase())) {
       this.pwdValidationSteps = 0;
       this.pwdEdited = true;
     } else {
@@ -202,7 +212,7 @@ export class EditAccountComponent implements OnInit {
   }
 
   changePhone(phonenum) {
-    this.userForm.get('cell').setValue(phonenum);
+    this.credentialsForm.get('cell').setValue(phonenum);
   }
 
   sendPwdCodeToMobile() {
@@ -225,16 +235,16 @@ export class EditAccountComponent implements OnInit {
     this.wait = true;
     const confirmPwd = <ConfirmToken>{};
     confirmPwd.userId = this.user.id.toString();
-    confirmPwd.token = this.userForm.value.pwdCode;
-    confirmPwd.userName = this.userForm.value.userName;
-    confirmPwd.oldPassword = this.userForm.value.oldPassword;
-    confirmPwd.password = this.userForm.value.password;
+    confirmPwd.token = this.credentialsForm.value.pwdCode;
+    confirmPwd.userName = this.credentialsForm.value.userName;
+    confirmPwd.oldPassword = this.credentialsForm.value.oldPassword;
+    confirmPwd.password = this.credentialsForm.value.password;
     this.accountService.editPwd(confirmPwd).subscribe((pwdOk: Boolean) => {
       this.pwdOk = pwdOk;
       if (this.pwdOk) {
         this.emailValidationSteps = 2;
-        this.userForm.get('emailCode').setValue('');
-        this.user.email = this.userForm.value.email;
+        this.credentialsForm.get('emailCode').setValue('');
+        this.user.email = this.credentialsForm.value.email;
         this.alertInfoTitle = 'votre email \'' + this.user.email + '\'est validé!';
         this.alertInfo = 'votre email a été modifié avec succès. merci';
         this.showAlert();
@@ -253,7 +263,7 @@ export class EditAccountComponent implements OnInit {
     const confirmEmail = <ConfirmToken>{};
     confirmEmail.userId = this.user.id.toString();
     confirmEmail.phoneNumber = this.user.phoneNumber;
-    confirmEmail.email = this.userForm.value.email;
+    confirmEmail.email = this.credentialsForm.value.email;
     this.accountService.sendCodeToEmail(confirmEmail).subscribe(codeSent => {
       if (codeSent) {
         this.emailValidationSteps = 1;
@@ -269,14 +279,14 @@ export class EditAccountComponent implements OnInit {
     this.wait = true;
     const confirmEmail = <ConfirmToken>{};
     confirmEmail.userId = this.user.id.toString();
-    confirmEmail.token = this.userForm.value.emailCode;
-    confirmEmail.email = this.userForm.value.email;
+    confirmEmail.token = this.credentialsForm.value.emailCode;
+    confirmEmail.email = this.credentialsForm.value.email;
     this.accountService.editEmail(confirmEmail).subscribe((emailOk: Boolean) => {
       this.emailOk = emailOk;
       if (this.emailOk) {
         this.emailValidationSteps = 2;
-        this.userForm.get('emailCode').setValue('');
-        this.user.email = this.userForm.value.email;
+        this.credentialsForm.get('emailCode').setValue('');
+        this.user.email = this.credentialsForm.value.email;
         this.alertInfoTitle = 'votre email \'' + this.user.email + '\'est validé!';
         this.alertInfo = 'votre email a été modifié avec succès. merci';
         this.showAlert();
@@ -292,7 +302,7 @@ export class EditAccountComponent implements OnInit {
 
   sendPhoneNumber() {
     this.wait = true;
-    this.accountService.sendPhoneNumberToValidate(this.user.id, this.userForm.value.cell).subscribe(codeSent => {
+    this.accountService.sendPhoneNumberToValidate(this.user.id, this.credentialsForm.value.cell).subscribe(codeSent => {
       if (codeSent) {
         this.phoneValidationSteps = 1;
       }
@@ -307,15 +317,15 @@ export class EditAccountComponent implements OnInit {
     this.wait = true;
     const confirmPhone = <ConfirmToken>{};
     confirmPhone.userId = this.user.id.toString();
-    confirmPhone.token = this.userForm.value.code;
-    confirmPhone.phoneNumber = this.userForm.value.cell;
+    confirmPhone.token = this.credentialsForm.value.code;
+    confirmPhone.phoneNumber = this.credentialsForm.value.cell;
     this.accountService.editPhoneNumber(confirmPhone).subscribe((phoneNumOk: Boolean) => {
       this.phoneOk = phoneNumOk;
       if (this.phoneOk) {
         this.phoneValidationSteps = 2;
-        this.userForm.get('code').setValue('');
-        this.user.phoneNumber = this.userForm.value.cell;
-        this.alertInfoTitle = 'votre numéro mobile \'' + Utils.formatPhoneNumber(this.user.phoneNumber) + '\'est validé!';
+        this.credentialsForm.get('code').setValue('');
+        this.user.phoneNumber = this.credentialsForm.value.cell;
+        this.alertInfoTitle = 'votre numéro mobile \'' + Utils.formatPhoneNumber(this.user.phoneNumber) + ' \'est validé!';
         this.alertInfo = 'votre numéro mobile a été modifié avec succès. merci';
         this.showAlert();
         } else {
@@ -328,7 +338,7 @@ export class EditAccountComponent implements OnInit {
     });
   }
 
-  addUser() {
+  updateUser() {
     this.wait = true;
     const formData = new FormData();
     if (this.photoFile) {
@@ -339,18 +349,11 @@ export class EditAccountComponent implements OnInit {
     formData.append('firstName', this.userForm.value.firstName);
     formData.append('gender', this.userForm.value.gender);
     formData.append('strDateOfBirth', this.userForm.value.dateOfBirth);
-    formData.append('email', this.userForm.value.email);
-    formData.append('phoneNumber', this.userForm.value.cell);
     formData.append('secondPhoneNumber', this.userForm.value.phone2);
-    // formData.append('userName', this.userForm.value.userName);
-    // formData.append('password', this.userForm.value.password);
-    // formData.append('pwdChanged', this.userForm.value.pwdActive);
-    formData.append('oldEmail', this.user.email);
-    formData.append('oldPhoneNumber', this.user.phoneNumber);
     formData.append('cityId', this.userForm.value.cityId);
     formData.append('districtId', this.userForm.value.districtId);
 
-    this.userService.editUserAccountr(formData).subscribe((updateOK: boolean) => {
+    this.userService.editUserAccount(formData).subscribe((updateOK: boolean) => {
       if (updateOK) {
         this.alertify.success('le compte a été mis à jour avec succès');
         this.router.navigate(['/userAccount', this.user.id]);

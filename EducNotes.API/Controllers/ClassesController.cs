@@ -254,29 +254,33 @@ namespace EducNotes.API.Controllers
         [HttpGet("{classId}/CourseWithTeacher")]
         public async Task<IActionResult> GetCourseWithTeacher(int classId)
         {
-            var teachersData = await _context.ClassCourses
-                                .Include(i => i.Teacher).ThenInclude(i => i.Photos)
-                                .Include(i => i.Course)
-                                .Where(u => u.ClassId == classId)
-                                .Distinct().ToListAsync();
+          var teachersData = await _context.ClassCourses
+                              .Include(i => i.Teacher).ThenInclude(i => i.Photos)
+                              .Include(i => i.Class).ThenInclude(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
+                              .Include(i => i.Course)
+                              .Where(u => u.ClassId == classId)
+                              .Distinct().ToListAsync();
 
-            List<TeacherForListDto> coursesWithTeacher = new List<TeacherForListDto>();
-            foreach (var data in teachersData)
-            {
-                TeacherForListDto teacherCourse = new TeacherForListDto();
-                teacherCourse.Id = Convert.ToInt32(data.TeacherId);
-                teacherCourse.LastName = data.Teacher.LastName;
-                teacherCourse.FirstName = data.Teacher.FirstName;
-                teacherCourse.Email = data.Teacher.Email;
-                teacherCourse.PhotoUrl = ""; //data.Teacher.Photos.FirstOrDefault(p => p.IsMain).Url;
-                teacherCourse.PhoneNumber = data.Teacher.PhoneNumber;
-                teacherCourse.DateOfBirth = data.Teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
-                teacherCourse.SecondPhoneNumber = data.Teacher.SecondPhoneNumber;
-                teacherCourse.Course = data.Course;
-                coursesWithTeacher.Add(teacherCourse);
-            }
+          List<TeacherForListDto> coursesWithTeacher = new List<TeacherForListDto>();
+          foreach (var data in teachersData)
+          {
+            TeacherForListDto teacherCourse = new TeacherForListDto();
+            teacherCourse.Id = Convert.ToInt32(data.TeacherId);
+            teacherCourse.LastName = data.Teacher.LastName;
+            teacherCourse.FirstName = data.Teacher.FirstName;
+            teacherCourse.Email = data.Teacher.Email;
+            teacherCourse.PhotoUrl = data.Teacher.Photos.FirstOrDefault(p => p.IsMain).Url;
+            teacherCourse.PhoneNumber = data.Teacher.PhoneNumber;
+            teacherCourse.DateOfBirth = data.Teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
+            teacherCourse.SecondPhoneNumber = data.Teacher.SecondPhoneNumber;
+            teacherCourse.Course = data.Course;
+            teacherCourse.EducLevelId = data.Class.ClassLevel.EducationLevel.Id;
+            teacherCourse.EducLevelName = data.Class.ClassLevel.EducationLevel.Name;
+            teacherCourse.ClassName = data.Class.Name;
+            coursesWithTeacher.Add(teacherCourse);
+          }
 
-            return Ok(coursesWithTeacher);
+          return Ok(coursesWithTeacher);
         }
 
         [HttpGet("{classId}/Students")]

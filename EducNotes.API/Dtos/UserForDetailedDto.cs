@@ -18,6 +18,7 @@ namespace EducNotes.API.Dtos
         public int ClassId { get; set; }
         public string ClassName { get; set; }
         public byte Gender { get; set; }
+        public string strGender { get; set; }
         public string strDateOfBirth { get; set; }
         public int Age { get; set; }
         public string KnownAs { get; set; }

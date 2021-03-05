@@ -1,6 +1,5 @@
 <div *ngIf="!loadingOk" class="spinning-preloader-container">
   <div class="preloader-wrapper big active">
-  
     <div class="spinner-layer spinner-blue">
       <div class="circle-clipper left">
         <div class="circle"> </div>
@@ -8,7 +7,6 @@
         <div class="circle"> </div>
       </div>
     </div>
-    
     <div class="spinner-layer spinner-red">
       <div class="circle-clipper left">
         <div class="circle"> </div>
@@ -16,7 +14,6 @@
         <div class="circle"> </div>
       </div>
     </div>
-    
     <div class="spinner-layer spinner-yellow">
       <div class="circle-clipper left">
         <div class="circle"> </div>
@@ -24,7 +21,6 @@
         <div class="circle"> </div>
       </div>
     </div>
-    
     <div class="spinner-layer spinner-green">
       <div class="circle-clipper left">
         <div class="circle"> </div>
@@ -32,7 +28,6 @@
         <div class="circle"> </div>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -40,15 +35,14 @@
   <div class="col-md-12" *ngIf="showChildrenList">
     <p class="text-15 text-muted m-1">sélectionner un enfant pour voir ses notes</p>
     <div class="row">
-      <div class="col-md-9 col-sm-12">
+      <div class="col-md-12 col-sm-12">
         <app-children-list [url]="url" [children]="children" (getUser)="getUser($event)"></app-children-list>
       </div>
-      <div class="col-md-3 col-sm-12">
+      <!-- <div class="col-md-3 col-sm-12">
         <app-timeline></app-timeline>
-      </div>
+      </div> -->
     </div>
   </div>
-
   <div class="col-md-12" *ngIf="!showChildrenList">
     <div class="row">
       <div class="col-md-12 mb-2" *ngIf="isParentConnected">
@@ -75,25 +69,25 @@
         </div>
       </div>
       <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6 mb-2">
-            <!-- <div class="card"> -->
-              <div class="border rounded-lg text-center p-1">
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center p-2">
                 <p *ngIf="periodAvg > -1000 && studentAvg < 10" class="text-15 font-weight-400 m-0">
-                  moy. {{periodName}} : <label class="text-danger"><b>{{periodAvg}} / 201</b></label>
+                  moy. {{periodName}} : <label class="text-danger"><b>{{periodAvg}} / 20</b></label>
                 </p>
                 <p *ngIf="periodAvg >= 10" class="text-15 font-weight-400 m-0">
-                  moy. {{periodName}} : <label class="text-success"><b>{{periodAvg}} / 202</b></label>
+                  moy. {{periodName}} : <label class="text-success"><b>{{periodAvg}} / 20</b></label>
                 </p>
                 <p *ngIf="periodAvg === -1000" class="text-15 font-weight-400 m-0">
                   moy. {{periodName}} : <label class="text-primary"><b>N/A</b></label>
                 </p>
               </div>      
-            <!-- </div> -->
+            </div>
           </div>
-          <div class="col-md-6 mb-2">
-            <!-- <div class="card"> -->
-              <div class="border rounded-lg text-center p-1">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center p-2">
                 <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-15 font-weight-400 m-0">
                   moy. générale : <label class="text-danger"><b>{{studentAvg}} / 20</b></label>
                 </p>
@@ -104,21 +98,6 @@
                   moy. générale : <label class="text-primary"><b>N/A</b></label>
                 </p>
               </div>
-            <!-- </div> -->
-          </div>
-          <div class="col-md-12" *ngIf="!selectedPeriod">
-            <div class="card">
-              <div class="card-body text-center p-1">
-                <p *ngIf="studentAvg < 10 && studentAvg > -1000" class="text-15 font-weight-400 m-0">
-                  moyenne générale : <label class="text-danger"><b>{{studentAvg}} / 20</b></label>
-                </p>
-                <p *ngIf="studentAvg >= 10" class="text-15 font-weight-400 m-0">
-                  moyenne générale : <label class="text-success"><b>{{studentAvg}} / 20</b></label>
-                </p>
-                <p *ngIf="studentAvg === -1000" class="text-15 font-weight-300 m-0">
-                  moyenne générale : <label class="text-primary"><b>N/A</b></label>
-                </p>
-              </div>      
             </div>
           </div>
         </div>
@@ -126,81 +105,108 @@
       <div class="col-md-12">
         <div class="row">
           <div class="col-md-6">
-            <div class="col-md-12 mb-2">
-              <div class="card">
-                <div class="card-body">
-                  <div *ngIf="!selectedPeriod">
-                    <div class="row">
-                      <div class="col-md-3 mb-2" *ngFor="let course of userCourses">
-                        <div class="card">
+            <div class="row">
+              <div class="col-md-12 mb-2">
+                <div class="card">
+                  <div class="card-body p-2">
+                    <div *ngIf="!selectedPeriod">
+                      <div class="row">
+                        <div class="col-md-3 mb-2" *ngFor="let course of userCourses">
                           <div *ngIf="course.userCourseAvg !== -1000" (click)="loadData(course)" style="cursor: pointer">
-                            <div class="card-body text-center p-2">
-                              <span class="text-muted text-16 mb-1 mr-1">{{course.courseAbbrev}} : </span>
-                              <span *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000" class="text-primary text-danger text-16 line-height-1 m-0">{{course.userCourseAvg}}</span>
-                              <span *ngIf="course.userCourseAvg >= 10" class="text-primary text-success text-16 line-height-1 m-0">{{course.userCourseAvg}}</span>
+                            <div class="border rounded-lg text-center p-2">
+                              <span class="text-muted text-13 mb-1 mr-1">{{course.courseAbbrev}} : </span>
+                              <span *ngIf="course.userCourseAvg < 10 && course.userCourseAvg > -1000"
+                                class="text-danger text-14 line-height-1 m-0">{{course.userCourseAvg}}</span>
+                              <span *ngIf="course.userCourseAvg >= 10" class="text-success text-14 line-height-1 m-0">
+                                {{course.userCourseAvg}}
+                              </span>
                             </div>
                           </div>
                           <div *ngIf="course.userCourseAvg === -1000">
-                            <div class="card-body text-center p-2">
-                              <span class="text-muted text-16 mb-1 mr-1">{{course.courseAbbrev}} : </span>
-                              <span *ngIf="course.userCourseAvg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</span>
+                            <div class="border rounded-lg text-center p-2">
+                              <span class="text-muted text-1 mb-13 mr-1">{{course.courseAbbrev}} : </span>
+                              <span *ngIf="course.userCourseAvg === -1000" class="textBlue text-14 line-height-1 m-0">n/a</span>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div *ngIf="selectedPeriod">
-                    <div class="row">
-                      <div class="col-md-3 mb-2" *ngFor="let course of coursesAvgs">
-                        <div class="card">
+                    <div *ngIf="selectedPeriod">
+                      <div class="row">
+                        <div class="col-md-3 mb-2" *ngFor="let course of coursesAvgs">
                           <div *ngIf="course.avg !== -1000" (click)="loadData(course)" style="cursor: pointer">
-                            <div class="card-body text-center p-2">
-                              <span class="text-muted text-16 mb-1 mr-1">{{course.abbrev}} : </span>
-                              <span *ngIf="course.avg < 10 && course.avg > -1000" class="text-primary text-danger text-16  line-height-1 m-0">{{course.avg}}</span>
-                              <span *ngIf="course.avg >= 10" class="text-primary text-success text-16 line-height-1 m-0">{{course.avg}}</span>
+                            <div class="border rounded-lg text-center p-2">
+                              <span class="text-muted text-13 mb-1 mr-1">{{course.abbrev}} : </span>
+                              <span *ngIf="course.avg < 10 && course.avg > -1000" class="text-danger text-14 line-height-1 m-0">{{course.avg}}</span>
+                              <span *ngIf="course.avg >= 10" class="text-primary text-success text-14 line-height-1 m-0">{{course.avg}}</span>
                             </div>
                           </div>
                           <div *ngIf="course.avg === -1000">
-                            <div class="card-body text-center p-2">
-                              <span class="text-muted text-16 mb-1 mr-1">{{course.abbrev}} : </span>
-                              <span *ngIf="course.avg === -1000" class="text-primary text-16 line-height-1 m-0">N/A</span>
+                            <div class="border rounded-lg text-center p-2">
+                              <span class="text-muted text-13 mb-1 mr-1">{{course.abbrev}} : </span>
+                              <span *ngIf="course.avg === -1000" class="text-primary text-14 line-height-1 m-0">n/a</span>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>     
+                  </div>     
+                </div>
               </div>
-            </div>
-            <div class="col-md-12 mb-2">
-              <div class="card">
-                <div class="card-body p-2">
-                  <p class="text-17 font-weight-300 m-0">détails des notes</p>
-                  <div *ngIf="selectedCourse">
-                    <table mdbTable hover="true" small="true">
-                      <thead>
-                        <tr>
-                          <th *ngFor="let head of headElts" scope="col">{{head}} </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr mdbTableCol *ngFor="let grade of evalData; let i = index">
-                          <td class="m-0">{{grade.evalDate}}</td>
-                          <td>{{grade.evalType}}</td>
-                          <td>
-                            <label class="text-danger" *ngIf="aboveAvg[i] === false"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
-                            <label class="text-success" *ngIf="aboveAvg[i] === true"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
-                          </td>
-                          <td>{{grade.classGradeMin}}</td>
-                          <td>{{grade.classGradeMax}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div *ngIf="!selectedCourse">
-                    <p class="text-18 font-weight-400 m-0 p-4">sélectionner un cours pour visualiser les notes</p>
+              <div class="col-md-12 mb-2">
+                <div class="card">
+                  <div class="card-body p-2">
+                    <div class="text-15 font-weight-300 m-0">détails des notes</div>
+                    <hr class="my-1">
+                    <div *ngIf="selectedCourse">
+                      <div class="d-none d-md-block">
+                        <table mdbTable hover="true" small="true">
+                          <thead>
+                            <tr>
+                              <th *ngFor="let head of headElts" scope="col">{{head}} </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr mdbTableCol *ngFor="let grade of evalData; let i = index">
+                              <td class="m-0">{{grade.evalDate}}</td>
+                              <td>{{grade.evalType}}</td>
+                              <td>
+                                <label class="text-danger" *ngIf="aboveAvg[i] === false"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
+                                <label class="text-success" *ngIf="aboveAvg[i] === true"><b>{{grade.grade}}/{{grade.gradeMax}}</b></label> 
+                              </td>
+                              <td>{{grade.classGradeMin}}</td>
+                              <td>{{grade.classGradeMax}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="d-md-none">
+                        <div *ngFor="let grade of evalData; let i = index">
+                          <div class="text-15"><b>{{grade.evalDate}}. {{grade.evalType}}</b></div>
+                          <div class="d-flex">
+                            <div class="w-40 text-15">note</div>
+                            <div class="w-10 text-15">:</div>
+                            <div class="w-30 text-15 text-right" [ngClass]="(aboveAvg[i] === false)?'text-danger':'text-success'">
+                              <b>{{grade.grade}}/{{grade.gradeMax}}</b>
+                            </div>
+                          </div>
+                          <div class="d-flex">
+                            <div class="w-40 text-15">note min.</div>
+                            <div class="w-10 text-15">:</div>
+                            <div class="w-30 text-15 text-right">{{grade.classGradeMin}}</div>
+                          </div>
+                          <div class="d-flex">
+                            <div class="w-40 text-15">note max.</div>
+                            <div class="w-10 text-15">:</div>
+                            <div class="w-30 text-15 text-right">{{grade.classGradeMax}}</div>
+                          </div>
+                          <hr class="my-1">
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="!selectedCourse">
+                      <p class="text-15 font-weight-400 m-0 p-4">sélectionner un cours pour visualiser les notes</p>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -1,79 +1,91 @@
 <div class="row">
-
   <div class="col-md-12" *ngIf="showChildrenList">
-
     <p class="text-15 text-muted m-1">sélectionner un enfant pour voir ses évènements</p>
-
     <div class="row">
-
-      <div class="col-md-9 col-sm-12">
-        <app-children-list [url]="url" [children]="children"></app-children-list>
+      <div class="col-md-12 col-sm-12">
+        <app-children-list [url]="url" [children]="children" (getUser)="getUser($event)"></app-children-list>
       </div>
-
-      <div class="col-md-3 col-sm-12">
-        <app-timeline></app-timeline>
-      </div>
-
     </div>
-
   </div>
-
   <div class="col-md-12" *ngIf="!showChildrenList">
-
-    <div class="row" class="col-lg-12 col-md-12">
-
-    <div class="col-md-12 mb-2">
-      <p class="lead m-0">vie de la classe - équipe pédagogique</p>
-    </div>
-
-    <div *ngIf="isParentConnected" class="col-md-12 mb-2">
-      <app-users-header [student]="student" (getUser)="getUser($event)"></app-users-header>
-    </div>
-      
-    <div class="col-md-10 card mb-1 p-0">
-      <div class="card-body p-1">
-        <div class="row">
-          <div class="col-md-1"></div>
-          <div class="col-md-2"><b>nom & prénom</b></div>
-          <div class="col-md-3"><b>cours</b></div>
-          <div class="col-md-4"><b>email</b></div>
-          <div class="col-md-2"><b>téléphone</b></div>
-        </div>
-      </div>      
-    </div>
-        
-    <div class="card col-md-10 mb-1 p-0" *ngFor="let user of teachers, let i = index"
-      [@animate]="{value:'*',params:{delay: (i*100)+'ms', x:'120px'}}">
-
-      <div class="card-body p-0">
-
-        <div class="row">
-          <div class="col-md-1">
-            <div>
-              <img class="img-box" src="{{user.photoUrl || '../../../../../assets/user.png'}}" alt="">
-            </div>
-          </div>
-          <div class="col-md-2 mt-3">
-            <p class="text-15 m-0">{{user.lastName}} {{user.firstName}}</p>
-          </div>
-          <div class="col-md-3 mt-3">
+    <div class="row">
+      <!-- <div class="col-md-12 mb-2">
+        <p class="lead m-0">vie de la classe - équipe pédagogique</p>
+      </div> -->
+      <div *ngIf="isParentConnected" class="col-md-12">
+        <app-users-header [student]="student" [children]="children" (getUser)="getUser($event)"></app-users-header>
+      </div>
+      <div *ngIf="isPrimaryClass" class="col-md-12 mb-2">
+        <div class="card mb-1 animated zoomIn">
+          <div class="card-body p-2">
+            <div class="text-15"><b>maîtresse</b></div>
+            <hr class="my-1">
             <div class="d-flex">
-              <div class="mr-2" [ngStyle]="{'background-color': user.course.color}" style="width: 20px;height: 20px;"></div>
-              <p class="text-15">{{user.course.name}}</p>
+              <div>
+                <img src="{{teachers[0].photoUrl || '../../../../../assets/user.png'}}" alt=""
+                  width="60" class="rounded-circle img-responsive">
+              </div>
+              <div class="ml-2 my-auto">
+                <div class="text-20 textBlue text-capitalize font-weight-500">{{teachers[0].lastName}} {{teachers[0].firstName}}</div>
+                <div class="text-16">{{teachers[0].phoneNumber}} / {{teachers[0].email}}</div>
+              </div>
             </div>
           </div>
-          <div class="col-md-4 mt-3">
-            <p class="text-15">{{user.email}}</p>
-          </div>
-          <div class="col-md-2 mt-3">
-            <p class="text-15">{{user.phoneNumber}}</p>
+        </div>
+        <div class="card mb-1 animated zoomIn">
+          <div class="card-body p-2">
+            <div class="text-15"><b>cours de la classe {{teachers[0].className}}</b></div>
+            <hr class="my-1">
+            <div class="row">
+              <div class="col-md-3 mt-3" *ngFor="let user of teachers">
+                <div [ngStyle]="{'background-color': user.course.color}" class="border rounded-pill p-1">
+                  <div class="text-15 ml-2 my-auto"><b>{{user.course.name}}</b></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
+      <div *ngIf="!isPrimaryClass" class="col-md-12">
+        <div class="card mb-1 p-0">
+          <div class="card-body p-1">
+            <div class="row">
+              <div class="col-md-1"></div>
+              <div class="col-md-2"><b>nom & prénom</b></div>
+              <div class="col-md-3"><b>cours</b></div>
+              <div class="col-md-4"><b>email</b></div>
+              <div class="col-md-2"><b>téléphone</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!isPrimaryClass" class="col-md-12">
+        <div class="card mb-1 animated zoomIn" *ngFor="let user of teachers, let i = index">
+          <div class="card-body p-0">
+            <div class="row">
+              <div class="col-md-1">
+                <div>
+                  <img class="img-box" src="{{user.photoUrl || '../../../../../assets/user.png'}}" alt="">
+                </div>
+              </div>
+              <div class="col-md-2 mt-3">
+                <p class="text-15 m-0">{{user.lastName}} {{user.firstName}}</p>
+              </div>
+              <div class="col-md-3 mt-3">
+                <div [ngStyle]="{'background-color': user.course.color}" class="border rounded-pill p-1">
+                  <div class="text-15 ml-2 my-auto"><b>{{user.course.name}}</b></div>
+                </div>
+              </div>
+              <div class="col-md-4 mt-3">
+                <p class="text-15">{{user.email}}</p>
+              </div>
+              <div class="col-md-2 mt-3">
+                <p class="text-15">{{user.phoneNumber}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    </div>
-  
   </div>
-
 </div>

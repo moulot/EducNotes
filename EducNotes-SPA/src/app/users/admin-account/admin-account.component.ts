@@ -16,6 +16,7 @@ export class AdminAccountComponent implements OnInit {
   ngOnInit() {
     this.userService.getUser(this.adminid).subscribe(user => {
       this.admin = user;
+      console.log(user);
     }, error => {
       this.alertify.error(error);
     });

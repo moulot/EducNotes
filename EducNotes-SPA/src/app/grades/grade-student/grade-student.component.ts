@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { echartStyles } from 'src/app/shared/echart-styles';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { ClassService } from 'src/app/_services/class.service';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { AuthService } from 'src/app/_services/auth.service';
 import { UserService } from 'src/app/_services/user.service';
@@ -83,10 +82,10 @@ export class GradeStudentComponent implements OnInit {
   // RADAR CHART
   radarchartType = 'radar';
   radarchartDatasets = [
-    { data: [65, 59, 80, 81, 56, 55, 40], label: 'My First dataset' },
-    { data: [28, 48, 40, 19, 86, 27, 90], label: 'My Second dataset' }
+    { data: [], label: 'notes de la classe' },
+    { data: [], label: 'notes de l\'enfant'}
   ];
-  radarchartLabels = ['Eating', 'Drinking', 'Sleeping', 'Designing', 'Coding', 'Cycling', 'Running'];
+  radarchartLabels = [];
   radarchartColors: Array<any>  = [
     {
       backgroundColor: 'rgba(255, 255, 255, .2)',
@@ -108,9 +107,8 @@ export class GradeStudentComponent implements OnInit {
   radarchartClicked(e: any): void { }
   radarchartHovered(e: any): void { }
 
-  constructor(private route: ActivatedRoute, private evalService: EvaluationService,
-    private alertify: AlertifyService, private classService: ClassService,
-    private authService: AuthService, private userService: UserService) { }
+  constructor(private route: ActivatedRoute, private evalService: EvaluationService, private authService: AuthService,
+    private alertify: AlertifyService, private userService: UserService) { }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -139,22 +137,8 @@ export class GradeStudentComponent implements OnInit {
       this.getUserGrades(this.student.id, this.student.classId);
       this.showChildrenList = false;
     }, error => {
-        this.alertify.error(error);
+      this.alertify.error(error);
     });
-    // this.getUserGrades(this.student.id, this.student.classId);
-    // this.showChildrenList = false;
-  //   this.userService.getUser(child.id).subscribe((user: User) => {
-  //   this.student = user;
-  //   this.getSiblings(this.student.id);
-  //   const loggedUser = this.authService.currentUser;
-  //   if (loggedUser.id !== this.student.id) {
-  //     this.isParentConnected = true;
-  //   }
-  //   this.getUserGrades(this.student.id, this.student.classId);
-  //   this.showChildrenList = false;
-  // }, error => {
-  //     this.alertify.error(error);
-  // });
   }
 
   getUserGrades(studentId, classId) {

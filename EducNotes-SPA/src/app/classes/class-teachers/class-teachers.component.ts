@@ -6,6 +6,7 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { User } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
 import { UserService } from 'src/app/_services/user.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-class-teachers',
@@ -16,6 +17,8 @@ import { UserService } from 'src/app/_services/user.service';
 export class ClassTeachersComponent implements OnInit {
   student: User;
   teachers: any;
+  educLevelPrimary = environment.educLevelPrimary;
+  isPrimaryClass = false;
   showChildrenList = false;
   children: User[];
   isParentConnected = false;
@@ -23,20 +26,13 @@ export class ClassTeachersComponent implements OnInit {
   parent: User;
   userIdFromRoute: any;
 
-  constructor(private classService: ClassService, private alertify: AlertifyService,
-    private route: ActivatedRoute, private authService: AuthService,
-    private userService: UserService) { }
+  constructor(private classService: ClassService, private alertify: AlertifyService, private route: ActivatedRoute,
+    private authService: AuthService, private userService: UserService) { }
 
   ngOnInit() {
-    // this.route.params.subscribe(params => {
-    //   const classId = params['classId'];
-    //   this.getClassTeachers(classId);
-    // });
-
     this.route.params.subscribe(params => {
       this.userIdFromRoute = params['id'];
     });
-
     // is the parent connected?
     if (Number(this.userIdFromRoute) === 0) {
       this.showChildrenList = true;
@@ -56,15 +52,25 @@ export class ClassTeachersComponent implements OnInit {
     });
   }
 
-  getUser(id) {
-    this.userService.getUser(id).subscribe((user: User) => {
+  getUser(childId) {
+    this.userService.getUser(childId).subscribe((user: User) => {
       this.student = user;
-
+      this.getSiblings(this.student.id);
       const loggedUser = this.authService.currentUser;
       if (loggedUser.id !== this.student.id) {
         this.isParentConnected = true;
       }
       this.getClassTeachers(this.student.classId);
+      this.showChildrenList = false;
+    }, error => {
+      this.alertify.error(error);
+      this.showChildrenList = false;
+    });
+  }
+
+  getSiblings(childId) {
+    this.userService.getSiblings(childId).subscribe((users: User[]) => {
+      this.children = users;
     }, error => {
       this.alertify.error(error);
     });
@@ -73,6 +79,12 @@ export class ClassTeachersComponent implements OnInit {
   getClassTeachers(classId) {
     this.classService.getCourseWithTeacher(classId).subscribe(teachers => {
       this.teachers = teachers;
+      // console.log(teachers);
+      if (this.teachers[0].educLevelId === this.educLevelPrimary) {
+        this.isPrimaryClass = true;
+      } else {
+        this.isPrimaryClass = false;
+      }
     });
   }
 

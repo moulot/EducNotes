@@ -209,6 +209,7 @@ namespace EducNotes.API.Controllers
         [HttpGet("Class/{classId}/CoursesWithEvals/{userId}")]
         public async Task<IActionResult> GetCoursesWithEvals(int userId, int classId)
         {
+          Period currPeriod = await _repo.GetPeriodFromDate(DateTime.Now);
           var periods = await _context.Periods.OrderBy(o => o.Abbrev).ToListAsync();
           List<UserCourseEvalsDto> coursesWithEvals = await _repo.GetUserGrades(userId, classId);
 
@@ -228,8 +229,6 @@ namespace EducNotes.API.Controllers
 
             if(courseCoeffSum > 0)
               GeneralAvg = Math.Round(courseAvgSum / courseCoeffSum, 2);
-
-            Period currPeriod = await _repo.GetPeriodFromDate(DateTime.Now);
 
             foreach (var period in periods)
             {
@@ -269,6 +268,34 @@ namespace EducNotes.API.Controllers
               if(coeffSum > 0)
                 pad.Avg = Math.Round(periodAvgSum / coeffSum, 2);
 
+              periodAvgs.Add(pad);
+            }
+          }
+          else
+          {
+            foreach (var period in periods)
+            {
+              PeriodAvgDto pad = new PeriodAvgDto();
+              pad.PeriodId = period.Id;
+              pad.PeriodName = period.Name;
+              pad.PeriodAbbrev = period.Abbrev;
+              pad.StartDate = period.StartDate;
+              pad.EndDate = period.EndDate;
+              //set activated period depending on startDate
+              if(DateTime.Now.Date >= period.StartDate)
+              {
+                pad.activated = true;
+              }
+              else
+              {
+                pad.activated = false;
+              }
+              if(currPeriod.Id == period.Id)
+                pad.Active = true;
+              else
+                pad.Active = false;
+
+              pad.Avg = -1000;
               periodAvgs.Add(pad);
             }
           }

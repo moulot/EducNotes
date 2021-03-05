@@ -118,17 +118,14 @@ namespace EducNotes.API.Data
         public async Task<User> GetUser(int id, bool isCurrentUser)
         {
           var query = _context.Users
-              .Include(c => c.Class)
-              .Include(c => c.ClassLevel)
-              .Include(c => c.District)
-              .Include(c => c.City)
-              .Include(p => p.Photos).AsQueryable();
+                      .Include(c => c.Class)
+                      .Include(c => c.ClassLevel)
+                      .Include(c => c.District)
+                      .Include(c => c.City)
+                      .Include(p => p.Photos).AsQueryable();
 
-          if (isCurrentUser)
-            query = query.IgnoreQueryFilters();
-
+          if (isCurrentUser) { query = query.IgnoreQueryFilters(); }
           var user = await query.FirstOrDefaultAsync(u => u.Id == id);
-
           return user;
         }
 
@@ -852,15 +849,11 @@ namespace EducNotes.API.Data
 
         public async Task<bool> EditUserAccount(UserAccountForEditDto user)
         {
-          var oldEmail = user.OldEmail;
-          var OldPhoneNumber = user.OldPhoneNumber;
-
           bool resultStatus = false;
           using (var identityContextTransaction = _context.Database.BeginTransaction())
           {
             try
             {
-              // User appUser = new User();
               User appUser = await _context.Users.Include(i => i.Photos).FirstOrDefaultAsync(u => u.Id == user.Id);
               appUser.LastName = user.LastName;
               appUser.FirstName = user.FirstName;
@@ -872,53 +865,55 @@ namespace EducNotes.API.Data
               DateTime birthDay = new DateTime(year, month, day);
               appUser.DateOfBirth = birthDay;
               appUser.SecondPhoneNumber = user.SecondPhoneNumber;
+              appUser.CityId = user.CityId;
+              appUser.DistrictId = user.DistrictId;
               
               //did we changed the email?
-              if(appUser.Email.ToLower() != user.Email.ToLower())
-              {
-                appUser.ToBeValidatedEmail = user.Email;
-              }
+              // if(appUser.Email.ToLower() != user.Email.ToLower())
+              // {
+              //   appUser.ToBeValidatedEmail = user.Email;
+              // }
 
               //did we changed the login/pwd?
-              if(user.PwdChanged)
-              {
-                var newPassword = _userManager.PasswordHasher.HashPassword(appUser, user.Password);
-                appUser.UserName = user.UserName.ToLower();
-                appUser.NormalizedUserName = user.UserName.ToUpper();
-                appUser.PasswordHash = newPassword;
-                var res = await _userManager.UpdateAsync(appUser);
-                if (res.Succeeded)
-                {
-                  var template = await _context.EmailTemplates.FirstAsync(t => t.Id == updateAccountEmailId);
-                  var email = await SetEmailForAccountUpdated(template.Subject, template.Body,
-                    user.LastName, user.Gender, user.Email, user.Id);
-                  _context.Add(email);
+              // if(user.PwdChanged)
+              // {
+              //   var newPassword = _userManager.PasswordHasher.HashPassword(appUser, user.Password);
+              //   appUser.UserName = user.UserName.ToLower();
+              //   appUser.NormalizedUserName = user.UserName.ToUpper();
+              //   appUser.PasswordHash = newPassword;
+              //   var res = await _userManager.UpdateAsync(appUser);
+              //   if (res.Succeeded)
+              //   {
+              //     var template = await _context.EmailTemplates.FirstAsync(t => t.Id == updateAccountEmailId);
+              //     var email = await SetEmailForAccountUpdated(template.Subject, template.Body,
+              //       user.LastName, user.Gender, user.Email, user.Id);
+              //     _context.Add(email);
 
-                  if (await SaveAll())
-                    return true;
-                }
+              //     if (await SaveAll())
+              //       return true;
+              //   }
 
-                return false;
-              }
+              //   return false;
+              // }
 
-              var userCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
-              // send the mail to update userName/pwd - add to Email table
-              if (appUser.Email != null)
-              {
-                ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {
-                  Id = appUser.Id,
-                  LastName = appUser.LastName,
-                  FirstName = appUser.FirstName,
-                  Cell = appUser.PhoneNumber,
-                  Gender = appUser.Gender,
-                  Email = appUser.Email,
-                  Token = userCode
-                };
+              // var userCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+              // // send the mail to update userName/pwd - add to Email table
+              // if (appUser.Email != null)
+              // {
+              //   ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {
+              //     Id = appUser.Id,
+              //     LastName = appUser.LastName,
+              //     FirstName = appUser.FirstName,
+              //     Cell = appUser.PhoneNumber,
+              //     Gender = appUser.Gender,
+              //     Email = appUser.Email,
+              //     Token = userCode
+              //   };
 
-                var template = await _context.EmailTemplates.FirstAsync(t => t.Id == teacherConfirmEmailId);
-                Email emailToSend = await SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
-                Add(emailToSend);
-              }
+              //   var template = await _context.EmailTemplates.FirstAsync(t => t.Id == teacherConfirmEmailId);
+              //   Email emailToSend = await SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
+              //   Add(emailToSend);
+              // }
 
               //add user photo
               var photoFile = user.PhotoFile;

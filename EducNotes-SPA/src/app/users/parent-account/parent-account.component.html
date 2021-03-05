@@ -3,11 +3,16 @@
     <div class="card-body p-2">
       <div *ngIf="showInfos[0]" class="row animated zoomIn">
         <div class="col-md-12">
-          <a class="d-flex" (click)="toggleInfos(0)">
-            <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
-              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
-            <div class="text-16"><b>infos du compte</b></div>
-          </a>
+          <div class="d-md-flex">
+            <a class="d-flex my-auto flex-md-grow-1" (click)="toggleInfos(0)">
+              <i class="text-16 fad fa-minus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
+              <div class="text-16"><b>infos du compte</b></div>
+            </a>
+            <div class="text-center text-md-left ml-md-2">
+              <button type="button" mdbBtn size="sm" class="btnBlue" [routerLink]="['/editAccount', parentid]">editer le compte</button>
+            </div>
+          </div>
         </div>
         <div class="col-md-12"><hr class="my-1"></div>
         <div class="col-md-12 d-flex">
