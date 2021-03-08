@@ -9,6 +9,7 @@ import { Class } from '../_models/class';
 import { Absence } from '../_models/absence';
 import { Schedule } from '../_models/schedule';
 import { Period } from '../_models/period';
+import { ScheduleData } from '../_models/scheduleData';
 
 @Injectable({
   providedIn: 'root'
@@ -210,7 +211,7 @@ export class ClassService {
     return this.http.get<Course[]>(this.baseUrl + 'classes/GetAllCourses');
   }
 
-  saveSchedules(schedules: Schedule[]) {
+  saveSchedules(schedules: ScheduleData[]) {
     return this.http.put(this.baseUrl + 'classes/saveSchedules', schedules);
   }
 

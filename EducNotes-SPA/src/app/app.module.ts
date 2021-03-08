@@ -278,6 +278,7 @@ import { AdminAccountComponent } from './users/admin-account/admin-account.compo
 import { StudentAccountComponent } from './users/student-account/student-account.component';
 import { EditAccountComponent } from './users/edit-account/edit-account.component';
 import { EditAccountResolver } from './_resolvers/edit-account-resolver';
+import { ClassScheduleEditComponent } from './admin/class-schedule-edit/class-schedule-edit.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -464,7 +465,8 @@ export function tokenGetter() {
       TeacherAccountComponent,
       AdminAccountComponent,
       StudentAccountComponent,
-      EditAccountComponent
+      EditAccountComponent,
+      ClassScheduleEditComponent
    ],
    imports: [
       FormWizardModule,

@@ -9,7 +9,9 @@
   </div>
   <div class="col-md-9">
     <div *ngIf="showTimeline">
-      <button type="button" mdbBtn size="sm" class="btnBlue" (click)="openModal()" mdbWavesEffect>ajouter des cours</button>
+      <!-- <button type="button" mdbBtn size="sm" class="btnBlue" (click)="openModal()" mdbWavesEffect>ajouter des cours</button> -->
+      <button type="button" mdbBtn size="sm" class="btnBlue" [routerLink]="['/classScheduleEdit', classControl.value]" 
+        mdbWavesEffect>modifier l'emploi du temps</button>
     </div>    
   </div>
 </div>
@@ -25,7 +27,7 @@
         <div *ngFor="let i of [0, 1, 2, 3, 4]" [ngStyle]="{'width': '20%'}">
           <div class="text-15 day-title mt-0 text-center">{{weekDays[i]}}</div>
           <div class="text-15 text-center dayCol" [ngStyle]="{'height': tableHeight}" style="border: 1px solid #192C47">
-          <app-schedule-day [items]="dayItems[i]"></app-schedule-day>
+          <app-schedule-day (reloadSchedule)="reloadSchedule()" [dayName]="weekDays[i]" [items]="dayItems[i]"></app-schedule-day>
           </div>
         </div>
       </div>
@@ -35,7 +37,7 @@
         <div *ngFor="let i of [0, 1, 2, 3, 4]" class="mb-2">
           <div class="text-15 day-title mt-0 text-center">{{weekDays[i]}}</div>
           <div class="text-15 text-center dayCol" [ngStyle]="{'height': tableHeight}" style="border: 1px solid #192C47">
-          <app-schedule-day [items]="dayItems[i]"></app-schedule-day>
+          <app-schedule-day (reloadSchedule)="reloadSchedule()" [dayName]="weekDays[i]" [items]="dayItems[i]"></app-schedule-day>
           </div>
         </div>
       </div>

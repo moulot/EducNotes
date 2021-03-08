@@ -45,8 +45,6 @@ import { SigninComponent } from './views/sessions/signin/signin.component';
 import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
 import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 import { ClassLifeComponent } from './classes/class-life/class-life.component';
-import { SchoolComponent } from './admin/school/school.component';
-import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { SchedulePanelComponent } from './schedule/schedule-panel/schedule-panel.component';
 import { ClassResolver } from './_resolvers/class-resolver';
@@ -148,6 +146,7 @@ import { UserValidationResolver } from './_resolvers/user-validation-resolver';
 import { LockoutComponent } from './views/sessions/lockout/lockout.component';
 import { EditAccountComponent } from './users/edit-account/edit-account.component';
 import { EditAccountResolver } from './_resolvers/edit-account-resolver';
+import { ClassScheduleEditComponent } from './admin/class-schedule-edit/class-schedule-edit.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -184,7 +183,8 @@ export const appRoutes: Routes = [
         { path: 'studentLife/:id', component: StudentLifeComponent }, // resolve: { student: StudentResolver } },
         { path: 'studentLifeP/:id', component: StudentLifeComponent },
         { path: 'studentNotes/:id', component: GradeStudentComponent },
-        { path: 'classScheduleEdit', component: ClassScheduleComponent },
+        { path: 'classSchedules', component: ClassScheduleComponent },
+        { path: 'classScheduleEdit/:classId', component: ClassScheduleEditComponent },
         { path: 'studentsClass/:classId', component: ClassStudentsComponent },
         { path: 'agendas/:classId', component: ClassAgendaComponent },
         { path: 'student', component: StudentDashboardComponent },

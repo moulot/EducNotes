@@ -707,6 +707,7 @@ namespace EducNotes.API.Controllers
                 courseDto.ClassId = course.ClassId;
                 courseDto.ClassName = course.Class.Name;
                 courseDto.CourseAbbrev = course.Course.Abbreviation;
+                courseDto.CourseColor = course.Course.Color;
                 courseDto.StartHour = course.StartHourMin;
                 courseDto.StartH = course.StartHourMin.ToString("HH:mm", frC);
                 courseDto.EndHour = course.EndHourMin;

@@ -152,19 +152,19 @@ export class ClassScheduleComponent implements OnInit {
     };
     this.modalRef = this.modalService1.show(ModalScheduleComponent, modalOptions);
     this.modalRef.content.saveSchedule.subscribe((data) => {
-      this.saveSchedules(data);
+      // this.saveSchedules(data);
     });
   }
 
-  saveSchedules(schedules: Schedule[]) {
-    this.classService.saveSchedules(schedules).subscribe(() => {
-      this.alertify.success('cours de l\'emploi du temps enregistrés');
-      this.loadWeekSchedule(this.classId);
-    }, error => {
-      this.alertify.error(error);
-      this.router.navigate(['/home']);
-    });
-  }
+  // saveSchedules(schedules: Schedule[]) {
+  //   this.classService.saveSchedules(schedules).subscribe(() => {
+  //     this.alertify.success('cours de l\'emploi du temps enregistrés');
+  //     this.loadWeekSchedule(this.classId);
+  //   }, error => {
+  //     this.alertify.error(error);
+  //     this.router.navigate(['/home']);
+  //   });
+  // }
 
   resetSchedule() {
     this.monCourses = [];

@@ -79,7 +79,6 @@ export class ClassTeachersComponent implements OnInit {
   getClassTeachers(classId) {
     this.classService.getCourseWithTeacher(classId).subscribe(teachers => {
       this.teachers = teachers;
-      // console.log(teachers);
       if (this.teachers[0].educLevelId === this.educLevelPrimary) {
         this.isPrimaryClass = true;
       } else {

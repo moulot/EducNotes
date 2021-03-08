@@ -1,0 +1,245 @@
+<form [formGroup]="scheduleForm" (ngSubmit)="saveScheduleItem()">
+  <div class="">
+  <div class="text-16">modification de l'emploi du temps</div>
+</div>
+<div class="row">
+  <div class="card col-md-12 animated shake alert-div mb-1" *ngIf="courseConflicts.length > 0">
+    <div *ngFor="let conflict of courseConflicts">
+      <p class="text-13 m-0 ">{{conflict.data}}</p>
+    </div>
+  </div>
+  <div class="col-md-12 mb-1">
+    <div class="card">
+      <div class="card-body p-2">
+        <div class="row">
+          <div class="col-md-3 mb-1">
+            <mdb-select [options]="teacherOptions" formControlName="teacher" name="teacher" [visibleOptions]="9"
+              (ngModelChange)="onTeacherChanged()" placeholder="choisir l'enseignant"></mdb-select>
+          </div>
+        </div>
+        <div *ngIf="teacherSchedule">
+          <div class="border rounded-lg p-2 mb-1">
+            <div class="text-16 textBlue my-1"><b>cours donnés par {{teacherSchedule.teacherName}}</b></div>
+            <hr class="my-1">
+            <div class="row">
+              <div class="col-md-2" *ngFor="let day of teacherSchedule.days">
+                <div class="text-15"><b>{{day.dayName}}</b></div>
+                <hr class="my-1">
+                <div *ngFor="let course of day.courses">
+                  <div class="border rounded-lg p-1 text-12 mb-1" [ngStyle]="{'background-color': course.courseColor}"
+                    [ngClass]="course.inConflict ? 'inConflict' : ''">
+                    {{course.startH}} à {{course.endH}}. {{course.courseAbbrev}}. {{course.className}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="border rounded-lg p-2">
+                <div class="row">
+                  <div class="form-group col-md-6 mb-0">
+                    <mdb-select [options]="courseOptions" placeholder="choisir le cours" name="course" formControlName="course"></mdb-select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div formGroupName="item1" class="mb-0">
+                      <div class="d-flex">
+                        <div class="text-20 mr-2 my-auto">1.</div>
+                        <div class="flex-grow-1">
+                          <div class="form-row">
+                            <div class="col-md-4">
+                              <mdb-select class="selMarginTop" [options]="daySelect" id="day1" (ngModelChange)="isConflict(1)"
+                                name="day1" [visibleOptions]="7" formControlName="day1" placeholder="jour"></mdb-select>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="md-form form-sm inpMarginTop mb-0">
+                                <input type="text" class="form-control mr-2" mdbInput formControlName="hourStart1" id="hourStart1"
+                                  [textMask]="{mask: timeMask}" (keyup)="isConflict(1)">
+                                <label for="hourStart1">heure début</label>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="md-form form-sm inpMarginTop mb-0">
+                                <input type="text" class="form-control mr-2" mdbInput formControlName="hourEnd1"
+                                  id="hourEnd1" [textMask]="{mask: timeMask}" (keyup)="isConflict(1)">
+                                <label for="hourEnd1">heure fin</label>
+                              </div>
+                            </div>
+                            <diV class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item1'].hasError('line1NOK')">
+                              tous les champs doivent être renseignés.
+                            </diV>
+                            <div class="text-danger text-12" *ngIf="scheduleForm.controls['item1'].hasError('line1DatesNOK')">
+                              les heures de cours sont au format : hh:mm
+                            </div>
+                            <div class="text-danger text-12" *ngIf="scheduleForm.controls['item1'].hasError('conflict')">
+                              la période choisie n'est pas disponible
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div formGroupName="item2" class="mb-0">
+                      <div class="d-flex">
+                        <div class="text-20 mr-2 my-2">2.</div>
+                        <div class="flex-grow-1">
+                          <div class="form-row">
+                            <div class="col-md-4">
+                              <mdb-select class="selMarginTop" [options]="daySelect" id="day2" name="day2" [visibleOptions]="7"
+                                formControlName="day2" placeholder="jour"></mdb-select>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="md-form form-sm inpMarginTop mb-0">
+                                <input type="text" class="form-control mr-2" mdbInput formControlName="hourStart2" id="hourStart2"
+                                  [textMask]="{mask: timeMask}" (keyup)="isConflict(2)">
+                                <label for="hourStart2">heure début</label>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="md-form form-sm inpMarginTop mb-0">
+                                <input type="text" class="form-control mr-2" mdbInput formControlName="hourEnd2" id="hourEnd2"
+                                  [textMask]="{mask: timeMask}" (keyup)="isConflict(2)">
+                                <label for="hourEnd2">heure fin</label>
+                              </div>
+                            </div>
+                            <diV class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item2'].hasError('line2NOK')">
+                              tous les champs doivent être renseignés.
+                            </diV>
+                            <div class="text-danger text-12" *ngIf="scheduleForm.controls['item2'].hasError('line2DatesNOK')">
+                              les heures de cours sont au format : hh:mm
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div formGroupName="item3" class="mb-0">
+                      <div class="d-flex">
+                        <div class="text-20 mr-2 my-auto">3.</div>
+                        <div class="flex-grow-1">
+                          <div class="form-row">
+                            <div class="col-md-4">
+                              <mdb-select class="selMarginTop" [options]="daySelect" id="day3" name="day3" [visibleOptions]="7"
+                                formControlName="day3" placeholder="jour"></mdb-select>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="md-form form-sm inpMarginTop mb-0">
+                                <input type="text" class="form-control mr-2" mdbInput formControlName="hourStart3" id="hourStart3"
+                                  [textMask]="{mask: timeMask}" (keyup)="isConflict(3)">
+                                <label for="hourStart3">heure début</label>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="md-form form-sm inpMarginTop mb-0">
+                                <input type="text" class="form-control mr-2" mdbInput formControlName="hourEnd3" id="hourEnd3"
+                                  [textMask]="{mask: timeMask}" (keyup)="isConflict(3)">
+                                <label for="hourEnd3">heure fin</label>
+                              </div>
+                            </div>
+                            <diV class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item3'].hasError('line3NOK')">
+                              tous les champs doivent être renseignés.
+                            </diV>
+                            <div class="text-danger text-12" *ngIf="scheduleForm.controls['item3'].hasError('line3DatesNOK')">
+                              les heures de cours sont au format : hh:mm
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div formGroupName="item4" class="mb-0">
+                      <div class="d-flex">
+                        <div class="text-20 mr-2 my-auto">4.</div>
+                        <div class="flex-grow-1">
+                          <div class="form-row">
+                            <div class="col-md-4">
+                              <mdb-select class="selMarginTop" [options]="daySelect" id="day4" name="day4" [visibleOptions]="7"
+                                formControlName="day4" placeholder="jour"></mdb-select>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="md-form form-sm inpMarginTop mb-0">
+                                <input type="text" class="form-control mr-2" mdbInput formControlName="hourStart4" id="hourStart4"
+                                [textMask]="{mask: timeMask}" (keyup)="isConflict(4)">
+                                <label for="hourStart4">heure début</label>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="md-form form-sm inpMarginTop mb-0">
+                                <input type="text" class="form-control mr-2" mdbInput formControlName="hourEnd4" id="hourEnd4"
+                                  [textMask]="{mask: timeMask}" (keyup)="isConflict(4)">
+                                <label for="hourEnd4">heure fin</label>
+                              </div>
+                            </div>
+                            <diV class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item4'].hasError('line4NOK')">
+                              tous les champs doivent être renseignés.
+                            </diV>
+                            <div class="text-danger text-12" *ngIf="scheduleForm.controls['item4'].hasError('line4DatesNOK')">
+                              les heures de cours sont au format : hh:mm
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div formGroupName="item5" class="mb-0">
+                      <div class="d-flex">
+                        <div class="text-20 mr-2 my-auto">5.</div>
+                        <div class="flex-grow-1">
+                          <div class="form-row">
+                            <div class="col-md-4">
+                              <mdb-select class="selMarginTop" [options]="daySelect" id="day5" name="day5" [visibleOptions]="7"
+                                formControlName="day5" placeholder="jour"></mdb-select>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="md-form form-sm inpMarginTop mb-0">
+                                <input type="text" class="form-control mr-2" mdbInput formControlName="hourStart5" id="hourStart5"
+                                  [textMask]="{mask: timeMask}" (keyup)="isConflict(5)">
+                                <label for="hourStart5">heure début</label>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="md-form form-sm inpMarginTop mb-0">
+                                <input type="text" class="form-control mr-2" mdbInput formControlName="hourEnd5" id="hourEnd5"
+                                  [textMask]="{mask: timeMask}" (keyup)="isConflict(5)">
+                                <label for="hourEnd5">heure fin</label>
+                              </div>
+                            </div>
+                            <diV class="ml-3 text-danger text-12" *ngIf="scheduleForm.controls['item5'].hasError('line5NOK')">
+                              tous les champs doivent être renseignés.
+                            </diV>
+                            <div class="text-danger text-12" *ngIf="scheduleForm.controls['item5'].hasError('line5DatesNOK')">
+                              les heures de cours sont au format : hh:mm
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="border rounded-lg p-2">
+                <div class="text-16 textBlue"><b>emploi du temps de la classe</b></div>
+                <hr class="my-1">
+              </div>
+            </div>
+            <div class="col-md-12"><hr class="my-1"></div>
+            <div class="col-md-12 text-center text-md-right">
+              <button type="button" mdbBtn size="sm" class="btnOrange mr-2" (click)="goBackToSchedule()" mdbWavesEffect>Cancel</button>
+              <button type="submit" size="sm" [disabled]="scheduleForm.hasError('formNOK') || periodConflict"
+                mdbBtn class="btnBlue" mdbWavesEffect>Ok</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</form>

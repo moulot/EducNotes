@@ -1,0 +1,26 @@
+.md-form .prefix ~ select {
+  margin-left: 3rem;
+  width: 92%;
+  width: -webkit-calc(100% - 3rem);
+  width: calc(100% - 3rem);
+ }
+
+ .inpMarginTop {
+  margin-top: 6px;
+ }
+
+
+ .selMarginTop {
+  margin-top: 1px;
+ }
+ 
+ .inConflict {
+   color: red;
+   font-weight: bold;
+ }
+
+ .alert-div {
+   background-color: red;
+   color: #ffffff;
+   font-weight: bold;
+ }

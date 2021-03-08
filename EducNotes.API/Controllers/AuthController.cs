@@ -204,8 +204,8 @@ namespace EducNotes.API.Controllers
     {
       var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName)
+              new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+              new Claim(ClaimTypes.Name, user.UserName)
             };
 
       var roles = await _userManager.GetRolesAsync(user);
@@ -216,7 +216,7 @@ namespace EducNotes.API.Controllers
       }
 
       var key = new SymmetricSecurityKey(Encoding.UTF8
-          .GetBytes(_config.GetSection("AppSettings:Token").Value));
+        .GetBytes(_config.GetSection("AppSettings:Token").Value));
 
       var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 

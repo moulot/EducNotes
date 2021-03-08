@@ -16,7 +16,6 @@
         <div class="card">
           <div class="card-body">
             <form [formGroup]="scheduleForm" (ngSubmit)="saveScheduleItem()">
-
               <div class="row">
                 <div class="form-group col-md-6 mb-1">
                   <mdb-select [options]="teacherOptions" formControlName="teacher" name="teacher" [visibleOptions]="9"
@@ -26,7 +25,6 @@
                   <mdb-select [options]="courseOptions" placeholder="cours" name="course" formControlName="course"></mdb-select>
                 </div>
               </div>
-    
               <div formGroupName="item1" class="mb-0">
                 <div class="d-flex">
                   <div class="text-20 mr-2 my-auto">1.</div>
@@ -63,9 +61,7 @@
                   </div>
                 </div>
               </div>
-    
-              <hr class="my-2" style="background-color: #f89f20;">
-    
+              <hr class="my-1" style="background-color: #192C47;">
               <div formGroupName="item2" class="mb-0">
                 <div class="d-flex">
                   <div class="text-20 mr-2 my-2">2.</div>
@@ -99,9 +95,7 @@
                   </div>
                 </div>
               </div>
-            
-              <hr class="my-2" style="background-color: #f89f20;">
-
+              <hr class="my-1" style="background-color: #192C47;">
               <div formGroupName="item3" class="mb-0">
                 <div class="d-flex">
                   <div class="text-20 mr-2 my-auto">3.</div>
@@ -135,9 +129,7 @@
                   </div>
                 </div>
               </div>
-            
-              <hr class="my-2" style="background-color: #f89f20;">
-
+              <hr class="my-1" style="background-color: #192C47;">
               <div formGroupName="item4" class="mb-0">
                 <div class="d-flex">
                   <div class="text-20 mr-2 my-auto">4.</div>
@@ -171,9 +163,7 @@
                   </div>
                 </div>
               </div>
-
-              <hr class="my-2" style="background-color: #f89f20;">
-
+              <hr class="my-1" style="background-color: #192C47;">
               <div formGroupName="item5" class="mb-0">
                 <div class="d-flex">
                   <div class="text-20 mr-2 my-auto">5.</div>
@@ -207,7 +197,6 @@
                   </div>
                 </div>
               </div>
-            
             </form>
           </div>
         </div>
@@ -231,10 +220,11 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="mr-2" mdbBtn size="sm" color="primary" (click)="activeModal.hide()" mdbWavesEffect>Cancel</button>
-    <button type="submit" size="sm" [disabled]="scheduleForm.hasError('formNOK') || periodConflict"
-      (click)="saveScheduleItem()" mdbBtn color="primary" mdbWavesEffect>Ok</button>
+    <hr class="my-1" style="background-color: #192C47;">
+    <div class="text-center text-md-right">
+      <button type="button" mdbBtn size="sm" class="btnOrange mr-2" (click)="activeModal.hide()" mdbWavesEffect>Cancel</button>
+      <button type="submit" size="sm" [disabled]="scheduleForm.hasError('formNOK') || periodConflict"
+        (click)="saveScheduleItem()" mdbBtn class="btnBlue" mdbWavesEffect>Ok</button>
+    </div>
   </div>
 </div>

@@ -189,12 +189,28 @@ namespace EducNotes.API.Controllers
         [HttpPut("DelCourseFromSchedule/{scheduleId}")]
         public async Task<IActionResult> DeleteScheduleItem(int scheduleId)
         {
+          bool deleteOK = false;
           var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == scheduleId);
           if (schedule != null)
           {
-            _repo.Delete(schedule);
-            if (await _repo.SaveAll())
-              return Ok();
+            using (var identityContextTransaction = _context.Database.BeginTransaction())
+            {
+              try
+              {
+                _repo.Delete(schedule);
+                if (await _repo.SaveAll())
+                {
+                  identityContextTransaction.Commit();
+                  deleteOK = true;
+                  return Ok(deleteOK);
+                }
+              }
+              catch
+              {
+                identityContextTransaction.Rollback();
+                return Ok(deleteOK);
+              }
+            }
           }
 
           return BadRequest("problème pour supprimer le cours de l'emploi du temps");

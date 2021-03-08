@@ -14,7 +14,8 @@ export class AlertifyService {
 
   options = {
     opacity: 0.8,
-    timeOut: 3000
+    timeOut: 3000,
+    positionClass: 'toast-bottom-right'
   };
 
   confirm(message: string, okCallback: () => any) {

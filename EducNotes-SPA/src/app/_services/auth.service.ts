@@ -154,27 +154,7 @@ export class AuthService {
   }
 
   setUserAccountData(id: number, userData: any) {
-    return this.http.post(this.baseUrl + id + '/setUserAccountData', userData)
-      .pipe(
-        map((response: any) => {
-          const user = response;
-          if (user) {
-            localStorage.setItem('token', user.token);
-            localStorage.setItem('user', JSON.stringify(user.user));
-            localStorage.setItem('settings', JSON.stringify(user.settings));
-            localStorage.setItem('currentPeriod', JSON.stringify(user.currentPeriod));
-            localStorage.setItem('currentChild', JSON.stringify(this.newUser));
-            localStorage.setItem('currentClassId', '0');
-            this.decodedToken = this.jwtHelper.decodeToken(user.token);
-            this.currentUser = user.user;
-            this.currentPeriod = user.currentPeriod;
-            this.settings = user.settings;
-            this.changeCurrentChild(this.newUser);
-            this.changeCurrentClassId(0);
-            this.changeUserPhoto(this.currentUser.photoUrl);
-          }
-        })
-      );
+    return this.http.post(this.baseUrl + id + '/setUserAccountData', userData);
   }
 
   forgotPassord(model: any) {
