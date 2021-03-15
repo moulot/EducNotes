@@ -1,172 +1,204 @@
-<div class="row">
-  <div class="col-md-12 d-flex">
-      <i class="fad fa-book-open text-19 my-auto mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color: #192C47;
-        --fa-secondary-color: #f89f20"></i>
-      <div class="text-19 my-auto">cahiers de textes</div>
-  </div>
-  <div class="col-md-3">
-    <form [formGroup]="classForm">
-      <div class="md-form form-sm m-0">
-        <mdb-select [options]="optionsClass" formControlName="classRoom" (ngModelChange)="classChanged()"
-          placeholder="choisir la classe"></mdb-select>
-      </div>
-    </form>
-  </div>
-  <div class="col-md-9 d-none d-md-block">
-    <div *ngIf="showSessionsData">
-      <div class="text-center mb-2">
-        <button type="button" mdbBtn (click)="loadMovedWeek(-7)"
-          class="btnWhiteB p-2" mdbWavesEffect><mdb-icon fas icon="angle-left"></mdb-icon>
-        </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[0], 0)" [ngClass]="(dayOfWeekActive == 0)?'btnBlue':'btnWhiteB'" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[0]}}
-          <span *ngIf="nbDayTasks[0] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[0]}}</span>
-        </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[1], 1)" [ngClass]="(dayOfWeekActive == 1)?'btnBlue':'btnWhiteB'"  class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[1]}}
-          <span *ngIf="nbDayTasks[1] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[1]}}</span>
-        </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[2], 2)" [ngClass]="(dayOfWeekActive == 2)?'btnBlue':'btnWhiteB'" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[2]}}
-          <span *ngIf="nbDayTasks[2] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[2]}}</span>
-        </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[3], 3)" [ngClass]="(dayOfWeekActive == 3)?'btnBlue':'btnWhiteB'" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[3]}}
-          <span *ngIf="nbDayTasks[3] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[3]}}</span>
-        </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[4], 4)" [ngClass]="(dayOfWeekActive == 4)?'btnBlue':'btnWhiteB'" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[4]}}
-          <span *ngIf="nbDayTasks[4] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[4]}}</span>
-        </button>
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[5], 5)" [ngClass]="(dayOfWeekActive == 5)?'btnBlue':'btnWhiteB'" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[5]}}
-          <span *ngIf="nbDayTasks[5] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[5]}}</span>
-        </button>
-        <button type="button" mdbBtn (click)="loadMovedWeek(7)" class="btnWhiteB p-2"
-          mdbWavesEffect><mdb-icon fas icon="angle-right"></mdb-icon>
-        </button>
+<div *ngIf="wait" class="spinning-preloader-container">
+  <div class="preloader-wrapper big active">
+    <div class="spinner-layer spinner-blue">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
       </div>
     </div>
-  </div>
-  <div class="col-md-9 d-md-none">
-    <div *ngIf="showSessionsData">
-      <div class="text-center mb-2">
-        <button type="button" mdbBtn (click)="loadMovedWeek(-7)" block="true" class="btnWhiteB text-lowercase p-2" mdbWavesEffect>-7 jours</button>
+    <div class="spinner-layer spinner-red">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
       </div>
-      <div class="mb-2">
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[0], 0)" [ngClass]="(dayOfWeekActive == 0)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[0]}}
-          <span *ngIf="nbDayTasks[0] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[0]}}</span>
-        </button>
+    </div>
+    <div class="spinner-layer spinner-yellow">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
       </div>
-      <div class="mb-2">
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[1], 1)" [ngClass]="(dayOfWeekActive == 1)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[1]}}
-          <span *ngIf="nbDayTasks[1] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[1]}}</span>
-        </button>
-      </div>
-      <div class="mb-2">
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[2], 2)" [ngClass]="(dayOfWeekActive == 2)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[2]}}
-          <span *ngIf="nbDayTasks[2] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[2]}}</span>
-        </button>
-      </div>
-      <div class="mb-2">
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[3], 3)" [ngClass]="(dayOfWeekActive == 3)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[3]}}
-          <span *ngIf="nbDayTasks[3] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[3]}}</span>
-        </button>
-      </div>
-      <div class="mb-2">
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[4], 4)" [ngClass]="(dayOfWeekActive == 4)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[4]}}
-          <span *ngIf="nbDayTasks[4] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[4]}}</span>
-        </button>
-      </div>
-      <div class="mb-2">
-        <button type="button" mdbBtn (click)="showItemsByDate(weekDates[5], 5)" [ngClass]="(dayOfWeekActive == 5)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
-          {{weekDays[5]}}
-          <span *ngIf="nbDayTasks[5] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[5]}}</span>
-        </button>
-      </div>
-      <div class="mb-2">
-        <button type="button" mdbBtn (click)="loadMovedWeek(7)" block="true" class="btnWhiteB text-lowercase p-2" mdbWavesEffect>+7 jours</button>
+    </div>
+    <div class="spinner-layer spinner-green">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
       </div>
     </div>
   </div>
 </div>
-
-<div *ngIf="!showSessionsData">
-  <div class="card mt-2">
-    <div class="card-body text-center">
-      <p class="lead">sélectionner une classe pour afficher le cahier de textes...</p>
-    </div>
-  </div>
-</div>
-
-<div *ngIf="showSessionsData">
+<div *ngIf="!wait">
   <div class="row">
+    <div class="col-md-12 d-flex">
+        <i class="fad fa-book-open text-19 my-auto mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color: #192C47;
+          --fa-secondary-color: #f89f20"></i>
+        <div class="text-19 my-auto">cahiers de textes</div>
+    </div>
     <div class="col-md-3">
-      <div class="card">
-        <div class="card-body">
-          <div class="mb-2">
-            <label class="switch switch-primary mr-3">
-              <span>afficher tous les cours</span>
-              <input type="checkbox" (change)="showAllCourses()" [(ngModel)]="allCourses">
-              <span class="slider"></span>
-            </label>
-          </div>
-          <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
-          <p class="text-danger text-15 text-center my-2">clicker sur le cours pour filtrer</p>
-          <div class="card mb-2" *ngFor="let course of coursesWithTasks">
-            <div class="card-up" [ngStyle]="{'background-color': course.courseColor}" style="height: 10px;
-              border-top-left-radius: 10px;border-top-right-radius: 10px">
-            </div>            
-            <a (click)="showCourseItems(course.courseId)" style="cursor: pointer;">
-              <div class="card-body p-2">
-                <div class="row">
-                  <div class="col-md-12 d-flex">
-                    <div class="flex-grow-1 text-17">{{course.courseName}}</div>
-                    <div class="text-17">{{course.nbTasks}}</div>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
+      <form [formGroup]="classForm">
+        <div class="md-form form-sm m-0">
+          <mdb-select [options]="optionsClass" formControlName="classRoom" (ngModelChange)="classChanged()"
+            placeholder="choisir la classe"></mdb-select>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-9 d-none d-md-block">
+      <div *ngIf="showSessionsData">
+        <div class="text-center mb-2">
+          <button type="button" mdbBtn (click)="loadMovedWeek(-7)"
+            class="btnWhiteB p-2" mdbWavesEffect><mdb-icon fas icon="angle-left"></mdb-icon>
+          </button>
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[0], 0)" [ngClass]="(dayOfWeekActive == 0)?'btnBlue':'btnWhiteB'" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[0]}}
+            <span *ngIf="nbDayTasks[0] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[0]}}</span>
+          </button>
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[1], 1)" [ngClass]="(dayOfWeekActive == 1)?'btnBlue':'btnWhiteB'"  class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[1]}}
+            <span *ngIf="nbDayTasks[1] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[1]}}</span>
+          </button>
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[2], 2)" [ngClass]="(dayOfWeekActive == 2)?'btnBlue':'btnWhiteB'" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[2]}}
+            <span *ngIf="nbDayTasks[2] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[2]}}</span>
+          </button>
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[3], 3)" [ngClass]="(dayOfWeekActive == 3)?'btnBlue':'btnWhiteB'" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[3]}}
+            <span *ngIf="nbDayTasks[3] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[3]}}</span>
+          </button>
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[4], 4)" [ngClass]="(dayOfWeekActive == 4)?'btnBlue':'btnWhiteB'" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[4]}}
+            <span *ngIf="nbDayTasks[4] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[4]}}</span>
+          </button>
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[5], 5)" [ngClass]="(dayOfWeekActive == 5)?'btnBlue':'btnWhiteB'" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[5]}}
+            <span *ngIf="nbDayTasks[5] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[5]}}</span>
+          </button>
+          <button type="button" mdbBtn (click)="loadMovedWeek(7)" class="btnWhiteB p-2"
+            mdbWavesEffect><mdb-icon fas icon="angle-right"></mdb-icon>
+          </button>
         </div>
       </div>
     </div>
-    <div class="col-md-9">
-      <div *ngIf="filteredSessions?.length > 0">
-        <div *ngFor="let item of filteredSessions; let i = index">
-          <div *ngIf="item.agendaItems.length > 0" class="card mb-2">
-            <div class="card-body">
-              <div class="d-none d-md-block text-15 day-title w-50 rounded-lg p-1 mb-2">à remettre le {{item.shortDueDate}}</div>
-              <div class="d-md-none text-15 day-title rounded-lg p-1 mb-2">à remettre le {{item.shortDueDate}}</div>
-              <div class="border rounded-lg p-0 mb-2" *ngFor="let ai of item.agendaItems">
-                <div [ngStyle]="{'background-color': ai.courseColor}" style="height: 5px;
-                  border-top-left-radius: 5px;border-top-right-radius: 5px">
-                </div>            
-                <div class="row d-md-flex p-1">
-                  <div class="col-md-9">
-                    <div class="d-md-flex text-15 font-weight-bold">
-                      <div>{{ai.className}} - {{ai.courseName}}</div>
-                      <div class="ml-2">{{ai.startHourMin}} à {{ai.endHourMin}}</div>
+    <div class="col-md-9 d-md-none">
+      <div *ngIf="showSessionsData">
+        <div class="text-center mb-2">
+          <button type="button" mdbBtn (click)="loadMovedWeek(-7)" block="true" class="btnWhiteB text-lowercase p-2" mdbWavesEffect>-7 jours</button>
+        </div>
+        <div class="mb-2">
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[0], 0)" [ngClass]="(dayOfWeekActive == 0)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[0]}}
+            <span *ngIf="nbDayTasks[0] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[0]}}</span>
+          </button>
+        </div>
+        <div class="mb-2">
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[1], 1)" [ngClass]="(dayOfWeekActive == 1)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[1]}}
+            <span *ngIf="nbDayTasks[1] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[1]}}</span>
+          </button>
+        </div>
+        <div class="mb-2">
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[2], 2)" [ngClass]="(dayOfWeekActive == 2)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[2]}}
+            <span *ngIf="nbDayTasks[2] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[2]}}</span>
+          </button>
+        </div>
+        <div class="mb-2">
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[3], 3)" [ngClass]="(dayOfWeekActive == 3)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[3]}}
+            <span *ngIf="nbDayTasks[3] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[3]}}</span>
+          </button>
+        </div>
+        <div class="mb-2">
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[4], 4)" [ngClass]="(dayOfWeekActive == 4)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[4]}}
+            <span *ngIf="nbDayTasks[4] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[4]}}</span>
+          </button>
+        </div>
+        <div class="mb-2">
+          <button type="button" mdbBtn (click)="showItemsByDate(weekDates[5], 5)" [ngClass]="(dayOfWeekActive == 5)?'btnBlue':'btnWhiteB'" block="true" class="text-lowercase p-2" mdbWavesEffect>
+            {{weekDays[5]}}
+            <span *ngIf="nbDayTasks[5] > 0" class="badge badge-primary btn-pill">{{nbDayTasks[5]}}</span>
+          </button>
+        </div>
+        <div class="mb-2">
+          <button type="button" mdbBtn (click)="loadMovedWeek(7)" block="true" class="btnWhiteB text-lowercase p-2" mdbWavesEffect>+7 jours</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="!showSessionsData">
+    <div class="card mt-2">
+      <div class="card-body text-center">
+        <p class="lead">sélectionner une classe pour afficher le cahier de textes...</p>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="showSessionsData">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="mb-2">
+              <label class="switch switch-primary mr-3">
+                <span>afficher tous les cours</span>
+                <input type="checkbox" (change)="showAllCourses()" [(ngModel)]="allCourses">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="mb-2 mt-2" style="border-top: 1px #cccccc solid"></div>
+            <p class="text-danger text-15 text-center my-2">clicker sur le cours pour filtrer</p>
+            <div class="card mb-2" *ngFor="let course of coursesWithTasks">
+              <div class="card-up" [ngStyle]="{'background-color': course.courseColor}" style="height: 10px;
+                border-top-left-radius: 10px;border-top-right-radius: 10px">
+              </div>            
+              <a (click)="showCourseItems(course.courseId)" style="cursor: pointer;">
+                <div class="card-body p-2">
+                  <div class="row">
+                    <div class="col-md-12 d-flex">
+                      <div class="flex-grow-1 text-17">{{course.courseName}}</div>
+                      <div class="text-17">{{course.nbTasks}}</div>
                     </div>
-                    <div class="text-15" *ngIf="ai.tasks !== ''" style="color: #2727f8;white-space: pre-wrap;">{{ai.tasks}}</div>
-                    <div class="text-15" *ngIf="ai.tasks === ''" style="color: #BA4A00;">aucun devoir</div>
                   </div>
-                  <div class="col-md-3">
-                    <button mdbBtn (click)="editTasks(ai)" class="btnBlue mt-2 mt-md-0 p-1" block="true" size="sm" mdbWavesEffect>saisir les devoirs</button>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-9">
+        <div *ngIf="filteredSessions?.length > 0">
+          <div *ngFor="let item of filteredSessions; let i = index">
+            <div *ngIf="item.agendaItems.length > 0" class="card mb-2">
+              <div class="card-body">
+                <div class="d-none d-md-block text-15 day-title w-50 rounded-lg p-1 mb-2">à remettre le {{item.shortDueDate}}</div>
+                <div class="d-md-none text-15 day-title rounded-lg p-1 mb-2">à remettre le {{item.shortDueDate}}</div>
+                <div class="border rounded-lg p-0 mb-2" *ngFor="let ai of item.agendaItems; let j = index">
+                  <div [ngStyle]="{'background-color': ai.courseColor}" style="height: 5px;
+                    border-top-left-radius: 5px;border-top-right-radius: 5px">
+                  </div>            
+                  <div class="row d-md-flex p-1">
+                    <div class="col-md-9">
+                      <div class="d-md-flex text-15 font-weight-bold">
+                        <div>{{ai.className}} - {{ai.courseName}}</div>
+                        <div class="ml-2">{{ai.startHourMin}} à {{ai.endHourMin}}</div>
+                      </div>
+                      <div class="text-15" *ngIf="ai.tasks !== ''" style="color: #2727f8;white-space: pre-wrap;">{{ai.tasks}}</div>
+                      <div class="text-15" *ngIf="ai.tasks === ''" style="color: #ba4a00;">aucun devoir</div>
+                    </div>
+                    <div class="col-md-3">
+                      <button mdbBtn (click)="editTasks(ai, i, j)" class="btnBlue mt-2 mt-md-0 p-1" block="true" size="sm" mdbWavesEffect>saisir les devoirs</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div *ngIf="filteredSessions?.length <= 0">
-        <p class="lead m-0">pas de devoirs à faire pour cette période...</p>
+        <div *ngIf="filteredSessions?.length <= 0">
+          <p class="lead m-0">pas de devoirs à faire pour cette période...</p>
+        </div>
       </div>
     </div>
   </div>

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { UserService } from 'src/app/_services/user.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { ConfirmToken } from 'src/app/_models/confirmToken';
 import { AccountService } from 'src/app/_services/account.service';
@@ -83,16 +82,6 @@ export class ResetPasswordComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
     });
-  }
-
-  resultMode(val: boolean) {
-    if (val) {
-      this.alertify.success('votre mot de passe a bien été modifié');
-      this.router.navigate(['/Home']);
-    } else {
-      this.alertify.success('erreur survenue');
-
-    }
   }
 
 }

@@ -48,7 +48,7 @@ namespace EducNotes.API
             opt.Password.RequireUppercase = false;
             opt.Lockout.AllowedForNewUsers = true;
             opt.Lockout.MaxFailedAccessAttempts = 3;
-            opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(1);
+            opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(4);
           });
 
           builder = new IdentityBuilder(builder.UserType, typeof(Role), builder.Services);

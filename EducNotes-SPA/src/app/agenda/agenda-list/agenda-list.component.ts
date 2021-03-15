@@ -47,6 +47,7 @@ export class AgendaListComponent implements OnInit {
   sessionsByDate = [];
   sessionsByCourse = [];
   dayOfWeekActive = -1;
+  wait = false;
 
   constructor(private userService: UserService, private fb: FormBuilder, private classService: ClassService,
     private authService: AuthService, public alertify: AlertifyService, private modalService: NgbModal,
@@ -75,7 +76,7 @@ export class AgendaListComponent implements OnInit {
     this.filteredSessions = this.allSessions;
   }
 
-  editTasks(session) {
+  editTasks(session, indexi, indexj) {
     this.ngbModalRef = this.modalService.open(AgendaModalComponent, {
       ariaLabelledBy: 'modal-basic-title',
       size: 'lg',
@@ -86,7 +87,7 @@ export class AgendaListComponent implements OnInit {
       const instance = this.ngbModalRef.componentInstance;
       instance.session = session;
       instance.saveAgenda.subscribe((data) => {
-        this.saveAgenda(data);
+        this.saveAgenda(data, indexi, indexj);
         if (data.id === 0) {
           const itemIndex = this.coursesWithTasks.findIndex(item => item.courseId === data.courseId);
           const nb = this.coursesWithTasks[itemIndex].nbTasks;
@@ -96,14 +97,15 @@ export class AgendaListComponent implements OnInit {
     }, 200);
   }
 
-  saveAgenda(session) {
+  saveAgenda(session, indexi, indexj) {
     this.agendaForSave.id = session.id;
     this.agendaForSave.sessionId = session.sessionId;
     this.agendaForSave.classId = session.classId;
     this.agendaForSave.courseId = session.courseId;
     this.agendaForSave.taskDesc = session.tasks;
 
-    return this.classService.saveAgendaItem(this.agendaForSave).subscribe(() => {
+    return this.classService.saveAgendaItem(this.agendaForSave).subscribe((agendaId) => {
+      this.filteredSessions[indexi].agendaItems[indexj].id = agendaId;
       this.alertify.success(session.courseName + '. devoirs du ' + session.strDayDate + ' validés!');
     }, error => {
       this.alertify.error(error);
@@ -111,6 +113,7 @@ export class AgendaListComponent implements OnInit {
   }
 
   getTeacherSessions(teacherId, classId) {
+    this.wait = true;
     this.userService.getTeacherSessionsFromToday(teacherId, classId).subscribe((data: any) => {
       this.filteredSessions = data.agendas;
       this.allSessions = data.agendas;
@@ -118,8 +121,10 @@ export class AgendaListComponent implements OnInit {
       this.weekDays = data.weekDays;
       this.weekDates = data.weekDates;
       this.coursesWithTasks = data.coursesWithTasks;
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 
@@ -230,6 +235,7 @@ export class AgendaListComponent implements OnInit {
   }
 
   loadMovedWeek(move: number) {
+    this.wait = true;
     this.dayOfWeekActive = -1;
     this.allCourses = true;
     this.agendaParams.dueDate = this.startDate;
@@ -243,8 +249,10 @@ export class AgendaListComponent implements OnInit {
       this.weekDays = data.weekDays;
       this.weekDates = data.weekDates;
       this.coursesWithTasks = data.coursesWithTasks;
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 

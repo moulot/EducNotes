@@ -439,46 +439,39 @@ namespace EducNotes.API.Data
 
         public async Task<Session> GetSessionFromSchedule(int scheduleId, int teacherId, DateTime sessionDate)
         {
-            var schedule = await _context.Schedules.Where(s => s.Id == scheduleId).FirstOrDefaultAsync();
-            var scheduleDay = schedule.Day;
+          var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == scheduleId);
+          var scheduleDay = schedule.Day;
 
-            // var today = DateTime.Now.Date;
-            // // monday=1, tue=2, ...
-            // var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
-
-            // if (todayDay != scheduleDay)
-            //   return BadRequest("l'emploi du temps du jour est incohérent.");
-
-            // get session by schedule and date
-            var sessionFromDB = await _context.Sessions
-                                .Include(i => i.Class)
-                                .Include(i => i.Course)
-                                .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == sessionDate);
-            if (sessionFromDB != null)
+          // get session by schedule and date
+          var sessionFromDB = await _context.Sessions
+                              .Include(i => i.Class)
+                              .Include(i => i.Course)
+                              .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == sessionDate);
+          if (sessionFromDB != null)
+          {
+            return (sessionFromDB);
+          }
+          else
+          {
+            var newSession = new Session
             {
-                return (sessionFromDB);
-            }
-            else
+              ScheduleId = schedule.Id,
+              TeacherId = teacherId,
+              ClassId = schedule.ClassId,
+              CourseId = schedule.CourseId,
+              StartHourMin = schedule.StartHourMin,
+              EndHourMin = schedule.EndHourMin,
+              SessionDate = sessionDate
+            };
+            _context.Add(newSession);
+
+            if (await SaveAll())
             {
-                var newSession = new Session
-                {
-                    ScheduleId = schedule.Id,
-                    TeacherId = teacherId,
-                    ClassId = schedule.ClassId,
-                    CourseId = schedule.CourseId,
-                    StartHourMin = schedule.StartHourMin,
-                    EndHourMin = schedule.EndHourMin,
-                    SessionDate = sessionDate
-                };
-                _context.Add(newSession);
-
-                if (await SaveAll())
-                {
-                    return newSession;
-                }
-
-                return null;
+              return newSession;
             }
+
+            return null;
+          }
         }
 
         public async Task<IEnumerable<Agenda>> GetClassAgenda(int classId)

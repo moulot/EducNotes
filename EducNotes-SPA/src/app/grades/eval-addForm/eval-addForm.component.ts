@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Period } from 'src/app/_models/period';
 import { UserService } from 'src/app/_services/user.service';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/_services/auth.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { SkillsModalComponent } from '../skills-modal/skills-modal.component';

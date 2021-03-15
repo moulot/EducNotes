@@ -121,6 +121,7 @@ namespace EducNotes.API.Controllers
     [HttpPost("ForgotPassword")]
     public async Task<IActionResult> ForgotPassword(UserForResetPwdDto userData)
     {
+      bool resetOK = false;
       var username = userData.Username;
       var email = userData.Email;
       // find user with username and email as inputs
@@ -136,13 +137,23 @@ namespace EducNotes.API.Controllers
           // envoi effectué
           user.ForgotPasswordCount += 1;
           user.ForgotPasswordDate = DateTime.Now;
-          await _repo.SaveAll();
-          return Ok();
+          if(await _repo.SaveAll())
+          {
+            resetOK = true;
+            return Ok(resetOK);
+          }
+          else
+          {
+            return BadRequest("problème pour envoyer le email");
+          }
         }
-        return BadRequest("echec d'envoi du mail");
-      }
-      return BadRequest("email non trouvé. Veuillez réessayer");
 
+        return BadRequest("problème pour envoyer le email");
+      }
+      else
+      {
+        return Ok(resetOK);
+      }
     }
 
     [HttpPost("Login")]

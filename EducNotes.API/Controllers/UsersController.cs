@@ -1068,7 +1068,8 @@ namespace EducNotes.API.Controllers
             var daySchedule = teacherSchedule
                                 .Where(d => d.Day == day && d.ClassId == classId)
                                 .OrderBy(d => d.StartHourMin.Hour)
-                                .ThenBy(d => d.StartHourMin.Minute);
+                                .ThenBy(d => d.StartHourMin.Minute)
+                                .ToList();
 
             foreach (var scheduleItem in daySchedule)
             {
@@ -1406,28 +1407,16 @@ namespace EducNotes.API.Controllers
                   lwcd.Classes = new List<ClassIdAndNameDto>();
                   foreach (var aclass in classesLevel)
                   {
-                    //is it a primary educLevel Class and does it already have a teacher?
-                    Boolean classHasTeacher = await _context.ClassCourses
-                                                    .Include(i => i.Class)
-                                                    .Include(i => i.Teacher)
-                                                    .Where(c => c.ClassId == aclass.Id && c.TeacherId != teacherId &&
-                                                      c.Class.ClassLevel.EducationLevelId == educLevelPrimary)
-                                                    .CountAsync() > 0;
-                    // if(!classHasTeacher)
-                    // {
-                    //   ClassIdAndNameDto cd = new ClassIdAndNameDto();
-                    //   cd.ClassId = aclass.Id;
-                    //   cd.ClassName = aclass.Name;
-                    //   cd.Active = selectedIds.IndexOf(aclass.Id) != -1 ? true : false;
-                    //   lwcd.Classes.Add(cd);
-                    // }
+                    Boolean assigned = await _context.ClassCourses
+                      .Where(c => c.CourseId == course.Id && c.ClassId == aclass.Id && c.TeacherId != teacherId).CountAsync() > 0;
+
                     ClassIdAndNameDto cd = new ClassIdAndNameDto();
                     cd.ClassId = aclass.Id;
                     cd.ClassName = aclass.Name;
                     cd.Active = selectedIds.IndexOf(aclass.Id) != -1 ? true : false;
-                    if(classHasTeacher)
+                    if(assigned)
                     {
-                      cd.Assigned = classHasTeacher == true ? true : false;
+                      cd.Assigned = assigned;
                       cd.Active = true;
                     }
                     lwcd.Classes.Add(cd);
@@ -1458,9 +1447,10 @@ namespace EducNotes.API.Controllers
             {
               //delete previous classes selection
               List<ClassCourse> prevClasses = await _context.ClassCourses
-                                              .Include(c => c.Class)
-                                              .Where(c => c.CourseId == course.CourseId && c.Class.ClassLevelId == level.LevelId)
-                                              .ToListAsync();
+                                            .Include(c => c.Class)
+                                            .Where(c => c.CourseId == course.CourseId && 
+                                              c.Class.ClassLevelId == level.LevelId && c.TeacherId == teacherId)
+                                            .ToListAsync();
               if (prevClasses.Count() > 0)
               {
                 _repo.DeleteAll(prevClasses);
@@ -1576,7 +1566,8 @@ namespace EducNotes.API.Controllers
                                       select new {
                                         ClassId = classes.Id,
                                         ClassName = classes.Name,
-                                        NbStudents = _context.Users.Where(u => u.ClassId == classes.Id).Count()
+                                        NbStudents = _context.Users.Where(u => u.ClassId == classes.Id &&
+                                          u.UserTypeId == studentTypeId).Count()
                                       })
                                       .OrderBy(o => o.ClassName)
                                       .Distinct().ToListAsync();

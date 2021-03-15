@@ -42,16 +42,18 @@ export class TeacherManagementComponent implements OnInit {
   affectaionVisible: boolean;
   submitText = 'enregistrer';
   dateOfBirth: string;
+  wait = false;
 
-  constructor(private adminService: AdminService, private fb: FormBuilder,
-    private classService: ClassService, private router: Router, private alertify: AlertifyService,
-    private route: ActivatedRoute) { }
+  constructor(private adminService: AdminService, private fb: FormBuilder, private classService: ClassService,
+    private router: Router, private alertify: AlertifyService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.route.data.subscribe(data => {
-      this.teachersCourses = data.teachers;
-      this.filteredTeachers = data.teachers;
-    });
+    // this.route.data.subscribe(data => {
+    //   this.teachersCourses = data.teachers;
+    //   this.filteredTeachers = data.teachers;
+    // });
+    this.getTeachers();
+
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
       this.filerData(value);
     });
@@ -80,12 +82,13 @@ export class TeacherManagementComponent implements OnInit {
   }
 
   getTeachers() {
-    this.classService.getAllTeachersCourses().subscribe((res: any[]) => {
+    this.wait = true;
+    this.classService.getTeachersWithCourses().subscribe((res: any[]) => {
       this.teachersCourses = res;
       this.filteredTeachers = res;
-      console.log(this.filteredTeachers);
+      this.wait = false;
     }, error => {
-      console.log(error);
+      this.alertify.error(error);
     });
   }
 

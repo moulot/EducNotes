@@ -147,6 +147,7 @@ import { LockoutComponent } from './views/sessions/lockout/lockout.component';
 import { EditAccountComponent } from './users/edit-account/edit-account.component';
 import { EditAccountResolver } from './_resolvers/edit-account-resolver';
 import { ClassScheduleEditComponent } from './admin/class-schedule-edit/class-schedule-edit.component';
+import { ConfigComponent } from './admin/config/config/config.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -204,7 +205,7 @@ export const appRoutes: Routes = [
         { path: 'classesPanel', component: ClassesPanelComponent, resolve: { levels: ClassesListResolver } },
         { path: 'addClass', component: NewClassComponent },
         { path: 'classSchedule/:classId', component: SchedulePanelComponent, resolve: { class: ClassResolver } },
-        { path: 'teachers', component: TeacherManagementComponent, resolve: { teachers: TeacherManagementResolver } },
+        { path: 'teachers', component: TeacherManagementComponent}, // resolve: { teachers: TeacherManagementResolver } },
         { path: 'addTeacher', component: NewTeacherComponent },
         { path: 'teacherAssignment/:id', component: TeacherAssignmentComponent, resolve: { teacher: TeacherFormResolver } },
         { path: 'courses', component: CoursesPanelComponent, resolve: { courses: CoursesListResolver } },
@@ -272,7 +273,8 @@ export const appRoutes: Routes = [
         { path: 'paymentLevelChild/:id', component: PaymentLevelChildComponent, resolve: {children: PaymentLevelChildResolver}},
         { path: 'absences', component: AbsencesComponent},
         { path: 'editAccount/:id', component: EditAccountComponent, resolve: {user: EditAccountResolver}},
-        { path: 'usersValidation', component: UserValidationComponent, resolve: {users: UserValidationResolver}}
+        { path: 'usersValidation', component: UserValidationComponent, resolve: {users: UserValidationResolver}},
+        { path: 'config', component: ConfigComponent}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

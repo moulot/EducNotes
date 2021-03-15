@@ -93,7 +93,7 @@ namespace EducNotes.API.Controllers
         }
 
         [HttpGet("{classId}/ScheduleByDay")]
-        public async Task<IActionResult> GetClassScheduleByDay(int classId)
+        public async Task<IActionResult> GetClassScheduleNDays(int classId)
         {
           int daysRange = 14;
           DateTime today = DateTime.Now.Date;
@@ -118,6 +118,56 @@ namespace EducNotes.API.Controllers
           }
 
           return Ok(items);
+        }
+
+        [HttpGet("{classId}/ScheduleCoursesByDay")]
+        public async Task<IActionResult> GetClassScheduleByDay(int classId)
+        {
+          var scheduleItems = await _context.Schedules
+                                    .Include(i => i.Class)
+                                    .Include(i => i.Course)
+                                    .Where(s => s.ClassId == classId).ToListAsync();
+          var days = scheduleItems.Select(d => d.Day).Distinct().OrderBy(o => o);
+
+          ScheduleClassDto classSchedule = new ScheduleClassDto();
+          if(scheduleItems.Count() > 0)
+          {
+            classSchedule.ClassId = classId;
+            classSchedule.ClassName = scheduleItems[0].Class.Name;
+
+            classSchedule.Days = new List<ScheduleDayDto>();
+            foreach (var day in days)
+            {
+              ScheduleDayDto sdd = new ScheduleDayDto();
+              sdd.Day = day;
+              sdd.DayName = day.DayIntToName();
+
+              var courses = scheduleItems.Where(s => s.Day == day)
+                                          .OrderBy(o => o.StartHourMin.ToString("HH:mm", frC));
+              sdd.Courses = new List<ScheduleCourseDto>();
+              foreach (var course in courses)
+              {
+                ScheduleCourseDto courseDto = new ScheduleCourseDto();
+                courseDto.CourseId = course.CourseId;
+                courseDto.CourseName = course.Course.Name;
+                courseDto.ClassId = course.ClassId;
+                courseDto.ClassName = course.Class.Name;
+                courseDto.TeacherId = Convert.ToInt32(course.TeacherId);
+                courseDto.CourseAbbrev = course.Course.Abbreviation;
+                courseDto.CourseColor = course.Course.Color;
+                courseDto.StartHour = course.StartHourMin;
+                courseDto.StartH = course.StartHourMin.ToString("HH:mm", frC);
+                courseDto.EndHour = course.EndHourMin;
+                courseDto.EndH = course.EndHourMin.ToString("HH:mm", frC);
+                courseDto.InConflict = false;
+                sdd.Courses.Add(courseDto);
+              }
+
+              classSchedule.Days.Add(sdd);
+            }
+          }
+
+          return Ok(classSchedule);
         }
 
         [HttpGet("{classId}/TimeTable")]
@@ -750,26 +800,31 @@ namespace EducNotes.API.Controllers
         [HttpPut("SaveAgenda")]
         public async Task<IActionResult> SaveAgendaItem([FromBody] AgendaForSaveDto agendaForSaveDto)
         {
-            var id = agendaForSaveDto.Id;
-            if (id == 0)
-            {
-                Agenda newAgendaItem = new Agenda();
-                _mapper.Map(agendaForSaveDto, newAgendaItem);
-                newAgendaItem.DateAdded = DateTime.Now;
-                newAgendaItem.DoneSetById = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                _repo.Add(newAgendaItem);
-            }
+          var id = agendaForSaveDto.Id;
+          Agenda newAgendaItem = new Agenda();
+          if (id == 0)
+          {
+            _mapper.Map(agendaForSaveDto, newAgendaItem);
+            newAgendaItem.DateAdded = DateTime.Now;
+            newAgendaItem.DoneSetById = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            _repo.Add(newAgendaItem);
+          }
+          else
+          {
+            var agendaItemFromRepo = await _repo.GetAgenda(id);
+            _mapper.Map(agendaForSaveDto, agendaItemFromRepo);
+            agendaItemFromRepo.DateAdded = DateTime.Now;
+          }
+
+          if (await _repo.SaveAll())
+          {
+            if(id == 0)
+              return Ok(newAgendaItem.Id);
             else
-            {
-                var agendaItemFromRepo = await _repo.GetAgenda(id);
-                _mapper.Map(agendaForSaveDto, agendaItemFromRepo);
-                agendaItemFromRepo.DateAdded = DateTime.Now;
-            }
+              return Ok(id);
+          }
 
-            if (await _repo.SaveAll())
-                return NoContent();
-
-            throw new Exception($"Updating/Saving agendaItem failed");
+          throw new Exception($"Updating/Saving agendaItem failed");
         }
 
         [HttpGet("GetAllCourses")]
@@ -1587,114 +1642,144 @@ namespace EducNotes.API.Controllers
             }
         }
 
-        [HttpGet("GetAllTeachersCourses")]
-        public async Task<IActionResult> GetAllTeachersCourses()
+        [HttpGet("TeachersWithCourses")]
+        public async Task<IActionResult> GetTeachersWithCourses()
         {
-            //recuperation de tous les professeurs ainsi que les cours affectés
-            var teachers = await _context.Users
-                                  .Include(p => p.Photos)
-                                  .Include(c => c.Class)
-                                  .Include(i => i.EducLevel)
-                                  .Where(u => u.UserTypeId == teacherTypeId)
-                                  .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
+          // var teachersToReturn = await (from teachers in _context.Users where teachers.UserTypeId == teacherTypeId
+          //                         select new {
+          //                           Id = teachers.Id,
+          //                           LastName = teachers.LastName,
+          //                           FirstName = teachers.FirstName,
+          //                           Gender = teachers.Gender,
+          //                           EducLevelId = teachers.EducLevelId != null ? teachers.EducLevelId : 0,
+          //                           EducLevelName = teachers.EducLevelId != null ? teachers.EducLevel.Name : "",
+          //                           ClassId = teachers.ClassId != null ? teachers.ClassId : 0,
+          //                           ClassName = teachers.ClassId != null ? teachers.Class.Name : "",
+          //                           PhoneNumber = teachers.PhoneNumber,
+          //                           SecondPhoneNumber = teachers.SecondPhoneNumber,
+          //                           Email = teachers.Email,
+          //                           DateOfBirth = teachers.DateOfBirth.ToString("dd/MM/yyyy", frC),
+          //                           Validated = teachers.Validated,
+          //                           PhotoUrl = teachers.Photos.FirstOrDefault(i => i.IsMain == true) == null ? "" :
+          //                             teachers.Photos.FirstOrDefault(i => i.IsMain == true).Url,
+          //                           Courses = (from courses in _context.TeacherCourses where courses.TeacherId == teachers.Id
+          //                                       select new {
+          //                                         Name = courses.Course.Name,
+          //                                         Abbrev = courses.Course.Abbreviation,
+          //                                         Classes = (from classes in _context.ClassCourses
+          //                                           where classes.TeacherId == teachers.Id && classes.CourseId == courses.CourseId
+          //                                           select new {
+          //                                             Name = classes.Class.Name
+          //                                           }).ToList()
+          //                                       }).Distinct().ToList()
+          //                         })
+          //                         .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
+          //                         .ToListAsync(); 
 
-            var teachersToReturn = new List<TeacherForListDto>();
-            foreach (var teacher in teachers)
+          //recuperation de tous les professeurs ainsi que les cours affectés
+          var teachers = await _context.Users
+                                .Include(p => p.Photos)
+                                .Include(c => c.Class)
+                                .Include(i => i.EducLevel)
+                                .Where(u => u.UserTypeId == teacherTypeId)
+                                .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
+
+          var teachersToReturn = new List<TeacherForListDto>();
+          foreach (var teacher in teachers)
+          {
+            var tdetails = new TeacherForListDto();
+            tdetails.PhoneNumber = teacher.PhoneNumber;
+            tdetails.SecondPhoneNumber = teacher.SecondPhoneNumber;
+            tdetails.Email = teacher.Email;
+            if(teacher.EducLevelId != null)
             {
-                var tdetails = new TeacherForListDto();
-                tdetails.PhoneNumber = teacher.PhoneNumber;
-                tdetails.SecondPhoneNumber = teacher.SecondPhoneNumber;
-                tdetails.Email = teacher.Email;
-                if(teacher.EducLevelId != null)
-                {
-                  tdetails.EducLevelId = Convert.ToInt32(teacher.EducLevelId);
-                  tdetails.EducLevelName = teacher.EducLevel.Name;
-                }
-                if(teacher.ClassId != null)
-                {
-                  tdetails.ClassId = Convert.ToInt32(teacher.ClassId);
-                  tdetails.ClassName = teacher.Class.Name;
-                }
-                tdetails.Id = teacher.Id;
-                tdetails.LastName = teacher.LastName;
-                tdetails.FirstName = teacher.FirstName;
-                tdetails.Gender = teacher.Gender;
-                tdetails.DateOfBirth = teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
-                tdetails.Validated = teacher.Validated;
-                var photo = teacher.Photos.FirstOrDefault(i => i.IsMain == true);
-                if (photo != null)
-                    tdetails.PhotoUrl = photo.Url;
-
-                tdetails.CourseClasses = new List<TeacherCourseClassesDto>();
-                var allteacherCourses = await _context.TeacherCourses
-                                              .Include(c => c.Course)
-                                              .Where(t => t.TeacherId == teacher.Id).ToListAsync();
-
-                foreach (var cours in allteacherCourses)
-                {
-                    var cdetails = new TeacherCourseClassesDto();
-                    cdetails.Course = cours.Course;
-                    cdetails.Classes = new List<Class>();
-                    var classes = _context.ClassCourses.Include(c => c.Class)
-                      .Where(t => t.TeacherId == teacher.Id && t.CourseId == cours.CourseId).ToList();
-                    if (classes != null & classes.Count() > 0)
-                        cdetails.Classes = classes.Select(c => c.Class).ToList();
-                    tdetails.CourseClasses.Add(cdetails);
-                }
-                teachersToReturn.Add(tdetails);
+              tdetails.EducLevelId = Convert.ToInt32(teacher.EducLevelId);
+              tdetails.EducLevelName = teacher.EducLevel.Name;
             }
+            if(teacher.ClassId != null)
+            {
+              tdetails.ClassId = Convert.ToInt32(teacher.ClassId);
+              tdetails.ClassName = teacher.Class.Name;
+            }
+            tdetails.Id = teacher.Id;
+            tdetails.LastName = teacher.LastName;
+            tdetails.FirstName = teacher.FirstName;
+            tdetails.Gender = teacher.Gender;
+            tdetails.DateOfBirth = teacher.DateOfBirth.ToString("dd/MM/yyyy", frC);
+            tdetails.Validated = teacher.Validated;
+            var photo = teacher.Photos.FirstOrDefault(i => i.IsMain == true);
+            if (photo != null)
+              tdetails.PhotoUrl = photo.Url;
 
-            return Ok(teachersToReturn);
+            tdetails.CourseClasses = new List<TeacherCourseClassesDto>();
+            var teacherCourses = await _context.TeacherCourses
+                                          .Include(c => c.Course)
+                                          .Where(t => t.TeacherId == teacher.Id).ToListAsync();
+
+            foreach (var course in teacherCourses)
+            {
+              var cdetails = new TeacherCourseClassesDto();
+              cdetails.Course = course.Course;
+              cdetails.Classes = new List<Class>();
+              var classes = await _context.ClassCourses
+                                  .Include(c => c.Class)
+                                  .Where(t => t.TeacherId == teacher.Id && t.CourseId == course.CourseId).ToListAsync();
+              if (classes != null & classes.Count() > 0)
+                cdetails.Classes = classes.Select(c => c.Class).ToList();
+              tdetails.CourseClasses.Add(cdetails);
+            }
+            teachersToReturn.Add(tdetails);
+          }
+
+          return Ok(teachersToReturn);
         }
 
         [HttpPost("{id}/UpdateTeacher")]
         public async Task<IActionResult> UpdateTeacher(int id, UserForUpdateDto teacherForUpdate)
         {
-            if (teacherForUpdate.CourseIds.Count() > 0)
+          if (teacherForUpdate.CourseIds.Count() > 0)
+          {
+            // les cours sont bien renseignés 
+            var courseIds = new List<int>();
+            foreach (var item in teacherForUpdate.CourseIds)
             {
-                // les cours sont bien renseignés 
-                var courseIds = new List<int>();
-                foreach (var item in teacherForUpdate.CourseIds)
-                {
-                    courseIds.Add(Convert.ToInt32(item));
-                }
-
-                var teacherCourses = await _context.TeacherCourses.Where(t => t.TeacherId == id).ToListAsync();
-                // recupartion des courseId du profésseur
-                var ccIds = teacherCourses.Select(c => c.CourseId).ToList();
-
-                foreach (var courId in courseIds.Except(ccIds))
-                {
-                    //ajout d'une nouvelle ligne dans TeacheCourses
-                    var cl = new TeacherCourse { TeacherId = id, CourseId = courId };
-                    _repo.Add(cl);
-                }
-
-                foreach (var courId in ccIds.Except(courseIds))
-                {
-                    var currentLines = _context.ClassCourses.Where(c => c.CourseId == courId && c.TeacherId == id);
-                    if (currentLines.Count() == 0)
-                        _repo.Delete(teacherCourses.FirstOrDefault(t => t.TeacherId == id && t.CourseId == courId));
-                    // suppression de la ligne concernée....
-                }
-
-                var userFromRepo = await _repo.GetUser(id, false);
-                // _mapper.Map(model, userFromRepo);
-                userFromRepo.FirstName = teacherForUpdate.FirstName;
-                userFromRepo.LastName = teacherForUpdate.LastName;
-                if (teacherForUpdate.DateOfBirth != null)
-                    userFromRepo.DateOfBirth = Convert.ToDateTime(teacherForUpdate.DateOfBirth);
-                userFromRepo.Email = teacherForUpdate.Email;
-                userFromRepo.PhoneNumber = teacherForUpdate.PhoneNumber;
-                userFromRepo.SecondPhoneNumber = teacherForUpdate.SecondPhoneNumber;
-                _repo.Update(userFromRepo);
-
-                if (await _repo.SaveAll())
-                    return Ok();
-
-                return BadRequest("impossible de terminer l'action");
+              courseIds.Add(Convert.ToInt32(item));
             }
-            return BadRequest("veuillez selectionner au moins un cours");
+
+            var teacherCourses = await _context.TeacherCourses.Where(t => t.TeacherId == id).ToListAsync();
+            // recupartion des courseId du profésseur
+            var ccIds = teacherCourses.Select(c => c.CourseId).ToList();
+
+            foreach (var courId in courseIds.Except(ccIds))
+            {
+              //ajout d'une nouvelle ligne dans TeacheCourses
+              var cl = new TeacherCourse { TeacherId = id, CourseId = courId };
+              _repo.Add(cl);
+            }
+
+            foreach (var courId in ccIds.Except(courseIds))
+            {
+              var currentLines = _context.ClassCourses.Where(c => c.CourseId == courId && c.TeacherId == id);
+              if (currentLines.Count() == 0)
+                _repo.Delete(teacherCourses.FirstOrDefault(t => t.TeacherId == id && t.CourseId == courId));
+            }
+
+            var userFromRepo = await _repo.GetUser(id, false);
+            userFromRepo.FirstName = teacherForUpdate.FirstName;
+            userFromRepo.LastName = teacherForUpdate.LastName;
+            if (teacherForUpdate.DateOfBirth != null)
+              userFromRepo.DateOfBirth = Convert.ToDateTime(teacherForUpdate.DateOfBirth);
+            userFromRepo.Email = teacherForUpdate.Email;
+            userFromRepo.PhoneNumber = teacherForUpdate.PhoneNumber;
+            userFromRepo.SecondPhoneNumber = teacherForUpdate.SecondPhoneNumber;
+            _repo.Update(userFromRepo);
+
+            if (await _repo.SaveAll())
+              return Ok();
+
+            return BadRequest("impossible de terminer l'action");
+          }
+          return BadRequest("veuillez selectionner au moins un cours");
         }
 
         [HttpPost("{id}/{courseId}/{levelId}/SaveTeacherAffectation")]

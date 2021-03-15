@@ -26,9 +26,13 @@ export class LockoutComponent implements OnInit {
   }
 
   sendLink() {
-    this.authService.forgotPassord(this.resetPwdForm.value).subscribe(res => {
-      this.alertify.success('email de re-initialisation envoyé');
-      this.emailSent = true;
+    this.authService.forgotPassord(this.resetPwdForm.value).subscribe(resetOk => {
+      if (resetOk) {
+        this.alertify.success('email de re-initialisation envoyé');
+        this.emailSent = true;
+      } else {
+        this.alertify.warning('l\'utilisateur ou/et le email n\'existent pas. recommencez svp.');
+      }
     }, error => {
       this.alertify.error(error);
     });

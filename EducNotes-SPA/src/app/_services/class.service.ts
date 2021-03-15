@@ -198,8 +198,8 @@ export class ClassService {
   }
 
   // recuperer tous les professeurs ainsi que les cours qui leurs sont deja assignés
-  getAllTeachersCourses() {
-    return this.http.get(this.baseUrl + 'classes/GetAllTeachersCourses');
+  getTeachersWithCourses() {
+    return this.http.get(this.baseUrl + 'classes/TeachersWithCourses');
   }
 
   getAllTeacherCoursesById(id: number) {
@@ -366,6 +366,10 @@ export class ClassService {
 
   getUserClassLife(childId) {
     return this.http.get(this.baseUrl + 'classes/UserClassLife/' + childId);
+  }
+
+  getScheduleCoursesByDay(classId) {
+    return this.http.get(this.baseUrl + 'classes/' + classId + '/ScheduleCoursesByDay');
   }
 
 }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ClassService } from 'src/app/_services/class.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, ROUTER_CONFIGURATION } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { AuthService } from 'src/app/_services/auth.service';
 import { UserService } from 'src/app/_services/user.service';
@@ -36,6 +36,7 @@ export class TeacherAssignmentComponent implements OnInit {
     this.route.data.subscribe(data => {
       const teacherData = data['teacher'];
       this.courses = teacherData.classes;
+      console.log(this.courses);
       this.teacher = teacherData.teacher;
       this.addCourseItems();
     });

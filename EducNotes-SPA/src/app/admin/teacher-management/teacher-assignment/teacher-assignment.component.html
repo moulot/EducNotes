@@ -31,10 +31,11 @@
                     --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i>
                   <div class="text-17 text-capitalize">{{course.value.courseName}}</div>
                 </div>
-                <hr class="mt-1 mb-2" style="background-color: #f89f20;">
+                <div class="text-13 textDarkRed">les classes bloquées (en orange) sont déjà attribuées à un autre enseignant</div>
                 <div class="row">
                   <div class="col-md-12" formArrayName="levels" *ngFor="let level of course.get('levels')['controls']; let j = index">
                     <div [formGroupName]="j">
+                      <hr class="my-1">
                       <div class="row">
                         <div class="col-md-3">
                           <div class="text-15 my-2">niveau {{level.value.levelName}}</div>
@@ -73,7 +74,7 @@
                             </div>
                           </div>
                         </div>
-                        <div class="col-md-12"><hr class="my-1"></div>
+                        <!-- <div class="col-md-12"><hr class="my-1"></div> -->
                       </div>
                     </div>
                   </div>

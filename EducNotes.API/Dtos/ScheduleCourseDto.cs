@@ -10,6 +10,7 @@ namespace EducNotes.API.Dtos
     public string CourseColor { get; set; }
     public int ClassId { get; set; }
     public string ClassName { get; set; }
+    public int TeacherId { get; set; }
     public DateTime StartHour { get; set; }
     public DateTime EndHour { get; set; }
     public string StartH { get; set; }

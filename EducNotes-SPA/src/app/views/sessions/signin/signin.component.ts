@@ -25,6 +25,10 @@ export class SigninComponent implements OnInit {
   loadingText: string;
   formValid: boolean;
   infos: any;
+  showInfoBox = false;
+  alertInfo: string;
+  maxFailed = 3;
+  failedCount = 0;
 
   constructor(private authService: AuthService, private router: Router, private fb: FormBuilder,
       private route: ActivatedRoute, private alertify: AlertifyService) { }
@@ -71,7 +75,9 @@ export class SigninComponent implements OnInit {
       if (this.authService.lockedOut) {
         this.router.navigate(['/lockout']);
       } else if (this.authService.loginPwdFailed) {
-        this.alertify.error('login ou mot de passe incorrect...');
+        this.alertify.error('utilisateur ou mot de passe incorrect...');
+        this.failedCount++;
+        this.showInfoBox = true;
       } else {
         this.user = this.authService.currentUser;
         if (this.user.emailConfirmed && this.user.phoneNumberConfirmed && this.user.validated) {
