@@ -109,7 +109,7 @@ export class NewTeacherComponent implements OnInit {
 
   getCourses() {
     if (this.courses.length === 0) {
-      this.classService.getAllCourses().subscribe(data => {
+      this.classService.getCourses().subscribe(data => {
         this.courses = data;
         const assigned = this.teacher.classesAssigned;
         const ids = this.teacher.courseIds.split(',');

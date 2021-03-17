@@ -105,6 +105,7 @@ namespace EducNotes.API
           services.AddTransient<Seed>();
           services.AddScoped<IDatingRepository, DatingRepository>();
           services.AddScoped<IEducNotesRepository, EducNotesRepository>();
+          services.AddScoped<ICacheRepository, CacheRepository>();
           services.AddScoped<LogUserActivity>();
         }
 

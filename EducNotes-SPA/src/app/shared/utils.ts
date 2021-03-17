@@ -99,11 +99,11 @@ export class Utils {
       return new Date(Number(dt[2]), Number(dt[1]) - 1, Number(dt[0]));
   }
 
-  static smoothScrollToTop() {
+  static smoothScrollToTop(step: number) {
       const scrollToTop = window.setInterval(() => {
         const pos = window.pageYOffset;
         if (pos > 0) {
-            window.scrollTo(0, pos - 10); // how far to scroll on each step
+            window.scrollTo(0, pos - step); // how far to scroll on each step
         } else {
             window.clearInterval(scrollToTop);
         }

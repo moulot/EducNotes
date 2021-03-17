@@ -95,13 +95,13 @@ export class GradeAddFormComponent implements OnInit {
     }, () => {
       this.evalService.setCurrentCurrentEval(this.selectedEval, this.newUserGrades);
       this.toggleView.emit();
-      Utils.smoothScrollToTop();
+      Utils.smoothScrollToTop(10);
     });
   }
 
   cancelForm() {
     this.toggleView.emit();
-    Utils.smoothScrollToTop();
+    Utils.smoothScrollToTop(10);
   }
 
 }

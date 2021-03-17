@@ -1,1 +1,46 @@
-<p>classlevel-courses works!</p>
+<div class="card">
+  <div class="card-body p-2">
+    <div class="text-15"><b>cours par niveau</b></div>
+    <hr class="my-1">
+    <form [formGroup]="levelCoursesForm" (ngSubmit)="save()">
+      <div class="my-1">
+        <button type="submit" mdbBtn block="true" class="btnBlue" size="sm" mdbWavesEffect>enregistrer les cours</button>
+      </div>
+      <div class="row">
+        <div class="col-md-12" formArrayName="levels" *ngFor="let level of levelCoursesForm.get('levels')['controls']; let i = index;">
+          <div [formGroupName]="i">
+            <div class="card mb-2">
+              <div class="card-body p-2">
+                <div class="text-17">niveau {{level.value.name}}</div>
+                <hr class="my-1">
+                <div class="row">
+                  <div class="col-md-3" formArrayName="courses" *ngFor="let course of level.get('courses')['controls']; let j = index">
+                    <div [formGroupName]="j">
+                      <div class="switch my-2 logo-switch">
+                        <label>
+                          <input type="checkbox" formControlName="selected">
+                          <span class="slider"></span>
+                          <span class="text-12 text-muted">{{course.value.name}}</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12"><hr class="my-2"></div>
+        <!-- <div class="col-md-6 mb-1">
+          <button type="button" [routerLink]="['/teachers']" mdbBtn block="true" class="btnOrange float-right" size="sm" mdbWavesEffect >annuler</button>
+        </div> -->
+        <div class="col-md-12 mb-1">
+          <button type="submit" mdbBtn block="true" class="btnBlue" size="sm" mdbWavesEffect>enregistrer les cours</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+

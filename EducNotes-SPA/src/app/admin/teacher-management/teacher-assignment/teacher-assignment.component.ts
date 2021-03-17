@@ -36,7 +36,6 @@ export class TeacherAssignmentComponent implements OnInit {
     this.route.data.subscribe(data => {
       const teacherData = data['teacher'];
       this.courses = teacherData.classes;
-      console.log(this.courses);
       this.teacher = teacherData.teacher;
       this.addCourseItems();
     });

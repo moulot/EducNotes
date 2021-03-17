@@ -113,7 +113,7 @@ export class NewUserComponent implements OnInit {
   }
 
   // getCourses() {
-  //   this.classService.getAllCourses().subscribe((res) => {
+  //   this.classService.getCourses().subscribe((res) => {
   //     this.courses = res;
   //   });
   // }

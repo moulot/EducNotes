@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AlertifyService } from 'src/app/_services/alertify.service';
 
 @Component({
   selector: 'app-config',
@@ -6,10 +7,21 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./config.component.scss']
 })
 export class ConfigComponent implements OnInit {
+  activeTabs = [false, false];
+  buttons = [false, false];
 
-  constructor() { }
+  constructor(private alertify: AlertifyService) { }
 
   ngOnInit() {
+  }
+
+  showTab(index) {
+    for (let i = 0; i < this.activeTabs.length; i++) {
+      this.activeTabs[i] = false;
+      this.buttons[i] = false;
+    }
+    this.activeTabs[index] = true;
+    this.buttons[index] = true;
   }
 
 }

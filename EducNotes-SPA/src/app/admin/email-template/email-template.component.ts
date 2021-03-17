@@ -20,7 +20,7 @@ export class EmailTemplateComponent implements OnInit {
     this.route.data.subscribe(data => {
       this.emailTemplates = data['templates'];
     });
-    Utils.smoothScrollToTop();
+    Utils.smoothScrollToTop(10);
   }
 
   addNew() {

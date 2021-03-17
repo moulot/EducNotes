@@ -20,7 +20,7 @@ export class SmsTemplateComponent implements OnInit {
     this.route.data.subscribe(data => {
       this.smsTemplates = data['templates'];
     });
-    Utils.smoothScrollToTop();
+    Utils.smoothScrollToTop(10);
   }
 
   addNew() {

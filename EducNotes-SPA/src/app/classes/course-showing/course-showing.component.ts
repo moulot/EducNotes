@@ -61,7 +61,7 @@ export class CourseShowingComponent implements OnInit {
     });
   }
   getCourses() {
-    this.classService.getAllCourses().subscribe((res: any[]) => {
+    this.classService.getCourses().subscribe((res: any[]) => {
       for (let i = 0; i < res.length; i++) {
         const element = { value: res[i].id, label: res[i].name };
         this.courses = [...this.courses, element];

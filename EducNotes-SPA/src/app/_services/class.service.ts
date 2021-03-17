@@ -7,7 +7,6 @@ import { Agenda } from '../_models/agenda';
 import { Course } from '../_models/course';
 import { Class } from '../_models/class';
 import { Absence } from '../_models/absence';
-import { Schedule } from '../_models/schedule';
 import { Period } from '../_models/period';
 import { ScheduleData } from '../_models/scheduleData';
 
@@ -15,28 +14,28 @@ import { ScheduleData } from '../_models/scheduleData';
   providedIn: 'root'
 })
 export class ClassService {
-  baseUrl = environment.apiUrl;
+  baseUrl = environment.apiUrl + 'classes/';
 
   constructor(private http: HttpClient) { }
 
   getClass(classId): Observable<Class> {
-    return this.http.get<Class>(this.baseUrl + 'classes/' + classId);
+    return this.http.get<Class>(this.baseUrl + classId);
   }
 
   getCourseWithTeacher(classId): Observable<User[]> {
-    return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/CourseWithTeacher');
+    return this.http.get<User[]>(this.baseUrl + classId + '/CourseWithTeacher');
   }
 
   getClassTeachers(classId): Observable<User[]> {
-    return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/teachers');
+    return this.http.get<User[]>(this.baseUrl + classId + '/teachers');
   }
 
   getTodayToNDaysAgenda(classId, toNbDays) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/TodayToNDaysAgenda/' + toNbDays);
+    return this.http.get(this.baseUrl + classId + '/TodayToNDaysAgenda/' + toNbDays);
   }
 
   getClassCurrWeekAgenda(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/CurrWeekAgenda');
+    return this.http.get(this.baseUrl + classId + '/CurrWeekAgenda');
   }
 
   getClassMovedWeekAgenda(classId, agendaParams) {
@@ -44,11 +43,11 @@ export class ClassService {
     let params = new HttpParams();
     params = params.append('dueDate', agendaParams.dueDate);
     params = params.append('moveWeek', agendaParams.moveWeek);
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/MovedWeekAgenda', { params });
+    return this.http.get(this.baseUrl + classId + '/MovedWeekAgenda', { params });
   }
 
   getPDFFromHtml(data: any) {
-    return this.http.post(this.baseUrl + 'classes/HtmlToPDF', data);
+    return this.http.post(this.baseUrl + 'HtmlToPDF', data);
   }
 
   getWeekDaysByDate(agendaParams): Observable<number[]> {
@@ -56,80 +55,80 @@ export class ClassService {
     let params = new HttpParams();
     params = params.append('dueDate', agendaParams.dueDate);
 
-    return this.http.get<number[]>(this.baseUrl + 'classes/GetWeekDays', { params });
+    return this.http.get<number[]>(this.baseUrl + 'GetWeekDays', { params });
   }
 
   getScheduleNDays(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/ScheduleNDays');
+    return this.http.get(this.baseUrl + classId + '/ScheduleNDays');
   }
 
   getSchedule(id) {
-    return this.http.get(this.baseUrl + 'classes/Schedule/' + id);
+    return this.http.get(this.baseUrl + 'Schedule/' + id);
   }
 
   getSessionData(scheduleId) {
-    return this.http.get(this.baseUrl + 'classes/SessionData/' + scheduleId);
+    return this.http.get(this.baseUrl + 'SessionData/' + scheduleId);
   }
 
   getSessionFromSchedule(scheduleId) {
-    return this.http.get(this.baseUrl + 'classes/Schedule/' + scheduleId + '/Session');
+    return this.http.get(this.baseUrl + 'Schedule/' + scheduleId + '/Session');
   }
 
   getSession(id) {
-    return this.http.get(this.baseUrl + 'classes/Sessions/' + id);
+    return this.http.get(this.baseUrl + 'Sessions/' + id);
   }
 
   getCallSheetStudents(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/CallSheet/Students');
+    return this.http.get(this.baseUrl + classId + '/CallSheet/Students');
   }
 
   saveCallSheet(sessionId: number, absences: Absence[]) {
-    return this.http.put(this.baseUrl + 'classes/saveCallSheet/' + sessionId, absences);
+    return this.http.put(this.baseUrl + 'saveCallSheet/' + sessionId, absences);
   }
 
   getSanctions() {
-    return this.http.get(this.baseUrl + 'classes/GetSanctions');
+    return this.http.get(this.baseUrl + 'GetSanctions');
   }
 
   getClassAbsences(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/Absences');
+    return this.http.get(this.baseUrl + classId + '/Absences');
   }
 
   getAbsencesBySession(sessionId) {
-    return this.http.get(this.baseUrl + 'classes/absences/' + sessionId);
+    return this.http.get(this.baseUrl + 'absences/' + sessionId);
   }
 
   getClassSanctions(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/ClassSanctions');
+    return this.http.get(this.baseUrl + classId + '/ClassSanctions');
   }
 
   getClassTimeTable(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/TimeTable');
+    return this.http.get(this.baseUrl + classId + '/TimeTable');
   }
 
   getClassScheduleByDay(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/ScheduleByDay');
+    return this.http.get(this.baseUrl + classId + '/ScheduleByDay');
   }
 
   delCourseFromSchedule(scheduleId) {
-    return this.http.put(this.baseUrl + 'classes/DelCourseFromSchedule/' + scheduleId, {});
+    return this.http.put(this.baseUrl + 'DelCourseFromSchedule/' + scheduleId, {});
   }
 
   getScheduleToday(classId: Number) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/schedule/today');
+    return this.http.get(this.baseUrl + classId + '/schedule/today');
   }
 
   // pour recuperer les eleves d'une classe a partir de classId
   getClassStudents(classId): Observable<User[]> {
-    return this.http.get<User[]>(this.baseUrl + 'classes/' + classId + '/Students');
+    return this.http.get<User[]>(this.baseUrl + classId + '/Students');
   }
 
   getScheduleDay(classId, day) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/schedule/' + day);
+    return this.http.get(this.baseUrl + classId + '/schedule/' + day);
   }
 
   getAgendaItemById(classId, agendaId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/agendas/' + agendaId);
+    return this.http.get(this.baseUrl + classId + '/agendas/' + agendaId);
   }
 
   getAgendaItemByData(agendaParams): Observable<Agenda> {
@@ -140,35 +139,35 @@ export class ClassService {
     params = params.append('courseId', agendaParams.courseId);
     params = params.append('dueDate', agendaParams.dueDate);
 
-    return this.http.get<Agenda>(this.baseUrl + 'classes/GetAgendaItem', { params });
+    return this.http.get<Agenda>(this.baseUrl + 'GetAgendaItem', { params });
   }
 
   getClassAgenda(classId): Observable<Agenda[]> {
-    return this.http.get<Agenda[]>(this.baseUrl + 'classes/' + classId + '/ClassAgenda');
+    return this.http.get<Agenda[]>(this.baseUrl + classId + '/ClassAgenda');
   }
 
   // saveAgendaItem(id: number, agendaItem: Agenda) {
-  //   return this.http.put(this.baseUrl + 'classes/' + id + '/SaveAgenda', agendaItem);
+  //   return this.http.put(this.baseUrl + id + '/SaveAgenda', agendaItem);
   // }
 
   saveAgendaItem(agendaItem: Agenda) {
-    return this.http.put(this.baseUrl + 'classes/SaveAgenda', agendaItem);
+    return this.http.put(this.baseUrl + 'SaveAgenda', agendaItem);
   }
 
   getClassCourses(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/ClassCourses');
+    return this.http.get(this.baseUrl + classId + '/ClassCourses');
   }
 
   getEducLevels() {
-    return this.http.get(this.baseUrl + 'classes/EducLevels');
+    return this.http.get(this.baseUrl + 'EducLevels');
   }
 
   getClassCoursesWithAgenda(classId, daysToNow, daysFromNow) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/CoursesWithAgenda/f/' + daysToNow + '/t/' + daysFromNow);
+    return this.http.get(this.baseUrl + classId + '/CoursesWithAgenda/f/' + daysToNow + '/t/' + daysFromNow);
   }
 
   getClassAgendaNbDays(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/AgendaNbDays');
+    return this.http.get(this.baseUrl + classId + '/AgendaNbDays');
   }
 
   getClassAgendaByDate(classId, agendaParams) {
@@ -178,120 +177,120 @@ export class ClassService {
     params = params.append('nbDays', agendaParams.nbDays);
     params = params.append('isMovingPeriod', agendaParams.isMovingPeriod);
 
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/AgendaByDate', { params });
+    return this.http.get(this.baseUrl + classId + '/AgendaByDate', { params });
   }
 
   classAgendaSetDone(agendaId, isDone) {
-    return this.http.get(this.baseUrl + 'classes/Agenda/' + agendaId + '/SetTask/' + isDone);
+    return this.http.get(this.baseUrl + 'Agenda/' + agendaId + '/SetTask/' + isDone);
   }
 
   getClassesByLevel() {
-    return this.http.get(this.baseUrl + 'classes/ClassesByLevel');
+    return this.http.get(this.baseUrl + 'ClassesByLevel');
   }
 
   getFreePrimaryClasses(teacherId, educLevelId) {
-    return this.http.get(this.baseUrl + 'classes/' + teacherId + '/FreePrimaryClasses/' + educLevelId);
+    return this.http.get(this.baseUrl + teacherId + '/FreePrimary' + educLevelId);
   }
 
   getAllClasses() {
-    return this.http.get<any[]>(this.baseUrl + 'classes/AllClasses');
+    return this.http.get<any[]>(this.baseUrl + 'AllClasses');
   }
 
   // recuperer tous les professeurs ainsi que les cours qui leurs sont deja assignés
   getTeachersWithCourses() {
-    return this.http.get(this.baseUrl + 'classes/TeachersWithCourses');
+    return this.http.get(this.baseUrl + 'TeachersWithCourses');
   }
 
   getAllTeacherCoursesById(id: number) {
-    return this.http.get(this.baseUrl + 'classes/' + id + '/GetAllTeacherCoursesById');
+    return this.http.get(this.baseUrl + id + '/GetAllTeacherCoursesById');
   }
 
   // recuperation de tous les cours
-  getAllCourses(): Observable<Course[]> {
-    return this.http.get<Course[]>(this.baseUrl + 'classes/GetAllCourses');
+  getCourses(): Observable<Course[]> {
+    return this.http.get<Course[]>(this.baseUrl + 'GetCourses');
   }
 
   saveSchedules(schedules: ScheduleData[]) {
-    return this.http.put(this.baseUrl + 'classes/saveSchedules', schedules);
+    return this.http.put(this.baseUrl + 'saveSchedules', schedules);
   }
 
   saveTeacherAffectation(id: number, courseId: number, levelId: number, classIds: number[]) {
-    return this.http.post(this.baseUrl + 'classes/' + id + '/' + courseId + '/' + levelId + ' /SaveTeacherAffectation', classIds);
+    return this.http.post(this.baseUrl + id + '/' + courseId + '/' + levelId + ' /SaveTeacherAffectation', classIds);
   }
 
   updateTeacher(id: number, user: any) {
-    return this.http.post(this.baseUrl + 'classes/' + id + '/UpdateTeacher', user);
+    return this.http.post(this.baseUrl + id + '/UpdateTeacher', user);
   }
 
   ////////////////////////////////////////
   // tous les cours et leurs differents professeurs
   getCoursesTeachers() {
-    return this.http.get(this.baseUrl + 'classes/GetCoursesTeachers');
+    return this.http.get(this.baseUrl + 'GetCoursesTeachers');
   }
 
   getAllCoursesDetails() {
-    return this.http.get(this.baseUrl + 'classes/GetAllCoursesDetails');
+    return this.http.get(this.baseUrl + 'GetAllCoursesDetails');
   }
 
   getStudentAllDetailsById(id: number) {
-    return this.http.get(this.baseUrl + 'classes/' + id + '/GetStudentsAllDetailsById');
+    return this.http.get(this.baseUrl + id + '/GetStudentsAllDetailsById');
   }
 
   getParentAllDetailsById(id: number) {
-    return this.http.get(this.baseUrl + 'classes/' + id + '/GetParentAllDetailsById');
+    return this.http.get(this.baseUrl + id + '/GetParentAllDetailsById');
   }
 
   getLevels() {
-    return this.http.get(this.baseUrl + 'classes/ClassLevels');
+    return this.http.get(this.baseUrl + 'ClassLevels');
   }
 
   getLevelsWithClasses() {
-    return this.http.get(this.baseUrl + 'classes/LevelsWithClasses');
+    return this.http.get(this.baseUrl + 'LevelsWithClasses');
   }
 
   updatCourse(courseId: number, course: Course) {
-    return this.http.post(this.baseUrl + 'classes/UpdateCourse/' + courseId, course);
+    return this.http.post(this.baseUrl + 'UpdateCourse/' + courseId, course);
   }
 
   getCourse(courseId: number): Observable<Course> {
-    return this.http.get<Course>(this.baseUrl + 'classes/course/' + courseId);
+    return this.http.get<Course>(this.baseUrl + 'course/' + courseId);
 
   }
 
   saveClassModification(classId: number, data: any) {
-    return this.http.post(this.baseUrl + 'classes/' + classId + '/UpdateClass', data);
+    return this.http.post(this.baseUrl + classId + '/UpdateClass', data);
   }
 
   updateCourse(courseId: number, courseName: string) {
-    return this.http.post(this.baseUrl + 'classes/' + courseId + '/UpdateCourse/' + courseName, {});
+    return this.http.post(this.baseUrl + courseId + '/UpdateCourse/' + courseName, {});
   }
 
   addCourse(course: any) {
-    return this.http.post(this.baseUrl + 'classes/AddCourse', course);
+    return this.http.post(this.baseUrl + 'AddCourse', course);
   }
 
   courseExist(courseName) {
-    return this.http.get(this.baseUrl + 'classes/CourseExist/' + courseName);
+    return this.http.get(this.baseUrl + 'CourseExist/' + courseName);
   }
 
   getClassesByLevelId(id: number) {
-    return this.http.get(this.baseUrl + 'classes/' + id + '/ClassesByLevelId');
+    return this.http.get(this.baseUrl + id + '/ClassesByLevelId');
   }
 
   getClassLevelsWithClasses(ids: number[]) {
-    return this.http.post(this.baseUrl + 'classes/ClassLevelsWithClasses', ids);
+    return this.http.post(this.baseUrl + 'ClassLevelsWithClasses', ids);
   }
 
   saveNewClasses(classes: any) {
-    return this.http.post(this.baseUrl + 'classes/SaveNewClasses', classes);
+    return this.http.post(this.baseUrl + 'SaveNewClasses', classes);
   }
 
   deleteClass(classId: number) {
-    return this.http.post(this.baseUrl + 'classes/' + classId + '/DeleteClass', {});
+    return this.http.post(this.baseUrl + classId + '/DeleteClass', {});
   }
 
   teacherClassCoursByLevel(teacherId: number, levelid: number, courseId: number) {
-    return this.http.get(this.baseUrl + 'classes/TeacherClassCoursByLevel/  ' + teacherId + '/' + levelid + '/' + courseId);
+    return this.http.get(this.baseUrl + 'TeacherClassCoursByLevel/  ' + teacherId + '/' + levelid + '/' + courseId);
   }
 
   getTeacher(id) {
@@ -299,77 +298,89 @@ export class ClassService {
   }
 
   getClassTypes() {
-    return this.http.get(this.baseUrl + 'classes/ClassTypes');
+    return this.http.get(this.baseUrl + 'ClassTypes');
   }
 
   createCourseCoefficient(courseCoefficient) {
-    return this.http.post(this.baseUrl + 'classes/CreateCourseCoefficient', courseCoefficient);
+    return this.http.post(this.baseUrl + 'CreateCourseCoefficient', courseCoefficient);
   }
   getClasslevelsCoefficients(levelId: number) {
-    return this.http.get(this.baseUrl + 'classes/ClassLevelCoefficients/' + levelId);
+    return this.http.get(this.baseUrl + 'ClassLevelCoefficients/' + levelId);
   }
 
   getCourseCoefficient(id: number) {
-    return this.http.get(this.baseUrl + 'classes/CourseCoefficient/' + id);
+    return this.http.get(this.baseUrl + 'CourseCoefficient/' + id);
   }
 
   updateCourseCoefficient(id: number, coeffficient: number) {
-    return this.http.post(this.baseUrl + 'classes/EditCoefficient/' + id + '/' + coeffficient, {});
+    return this.http.post(this.baseUrl + 'EditCoefficient/' + id + '/' + coeffficient, {});
   }
 
   saveNewTheme(theme) {
-    return this.http.post(this.baseUrl + 'classes/SaveNewTheme', theme);
+    return this.http.post(this.baseUrl + 'SaveNewTheme', theme);
   }
   getTeacherCourseProgram(courseId: number, teacherId: number) {
-    return this.http.get(this.baseUrl + 'classes/courses/' + courseId + '/teacher/' + teacherId + '/Program');
+    return this.http.get(this.baseUrl + 'courses/' + courseId + '/teacher/' + teacherId + '/Program');
   }
 
   searchThemes(classLevelId: number, courseId: number) {
-    return this.http.get(this.baseUrl + 'classes/ClassLevelCourseThemes/' + classLevelId + '/' + courseId);
+    return this.http.get(this.baseUrl + 'ClassLevelCourseThemes/' + classLevelId + '/' + courseId);
   }
 
   getPeriods(): Observable<Period[]> {
-    return this.http.get<Period[]>(this.baseUrl + 'classes/Periods');
+    return this.http.get<Period[]>(this.baseUrl + 'Periods');
   }
 
   getClassEvents() {
-    return this.http.get(this.baseUrl + 'classes/ClassEvents');
+    return this.http.get(this.baseUrl + 'ClassEvents');
   }
 
   getEvents(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/events');
+    return this.http.get(this.baseUrl + classId + '/events');
   }
 
   classStudentsAssignment(classId: number, studentsList) {
-    return this.http.post(this.baseUrl + 'classes/classStudentsAssignment/' + classId , studentsList);
+    return this.http.post(this.baseUrl + 'classStudentsAssignment/' + classId , studentsList);
   }
 
   addCourseShowing(courseShowing: FormData) {
-    return this.http.post(this.baseUrl + 'classes/courseShowing', courseShowing);
+    return this.http.post(this.baseUrl + 'courseShowing', courseShowing);
   }
 
   getActiveClasslevels() {
-    return this.http.get(this.baseUrl + 'classes/ActiveClasslevels');
+    return this.http.get(this.baseUrl + 'ActiveClasslevels');
+  }
+
+  getClassLevelCourses() {
+    return this.http.get(this.baseUrl + 'ClassLevelCourses');
+  }
+
+  saveLevelCourses(levelCourses) {
+    return this.http.post(this.baseUrl + 'saveCLCourses', levelCourses);
+  }
+
+  getCoursesByLevelId(levelid) {
+    return this.http.get(this.baseUrl + 'CoursesByLevelId/' + levelid);
   }
 
   getCurrentWeekAbsences() {
-    return this.http.get(this.baseUrl + 'classes/CurrentWeekAbsences');
+    return this.http.get(this.baseUrl + 'CurrentWeekAbsences');
   }
 
   getWeekAbsences(data: any) {
-    return this.http.post(this.baseUrl + 'classes/WeekAbsences', data);
+    return this.http.post(this.baseUrl + 'WeekAbsences', data);
   }
 
   getDayAbsences(date: Date) {
-    return this.http.post(this.baseUrl + 'classes/DayAbsences', date);
+    return this.http.post(this.baseUrl + 'DayAbsences', date);
   }
 
   getUserClassLife(childId) {
-    return this.http.get(this.baseUrl + 'classes/UserClassLife/' + childId);
+    return this.http.get(this.baseUrl + 'UserClassLife/' + childId);
   }
 
   getScheduleCoursesByDay(classId) {
-    return this.http.get(this.baseUrl + 'classes/' + classId + '/ScheduleCoursesByDay');
+    return this.http.get(this.baseUrl + classId + '/ScheduleCoursesByDay');
   }
 
 }

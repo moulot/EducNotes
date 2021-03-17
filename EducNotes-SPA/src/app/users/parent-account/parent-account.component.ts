@@ -127,7 +127,7 @@ export class ParentAccountComponent implements OnInit {
 
   saveUserSMS() {
     this.userService.saveUserSms(this.parent.id, this.selectedSms).subscribe(() => {
-      Utils.smoothScrollToTop();
+      Utils.smoothScrollToTop(10);
       this.alertify.success('le choix des sms est validé');
     }, error => {
       this.alertify.error(error);
