@@ -48,11 +48,11 @@ export class TeacherManagementComponent implements OnInit {
     private router: Router, private alertify: AlertifyService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    // this.route.data.subscribe(data => {
-    //   this.teachersCourses = data.teachers;
-    //   this.filteredTeachers = data.teachers;
-    // });
-    this.getTeachers();
+    this.route.data.subscribe(data => {
+      this.teachersCourses = data.teachers;
+      this.filteredTeachers = data.teachers;
+    });
+    // this.getTeachers();
 
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
       this.filerData(value);
@@ -70,7 +70,7 @@ export class TeacherManagementComponent implements OnInit {
       return;
     }
 
-    const rows = this.teachersCourses.filter(function(d) {
+    const rows = this.teachersCourses.filter(function (d) {
       for (let i = 0; i <= columns.length; i++) {
         const column = columns[i];
         if (d[column] && d[column].toString().toLowerCase().indexOf(val) > -1) {
@@ -81,21 +81,25 @@ export class TeacherManagementComponent implements OnInit {
     this.filteredTeachers = rows;
   }
 
-  getTeachers() {
-    this.wait = true;
-    this.classService.getTeachersWithCourses().subscribe((res: any[]) => {
-      this.teachersCourses = res;
-      this.filteredTeachers = res;
-      this.wait = false;
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
+  // getTeachers() {
+  //   // this.wait = true;
+  //   console.log('in fct');
+  //   this.classService.getTeachersWithCourses().subscribe((data: any) => {
+  //     console.log('ee');
+  //     console.log(data);
+  //     this.teachersCourses = data;
+  //     this.filteredTeachers = data;
+  //     this.wait = false;
+  //   }, error => {
+  //       this.alertify.error(error);
+  //     }
+  //   );
+  // }
 
   saveImport() {
     this.adminService.importTeachersFile(this.exportedTeachers).subscribe(() => {
       this.alertify.success('enregistrement terminé...');
-      this.getTeachers();
+      // this.getTeachers();
       this.show = 'all';
     }, error => {
       this.alertify.error(error);

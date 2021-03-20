@@ -205,7 +205,7 @@ export const appRoutes: Routes = [
         { path: 'classesPanel', component: ClassesPanelComponent, resolve: { levels: ClassesListResolver } },
         { path: 'addClass', component: NewClassComponent },
         { path: 'classSchedule/:classId', component: SchedulePanelComponent, resolve: { class: ClassResolver } },
-        { path: 'teachers', component: TeacherManagementComponent}, // resolve: { teachers: TeacherManagementResolver } },
+        { path: 'teachers', component: TeacherManagementComponent, resolve: { teachers: TeacherManagementResolver } },
         { path: 'addTeacher', component: NewTeacherComponent },
         { path: 'teacherAssignment/:id', component: TeacherAssignmentComponent, resolve: { teacher: TeacherFormResolver } },
         { path: 'courses', component: CoursesPanelComponent, resolve: { courses: CoursesListResolver } },

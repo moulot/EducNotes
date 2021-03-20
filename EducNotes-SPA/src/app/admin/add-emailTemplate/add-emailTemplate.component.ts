@@ -28,7 +28,6 @@ export class AddEmailTemplateComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe(data => {
       this.template = data['template'];
-      console.log(this.template.name);
       if (this.template) {
         this.templateId = this.template.id;
         this.name = this.template.name;

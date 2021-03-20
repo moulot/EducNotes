@@ -6,7 +6,7 @@ import { Period } from './_models/period';
 import { PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
 import { Subject } from 'rxjs';
 import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
-import { Router } from '@angular/router';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { Setting } from './_models/setting';
 import { AlertifyService } from './_services/alertify.service';
 
@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   @ViewChild(PerfectScrollbarDirective, { static: true }) perfectScrollbar: PerfectScrollbarDirective;
   userActivity;
   userInactive: Subject<any> = new Subject();
+  wait = false;
 
   constructor(private mdbSpinningPreloader: MDBSpinningPreloader, private authService: AuthService,
     private router: Router, private alertify: AlertifyService) {
@@ -34,6 +35,21 @@ export class AppComponent implements OnInit {
         }
       }
     );
+    this.router.events.subscribe((event) => {
+      switch (true) {
+        case event instanceof NavigationStart:
+          this.wait = true;
+          break;
+        case event instanceof NavigationEnd:
+        case event instanceof NavigationCancel:
+        case event instanceof NavigationError:
+          this.wait = false;
+          break;
+        default:
+          break;
+
+      }
+    });
   }
 
   setTimeout() {

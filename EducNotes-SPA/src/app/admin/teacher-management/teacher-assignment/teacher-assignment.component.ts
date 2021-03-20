@@ -27,6 +27,7 @@ export class TeacherAssignmentComponent implements OnInit {
   courseOptions: any = [];
   levelOptions: any = [];
   classOptions: any = [];
+  wait = false;
 
   constructor(private classService: ClassService, private alertify: AlertifyService, private authService: AuthService,
     private userService: UserService, private route: ActivatedRoute, private fb: FormBuilder, private router: Router) { }

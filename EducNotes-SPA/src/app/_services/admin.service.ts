@@ -98,9 +98,9 @@ export class AdminService {
     return this.http.get(this.baseUrl + 'admin/LastUsersActivated');
   }
 
-  getLevelsInscDetails() {
-    return this.http.get(this.baseUrl + 'admin/ClassLevelDetails');
-  }
+  // getLevelsInscDetails() {
+  //   return this.http.get(this.baseUrl + 'admin/ClassLevelDetails');
+  // }
 
   getUsersRecap() {
     return this.http.get(this.baseUrl + 'admin/UsersRecap');

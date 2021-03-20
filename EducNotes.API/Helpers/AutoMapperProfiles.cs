@@ -141,10 +141,6 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.UserTypeName, opt => {
                     opt.MapFrom(src => src.UserType.Name);
                 });
-            CreateMap<Class, ClassDetailDto>()
-                .ForMember(dest => dest.TotalStudents, opt => {
-                    opt.MapFrom(src => src.Students.Count());
-                });
             CreateMap<Evaluation, EvalsForEditDto>()
                 .ForMember(dest => dest.EvalTypeName, opt => {
                     opt.MapFrom(src => src.EvalType.Name);
@@ -197,11 +193,13 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.Coeff, opt => {
                     opt.MapFrom(src => src.Evaluation.Coeff);
                 });
+            CreateMap<Class, ClassDetailDto>();
             CreateMap<Photo, PhotosForDetailedDto>();
             CreateMap<UserForUpdateDto, User>();
             CreateMap<Photo, PhotoForReturnDto>();
             CreateMap<PhotoForCreationDto, Photo>();
             CreateMap<UserForRegisterDto, User>();
+            CreateMap<ClassLevel, ClassLevelDto>();
             CreateMap<User, TeacherInfoDto>()
                 .ForMember(u => u.PhotoUrl, opt => opt
                   .MapFrom(u => u.Photos.FirstOrDefault (p => p.IsMain).Url));

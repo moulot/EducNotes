@@ -12,6 +12,6 @@ namespace EducNotes.API.Models
         public string Name { get; set; }
         public byte Active { get; set; }
         public int MaxStudent { get; set; }
-        public ICollection<User> Students { get; set; }
+        // public ICollection<User> Students { get; set; }
     }
 }

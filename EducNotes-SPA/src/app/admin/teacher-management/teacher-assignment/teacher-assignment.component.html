@@ -88,10 +88,16 @@
         <div class="col-md-12"><hr class="my-2"></div>
         <div class="col-md-8"></div>
         <div class="col-md-2 mb-1">
-          <button type="submit" [disabled]="false" mdbBtn block="true" class="btnBlue float-right" size="sm" mdbWavesEffect>valider</button>
+          <button type="submit" [disabled]="wait" mdbBtn block="true" class="btnBlue float-right" size="sm" mdbWavesEffect>
+            <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            valider
+          </button>
         </div>
         <div class="col-md-2 mb-1">
-          <button type="button" [routerLink]="['/teachers']" mdbBtn block="true" class="btnOrange float-right" size="sm" mdbWavesEffect >annuler</button>
+          <button type="button" [disabled]="wait" [routerLink]="['/teachers']" mdbBtn block="true" class="btnOrange float-right" size="sm" mdbWavesEffect>
+            <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            annuler
+          </button>
         </div>
       </div>
     </form>

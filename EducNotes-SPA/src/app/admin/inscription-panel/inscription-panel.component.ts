@@ -15,13 +15,13 @@ export class InscriptionPanelComponent implements OnInit {
 
   ngOnInit() {
     // this.products$ = this.productService.getProducts();
-    this.getLevelsDetails();
+    // this.getLevelsDetails();
   }
-  getLevelsDetails() {
-    this.adminService.getLevelsInscDetails().subscribe((res) => {
-      this.levels = res;
-    }, error => {
-      console.log(error);
-    });
-  }
+  // getLevelsDetails() {
+  //   this.adminService.getLevelsInscDetails().subscribe((res) => {
+  //     this.levels = res;
+  //   }, error => {
+  //     console.log(error);
+  //   });
+  // }
 }
