@@ -8,6 +8,7 @@ namespace EducNotes.API.Dtos
      public int? suffixe { get; set; }
      public int maxStudent { get; set; }
      public int? classTypeId { get; set; }
+     public string ClassTypeCode { get; set; }
      public int? NbClass { get; set; }
     }
 }

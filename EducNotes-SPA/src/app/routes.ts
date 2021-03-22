@@ -31,7 +31,7 @@ import { EvalAddFormComponent } from './grades/eval-addForm/eval-addForm.compone
 import { ClassCallSheetComponent } from './classes/class-callSheet/class-callSheet.component';
 import { AdminDashboardComponent } from './dashboard/admin-dashboard/admin-dashboard.component';
 import { InscriptionsListComponent } from './admin/inscriptions-list/inscriptions-list.component';
-import { ClassesPanelComponent } from './admin/class-managemet/classes-panel/classes-panel.component';
+import { ClassesPanelComponent } from './admin/class-management/classes-panel/classes-panel.component';
 import { ClassesListResolver } from './_resolvers/classes-list-resolver';
 import { CoursesPanelComponent } from './admin/courses-management/courses-panel/courses-panel.component';
 import { CoursesListResolver } from './_resolvers/courses-list.resolver';
@@ -64,7 +64,7 @@ import { CourseFormResolver } from './_resolvers/course-form-resolver';
 import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
 import { TeacherFormResolver } from './_resolvers/teacher-form-resolver';
 import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-assignment/teacher-assignment.component';
-import { NewClassComponent } from './admin/class-managemet/new-class/new-class.component';
+import { NewClassComponent } from './admin/class-management/new-class/new-class.component';
 import { BroadcastComponent } from './comm/brodcast/broadcast.component';
 import { EmailComponent } from './comm/email/email.component';
 import { StudentAgendaComponent } from './agenda/student-agenda/student-agenda.component';
@@ -149,6 +149,7 @@ import { EditAccountResolver } from './_resolvers/edit-account-resolver';
 import { ClassScheduleEditComponent } from './admin/class-schedule-edit/class-schedule-edit.component';
 import { ConfigComponent } from './admin/config/config/config.component';
 import { ClassScheduleResolver } from './_resolvers/class-schedule-resolver';
+import { EditLevelClassesComponent } from './admin/class-management/edit-level-classes/edit-level-classes.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -275,7 +276,8 @@ export const appRoutes: Routes = [
         { path: 'absences', component: AbsencesComponent},
         { path: 'editAccount/:id', component: EditAccountComponent, resolve: {user: EditAccountResolver}},
         { path: 'usersValidation', component: UserValidationComponent, resolve: {users: UserValidationResolver}},
-        { path: 'config', component: ConfigComponent}
+        { path: 'config', component: ConfigComponent},
+        { path: 'editClasses', component: EditLevelClassesComponent}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

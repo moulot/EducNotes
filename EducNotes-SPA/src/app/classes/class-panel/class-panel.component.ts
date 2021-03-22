@@ -56,8 +56,6 @@ export class ClassPanelComponent implements OnInit {
     this.createSessionForm();
     this.teacher = this.authService.currentUser;
     this.getTeacherClasses(this.teacher.id);
-    // this.getTeacherNextCourses(this.teacher.id);
-    // this.getNextCoursesByClass(this.teacher.id);
   }
 
   createSessionForm() {

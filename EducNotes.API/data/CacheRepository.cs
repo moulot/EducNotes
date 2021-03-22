@@ -105,7 +105,8 @@ namespace EducNotes.API.data {
       return teachercourses;
     }
 
-    public async Task<List<ClassCourse>> GetClassCourses() {
+    public async Task<List<ClassCourse>> GetClassCourses()
+    {
       List<ClassCourse> classCourses = new List<ClassCourse>();
 
       // Look for cache key.
@@ -117,7 +118,8 @@ namespace EducNotes.API.data {
       return classCourses;
     }
 
-    public async Task<List<ClassCourse>> LoadClassCourses() {
+    public async Task<List<ClassCourse>> LoadClassCourses()
+    {
       List<ClassCourse> classcourses = await _context.ClassCourses
         .Include(i => i.Teacher).ThenInclude(i => i.Photos)
         .Include(i => i.Class).ThenInclude(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
@@ -137,11 +139,13 @@ namespace EducNotes.API.data {
       return classcourses;
     }
 
-    public async Task<List<ClassLevel>> GetClassLevels () {
-      List<ClassLevel> classLevels = new List<ClassLevel> ();
+    public async Task<List<ClassLevel>> GetClassLevels()
+    {
+      List<ClassLevel> classLevels = new List<ClassLevel>();
 
       // Look for cache key.
-      if (!_cache.TryGetValue(CacheKeys.ClassLevels, out classLevels)) {
+      if (!_cache.TryGetValue(CacheKeys.ClassLevels, out classLevels))
+      {
         // Key not in cache, so get data.
         classLevels = await LoadClassLevels();
       }
@@ -150,7 +154,10 @@ namespace EducNotes.API.data {
     }
 
     public async Task<List<ClassLevel>> LoadClassLevels () {
-      List<ClassLevel> classLevels = await _context.ClassLevels.OrderBy(o => o.DsplSeq).ToListAsync();
+      List<ClassLevel> classLevels = await _context.ClassLevels
+                                            .Include(i => i.Inscriptions)
+                                            .OrderBy(o => o.DsplSeq)
+                                            .ToListAsync();
 
       // Set cache options.
       var cacheEntryOptions = new MemoryCacheEntryOptions ()
@@ -162,6 +169,36 @@ namespace EducNotes.API.data {
       _cache.Set (CacheKeys.ClassLevels, classLevels, cacheEntryOptions);
 
       return classLevels;
+    }
+
+    public async Task<List<ClassLevelProduct>> GetClassLevelProducts()
+    {
+      List<ClassLevelProduct> levelproducts = new List<ClassLevelProduct>();
+
+      // Look for cache key.
+      if (!_cache.TryGetValue(CacheKeys.ClassLevelProducts, out levelproducts))
+      {
+        // Key not in cache, so get data.
+        levelproducts = await LoadClassLevelProducts();
+      }
+
+      return levelproducts;
+    }
+
+    public async Task<List<ClassLevelProduct>> LoadClassLevelProducts ()
+    {
+      List<ClassLevelProduct> levelproducts = await _context.ClassLevelProducts.ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions ()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration (TimeSpan.FromDays (7));
+
+      // Save data in cache.
+      _cache.Remove (CacheKeys.ClassLevelProducts);
+      _cache.Set (CacheKeys.ClassLevelProducts, levelproducts, cacheEntryOptions);
+
+      return levelproducts;
     }
 
     public async Task<List<Class>> GetClasses() {
@@ -176,10 +213,12 @@ namespace EducNotes.API.data {
       return classes;
     }
 
-    public async Task<List<Class>> LoadClasses() {
+    public async Task<List<Class>> LoadClasses()
+    {
       List<Class> classes = await _context.Classes
-        .OrderBy(o => o.Name)
-        .ToListAsync();
+                                  .Include(i => i.ClassType)
+                                  .Include(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
+                                  .OrderBy(o => o.Name).ToListAsync();
 
       // Set cache options.
       var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -479,6 +518,196 @@ namespace EducNotes.API.data {
       _cache.Set(CacheKeys.Tokens, tokens, cacheEntryOptions);
 
       return tokens;
+    }
+
+    public async Task<List<ProductDeadLine>> GetProductDeadLines()
+    {
+      List<ProductDeadLine> productdeadlines = new List<ProductDeadLine>();
+      // Look for cache key.
+      if (!_cache.TryGetValue(CacheKeys.ProductDeadLines, out productdeadlines))
+      {
+        // Key not in cache, so get data.
+        productdeadlines = await LoadProductDeadLines();
+      }
+      return productdeadlines;
+    }
+
+    public async Task<List<ProductDeadLine>> LoadProductDeadLines()
+    {
+      List<ProductDeadLine> productdeadlines = await _context.ProductDeadLines.ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+      
+      // Save data in cache.
+      _cache.Remove(CacheKeys.ProductDeadLines);
+      _cache.Set(CacheKeys.ProductDeadLines, productdeadlines, cacheEntryOptions);
+
+      return productdeadlines;
+    }
+
+    public async Task<List<Role>> GetRoles()
+    {
+      List<Role> roles = new List<Role>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.Roles, out roles))
+      {
+        // Key not in cache, so get data.
+        roles = await LoadRoles();
+      }
+
+      return roles;
+    }
+
+    public async Task<List<Role>> LoadRoles()
+    {
+      List<Role> roles = await _context.Roles.OrderBy(o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.Roles);
+      _cache.Set(CacheKeys.Roles, roles, cacheEntryOptions);
+
+      return roles;
+    }
+
+    public async Task<List<Order>> GetOrders()
+    {
+      List<Order> orders = new List<Order>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.Orders, out orders))
+      {
+        // Key not in cache, so get data.
+        orders = await LoadOrders();
+      }
+
+      return orders;
+    }
+
+    public async Task<List<Order>> LoadOrders()
+    {
+      List<Order> orders = await _context.Orders
+                                  .Include(i => i.Child)
+                                  .Include (i => i.Mother)
+                                  .Include (i => i.Father)
+                                  .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.Orders);
+      _cache.Set(CacheKeys.Orders, orders, cacheEntryOptions);
+
+      return orders;
+    }
+
+    public async Task<List<OrderLine>> GetOrderLines()
+    {
+      List<OrderLine> lines = new List<OrderLine>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.OrderLines, out lines))
+      {
+        // Key not in cache, so get data.
+        lines = await LoadOrderLines();
+      }
+
+      return lines;
+    }
+
+    public async Task<List<OrderLine>> LoadOrderLines()
+    {
+      List<OrderLine> lines = await _context.OrderLines
+                                    .Include(i => i.Order)
+                                    .Include(i => i.Product)
+                                    .Include(i => i.Child).ThenInclude(i => i.Photos)
+                                    .Include(i => i.ClassLevel)
+                                    .Include(i => i.Product)
+                                    .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.OrderLines);
+      _cache.Set(CacheKeys.OrderLines, lines, cacheEntryOptions);
+
+      return lines;
+    }
+
+    public async Task<List<OrderLineDeadline>> GetOrderLineDeadLines()
+    {
+      List<OrderLineDeadline> linedeadlines = new List<OrderLineDeadline>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.OrderLineDeadLines, out linedeadlines))
+      {
+        // Key not in cache, so get data.
+        linedeadlines = await LoadOrderLineDeadLines();
+      }
+
+      return linedeadlines;
+    }
+
+    public async Task<List<OrderLineDeadline>> LoadOrderLineDeadLines()
+    {
+      List<OrderLineDeadline> linedeadlines = await _context.OrderLineDeadlines
+                                                    .Include(i => i.OrderLine)
+                                                    .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.OrderLineDeadLines);
+      _cache.Set(CacheKeys.OrderLineDeadLines, linedeadlines, cacheEntryOptions);
+
+      return linedeadlines;
+    }
+
+    public async Task<List<UserLink>> GetUserLinks()
+    {
+      List<UserLink> userlinks = new List<UserLink>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.UserLinks, out userlinks))
+      {
+        // Key not in cache, so get data.
+        userlinks = await LoadUserLinks();
+      }
+
+      return userlinks;
+    }
+
+    public async Task<List<UserLink>> LoadUserLinks()
+    {
+      List<UserLink> userlinks = await _context.UserLinks.ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.UserLinks);
+      _cache.Set(CacheKeys.UserLinks, userlinks, cacheEntryOptions);
+
+      return userlinks;
     }
   }
 }

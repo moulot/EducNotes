@@ -2,8 +2,9 @@
   <div class="face front card tp-box_side tp-box_front">
     <div class="content p-2">
       <div class="d-flex flex align-items-center">
-      <div class="flex-grow-1 text-17">niveau {{level.name}}</div>
-      <button size="sm" mdbBtn class="btnBlue p-2 text-lowercase" style="letter-spacing: 1px;" mdbWavesEffect (click)="card.toggle()">détails</button>
+        <div class="flex-grow-1 text-17">niveau {{level.name}}</div>
+        <button size="sm" mdbBtn class="btnBlue p-2 text-lowercase" style="letter-spacing: 1px;" mdbWavesEffect (click)="card.toggle()">détails</button>
+        <button size="sm" mdbBtn [routerLink]="['/editClasses']" class="btnBlue p-2 text-lowercase" style="letter-spacing: 1px;">editer</button>
       </div>
       <hr class="my-1" style="background-color: #f89f20;">
       <div class="text-center">
@@ -22,7 +23,7 @@
   </div>
 
   <div class="face back card tp-box_side tp-box_back p-0">
-    <div class="content">
+    <div class="content" style="overflow-y: scroll;">
       <div class="d-flex">        
         <div class="flex-grow-1 text-17">niveau {{level.name}}</div>
         <div>

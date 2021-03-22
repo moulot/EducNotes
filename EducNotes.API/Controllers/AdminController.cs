@@ -318,15 +318,12 @@ namespace EducNotes.API.Controllers {
     {
       List<Class> classesCached = await _cache.GetClasses();
       List<User> studentsCached = await _cache.GetStudents();
+      List<ClassLevel> classlevels = await _cache.GetClassLevels();
 
-      var levels = await _context.ClassLevels
-        .Include(i => i.Inscriptions)
-        // .Include(c => c.Classes).ThenInclude(c => c.Students)
-        .OrderBy(a => a.DsplSeq)
-        .ToListAsync();
-
+      var levels = classlevels.ToList();
       var dataToReturn = new List<ClassLevelDetailDto>();
-      foreach(var item in levels) {
+      foreach(var item in levels)
+      {
         var res = new ClassLevelDetailDto();
         res.Id = item.Id;
         res.Name = item.Name;
@@ -336,7 +333,7 @@ namespace EducNotes.API.Controllers {
         List<Class> classes = classesCached.Where(c => c.ClassLevelId == item.Id).ToList();
         foreach (var aclass in classes)
         {
-          var students = studentsCached.Where(s => s.UserTypeId == studentTypeId);
+          var students = studentsCached.Where(s => s.UserTypeId == studentTypeId && s.ClassId == aclass.Id);
           var nbStudents = students.Count();
           res.TotalStudents += nbStudents;
           //add class data
@@ -348,10 +345,9 @@ namespace EducNotes.API.Controllers {
           res.Classes.Add(cdd);
         }
 
-        //res.Classes = item.Classes.ToList();
-        dataToReturn.Add (res);
+        dataToReturn.Add(res);
       }
-      return Ok (dataToReturn);
+      return Ok(dataToReturn);
     }
 
     // enregistrement de préinscription : perer , mere et enfants
@@ -1055,13 +1051,17 @@ namespace EducNotes.API.Controllers {
       return Ok (settings);
     }
 
-    [HttpPost ("UpdateSettings")]
-    public async Task<IActionResult> UpdateSettings (List<Setting> settings) {
-      _context.UpdateRange (settings);
-      if (await _repo.SaveAll ())
-        return Ok ();
+    [HttpPost("UpdateSettings")]
+    public async Task<IActionResult> UpdateSettings(List<Setting> settings)
+    {
+      _context.UpdateRange(settings);
+      if(await _repo.SaveAll())
+      {
+        await _cache.LoadSettings();
+        return Ok();
+      }
 
-      return BadRequest ("problème pour metre à jour les paramètres");
+      return BadRequest("problème pour metre à jour les paramètres");
     }
 
     // [HttpGet("GetToken")]

@@ -104,12 +104,21 @@ export class NewClassComponent implements OnInit {
   // }
 
   saveClass() {
+    this.wait = true;
+    const levelid = this.classForm.value.levelId;
+    const classtypeid = this.classForm.value.classTypeId;
     const classes = Object.assign({}, this.classForm.value);
+    const level = this.levels.find(l => l.levelId === levelid);
+    if (level.classTypes.length > 0) {
+      classes.classTypeCode = level.classTypes.find(c => c.id = classtypeid).code;
+    }
     this.classService.saveClasses(classes).subscribe(next => {
       this.alertify.success('les classes ont été ajoutées');
+      this.wait = false;
       this.router.navigate(['classesPanel']);
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 }

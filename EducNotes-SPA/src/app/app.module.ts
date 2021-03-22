@@ -115,8 +115,8 @@ import { FlipModule } from 'ngx-flip';
 import { InscriptionsListComponent } from './admin/inscriptions-list/inscriptions-list.component';
 import { AccountHistoryComponent } from './admin/account-history/account-history.component';
 import { InscriptionPanelComponent } from './admin/inscription-panel/inscription-panel.component';
-import { ClassesPanelComponent } from './admin/class-managemet/classes-panel/classes-panel.component';
-import { NewClassComponent } from './admin/class-managemet/new-class/new-class.component';
+import { ClassesPanelComponent } from './admin/class-management/classes-panel/classes-panel.component';
+import { NewClassComponent } from './admin/class-management/new-class/new-class.component';
 import { CoursesPanelComponent } from './admin/courses-management/courses-panel/courses-panel.component';
 import { NewCourseComponent } from './admin/courses-management/new-course/new-course.component';
 // import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
@@ -221,10 +221,10 @@ import { AddEmailTemplateComponent } from './admin/add-emailTemplate/add-emailTe
 import { EditEmailTemplateResolver } from './_resolvers/edit-email-template-resolver';
 import { EditTeacherResolver } from './_resolvers/edit-teacher-resolver';
 import { CourseShowingComponent } from './classes/course-showing/course-showing.component';
-import { ClassCardComponent } from './admin/class-managemet/class-card/class-card.component';
+import { ClassCardComponent } from './admin/class-management/class-card/class-card.component';
 import { BtnBackDirective } from './_directives/btnBack.directive';
 import { ClassStudentsAssignmentComponent } from './classes/class-students-assignment/class-students-assignment.component';
-import { CourseCardComponent } from './admin/class-managemet/course-card/course-card.component';
+import { CourseCardComponent } from './admin/class-management/course-card/course-card.component';
 import { DayScheduleComponent } from './dashboard/day-schedule/day-schedule.component';
 import { TuitionPanelComponent } from './admin/tuition/tuition-panel/tuition-panel.component';
 import { CheckoutComponent } from './tuition/checkout/checkout.component';
@@ -282,6 +282,7 @@ import { ClassScheduleEditComponent } from './admin/class-schedule-edit/class-sc
 import { ClasslevelCoursesComponent } from './admin/config/classlevel-courses/classlevel-courses.component';
 import { ConfigComponent } from './admin/config/config/config.component';
 import { ClassScheduleResolver } from './_resolvers/class-schedule-resolver';
+import { EditLevelClassesComponent } from './admin/class-management/edit-level-classes/edit-level-classes.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -471,7 +472,8 @@ export function tokenGetter() {
       EditAccountComponent,
       ClassScheduleEditComponent,
       ClasslevelCoursesComponent,
-      ConfigComponent
+      ConfigComponent,
+      EditLevelClassesComponent
    ],
    imports: [
       FormWizardModule,

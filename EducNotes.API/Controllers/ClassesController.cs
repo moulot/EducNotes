@@ -1518,12 +1518,12 @@ namespace EducNotes.API.Controllers {
     {
       try
       {
-        List<ClassLevel> classlevelsCached = await _cache.GetClassLevels();
+        List<ClassLevel> classlevels = await _cache.GetClassLevels();
+        var levelName = classlevels.FirstOrDefault(e => e.Id == model.LevelId).Name + " " + model.Name;
 
         if (model.suffixe != null)
         {
-          var levelName = classlevelsCached.FirstOrDefault(e => e.Id == model.LevelId).Name + " " + model.Name;
-          //plusieurs classes a ajouter
+          //suffixe is a letter
           if (model.suffixe == 1)
           {
             //suffixe alphabetic
@@ -1533,14 +1533,13 @@ namespace EducNotes.API.Controllers {
               if(compteur <= model.NbClass)
               {
                 var newClass = new Class {
-                Name = levelName + " " + i,
-                ClassLevelId = model.LevelId,
-                Active = 1,
-                ClassTypeId = model.classTypeId,
-                MaxStudent = model.maxStudent
+                  Name = levelName + " " + model.ClassTypeCode + " " + i,
+                  ClassLevelId = model.LevelId,
+                  Active = 1,
+                  ClassTypeId = model.classTypeId,
+                  MaxStudent = model.maxStudent
                 };
                 await _context.Classes.AddAsync(newClass);
-
                 compteur++;
               }
             }
@@ -1551,7 +1550,7 @@ namespace EducNotes.API.Controllers {
             for(int i = 1; i <= model.NbClass; i++)
             {
               var newClass = new Class {
-                Name = levelName + " " + i,
+                Name = levelName + " " + model.ClassTypeCode + " " + i,
                 ClassLevelId = model.LevelId,
                 Active = 1,
                 ClassTypeId = model.classTypeId,
@@ -1560,10 +1559,11 @@ namespace EducNotes.API.Controllers {
               await _context.Classes.AddAsync(newClass);
             }
           }
-        } else
+        }
+        else
         {
           var newClass = new Class {
-            Name = model.Name,
+            Name = levelName + " " + model.ClassTypeCode + " " + model.Name,
             ClassLevelId = model.LevelId,
             MaxStudent = model.maxStudent,
             Active = 1,
@@ -1574,7 +1574,8 @@ namespace EducNotes.API.Controllers {
         await _context.SaveChangesAsync();
         await _cache.LoadClasses();
         return Ok();
-      } catch(System.Exception ex)
+      } 
+      catch(System.Exception ex)
       {
         return BadRequest(ex.Message);
       }

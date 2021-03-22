@@ -57,6 +57,5 @@ namespace EducNotes.API.Models
     public DateTime UpdateDate { get; set; }
     public int UpdateUserId { get; set; }
     public User UpdateUser { get; set; }
-    public List<OrderLineDeadline> Deadlines { get; set; }
   }
 }

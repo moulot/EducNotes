@@ -19,6 +19,8 @@
                 <div class="md-form m-0">
                   <mdb-select [options]="levelOptions" (ngModelChange)="levelChanged()" formControlName="levelId" placeholder="niveau des classes">
                   </mdb-select>
+                  <div *ngIf="classForm.get('levelId').errors && classForm.get('levelId').touched"
+                    class="text-small text-danger">le niveau de la classe est obligatoire</div>
                 </div>
               </div>
               <div class="col-md-6">
@@ -45,12 +47,16 @@
                 <div class="md-form m-0">
                   <input mdbInput type="number" id="nbClass" class="form-control" formControlName="nbClass" min="1" max="10">
                   <label for="nbClass" class="">nombre de classes à créer</label>
+                  <div *ngIf="classForm.get('nbClass').errors && classForm.get('nbClass').touched"
+                    class="text-small text-danger">le nombre de classes est obligatoire</div>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="md-form m-0">
                   <input mdbInput type="number" id="maxStudent" class="form-control" formControlName="maxStudent" min="1" max="100">
                   <label for="maxStudent" class="">nombre max d'élèves</label>
+                  <div *ngIf="classForm.get('maxStudent').errors && classForm.get('maxStudent').touched"
+                    class="text-small text-danger">le nombre de classes est obligatoire</div>
                 </div>
               </div>
               <div class="col-md-12"><hr class="my-2"></div>
@@ -75,51 +81,3 @@
     </div>
   </div>
 </div>
-
-<!-- <div class="row  mt-1 row justify-content-center align-items-center animated zoomInUp">
-
-    <div class="col-md-6">
-            <form class="text-center" style="color: #757575;"  [formGroup]="classForm" (ngSubmit)="save()">
-                <mdb-card>
-                    <mdb-card-body class="px-lg-5 pt-0">
-                        <div class="md-form">
-                            <input mdbInput type="text" id="name" class="form-control" formControlName="name">
-                            <label for="name" class="">Nom</label>
-                        </div>
-
-                        <div class="md-form">
-                            <mdb-select [options]="levels" formControlName="levelId" placeholder="Choisir le niveau">
-                            </mdb-select>
-                        </div>
-
-                        <div class="md-form">
-                            <mdb-select [options]="classTypes" formControlName="classTypeId" placeholder="Choisir le type*">
-                            </mdb-select>
-                        </div>
-
-                        <div class="md-form">
-                            <mdb-select [options]="suffixes" formControlName="suffixe" placeholder="Choisir le suffixe">
-                            </mdb-select>
-                        </div>
-
-                        <div class="md-form">
-                            <input mdbInput type="number" id="number" class="form-control" formControlName="number" min="1" max="100">
-                            <label for="number" class="">Entrer le nombre de classe</label>
-                        </div>
-
-                        <div class="md-form">
-                            <input mdbInput type="number" id="maxStudent" class="form-control" formControlName="maxStudent" min="1" max="100">
-                            <label for="maxStudent" class="">Entrer le nombre d'élève</label>
-                        </div>
-                        <div class="md-form mt-0">
-                            <button type="submit" [disabled]="!classForm.valid || submitText!='enregistrer'" mdbBtn
-                            color="info" size="sm" mdbWavesEffect><span>{{submitText}}</span></button>
-                        <button type="button" mdbBtn color="light" size="sm" mdbWavesEffect
-                            [routerLink]="['/classesPanel']" routerLinkActive="router-link-active">annuler</button>
-                        </div>
-                    </mdb-card-body>
-                </mdb-card>
-
-            </form>
-    </div>
-</div> -->

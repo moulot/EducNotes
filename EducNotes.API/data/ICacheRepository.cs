@@ -17,6 +17,8 @@ namespace EducNotes.API.data
     Task<List<ClassCourse>> LoadClassCourses();
     Task<List<ClassLevel>> GetClassLevels();
     Task<List<ClassLevel>> LoadClassLevels();
+    Task<List<ClassLevelProduct>> GetClassLevelProducts();
+    Task<List<ClassLevelProduct>> LoadClassLevelProducts();
     Task<List<Class>> GetClasses();
     Task<List<Class>> LoadClasses();
     Task<List<EducationLevel>> GetEducLevels();
@@ -39,5 +41,17 @@ namespace EducNotes.API.data
     Task<List<Setting>> LoadSettings();
     Task<List<Token>> GetTokens();
     Task<List<Token>> LoadTokens();
+    Task<List<ProductDeadLine>> GetProductDeadLines();
+    Task<List<ProductDeadLine>> LoadProductDeadLines();
+    Task<List<Role>> GetRoles();
+    Task<List<Role>> LoadRoles();
+    Task<List<Order>> GetOrders();
+    Task<List<Order>> LoadOrders();
+    Task<List<OrderLine>> GetOrderLines();
+    Task<List<OrderLine>> LoadOrderLines();
+    Task<List<OrderLineDeadline>> GetOrderLineDeadLines();
+    Task<List<OrderLineDeadline>> LoadOrderLineDeadLines();
+    Task<List<UserLink>> GetUserLinks();
+    Task<List<UserLink>> LoadUserLinks();
   }
 }
