@@ -4,7 +4,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Schedule } from 'src/app/_models/schedule';
 import { ModalScheduleComponent } from '../modal-schedule/modal-schedule.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MDBModalService, MDBModalRef } from 'ng-uikit-pro-standard';
 
 @Component({
@@ -15,6 +15,7 @@ import { MDBModalService, MDBModalRef } from 'ng-uikit-pro-standard';
 export class ClassScheduleComponent implements OnInit {
   @ViewChild('classSelect', {static: false}) classSelect: ElementRef;
   classId: number;
+  classes: any;
   scheduleItems: any;
   scheduleForm: FormGroup;
   modalRef: MDBModalRef;
@@ -44,30 +45,29 @@ export class ClassScheduleComponent implements OnInit {
   optionsClass: any[] = [];
 
   constructor(private classService: ClassService, public alertify: AlertifyService,
-    private modalService1: MDBModalService, private router: Router) { }
+    private modalService1: MDBModalService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.getClasses();
+    this.route.data.subscribe(data => {
+      this.classes = data['classes'];
+      this.getClasses();
+    });
   }
 
   getClasses() {
-    this.classService.getClassesByLevel().subscribe((data: any) => {
-      for (let i = 0; i < data.length; i++) {
-        const level = data[i];
-        if (level.classes.length > 0) {
-          const elt = {value: '', label: 'niveau ' + level.levelName, group: true};
-          this.optionsClass = [...this.optionsClass, elt];
-          for (let j = 0; j < level.classes.length; j++) {
-            const aclass = level.classes[j];
-            const elt1 = {value: aclass.id, label: 'classe ' + aclass.name};
-            this.optionsClass = [...this.optionsClass, elt1];
-          }
+    for (let i = 0; i < this.classes.length; i++) {
+      const level = this.classes[i];
+      if (level.classes.length > 0) {
+        const elt = {value: '', label: 'niveau ' + level.levelName, group: true};
+        this.optionsClass = [...this.optionsClass, elt];
+        for (let j = 0; j < level.classes.length; j++) {
+          const aclass = level.classes[j];
+          const elt1 = {value: aclass.id, label: 'classe ' + aclass.name};
+          this.optionsClass = [...this.optionsClass, elt1];
         }
       }
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
+    }
+}
 
   classChanged() {
     if (this.classControl.value !== '') {

@@ -281,6 +281,7 @@ import { EditAccountResolver } from './_resolvers/edit-account-resolver';
 import { ClassScheduleEditComponent } from './admin/class-schedule-edit/class-schedule-edit.component';
 import { ClasslevelCoursesComponent } from './admin/config/classlevel-courses/classlevel-courses.component';
 import { ConfigComponent } from './admin/config/config/config.component';
+import { ClassScheduleResolver } from './_resolvers/class-schedule-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -585,6 +586,7 @@ export function tokenGetter() {
       ParentFileResolver,
       UserValidationResolver,
       EditAccountResolver,
+      ClassScheduleResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

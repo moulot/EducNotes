@@ -292,5 +292,21 @@ namespace EducNotes.API.Helpers
         }
         return null;
       }
+
+      public static Boolean IsDarkColor(this string hexColor)
+      {
+        if(!hexColor.IsNumeric())
+        {
+          return false;
+        }
+        else
+        {
+          string shortColor = hexColor.Substring(1,1);
+          if(Convert.ToInt32(shortColor) < 5)
+            return true;
+          else
+            return false;
+        }
+      }
     }
 }

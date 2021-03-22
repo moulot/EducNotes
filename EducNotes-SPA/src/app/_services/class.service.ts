@@ -189,7 +189,7 @@ export class ClassService {
   }
 
   getFreePrimaryClasses(teacherId, educLevelId) {
-    return this.http.get(this.baseUrl + teacherId + '/FreePrimary' + educLevelId);
+    return this.http.get(this.baseUrl + teacherId + '/FreePrimaryClasses/' + educLevelId);
   }
 
   getAllClasses() {
@@ -281,8 +281,8 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'ClassLevelsWithClasses', ids);
   }
 
-  saveNewClasses(classes: any) {
-    return this.http.post(this.baseUrl + 'SaveNewClasses', classes);
+  saveClasses(classes: any) {
+    return this.http.post(this.baseUrl + 'SaveClasses', classes);
   }
 
   deleteClass(classId: number) {
@@ -299,6 +299,14 @@ export class ClassService {
 
   getClassTypes() {
     return this.http.get(this.baseUrl + 'ClassTypes');
+  }
+
+  getCLClassTypes() {
+    return this.http.get(this.baseUrl + 'CLClassTypes');
+  }
+
+  getLevelWithClassTypes() {
+    return this.http.get(this.baseUrl + 'ClassTypesByLevel');
   }
 
   createCourseCoefficient(courseCoefficient) {

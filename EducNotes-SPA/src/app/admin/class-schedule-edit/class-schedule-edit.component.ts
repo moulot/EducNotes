@@ -1,13 +1,13 @@
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Course } from 'src/app/_models/course';
 import { ScheduleData } from 'src/app/_models/scheduleData';
 import { User } from 'src/app/_models/user';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ClassService } from 'src/app/_services/class.service';
 import { UserService } from 'src/app/_services/user.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-class-schedule-edit',
@@ -15,7 +15,9 @@ import { UserService } from 'src/app/_services/user.service';
   styleUrls: ['./class-schedule-edit.component.scss']
 })
 export class ClassScheduleEditComponent implements OnInit {
+  educLevelPrimary = environment.educLevelPrimary;
   classId: number;
+  class: any;
   courses: Course[];
   teachers: User[];
   teacherName: string;
@@ -40,13 +42,15 @@ export class ClassScheduleEditComponent implements OnInit {
   friCourses = [];
   satCourses = [];
   sunCourses = [];
+  wait = false;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private route: ActivatedRoute,
-    private classService: ClassService, private userService: UserService, private router: Router) { }
+    private classService: ClassService, private userService: UserService) { }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.classId = params['classId'];
+      this.getClass(this.classId);
       this.getClassTeachers(this.classId);
       this.getScheduleCourses(this.classId);
     });
@@ -152,7 +156,6 @@ export class ClassScheduleEditComponent implements OnInit {
     // line 1
     const day1 = g.get('day1').value;
     const hourStart1 = g.get('hourStart1').value;
-    console.log(hourStart1);
     const hourEnd1 = g.get('hourEnd1').value;
     if (day1 !== null || hourStart1.length > 0 || hourEnd1.length > 0) {
       const typedHS1 = hourStart1.replace('_', '');
@@ -250,7 +253,6 @@ export class ClassScheduleEditComponent implements OnInit {
   }
 
   isConflict(index) {
-    console.log('in conflict');
     this.courseConflicts = [];
     const formIsValid = this.scheduleForm.controls['item' + index].valid;
     if (formIsValid) {
@@ -356,7 +358,6 @@ export class ClassScheduleEditComponent implements OnInit {
   }
 
   resetConflicts(day) {
-    console.log(this.teacherSchedule);
     if (this.teacherSchedule.days) {
       const dayCourses = this.teacherSchedule.days.find(c => c.day === day);
       if (dayCourses) {
@@ -519,8 +520,16 @@ export class ClassScheduleEditComponent implements OnInit {
     }
   }
 
-  goBackToSchedule() {
+  getClass(classid) {
+    this.classService.getClass(classid).subscribe(data => {
+      this.class = data;
+      console.log(this.class);
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
 
+  goBackToSchedule() {
   }
 
 }

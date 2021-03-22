@@ -1,11 +1,13 @@
 <div class="border rounded-lg" style="position:absolute; width: 100%" *ngFor="let item of items"
   [ngStyle]="{'top': item.top, 'height': item.height, 'background-color': item.color}">
     <div class="d-flex">
-      <div class="text-12 flex-grow-1"><b>{{item.courseName | uppercase}} de {{item.strStartHourMin}} à {{item.strEndHourMin}}</b></div>
+      <div class="text-12 text-white flex-grow-1">
+        <b>{{item.courseName | uppercase}} de {{item.strStartHourMin}} à {{item.strEndHourMin}}</b>
+      </div>
       <div>
         <div class="text-12"><i class="fa text-12 fa-trash" style="cursor: pointer;" aria-hidden="true"
           (click)="deleteCourse(item.id, dayName, item.delInfo)"></i></div>
       </div>
     </div>
-    <div class="text-11">{{item.teacherName | uppercase}}</div>
+    <div class="text-11 text-white">{{item.teacherName | uppercase}}</div>
 </div>

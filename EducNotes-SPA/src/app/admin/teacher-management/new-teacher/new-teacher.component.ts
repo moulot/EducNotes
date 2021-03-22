@@ -75,6 +75,8 @@ export class NewTeacherComponent implements OnInit {
         const educlevel = {value: elt.id, label: elt.name};
         this.educlevelOptions = [...this.educlevelOptions, educlevel];
       }
+    }, error => {
+      this.alertify.error('problème d\'initialisation des données');
     });
   }
 

@@ -24,7 +24,7 @@ namespace EducNotes.API
             var userManager = services.GetRequiredService<UserManager<User>>();
             var roleManager = services.GetRequiredService<RoleManager<Role>>();
             context.Database.Migrate();
-            Seed.SeedUsers(context, userManager, roleManager);
+            Seed.SeedTables(context, userManager, roleManager);
           }
           catch(Exception ex)
           {

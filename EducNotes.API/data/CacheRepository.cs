@@ -119,10 +119,9 @@ namespace EducNotes.API.data {
 
     public async Task<List<ClassCourse>> LoadClassCourses() {
       List<ClassCourse> classcourses = await _context.ClassCourses
-        // .Include(i => i.Teacher).ThenInclude(i => i.Photos)
-        // .Include(i => i.Class).ThenInclude(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
-        // .Include(i => i.Class).ThenInclude(i => i.Students)
-        // .Include(i => i.Course)
+        .Include(i => i.Teacher).ThenInclude(i => i.Photos)
+        .Include(i => i.Class).ThenInclude(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
+        .Include(i => i.Course)
         .Include(i => i.Class)
         .ToListAsync();
 
@@ -151,7 +150,7 @@ namespace EducNotes.API.data {
     }
 
     public async Task<List<ClassLevel>> LoadClassLevels () {
-      List<ClassLevel> classLevels = await _context.ClassLevels.ToListAsync();
+      List<ClassLevel> classLevels = await _context.ClassLevels.OrderBy(o => o.DsplSeq).ToListAsync();
 
       // Set cache options.
       var cacheEntryOptions = new MemoryCacheEntryOptions ()
@@ -281,6 +280,205 @@ namespace EducNotes.API.data {
       _cache.Set(CacheKeys.Cycles, cycles, cacheEntryOptions);
 
       return cycles;
+    }
+
+    public async Task<List<Course>> GetCourses()
+    {
+      List<Course> courses = new List<Course>();
+      // Look for cache key.
+      if (!_cache.TryGetValue (CacheKeys.Courses, out courses))
+      {
+        // Key not in cache, so get data.
+        courses = await LoadCourses();
+      }
+      return courses;
+    }
+
+    public async Task<List<Course>> LoadCourses()
+    {
+      List<Course> courses = await _context.Courses.OrderBy(o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+      
+      // Save data in cache.
+      _cache.Remove(CacheKeys.Courses);
+      _cache.Set(CacheKeys.Courses, courses, cacheEntryOptions);
+
+      return courses;
+    }
+
+    public async Task<List<ClassType>> GetClassTypes()
+    {
+      List<ClassType> classtypes = new List<ClassType>();
+      // Look for cache key.
+      if (!_cache.TryGetValue(CacheKeys.ClassTypes, out classtypes))
+      {
+        // Key not in cache, so get data.
+        classtypes = await LoadClassTypes();
+      }
+      return classtypes;
+    }
+
+    public async Task<List<ClassType>> LoadClassTypes()
+    {
+      List<ClassType> classtypes = await _context.ClassTypes.OrderBy(o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+      
+      // Save data in cache.
+      _cache.Remove(CacheKeys.ClassTypes);
+      _cache.Set(CacheKeys.ClassTypes, classtypes, cacheEntryOptions);
+
+      return classtypes;
+    }
+
+    public async Task<List<ClassLevelClassType>> GetCLClassTypes()
+    {
+      List<ClassLevelClassType> clclasstypes = new List<ClassLevelClassType>();
+      // Look for cache key.
+      if (!_cache.TryGetValue(CacheKeys.CLClassTypes, out clclasstypes))
+      {
+        // Key not in cache, so get data.
+        clclasstypes = await LoadCLClassTypes();
+      }
+      return clclasstypes;
+    }
+
+    public async Task<List<ClassLevelClassType>> LoadCLClassTypes()
+    {
+      List<ClassLevelClassType> clclasstypes = await _context.ClassLevelClassTypes
+                                                    .Include(i => i.ClassType)
+                                                    .Include(i => i.ClassLevel)
+                                                    .OrderBy(o => o.ClassType.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+      
+      // Save data in cache.
+      _cache.Remove(CacheKeys.CLClassTypes);
+      _cache.Set(CacheKeys.CLClassTypes, clclasstypes, cacheEntryOptions);
+
+      return clclasstypes;
+    }
+
+    public async Task<List<EmailTemplate>> GetEmailTemplates()
+    {
+      List<EmailTemplate> templates = new List<EmailTemplate>();
+      // Look for cache key.
+      if (!_cache.TryGetValue(CacheKeys.EmailTemplates, out templates))
+      {
+        // Key not in cache, so get data.
+        templates = await LoadEmailTemplates();
+      }
+      return templates;
+    }
+
+    public async Task<List<EmailTemplate>> LoadEmailTemplates()
+    {
+      List<EmailTemplate> templates = await _context.EmailTemplates.OrderBy(o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+      
+      // Save data in cache.
+      _cache.Remove(CacheKeys.EmailTemplates);
+      _cache.Set(CacheKeys.EmailTemplates, templates, cacheEntryOptions);
+
+      return templates;
+    }
+
+    public async Task<List<SmsTemplate>> GetSmsTemplates()
+    {
+      List<SmsTemplate> templates = new List<SmsTemplate>();
+      // Look for cache key.
+      if (!_cache.TryGetValue(CacheKeys.SmsTemplates, out templates))
+      {
+        // Key not in cache, so get data.
+        templates = await LoadSmsTemplates();
+      }
+      return templates;
+    }
+
+    public async Task<List<SmsTemplate>> LoadSmsTemplates()
+    {
+      List<SmsTemplate> templates = await _context.SmsTemplates.OrderBy(o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+      
+      // Save data in cache.
+      _cache.Remove(CacheKeys.SmsTemplates);
+      _cache.Set(CacheKeys.SmsTemplates, templates, cacheEntryOptions);
+
+      return templates;
+    }
+
+    public async Task<List<Setting>> GetSettings()
+    {
+      List<Setting> settings = new List<Setting>();
+      // Look for cache key.
+      if (!_cache.TryGetValue(CacheKeys.Settings, out settings))
+      {
+        // Key not in cache, so get data.
+        settings = await LoadSettings();
+      }
+      return settings;
+    }
+
+    public async Task<List<Setting>> LoadSettings()
+    {
+      List<Setting> settings = await _context.Settings.OrderBy(o => o.DisplayName).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+      
+      // Save data in cache.
+      _cache.Remove(CacheKeys.Settings);
+      _cache.Set(CacheKeys.Settings, settings, cacheEntryOptions);
+
+      return settings;
+    }
+
+    public async Task<List<Token>> GetTokens()
+    {
+      List<Token> tokens = new List<Token>();
+      // Look for cache key.
+      if (!_cache.TryGetValue(CacheKeys.Tokens, out tokens))
+      {
+        // Key not in cache, so get data.
+        tokens = await LoadTokens();
+      }
+      return tokens;
+    }
+
+    public async Task<List<Token>> LoadTokens()
+    {
+      List<Token> tokens = await _context.Tokens.OrderBy(o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+      
+      // Save data in cache.
+      _cache.Remove(CacheKeys.Tokens);
+      _cache.Set(CacheKeys.Tokens, tokens, cacheEntryOptions);
+
+      return tokens;
     }
   }
 }

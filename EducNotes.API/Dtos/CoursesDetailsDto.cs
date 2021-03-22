@@ -9,9 +9,9 @@ namespace EducNotes.API.Dtos
         public string Name { get; set; }
         public string Abbreviation { get; set; }
         public string Color { get; set; }
-        public int StudentsNumber { get; set; }
-        public int TeachersNumber { get; set; }
-        public int ClassesNumber { get; set; }
+        public int NbStudents { get; set; }
+        public int NbTeachers { get; set; }
+        public int NbClasses { get; set; }
         public List<UserForListDto> Teachers { get; set; }
         public List<Class> Classes { get; set; }
     }

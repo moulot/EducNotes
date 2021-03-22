@@ -19,5 +19,6 @@ export const environment = {
   finOpTypeInvoice: 1,
   finOpTypePayment: 2,
   educLevelPrimary: 1,
-  educLevelSecondary: 2
+  educLevelSecondary: 2,
+  terminalCycle: 5
 };

@@ -259,9 +259,9 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.CourseName, opt => {
                   opt.MapFrom(d => d.Course.Name.Length > 10 ? d.Course.Abbreviation : d.Course.Name);
                 })
-                // .ForMember(dest => dest.Top, opt => {
-                //   opt.MapFrom(d => d.StartHourMin.CalculateTop());
-                // })
+                .ForMember(dest => dest.IsDarkColor, opt => {
+                  opt.MapFrom(d => d.Course.Color.IsDarkColor());
+                })
                 .ForMember(dest => dest.Height, opt => {
                   opt.MapFrom(d => d.StartHourMin.CalculateHeight(d.EndHourMin));
                 })

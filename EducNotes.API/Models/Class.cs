@@ -8,6 +8,7 @@ namespace EducNotes.API.Models
         public int ClassLevelId { get; set; }
         public ClassLevel ClassLevel { get; set; }
         public int? ClassTypeId { get; set; }
+        public ClassType ClassType { get; set; }
         public int? MainTeacherId { get; set; }
         public string Name { get; set; }
         public byte Active { get; set; }

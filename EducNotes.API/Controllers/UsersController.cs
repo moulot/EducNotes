@@ -1985,7 +1985,8 @@ namespace EducNotes.API.Controllers {
       List<User> children = new List<User>();
       string query = "select * from AspNetUsers where UserTypeId=" + studentTypeId + " AND(";
       query += lastNameWhere + " OR " + firstNameWhere + " OR " + idNumWhere + ")";
-      var usersFromRepo = await _context.Users.Include(i => i.Photos)
+      var usersFromRepo = await _context.Users
+        .Include(i => i.Photos)
         .Include(i => i.Class)
         .FromSql(query)
         .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)

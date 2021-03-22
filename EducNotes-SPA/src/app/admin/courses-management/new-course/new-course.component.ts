@@ -70,7 +70,6 @@ export class NewCourseComponent implements OnInit {
   }
 
   addCourse() {
-    console.log(this.courseForm.value);
     this.classService.addCourse(this.courseForm.value).subscribe(() => {
       this.alertify.success('le cours est bien enregistré...');
       this.router.navigate(['/courses']);

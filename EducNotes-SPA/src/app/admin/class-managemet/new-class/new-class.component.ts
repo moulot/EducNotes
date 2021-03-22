@@ -1,9 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ClassService } from 'src/app/_services/class.service';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-new-class',
@@ -12,84 +13,103 @@ import { Router } from '@angular/router';
   animations: [SharedAnimations]
 })
 export class NewClassComponent implements OnInit {
-  levels: any = [];
-  classTypes;
+  cyle = environment.terminalCycle;
+  levelOptions = [];
+  classTypeOptions = [];
+  levels: any;
   classForm: FormGroup;
-  errorMessage = '';
-  submitText = 'enregistrer';
   suffixes = [{ value: 1, label: 'A,B,C,...' }, { value: 2, label: '1,2,3,.....' }];
+  wait = false;
 
   constructor(private fb: FormBuilder, private router: Router,
     private classService: ClassService, private alertify: AlertifyService) { }
 
   ngOnInit() {
     this.getLevels();
+    this.getCLClassTypes();
     this.createClassForm();
-    this.getClassTypes();
   }
 
   createClassForm() {
     this.classForm = this.fb.group({
       levelId: [null, Validators.required],
-      classTypeId: [null, Validators.nullValidator],
-      name: [, Validators.nullValidator],
+      classTypeId: [null],
+      name: [''],
       suffixe: [null, Validators.nullValidator],
-      maxStudent: [null, Validators.nullValidator],
-      number: [null, Validators.nullValidator]
-    });
+      maxStudent: [null, Validators.required],
+      nbClass: [null, Validators.required]
+    }, {validator: this.formValidator});
+  }
+
+  formValidator(g: FormGroup) {
+    const levelid = g.get('levelId').value;
+    const classId = g.get('classTypeId').value;
+    if ((levelid === 14 || levelid === 15 || levelid === 16) && classId == null) {
+      return {'classTypeNOK': true};
+    }
+    return null;
   }
 
   getLevels() {
     this.classService.getLevels().subscribe((res: any[]) => {
       for (let i = 0; i < res.length; i++) {
         const elt = { value: res[i].id, label: res[i].name };
-        this.levels = [...this.levels, elt];
+        this.levelOptions = [...this.levelOptions, elt];
       }
     }, error => {
       this.alertify.error(error);
     });
   }
 
-  getClassTypes() {
-    this.classService.getClassTypes().subscribe((res: any[]) => {
-      for (let i = 0; i < res.length; i++) {
-        const elt = { value: res[i].id, label: res[i].name };
-        this.classTypes = [...this.classTypes, elt];
-      }
+  getCLClassTypes() {
+    this.classService.getLevelWithClassTypes().subscribe(data => {
+      this.levels = data;
+    }, error => {
+      this.alertify.error(error);
     });
   }
 
-  save() {
-    this.errorMessage = '';
-    const classFromForm = Object.assign({}, this.classForm.value);
-    if (classFromForm.suffixe) {
-      if (!classFromForm.number) {
-        this.alertify.error('veuillez saisir le nombre de classe');
-      } else {
-        this.saveClass(classFromForm);
+  levelChanged() {
+    this.classForm.patchValue({classTypeId: null});
+    this.classTypeOptions = [];
+    const levelid = this.classForm.value.levelId;
+    if (levelid) {
+      const level = this.levels.find(c => c.levelId === levelid);
+      for (let i = 0; i < level.classTypes.length; i++) {
+        const ctype = level.classTypes[i];
+        const elt = { value: ctype.id, label: ctype.name };
+         this.classTypeOptions = [...this.classTypeOptions, elt];
       }
-    } else if (!classFromForm.name) {
-      if (!classFromForm.suffixe) {
-        this.alertify.error('veuillez saisir au moins le nom de la classe');
-      } else {
-        this.saveClass(classFromForm);
-      }
-    } else {
-      this.saveClass(classFromForm);
     }
   }
 
-  saveClass(element) {
-    this.submitText = 'patientez...';
+  // save() {
+  //   this.errorMessage = '';
+  //   const classFromForm = Object.assign({}, this.classForm.value);
+  //   if (classFromForm.suffixe) {
+  //     if (!classFromForm.number) {
+  //       this.alertify.error('veuillez saisir le nombre de classe');
+  //     } else {
+  //       this.saveClass(classFromForm);
+  //     }
+  //   } else if (!classFromForm.name) {
+  //     if (!classFromForm.suffixe) {
+  //       this.alertify.error('veuillez saisir au moins le nom de la classe');
+  //     } else {
+  //       this.saveClass(classFromForm);
+  //     }
+  //   } else {
+  //     this.saveClass(classFromForm);
+  //   }
+  // }
 
-    this.classService.saveNewClasses(element).subscribe(next => {
-      this.submitText = 'enregistrer';
-      this.alertify.success('la classe a été ajoutée...');
+  saveClass() {
+    const classes = Object.assign({}, this.classForm.value);
+    this.classService.saveClasses(classes).subscribe(next => {
+      this.alertify.success('les classes ont été ajoutées');
       this.router.navigate(['classesPanel']);
     }, error => {
-      console.log(error);
-      this.submitText = 'enregistrer';
-      this.errorMessage = error;
+      this.alertify.error(error);
     });
   }
 }

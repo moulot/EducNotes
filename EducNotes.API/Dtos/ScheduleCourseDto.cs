@@ -16,5 +16,6 @@ namespace EducNotes.API.Dtos
     public string StartH { get; set; }
     public string EndH { get; set; }
     public Boolean InConflict { get; set; }
+    public Boolean IsDarkColor { get; set; }
   }
 }

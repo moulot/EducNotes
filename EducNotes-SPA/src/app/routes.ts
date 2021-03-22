@@ -148,6 +148,7 @@ import { EditAccountComponent } from './users/edit-account/edit-account.componen
 import { EditAccountResolver } from './_resolvers/edit-account-resolver';
 import { ClassScheduleEditComponent } from './admin/class-schedule-edit/class-schedule-edit.component';
 import { ConfigComponent } from './admin/config/config/config.component';
+import { ClassScheduleResolver } from './_resolvers/class-schedule-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -184,7 +185,7 @@ export const appRoutes: Routes = [
         { path: 'studentLife/:id', component: StudentLifeComponent }, // resolve: { student: StudentResolver } },
         { path: 'studentLifeP/:id', component: StudentLifeComponent },
         { path: 'studentNotes/:id', component: GradeStudentComponent },
-        { path: 'classSchedules', component: ClassScheduleComponent },
+        { path: 'classSchedules', component: ClassScheduleComponent, resolve: {classes: ClassScheduleResolver} },
         { path: 'classScheduleEdit/:classId', component: ClassScheduleEditComponent },
         { path: 'studentsClass/:classId', component: ClassStudentsComponent },
         { path: 'agendas/:classId', component: ClassAgendaComponent },

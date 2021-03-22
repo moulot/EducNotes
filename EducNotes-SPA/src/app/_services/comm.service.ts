@@ -11,55 +11,55 @@ import { EmailTemplate } from '../_models/emailTemplate';
   providedIn: 'root'
 })
 export class CommService {
-  baseUrl = environment.apiUrl;
+  baseUrl = environment.apiUrl + 'comm/';
 
   constructor(private http: HttpClient) { }
 
   // sendSms(data: Sms) {
-  //   return this.http.post(this.baseUrl + 'comm/sendSms', data);
+  //   return this.http.post(this.baseUrl + 'sendSms', data);
   // }
   sendSms(data: clickatellParams) {
-    return this.http.post(this.baseUrl + 'comm/sendSms', data);
+    return this.http.post(this.baseUrl + 'sendSms', data);
   }
 
   getEmailCategories() {
-    return this.http.get(this.baseUrl + 'comm/EmailCategories');
+    return this.http.get(this.baseUrl + 'EmailCategories');
   }
 
   getSmsCategories() {
-    return this.http.get(this.baseUrl + 'comm/SmsCategories');
+    return this.http.get(this.baseUrl + 'SmsCategories');
   }
 
   getEmailTemplates() {
-    return this.http.get(this.baseUrl + 'comm/EmailTemplates');
+    return this.http.get(this.baseUrl + 'EmailTemplates');
   }
 
   getEmailTemplateById(id) {
-    return this.http.get(this.baseUrl + 'comm/EmailTemplates/' + id);
+    return this.http.get(this.baseUrl + 'EmailTemplates/' + id);
   }
 
   saveEmailTemplate(emailTemplate: EmailTemplate) {
-    return this.http.put(this.baseUrl + 'comm/SaveEmailTemplate', emailTemplate);
+    return this.http.put(this.baseUrl + 'SaveEmailTemplate', emailTemplate);
   }
 
   getSmsTemplates() {
-    return this.http.get(this.baseUrl + 'comm/SmsTemplates');
+    return this.http.get(this.baseUrl + 'SmsTemplates');
   }
 
   getSmsTemplateById(id) {
-    return this.http.get(this.baseUrl + 'comm/SmsTemplates/' + id);
+    return this.http.get(this.baseUrl + 'SmsTemplates/' + id);
   }
 
   saveSmsTemplate(smsTemplate: SmsTemplate) {
-    return this.http.put(this.baseUrl + 'comm/SaveSmsTemplate', smsTemplate);
+    return this.http.put(this.baseUrl + 'SaveSmsTemplate', smsTemplate);
   }
 
   getSmsByCategory() {
-    return this.http.get(this.baseUrl + 'comm/SmsByCategory');
+    return this.http.get(this.baseUrl + 'SmsByCategory');
   }
 
   getTokens() {
-    return this.http.get(this.baseUrl + 'comm/Tokens');
+    return this.http.get(this.baseUrl + 'Tokens');
   }
 
 }

@@ -19,6 +19,7 @@ using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
 using EducNotes.API.Helpers;
 using Microsoft.Extensions.Options;
+using EducNotes.API.data;
 
 namespace EducNotes.API.Controllers
 {
@@ -39,11 +40,13 @@ namespace EducNotes.API.Controllers
     int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId;
     int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
     int parentIsncrTypeId, schoolInscrTypeId, updateAccountEmailId, resetPwdEmailId;
+    public ICacheRepository _cache { get; }
 
     public AuthController(IConfiguration config, IMapper mapper, IEducNotesRepository repo,
       UserManager<User> userManager, SignInManager<User> signInManager, DataContext context,
-      IOptions<CloudinarySettings> cloudinaryConfig)
+      IOptions<CloudinarySettings> cloudinaryConfig, ICacheRepository cache)
     {
+      _cache = cache;
       _context = context;
       _repo = repo;
       _config = config;
@@ -137,7 +140,7 @@ namespace EducNotes.API.Controllers
           // envoi effectué
           user.ForgotPasswordCount += 1;
           user.ForgotPasswordDate = DateTime.Now;
-          if(await _repo.SaveAll())
+          if (await _repo.SaveAll())
           {
             resetOK = true;
             return Ok(resetOK);
@@ -160,15 +163,15 @@ namespace EducNotes.API.Controllers
     public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
     {
       // verification de l'existence du userName
-      if(await _repo.UserNameExist(userForLoginDto.Username.ToLower(), 0))
+      if (await _repo.UserNameExist(userForLoginDto.Username.ToLower(), 0))
       {
         var user = await _userManager.FindByNameAsync(userForLoginDto.Username.ToLower());
-        if(!user.AccountDataValidated)
+        if (!user.AccountDataValidated)
           return BadRequest("l'utilisateur n'a pas confirmé son email/mobile.");
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, true);
 
-        if(result.Succeeded)
+        if (result.Succeeded)
         {
           var appUser = await _userManager.Users.Include(p => p.Photos)
             .FirstOrDefaultAsync(u => u.NormalizedUserName == userForLoginDto.Username.ToUpper());
@@ -194,7 +197,8 @@ namespace EducNotes.API.Controllers
         if (result.IsLockedOut)
         {
           lockedOut = true;
-          return Ok(new {
+          return Ok(new
+          {
             userName = user.LastName + " " + user.FirstName,
             lockedOut
           });
@@ -206,7 +210,8 @@ namespace EducNotes.API.Controllers
       }
 
       var loginPwdFailed = true;
-      return Ok(new {
+      return Ok(new
+      {
         failed = loginPwdFailed
       });
     }
@@ -501,6 +506,7 @@ namespace EducNotes.API.Controllers
           var userToReturn = _mapper.Map<UserForListDto>(user);
           if (await _repo.SaveAll())
           {
+            await _cache.LoadUsers();
             return Ok(new
             {
               token = await GenerateJwtToken(user),

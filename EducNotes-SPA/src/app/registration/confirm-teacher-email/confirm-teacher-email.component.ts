@@ -40,10 +40,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
 
     const id: string = this.route.snapshot.queryParamMap.get('id');
     const token: string = this.route.snapshot.queryParamMap.get('token');
-    // console.log('id:' + id);
-    // console.log('token:' + token);
     if (id !== null && token !== null) {
-      // console.log('in validation');
       this.userid = id;
       const confirmEmail = <ConfirmToken>{};
       confirmEmail.userId = id;

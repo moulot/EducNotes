@@ -8,23 +8,25 @@
     </div>
     <div class="lead">ajout de classes par niveau</div>
   </div>
-  <div class="col-md-12 mb-2"><hr class="my-2" style="background-color: #f89f20;"></div>
+  <div class="col-md-12 mb-2"><hr class="my-2"></div>
   <div class="col-md-9">
     <div class="card">
-      <div class="card-body">
+      <div class="card-body p-2">
         <div class="col-md-12">
-          <form [formGroup]="classForm" (ngSubmit)="save()">
+          <form [formGroup]="classForm" (ngSubmit)="saveClass()">
             <div class="row">
               <div class="col-md-6">
                 <div class="md-form m-0">
-                  <mdb-select [options]="levels" formControlName="levelId" placeholder="niveau des classes">
+                  <mdb-select [options]="levelOptions" (ngModelChange)="levelChanged()" formControlName="levelId" placeholder="niveau des classes">
                   </mdb-select>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="md-form m-0">
-                  <mdb-select [options]="classTypes" formControlName="classTypeId" placeholder="type des classes">
+                  <mdb-select [options]="classTypeOptions" formControlName="classTypeId" placeholder="série des classes">
                   </mdb-select>
+                  <div *ngIf="classForm.hasError('classTypeNOK') && classForm.get('classTypeId').touched"
+                    class="text-small text-danger">la série de la classe est obligatoire</div>
                 </div>
               </div>
               <div class="col-md-6">
@@ -41,8 +43,8 @@
               </div>
               <div class="col-md-6">
                 <div class="md-form m-0">
-                  <input mdbInput type="number" id="number" class="form-control" formControlName="number" min="1" max="10">
-                  <label for="number" class="">nombre de classe à créer</label>
+                  <input mdbInput type="number" id="nbClass" class="form-control" formControlName="nbClass" min="1" max="10">
+                  <label for="nbClass" class="">nombre de classes à créer</label>
                 </div>
               </div>
               <div class="col-md-6">
@@ -54,10 +56,16 @@
               <div class="col-md-12"><hr class="my-2"></div>
               <div class="col-md-12">
                 <div class="float-right">
-                  <button type="submit" [disabled]="!classForm.valid || submitText!='enregistrer'" mdbBtn
-                  class="btnBlue" size="sm" mdbWavesEffect>enregistrer</button>
-                  <button type="button" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
-                    [routerLink]="['/classesPanel']" routerLinkActive="router-link-active">annuler</button>
+                  <button type="button" [disabled]="wait" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
+                    [routerLink]="['/classesPanel']">
+                    <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    annuler
+                  </button>
+                  <button type="submit" [disabled]="!classForm.valid || wait" mdbBtn
+                    class="btnBlue" size="sm" mdbWavesEffect>
+                    <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    enregistrer
+                  </button>
                 </div>
               </div>
             </div>

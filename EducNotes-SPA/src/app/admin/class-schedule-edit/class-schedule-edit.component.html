@@ -23,7 +23,7 @@
                   <div class="border rounded-lg p-1 text-center text-12 mb-1 blueWhite">{{day.dayName}}</div>
                   <hr class="my-1">
                   <div *ngFor="let course of day.courses">
-                    <div class="border rounded-lg p-1 text-12 mb-1" [ngStyle]="{'background-color': course.courseColor}"
+                    <div class="border rounded-lg p-1 text-12 text-white mb-1" [ngStyle]="{'background-color': course.courseColor}"
                       [ngClass]="course.inConflict ? 'inConflict' : ''">
                       {{course.startH}} à {{course.endH}} {{course.courseAbbrev}} {{course.className}}
                     </div>
@@ -244,9 +244,9 @@
                   <div class="row">
                     <div *ngFor="let index of [0, 1, 2, 3, 4]" class="col">
                       <div *ngFor="let courses of dayItems[index]">
-                      <div *ngFor="let course of courses" class="border rounded-lg p-1 text-12 mb-1"
+                      <div *ngFor="let course of courses" class="border rounded-lg p-1 text-12 text-white mb-1"
                         [ngStyle]="{'background-color': course.courseColor}">
-                        {{course.startH}} à {{course.endH}}<br>{{course.courseAbbrev}}
+                        {{course.startH}} à {{course.endH}}<br>{{course.courseAbbrev | uppercase}}
                       </div>
                       </div>
                     </div>

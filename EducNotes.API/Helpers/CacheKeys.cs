@@ -10,5 +10,12 @@ namespace EducNotes.API.Helpers
     public static string EducLevels { get { return "_EducLevels"; } }
     public static string Schools { get { return "_Schools"; } }
     public static string Cycles { get { return "_Cycles"; } }
+    public static string Courses { get { return "_Courses"; } }
+    public static string ClassTypes { get { return "_ClassTypes"; } }
+    public static string CLClassTypes { get { return "_CLClassTypes"; } }
+    public static string EmailTemplates { get { return "_EmailTemplates"; } }
+    public static string SmsTemplates { get { return "_SmsTemplates"; } }
+    public static string Settings { get { return "_Settings"; } }
+    public static string Tokens { get { return "_Tokens"; } }
   }
 }

@@ -25,5 +25,19 @@ namespace EducNotes.API.data
     Task<List<School>> LoadSchools();
     Task<List<Cycle>> GetCycles();
     Task<List<Cycle>> LoadCycles();
+    Task<List<Course>> GetCourses();
+    Task<List<Course>> LoadCourses();
+    Task<List<ClassType>> GetClassTypes();
+    Task<List<ClassType>> LoadClassTypes();
+    Task<List<ClassLevelClassType>> GetCLClassTypes();
+    Task<List<ClassLevelClassType>> LoadCLClassTypes();
+    Task<List<EmailTemplate>> GetEmailTemplates();
+    Task<List<EmailTemplate>> LoadEmailTemplates();
+    Task<List<SmsTemplate>> GetSmsTemplates();
+    Task<List<SmsTemplate>> LoadSmsTemplates();
+    Task<List<Setting>> GetSettings();
+    Task<List<Setting>> LoadSettings();
+    Task<List<Token>> GetTokens();
+    Task<List<Token>> LoadTokens();
   }
 }
