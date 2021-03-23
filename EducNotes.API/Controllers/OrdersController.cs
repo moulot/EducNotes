@@ -171,97 +171,32 @@ namespace EducNotes.API.Controllers
     [HttpGet("balanceData")]
     public async Task<IActionResult> GetBalanceData()
     {
+      List<Order> orders = await _cache.GetOrders();
+      List<FinOp> finOps = await _cache.GetFinOps();
       var today = DateTime.Now.Date;
 
       // invoiced amount
-      var invoiced = await _context.Orders.SumAsync(s => s.AmountTTC);
+      var invoiced = orders.Sum(s => s.AmountTTC);
       // cashed amount
-      var cashed = await _context.FinOps
-                          .Where(o => o.Cashed == true && o.FinOpTypeId == finOpTypePayment)
-                          .SumAsync(s => s.Amount);
+      var cashed = finOps
+                    .Where(o => o.Cashed == true && o.FinOpTypeId == finOpTypePayment)
+                    .Sum(s => s.Amount);
       // in validation amount
-      var toBeValidated = await _context.FinOps
-                                .Where(o => o.Cashed == false && o.Rejected == false && o.FinOpTypeId == finOpTypePayment)
-                                .SumAsync(s => s.Amount);
+      var toBeValidated = finOps
+                          .Where(o => o.Cashed == false && o.Rejected == false && o.FinOpTypeId == finOpTypePayment)
+                          .Sum(s => s.Amount);
       // outstanding balance
-      var balance = await _context.OrderLineHistories.Where(f => f.Cashed == true).SumAsync(b => b.Delta);
+      var openBalance = await _context.OrderLineHistories.Where(f => f.Cashed == true).SumAsync(b => b.Delta);
 
-      decimal todayDueAmount = 0;
-      decimal lateAmount7Days = 0;
-      decimal lateAmount15Days = 0;
-      decimal lateAmount30Days = 0;
-      decimal lateAmount60Days = 0;
-      decimal lateAmount60DaysPlus = 0;
-      // get amount due today
-      var lines = await _context.OrderLines.ToListAsync();
-      foreach (var line in lines)
-      {
-        var lineDeadlines = await _context.OrderLineDeadlines
-                                    .Where(o => o.OrderLineId == line.Id)
-                                    .OrderBy(o => o.DueDate)
-                                    .ToListAsync();
-        var amountPaid = await _context.FinOpOrderLines
-                                .Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
-                                .SumAsync(s => s.Amount);
-        decimal lineDueAmount = 0;
-        if (lineDeadlines.Count() > 0)
-        {
-          foreach (var lineD in lineDeadlines)
-          {
-            if (lineD.DueDate.Date < today && !lineD.Paid)
-            {
-              lineDueAmount = lineD.Amount + lineD.ProductFee - amountPaid;
-              todayDueAmount += lineDueAmount;
-
-              // split late amount in amounts of days late
-              var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
-              if (nbDaysLate <= 7)
-                lateAmount7Days += lineDueAmount;
-              else if (nbDaysLate > 7 && nbDaysLate <= 15)
-                lateAmount15Days += lineDueAmount;
-              else if (nbDaysLate > 15 && nbDaysLate <= 30)
-                lateAmount30Days += lineDueAmount;
-              else if (nbDaysLate > 30 && nbDaysLate <= 60)
-                lateAmount60Days += lineDueAmount;
-              else if (nbDaysLate > 60)
-                lateAmount60DaysPlus += lineDueAmount;
-            }
-          }
-        }
-        else
-        {
-          if (line.Deadline.Date < today)
-          {
-            todayDueAmount += line.AmountTTC - amountPaid;
-
-            // split late amount in amounts of days late
-            var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
-            if (nbDaysLate <= 7)
-              lateAmount7Days += line.AmountTTC;
-            else if (nbDaysLate > 7 && nbDaysLate <= 15)
-              lateAmount15Days += line.AmountTTC;
-            else if (nbDaysLate > 15 && nbDaysLate <= 30)
-              lateAmount30Days += line.AmountTTC;
-            else if (nbDaysLate > 30 && nbDaysLate <= 60)
-              lateAmount60Days += line.AmountTTC;
-            else if (nbDaysLate > 60)
-              lateAmount60DaysPlus += line.AmountTTC;
-          }
-        }
-      }
+      LateAmountsDto lateAmounts = await _repo.GetLateAmountsDue();
 
       return Ok(new
       {
         invoiced,
-        toBeValidated,
         cashed,
-        openBalance = balance,
-        lateAmount = todayDueAmount,
-        lateAmount7Days,
-        lateAmount15Days,
-        lateAmount30Days,
-        lateAmount60Days,
-        lateAmount60DaysPlus
+        openBalance,
+        toBeValidated,
+        lateAmounts
       });
     }
 

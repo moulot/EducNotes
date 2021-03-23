@@ -129,5 +129,6 @@ namespace EducNotes.API.Data
     Task<List<GradeDto>> GetStudentLastGrades(int userId, int nbOfGrades);
     Task<List<Course>> GetUserCourses(int classId);
     Task<User> GetUserByEmailAndLogin(string username, string email);
+    Task<LateAmountsDto> GetLateAmountsDue();
   }
 }

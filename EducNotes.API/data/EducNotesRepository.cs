@@ -2838,49 +2838,29 @@ namespace EducNotes.API.Data {
     public async Task<Order> GetOrder(int id)
     {
       List<Order> orders = await _cache.GetOrders();
+      List<OrderLine> lines = await _cache.GetOrderLines();
       
       var order = orders.FirstOrDefault(o => o.Id == id);
-      if (order != null)
-      {
-        order.Lines = await _context.OrderLines
-          .Include (i => i.Child)
-          .Include (i => i.ClassLevel)
-          .Where (o => o.OrderId == order.Id).ToListAsync();
-        foreach (var line in order.Lines)
-        {
-          line.Deadlines = await _context.OrderLineDeadlines.Where(d => d.OrderLineId == line.Id).ToListAsync();
-        }
-      }
+      order.Lines = lines.Where(o => o.OrderId == order.Id).ToList();
 
       return order;
     }
 
-    public async Task<List<FinOpOrderLine>> GetChildPayments (int childId) {
-      var payments = await _context.FinOpOrderLines
-        .Include (i => i.FinOp).ThenInclude (i => i.Cheque).ThenInclude (i => i.Bank)
-        .Include (i => i.Invoice)
-        .Include (i => i.FinOp).ThenInclude (i => i.PaymentType)
-        .Include (i => i.FinOp).ThenInclude (i => i.FromBankAccount)
-        .Include (i => i.FinOp).ThenInclude (i => i.FromCashDesk)
-        .Include (i => i.FinOp).ThenInclude (i => i.ToBankAccount)
-        .Include (i => i.FinOp).ThenInclude (i => i.ToCashDesk)
-        .Where (f => f.OrderLine.ChildId == childId)
-        .OrderBy (o => o.FinOp.FinOpDate)
-        .ToListAsync ();
+    public async Task<List<FinOpOrderLine>> GetChildPayments (int childId)
+    {
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+      var payments = finOpLines
+                          .Where(f => f.OrderLine.ChildId == childId)
+                          .OrderBy(o => o.FinOp.FinOpDate)
+                          .ToList();
       return payments;
     }
 
-    public async Task<List<FinOpDto>> GetOrderPayments (int orderId) {
-      var paymentsFromDB = await _context.FinOps.Where (f => f.OrderId == orderId)
-        .Include (i => i.Cheque).ThenInclude (i => i.Bank)
-        .Include (i => i.Invoice)
-        .Include (i => i.PaymentType)
-        .Include (i => i.FromBankAccount)
-        .Include (i => i.FromCashDesk)
-        .Include (i => i.ToBankAccount)
-        .Include (i => i.ToCashDesk)
-        .ToListAsync ();
-      var payments = _mapper.Map<List<FinOpDto>> (paymentsFromDB);
+    public async Task<List<FinOpDto>> GetOrderPayments(int orderId)
+    {
+      List<FinOp> finOps = await _cache.GetFinOps();
+      var paymentsFromDB = finOps.Where(f => f.OrderId == orderId).ToList();
+      var payments = _mapper.Map<List<FinOpDto>>(paymentsFromDB);
       return payments;
     }
 
@@ -2891,7 +2871,8 @@ namespace EducNotes.API.Data {
       return lines;
     }
 
-    public string GetInvoiceNumber (int invoiceId) {
+    public string GetInvoiceNumber (int invoiceId)
+    {
       var today = DateTime.Now;
       string year = today.Year.ToString ().Substring (2);
       var todaymonth = today.Month;
@@ -2903,18 +2884,21 @@ namespace EducNotes.API.Data {
       return num;
     }
 
-    public async Task<IEnumerable<PaymentType>> GetPaymentTypes () {
-      var types = await _context.PaymentTypes.ToListAsync ();
+    public async Task<IEnumerable<PaymentType>> GetPaymentTypes()
+    {
+      var types = await _cache.GetPaymentTypes();
       return types;
     }
 
-    public async Task<IEnumerable<ClassLevel>> GetClasslevels () {
-      var levels = await _context.ClassLevels.OrderBy (o => o.DsplSeq).ToListAsync ();
+    public async Task<IEnumerable<ClassLevel>> GetClasslevels()
+    {
+      var levels = await _cache.GetClassLevels();
       return levels;
     }
 
-    public async Task<IEnumerable<Bank>> GetBanks () {
-      var banks = await _context.Banks.OrderBy (o => o.Name).ToListAsync ();
+    public async Task<IEnumerable<Bank>> GetBanks()
+    {
+      var banks = await _cache.GetBanks();
       return banks;
     }
 
@@ -2978,6 +2962,94 @@ namespace EducNotes.API.Data {
       var top = scheduleHourSize * (totalMins / 60); // + 1 * netHours;
       top = Math.Round (top, 2);
       return (top + "px").Replace (",", ".");
+    }
+
+    public async Task<LateAmountsDto> GetLateAmountsDue()
+    {
+      List<OrderLine> linesCached = await _cache.GetOrderLines();
+      List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+      var today = DateTime.Now.Date;
+
+      LateAmountsDto lateAmounts = new LateAmountsDto();
+      // get amount due today
+      var lines = linesCached.ToList();
+      foreach(var line in lines)
+      {
+        var lineDeadlines = lineDeadLinesCached.Where(o => o.OrderLineId == line.Id)
+                                               .OrderBy(o => o.DueDate)
+                                               .ToList();
+        var amountPaid = finOpLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+                                   .Sum(s => s.Amount);
+        
+        decimal lineDueAmount = 0;
+        decimal balance = amountPaid;
+        if(lineDeadlines.Count() > 0)
+        {
+          foreach(var lineD in lineDeadlines)
+          {
+            if(lineD.DueDate.Date < today && !lineD.Paid)
+            {
+              lineDueAmount = lineD.Amount + lineD.ProductFee;
+
+              if(lineDueAmount >= balance)
+              {
+                decimal lateAmount = lineDueAmount - balance;
+                lateAmounts.TotalLateAmount += lateAmount;
+                balance = 0;
+              
+                // split late amount in amounts of days late
+                var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
+                if(nbDaysLate <= 7)
+                  lateAmounts.LateAmount7Days += lateAmount;
+                else if(nbDaysLate > 7 && nbDaysLate <= 15)
+                  lateAmounts.LateAmount15Days += lateAmount;
+                else if(nbDaysLate > 15 && nbDaysLate <= 30)
+                  lateAmounts.LateAmount30Days += lateAmount;
+                else if(nbDaysLate > 30 && nbDaysLate <= 60)
+                  lateAmounts.LateAmount60Days += lateAmount;
+                else if(nbDaysLate > 60)
+                  lateAmounts.LateAmount60DaysPlus += lateAmount;
+              }
+              else
+              {
+                balance = balance - lineDueAmount;
+              }
+            }
+          }
+        }
+        else // orderline has only one deadline (no split payments)
+        {
+          if(line.Deadline.Date < today)
+          {
+            if(line.AmountTTC >= balance)
+            {
+              decimal lateAmount = line.AmountTTC - balance;
+              lateAmounts.TotalLateAmount += lateAmount;
+              balance = 0;
+
+              // split late amount in amounts of days late
+              var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
+              if(nbDaysLate <= 7)
+                lateAmounts.LateAmount7Days += lateAmount;
+              else if(nbDaysLate > 7 && nbDaysLate <= 15)
+                lateAmounts.LateAmount15Days += lateAmount;
+              else if(nbDaysLate > 15 && nbDaysLate <= 30)
+                lateAmounts.LateAmount30Days += lateAmount;
+              else if(nbDaysLate > 30 && nbDaysLate <= 60)
+                lateAmounts.LateAmount60Days += lateAmount;
+              else if(nbDaysLate > 60)
+                lateAmounts.LateAmount60DaysPlus += lateAmount;
+            }
+            else
+            {
+              balance = balance - line.AmountTTC;
+            }
+          }
+        }
+      }
+    
+      return lateAmounts;
     }
   }
 }

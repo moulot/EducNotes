@@ -2092,10 +2092,14 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpPost("ResendConfirmEmail")]
-    public async Task<IActionResult> ResendConfirmEmail(List<SendConfirmEmailDto> usersData) {
+    public async Task<IActionResult> ResendConfirmEmail(List<SendConfirmEmailDto> usersData)
+    {
+      List<Setting> settings = await _cache.GetSettings();
+      List<Order> orders = await _cache.GetOrders();
+      List<ProductDeadLine> productdeadlines = await _cache.GetProductDeadLines();
+
       List<RegistrationEmailDto> emails = new List<RegistrationEmailDto>();
 
-      var settings = await _context.Settings.ToListAsync();
       var schoolName = settings.First(s => s.Name == "SchoolName").Value;
       string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
 
@@ -2104,13 +2108,13 @@ namespace EducNotes.API.Controllers {
 
         if(userType == parentTypeId) {
           foreach(var userid in data.UserIds) {
-            var order = await _context.Orders.FirstAsync(o => o.isReg &&(o.MotherId == userid || o.FatherId == userid));
+            var order = orders.First(o => o.isReg &&(o.MotherId == userid || o.FatherId == userid));
             var reg = await _repo.GetOrder(order.Id);
             var user = reg.Mother != null ? reg.Mother : reg.Father;
 
-            var firstDeadline =(await _context.ProductDeadLines
-              .OrderBy(o => o.DueDate)
-              .FirstAsync(p => p.ProductId == tuitionId));
+            var firstDeadline = productdeadlines
+                                      .OrderBy(o => o.DueDate)
+                                      .First(p => p.ProductId == tuitionId);
             var firstDeadlineDate = firstDeadline.DueDate;
             decimal DPPct = firstDeadline.Percentage;
 

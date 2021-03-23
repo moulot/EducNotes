@@ -709,5 +709,174 @@ namespace EducNotes.API.data {
 
       return userlinks;
     }
+
+    public async Task<List<FinOp>> GetFinOps()
+    {
+      List<FinOp> finops = new List<FinOp>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.FinOps, out finops))
+      {
+        // Key not in cache, so get data.
+        finops = await LoadFinOps();
+      }
+
+      return finops;
+    }
+
+    public async Task<List<FinOp>> LoadFinOps()
+    {
+      List<FinOp> finops = await _context.FinOps
+                                  .Include(i => i.Cheque).ThenInclude(i => i.Bank)
+                                  .Include(i => i.PaymentType)
+                                  .Include(i => i.Invoice)
+                                  .Include(i => i.FromBank)
+                                  .Include(i => i.FromBankAccount)
+                                  .Include(i => i.FromCashDesk)
+                                  .Include(i => i.ToBankAccount)
+                                  .Include(i => i.ToCashDesk)
+                                  .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.FinOps);
+      _cache.Set(CacheKeys.FinOps, finops, cacheEntryOptions);
+
+      return finops;
+    }
+
+    public async Task<List<FinOpOrderLine>> GetFinOpOrderLines()
+    {
+      List<FinOpOrderLine> finoporderlines = new List<FinOpOrderLine>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.FinOpOrderLines, out finoporderlines))
+      {
+        // Key not in cache, so get data.
+        finoporderlines = await LoadFinOpOrderLines();
+      }
+
+      return finoporderlines;
+    }
+
+    public async Task<List<FinOpOrderLine>> LoadFinOpOrderLines()
+    {
+      List<FinOpOrderLine> finoporderlines = await _context.FinOpOrderLines
+                                                    .Include(d => d.Invoice)
+                                                    .Include(o => o.OrderLine).ThenInclude(p => p.Product)
+                                                    .Include(o => o.OrderLine).ThenInclude(c => c.Child)
+                                                    .Include(i => i.FinOp).ThenInclude(i => i.Cheque).ThenInclude(i => i.Bank)
+                                                    .Include(i => i.FinOp).ThenInclude(i => i.PaymentType)
+                                                    .Include(i => i.FinOp).ThenInclude(i => i.FromBankAccount)
+                                                    .Include(i => i.FinOp).ThenInclude(i => i.ToBankAccount)
+                                                    .Include(i => i.FinOp).ThenInclude(i => i.FromCashDesk)
+                                                    .Include(i => i.FinOp).ThenInclude(i => i.ToCashDesk)
+                                                    .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.FinOpOrderLines);
+      _cache.Set(CacheKeys.FinOpOrderLines, finoporderlines, cacheEntryOptions);
+
+      return finoporderlines;
+    }
+
+    public async Task<List<Cheque>> GetCheques()
+    {
+      List<Cheque> cheques = new List<Cheque>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.Cheques, out cheques))
+      {
+        // Key not in cache, so get data.
+        cheques = await LoadCheques();
+      }
+
+      return cheques;
+    }
+
+    public async Task<List<Cheque>> LoadCheques()
+    {
+      List<Cheque> cheques = await _context.Cheques.ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.Cheques);
+      _cache.Set(CacheKeys.Cheques, cheques, cacheEntryOptions);
+
+      return cheques;
+    }
+
+    public async Task<List<Bank>> GetBanks()
+    {
+      List<Bank> banks = new List<Bank>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.Banks, out banks))
+      {
+        // Key not in cache, so get data.
+        banks = await LoadBanks();
+      }
+
+      return banks;
+    }
+
+    public async Task<List<Bank>> LoadBanks()
+    {
+      List<Bank> banks = await _context.Banks.OrderBy(o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.Banks);
+      _cache.Set(CacheKeys.Banks, banks, cacheEntryOptions);
+
+      return banks;
+    }
+
+    public async Task<List<PaymentType>> GetPaymentTypes()
+    {
+      List<PaymentType> paymentTypes = new List<PaymentType>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.PaymentTypes, out paymentTypes))
+      {
+        // Key not in cache, so get data.
+        paymentTypes = await LoadPaymentTypes();
+      }
+
+      return paymentTypes;
+    }
+
+    public async Task<List<PaymentType>> LoadPaymentTypes()
+    {
+      List<PaymentType> paymentTypes = await _context.PaymentTypes.OrderBy(o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.PaymentTypes);
+      _cache.Set(CacheKeys.PaymentTypes, paymentTypes, cacheEntryOptions);
+
+      return paymentTypes;
+    }
   }
 }

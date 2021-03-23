@@ -53,5 +53,15 @@ namespace EducNotes.API.data
     Task<List<OrderLineDeadline>> LoadOrderLineDeadLines();
     Task<List<UserLink>> GetUserLinks();
     Task<List<UserLink>> LoadUserLinks();
+    Task<List<FinOp>> GetFinOps();
+    Task<List<FinOp>> LoadFinOps();
+    Task<List<FinOpOrderLine>> GetFinOpOrderLines();
+    Task<List<FinOpOrderLine>> LoadFinOpOrderLines();
+    Task<List<Cheque>> GetCheques();
+    Task<List<Cheque>> LoadCheques();
+    Task<List<Bank>> GetBanks();
+    Task<List<Bank>> LoadBanks();
+    Task<List<PaymentType>> GetPaymentTypes();
+    Task<List<PaymentType>> LoadPaymentTypes();
   }
 }

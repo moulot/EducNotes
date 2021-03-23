@@ -23,5 +23,11 @@ namespace EducNotes.API.Helpers
     public static string Orders { get { return "_Orders"; } }
     public static string OrderLines { get { return "_OrderLines"; } }
     public static string OrderLineDeadLines { get { return "_OrderLineDeadLines"; } }
-    public static string UserLinks { get { return "_UserLinks"; } }  }
+    public static string UserLinks { get { return "_UserLinks"; } }
+    public static string FinOps { get { return "_FinOps"; } }
+    public static string FinOpOrderLines { get { return "_FinOpOrderLines"; } }
+    public static string Cheques { get { return "_Cheques"; } }
+    public static string Banks { get { return "_Banks"; } }
+    public static string PaymentTypes { get { return "_PaymentTyes"; } }
+  }
 }
