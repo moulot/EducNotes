@@ -10,12 +10,13 @@ import { OrderService } from 'src/app/_services/order.service';
 export class RecoveryListComponent implements OnInit {
   levelRecovery: any;
   childRecovery: any;
+  toggleLevelChild = true;
 
   constructor(private orderService: OrderService, private alertify: AlertifyService) { }
 
   ngOnInit() {
     this.getLevelLatePayments();
-    // this.getChildRecovery();
+    this.getChildRecovery();
   }
 
   getLevelLatePayments() {
@@ -29,9 +30,14 @@ export class RecoveryListComponent implements OnInit {
   getChildRecovery() {
     this.orderService.getChildLatePayments().subscribe(data => {
       this.childRecovery = data;
+      console.log(data);
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  toggleView() {
+    this.toggleLevelChild = !this.toggleLevelChild;
   }
 
 }

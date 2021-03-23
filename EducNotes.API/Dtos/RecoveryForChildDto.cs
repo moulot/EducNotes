@@ -10,7 +10,7 @@ namespace EducNotes.API.Dtos
     public string LevelName { get; set; }
     public string ClassName { get; set; }
     public string PhotoUrl { get; set; }
-    public decimal LateAmount { get; set; }
+    public decimal LateDueAmount { get; set; }
     public List<ProductRecoveryDto> ProductRecovery { get; set; }
 
   }

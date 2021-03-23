@@ -63,5 +63,7 @@ namespace EducNotes.API.data
     Task<List<Bank>> LoadBanks();
     Task<List<PaymentType>> GetPaymentTypes();
     Task<List<PaymentType>> LoadPaymentTypes();
+    Task<List<Product>> GetProducts();
+    Task<List<Product>> LoadProducts();
   }
 }

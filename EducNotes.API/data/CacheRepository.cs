@@ -201,11 +201,13 @@ namespace EducNotes.API.data {
       return levelproducts;
     }
 
-    public async Task<List<Class>> GetClasses() {
+    public async Task<List<Class>> GetClasses()
+    {
       List<Class> classes = new List<Class>();
 
       // Look for cache key.
-      if (!_cache.TryGetValue (CacheKeys.Classes, out classes)) {
+      if (!_cache.TryGetValue (CacheKeys.Classes, out classes))
+      {
         // Key not in cache, so get data.
         classes = await LoadClasses();
       }
@@ -877,6 +879,36 @@ namespace EducNotes.API.data {
       _cache.Set(CacheKeys.PaymentTypes, paymentTypes, cacheEntryOptions);
 
       return paymentTypes;
+    }
+
+    public async Task<List<Product>> GetProducts()
+    {
+      List<Product> products = new List<Product>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(CacheKeys.Products, out products))
+      {
+        // Key not in cache, so get data.
+        products = await LoadProducts();
+      }
+
+      return products;
+    }
+
+    public async Task<List<Product>> LoadProducts()
+    {
+      List<Product> products = await _context.Products.OrderBy(o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(CacheKeys.Products);
+      _cache.Set(CacheKeys.Products, products, cacheEntryOptions);
+
+      return products;
     }
   }
 }

@@ -29,5 +29,6 @@ namespace EducNotes.API.Helpers
     public static string Cheques { get { return "_Cheques"; } }
     public static string Banks { get { return "_Banks"; } }
     public static string PaymentTypes { get { return "_PaymentTyes"; } }
+    public static string Products { get { return "_Products"; } }
   }
 }

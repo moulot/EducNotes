@@ -16,7 +16,6 @@ export class PaymentLevelChildComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe((data: any) => {
       this.children = data['children'];
-      // console.log(this.children);
     });
   }
 

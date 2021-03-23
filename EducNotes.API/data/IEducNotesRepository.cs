@@ -130,5 +130,7 @@ namespace EducNotes.API.Data
     Task<List<Course>> GetUserCourses(int classId);
     Task<User> GetUserByEmailAndLogin(string username, string email);
     Task<LateAmountsDto> GetLateAmountsDue();
+    Task<LateAmountsDto> GetProductLateAmountsDue(int productId, int levelId);
+    Task<LateAmountsDto> GetChildLateAmountsDue(int productId, int childId);
   }
 }
