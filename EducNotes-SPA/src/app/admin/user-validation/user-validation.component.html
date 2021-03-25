@@ -1,4 +1,4 @@
-<!-- <div class="container" *ngIf="!userTypes">
+<!-- <div class="container">
   <h4>chargement en cours...</h4>
   <mdb-progress-bar class="progress primary-color-dark" mode="indeterminate"></mdb-progress-bar>
 </div> -->
@@ -192,170 +192,10 @@
             </div>
           </div>
         </div>
-        <!-- <div *ngIf="type.id == studentTypeId && (btnActive == studentTypeId || btnActive == 0)" class="mb-2">
-          <div class="card">
-            <div class="card-body p-2">
-              <div class="row">
-                <div class="col-md-12 text-16"><b>{{type.name}}s</b></div>
-                <div class="col-md-12"><hr class="my-1"></div>
-                <div class="col-md-12">
-                  <div class="row text-15 text-muted">
-                    <div class="col-md-2">action</div>
-                    <div class="col-md-3">nom & prénom</div>
-                    <div class="col-md-1">classe</div>
-                    <div class="col-md-4">email</div>
-                    <div class="col-md-2">mobile</div>
-                  </div>
-                </div>
-                <div class="col-md-12"><hr class="my-1"></div>
-                <div class="col-md-12 my-1" formArrayName="students" *ngFor="let child of usersForm.get('students')['controls'] |
-                  paginate: { id: 'student', itemsPerPage: studentpageSize, currentPage: studentpage }; let i = index;">
-                  <div class="card" [formGroupName]="i">
-                    <div class="card-body p-2">
-                      <div class="row">
-                        <div class="col-md-2">
-                          <div class="d-md-flex">
-                            <a (click)="toggleEditDiv(type.id, i)">
-                              <i class="text-20 fad fa-edit mr-2" style="--fa-secondary-opacity: 1;
-                                --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-                            </a>
-                            <div *ngIf="child.value.email && !usersDivs[type.id].editDiv[i]" class="blue-text">
-                              <a (click)="sendUserConfirmEmail(type.id, child.value.id)">email de confirmation</a>
-                            </div>
-                            <div *ngIf="!child.value.email && !usersDivs[type.id].editDiv[i]" class="blue-text">
-                              <a (click)="toggleEditDiv(type.id, i)">saisir email & cell</a>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-3 text-15 text-capitalize"><b>{{child.value.lname}} {{child.value.fname}}</b></div>
-                        <div class="col-md-1 text-15">{{child.value.className || child.value.classLevelName}}</div>
-                        <div *ngIf="child.value.email" class="col-md-4 text-15">{{child.value.email}}</div>
-                        <div *ngIf="!child.value.email" class="col-md-4 text-15">N/A</div>
-                        <div *ngIf="child.value.cell" class="col-md-2 text-15">{{child.value.cell}}</div>
-                        <div *ngIf="!child.value.cell" class="col-md-2 text-15">N/A</div>
-                      </div>
-                    <hr class="my-1">
-                    <div *ngIf="!usersDivs[type.id].editDiv[i]">
-                      <div class="d-md-flex text-15">
-                        <div *ngIf="child.value.fLastN">père : <span class="text-15 text-capitalize mr-2">{{child.value.fLastN}} {{child.value.fFirstN}}. {{child.value.fCell}}</span></div>
-                        <div *ngIf="child.value.mLastN">mère : <span class="text-15 text-capitalize">{{child.value.mLastN}} {{child.value.mFirstN}}. {{child.value.mCell}}</span></div>
-                      </div>
-                    </div>
-                    <div *ngIf="usersDivs[type.id].editDiv[i]">
-                      <div class="row">
-                        <div class="col-md-12 text-13 text-danger">saisir le email afin de valider ses infos</div>
-                        <div class="col-md-4">
-                          <div class="md-form my-1">
-                            <input mdbInput type="text" id="email" class="form-control" formControlName="email">
-                            <label for="email" class="">email</label>
-                            <div *ngIf="child.get('email').errors && child.get('email').touched"
-                              class="text-small text-danger">l'email est incorrect</div>
-                          </div>
-                        </div>
-                        <div class="col-md-2">
-                          <div class="md-form my-1">
-                            <input mdbInput type="text" id="cell" class="form-control" formControlName="cell" mdbValidate>
-                            <label for="cell" class="">mobile</label>
-                          </div>          
-                        </div>
-                        <div class="col-2 mt-1">
-                          <button type="button" mdbBtn (click)="cancelEdit(type.id, child.value.id, i)"
-                            class="btnBlue" size="sm" block="true" mdbWavesEffect>annuler</button>
-                        </div>
-                        <div class="col-2 mt-1">
-                          <button type="button" mdbBtn (click)="editUser(type.id, i)" class="btnBlue" size="sm" block="true"
-                          [disabled]="child.get('email').errors || child.value.email == ''" mdbWavesEffect>OK</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                </div>
-                <div class="col-md-12 mt-1">
-                  <pagination-controls (pageChange)="studentpage = $event" id="student" responsive="true"
-                    directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> -->
       </div>
     </div>
     <div *ngIf="!list">
       <div *ngFor="let type of userTypes">
-        <!-- <div *ngIf="type.id == studentTypeId && (btnActive == studentTypeId || btnActive == 0)" class="mb-2">
-          <div class="card">
-            <div class="card-body p-2">
-              <div class="row">
-                <div class="col-md-12 text-16"><b>{{type.name}}s</b></div>
-                <div class="col-md-12"><hr class="my-1"></div>
-                <div class="col-md-4 my-2" formArrayName="students" *ngFor="let child of usersForm.get('students')['controls'] |
-                  paginate: { id: 'student', itemsPerPage: studentpageSize, currentPage: studentpage }; let i = index;">
-                  <mdb-card [formGroupName]="i">
-                    <mdb-card-body class="p-2">
-                      <div class="d-md-flex">
-                        <div class="text-15 my-auto flex-grow-1 text-capitalize">
-                          {{child.value.lname}} {{child.value.fname}}
-                        </div>
-                        <div *ngIf="child.value.email && !usersDivs[type.id].editDiv[i]" class="blue-text">
-                          <a (click)="sendUserConfirmEmail(type.id, child.value.id)">email de confirmation</a>
-                        </div>
-                        <div *ngIf="!child.value.email && !usersDivs[type.id].editDiv[i]" class="blue-text">
-                          <a (click)="toggleEditDiv(type.id, i)">saisir email & cell</a>
-                        </div>
-                      </div>
-                      <hr class="my-1">
-                      <div *ngIf="!usersDivs[type.id].editDiv[i]">
-                        <div *ngIf="child.value.email" class="blue-text">
-                          <a (click)="toggleEditDiv(type.id, i)">editer email & cell</a>
-                        </div>
-                        <div *ngIf="child.value.email" class="text-15">email : {{child.value.email}}</div>
-                        <div *ngIf="!child.value.email" class="text-15">email : N/D</div>
-                        <div *ngIf="child.value.cell" class="text-15">cell : {{child.value.cell}}</div>
-                        <div *ngIf="!child.value.cell" class="text-15">cell : N/D</div>
-                        <hr class="my-1">
-                        <div class="text-15">classe: {{child.value.className || child.value.classLevelName}}</div>
-                        <div class="text-15 text-capitalize">père : {{child.value.fLastN}} {{child.value.fFirstN}}. {{child.value.fCell}}</div>
-                        <div class="text-15 text-capitalize">mère : {{child.value.mLastN}} {{child.value.mFirstN}}. {{child.value.mCell}}</div>
-                      </div>
-                      <div *ngIf="usersDivs[type.id].editDiv[i]">
-                        <div class="row">
-                          <div class="col-md-12 text-13 text-danger">saisir le email afin de valider ses infos</div>
-                          <div class="col-md-12">
-                            <div class="md-form my-1">
-                              <input mdbInput type="text" id="email" class="form-control" formControlName="email">
-                              <label for="email" class="">email</label>
-                              <div *ngIf="child.get('email').errors && child.get('email').touched"
-                                class="text-small text-danger">l'email est incorrect</div>
-                            </div>
-                          </div>
-                          <div class="col-md-12">
-                            <div class="md-form my-1">
-                              <input mdbInput type="text" id="cell" class="form-control" formControlName="cell" mdbValidate>
-                              <label for="cell" class="">mobile</label>
-                            </div>          
-                          </div>
-                          <div class="col-6 mt-1">
-                            <button type="button" mdbBtn (click)="cancelEdit(type.id, child.value.id, i)"
-                              class="btnBlue" size="sm" block="true" mdbWavesEffect>annuler</button>
-                          </div>
-                          <div class="col-6 mt-1">
-                            <button type="button" mdbBtn (click)="editUser(type.id, i)" class="btnBlue" size="sm" block="true"
-                            [disabled]="child.get('email').errors || child.value.email == ''" mdbWavesEffect>OK</button>
-                          </div>
-                        </div>
-                      </div>
-                    </mdb-card-body>
-                  </mdb-card>
-                </div>
-                <div class="col-md-12 mt-1">
-                  <pagination-controls (pageChange)="studentpage = $event" id="student" responsive="true"
-                    directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> -->
         <div *ngIf="nbParents > 0 && type.id == parentTypeId && (btnActive == parentTypeId || btnActive == 0)" class="mb-2">
           <div class="card">
             <div class="card-body">
@@ -498,4 +338,11 @@
       </div>
     </div>
   </form>
+</div>
+<div class="mt-3" *ngIf="nbParents === 0 && nbTeachers === 0">
+  <div class="card">
+    <div class="card-body p-2">
+      <div class="text-17 textDarkRed">pas d'utilisateur à valider. merci.</div>
+    </div>
+  </div>
 </div>

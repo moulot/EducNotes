@@ -283,6 +283,7 @@ import { ClasslevelCoursesComponent } from './admin/config/classlevel-courses/cl
 import { ConfigComponent } from './admin/config/config/config.component';
 import { ClassScheduleResolver } from './_resolvers/class-schedule-resolver';
 import { EditLevelClassesComponent } from './admin/class-management/edit-level-classes/edit-level-classes.component';
+import { ConfigProductsComponent } from './admin/config/config-products/config-products.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -473,7 +474,8 @@ export function tokenGetter() {
       ClassScheduleEditComponent,
       ClasslevelCoursesComponent,
       ConfigComponent,
-      EditLevelClassesComponent
+      EditLevelClassesComponent,
+      ConfigProductsComponent
    ],
    imports: [
       FormWizardModule,

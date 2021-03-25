@@ -60,17 +60,16 @@ export class ConfirmTeacherEmailComponent implements OnInit {
     this.userForm = this.fb.group({
       lastName: ['', Validators.required],
       firstName: ['', Validators.required],
-      email: ['', Validators.required],
+      // email: ['', Validators.required],
       userName: ['', Validators.required],
-      cell: ['', [ Validators.required, this.phoneValidator ] ],
+      // cell: ['', [ Validators.required, this.phoneValidator ] ],
       pwd: ['', Validators.required],
       checkpwd: ['', [ Validators.required, this.confirmationValidator ] ]
     });
   }
 
   initialValues() {
-    this.userForm.setValue({lastName: this.user.lastName, firstName: this.user.firstName, email: this.user.email,
-      userName: '', cell: this.user.phoneNumber, pwd: '', checkpwd: ''});
+    this.userForm.setValue({lastName: this.user.lastName, firstName: this.user.firstName, userName: '', pwd: '', checkpwd: ''});
     this.phoneForm.setValue({phone: this.user.phoneNumber, code: ''});
   }
 

@@ -180,15 +180,12 @@ export class UserValidationComponent implements OnInit {
       case this.studentTypeId:
         user = this.usersForm.value.students[index];
         break;
-
       case this.parentTypeId:
         user = this.usersForm.value.parents[index];
         break;
-
       case this.teacherTypeId:
         user = this.usersForm.value.teachers[index];
         break;
-
       default:
         break;
     }

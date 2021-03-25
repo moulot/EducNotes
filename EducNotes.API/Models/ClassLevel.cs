@@ -14,6 +14,5 @@ namespace EducNotes.API.Models
     public EducationLevel EducationLevel { get; set; }
     public byte DsplSeq { get; set; }
     public ICollection<Inscription> Inscriptions { get; set; }
-    // public ICollection<Class> Classes { get; set; }
   }
 }

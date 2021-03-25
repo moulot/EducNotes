@@ -30,7 +30,6 @@ export class RecoveryListComponent implements OnInit {
   getChildRecovery() {
     this.orderService.getChildLatePayments().subscribe(data => {
       this.childRecovery = data;
-      console.log(data);
     }, error => {
       this.alertify.error(error);
     });

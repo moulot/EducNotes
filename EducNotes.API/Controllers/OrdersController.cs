@@ -486,6 +486,9 @@ namespace EducNotes.API.Controllers
           {
             await _cache.LoadOrders();
             await _cache.LoadOrderLines();
+            await _cache.LoadOrderLineDeadLines();
+            await _cache.LoadUsers();
+            await _cache.LoadUserLinks();
             identityContextTransaction.Commit();
             return Ok(new {
               orderId = order.Id,
@@ -512,7 +515,7 @@ namespace EducNotes.API.Controllers
 
       var tuitionIds = orders.Where(t => t.OrderTypeId == tuitionTypeId).Select(s => s.Id).ToList();
       var tuitions = lines.Where(t => tuitionIds.Contains(t.OrderId)).ToList();
-      var totalTuitions = tuitions.Where(t => tuitionIds.Contains(t.OrderId)).Count();
+      var totalTuitions = tuitions.Count();
       var tuitionsNotValidated = tuitions.Where(t => t.Validated == false).Count();
       var tuitionsValidated = tuitions.Where(t => t.Validated == true).Count();
       var classSpaces = classes.Sum(c => c.MaxStudent);
@@ -531,13 +534,13 @@ namespace EducNotes.API.Controllers
     {
       List<Class> classes = await _cache.GetClasses();
       List<OrderLine> lines = await _cache.GetOrderLines();
+      List<FinOpOrderLine> finOpLinesCached = await _cache.GetFinOpOrderLines();
 
-      var classlevels = classes
-                          .OrderBy(o => o.ClassLevel.DsplSeq)
-                          .Select(c => c.ClassLevel).Distinct().ToList();
+      var classlevels = classes.OrderBy(o => o.ClassLevel.DsplSeq)
+                               .Select(c => c.ClassLevel).Distinct().ToList();
       List<TuitionListDto> tuitionList = new List<TuitionListDto>();
       var orderlines = lines.Where(o => o.Order.isReg == true).ToList();
-      var finOpLines = await _context.FinOpOrderLines.Where(f => f.FinOp.Cashed).ToListAsync();
+      var finOpLines = finOpLinesCached.Where(f => f.FinOp.Cashed).ToList();
       decimal totalInvoiced = orderlines.Sum(s => s.AmountTTC);
       decimal totalPaid = finOpLines.Sum(s => s.Amount);
       decimal totalTuitions = orderlines.Count();
@@ -556,8 +559,7 @@ namespace EducNotes.API.Controllers
         tuitionList.Add(tld);
       }
 
-      return Ok(new
-      {
+      return Ok(new {
         tuitionList,
         totalInvoiced,
         totalPaid,
@@ -569,11 +571,11 @@ namespace EducNotes.API.Controllers
     [HttpGet("AmountByDeadline")]
     public async Task<IActionResult> GetOrderAmountWithDeadlines()
     {
-      List<OrderLineDeadline> lineDeadlines = await _cache.GetOrderLineDeadLines();
+      List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
 
       var balanceLinesPaid = await _repo.GetOrderLinesPaid();
       var today = DateTime.Now.Date;
-      var duedates = lineDeadlines.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
+      var duedates = lineDeadlinesCached.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
       List<AmountWithDeadlinesDto> amountDeadlines = new List<AmountWithDeadlinesDto>();
       int i = 0;
       var olddate = new DateTime();
@@ -582,16 +584,12 @@ namespace EducNotes.API.Controllers
         var linedeadlines = new List<OrderLineDeadline>();
         if (i == 0)
         {
-          linedeadlines = await _context.OrderLineDeadlines
-                                  .Include(o => o.OrderLine)
-                                  .Where(o => o.DueDate <= duedate).ToListAsync();
+          linedeadlines = lineDeadlinesCached.Where(o => o.DueDate <= duedate).ToList();
         }
         else
         {
-          linedeadlines = await _context.OrderLineDeadlines
-                                  .Include(o => o.OrderLine)
-                                  .OrderBy(o => o.DueDate)
-                                  .Where(o => o.DueDate > olddate && o.DueDate <= duedate).ToListAsync();
+          linedeadlines = lineDeadlinesCached.OrderBy(o => o.DueDate)
+                                             .Where(o => o.DueDate > olddate && o.DueDate <= duedate).ToList();
         }
 
         decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
@@ -684,6 +682,7 @@ namespace EducNotes.API.Controllers
       {
         RecoveryForChildDto rfcd = new RecoveryForChildDto();
         rfcd.ProductRecovery = new List<ProductRecoveryDto>();
+        rfcd.Id = child.Id;
         rfcd.LastName = child.LastName;
         rfcd.FirstName = child.FirstName;
         rfcd.LevelName = child.ClassLevelName;

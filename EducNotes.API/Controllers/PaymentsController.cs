@@ -140,14 +140,13 @@ namespace EducNotes.API.Controllers
               if (finOp.Cashed)
               {
                 var line = lines.First(o => o.Id == payment.OrderLineId);
-                var deadlines = lineDeadlines
-                                        .Where(d => d.OrderLineId == line.Id)
-                                        .OrderBy(o => o.DueDate)
-                                        .ToList();
+                var deadlines = lineDeadlines.Where(d => d.OrderLineId == line.Id)
+                                             .OrderBy(o => o.DueDate)
+                                             .ToList();
 
                 var allPaid = finOpOrderLines
-                                    .Where(f => f.FinOp.Cashed && f.FinOp.FinOpTypeId == finOpTypePayment && f.OrderLineId == line.Id)
-                                    .Sum(s => s.Amount);
+                              .Where(f => f.FinOp.Cashed && f.FinOp.FinOpTypeId == finOpTypePayment && f.OrderLineId == line.Id)
+                              .Sum(s => s.Amount);
                 decimal paidBalance = allPaid;
                 if (!line.Validated)
                 {
@@ -176,7 +175,7 @@ namespace EducNotes.API.Controllers
                     {
                       var lineD = deadlines[i];
                       var dueTotal = lineD.Amount + lineD.ProductFee;
-                      if (paidBalance >= dueTotal)
+                      if(paidBalance >= dueTotal)
                       {
                         lineD.Paid = true;
                         _repo.Update(lineD);
@@ -271,8 +270,9 @@ namespace EducNotes.API.Controllers
             return Ok();
           }
         }
-        catch
+        catch(Exception ex)
         {
+          string ddd = ex.Message;
           identityContextTransaction.Rollback();
           return BadRequest("erreur lors de l'ajout du paiement.");
         }

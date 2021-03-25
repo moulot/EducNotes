@@ -34,7 +34,7 @@ export class LockoutComponent implements OnInit {
         this.alertify.warning('l\'utilisateur ou/et le email n\'existent pas. recommencez svp.');
       }
     }, error => {
-      this.alertify.error(error);
+      console.log(error);
     });
   }
 }

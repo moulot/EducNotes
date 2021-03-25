@@ -30,5 +30,6 @@ namespace EducNotes.API.Helpers
     public static string Banks { get { return "_Banks"; } }
     public static string PaymentTypes { get { return "_PaymentTyes"; } }
     public static string Products { get { return "_Products"; } }
+    public static string UserTypes { get { return "_UserTypes"; } }
   }
 }

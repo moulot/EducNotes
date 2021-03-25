@@ -1,6 +1,6 @@
 <div class="d-none d-md-block">
   <div *ngIf="!showInfos" class="row animated fadeIn">
-    <div class="col-8">
+    <div class="col-7">
       <a class="d-flex" (click)="toggleInfos()">
         <i class="text-15 fad fa-plus-square mr-1 my-1" style="--fa-secondary-opacity: 1;
           --fa-primary-color:#192C47;--fa-secondary-color:#f89f20"></i>
@@ -10,8 +10,8 @@
         </div>
       </a>
     </div>
-    <div *ngIf="showBtn && tuition?.balance > 0" class="col-md-4 text-right">
-      <button type="button" mdbBtn (click)="addPayment()" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement</button>
+    <div *ngIf="showBtn && tuition?.balance > 0" class="col-md-5 text-right">
+      <button type="button" mdbBtn (click)="addPayment()" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement pour {{childFName}}</button>
     </div>      
   </div>
   <div *ngIf="showInfos" class="row animated fadeIn">
@@ -26,7 +26,7 @@
       </a>
     </div>
     <div *ngIf="showBtn && tuition?.balance > 0" class="col-md-4 text-right">
-      <button type="button" mdbBtn (click)="addPayment()" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement</button>
+      <button type="button" mdbBtn (click)="addPayment()" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement pour {{childFName}}</button>
     </div>    
     <div class="col-md-12"><hr class="my-1"></div>
     <div class="col-md-8 mb-2">
@@ -119,7 +119,7 @@
       la scolarité est entièrement payée. merci!
     </div>
     <div *ngIf="showBtn && tuition?.balance > 0" class="col-md-12 my-2">
-      <button type="button" mdbBtn (click)="addPayment()" block="true" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement</button>
+      <button type="button" mdbBtn (click)="addPayment()" block="true" class="btnBlue m-0" size="sm" mdbWavesEffect>effectuer un paiement pour {{childFName}}</button>
     </div>
     <div class="col-md-12 mt-1">
       <div *ngIf="!tuition?.validated" class="border rounded-lg p-2">

@@ -35,7 +35,6 @@ import { ClassesPanelComponent } from './admin/class-management/classes-panel/cl
 import { ClassesListResolver } from './_resolvers/classes-list-resolver';
 import { CoursesPanelComponent } from './admin/courses-management/courses-panel/courses-panel.component';
 import { CoursesListResolver } from './_resolvers/courses-list.resolver';
-// import { TeacherManagementComponent } from './admin/teacher-management/teacher-management.component';
 import { PreRegisterComponent } from './admin/selfs-registers/pre-register/pre-register.component';
 import { TeacherManagementResolver } from './_resolvers/teacher-management.resolver';
 import { SelfRegisterComponent } from './admin/selfs-registers/self-register/self-register.component';

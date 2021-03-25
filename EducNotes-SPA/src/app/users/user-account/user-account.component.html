@@ -9,7 +9,7 @@
   </div>
 
   <div *ngIf="teacherLoggedIn()">
-    <app-teacher-account></app-teacher-account>     
+    <app-teacher-account [teacherid]="userid"></app-teacher-account>     
   </div>
 
   <div *ngIf="adminLoggedIn()">

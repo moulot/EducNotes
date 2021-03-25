@@ -883,18 +883,23 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("UsersRecap")]
-    public async Task<IActionResult> UsersRecap () {
-      var dataToReturn = new List<UsersRecapDto> ();
-      var userTypes = await _context.UserTypes.Include (u => u.Users).ToListAsync ();
-      foreach (var item in userTypes) {
-        dataToReturn.Add (new UsersRecapDto {
+    public async Task<IActionResult> UsersRecap()
+    {
+      List<UserType> userTypes = await _cache.GetUserTypes();
+
+      var dataToReturn = new List<UsersRecapDto>();
+      foreach(var item in userTypes)
+      {
+        UsersRecapDto userRecap = new UsersRecapDto {
           UserTypeId = item.Id,
-            UserTypeName = item.Name,
-            TotalAccount = item.Users.Count (),
-            TotalActive = item.Users.Where (u => u.Validated == true).Count ()
-        });
+          UserTypeName = item.Name,
+          TotalAccount = item.Users.Count(),
+          TotalActive = item.Users.Where(u => u.AccountDataValidated == true).Count()
+        };
+
+        dataToReturn.Add(userRecap);
       }
-      return Ok (dataToReturn);
+      return Ok(dataToReturn);
     }
 
     [HttpGet ("SearchInscription")]

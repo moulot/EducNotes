@@ -91,9 +91,9 @@ export class EditAccountComponent implements OnInit {
 
   createCredentialsForm() {
     this.credentialsForm = this.fb.group({
-      userName: [this.user.userName, Validators.required],
-      password: ['', Validators.required],
+      userName: ['', Validators.required],
       oldPassword: ['', Validators.required],
+      password: ['', Validators.required],
       checkpwd: ['', [ Validators.required, this.pwdValidator ] ],
       email: [this.user.email, [Validators.required, Validators.email ] ],
       cell: [this.user.phoneNumber, [Validators.required, this.phoneValidator] ],
@@ -242,14 +242,17 @@ export class EditAccountComponent implements OnInit {
     this.accountService.editPwd(confirmPwd).subscribe((pwdOk: Boolean) => {
       this.pwdOk = pwdOk;
       if (this.pwdOk) {
+        this.updatePwd = false;
         this.emailValidationSteps = 2;
-        this.credentialsForm.get('emailCode').setValue('');
-        this.user.email = this.credentialsForm.value.email;
-        this.alertInfoTitle = 'votre email \'' + this.user.email + '\'est validé!';
-        this.alertInfo = 'votre email a été modifié avec succès. merci';
+        this.credentialsForm.get('userName').setValue({userName : ''});
+        this.credentialsForm.get('oldPassword').setValue('');
+        this.credentialsForm.get('password').setValue('');
+        this.credentialsForm.get('checkpwd').setValue('');
+        this.alertInfoTitle = 'mot de passe validé!';
+        this.alertInfo = 'votre mot de passe a été modifié avec succès. merci';
         this.showAlert();
         } else {
-        this.alertify.error('nous avons eu un problème pour modifier votre email.');
+        this.alertify.error('nous avons eu un problème pour modifier votre mot de passe.');
       }
       this.wait = false;
     }, error => {

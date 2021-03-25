@@ -20,6 +20,10 @@
     <button type='button' mdbBtn (click)="showTab(1)" [ngClass]="activeTabs[1] ? 'btnBlue' : 'btnWhiteBbtnBlue'"
       size="sm" block="true">menu</button>
   </div>
+  <div class="col-md-2">
+    <button type='button' mdbBtn (click)="showTab(2)" [ngClass]="activeTabs[2] ? 'btnBlue' : 'btnWhiteBbtnBlue'"
+      size="sm" block="true">produits</button>
+  </div>
   <div class="col-md-12 mt-3">
     <div *ngIf="activeTabs[0]">
       <app-classlevel-courses></app-classlevel-courses>
@@ -31,6 +35,9 @@
           <hr class="my-1">
         </div>
       </div>
+    </div>
+    <div *ngIf="activeTabs[2]">
+      <app-config-products></app-config-products>
     </div>
   </div>
 </div>

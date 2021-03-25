@@ -1446,7 +1446,7 @@ namespace EducNotes.API.Controllers {
 
           //set sms data
           if (userTemplate != null) {
-            var parent = await _context.Users.FirstAsync (p => p.Id == parentId);
+            var parent = await _context.Users.FirstAsync(p => p.Id == parentId);
             AbsenceSmsDto asd = new AbsenceSmsDto ();
             asd.ChildId = childId;
             asd.AbsenceTypeId = absence.AbsenceTypeId;

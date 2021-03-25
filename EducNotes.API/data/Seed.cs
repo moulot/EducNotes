@@ -355,7 +355,8 @@ namespace EducNotes.API.Data
                 new Token {Name = "prénom enseignant", TokenString = "<P_ENSEIGNANT>"},
                 new Token {Name = "email enseignant", TokenString = "<EMAIL_ENSEIGNANT>"},
                 new Token {Name = "mobile enseignant", TokenString = "<CELL_ENSEIGNANT>"},
-                new Token {Name = "lien de confirmation", TokenString = "<CONFIRM_LINK>"}
+                new Token {Name = "lien de confirmation", TokenString = "<CONFIRM_LINK>"},
+                new Token {Name = "moyens de paiement", TokenString = "<TYPES_PAIEMENT>"}
             };
             context.AddRange(tokens);
 

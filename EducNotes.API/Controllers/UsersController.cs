@@ -239,7 +239,10 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("ChildFile/{childId}")]
-    public async Task<IActionResult> GetChildFile(int childId) {
+    public async Task<IActionResult> GetChildFile(int childId)
+    {
+      List<OrderLine> lines = await _cache.GetOrderLines();
+
       var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == childId;
       if(!isCurrentUser)
         Unauthorized();
@@ -265,8 +268,10 @@ namespace EducNotes.API.Controllers {
 
       var parentsFromRepo = await _repo.GetParents(childId);
       var parents = _mapper.Map<IEnumerable<UserForDetailedDto>>(parentsFromRepo);
-      foreach(var parent in parents) {
-        if(parent.UserTypeId == parentTypeId && parent.Gender == 0) {
+      foreach(var parent in parents)
+      {
+        if(parent.UserTypeId == parentTypeId && parent.Gender == 0)
+        {
           userFile.MotherId = parent.Id;
           userFile.MotherLastName = parent.LastName;
           userFile.MotherFirstName = parent.FirstName;
@@ -276,7 +281,8 @@ namespace EducNotes.API.Controllers {
           userFile.MotherPhotoUrl = parent.PhotoUrl;
         }
 
-        if(parent.UserTypeId == parentTypeId && parent.Gender == 1) {
+        if(parent.UserTypeId == parentTypeId && parent.Gender == 1)
+        {
           userFile.FatherId = parent.Id;
           userFile.FatherLastName = parent.LastName;
           userFile.FatherFirstName = parent.FirstName;
@@ -292,11 +298,10 @@ namespace EducNotes.API.Controllers {
       var children = _mapper.Map<List<UserForDetailedDto>>(parentsChildren);
       userFile.Siblings = children;
 
-      var line = await _context.OrderLines
-        .Include(i => i.Order)
-        .Where(l => l.Order.isReg && l.ChildId == childId)
-        .FirstOrDefaultAsync();
-      if(line != null) {
+      var line = lines.Where(l => l.Order.isReg && l.ChildId == childId)
+                      .FirstOrDefault();
+      if(line != null)
+      {
         userFile.OrderId = line.OrderId;
         userFile.OrderLineId = line.Id;
       }
@@ -305,7 +310,8 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("UserInfos/{id}/{parentId}")]
-    public async Task<IActionResult> GetStudentInfos(int id, int parentId) {
+    public async Task<IActionResult> GetStudentInfos(int id, int parentId)
+    {
       // agenda
       var toNbDays = 7;
       var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
@@ -324,7 +330,8 @@ namespace EducNotes.API.Controllers {
       double courseCoeffSum = 0;
       double GeneralAvg = -1000;
       List<PeriodAvgDto> periodAvgs = new List<PeriodAvgDto>();
-      if(coursesWithEvals.Count() > 0) {
+      if(coursesWithEvals.Count() > 0)
+      {
         foreach(var course in coursesWithEvals) {
           courseAvgSum += course.UserCourseAvg * course.CourseCoeff;
           courseCoeffSum += course.CourseCoeff;
@@ -379,7 +386,8 @@ namespace EducNotes.API.Controllers {
 
       int todayIndex = 0;
       List<ClassScheduleNDaysDto> scheduleDays = new List<ClassScheduleNDaysDto>();
-      for(int i = 0; i < 2 * daysRange; i++) {
+      for(int i = 0; i < 2 * daysRange; i++)
+      {
         ClassScheduleNDaysDto item = new ClassScheduleNDaysDto();
         var currentDate = startDate.AddDays(i);
         if(currentDate.Date == today) {
@@ -1732,13 +1740,15 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpPost("EditUserAccount")]
-    public async Task<IActionResult> EditUserAccount([FromForm] UserAccountForEditDto user) {
+    public async Task<IActionResult> EditUserAccount([FromForm] UserAccountForEditDto user)
+    {
       bool userOK = await _repo.EditUserAccount(user);
       return Ok(userOK);
     }
 
     [HttpPost("AddTeacher")]
-    public async Task<IActionResult> AddTeacher([FromForm] TeacherForEditDto user) {
+    public async Task<IActionResult> AddTeacher([FromForm] TeacherForEditDto user)
+    {
       // int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
       bool userOK = await _repo.AddTeacher(user);
 
@@ -1996,21 +2006,21 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("UsersToValidate")]
-    public async Task<IActionResult> GetUsersToValidate() {
-      // users to validate exclude chidren/students as they are coped by parent on their account
-      var usersFromDB = await _context.Users
-        .Include(i => i.UserType)
-        .Include(i => i.Class)
-        .Include(i => i.ClassLevel)
-        .Where(u => u.AccountDataValidated == false && u.UserTypeId != studentTypeId)
-        .ToListAsync();
-      var activeTuitions = await _context.Orders
-        .Include(i => i.Father).ThenInclude(i => i.UserType)
-        .Include(i => i.Mother).ThenInclude(i => i.UserType)
-        .Where(t => t.isReg == true && t.Expired == false || t.Cancelled == false)
-        .ToListAsync();
+    public async Task<IActionResult> GetUsersToValidate()
+    {
+      List<User> usersCached = await _cache.GetUsers();
+      List<Order> orders = await _cache.GetOrders();
+      List<UserType> userTypesCached = await _cache.GetUserTypes();
 
-      var userTypes = await _context.UserTypes.Where(u => u.Id != studentTypeId).OrderBy(o => o.Name).ToListAsync();
+      // users to validate exclude chidren/students as they are coped by parent on their account
+      var usersFromDB = usersCached.Where(u => u.AccountDataValidated == false && u.UserTypeId != studentTypeId)
+                                   .ToList();
+      var activeTuitions = orders.Where(t => t.isReg == true && t.Expired == false || t.Cancelled == false)
+                                 .ToList();
+
+      var userTypes = userTypesCached.Where(u => u.Id != studentTypeId)
+                                     .OrderBy(o => o.Name)
+                                     .ToList();
       List<UserTypeToValidateDto> types = new List<UserTypeToValidateDto>();
       foreach(var type in userTypes) {
         if(type.Name.ToLower() == "admin") { continue; }
@@ -2080,13 +2090,18 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpPost("EditUserToValidate")]
-    public async Task<IActionResult> EditUserToValidate(EditUserToValidateDto userData) {
-      var user = await _context.Users.FirstAsync(u => u.Id == userData.Id);
+    public async Task<IActionResult> EditUserToValidate(EditUserToValidateDto userData)
+    {
+      List<User> users = await _cache.GetUsers();
+      var user = users.First(u => u.Id == userData.Id);
       user.Email = userData.Email;
       user.PhoneNumber = userData.Cell;
       _context.Update(user);
       if(await _repo.SaveAll())
+      {
+        await _cache.LoadUsers();
         return Ok();
+      }
       else
         return BadRequest("problème pour mettre à jour les données");
     }
@@ -2097,30 +2112,35 @@ namespace EducNotes.API.Controllers {
       List<Setting> settings = await _cache.GetSettings();
       List<Order> orders = await _cache.GetOrders();
       List<ProductDeadLine> productdeadlines = await _cache.GetProductDeadLines();
+      List<EmailTemplate> emailTemplates= await _cache.GetEmailTemplates();
+      List<User> users = await _cache.GetUsers();
 
       List<RegistrationEmailDto> emails = new List<RegistrationEmailDto>();
 
       var schoolName = settings.First(s => s.Name == "SchoolName").Value;
       string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
 
-      foreach(var data in usersData) {
+      foreach(var data in usersData)
+      {
         var userType = data.UserTypeId;
 
-        if(userType == parentTypeId) {
-          foreach(var userid in data.UserIds) {
+        if(userType == parentTypeId)
+        {
+          foreach(var userid in data.UserIds)
+          {
             var order = orders.First(o => o.isReg &&(o.MotherId == userid || o.FatherId == userid));
             var reg = await _repo.GetOrder(order.Id);
             var user = reg.Mother != null ? reg.Mother : reg.Father;
 
-            var firstDeadline = productdeadlines
-                                      .OrderBy(o => o.DueDate)
-                                      .First(p => p.ProductId == tuitionId);
+            var firstDeadline = productdeadlines.OrderBy(o => o.DueDate)
+                                                .First(p => p.ProductId == tuitionId);
             var firstDeadlineDate = firstDeadline.DueDate;
             decimal DPPct = firstDeadline.Percentage;
 
             decimal orderDueAmount = 0;
             List<ChildRegistrationDto> children = new List<ChildRegistrationDto>();
-            foreach(var line in reg.Lines) {
+            foreach(var line in reg.Lines)
+            {
               ChildRegistrationDto crd = new ChildRegistrationDto();
               crd.LastName = line.Child.LastName;
               crd.FirstName = line.Child.FirstName;
@@ -2153,15 +2173,16 @@ namespace EducNotes.API.Controllers {
             emails.Add(email);
           }
 
-          var template = await _context.EmailTemplates.FirstAsync(t => t.Id == newRegToBePaidEmailId);
+          var template = emailTemplates.First(t => t.Id == newRegToBePaidEmailId);
           var RegEmails = await _repo.SetEmailDataForRegistration(emails, template.Body, RegDeadLine);
           _context.AddRange(RegEmails);
         }
 
-        if(userType == teacherTypeId) {
+        if(userType == teacherTypeId)
+        {
           // send the mail to update userName/pwd - add to Email table
           foreach(var userid in data.UserIds) {
-            var appUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userid);
+            var appUser = users.FirstOrDefault(u => u.Id == userid);
             var teacherCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
 
             ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {
@@ -2174,7 +2195,7 @@ namespace EducNotes.API.Controllers {
               Token = teacherCode
             };
 
-            var template = await _context.EmailTemplates.FirstAsync(t => t.Id == teacherConfirmEmailId);
+            var template = emailTemplates.First(t => t.Id == teacherConfirmEmailId);
             Email emailToSend = await _repo.SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
             _repo.Add(emailToSend);
           }
@@ -2186,6 +2207,5 @@ namespace EducNotes.API.Controllers {
 
       return Ok();
     }
-
   }
 }

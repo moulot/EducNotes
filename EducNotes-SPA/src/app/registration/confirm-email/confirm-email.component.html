@@ -61,7 +61,7 @@
   </div>
   <div class="col-md-11 mx-auto">
     <div class="card mb-2">
-      <div class="card-body">
+      <div class="card-body">userphoneconfirmed:{{user.phoneNumberConfirmed}}
         <div *ngIf="!user.phoneNumberConfirmed">
           <form [formGroup]="phoneForm" (ngSubmit)="validatePhone()">
             <div *ngIf="phoneValidationSteps == 0" class="row">

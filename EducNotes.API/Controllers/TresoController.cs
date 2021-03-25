@@ -46,7 +46,8 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("GetProducts")]
-    public async Task<IActionResult> GetProducts () {
+    public async Task<IActionResult> GetProducts ()
+    {
       // var products = await _context.Products.OrderBy (p => p.Name).ToListAsync ();
       // return Ok(products);
       int schoolServiceTypeId = _config.GetValue<int> ("AppSettings:schoolServiceTypeId");

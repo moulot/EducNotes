@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-parent-file',
@@ -10,7 +9,7 @@ import { UserService } from 'src/app/_services/user.service';
 })
 export class ParentFileComponent implements OnInit {
 
-  constructor(private userService: UserService, private alertify: AlertifyService,
+  constructor(private alertify: AlertifyService,
     private route: ActivatedRoute) { }
   parentFile: any;
   showInfos = [true, true, true];
