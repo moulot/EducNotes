@@ -14,8 +14,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-broadcast',
   templateUrl: './broadcast.component.html',
-  styleUrls: ['./broadcast.component.scss'],
-  animations :  [SharedAnimations]
+  styleUrls: ['./broadcast.component.scss']
 })
 export class BroadcastComponent implements OnInit {
   parentTypeId = environment.parentTypeId;
@@ -25,7 +24,7 @@ export class BroadcastComponent implements OnInit {
   userTypeOptions = [];
   classLevelOptions = [];
   classOptions = [];
-  emailForm: FormGroup;
+  msgForm: FormGroup;
   showWarning = false;
   email: Email;
   autocompletes$: any[] = [];
@@ -34,9 +33,11 @@ export class BroadcastComponent implements OnInit {
   schools: any;
   classLevels: any;
   classes: ClassForBroadCast[] = [];
-  templates: any;
+  emailTemplates: any;
+  smsTemplates: any;
   templateOptions = [];
-  bodyType: number;
+  emailBodyType: number;
+  smsBodyType: number;
   showTo = true;
   toData: string;
   showGroups = true;
@@ -48,6 +49,7 @@ export class BroadcastComponent implements OnInit {
   educLevelClassList: any[] = [];
   schoolClassList: any[] = [];
   classLevelClassList: any[] = [];
+  toggleEmailSms = true;
 
   constructor(private classService: ClassService, private alertify: AlertifyService, private router: Router,
     private adminService: AdminService, private fb: FormBuilder, private userService: UserService) { }
@@ -55,26 +57,32 @@ export class BroadcastComponent implements OnInit {
   ngOnInit() {
     this.showTo = true;
     this.showGroups = true;
-    this.bodyType = 1;
-    this.createEmailForm();
+    this.emailBodyType = 1;
+    this.smsBodyType = 1;
+    this.createMsgForm();
     this.addUserTypeItem();
     this.getData();
     this.getClassLevels();
     this.getEmailTemplatesData();
+    this.getSmsTemplatesData();
   }
 
-  createEmailForm() {
-    this.emailForm = this.fb.group({
+  createMsgForm() {
+    this.msgForm = this.fb.group({
       userTypes: this.fb.array([]),
       educLevels: this.fb.array([]),
       schools: this.fb.array([]),
       cycles: this.fb.array([]),
       classLevels: this.fb.array([]),
       classes: this.fb.array([]),
-      subject: ['', Validators.required],
-      type: [null],
-      template: [null],
-      body: ['']
+      msgChoice: [1],
+      emailType: [1],
+      emailSubject: ['', Validators.required],
+      emailTemplate: [null],
+      emailBody: [''],
+      smsType: [1],
+      smsTemplate: [null],
+      smsBody: ['']
     }, {validator: this.formValidator});
   }
 
@@ -107,13 +115,29 @@ export class BroadcastComponent implements OnInit {
       classeserror = true;
     }
 
-    const template = g.get('template').value;
-    const body = g.get('body').value;
+    const msgChoice = g.get('msgChoice').value;
     let bodyerror = false;
-    if ((template === null || template === 'undefined') && body === '') {
-      bodyerror = true;
+    const emailtemplate = g.get('emailTemplate').value;
+    const emailbody = g.get('emailBody').value;
+    const emailType = g.get('emailType').value;
+    // console.log('email: ' + msgChoice + '-' + emailtemplate + '-' + emailbody + '-' + emailType);
+    if (msgChoice === 1 && emailType === 2) {
+      if ((emailtemplate === null || emailtemplate === 'undefined') && emailbody === '') {
+        bodyerror = true;
+      }
     }
 
+    const smstemplate = g.get('smsTemplate').value;
+    const smsbody = g.get('smsBody').value;
+    const smsType = g.get('smsType').value;
+    // console.log('sms: ' + msgChoice + '-' + smstemplate + '-' + smsbody + '-' + smsType);
+    if (msgChoice === 2 && smsType === 2) {
+      if ((smstemplate === null || smstemplate === 'undefined') && smsbody === '') {
+        bodyerror = true;
+      }
+    }
+
+    // console.log('errors: usersNOK:' + userserror + ' classesNOK:' + classeserror + ' bodyerror:' + bodyerror);
     if (userserror === true || classeserror === true || bodyerror === true) {
       return {'usersNOK': userserror, 'classesNOK': classeserror, 'bodyNOK': bodyerror, 'formNOK': true};
     }
@@ -122,7 +146,7 @@ export class BroadcastComponent implements OnInit {
   }
 
   addUserTypeItem(): void {
-    const userTypes = this.emailForm.get('userTypes') as FormArray;
+    const userTypes = this.msgForm.get('userTypes') as FormArray;
     userTypes.push(this.createUserTypeItem(this.parentTypeId, 'tous les parents'));
     userTypes.push(this.createUserTypeItem(this.studentTypeId, 'tous les élèves'));
     userTypes.push(this.createUserTypeItem(this.teacherTypeId, 'tous les profs'));
@@ -138,7 +162,7 @@ export class BroadcastComponent implements OnInit {
   }
 
   addEducLevelItem(id, name): void {
-    const educLevels = this.emailForm.get('educLevels') as FormArray;
+    const educLevels = this.msgForm.get('educLevels') as FormArray;
     educLevels.push(this.createEducLevelItem(id, name));
   }
 
@@ -151,7 +175,7 @@ export class BroadcastComponent implements OnInit {
   }
 
   addSchoolItem(id, name): void {
-    const schools = this.emailForm.get('schools') as FormArray;
+    const schools = this.msgForm.get('schools') as FormArray;
     schools.push(this.createSchoolItem(id, name));
   }
 
@@ -164,7 +188,7 @@ export class BroadcastComponent implements OnInit {
   }
 
   addCycleItem(id, name): void {
-    const cycles = this.emailForm.get('cycles') as FormArray;
+    const cycles = this.msgForm.get('cycles') as FormArray;
     cycles.push(this.createCycleItem(id, name));
   }
 
@@ -177,7 +201,7 @@ export class BroadcastComponent implements OnInit {
   }
 
   addClassLevelItem(id, name): void {
-    const cycles = this.emailForm.get('classLevels') as FormArray;
+    const cycles = this.msgForm.get('classLevels') as FormArray;
     cycles.push(this.createClassLevelItem(id, name));
   }
 
@@ -190,7 +214,7 @@ export class BroadcastComponent implements OnInit {
   }
 
   addClassItem(id, name, classLevelId, educationLevelId, schoolId, cycleId): void {
-    const classes = this.emailForm.get('classes') as FormArray;
+    const classes = this.msgForm.get('classes') as FormArray;
     classes.push(this.createClassItem(id, name, classLevelId, educationLevelId, schoolId, cycleId));
   }
 
@@ -271,9 +295,22 @@ export class BroadcastComponent implements OnInit {
 
   getEmailTemplatesData() {
     this.adminService.getEmailTemplatesData().subscribe(data => {
-      this.templates = data;
-      for (let i = 0; i < this.templates.length; i++) {
-        const elt = this.templates[i];
+      this.emailTemplates = data;
+      for (let i = 0; i < this.emailTemplates.length; i++) {
+        const elt = this.emailTemplates[i];
+        const tpl = {value: elt.id, label: elt.name + ' (' + elt.emailCategoryName + ')'};
+        this.templateOptions = [...this.templateOptions, tpl];
+      }
+    }, error => {
+      this.alertify.error(error);
+    });
+  }
+
+  getSmsTemplatesData() {
+    this.adminService.getSmsTemplatesData().subscribe(data => {
+      this.smsTemplates = data;
+      for (let i = 0; i < this.smsTemplates.length; i++) {
+        const elt = this.smsTemplates[i];
         const tpl = {value: elt.id, label: elt.name + ' (' + elt.emailCategoryName + ')'};
         this.templateOptions = [...this.templateOptions, tpl];
       }
@@ -285,7 +322,7 @@ export class BroadcastComponent implements OnInit {
   educLevelSelect(educLevel) {
     const active = educLevel.active;
     const id = educLevel.educLevelId;
-    const classes = this.emailForm.get('classes') as FormArray;
+    const classes = this.msgForm.get('classes') as FormArray;
     for (let i = 0; i < classes.length; i++) {
       const elt = classes.at(i);
       if (elt.value.educationLevelId === id) {
@@ -300,7 +337,7 @@ export class BroadcastComponent implements OnInit {
   schoolSelect(school) {
     const active = school.active;
     const id = school.schoolId;
-    const classes = this.emailForm.get('classes') as FormArray;
+    const classes = this.msgForm.get('classes') as FormArray;
     for (let i = 0; i < classes.length; i++) {
       const elt = classes.at(i);
       if (elt.value.schoolId === id) {
@@ -315,7 +352,7 @@ export class BroadcastComponent implements OnInit {
   classLevelSelect(classLevel) {
     const active = classLevel.active;
     const id = classLevel.classLevelId;
-    const classes = this.emailForm.get('classes') as FormArray;
+    const classes = this.msgForm.get('classes') as FormArray;
     for (let i = 0; i < classes.length; i++) {
       const elt = classes.at(i);
       if (elt.value.classLevelId === id) {
@@ -328,8 +365,8 @@ export class BroadcastComponent implements OnInit {
   }
 
   selectEducLevelClasses() {
-    const educLevels = this.emailForm.get('educLevels') as FormArray;
-    const classes = this.emailForm.get('classes') as FormArray;
+    const educLevels = this.msgForm.get('educLevels') as FormArray;
+    const classes = this.msgForm.get('classes') as FormArray;
     for (let i = 0; i < educLevels.length; i++) {
       const el = educLevels.at(i);
       const id = el.value.educLevelId;
@@ -346,8 +383,8 @@ export class BroadcastComponent implements OnInit {
   }
 
   selectSchoolClasses() {
-    const schools = this.emailForm.get('schools') as FormArray;
-    const classes = this.emailForm.get('classes') as FormArray;
+    const schools = this.msgForm.get('schools') as FormArray;
+    const classes = this.msgForm.get('classes') as FormArray;
     for (let i = 0; i < schools.length; i++) {
       const el = schools.at(i);
       const id = el.value.schoolId;
@@ -364,8 +401,8 @@ export class BroadcastComponent implements OnInit {
   }
 
   selectClassLevelClasses() {
-    const classLevels = this.emailForm.get('classLevels') as FormArray;
-    const classes = this.emailForm.get('classes') as FormArray;
+    const classLevels = this.msgForm.get('classLevels') as FormArray;
+    const classes = this.msgForm.get('classes') as FormArray;
     for (let i = 0; i < classLevels.length; i++) {
       const el = classLevels.at(i);
       const id = el.value.classLevelId;
@@ -384,7 +421,7 @@ export class BroadcastComponent implements OnInit {
   cycleSelect(cycle) {
     const active = cycle.active;
     const id = cycle.cycleId;
-    const classes = this.emailForm.get('classes') as FormArray;
+    const classes = this.msgForm.get('classes') as FormArray;
     for (let i = 0; i < classes.length; i++) {
       const elt = classes.at(i);
       if (elt.value.cycleId === id) {
@@ -393,25 +430,40 @@ export class BroadcastComponent implements OnInit {
     }
   }
 
-  selectBody() {
-    this.bodyType = this.emailForm.value.type;
-    this.emailForm.get('subject').setValue('');
-    this.emailForm.get('body').setValue('');
-    this.emailForm.get('template').reset();
+  selectEmailBody() {
+    this.emailBodyType = this.msgForm.value.emailType;
+    console.log('emailBodyType:' + this.emailBodyType);
+    this.msgForm.get('emailSubject').setValue('');
+    this.msgForm.get('emailBody').setValue('');
+    this.msgForm.get('emailTemplate').reset();
   }
 
-  setTemplateData() {
-    const id = this.emailForm.value.template;
+  selectSmsBody() {
+    this.toggleEmailSms = false;
+    this.smsBodyType = this.msgForm.value.smsType;
+    console.log('smsBodyType:' + this.smsBodyType);
+    this.msgForm.get('smsBody').setValue('');
+    this.msgForm.get('smsTemplate').reset();
+  }
+
+  setEmailTemplateData() {
+    const id = this.msgForm.value.emailTemplate;
     if (id) {
-      const tplSubject = this.templates.find(t => t.id === id).subject;
-      this.emailForm.get('subject').setValue(tplSubject);
+      const tplSubject = this.emailTemplates.find(t => t.id === id).subject;
+      this.msgForm.get('emailSubject').setValue(tplSubject);
     }
   }
 
+  // setSmsTemplateData() {
+  //   const id = this.msgForm.value.smsTemplate;
+  //   if (id) {
+  //   }
+  // }
+
   getRecipients() {
     this.toData = '';
-    for (let i = 0; i < this.emailForm.value.userTypes.length; i++) {
-      const elt = this.emailForm.value.userTypes[i];
+    for (let i = 0; i < this.msgForm.value.userTypes.length; i++) {
+      const elt = this.msgForm.value.userTypes[i];
       if (elt.active) {
         if (this.toData === '') {
           this.toData = elt.name;
@@ -433,8 +485,8 @@ export class BroadcastComponent implements OnInit {
     this.schoolData = '';
     this.classesData = '';
 
-    for (let i = 0; i < this.emailForm.value.educLevels.length; i++) {
-      const elt = this.emailForm.value.educLevels[i];
+    for (let i = 0; i < this.msgForm.value.educLevels.length; i++) {
+      const elt = this.msgForm.value.educLevels[i];
       if (elt.active) {
         if (this.groupData === '') {
           this.groupData = elt.name;
@@ -444,8 +496,8 @@ export class BroadcastComponent implements OnInit {
       }
     }
 
-    for (let i = 0; i < this.emailForm.value.schools.length; i++) {
-      const elt = this.emailForm.value.schools[i];
+    for (let i = 0; i < this.msgForm.value.schools.length; i++) {
+      const elt = this.msgForm.value.schools[i];
       if (elt.active) {
         if (this.groupData === '') {
           this.groupData = elt.name;
@@ -455,8 +507,8 @@ export class BroadcastComponent implements OnInit {
       }
     }
 
-    for (let i = 0; i < this.emailForm.value.classLevels.length; i++) {
-      const elt = this.emailForm.value.classLevels[i];
+    for (let i = 0; i < this.msgForm.value.classLevels.length; i++) {
+      const elt = this.msgForm.value.classLevels[i];
       if (elt.active) {
         if (this.groupData === '') {
           this.groupData = elt.name;
@@ -466,8 +518,8 @@ export class BroadcastComponent implements OnInit {
       }
     }
 
-    for (let i = 0; i < this.emailForm.value.classes.length; i++) {
-      const elt = this.emailForm.value.classes[i];
+    for (let i = 0; i < this.msgForm.value.classes.length; i++) {
+      const elt = this.msgForm.value.classes[i];
       if (elt.selected && this.educLevelClassList.findIndex(c => Number(c.id) === Number(elt.classId)) === -1 &&
           this.schoolClassList.findIndex(c => Number(c.id) === Number(elt.classId)) === -1 &&
           this.classLevelClassList.findIndex(c => Number(c.id) === Number(elt.classId)) === -1) {
@@ -485,39 +537,61 @@ export class BroadcastComponent implements OnInit {
     this.showGroups = true;
   }
 
-  sendEmail() {
+  toggleBox() {
+    this.toggleEmailSms = !this.toggleEmailSms;
+  }
+
+  sendMessages() {
     let userTypeIds = [];
-    for (let i = 0; i < this.emailForm.value.userTypes.length; i++) {
-      const userType = this.emailForm.value.userTypes[i];
+    for (let i = 0; i < this.msgForm.value.userTypes.length; i++) {
+      const userType = this.msgForm.value.userTypes[i];
       if (userType.active === true) {
         userTypeIds = [...userTypeIds, userType.userTypeId];
       }
     }
     let classIds = [];
-    for (let j = 0; j < this.emailForm.value.classes.length; j++) {
-      const aclass = this.emailForm.value.classes[j];
+    for (let j = 0; j < this.msgForm.value.classes.length; j++) {
+      const aclass = this.msgForm.value.classes[j];
       if (aclass.selected === true) {
         classIds = [...classIds, aclass.classId];
       }
     }
-    const subject = this.emailForm.value.subject;
-    const body = this.emailForm.value.body;
-    const templateId = this.emailForm.value.template;
 
-    const dataForEmails = <DataForBroadcast>{};
-    if (Number(this.bodyType) === 1) {
-      dataForEmails.emailTemplateId = templateId;
-      dataForEmails.subject = '';
-      dataForEmails.body = '';
+    const dataForMsgs = <any>{};
+    const msgChoice = this.msgForm.value.msgChoice;
+    if (msgChoice === 1) {
+      const subject = this.msgForm.value.emailSubject;
+      const body = this.msgForm.value.emailBody;
+      const templateId = this.msgForm.value.emailTemplate;
+
+      dataForMsgs.msgType = msgChoice;
+      if (Number(this.emailBodyType) === 1) {
+        dataForMsgs.templateId = templateId;
+        dataForMsgs.subject = '';
+        dataForMsgs.body = '';
+      } else {
+        dataForMsgs.emailTemplateId = 0;
+        dataForMsgs.subject = subject;
+        dataForMsgs.body = body;
+      }
     } else {
-      dataForEmails.emailTemplateId = 0;
-      dataForEmails.subject = subject;
-      dataForEmails.body = body;
+      const body = this.msgForm.value.smsBody;
+      const templateId = this.msgForm.value.smsTemplate;
+
+      if (Number(this.smsBodyType) === 1) {
+        dataForMsgs.templateId = templateId;
+        dataForMsgs.subject = '';
+        dataForMsgs.body = '';
+      } else {
+        dataForMsgs.templateId = 0;
+        dataForMsgs.subject = '';
+        dataForMsgs.body = body;
+      }
     }
 
-    dataForEmails.userTypeIds = userTypeIds;
-    dataForEmails.classIds = classIds;
-    this.adminService.sendEmailBroadcast(dataForEmails).subscribe(() => {
+    dataForMsgs.userTypeIds = userTypeIds;
+    dataForMsgs.classIds = classIds;
+    this.adminService.BroadcastMessaging(dataForMsgs).subscribe(data => {
       this.alertify.success('messages envoyés.');
       this.router.navigate(['/home']);
     }, error => {

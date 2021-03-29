@@ -129,8 +129,10 @@ namespace EducNotes.API.Data {
 
       // MANAGEMENT OF TUITION AND NEXT YEAR TUITION TO BE TREATED!!!!!!!!!!!!!!
       var order = await _context.Orders.FirstAsync(o => o.isReg == true && (o.MotherId == parentId || o.FatherId == parentId));
-      var usersFromDB = await _context.OrderLines.Where(o => o.OrderId == order.Id)
-                             .ToListAsync();
+      var usersFromDB = await _context.OrderLines.Include(i => i.Child)
+                                                 .Include(i => i.ClassLevel)
+                                                 .Where(o => o.OrderId == order.Id)
+                                                 .ToListAsync();
       List<UserForDetailedDto> children = new List<UserForDetailedDto>();
       for(int i = 0; i < usersFromDB.Count (); i++)
       {
@@ -1091,6 +1093,31 @@ namespace EducNotes.API.Data {
 
     public async Task<Course> GetCourse (int Id) {
       return await _context.Courses.FirstOrDefaultAsync (c => c.Id == Id);
+    }
+
+    public async Task<Boolean> SendTeacherConfirmEmail(int userId)
+    {
+      var appUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+      var teacherCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+
+      ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {
+        Id = appUser.Id,
+        LastName = appUser.LastName,
+        FirstName = appUser.FirstName,
+        Cell = appUser.PhoneNumber,
+        Gender = appUser.Gender,
+        Email = appUser.Email,
+        Token = teacherCode
+      };
+
+      var template = await _context.EmailTemplates.FirstAsync(t => t.Id == teacherConfirmEmailId);
+      Email emailToSend = await SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
+      Add(emailToSend);
+
+      if(!await SaveAll())
+        return false;
+
+      return true;
     }
 
     public async Task<bool> SendResetPasswordLink (User user, string token) {
@@ -2923,6 +2950,8 @@ namespace EducNotes.API.Data {
     {
       // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
       var payments = await _context.FinOpOrderLines
+                          .Include(i => i.OrderLine)
+                          .Include(i => i.FinOp)
                           .Where(f => f.OrderLine.ChildId == childId)
                           .OrderBy(o => o.FinOp.FinOpDate)
                           .ToListAsync();
@@ -3001,7 +3030,7 @@ namespace EducNotes.API.Data {
 
     public async Task<List<ClassLevel>> GetActiveClassLevels()
     {
-      List<Class> classes = await _context.Classes.ToListAsync();
+      List<Class> classes = await _context.Classes.Include(i => i.ClassLevel).ToListAsync();
       var classLevels = classes.OrderBy(o => o.ClassLevel.DsplSeq)
                                .Select(s => s.ClassLevel).Distinct().ToList();
       return classLevels;

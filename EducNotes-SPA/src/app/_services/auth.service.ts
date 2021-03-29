@@ -318,4 +318,7 @@ export class AuthService {
     return this.http.post(this.baseUrl + 'setClientDB', {});
   }
 
+  sendTeacherConfirmEmail(userid) {
+    return this.http.get(this.baseUrl + userid + '/TeacherConfirmEmail');
+  }
 }

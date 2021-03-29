@@ -583,114 +583,225 @@ namespace EducNotes.API.Controllers {
       }
     }
 
-    [HttpGet ("EmailTemplatesData")]
-    public async Task<IActionResult> GetEmailTemplatesData () {
-      var emailTemplates = await _context.EmailTemplates
-        .Include (i => i.EmailCategory)
-        .OrderBy (o => o.Name).ToListAsync ();
+    [HttpGet ("EmailTemplates")]
+    public async Task<IActionResult> GetEmailTemplates()
+    {
+      var emailTemplates = await _context.EmailTemplates.Include(i => i.EmailCategory)
+                                                        .OrderBy(o => o.Name).ToListAsync();
 
-      List<EmailBroadcastDataDto> templates = new List<EmailBroadcastDataDto> ();
-      foreach (var tpl in emailTemplates) {
-        EmailBroadcastDataDto ebdd = new EmailBroadcastDataDto ();
+      List<BroadcastMessageDto> templates = new List<BroadcastMessageDto>();
+      foreach(var tpl in emailTemplates)
+      {
+        BroadcastMessageDto ebdd = new BroadcastMessageDto();
         ebdd.Id = tpl.Id;
         ebdd.Name = tpl.Name;
         ebdd.Subject = tpl.Subject;
         ebdd.EmailCategoryName = tpl.EmailCategory.Name;
-        templates.Add (ebdd);
+        templates.Add(ebdd);
       }
       return Ok (templates);
     }
 
-    [HttpPost ("EmailBroadcast")]
-    public async Task<IActionResult> EmailBroadcast (DataForBroadcastDto dataForEmailDto) {
-      var currentUserId = int.Parse (User.FindFirst (ClaimTypes.NameIdentifier).Value);
-      List<int> userTypeIds = dataForEmailDto.UserTypeIds;
+    [HttpGet ("SmsTemplates")]
+    public async Task<IActionResult> GetSmsTemplates()
+    {
+      var smsTemplates = await _context.SmsTemplates.Include(i => i.SmsCategory)
+                                                    .OrderBy(o => o.Name).ToListAsync();
+
+      List<BroadcastMessageDto> templates = new List<BroadcastMessageDto>();
+      foreach(var tpl in smsTemplates)
+      {
+        BroadcastMessageDto msg = new BroadcastMessageDto();
+        msg.Id = tpl.Id;
+        msg.Name = tpl.Name;
+        msg.SmsCategoryName = tpl.SmsCategory.Name;
+        templates.Add(msg);
+      }
+      return Ok(templates);
+    }
+
+    [HttpPost ("BroadcastMessaging")]
+    public async Task<IActionResult> BroadcastMessaging (DataForBroadcastDto dataForMsgDto)
+    {
+      var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+      List<int> userTypeIds = dataForMsgDto.UserTypeIds;
       List<int> classLevelIds = new List<int> (); //dataForEmailDto.ClassLevelIds;
-      List<int> classIds = dataForEmailDto.ClassIds;
-      int templateId = dataForEmailDto.EmailTemplateId;
+      List<int> classIds = dataForMsgDto.ClassIds;
+      int msgType = dataForMsgDto.MsgType;
+      int templateId = dataForMsgDto.TemplateId;
       string subject = "";
       string body = "";
 
-      List<string> recipientEmails = new List<string> ();
+      List<BroadcastDataDto> recipients = new List<BroadcastDataDto>();
+      List<UserForDetailedDto> usersWithNoEmailSms = new List<UserForDetailedDto>();
 
-      var users = new List<User> ();
-      foreach (var ut in userTypeIds) {
-        if (ut == studentTypeId || ut == parentTypeId) {
-          if (users.Count () == 0) {
+      var users = new List<User>();
+      foreach(var ut in userTypeIds)
+      {
+        if(ut == studentTypeId || ut == parentTypeId)
+        {
+          if(users.Count() == 0)
+          {
             users = await _context.Users
-              .Where (u => classIds.Contains (Convert.ToInt32 (u.ClassId)) && u.AccountDataValidated == true &&
-                u.UserTypeId == studentTypeId).ToListAsync ();
+              .Where(u => classIds.Contains(Convert.ToInt32(u.ClassId)) && u.UserTypeId == studentTypeId).ToListAsync();
           }
 
-          if (ut == studentTypeId) {
-            foreach (var user in users) {
-              if (string.IsNullOrEmpty (user.Email))
-                recipientEmails.Add (user.Email);
+          if(ut == studentTypeId)
+          {
+            foreach(var user in users)
+            {
+              BroadcastDataDto userData = new BroadcastDataDto();
+              userData.RecipientId = user.Id;
+              if(msgType == 1) //email
+              {
+                if(user.EmailConfirmed)
+                {
+                  userData.RecipientEmail = user.Email;
+                  recipients.Add(userData);
+                }
+                else
+                {
+                  UserForDetailedDto userNoEmailSms = _mapper.Map<UserForDetailedDto>(user);
+                  usersWithNoEmailSms.Add(userNoEmailSms);
+                }
+              }
+              else
+              {
+                if(user.PhoneNumberConfirmed)
+                {
+                  userData.RecipientMobile = user.PhoneNumber;
+                  recipients.Add(userData);
+                }
+                else
+                {
+                  UserForDetailedDto userNoEmailSms = _mapper.Map<UserForDetailedDto>(user);
+                  usersWithNoEmailSms.Add(userNoEmailSms);
+                }
+              }
             }
           }
 
-          if (ut == parentTypeId) {
-            var ids = users.Select (u => u.Id);
-            var parents = _context.UserLinks.Where (u => ids.Contains (u.UserId)).Select (u => u.UserP).Distinct ();
+          if(ut == parentTypeId)
+          {
+            var ids = users.Select(u => u.Id);
+            var parents = _context.UserLinks.Where(u => ids.Contains(u.UserId)).Select(u => u.UserP).Distinct();
 
-            foreach (var user in parents) {
-              if (user.AccountDataValidated && user.EmailConfirmed)
-                recipientEmails.Add (user.Email);
+            foreach(var user in parents)
+            {
+              BroadcastDataDto userData = new BroadcastDataDto();
+              userData.RecipientId = user.Id;
+              if(msgType == 1) //email
+              {
+                if(user.EmailConfirmed)
+                {
+                  userData.RecipientEmail = user.Email;
+                  recipients.Add(userData);
+                }
+                else
+                {
+                  UserForDetailedDto userNoEmailSms = _mapper.Map<UserForDetailedDto>(user);
+                  usersWithNoEmailSms.Add(userNoEmailSms);
+                }
+              }
+              else
+              {
+                if(user.PhoneNumberConfirmed)
+                {
+                  userData.RecipientMobile = user.PhoneNumber;
+                  recipients.Add(userData);
+                }
+                else
+                {
+                  UserForDetailedDto userNoEmailSms = _mapper.Map<UserForDetailedDto>(user);
+                  usersWithNoEmailSms.Add(userNoEmailSms);
+                }
+              }
             }
           }
         }
 
         if(ut == teacherTypeId)
         {
-          List<ClassCourse> classCourses = await _context.ClassCourses.ToListAsync();
+          List<ClassCourse> classCourses = await _context.ClassCourses.Include(i => i.Teacher).ToListAsync();
           var teachers = classCourses
-            .Where(t => classIds.Contains (t.ClassId) && t.Teacher.AccountDataValidated == true &&
-              t.Teacher.UserTypeId == teacherTypeId && t.Teacher.EmailConfirmed == true)
+            .Where(t => classIds.Contains(t.ClassId) && t.Teacher.UserTypeId == teacherTypeId)
             .Select(t => t.Teacher).Distinct().ToList();
 
           foreach (var user in teachers)
           {
-            if(user.AccountDataValidated && user.EmailConfirmed)
-              recipientEmails.Add (user.Email);
+            BroadcastDataDto userData = new BroadcastDataDto();
+            userData.RecipientId = user.Id;
+            if(msgType == 1) //email
+            {
+              if(user.EmailConfirmed)
+              {
+                userData.RecipientEmail = user.Email;
+                recipients.Add(userData);
+              }
+              else
+              {
+                UserForDetailedDto userNoEmailSms = _mapper.Map<UserForDetailedDto>(user);
+                usersWithNoEmailSms.Add(userNoEmailSms);
+              }
+            }
+            else
+            {
+              if(user.PhoneNumberConfirmed)
+              {
+                userData.RecipientMobile = user.PhoneNumber;
+                recipients.Add(userData);
+              }
+              else
+              {
+                UserForDetailedDto userNoEmailSms = _mapper.Map<UserForDetailedDto>(user);
+                usersWithNoEmailSms.Add(userNoEmailSms);
+              }
+            }
           }
         }
       }
 
       List<Setting> settings = await _context.Settings.ToListAsync();
-      var schoolName = settings.First(s => s.Name.ToLower () == "schoolname");
+      var schoolName = settings.First(s => s.Name.ToLower() == "schoolname");
 
       //did we select a template?
       if (templateId != 0)
       {
-        var template = await _context.EmailTemplates.FirstAsync (t => t.Id == templateId);
-        subject = dataForEmailDto.Subject;
+        var template = await _context.EmailTemplates.FirstAsync(t => t.Id == templateId);
+        subject = dataForMsgDto.Subject;
         return NoContent();
       }
       else
       {
-        body = dataForEmailDto.Body;
-        subject = dataForEmailDto.Subject;
+        body = dataForMsgDto.Body;
+        subject = dataForMsgDto.Subject;
 
-        List<Email> emailsToBeSent = new List<Email> ();
+        List<Email> emailsToBeSent = new List<Email>();
         //save emails to Emails table
-        foreach (var email in recipientEmails) {
+        foreach (var recipient in recipients)
+        {
           Email newEmail = new Email ();
           newEmail.EmailTypeId = 1;
+          newEmail.ToUserId = recipient.RecipientId;
           newEmail.FromAddress = "no-reply@educnotes.com";
           newEmail.Subject = subject;
           newEmail.Body = body;
-          newEmail.ToAddress = email;
+          newEmail.ToAddress = recipient.RecipientEmail;
           newEmail.TimeToSend = DateTime.Now;
           newEmail.InsertUserId = currentUserId;
           newEmail.InsertDate = DateTime.Now;
           newEmail.UpdateUserId = currentUserId;
           newEmail.UpdateDate = DateTime.Now;
-          emailsToBeSent.Add (newEmail);
+          emailsToBeSent.Add(newEmail);
         }
-        _context.AddRange (emailsToBeSent);
+        _context.AddRange(emailsToBeSent);
 
-        if (await _repo.SaveAll ()) {
-          return NoContent ();
+        if (await _repo.SaveAll())
+        {
+          return Ok(new {
+            nbEmailsSent = recipients.Count(),
+            usersWithNoEmailSms
+          });
         } else {
           return BadRequest ("problème pour envoyer les emails");
         }
@@ -890,7 +1001,7 @@ namespace EducNotes.API.Controllers {
     [HttpGet ("UsersRecap")]
     public async Task<IActionResult> UsersRecap()
     {
-      List<UserType> userTypes = await _context.UserTypes.ToListAsync();
+      List<UserType> userTypes = await _context.UserTypes.Include(i => i.Users).ToListAsync();
 
       var dataToReturn = new List<UsersRecapDto>();
       foreach(var item in userTypes)

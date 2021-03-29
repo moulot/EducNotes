@@ -3,11 +3,12 @@ import { AuthService } from 'src/app/_services/auth.service';
 import { User } from 'src/app/_models/user';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AccountService } from 'src/app/_services/account.service';
 import { ConfirmToken } from 'src/app/_models/confirmToken';
 import { Utils } from 'src/app/shared/utils';
+import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-confirm-teacher-email',
@@ -27,25 +28,26 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   phoneOk = true;
   teacherOk = false;
   userid: any;
+  userToken: any;
   username: string;
   pwd: string;
   wait = false;
 
   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
-    private alertify: AlertifyService,  private router: Router, private accountService: AccountService) { }
+    private alertify: AlertifyService,  private userService: UserService,
+    private accountService: AccountService, private router: Router) { }
 
   ngOnInit() {
     this.authService.eraseSessionData();
     this.createPhoneForm();
     this.createUserForm();
 
-    const id: string = this.route.snapshot.queryParamMap.get('id');
-    const token: string = this.route.snapshot.queryParamMap.get('token');
-    if (id !== null && token !== null) {
-      this.userid = id;
+    this.userid = this.route.snapshot.queryParamMap.get('id');
+    this.userToken = this.route.snapshot.queryParamMap.get('token');
+    if (this.userid !== null && this.userToken !== null) {
       const confirmEmail = <ConfirmToken>{};
-      confirmEmail.userId = id;
-      confirmEmail.token = token;
+      confirmEmail.userId = this.userid;
+      confirmEmail.token = this.userToken;
       this.validateEmail(confirmEmail);
     }
   }
@@ -89,7 +91,16 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   }
 
   sendEmailToConfirm() {
-
+    this.authService.sendTeacherConfirmEmail(this.userid).subscribe((emailSent: Boolean) => {
+      if (emailSent) {
+        // this.router.navigate(['EmailSent']);
+        this.alertify.success('le email vous a été envoyé avec succès');
+      } else {
+        this.alertify.info('le email n\'a pu être envoyé, recommencez svp');
+      }
+    }, error => {
+      this.alertify.error('problème pour envoyer le email. recommencez svp.');
+    });
   }
 
   validateEmail(confirmEmail: ConfirmToken) {

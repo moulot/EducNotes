@@ -63,8 +63,8 @@ export class ClassScheduleEditComponent implements OnInit {
       course: [null, Validators.required],
       item1: this.fb.group({
         day1: [null],
-        hourStart1: [''],
-        hourEnd1: ['']
+        hourStart1: [null],
+        hourEnd1: [null]
       }, {validator: this.item1Validator}),
       item2: this.fb.group({
         day2: [null],
@@ -144,6 +144,7 @@ export class ClassScheduleEditComponent implements OnInit {
       formTouched = true;
     }
 
+    console.log(form1IsValid + '-' + form2IsValid + '-' + form3IsValid + '-' + form4IsValid + '-' + form5IsValid + ' t: ' + formTouched);
     if (!form1IsValid || !form2IsValid || !form3IsValid || !form4IsValid ||
         !form5IsValid || !teacherIsValid || !courseIsValid || !formTouched) {
       return {'formNOK': true};
@@ -158,17 +159,19 @@ export class ClassScheduleEditComponent implements OnInit {
     const hourStart1 = g.get('hourStart1').value;
     const hourEnd1 = g.get('hourEnd1').value;
     console.log(day1 + '-' + hourStart1 + '-' + hourEnd1);
-    if (day1 != null) {
-      if (hourStart1.length > 0 || hourEnd1.length > 0) {
-        const typedHS1 = hourStart1.replace('_', '');
-        const typedHE1 = hourEnd1.replace('_', '');
+    if (day1) {
+      if (hourStart1 || hourEnd1) {
+        const typedHS1 = hourStart1 ? hourStart1.replace('_', '') : '';
+        const typedHE1 = hourEnd1 ? hourEnd1.replace('_', '') : '';
         if (day1 !== null && typedHS1.length > 1 && typedHE1.length > 1) {
+          console.log('in line');
           if (typedHS1.length !== 5 || typedHE1.length !== 5) {
             return {'line1DatesNOK': true};
           } else {
             return null;
           }
         } else {
+          console.log('line NOK');
           return {'line1NOK': true};
         }
       }
@@ -180,17 +183,19 @@ export class ClassScheduleEditComponent implements OnInit {
     const day2 = g.get('day2').value;
     const hourStart2 = g.get('hourStart2').value;
     const hourEnd2 = g.get('hourEnd2').value;
-    if (day2 !== null || hourStart2.length > 0 || hourEnd2.length > 0) {
-      const typedHS2 = hourStart2.replace('_', '');
-      const typedHE2 = hourEnd2.replace('_', '');
-      if (day2 !== null && typedHS2.length > 1 && typedHE2.length > 1) {
-        if (typedHS2.length !== 5 || typedHE2.length !== 5) {
-          return {'line2DatesNOK': true};
+    if (day2) {
+      if (hourStart2.length > 0 || hourEnd2.length > 0) {
+        const typedHS2 = hourStart2.replace('_', '');
+        const typedHE2 = hourEnd2.replace('_', '');
+        if (day2 !== null && typedHS2.length > 1 && typedHE2.length > 1) {
+          if (typedHS2.length !== 5 || typedHE2.length !== 5) {
+            return {'line2DatesNOK': true};
+          } else {
+            return null;
+          }
         } else {
-          return null;
+          return {'line2NOK': true};
         }
-      } else {
-        return {'line2NOK': true};
       }
     }
   }
@@ -200,17 +205,19 @@ export class ClassScheduleEditComponent implements OnInit {
     const day3 = g.get('day3').value;
     const hourStart3 = g.get('hourStart3').value;
     const hourEnd3 = g.get('hourEnd3').value;
-    if (day3 !== null || hourStart3.length > 0 || hourEnd3.length > 0) {
-      if (day3 !== null && hourStart3.length > 0 && hourEnd3.length > 0) {
-        const typedHS3 = hourStart3.replace('_', '');
-        const typedHE3 = hourEnd3.replace('_', '');
-        if (typedHS3.length !== 5 || typedHE3.length !== 5) {
-          return {'line3DatesNOK': true};
+    if (day3) {
+      if (hourStart3.length > 0 || hourEnd3.length > 0) {
+        if (day3 !== null && hourStart3.length > 0 && hourEnd3.length > 0) {
+          const typedHS3 = hourStart3.replace('_', '');
+          const typedHE3 = hourEnd3.replace('_', '');
+          if (typedHS3.length !== 5 || typedHE3.length !== 5) {
+            return {'line3DatesNOK': true};
+          } else {
+            return null;
+          }
         } else {
-          return null;
+          return {'line3NOK': true};
         }
-      } else {
-        return {'line3NOK': true};
       }
     }
   }
@@ -220,17 +227,19 @@ export class ClassScheduleEditComponent implements OnInit {
     const day4 = g.get('day4').value;
     const hourStart4 = g.get('hourStart4').value;
     const hourEnd4 = g.get('hourEnd4').value;
-    if (day4 !== null || hourStart4.length > 0 || hourEnd4.length > 0) {
-      if (day4 !== null && hourStart4.length > 0 && hourEnd4.length > 0) {
-        const typedHS4 = hourStart4.replace('_', '');
-        const typedHE4 = hourEnd4.replace('_', '');
-        if (typedHS4.length !== 5 || typedHE4.length !== 5) {
-          return {'line4DatesNOK': true};
+    if (day4) {
+      if (hourStart4.length > 0 || hourEnd4.length > 0) {
+        if (day4 !== null && hourStart4.length > 0 && hourEnd4.length > 0) {
+          const typedHS4 = hourStart4.replace('_', '');
+          const typedHE4 = hourEnd4.replace('_', '');
+          if (typedHS4.length !== 5 || typedHE4.length !== 5) {
+            return {'line4DatesNOK': true};
+          } else {
+            return null;
+          }
         } else {
-          return null;
+          return {'line4NOK': true};
         }
-      } else {
-        return {'line4NOK': true};
       }
     }
   }
@@ -240,17 +249,19 @@ export class ClassScheduleEditComponent implements OnInit {
     const day5 = g.get('day5').value;
     const hourStart5 = g.get('hourStart5').value;
     const hourEnd5 = g.get('hourEnd5').value;
-    if (day5 !== null || hourStart5.length > 0 || hourEnd5.length > 0) {
-      if (day5 !== null && hourStart5.length > 0 && hourEnd5.length > 0) {
-        const typedHS5 = hourStart5.replace('_', '');
-        const typedHE5 = hourEnd5.replace('_', '');
-        if (typedHS5.length !== 5 || typedHE5.length !== 5) {
-          return {'line5DatesNOK': true};
+    if (day5) {
+      if (hourStart5.length > 0 || hourEnd5.length > 0) {
+        if (day5 !== null && hourStart5.length > 0 && hourEnd5.length > 0) {
+          const typedHS5 = hourStart5.replace('_', '');
+          const typedHE5 = hourEnd5.replace('_', '');
+          if (typedHS5.length !== 5 || typedHE5.length !== 5) {
+            return {'line5DatesNOK': true};
+          } else {
+            return null;
+          }
         } else {
-          return null;
+          return {'line5NOK': true};
         }
-      } else {
-        return {'line5NOK': true};
       }
     }
   }
@@ -258,97 +269,99 @@ export class ClassScheduleEditComponent implements OnInit {
   isConflict(index) {
     this.courseConflicts = [];
     const formIsValid = this.scheduleForm.controls['item' + index].valid;
-    if (formIsValid) {
-      const day = this.scheduleForm.controls['item' + index].get('day' + index).value;
+    const day = this.scheduleForm.controls['item' + index].get('day' + index).value;
+    if (formIsValid && day) {
       const startH = this.scheduleForm.controls['item' + index].get('hourStart' + index).value;
       const endH = this.scheduleForm.controls['item' + index].get('hourEnd' + index).value;
-      const startHNum = Number(startH.replace(':', ''));
-      const endHNum = Number(endH.replace(':', ''));
-      // cope with teacher schedule
-      let teacherDayCourses = [];
-      if (this.teacherSchedule.days) {
-        const teacherDayIndex = this.teacherSchedule.days.findIndex(elt => elt.day === day);
-        if (teacherDayIndex !== -1) {
-          teacherDayCourses = [...teacherDayCourses, this.teacherSchedule.days[teacherDayIndex]];
+      if (startH) {
+        const startHNum = Number(startH.replace(':', ''));
+        const endHNum = Number(endH.replace(':', ''));
+        // cope with teacher schedule
+        let teacherDayCourses = [];
+        if (this.teacherSchedule.days) {
+          const teacherDayIndex = this.teacherSchedule.days.findIndex(elt => elt.day === day);
+          if (teacherDayIndex !== -1) {
+            teacherDayCourses = [...teacherDayCourses, this.teacherSchedule.days[teacherDayIndex]];
+          }
         }
-      }
 
-      // then with class schedule (remove courses already treated with teacher)
-      let classDayCourses = <any>{};
-      if (this.scheduleCourses.days) {
-        const classDayIndex = this.scheduleCourses.days.findIndex(elt => elt.day === day);
-        classDayCourses = classDayIndex !== -1 ? this.scheduleCourses.days[classDayIndex] : [];
-      }
+        // then with class schedule (remove courses already treated with teacher)
+        let classDayCourses = <any>{};
+        if (this.scheduleCourses.days) {
+          const classDayIndex = this.scheduleCourses.days.findIndex(elt => elt.day === day);
+          classDayCourses = classDayIndex !== -1 ? this.scheduleCourses.days[classDayIndex] : [];
+        }
 
-      let filteredClassDayCourses = [];
-      if (classDayCourses.length > 0) {
-        if (teacherDayCourses.length > 0) {
-          for (let i = 0; i < classDayCourses.courses.length; i++) {
-            const elt = classDayCourses.courses[i];
-            if (teacherDayCourses.length > 0) {
-              for (let j = 0; j < teacherDayCourses.length; j++) {
-                const elt1 = teacherDayCourses[j];
-                for (let k = 0; k < elt1.courses.length; k++) {
-                  const course = elt1.courses[k];
-                  const courseIndex = teacherDayCourses.findIndex(c => c.courseId === elt.courseId);
-                  if (courseIndex === -1) {
-                    filteredClassDayCourses = [...filteredClassDayCourses, elt];
+        let filteredClassDayCourses = [];
+        if (classDayCourses.length > 0) {
+          if (teacherDayCourses.length > 0) {
+            for (let i = 0; i < classDayCourses.courses.length; i++) {
+              const elt = classDayCourses.courses[i];
+              if (teacherDayCourses.length > 0) {
+                for (let j = 0; j < teacherDayCourses.length; j++) {
+                  const elt1 = teacherDayCourses[j];
+                  for (let k = 0; k < elt1.courses.length; k++) {
+                    const course = elt1.courses[k];
+                    const courseIndex = teacherDayCourses.findIndex(c => c.courseId === elt.courseId);
+                    if (courseIndex === -1) {
+                      filteredClassDayCourses = [...filteredClassDayCourses, elt];
+                    }
                   }
                 }
               }
             }
+          } else {
+            filteredClassDayCourses = [...filteredClassDayCourses, classDayCourses];
           }
         } else {
           filteredClassDayCourses = [...filteredClassDayCourses, classDayCourses];
         }
-      } else {
-        filteredClassDayCourses = [...filteredClassDayCourses, classDayCourses];
-      }
 
-      const classDayName = classDayCourses.dayName;
-      this.resetConflicts(day);
+        const classDayName = classDayCourses.dayName;
+        this.resetConflicts(day);
 
-      // let conflict = false;
-      this.periodConflict = false;
+        // let conflict = false;
+        this.periodConflict = false;
 
-      if (teacherDayCourses.length > 0) {
-        if (day || startH.length === 5 || endH.length === 5) {
-          for (let i = 0; i < teacherDayCourses.length; i++) {
-            const elt = teacherDayCourses[i];
-            for (let j = 0; j < elt.courses.length; j++) {
-              const course = elt.courses[j];
-              const courseStartH = Number(course.startH.replace(':', ''));
-              const courseEndH = Number(course.endH.replace(':', ''));
-              if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH &&
-                endHNum <= courseEndH) || (startHNum < courseStartH && endHNum > courseEndH)) {
-                const conflictElt = { day: day, data: 'ligne ' + index + '. conflit avec le cours ' + course.courseAbbrev +
-                  ' du ' + this.teacherName + '. horaire : ' + course.startH + ' - ' + course.endH };
-                this.courseConflicts = [...this.courseConflicts, conflictElt];
-                teacherDayCourses[i].courses[j].inConflict = true;
-                // conflict = true;
-                this.periodConflict = true;
-              }
-            }
-          }
-        }
-      }
-
-      if (filteredClassDayCourses.length > 0) {
-        if (day || startH.length === 5 || endH.length === 5) {
-          for (let i = 0; i < filteredClassDayCourses.length; i++) {
-            const elt = filteredClassDayCourses[i];
-            if (elt.courses) {
+        if (teacherDayCourses.length > 0) {
+          if (day || startH.length === 5 || endH.length === 5) {
+            for (let i = 0; i < teacherDayCourses.length; i++) {
+              const elt = teacherDayCourses[i];
               for (let j = 0; j < elt.courses.length; j++) {
                 const course = elt.courses[j];
                 const courseStartH = Number(course.startH.replace(':', ''));
                 const courseEndH = Number(course.endH.replace(':', ''));
                 if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH &&
                   endHNum <= courseEndH) || (startHNum < courseStartH && endHNum > courseEndH)) {
-                  const conflictElt = { day: day, data: 'ligne classe ' + index + '. conflit avec le cours ' +
-                  course.courseAbbrev + ' du ' + classDayName + '. horaire : ' + course.startH + ' - ' + course.endH };
+                  const conflictElt = { day: day, data: 'ligne ' + index + '. conflit avec le cours ' + course.courseAbbrev +
+                    ' du ' + this.teacherName + '. horaire : ' + course.startH + ' - ' + course.endH };
                   this.courseConflicts = [...this.courseConflicts, conflictElt];
-                  filteredClassDayCourses[i].courses[j].inConflict = true;
+                  teacherDayCourses[i].courses[j].inConflict = true;
+                  // conflict = true;
                   this.periodConflict = true;
+                }
+              }
+            }
+          }
+        }
+
+        if (filteredClassDayCourses.length > 0) {
+          if (day || startH.length === 5 || endH.length === 5) {
+            for (let i = 0; i < filteredClassDayCourses.length; i++) {
+              const elt = filteredClassDayCourses[i];
+              if (elt.courses) {
+                for (let j = 0; j < elt.courses.length; j++) {
+                  const course = elt.courses[j];
+                  const courseStartH = Number(course.startH.replace(':', ''));
+                  const courseEndH = Number(course.endH.replace(':', ''));
+                  if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH &&
+                    endHNum <= courseEndH) || (startHNum < courseStartH && endHNum > courseEndH)) {
+                    const conflictElt = { day: day, data: 'ligne classe ' + index + '. conflit avec le cours ' +
+                    course.courseAbbrev + ' du ' + classDayName + '. horaire : ' + course.startH + ' - ' + course.endH };
+                    this.courseConflicts = [...this.courseConflicts, conflictElt];
+                    filteredClassDayCourses[i].courses[j].inConflict = true;
+                    this.periodConflict = true;
+                  }
                 }
               }
             }
@@ -416,13 +429,18 @@ export class ClassScheduleEditComponent implements OnInit {
   }
 
   resetForm() {
-    this.scheduleForm.reset();
+    // this.scheduleForm.reset();
+    this.scheduleForm.get('course').setValue('');
     this.scheduleForm.controls['item1'].reset();
     this.scheduleForm.controls['item2'].reset();
     this.scheduleForm.controls['item3'].reset();
     this.scheduleForm.controls['item4'].reset();
     this.scheduleForm.controls['item5'].reset();
-    this.scheduleForm.get('course').setValue('');
+    this.scheduleForm.controls['item1'].markAsUntouched();
+    this.scheduleForm.controls['item2'].markAsUntouched();
+    this.scheduleForm.controls['item3'].markAsUntouched();
+    this.scheduleForm.controls['item4'].markAsUntouched();
+    this.scheduleForm.controls['item5'].markAsUntouched();
   }
 
   onTeacherChanged(selected) {

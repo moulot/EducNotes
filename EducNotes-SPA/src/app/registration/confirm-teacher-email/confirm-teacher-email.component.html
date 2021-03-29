@@ -32,7 +32,7 @@
 </div>
 <div *ngIf="!wait">
   <div *ngIf="!user">
-  <div class="text-20 mt-2">CONFIRMATION DU MOBILE ET DU EMAIL</div>
+  <div class="text-20 mt-2">ACTIVATION DE VOTRE COMPTE</div>
   <div class="text-center p-4">
     <i class="fad fa-exclamation-triangle fa-6x" style="--fa-secondary-opacity: 1;
       --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
@@ -41,14 +41,14 @@
     <div>Bonjour,</div>
     <div>Le lien de validation est incorrect. Pour valider votre email et votre compte vous devez clicker sur le lien reçu dans le email que nous vous avons envoyé. merci</div>
     <div class="my-3">Pour des informations complémentaires vous pouvez nous contacter au :</div>
-    <div class="mb-3 pl-3"> téléphone :<b>07.87.87.87.07</b></div>
+    <div class="mb-3 pl-3"> téléphone : <b>07.87.87.87.07</b></div>
     <!-- <div class="mb-3 pl-3"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div> -->
-    <div class="mb-3 pl-3"> email :<b>support@educnotes.com</b></div>
+    <div class="mb-3 pl-3"> email : <b>support@educnotes.com</b></div>
   </div>
   </div>
 
   <div class="text-20" *ngIf="user && !emailOK">
-  <div class="text-20 text-center mt-2">CONFIRMATION DU MOBILE ET DU EMAIL</div>
+  <div class="text-20 text-center mt-2">ACTIVATION DE VOTRE COMPTE</div>
   <div *ngIf="user">Bonjour
     <span  *ngIf="user.gender == 0">Mme</span>
     <span  *ngIf="user.gender == 1">Mr</span>
@@ -69,7 +69,7 @@
   </div>
   <div class="my-3 text-center">
     <button type="button" mdbBtn (click)="sendEmailToConfirm()" class="btnBlue"
-      mdbWavesEffect>envoyer à nouveau le email de confirmation</button>
+      mdbWavesEffect>envoyer a nouveau le email d'activation</button>
   </div>
   <div class="text-16">Si le problème persiste veuillez nous contacter au :</div>
   <div class="text-16 my-3 pl-3"> téléphone :<b>07.87.87.87.07</b></div>
@@ -83,7 +83,7 @@
     {{user.lastName | titlecase}},
   </div>
   <div *ngIf="!validAccount">
-    <div class="col-md-12 text-16 my-2">finaliser svp la création de votre compte sur la plateforme Educ'Notes.</div>
+    <div class="col-md-12 text-16 my-2">merci de compléter le formulaire afin d'activer votre compte sur la plateforme Educ'Notes.</div>
   </div>
   <div class="col-md-10 mx-auto">
     <div class="card mb-2">

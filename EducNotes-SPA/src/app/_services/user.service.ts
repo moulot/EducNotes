@@ -379,4 +379,5 @@ constructor(private http: HttpClient) {}
   resendConfirmEmail(usersData) {
     return this.http.post(this.baseUrl + 'ResendConfirmEmail', usersData);
   }
+
 }

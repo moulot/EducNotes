@@ -1051,8 +1051,9 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("ActiveClasslevels")]
-    public async Task<IActionResult> GetActiveClassLevels () {
-      var classLevels = await _repo.GetActiveClassLevels ();
+    public async Task<IActionResult> GetActiveClassLevels()
+    {
+      var classLevels = await _repo.GetActiveClassLevels();
       return Ok (classLevels);
     }
 
@@ -1665,7 +1666,7 @@ namespace EducNotes.API.Controllers {
         var courseIds = new List<int>();
         foreach(var item in teacherForUpdate.CourseIds)
         {
-          courseIds.Add(Convert.ToInt32 (item));
+          courseIds.Add(Convert.ToInt32(item));
         }
 
         var teacherCourses = await _context.TeacherCourses.Where(t => t.TeacherId == id).ToListAsync();
