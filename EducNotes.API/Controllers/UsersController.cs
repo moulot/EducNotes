@@ -241,7 +241,7 @@ namespace EducNotes.API.Controllers {
     [HttpGet("ChildFile/{childId}")]
     public async Task<IActionResult> GetChildFile(int childId)
     {
-      List<OrderLine> lines = await _cache.GetOrderLines();
+      // List<OrderLine> lines = await _cache.GetOrderLines();
 
       var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == childId;
       if(!isCurrentUser)
@@ -298,8 +298,8 @@ namespace EducNotes.API.Controllers {
       var children = _mapper.Map<List<UserForDetailedDto>>(parentsChildren);
       userFile.Siblings = children;
 
-      var line = lines.Where(l => l.Order.isReg && l.ChildId == childId)
-                      .FirstOrDefault();
+      var line = await _context.OrderLines.Where(l => l.Order.isReg && l.ChildId == childId)
+                      .FirstOrDefaultAsync();
       if(line != null)
       {
         userFile.OrderId = line.OrderId;
@@ -925,7 +925,8 @@ namespace EducNotes.API.Controllers {
       var itemsFromRepo = await _repo.GetClassAgenda(classId, monday, saturday);
       var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
-      var classCourses = (await _cache.GetClassCourses())
+      List<ClassCourse> classCoursesFromDB = await _context.ClassCourses.ToListAsync();
+      var classCourses = classCoursesFromDB
                         .Where(c => c.ClassId == classId && c.TeacherId == teacherId)
                         .Select(s => s.Course).ToList();
 
@@ -1083,9 +1084,9 @@ namespace EducNotes.API.Controllers {
       var itemsFromRepo = await _repo.GetClassAgenda(classId, today, today.AddDays(6));
       var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
-      var classCourses = (await _cache.GetClassCourses())
+      var classCourses = await _context.ClassCourses
                         .Where(c => c.ClassId == classId && c.TeacherId == teacherId)
-                        .Select(s => s.Course).ToList();
+                        .Select(s => s.Course).ToListAsync();
 
       List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto>();
       foreach(var course in classCourses) {
@@ -1202,9 +1203,9 @@ namespace EducNotes.API.Controllers {
       var itemsFromRepo = await _repo.GetClassAgenda(classId, date, date.AddDays(6));
       //var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
-      var classCourses = (await _cache.GetClassCourses())
+      var classCourses = await _context.ClassCourses
                       .Where(c => c.ClassId == classId && c.TeacherId == teacherId)
-                      .Select(s => s.Course).ToList();
+                      .Select(s => s.Course).ToListAsync();
 
       List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto>();
       foreach(var course in classCourses) {
@@ -1251,32 +1252,41 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{teacherId}/teacherWithCourses")]
-    public async Task<IActionResult> GetTeacherWithCourses(int teacherId) {
+    public async Task<IActionResult> GetTeacherWithCourses(int teacherId)
+    {
+      // List<ClassCourse> classCourses = await _cache.GetClassCourses();
+
       var teacherFromDB = await _context.Users
-        .Include(i => i.Photos)
-        .FirstOrDefaultAsync(u => u.Id == teacherId);
+                                .Include(i => i.Photos)
+                                .FirstOrDefaultAsync(u => u.Id == teacherId);
       TeacherForEditDto teacher = _mapper.Map<TeacherForEditDto>(teacherFromDB);
 
       var courses = await _repo.GetTeacherCourses(teacherId);
       string listCourses = "";
       teacher.ClassesAssigned = new List<CourseDto>();
-      foreach(var course in courses) {
-        if(listCourses == "") {
+      foreach(var course in courses)
+      {
+        if(listCourses == "")
+        {
           listCourses = course.Id.ToString();
-        } else {
+        }
+        else
+        {
           listCourses += "," + course.Id.ToString();
         }
 
         CourseDto cd = new CourseDto();
         cd.Id = course.Id;
         cd.Name = course.Name;
-        cd.ClassesAssigned = false;
+        cd.Abbrev = course.Abbreviation;
         // does this course has classes assigned to it?
-        var classesAssigned = (await _cache.GetClassCourses())
-            .Where(c => c.TeacherId == teacherId && c.CourseId == course.Id).ToList();
-        if(classesAssigned.Count() > 0) {
+        cd.ClassesAssigned = false;
+        var classesAssigned = await _context.ClassCourses.Where(c => c.TeacherId == teacherId && c.CourseId == course.Id).ToListAsync();
+        if(classesAssigned.Count() > 0)
+        {
           cd.ClassesAssigned = true;
         }
+
         teacher.ClassesAssigned.Add(cd);
       }
 
@@ -1289,19 +1299,19 @@ namespace EducNotes.API.Controllers {
     public async Task<IActionResult> GetAssignedClasses(int teacherId)
     {
       //get teacher with all his classes
-      List<User> teacherCached = await _cache.GetUsers();
-      var teacherFromDB = teacherCached.FirstOrDefault(u => u.Id == teacherId);
+      // List<User> teacherCached = await _cache.GetTeachers();
+      var teacherFromDB = await _context.Users.FirstOrDefaultAsync(u => u.Id == teacherId);
       var teacher = _mapper.Map<User>(teacherFromDB);
       
       if(teacherFromDB != null)
       {
-        List<TeacherCourse> teacherCoursesCached = await _cache.GetTeacherCourses();
-        List<ClassLevel> classLevelsCached = await _cache.GetClassLevels();
-        List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
-        List<Class> classesCached = await _cache.GetClasses();
+        // List<TeacherCourse> teacherCoursesCached = await _cache.GetTeacherCourses();
+        // List<ClassLevel> classLevelsCached = await _cache.GetClassLevels();
+        // List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
+        // List<Class> classesCached = await _cache.GetClasses();
 
         List<AssignedClassesDto> classes = new List<AssignedClassesDto>();
-        var courses = teacherCoursesCached.Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToList();
+        var courses = await _context.TeacherCourses.Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToListAsync();
         
         foreach(var course in courses)
         {
@@ -1310,14 +1320,14 @@ namespace EducNotes.API.Controllers {
           assignedClasses.CourseName = course.Name;
 
           assignedClasses.Levels = new List<LevelWithClassesDto>();
-          var levels = classLevelsCached.Where(c => c.EducationLevelId == teacher.EducLevelId)
-                                        .OrderBy(c => c.DsplSeq).ToList();
+          var levels = await _context.ClassLevels.Where(c => c.EducationLevelId == teacher.EducLevelId)
+                                        .OrderBy(c => c.DsplSeq).ToListAsync();
           foreach(var level in levels)
           {
             LevelWithClassesDto lwcd = new LevelWithClassesDto();
-            var selectedIds = classCoursesCached.Where(c => c.TeacherId == teacherId && c.CourseId == course.Id &&
-              c.Class.ClassLevelId == level.Id).Select(t => t.ClassId).Distinct().ToList();
-            List<Class> classesLevel = classesCached.Where(c => c.ClassLevelId == level.Id).OrderBy(o => o.Name).ToList();
+            var selectedIds = await _context.ClassCourses.Where(c => c.TeacherId == teacherId && c.CourseId == course.Id &&
+              c.Class.ClassLevelId == level.Id).Select(t => t.ClassId).Distinct().ToListAsync();
+            List<Class> classesLevel = await _context.Classes.Where(c => c.ClassLevelId == level.Id).OrderBy(o => o.Name).ToListAsync();
             if(classesLevel.Count() > 0)
             {
               lwcd.LevelId = level.Id;
@@ -1325,8 +1335,8 @@ namespace EducNotes.API.Controllers {
               lwcd.Classes = new List<ClassIdAndNameDto>();
               foreach(var aclass in classesLevel)
               {
-                Boolean assigned = classCoursesCached
-                  .Where(c => c.CourseId == course.Id && c.ClassId == aclass.Id && c.TeacherId != teacherId).Count() > 0;
+                Boolean assigned = await _context.ClassCourses
+                  .Where(c => c.CourseId == course.Id && c.ClassId == aclass.Id && c.TeacherId != teacherId).CountAsync() > 0;
 
                 ClassIdAndNameDto cd = new ClassIdAndNameDto();
                 cd.ClassId = aclass.Id;
@@ -1354,31 +1364,36 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpPost("{teacherId}/AssignClasses")]
-    public async Task<IActionResult> AssignClasses(int teacherId, [FromBody] List<AssignedClassesDto> courses) {
-      Boolean dataToBeSaved = false;
+    public async Task<IActionResult> AssignClasses(int teacherId, [FromBody] List<AssignedClassesDto> courses)
+    {
+      // List<ClassCourse> classCourses = await _cache.GetClassCourses();
 
-      foreach(var course in courses) {
-        foreach(var level in course.Levels) {
+      Boolean dataToBeSaved = false;
+      foreach(var course in courses)
+      {
+        foreach(var level in course.Levels)
+        {
           //delete previous classes selection
-          List<ClassCourse> prevClasses = (await _cache.GetClassCourses())
-            .Where(c => c.CourseId == course.CourseId &&
-              c.Class.ClassLevelId == level.LevelId && c.TeacherId == teacherId)
-            .ToList();
-          if(prevClasses.Count() > 0) {
+          List<ClassCourse> prevClasses = await _context.ClassCourses.Where(c => c.CourseId == course.CourseId && 
+                                                        c.Class.ClassLevelId == level.LevelId && c.TeacherId == teacherId)
+                                                      .ToListAsync();
+          if(prevClasses.Count() > 0)
+          {
             _repo.DeleteAll(prevClasses);
             dataToBeSaved = true;
           }
 
           // add new classes selection
           List<ClassCourse> newSelection = new List<ClassCourse>();
-          foreach(var aclass in level.Classes) {
-            if(aclass.Active == true && !aclass.Assigned) {
+          foreach(var aclass in level.Classes)
+          {
+            if(aclass.Active == true && !aclass.Assigned)
+            {
               ClassCourse classCourse = new ClassCourse() {
               ClassId = aclass.ClassId,
               CourseId = course.CourseId,
               TeacherId = teacherId
               };
-
               _repo.Add(classCourse);
               dataToBeSaved = true;
             }
@@ -1386,10 +1401,13 @@ namespace EducNotes.API.Controllers {
         }
       }
 
-      if(dataToBeSaved && await _repo.SaveAll()) {
-        await _cache.LoadClassCourses();
+      if(dataToBeSaved && await _repo.SaveAll())
+      {
+        // await _cache.LoadClassCourses();
         return Ok();
-      } else {
+      }
+      else
+      {
         return NoContent();
       }
     }
@@ -1397,16 +1415,18 @@ namespace EducNotes.API.Controllers {
     [HttpPost("{id}/course/{courseId}/level/{levelId}/AddClasses")]
     public async Task<IActionResult> AddClasses(int id, int courseId, int levelId, [FromBody] List<int> classIds) {
       // delete previous classes selection for the teacher
-      var prevClasses = (await _cache.GetClassCourses())
+      var prevClasses = await _context.ClassCourses
         .Where(c => c.CourseId == courseId && c.Class.ClassLevelId == levelId)
-        .ToList();
+        .ToListAsync();
 
-      if(prevClasses.Count() > 0) {
+      if(prevClasses.Count() > 0)
+      {
         _repo.DeleteAll(prevClasses);
       }
 
       // add new classes selection
-      foreach(var classId in classIds) {
+      foreach(var classId in classIds)
+      {
         ClassCourse cc = new ClassCourse();
         cc.TeacherId = id;
         cc.ClassId = classId;
@@ -1416,7 +1436,7 @@ namespace EducNotes.API.Controllers {
 
       if(await _repo.SaveAll())
       {
-        await _cache.GetClassCourses();
+        // await _cache.LoadClassCourses();
         return Ok();
       }
 
@@ -1424,16 +1444,17 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{teacherId}/Classes")]
-    public async Task<IActionResult> GetTeacherClasses(int teacherId) {
+    public async Task<IActionResult> GetTeacherClasses(int teacherId)
+    {
       // if(teacherId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
       //     return Unauthorized();
-      List<User> users = await _cache.GetUsers();
+      // List<User> users = await _cache.GetUsers();
       var teacherClasses = await(from courses in _context.ClassCourses
           join classes in _context.Classes on courses.ClassId equals classes.Id
           where courses.TeacherId == teacherId select new {
             ClassId = classes.Id,
             ClassName = classes.Name,
-            NbStudents = users.Where(u => u.ClassId == classes.Id &&
+            NbStudents = _context.Users.Where(u => u.ClassId == classes.Id &&
               u.UserTypeId == studentTypeId).Count()
         })
         .OrderBy(o => o.ClassName)
@@ -1445,9 +1466,9 @@ namespace EducNotes.API.Controllers {
     [HttpGet("{TeacherId}/period/{periodId}/ClassesWithEvalsByPeriod")]
     public async Task<IActionResult> GetTeacherClassesWithEvalsByPeriod(int teacherId, int periodId)
     {
-      var Classes = (await _cache.GetClassCourses())
-                    .Where(c => c.TeacherId == teacherId).Distinct().ToList();
-      List<User> studentsCached = await _cache.GetStudents();
+      var Classes = await _context.ClassCourses
+                    .Where(c => c.TeacherId == teacherId).Distinct().ToListAsync();
+      // List<User> studentsCached = await _cache.GetStudents();
 
       List<ClassesWithEvalsDto> classesWithEvals = new List<ClassesWithEvalsDto>();
       foreach(var aclass in Classes) {
@@ -1467,7 +1488,7 @@ namespace EducNotes.API.Controllers {
           ClassesWithEvalsDto classDto = new ClassesWithEvalsDto();
           classDto.ClassId = Convert.ToInt32(aclass.ClassId);
           classDto.ClassName = aclass.Class.Name;
-          classDto.NbStudents = studentsCached.Where(s => s.ClassId == aclass.Id).Count();
+          classDto.NbStudents = await _context.Users.Where(s => s.ClassId == aclass.Id).CountAsync();
           classDto.NbEvals = NbEvals;
           classDto.OpenedEvals = OpenedEvalsDto;
           classDto.ToBeGradedEvals = ToBeGradedEvalsDto;
@@ -1478,21 +1499,6 @@ namespace EducNotes.API.Controllers {
 
       return Ok(classesWithEvals);
     }
-
-    // [HttpGet("{teacherId}/Courses")]
-    // public async Task<IActionResult> GetTeacherCourses(int teacherId)
-    // {
-    //     var courses = await(from cu in _context.TeacherCourses
-    //                             where cu.Teacher.Id == teacherId
-    //                             select new{
-    //                                 TeacherId = cu.TeacherId,
-    //                                 TeacherName = cu.Teacher.FirstName + ' ' + cu.Teacher.LastName,
-    //                                 CourseId = cu.CourseId,
-    //                                 CourseName = cu.Course.Name
-    //                             }).OrderBy(o => o.CourseName).ToListAsync();
-
-    //     return Ok(courses);
-    // }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(int id, UserForUpdateDto userForUpdateDto) {
@@ -1659,13 +1665,13 @@ namespace EducNotes.API.Controllers {
     [HttpGet("GetAllClassesCourses")]
     public async Task<IActionResult> GetClassesCourses()
     {
-      List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
+      // List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
       var classes = await _context.Classes.Where(a => a.Active == 1).ToListAsync();
       var ccourses = new List<ClassCoursesDto>();
       foreach(var aclass in classes) {
         ccourses.Add(new ClassCoursesDto {
           Class = aclass,
-            Courses = classCoursesCached.Where(e => e.ClassId == aclass.Id).Select(e => e.Course).ToList()
+            Courses = await _context.ClassCourses.Where(e => e.ClassId == aclass.Id).Select(e => e.Course).ToListAsync()
         });
       }
       return Ok(ccourses);
@@ -1753,9 +1759,9 @@ namespace EducNotes.API.Controllers {
       bool userOK = await _repo.AddTeacher(user);
 
       if(userOK) {
-        await _cache.LoadUsers();
-        await _cache.LoadTeacherCourses();
-        await _cache.LoadClassCourses();
+        // await _cache.LoadUsers();
+        // await _cache.LoadTeacherCourses();
+        // await _cache.LoadClassCourses();
         return Ok();
       } else
         return BadRequest("problème pour ajouter l'enseigant");
@@ -2008,19 +2014,19 @@ namespace EducNotes.API.Controllers {
     [HttpGet("UsersToValidate")]
     public async Task<IActionResult> GetUsersToValidate()
     {
-      List<User> usersCached = await _cache.GetUsers();
-      List<Order> orders = await _cache.GetOrders();
-      List<UserType> userTypesCached = await _cache.GetUserTypes();
+      // List<User> usersCached = await _cache.GetUsers();
+      // List<Order> orders = await _cache.GetOrders();
+      // List<UserType> userTypesCached = await _cache.GetUserTypes();
 
       // users to validate exclude chidren/students as they are coped by parent on their account
-      var usersFromDB = usersCached.Where(u => u.AccountDataValidated == false && u.UserTypeId != studentTypeId)
-                                   .ToList();
-      var activeTuitions = orders.Where(t => t.isReg == true && t.Expired == false || t.Cancelled == false)
-                                 .ToList();
+      var usersFromDB = await _context.Users.Where(u => u.AccountDataValidated == false && u.UserTypeId != studentTypeId)
+                                   .ToListAsync();
+      var activeTuitions = await _context.Orders.Where(t => t.isReg == true && t.Expired == false || t.Cancelled == false)
+                                 .ToListAsync();
 
-      var userTypes = userTypesCached.Where(u => u.Id != studentTypeId)
+      var userTypes = await _context.UserTypes.Where(u => u.Id != studentTypeId)
                                      .OrderBy(o => o.Name)
-                                     .ToList();
+                                     .ToListAsync();
       List<UserTypeToValidateDto> types = new List<UserTypeToValidateDto>();
       foreach(var type in userTypes) {
         if(type.Name.ToLower() == "admin") { continue; }
@@ -2092,14 +2098,14 @@ namespace EducNotes.API.Controllers {
     [HttpPost("EditUserToValidate")]
     public async Task<IActionResult> EditUserToValidate(EditUserToValidateDto userData)
     {
-      List<User> users = await _cache.GetUsers();
-      var user = users.First(u => u.Id == userData.Id);
+      // List<User> users = await _cache.GetUsers();
+      var user = await _context.Users.FirstAsync(u => u.Id == userData.Id);
       user.Email = userData.Email;
       user.PhoneNumber = userData.Cell;
       _context.Update(user);
       if(await _repo.SaveAll())
       {
-        await _cache.LoadUsers();
+        // await _cache.LoadUsers();
         return Ok();
       }
       else
@@ -2109,14 +2115,15 @@ namespace EducNotes.API.Controllers {
     [HttpPost("ResendConfirmEmail")]
     public async Task<IActionResult> ResendConfirmEmail(List<SendConfirmEmailDto> usersData)
     {
-      List<Setting> settings = await _cache.GetSettings();
-      List<Order> orders = await _cache.GetOrders();
-      List<ProductDeadLine> productdeadlines = await _cache.GetProductDeadLines();
-      List<EmailTemplate> emailTemplates= await _cache.GetEmailTemplates();
-      List<User> users = await _cache.GetUsers();
+      // List<Setting> settings = await _cache.GetSettings();
+      // List<Order> orders = await _cache.GetOrders();
+      // List<ProductDeadLine> productdeadlines = await _cache.GetProductDeadLines();
+      List<EmailTemplate> emailTemplates= await _context.EmailTemplates.ToListAsync();
+      // List<User> users = await _cache.GetUsers();
 
       List<RegistrationEmailDto> emails = new List<RegistrationEmailDto>();
 
+      List<Setting> settings = await _context.Settings.ToListAsync();
       var schoolName = settings.First(s => s.Name == "SchoolName").Value;
       string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
 
@@ -2128,12 +2135,12 @@ namespace EducNotes.API.Controllers {
         {
           foreach(var userid in data.UserIds)
           {
-            var order = orders.First(o => o.isReg &&(o.MotherId == userid || o.FatherId == userid));
+            var order = await _context.Orders.FirstAsync(o => o.isReg &&(o.MotherId == userid || o.FatherId == userid));
             var reg = await _repo.GetOrder(order.Id);
             var user = reg.Mother != null ? reg.Mother : reg.Father;
 
-            var firstDeadline = productdeadlines.OrderBy(o => o.DueDate)
-                                                .First(p => p.ProductId == tuitionId);
+            var firstDeadline = await _context.ProductDeadLines.OrderBy(o => o.DueDate)
+                                                .FirstAsync(p => p.ProductId == tuitionId);
             var firstDeadlineDate = firstDeadline.DueDate;
             decimal DPPct = firstDeadline.Percentage;
 
@@ -2181,8 +2188,9 @@ namespace EducNotes.API.Controllers {
         if(userType == teacherTypeId)
         {
           // send the mail to update userName/pwd - add to Email table
-          foreach(var userid in data.UserIds) {
-            var appUser = users.FirstOrDefault(u => u.Id == userid);
+          foreach(var userid in data.UserIds)
+          {
+            var appUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userid);
             var teacherCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
 
             ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {

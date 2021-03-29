@@ -96,9 +96,9 @@ namespace EducNotes.API.Controllers
     [HttpGet("tuitionFromChild/{id}")]
     public async Task<IActionResult> GetTuitionFromChild(int id)
     {
-      List<Order> orders = await _cache.GetOrders();
-      List<OrderLineDeadline> lineDeadlines = await _cache.GetOrderLineDeadLines();
-      List<User> students = await _cache.GetStudents();
+      // List<Order> orders = await _cache.GetOrders();
+      // List<OrderLineDeadline> lineDeadlines = await _cache.GetOrderLineDeadLines();
+      // List<User> students = await _cache.GetStudents();
 
       var parents = await _repo.GetParents(id);
       int fatherId = 0;
@@ -109,7 +109,7 @@ namespace EducNotes.API.Controllers
       var mother = parents.FirstOrDefault(p => p.Gender == 0);
       if (mother != null)
         motherId = mother.Id;
-      var order = orders.FirstOrDefault(t => t.isReg && (t.MotherId == motherId || t.FatherId == fatherId));
+      var order = await _context.Orders.FirstOrDefaultAsync(t => t.isReg && (t.MotherId == motherId || t.FatherId == fatherId));
       var tuition = _mapper.Map<OrderDto>(order);
 
       var lines = await _repo.GetOrderLines(tuition.Id);
@@ -138,12 +138,12 @@ namespace EducNotes.API.Controllers
                                 .Where(p => p.FinOpTypeId == finOpTypePayment && p.Cashed == false && p.Rejected == false)
                                 .Sum(s => s.Amount);
       tuition.strAmountToValidate = tuition.AmountToValidate.ToString("N0") + " F";
-      var lineDeadline = lineDeadlines
+      var lineDeadline = await _context.OrderLineDeadlines
                               .Where(l => l.OrderLine.ChildId == id)
                               .OrderBy(o => o.DueDate)
-                              .First();
+                              .FirstAsync();
       tuition.DownPayment = lineDeadline.Amount + lineDeadline.ProductFee;
-      tuition.Validated = (students.Where(u => u.Id == id).First()).Validated;
+      tuition.Validated = (await _context.Users.Where(u => u.Id == id).FirstAsync()).Validated;
 
       return Ok(tuition);
     }
@@ -171,20 +171,20 @@ namespace EducNotes.API.Controllers
     [HttpGet("balanceData")]
     public async Task<IActionResult> GetBalanceData()
     {
-      List<Order> orders = await _cache.GetOrders();
-      List<FinOp> finOps = await _cache.GetFinOps();
+      // List<Order> orders = await _cache.GetOrders();
+      // List<FinOp> finOps = await _cache.GetFinOps();
       var today = DateTime.Now.Date;
 
       // invoiced amount
-      var invoiced = orders.Sum(s => s.AmountTTC);
+      var invoiced = await _context.Orders.SumAsync(s => s.AmountTTC);
       // cashed amount
-      var cashed = finOps
+      var cashed = await _context.FinOps
                     .Where(o => o.Cashed == true && o.FinOpTypeId == finOpTypePayment)
-                    .Sum(s => s.Amount);
+                    .SumAsync(s => s.Amount);
       // in validation amount
-      var toBeValidated = finOps
+      var toBeValidated = await _context.FinOps
                           .Where(o => o.Cashed == false && o.Rejected == false && o.FinOpTypeId == finOpTypePayment)
-                          .Sum(s => s.Amount);
+                          .SumAsync(s => s.Amount);
       // outstanding balance
       var openBalance = await _context.OrderLineHistories.Where(f => f.Cashed == true).SumAsync(b => b.Delta);
 
@@ -208,19 +208,20 @@ namespace EducNotes.API.Controllers
       {
         try
         {
-          List<ProductDeadLine> ProdDeadLines = await _cache.GetProductDeadLines();
-          List<Setting> settings = await _cache.GetSettings();
-          List<ClassLevel> classlevels = await _cache.GetClassLevels();
-          List<ClassLevelProduct> levelProducts = await _cache.GetClassLevelProducts();
-          List<Role> roles = await _cache.GetRoles();
-          List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
+          // List<ProductDeadLine> ProdDeadLines = await _cache.GetProductDeadLines();
+          // List<Setting> settings = await _cache.GetSettings();
+          // List<ClassLevel> classlevels = await _cache.GetClassLevels();
+          // List<ClassLevelProduct> levelProducts = await _cache.GetClassLevelProducts();
+          List<Role> roles = await _context.Roles.ToListAsync();
+          // List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
 
+          List<Setting> settings = await _context.Settings.ToListAsync();
           var schoolName = settings.First(s => s.Name.ToLower() == "schoolname").Value;
           string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
 
-          var deadlines = ProdDeadLines
+          var deadlines = await _context.ProductDeadLines
                                 .OrderBy(o => o.DueDate)
-                                .Where(p => p.ProductId == tuitionId).ToList();
+                                .Where(p => p.ProductId == tuitionId).ToListAsync();
           var firstDeadline = deadlines.First();
           var firstDeadlineDate = firstDeadline.DueDate.Date;
 
@@ -277,8 +278,8 @@ namespace EducNotes.API.Controllers
             _repo.Update(user);
             ChildList.Add(user);
 
-            var nextClassLevel = classlevels.First(c => c.Id == child.ClassLevelId);
-            var classProduct = levelProducts.First(c => c.ClassLevelId == nextClassLevel.Id && c.ProductId == tuitionId);
+            var nextClassLevel = await _context.ClassLevels.FirstAsync(c => c.Id == child.ClassLevelId);
+            var classProduct = await _context.ClassLevelProducts.FirstAsync(c => c.ClassLevelId == nextClassLevel.Id && c.ProductId == tuitionId);
             decimal tuitionFee = Convert.ToDecimal(classProduct.Price);
             decimal DPPct = firstDeadline.Percentage;
             decimal DownPayment = DPPct * tuitionFee;
@@ -358,7 +359,7 @@ namespace EducNotes.API.Controllers
             children.Add(crd);
           }
 
-          var template = emailTemplates.First(t => t.Id == newRegToBePaidEmailId);
+          var template = await _context.EmailTemplates.FirstAsync(t => t.Id == newRegToBePaidEmailId);
 
           //father
           if (newTuition.FEmail != "")
@@ -484,11 +485,11 @@ namespace EducNotes.API.Controllers
 
           if (await _repo.SaveAll())
           {
-            await _cache.LoadOrders();
-            await _cache.LoadOrderLines();
-            await _cache.LoadOrderLineDeadLines();
-            await _cache.LoadUsers();
-            await _cache.LoadUserLinks();
+            // await _cache.LoadOrders();
+            // await _cache.LoadOrderLines();
+            // await _cache.LoadOrderLineDeadLines();
+            // await _cache.LoadUsers();
+            // await _cache.LoadUserLinks();
             identityContextTransaction.Commit();
             return Ok(new {
               orderId = order.Id,
@@ -509,16 +510,17 @@ namespace EducNotes.API.Controllers
     [HttpGet("TuitionFigures")]
     public async Task<IActionResult> GetTuitionFigures()
     {
-      List<Order> orders = await _cache.GetOrders();
-      List<OrderLine> lines = await _cache.GetOrderLines();
-      List<Class> classes = await _cache.GetClasses();
+      // List<Order> orders = await _cache.GetOrders();
+      // List<OrderLine> lines = await _cache.GetOrderLines();
+      // List<Class> classes = await _cache.GetClasses();
 
-      var tuitionIds = orders.Where(t => t.OrderTypeId == tuitionTypeId).Select(s => s.Id).ToList();
-      var tuitions = lines.Where(t => tuitionIds.Contains(t.OrderId)).ToList();
+      List<Order> orders = await _context.Orders.Where(t => t.OrderTypeId == tuitionTypeId).ToListAsync();
+      var tuitionIds = orders.Select(s => s.Id).ToList();
+      var tuitions = await _context.OrderLines.Where(t => tuitionIds.Contains(t.OrderId)).ToListAsync();
       var totalTuitions = tuitions.Count();
       var tuitionsNotValidated = tuitions.Where(t => t.Validated == false).Count();
       var tuitionsValidated = tuitions.Where(t => t.Validated == true).Count();
-      var classSpaces = classes.Sum(c => c.MaxStudent);
+      var classSpaces = await _context.Classes.SumAsync(c => c.MaxStudent);
 
       return Ok(new
       {
@@ -532,15 +534,15 @@ namespace EducNotes.API.Controllers
     [HttpGet("TuitionList")]
     public async Task<IActionResult> GetTuitionList()
     {
-      List<Class> classes = await _cache.GetClasses();
-      List<OrderLine> lines = await _cache.GetOrderLines();
-      List<FinOpOrderLine> finOpLinesCached = await _cache.GetFinOpOrderLines();
+      // List<Class> classes = await _cache.GetClasses();
+      // List<OrderLine> lines = await _cache.GetOrderLines();
+      // List<FinOpOrderLine> finOpLinesCached = await _cache.GetFinOpOrderLines();
 
-      var classlevels = classes.OrderBy(o => o.ClassLevel.DsplSeq)
-                               .Select(c => c.ClassLevel).Distinct().ToList();
+      var classlevels = await _context.Classes.OrderBy(o => o.ClassLevel.DsplSeq)
+                               .Select(c => c.ClassLevel).Distinct().ToListAsync();
       List<TuitionListDto> tuitionList = new List<TuitionListDto>();
-      var orderlines = lines.Where(o => o.Order.isReg == true).ToList();
-      var finOpLines = finOpLinesCached.Where(f => f.FinOp.Cashed).ToList();
+      var orderlines = await _context.OrderLines.Where(o => o.Order.isReg == true).ToListAsync();
+      var finOpLines = await _context.FinOpOrderLines.Where(f => f.FinOp.Cashed).ToListAsync();
       decimal totalInvoiced = orderlines.Sum(s => s.AmountTTC);
       decimal totalPaid = finOpLines.Sum(s => s.Amount);
       decimal totalTuitions = orderlines.Count();
@@ -571,11 +573,12 @@ namespace EducNotes.API.Controllers
     [HttpGet("AmountByDeadline")]
     public async Task<IActionResult> GetOrderAmountWithDeadlines()
     {
-      List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
+      // List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
 
       var balanceLinesPaid = await _repo.GetOrderLinesPaid();
       var today = DateTime.Now.Date;
-      var duedates = lineDeadlinesCached.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
+      List<OrderLineDeadline> lineDeadLines = await _context.OrderLineDeadlines.ToListAsync();
+      var duedates = lineDeadLines.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
       List<AmountWithDeadlinesDto> amountDeadlines = new List<AmountWithDeadlinesDto>();
       int i = 0;
       var olddate = new DateTime();
@@ -584,11 +587,11 @@ namespace EducNotes.API.Controllers
         var linedeadlines = new List<OrderLineDeadline>();
         if (i == 0)
         {
-          linedeadlines = lineDeadlinesCached.Where(o => o.DueDate <= duedate).ToList();
+          linedeadlines = lineDeadLines.Where(o => o.DueDate <= duedate).ToList();
         }
         else
         {
-          linedeadlines = lineDeadlinesCached.OrderBy(o => o.DueDate)
+          linedeadlines = lineDeadLines.OrderBy(o => o.DueDate)
                                              .Where(o => o.DueDate > olddate && o.DueDate <= duedate).ToList();
         }
 
@@ -670,12 +673,12 @@ namespace EducNotes.API.Controllers
     [HttpGet("ChildLatePayments")]
     public async Task<IActionResult> GetChildrenRecoveryData()
     {
-      List<User> students = await _cache.GetStudents();
+      // List<User> students = await _cache.GetStudents();
 
       var today = DateTime.Now.Date;
-      var childrenFromDB = students.Where(o => o.UserTypeId == studentTypeId)
+      var childrenFromDB = await _context.Users.Where(o => o.UserTypeId == studentTypeId)
                                    .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
-                                   .ToList();
+                                   .ToListAsync();
       var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(childrenFromDB);
       List<RecoveryForChildDto> childRecovery = new List<RecoveryForChildDto>();
       foreach (var child in children)
@@ -712,12 +715,12 @@ namespace EducNotes.API.Controllers
     [HttpGet("ChildLatePaymentByLevel/{levelid}")]
     public async Task<IActionResult> GetChildLatePaymentByLevel(int levelid)
     {
-      List<User> students = await _cache.GetStudents();
+      // List<User> students = await _cache.GetStudents();
       var today = DateTime.Now.Date;
 
-      var childrenFromDB = students.Where(o => o.ClassLevelId == levelid && o.UserTypeId == studentTypeId)
+      var childrenFromDB = await _context.Users.Where(o => o.ClassLevelId == levelid && o.UserTypeId == studentTypeId)
                                    .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
-                                   .ToList();
+                                   .ToListAsync();
       var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(childrenFromDB);
       List<RecoveryForChildDto> childRecovery = new List<RecoveryForChildDto>();
       foreach (var child in children)

@@ -113,11 +113,11 @@ namespace EducNotes.API.Controllers {
     [HttpGet("PhoneCode/{userId}/{num}")]
     public async Task<IActionResult> GetPhoneValidationCode(int userId, string num)
     {
-      List<User> users = await _cache.GetUsers();
-      List<SmsTemplate> smsTemplates = await _cache.GetSmsTemplates();
+      // List<User> users = await _cache.GetUsers();
+      // List<SmsTemplate> smsTemplates = await _cache.GetSmsTemplates();
 
       bool codeSent = false;
-      var user = users.First(u => u.Id == userId);
+      var user = await _context.Users.FirstAsync(u => u.Id == userId);
       user.PhoneNumber = num;
       var token = await _userManager.GenerateChangePhoneNumberTokenAsync(user, num);
       Sms sms = new Sms();
@@ -125,7 +125,7 @@ namespace EducNotes.API.Controllers {
       sms.ToUserId = user.Id;
       sms.SmsTypeId = _config.GetValue<int>("AppSettings:SmsValidationTypeId");
       var smsTemplateId = _config.GetValue<int>("AppSettings:PhoneEditCodeSms");
-      var smsTemplate = smsTemplates.First(t => t.Id == smsTemplateId);
+      var smsTemplate = await _context.SmsTemplates.FirstAsync(t => t.Id == smsTemplateId);
       sms.Content = string.Format(smsTemplate.Content, token);
       sms.InsertUserId = _config.GetValue<int>("AppSettings:Admin");
       sms.InsertDate = DateTime.Now;
@@ -158,14 +158,14 @@ namespace EducNotes.API.Controllers {
         phoneNumOk = true;
       }
 
-      await _cache.LoadUsers();
+      // await _cache.LoadUsers();
       return Ok(phoneNumOk);
     }
 
     [HttpPost("EditEmail")]
     public async Task<IActionResult> EditEmail(ConfirmTokenDto confirmTokenDto)
     {
-      int userId = Convert.ToInt32 (confirmTokenDto.UserId);
+      int userId = Convert.ToInt32(confirmTokenDto.UserId);
       string token = confirmTokenDto.Token;
       string email = confirmTokenDto.Email;
 
@@ -180,7 +180,7 @@ namespace EducNotes.API.Controllers {
         emailOk = true;
       }
 
-      await _cache.LoadUsers();
+      // await _cache.LoadUsers();
       return Ok(emailOk);
     }
 
@@ -205,7 +205,7 @@ namespace EducNotes.API.Controllers {
         pwdOk = true;
       }
 
-      await _cache.LoadUsers();
+      // await _cache.LoadUsers();
       return Ok(pwdOk);
     }
 
@@ -227,7 +227,7 @@ namespace EducNotes.API.Controllers {
 
       if(phoneNumValidated && await _repo.SaveAll())
       {
-        await _cache.LoadUsers();
+        // await _cache.LoadUsers();
       }
 
       return Ok(new {
@@ -309,7 +309,7 @@ namespace EducNotes.API.Controllers {
         }
       }
 
-      await _cache.LoadUsers();
+      // await _cache.LoadUsers();
       return Ok(new {
         emailOK = success,
         accountValidated = validated,

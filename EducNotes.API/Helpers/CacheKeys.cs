@@ -1,35 +1,72 @@
-namespace EducNotes.API.Helpers
-{
-  public class CacheKeys
-  {
-    public static string Users { get { return "_Users"; } }
-    public static string TeacherCourses { get { return "_TeacherCourses"; } }
-    public static string ClassCourses { get { return "_ClassCourses"; } }
-    public static string ClassLevels { get { return "_ClassLevels"; } }
-    public static string ClassLevelProducts { get { return "_ClassLevelProducts"; } }
-    public static string Classes { get { return "_Classes"; } }
-    public static string EducLevels { get { return "_EducLevels"; } }
-    public static string Schools { get { return "_Schools"; } }
-    public static string Cycles { get { return "_Cycles"; } }
-    public static string Courses { get { return "_Courses"; } }
-    public static string ClassTypes { get { return "_ClassTypes"; } }
-    public static string CLClassTypes { get { return "_CLClassTypes"; } }
-    public static string EmailTemplates { get { return "_EmailTemplates"; } }
-    public static string SmsTemplates { get { return "_SmsTemplates"; } }
-    public static string Settings { get { return "_Settings"; } }
-    public static string Tokens { get { return "_Tokens"; } }
-    public static string ProductDeadLines { get { return "_ProductDeadLines"; } }
-    public static string Roles { get { return "_Roles"; } }
-    public static string Orders { get { return "_Orders"; } }
-    public static string OrderLines { get { return "_OrderLines"; } }
-    public static string OrderLineDeadLines { get { return "_OrderLineDeadLines"; } }
-    public static string UserLinks { get { return "_UserLinks"; } }
-    public static string FinOps { get { return "_FinOps"; } }
-    public static string FinOpOrderLines { get { return "_FinOpOrderLines"; } }
-    public static string Cheques { get { return "_Cheques"; } }
-    public static string Banks { get { return "_Banks"; } }
-    public static string PaymentTypes { get { return "_PaymentTyes"; } }
-    public static string Products { get { return "_Products"; } }
-    public static string UserTypes { get { return "_UserTypes"; } }
+using System.Linq;
+using EducNotes.API.Data;
+
+namespace EducNotes.API.Helpers {
+  public class CacheKeys {
+
+    public CacheKeys(DataContext context)
+    {
+      string subDomain = context.Settings.FirstOrDefault(s => s.Name.ToLower () == "subdomain").Value;
+      Users = subDomain + "Users";
+      TeacherCourses = subDomain + "TeacherCourses";
+      ClassCourses = subDomain + "ClassCourses";
+      ClassLevels = subDomain + "ClassLevels";
+      ClassLevelProducts = subDomain + "ClassLevelProducts";
+      Classes = subDomain + "Classes";
+      EducLevels = subDomain + "EducLevels";
+      Schools = subDomain + "Schools";
+      Cycles = subDomain + "Cycles";
+      Courses = subDomain + "Courses";
+      ClassTypes = subDomain + "ClassTypes";
+      CLClassTypes = subDomain + "CLClassTypes";
+      EmailTemplates = subDomain + "EmailTemplates";
+      SmsTemplates = subDomain + "SmsTemplates";
+      Settings = subDomain + "Settings";
+      Tokens = subDomain + "Tokens";
+      ProductDeadLines = subDomain + "ProductDeadLines";
+      Roles = subDomain + "Roles";
+      Orders = subDomain + "Orders";
+      OrderLines = subDomain + "OrderLines";
+      OrderLineDeadLines = subDomain + "OrderLineDeadLines";
+      UserLinks = subDomain + "UserLinks";
+      FinOps = subDomain + "FinOps";
+      FinOpOrderLines = subDomain + "FinOpOrderLines";
+      Cheques = subDomain + "Cheques";
+      Banks = subDomain + "Banks";
+      PaymentTypes = subDomain + "PaymentTypes";
+      Products = subDomain + "Products";
+      UserTypes = subDomain + "UserTypes";
+    }
+
+
+    public  string Users { get; set; }
+    public  string TeacherCourses { get; set; }
+    public  string ClassCourses { get; set; }
+    public  string ClassLevels { get; set; }
+    public  string ClassLevelProducts { get; set; }
+    public  string Classes { get; set; }
+    public  string EducLevels { get; set; }
+    public  string Schools { get; set; }
+    public  string Cycles { get; set; }
+    public  string Courses { get; set; }
+    public  string ClassTypes { get; set; }
+    public  string CLClassTypes { get; set; }
+    public  string EmailTemplates { get; set; }
+    public  string SmsTemplates { get; set; }
+    public  string Settings { get; set; }
+    public  string Tokens { get; set; }
+    public  string ProductDeadLines { get; set; }
+    public  string Roles { get; set; }
+    public  string Orders { get; set; }
+    public  string OrderLines { get; set; }
+    public  string OrderLineDeadLines { get; set; }
+    public  string UserLinks { get; set; }
+    public  string FinOps { get; set; }
+    public  string FinOpOrderLines { get; set; }
+    public  string Cheques  { get; set; }
+    public  string Banks  { get; set; }
+     public  string PaymentTypes  { get; set; }
+    public  string Products { get; set; }
+    public  string UserTypes { get; set; }
   }
 }

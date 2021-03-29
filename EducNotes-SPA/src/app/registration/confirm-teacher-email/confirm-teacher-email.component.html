@@ -1,4 +1,37 @@
-<div *ngIf="!user">
+<div *ngIf="wait" class="spinning-preloader-container">
+  <div class="preloader-wrapper big active">
+    <div class="spinner-layer spinner-blue">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-red">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-yellow">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-green">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="!wait">
+  <div *ngIf="!user">
   <div class="text-20 mt-2">CONFIRMATION DU MOBILE ET DU EMAIL</div>
   <div class="text-center p-4">
     <i class="fad fa-exclamation-triangle fa-6x" style="--fa-secondary-opacity: 1;
@@ -8,12 +41,13 @@
     <div>Bonjour,</div>
     <div>Le lien de validation est incorrect. Pour valider votre email et votre compte vous devez clicker sur le lien reçu dans le email que nous vous avons envoyé. merci</div>
     <div class="my-3">Pour des informations complémentaires vous pouvez nous contacter au :</div>
-    <div class="mb-3 pl-3"> téléphone :<b>12.34.56.78</b></div>
-    <div class="mb-3 pl-3"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
+    <div class="mb-3 pl-3"> téléphone :<b>07.87.87.87.07</b></div>
+    <!-- <div class="mb-3 pl-3"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div> -->
+    <div class="mb-3 pl-3"> email :<b>support@educnotes.com</b></div>
   </div>
-</div>
+  </div>
 
-<div class="text-20" *ngIf="user && !emailOK">
+  <div class="text-20" *ngIf="user && !emailOK">
   <div class="text-20 text-center mt-2">CONFIRMATION DU MOBILE ET DU EMAIL</div>
   <div *ngIf="user">Bonjour
     <span  *ngIf="user.gender == 0">Mme</span>
@@ -38,11 +72,11 @@
       mdbWavesEffect>envoyer à nouveau le email de confirmation</button>
   </div>
   <div class="text-16">Si le problème persiste veuillez nous contacter au :</div>
-  <div class="text-16 my-3 pl-3"> téléphone :<b>12.34.56.78</b></div>
-  <div class="text-16 mb-3 pl-3"> email :<a [routerLink]="['/contactus']"><b>sav@educnotes.com</b></a></div>
-</div>
+  <div class="text-16 my-3 pl-3"> téléphone :<b>07.87.87.87.07</b></div>
+  <div class="text-16 mb-3 pl-3"> email :<b>support@educnotes.com</b></div>
+  </div>
 
-<div class="row" *ngIf="emailOK">
+  <div class="row" *ngIf="emailOK">
   <div class="col-md-12 text-16 mb-2">Bonjour
     <span  *ngIf="user.gender == 0">Mme</span>
     <span  *ngIf="user.gender == 1">Mr</span>
@@ -188,5 +222,6 @@
   </div>
   <div *ngIf="teacherOk" class="mt-4 mx-auto">
     <button type="button" mdbBtn [routerLink]="['/signIn']"  class="btnBlue" mdbWavesEffect>connecter vous à votre compte</button>
+  </div>
   </div>
 </div>

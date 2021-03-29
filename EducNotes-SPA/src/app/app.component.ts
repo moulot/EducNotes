@@ -24,17 +24,18 @@ export class AppComponent implements OnInit {
 
   constructor(private mdbSpinningPreloader: MDBSpinningPreloader, private authService: AuthService,
     private router: Router, private alertify: AlertifyService) {
-    this.setTimeout();
-    this.userInactive.subscribe(() => {
-        if (this.authService.loggedIn()) {
-          // this.authService.redirectUrl = state.url;
-          this.authService.redirectUrl = this.router.url;
-          localStorage.setItem('url', this.authService.redirectUrl);
-          alert('votre session a expiré');
-          this.authService.logout();
-        }
-      }
-    );
+    // this.setTimeout();
+    // this.userInactive.subscribe(() => {
+    //     if (this.authService.loggedIn()) {
+    //       // this.authService.redirectUrl = state.url;
+    //       this.authService.redirectUrl = this.router.url;
+    //       localStorage.setItem('url', this.authService.redirectUrl);
+    //       alert('votre session a expiré');
+    //       this.authService.logout();
+    //     }
+    //   }
+    // );
+
     this.router.events.subscribe((event) => {
       switch (true) {
         case event instanceof NavigationStart:
@@ -47,24 +48,23 @@ export class AppComponent implements OnInit {
           break;
         default:
           break;
-
       }
     });
   }
 
-  setTimeout() {
-    this.userActivity = setTimeout(() => this.userInactive.next(undefined), 900000); // soit 15 minutes d'inactivité
-  }
+  // setTimeout() {
+  //   this.userActivity = setTimeout(() => this.userInactive.next(undefined), 900000); // soit 15 minutes d'inactivité
+  // }
 
-  @HostListener('window:mousemove') refreshUserStateMouse() {
-    clearTimeout(this.userActivity);
-    this.setTimeout();
-  }
+  // @HostListener('window:mousemove') refreshUserStateMouse() {
+  //   clearTimeout(this.userActivity);
+  //   this.setTimeout();
+  // }
 
-  @HostListener('window:keypress') refreshUserStateKey() {
-    clearTimeout(this.userActivity);
-    this.setTimeout();
-  }
+  // @HostListener('window:keypress') refreshUserStateKey() {
+  //   clearTimeout(this.userActivity);
+  //   this.setTimeout();
+  // }
 
   ngOnInit() {
     // // setup the client connection string
@@ -90,7 +90,7 @@ export class AppComponent implements OnInit {
       this.authService.changeUserPhoto(user.photoUrl);
       this.authService.changeCurrentClassId(Number(currentClassId));
     }
-    this.setTimeout();
+    // this.setTimeout();
     this.mdbSpinningPreloader.stop();
   }
 

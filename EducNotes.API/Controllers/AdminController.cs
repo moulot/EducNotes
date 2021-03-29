@@ -316,8 +316,8 @@ namespace EducNotes.API.Controllers {
     [HttpGet("GetClassLevels")]
     public async Task<IActionResult> GetClassLevels()
     {
-      List<Class> classesCached = await _cache.GetClasses();
-      List<User> studentsCached = await _cache.GetStudents();
+      // List<Class> classesCached = await _cache.GetClasses();
+      // List<User> studentsCached = await _cache.GetStudents();
       List<ClassLevel> classlevels = await _cache.GetClassLevels();
 
       var levels = classlevels.ToList();
@@ -330,10 +330,10 @@ namespace EducNotes.API.Controllers {
         res.TotalEnrolled = item.Inscriptions.Count();
         res.TotalStudents = 0;
         res.Classes = new List<ClassDetailDto>();
-        List<Class> classes = classesCached.Where(c => c.ClassLevelId == item.Id).ToList();
+        List<Class> classes = await _context.Classes.Where(c => c.ClassLevelId == item.Id).ToListAsync();
         foreach (var aclass in classes)
         {
-          var students = studentsCached.Where(s => s.UserTypeId == studentTypeId && s.ClassId == aclass.Id);
+          var students = await _context.Users.Where(s => s.UserTypeId == studentTypeId && s.ClassId == aclass.Id).ToListAsync();
           var nbStudents = students.Count();
           res.TotalStudents += nbStudents;
           //add class data
@@ -640,30 +640,34 @@ namespace EducNotes.API.Controllers {
           }
         }
 
-        if (ut == teacherTypeId) {
-          List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
-          var teachers = classCoursesCached
+        if(ut == teacherTypeId)
+        {
+          List<ClassCourse> classCourses = await _context.ClassCourses.ToListAsync();
+          var teachers = classCourses
             .Where(t => classIds.Contains (t.ClassId) && t.Teacher.AccountDataValidated == true &&
               t.Teacher.UserTypeId == teacherTypeId && t.Teacher.EmailConfirmed == true)
             .Select(t => t.Teacher).Distinct().ToList();
 
-          foreach (var user in teachers) {
-            if (user.AccountDataValidated && user.EmailConfirmed)
+          foreach (var user in teachers)
+          {
+            if(user.AccountDataValidated && user.EmailConfirmed)
               recipientEmails.Add (user.Email);
           }
         }
       }
 
-      List<Setting> settings = await _context.Settings.ToListAsync ();
-      var schoolName = settings.First (s => s.Name.ToLower () == "schoolname");
+      List<Setting> settings = await _context.Settings.ToListAsync();
+      var schoolName = settings.First(s => s.Name.ToLower () == "schoolname");
 
       //did we select a template?
-      if (templateId != 0) {
+      if (templateId != 0)
+      {
         var template = await _context.EmailTemplates.FirstAsync (t => t.Id == templateId);
         subject = dataForEmailDto.Subject;
-
-        return NoContent ();
-      } else {
+        return NoContent();
+      }
+      else
+      {
         body = dataForEmailDto.Body;
         subject = dataForEmailDto.Subject;
 
@@ -694,10 +698,11 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("EmailBroadCastData")]
-    public async Task<IActionResult> GetEmailBroadCastData () {
-      var schools = await _repo.GetSchools ();
-      var cycles = await _repo.GetCycles ();
-      var educLevels = await _repo.GetEducationLevelsWithClasses ();
+    public async Task<IActionResult> GetEmailBroadCastData()
+    {
+      var schools = await _repo.GetSchools();
+      var cycles = await _repo.GetCycles();
+      var educLevels = await _repo.GetEducationLevelsWithClasses();
       return Ok (new {
         schools,
         cycles,
@@ -885,7 +890,7 @@ namespace EducNotes.API.Controllers {
     [HttpGet ("UsersRecap")]
     public async Task<IActionResult> UsersRecap()
     {
-      List<UserType> userTypes = await _cache.GetUserTypes();
+      List<UserType> userTypes = await _context.UserTypes.ToListAsync();
 
       var dataToReturn = new List<UsersRecapDto>();
       foreach(var item in userTypes)
@@ -966,7 +971,7 @@ namespace EducNotes.API.Controllers {
     public async Task<IActionResult> GetTeacher (int teacherId)
     {
       //recuperation du professeur professeurs ainsi que tous ses cours
-      User teacher = (await _cache.GetUsers()).FirstOrDefault(u => u.Id == teacherId);
+      User teacher = await _context.Users.FirstOrDefaultAsync(u => u.Id == teacherId);
       if (teacher != null) {
         var tdetails = new TeacherForListDto ();
         tdetails.PhoneNumber = teacher.PhoneNumber;
@@ -977,154 +982,41 @@ namespace EducNotes.API.Controllers {
         tdetails.FirstName = teacher.FirstName;
         tdetails.DateOfBirth = teacher.DateOfBirth.ToString ("dd/MM/yyyy", frC);
 
-        tdetails.Courses = (await _cache.GetTeacherCourses())
-          .Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToList();
+        tdetails.Courses = await _context.TeacherCourses
+          .Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToListAsync();
         
-        tdetails.classIds = (await _cache.GetClassCourses()).Where(t => t.TeacherId == teacherId)
-          .Select(t => t.ClassId).Distinct().ToList();
+        tdetails.classIds = await _context.ClassCourses.Where(t => t.TeacherId == teacherId)
+          .Select(t => t.ClassId).Distinct().ToListAsync();
         
         return Ok(tdetails);
       }
       return BadRequest ("impossible de trouver l'utilisateur");
     }
 
-    // [HttpPost("ImportedUsers/{insertUserId}")]
-    // public async Task<IActionResult> Importedteachers(int insertUserId, List<ImportUserDto> importedUsers)
-    // {
-    //     if (importedUsers[0].UserTypeId == teacherTypeId)
-    //     {
-    //         var TeacherRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
-    //         foreach (var importUser in importedUsers)
-    //         {
-    //             string code = Guid.NewGuid().ToString();
-    //             var teacher = _mapper.Map<User>(importUser);
-    //             teacher.UserName = code;
-    //             //teacher.ValidationCode = code;
-    //             // enregistrement du professeur
-    //             int userId = await _repo.AddSelfRegister(teacher, TeacherRole.Name, true, insertUserId);
-    //         }
-    //         return NoContent();
-    //     }
-
-    //     if (importedUsers[0].UserTypeId == parentTypeId)
-    //     {
-    //         var ParentRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == parentTypeId);
-    //         foreach (var importUser in importedUsers)
-    //         {
-    //             string code = Guid.NewGuid().ToString();
-    //             var parent = _mapper.Map<User>(importUser);
-    //             parent.UserName = code;
-    //             // parent.ValidationCode = code;
-
-    //             int parentId = await _repo.AddSelfRegister(parent, ParentRole.Name, true, insertUserId);
-
-    //             if (parentId > 0)
-    //             {
-    //                 for (int i = 0; i < importUser.MaxChild; i++)
-    //                 {
-    //                     var MemberRole = await _context.Roles.FirstOrDefaultAsync(a => a.Id == memberRoleId);
-    //                     code = Guid.NewGuid().ToString();
-    //                     var child = new User
-    //                     {
-    //                         // ValidationCode = code,
-    //                         UserName = code,
-    //                         UserTypeId = studentTypeId
-    //                     };
-    //                     int childId = await _repo.AddSelfRegister(child, MemberRole.Name, false, insertUserId);
-    //                     if (childId > 0)
-    //                     {
-    //                         var userLink = new UserLink
-    //                         {
-    //                             UserPId = parentId,
-    //                             UserId = childId
-    //                         };
-    //                         _repo.Add(userLink);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         if (await _repo.SaveAll())
-    //             return NoContent();
-    //     }
-
-    //     return BadRequest();
-    // }
-
-    [HttpGet ("Settings")]
-    public async Task<IActionResult> GetSettings () {
-      var settings = await _repo.GetSettings ();
-      return Ok (settings);
+    [HttpGet("Settings")]
+    public async Task<IActionResult> GetSettings()
+    {
+      var settings = await _repo.GetSettings();
+      return Ok(settings);
     }
 
     [HttpPost("UpdateSettings")]
     public async Task<IActionResult> UpdateSettings(List<Setting> settings)
     {
-      _context.UpdateRange(settings);
+      foreach(var item in settings)
+      {
+        if(item.Name.ToLower() == "subdomain") { continue; }
+        _context.Settings.Update(item);
+      }
+
       if(await _repo.SaveAll())
       {
-        await _cache.LoadSettings();
+        // await _cache.LoadSettings();
         return Ok();
       }
 
       return BadRequest("problème pour metre à jour les paramètres");
     }
-
-    // [HttpGet("GetToken")]
-    // public List<string> GetOrangeAccessToken()
-    // {
-    //   ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-    //   var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.orange.com/oauth/v2/token");
-    //   httpWebRequest.ContentType = "application/json";
-    //   httpWebRequest.Method = "POST";
-    //   httpWebRequest.Accept = "application/json";
-    //   httpWebRequest.PreAuthenticate = true;
-    //   httpWebRequest.Headers.Add("Authorization", "Basic YlppdEs0aHhKdjl0Q2tkc1p1ZHVMVFdkU3E3anJUN0E6OUFtUWVRd0hOQ0cyNFVQQQ==");
-
-    //   using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-    //   {
-    //     streamWriter.Write("");
-    //     streamWriter.Flush();
-    //     streamWriter.Close();
-    //   }
-
-    //   List<string> result = new List<string>();
-    //   var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-    //   using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-    //   {
-    //     result.Add(streamReader.ReadToEnd());
-    //   }
-
-    //   return result;
-    // }
-
-    // [HttpGet("TestJson")]
-    // public void GetTest()
-    // {
-    //   SmsDataRequest data = new SmsDataRequest();
-    //   data.outboundSMSMessageRequest = new OutboundSMSMessageRequest();
-    //   data.outboundSMSMessageRequest.Address = "tel+22507104446";
-    //   data.outboundSMSMessageRequest.SenderAddress = "tel+22507104446";
-    //   data.outboundSMSMessageRequest.outboundSMSTextMessage = new OutboundSMSTextMessage();
-    //   data.outboundSMSMessageRequest.outboundSMSTextMessage.Message = "hello!";
-    //   string JsonArray = JsonConvert.SerializeObject(data);
-    //   Dictionary<string, string> Params = new Dictionary<string, string>();
-    //   Params.Add("content", "hello!");
-    //   Params.Add("to", "07104446,22334455");
-    //   Params.Add("validityPeriod", "1");
-
-    //   Params["to"] = CreateRecipientList(Params["to"]);
-    //   string JsonArray1 = JsonConvert.SerializeObject(Params, Formatting.None);
-    //   JsonArray1 = JsonArray1.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
-    // }
-
-    // public static string CreateRecipientList(string to)
-    // {
-    //   string[] tmp = to.Split(new char[] { ',' });
-    //   to = "[\"";
-    //   to = to + string.Join("\",\"", tmp);
-    //   to = to + "\"]";
-    //   return to;
-    // }
 
   }
 

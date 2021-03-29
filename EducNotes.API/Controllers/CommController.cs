@@ -197,7 +197,7 @@ namespace EducNotes.API.Controllers
 
       if (await _repo.SaveAll())
       {
-        await _cache.LoadEmailTemplates();
+        // await _cache.LoadEmailTemplates();
         return Ok();
       }
 
@@ -242,7 +242,7 @@ namespace EducNotes.API.Controllers
 
       if (await _repo.SaveAll())
       {
-        await _cache.LoadSmsTemplates();
+        // await _cache.LoadSmsTemplates();
         return Ok();
       }
 

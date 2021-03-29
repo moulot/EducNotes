@@ -284,6 +284,7 @@ import { ConfigComponent } from './admin/config/config/config.component';
 import { ClassScheduleResolver } from './_resolvers/class-schedule-resolver';
 import { EditLevelClassesComponent } from './admin/class-management/edit-level-classes/edit-level-classes.component';
 import { ConfigProductsComponent } from './admin/config/config-products/config-products.component';
+import { RecoveryComponent } from './admin/treso/recovery/recovery.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -475,7 +476,8 @@ export function tokenGetter() {
       ClasslevelCoursesComponent,
       ConfigComponent,
       EditLevelClassesComponent,
-      ConfigProductsComponent
+      ConfigProductsComponent,
+      RecoveryComponent
    ],
    imports: [
       FormWizardModule,

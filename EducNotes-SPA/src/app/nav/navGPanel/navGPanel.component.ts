@@ -24,8 +24,7 @@ export class NavGPanelComponent implements OnInit {
   acc_name: string;
 
     // editer par mohamed
-  constructor(public authService: AuthService, private alertify: AlertifyService,
-    private router: Router) {
+  constructor(public authService: AuthService, private alertify: AlertifyService) {
       this.notifications = [
         {
           icon: 'i-Speach-Bubble-6',
@@ -75,7 +74,7 @@ export class NavGPanelComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.currentUser;
-    this.acc_name = this.user.firstName.toLowerCase() + ' ' + this.user.lastName.substring(0, 1).toLowerCase() + '.';
+    this.acc_name = this.user.lastName.toLowerCase() + ' ' + this.user.firstName.substring(0, 1).toLowerCase() + '.';
     this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
 }
 

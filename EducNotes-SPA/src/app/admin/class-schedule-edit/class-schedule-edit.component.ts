@@ -157,17 +157,20 @@ export class ClassScheduleEditComponent implements OnInit {
     const day1 = g.get('day1').value;
     const hourStart1 = g.get('hourStart1').value;
     const hourEnd1 = g.get('hourEnd1').value;
-    if (day1 !== null || hourStart1.length > 0 || hourEnd1.length > 0) {
-      const typedHS1 = hourStart1.replace('_', '');
-      const typedHE1 = hourEnd1.replace('_', '');
-      if (day1 !== null && typedHS1.length > 1 && typedHE1.length > 1) {
-        if (typedHS1.length !== 5 || typedHE1.length !== 5) {
-          return {'line1DatesNOK': true};
+    console.log(day1 + '-' + hourStart1 + '-' + hourEnd1);
+    if (day1 != null) {
+      if (hourStart1.length > 0 || hourEnd1.length > 0) {
+        const typedHS1 = hourStart1.replace('_', '');
+        const typedHE1 = hourEnd1.replace('_', '');
+        if (day1 !== null && typedHS1.length > 1 && typedHE1.length > 1) {
+          if (typedHS1.length !== 5 || typedHE1.length !== 5) {
+            return {'line1DatesNOK': true};
+          } else {
+            return null;
+          }
         } else {
-          return null;
+          return {'line1NOK': true};
         }
-      } else {
-        return {'line1NOK': true};
       }
     }
   }
@@ -414,12 +417,12 @@ export class ClassScheduleEditComponent implements OnInit {
 
   resetForm() {
     this.scheduleForm.reset();
-    // this.scheduleForm.controls['item1'].reset();
-    // this.scheduleForm.controls['item2'].reset();
-    // this.scheduleForm.controls['item3'].reset();
-    // this.scheduleForm.controls['item4'].reset();
-    // this.scheduleForm.controls['item5'].reset();
-    // this.scheduleForm.get('course').setValue('');
+    this.scheduleForm.controls['item1'].reset();
+    this.scheduleForm.controls['item2'].reset();
+    this.scheduleForm.controls['item3'].reset();
+    this.scheduleForm.controls['item4'].reset();
+    this.scheduleForm.controls['item5'].reset();
+    this.scheduleForm.get('course').setValue('');
   }
 
   onTeacherChanged(selected) {
@@ -506,7 +509,7 @@ export class ClassScheduleEditComponent implements OnInit {
       this.teachers = teachers;
       for (let i = 0; i < this.teachers.length; i++) {
         const elt = this.teachers[i];
-        this.teacherOptions = [...this.teacherOptions, {value: elt.id, label: elt.firstName + ' ' + elt.lastName}];
+        this.teacherOptions = [...this.teacherOptions, {value: elt.id, label: elt.lastName + ' ' + elt.firstName}];
       }
     }, error => {
       this.alertify.error(error);
@@ -523,7 +526,6 @@ export class ClassScheduleEditComponent implements OnInit {
   getClass(classid) {
     this.classService.getClass(classid).subscribe(data => {
       this.class = data;
-      console.log(this.class);
     }, error => {
       this.alertify.error(error);
     });

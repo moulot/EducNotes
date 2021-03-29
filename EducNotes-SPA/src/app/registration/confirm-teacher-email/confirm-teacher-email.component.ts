@@ -29,6 +29,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   userid: any;
   username: string;
   pwd: string;
+  wait = false;
 
   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
     private alertify: AlertifyService,  private router: Router, private accountService: AccountService) { }
@@ -92,14 +93,17 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   }
 
   validateEmail(confirmEmail: ConfirmToken) {
+    this.wait = true;
     this.accountService.confirmEmail(confirmEmail).subscribe((data: any) => {
       this.emailOK = data.emailOK;
       this.user = data.user;
       this.teacherOk = this.user.validated;
       this.validAccount = data.accountValidated;
       this.initialValues();
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 

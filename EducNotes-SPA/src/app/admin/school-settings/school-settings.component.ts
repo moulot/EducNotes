@@ -65,7 +65,7 @@ export class SchoolSettingsComponent implements OnInit {
       this.alertify.success('les paramètres sont mis à jour!');
       this.router.navigate(['home']);
     }, error => {
-      this.alertify.error(error);
+      console.log(error);
     });
   }
 

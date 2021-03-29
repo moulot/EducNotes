@@ -9,5 +9,6 @@ namespace EducNotes.API.Dtos
     public string Cell { get; set; }
     public string Email { get; set; }
     public string Token { get; set; }
+    public string Courses { get; set; }
   }
 }

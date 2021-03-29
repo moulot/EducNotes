@@ -383,11 +383,13 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'DayAbsences', date);
   }
 
-  getUserClassLife(childId) {
+  getUserClassLife(childId)
+  {
     return this.http.get(this.baseUrl + 'UserClassLife/' + childId);
   }
 
-  getScheduleCoursesByDay(classId) {
+  getScheduleCoursesByDay(classId)
+  {
     return this.http.get(this.baseUrl + classId + '/ScheduleCoursesByDay');
   }
 

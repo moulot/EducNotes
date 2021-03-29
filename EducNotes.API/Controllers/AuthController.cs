@@ -484,7 +484,7 @@ namespace EducNotes.API.Controllers
     [HttpPost("{id}/setUserAccountData")]
     public async Task<IActionResult> setUserAccountData(int id, UserDataToUpdateDto userData)
     {
-      List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
+      // List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
 
       var user = await _repo.GetUser(id, false);
       if (user != null)
@@ -500,7 +500,7 @@ namespace EducNotes.API.Controllers
         var res = await _userManager.UpdateAsync(user);
         if (res.Succeeded)
         {
-          var template = emailTemplates.First(t => t.Id == updateAccountEmailId);
+          var template = await _context.EmailTemplates.FirstAsync(t => t.Id == updateAccountEmailId);
           var email = await _repo.SetEmailForAccountUpdated(template.Subject, template.Body,
             user.LastName, user.Gender, user.Email, user.Id);
           _context.Add(email);
@@ -508,7 +508,7 @@ namespace EducNotes.API.Controllers
           var userToReturn = _mapper.Map<UserForListDto>(user);
           if (await _repo.SaveAll())
           {
-            await _cache.LoadUsers();
+            // await _cache.LoadUsers();
             return Ok(new
             {
               token = await GenerateJwtToken(user),

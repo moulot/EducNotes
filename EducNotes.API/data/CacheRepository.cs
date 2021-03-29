@@ -16,8 +16,11 @@ namespace EducNotes.API.data {
     int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
     public readonly IConfiguration _config;
     public string subDomain;
+      private CacheKeys ck;
 
-    public CacheRepository (DataContext context, IConfiguration config, IMemoryCache memoryCache) {
+
+    public CacheRepository(DataContext context, IConfiguration config, IMemoryCache memoryCache)
+    {
       _config = config;
       _context = context;
       _cache = memoryCache;
@@ -25,7 +28,7 @@ namespace EducNotes.API.data {
       parentTypeId = _config.GetValue<int>("AppSettings:parentTypeId");
       adminTypeId = _config.GetValue<int>("AppSettings:adminTypeId");
       studentTypeId = _config.GetValue<int>("AppSettings:studentTypeId");
-      subDomain = (_context.Settings.First(s => s.Name.ToLower() == "subdomain")).Value;
+      ck = new CacheKeys(context);
     }
 
     public async Task<List<User>> GetUsers()
@@ -33,10 +36,10 @@ namespace EducNotes.API.data {
       List<User> users = new List<User>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue (subDomain + CacheKeys.Users, out users))
+      if(!_cache.TryGetValue(ck.Users, out users))
       {
         // Key not in cache, so get data.
-        users = await LoadUsers ();
+        users = await LoadUsers();
       }
 
       return users;
@@ -75,8 +78,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration (TimeSpan.FromDays (7));
 
       // Save data in cache.
-      _cache.Remove (subDomain + CacheKeys.Users);
-      _cache.Set (subDomain + CacheKeys.Users, users, cacheEntryOptions);
+       _cache.Remove(ck.Users);
+       _cache.Set(ck.Users, users, cacheEntryOptions);
 
       return users;
     }
@@ -85,7 +88,7 @@ namespace EducNotes.API.data {
       List<TeacherCourse> teacherCourses = new List<TeacherCourse>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.TeacherCourses, out teacherCourses)) {
+      if(!_cache.TryGetValue(ck.TeacherCourses, out teacherCourses)) {
         // Key not in cache, so get data.
         teacherCourses = await LoadTeacherCourses();
       }
@@ -104,8 +107,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.TeacherCourses);
-      _cache.Set(subDomain + CacheKeys.TeacherCourses, teachercourses, cacheEntryOptions);
+      _cache.Remove(ck.TeacherCourses);
+      _cache.Set(ck.TeacherCourses, teachercourses, cacheEntryOptions);
 
       return teachercourses;
     }
@@ -115,7 +118,7 @@ namespace EducNotes.API.data {
       List<ClassCourse> classCourses = new List<ClassCourse>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue (subDomain + CacheKeys.ClassCourses, out classCourses)) {
+      if(!_cache.TryGetValue (ck.ClassCourses, out classCourses)) {
         // Key not in cache, so get data.
         classCourses = await LoadClassCourses();
       }
@@ -138,8 +141,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.ClassCourses);
-      _cache.Set(subDomain + CacheKeys.ClassCourses, classcourses, cacheEntryOptions);
+      _cache.Remove(ck.ClassCourses);
+      _cache.Set(ck.ClassCourses, classcourses, cacheEntryOptions);
 
       return classcourses;
     }
@@ -149,7 +152,7 @@ namespace EducNotes.API.data {
       List<ClassLevel> classLevels = new List<ClassLevel>();
 
       // Look for cache key.
-      if (!_cache.TryGetValue(subDomain + CacheKeys.ClassLevels, out classLevels))
+      if (!_cache.TryGetValue(ck.ClassLevels, out classLevels))
       {
         // Key not in cache, so get data.
         classLevels = await LoadClassLevels();
@@ -170,8 +173,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration (TimeSpan.FromDays (7));
 
       // Save data in cache.
-      _cache.Remove (subDomain + CacheKeys.ClassLevels);
-      _cache.Set (subDomain + CacheKeys.ClassLevels, classLevels, cacheEntryOptions);
+      _cache.Remove (ck.ClassLevels);
+      _cache.Set (ck, classLevels, cacheEntryOptions);
 
       return classLevels;
     }
@@ -181,7 +184,7 @@ namespace EducNotes.API.data {
       List<ClassLevelProduct> levelproducts = new List<ClassLevelProduct>();
 
       // Look for cache key.
-      if (!_cache.TryGetValue(subDomain + CacheKeys.ClassLevelProducts, out levelproducts))
+      if (!_cache.TryGetValue(ck.ClassLevelProducts, out levelproducts))
       {
         // Key not in cache, so get data.
         levelproducts = await LoadClassLevelProducts();
@@ -200,8 +203,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration (TimeSpan.FromDays (7));
 
       // Save data in cache.
-      _cache.Remove (subDomain + CacheKeys.ClassLevelProducts);
-      _cache.Set (subDomain + CacheKeys.ClassLevelProducts, levelproducts, cacheEntryOptions);
+      _cache.Remove (ck.ClassLevelProducts);
+      _cache.Set (ck.ClassLevelProducts, levelproducts, cacheEntryOptions);
 
       return levelproducts;
     }
@@ -211,7 +214,7 @@ namespace EducNotes.API.data {
       List<Class> classes = new List<Class>();
 
       // Look for cache key.
-      if (!_cache.TryGetValue (subDomain + CacheKeys.Classes, out classes))
+      if (!_cache.TryGetValue (ck.Classes, out classes))
       {
         // Key not in cache, so get data.
         classes = await LoadClasses();
@@ -233,8 +236,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays (7));
 
       // Save data in cache.
-      _cache.Remove (subDomain + CacheKeys.Classes);
-      _cache.Set (subDomain + CacheKeys.Classes, classes, cacheEntryOptions);
+      _cache.Remove (ck.Classes);
+      _cache.Set (ck.Classes, classes, cacheEntryOptions);
 
       return classes;
     }
@@ -244,7 +247,7 @@ namespace EducNotes.API.data {
       List<EducationLevel> educLevels = new List<EducationLevel>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue (subDomain + CacheKeys.EducLevels, out educLevels))
+      if(!_cache.TryGetValue (ck.EducLevels, out educLevels))
       {
         // Key not in cache, so get data.
         educLevels = await LoadEducLevels();
@@ -265,8 +268,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove (subDomain + CacheKeys.EducLevels);
-      _cache.Set (subDomain + CacheKeys.EducLevels, educLevels, cacheEntryOptions);
+      _cache.Remove (ck.EducLevels);
+      _cache.Set (ck.EducLevels, educLevels, cacheEntryOptions);
 
       return educLevels;
     }
@@ -275,7 +278,7 @@ namespace EducNotes.API.data {
     {
       List<School> schools = new List<School>();
       // Look for cache key.
-      if (!_cache.TryGetValue (subDomain + CacheKeys.Schools, out schools)) {
+      if (!_cache.TryGetValue (ck.Schools, out schools)) {
         // Key not in cache, so get data.
         schools = await LoadSchools();
       }
@@ -294,8 +297,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.Schools);
-      _cache.Set(subDomain + CacheKeys.Schools, schools, cacheEntryOptions);
+      _cache.Remove(ck.Schools);
+      _cache.Set(ck.Schools, schools, cacheEntryOptions);
 
       return schools;
     }
@@ -304,7 +307,7 @@ namespace EducNotes.API.data {
     {
       List<Cycle> cycles = new List<Cycle>();
       // Look for cache key.
-      if (!_cache.TryGetValue (subDomain + CacheKeys.Cycles, out cycles))
+      if (!_cache.TryGetValue (ck.Cycles, out cycles))
       {
         // Key not in cache, so get data.
         cycles = await LoadCycles();
@@ -322,8 +325,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
       
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.Cycles);
-      _cache.Set(subDomain + CacheKeys.Cycles, cycles, cacheEntryOptions);
+      _cache.Remove(ck.Cycles);
+      _cache.Set(ck.Cycles, cycles, cacheEntryOptions);
 
       return cycles;
     }
@@ -332,7 +335,7 @@ namespace EducNotes.API.data {
     {
       List<Course> courses = new List<Course>();
       // Look for cache key.
-      if (!_cache.TryGetValue (subDomain + CacheKeys.Courses, out courses))
+      if (!_cache.TryGetValue (ck.Courses, out courses))
       {
         // Key not in cache, so get data.
         courses = await LoadCourses();
@@ -350,8 +353,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
       
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.Courses);
-      _cache.Set(subDomain + CacheKeys.Courses, courses, cacheEntryOptions);
+      _cache.Remove(ck.Courses);
+      _cache.Set(ck.Courses, courses, cacheEntryOptions);
 
       return courses;
     }
@@ -360,7 +363,7 @@ namespace EducNotes.API.data {
     {
       List<ClassType> classtypes = new List<ClassType>();
       // Look for cache key.
-      if (!_cache.TryGetValue(subDomain + CacheKeys.ClassTypes, out classtypes))
+      if (!_cache.TryGetValue(ck.ClassTypes, out classtypes))
       {
         // Key not in cache, so get data.
         classtypes = await LoadClassTypes();
@@ -378,8 +381,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
       
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.ClassTypes);
-      _cache.Set(subDomain + CacheKeys.ClassTypes, classtypes, cacheEntryOptions);
+      _cache.Remove(ck.ClassTypes);
+      _cache.Set(ck.ClassTypes, classtypes, cacheEntryOptions);
 
       return classtypes;
     }
@@ -388,7 +391,7 @@ namespace EducNotes.API.data {
     {
       List<ClassLevelClassType> clclasstypes = new List<ClassLevelClassType>();
       // Look for cache key.
-      if (!_cache.TryGetValue(subDomain + CacheKeys.CLClassTypes, out clclasstypes))
+      if (!_cache.TryGetValue(ck.CLClassTypes, out clclasstypes))
       {
         // Key not in cache, so get data.
         clclasstypes = await LoadCLClassTypes();
@@ -409,8 +412,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
       
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.CLClassTypes);
-      _cache.Set(subDomain + CacheKeys.CLClassTypes, clclasstypes, cacheEntryOptions);
+      _cache.Remove(ck.CLClassTypes);
+      _cache.Set(ck.CLClassTypes, clclasstypes, cacheEntryOptions);
 
       return clclasstypes;
     }
@@ -419,7 +422,7 @@ namespace EducNotes.API.data {
     {
       List<EmailTemplate> templates = new List<EmailTemplate>();
       // Look for cache key.
-      if (!_cache.TryGetValue(subDomain + CacheKeys.EmailTemplates, out templates))
+      if (!_cache.TryGetValue(ck.EmailTemplates, out templates))
       {
         // Key not in cache, so get data.
         templates = await LoadEmailTemplates();
@@ -437,8 +440,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
       
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.EmailTemplates);
-      _cache.Set(subDomain + CacheKeys.EmailTemplates, templates, cacheEntryOptions);
+      _cache.Remove(ck.EmailTemplates);
+      _cache.Set(ck.EmailTemplates, templates, cacheEntryOptions);
 
       return templates;
     }
@@ -447,7 +450,7 @@ namespace EducNotes.API.data {
     {
       List<SmsTemplate> templates = new List<SmsTemplate>();
       // Look for cache key.
-      if (!_cache.TryGetValue(subDomain + CacheKeys.SmsTemplates, out templates))
+      if (!_cache.TryGetValue(ck.SmsTemplates, out templates))
       {
         // Key not in cache, so get data.
         templates = await LoadSmsTemplates();
@@ -465,8 +468,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
       
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.SmsTemplates);
-      _cache.Set(subDomain + CacheKeys.SmsTemplates, templates, cacheEntryOptions);
+      _cache.Remove(ck.SmsTemplates);
+      _cache.Set(ck.SmsTemplates, templates, cacheEntryOptions);
 
       return templates;
     }
@@ -475,7 +478,7 @@ namespace EducNotes.API.data {
     {
       List<Setting> settings = new List<Setting>();
       // Look for cache key.
-      if (!_cache.TryGetValue(subDomain + CacheKeys.Settings, out settings))
+      if (!_cache.TryGetValue(ck.Settings, out settings))
       {
         // Key not in cache, so get data.
         settings = await LoadSettings();
@@ -493,8 +496,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
       
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.Settings);
-      _cache.Set(subDomain + CacheKeys.Settings, settings, cacheEntryOptions);
+      _cache.Remove(ck.Settings);
+      _cache.Set(ck.Settings, settings, cacheEntryOptions);
 
       return settings;
     }
@@ -503,7 +506,7 @@ namespace EducNotes.API.data {
     {
       List<Token> tokens = new List<Token>();
       // Look for cache key.
-      if (!_cache.TryGetValue(subDomain + CacheKeys.Tokens, out tokens))
+      if (!_cache.TryGetValue(ck.Tokens, out tokens))
       {
         // Key not in cache, so get data.
         tokens = await LoadTokens();
@@ -521,8 +524,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
       
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.Tokens);
-      _cache.Set(subDomain + CacheKeys.Tokens, tokens, cacheEntryOptions);
+      _cache.Remove(ck.Tokens);
+      _cache.Set(ck.Tokens, tokens, cacheEntryOptions);
 
       return tokens;
     }
@@ -531,7 +534,7 @@ namespace EducNotes.API.data {
     {
       List<ProductDeadLine> productdeadlines = new List<ProductDeadLine>();
       // Look for cache key.
-      if (!_cache.TryGetValue(subDomain + CacheKeys.ProductDeadLines, out productdeadlines))
+      if (!_cache.TryGetValue(ck.ProductDeadLines, out productdeadlines))
       {
         // Key not in cache, so get data.
         productdeadlines = await LoadProductDeadLines();
@@ -549,8 +552,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
       
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.ProductDeadLines);
-      _cache.Set(subDomain + CacheKeys.ProductDeadLines, productdeadlines, cacheEntryOptions);
+      _cache.Remove(ck.ProductDeadLines);
+      _cache.Set(ck.ProductDeadLines, productdeadlines, cacheEntryOptions);
 
       return productdeadlines;
     }
@@ -560,7 +563,7 @@ namespace EducNotes.API.data {
       List<Role> roles = new List<Role>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.Roles, out roles))
+      if(!_cache.TryGetValue(ck.Roles, out roles))
       {
         // Key not in cache, so get data.
         roles = await LoadRoles();
@@ -579,8 +582,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.Roles);
-      _cache.Set(subDomain + CacheKeys.Roles, roles, cacheEntryOptions);
+      _cache.Remove(ck.Roles);
+      _cache.Set(ck.Roles, roles, cacheEntryOptions);
 
       return roles;
     }
@@ -590,7 +593,7 @@ namespace EducNotes.API.data {
       List<Order> orders = new List<Order>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.Orders, out orders))
+      if(!_cache.TryGetValue(ck.Orders, out orders))
       {
         // Key not in cache, so get data.
         orders = await LoadOrders();
@@ -613,8 +616,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.Orders);
-      _cache.Set(subDomain + CacheKeys.Orders, orders, cacheEntryOptions);
+      _cache.Remove(ck.Orders);
+      _cache.Set(ck.Orders, orders, cacheEntryOptions);
 
       return orders;
     }
@@ -624,7 +627,7 @@ namespace EducNotes.API.data {
       List<OrderLine> lines = new List<OrderLine>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.OrderLines, out lines))
+      if(!_cache.TryGetValue(ck.OrderLines, out lines))
       {
         // Key not in cache, so get data.
         lines = await LoadOrderLines();
@@ -649,8 +652,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.OrderLines);
-      _cache.Set(subDomain + CacheKeys.OrderLines, lines, cacheEntryOptions);
+      _cache.Remove(ck.OrderLines);
+      _cache.Set(ck.OrderLines, lines, cacheEntryOptions);
 
       return lines;
     }
@@ -660,7 +663,7 @@ namespace EducNotes.API.data {
       List<OrderLineDeadline> linedeadlines = new List<OrderLineDeadline>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.OrderLineDeadLines, out linedeadlines))
+      if(!_cache.TryGetValue(ck.OrderLineDeadLines, out linedeadlines))
       {
         // Key not in cache, so get data.
         linedeadlines = await LoadOrderLineDeadLines();
@@ -681,8 +684,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.OrderLineDeadLines);
-      _cache.Set(subDomain + CacheKeys.OrderLineDeadLines, linedeadlines, cacheEntryOptions);
+      _cache.Remove(ck.OrderLineDeadLines);
+      _cache.Set(ck.OrderLineDeadLines, linedeadlines, cacheEntryOptions);
 
       return linedeadlines;
     }
@@ -692,7 +695,7 @@ namespace EducNotes.API.data {
       List<UserLink> userlinks = new List<UserLink>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.UserLinks, out userlinks))
+      if(!_cache.TryGetValue(ck.UserLinks, out userlinks))
       {
         // Key not in cache, so get data.
         userlinks = await LoadUserLinks();
@@ -711,8 +714,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.UserLinks);
-      _cache.Set(subDomain + CacheKeys.UserLinks, userlinks, cacheEntryOptions);
+      _cache.Remove(ck.UserLinks);
+      _cache.Set(ck.UserLinks, userlinks, cacheEntryOptions);
 
       return userlinks;
     }
@@ -722,7 +725,7 @@ namespace EducNotes.API.data {
       List<FinOp> finops = new List<FinOp>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.FinOps, out finops))
+      if(!_cache.TryGetValue(ck.FinOps, out finops))
       {
         // Key not in cache, so get data.
         finops = await LoadFinOps();
@@ -750,8 +753,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.FinOps);
-      _cache.Set(subDomain + CacheKeys.FinOps, finops, cacheEntryOptions);
+      _cache.Remove(ck.FinOps);
+      _cache.Set(ck.FinOps, finops, cacheEntryOptions);
 
       return finops;
     }
@@ -761,7 +764,7 @@ namespace EducNotes.API.data {
       List<FinOpOrderLine> finoporderlines = new List<FinOpOrderLine>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.FinOpOrderLines, out finoporderlines))
+      if(!_cache.TryGetValue(ck.FinOpOrderLines, out finoporderlines))
       {
         // Key not in cache, so get data.
         finoporderlines = await LoadFinOpOrderLines();
@@ -790,8 +793,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.FinOpOrderLines);
-      _cache.Set(subDomain + CacheKeys.FinOpOrderLines, finoporderlines, cacheEntryOptions);
+      _cache.Remove(ck.FinOpOrderLines);
+      _cache.Set(ck.FinOpOrderLines, finoporderlines, cacheEntryOptions);
 
       return finoporderlines;
     }
@@ -801,7 +804,7 @@ namespace EducNotes.API.data {
       List<Cheque> cheques = new List<Cheque>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.Cheques, out cheques))
+      if(!_cache.TryGetValue(ck.Cheques, out cheques))
       {
         // Key not in cache, so get data.
         cheques = await LoadCheques();
@@ -820,8 +823,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.Cheques);
-      _cache.Set(subDomain + CacheKeys.Cheques, cheques, cacheEntryOptions);
+      _cache.Remove(ck.Cheques);
+      _cache.Set(ck.Cheques, cheques, cacheEntryOptions);
 
       return cheques;
     }
@@ -831,7 +834,7 @@ namespace EducNotes.API.data {
       List<Bank> banks = new List<Bank>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.Banks, out banks))
+      if(!_cache.TryGetValue(ck.Banks, out banks))
       {
         // Key not in cache, so get data.
         banks = await LoadBanks();
@@ -850,8 +853,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.Banks);
-      _cache.Set(subDomain + CacheKeys.Banks, banks, cacheEntryOptions);
+      _cache.Remove(ck.Banks);
+      _cache.Set(ck.Banks, banks, cacheEntryOptions);
 
       return banks;
     }
@@ -861,7 +864,7 @@ namespace EducNotes.API.data {
       List<PaymentType> paymentTypes = new List<PaymentType>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.PaymentTypes, out paymentTypes))
+      if(!_cache.TryGetValue(ck.PaymentTypes, out paymentTypes))
       {
         // Key not in cache, so get data.
         paymentTypes = await LoadPaymentTypes();
@@ -880,8 +883,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.PaymentTypes);
-      _cache.Set(subDomain + CacheKeys.PaymentTypes, paymentTypes, cacheEntryOptions);
+      _cache.Remove(ck.PaymentTypes);
+      _cache.Set(ck.PaymentTypes, paymentTypes, cacheEntryOptions);
 
       return paymentTypes;
     }
@@ -891,7 +894,7 @@ namespace EducNotes.API.data {
       List<Product> products = new List<Product>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.Products, out products))
+      if(!_cache.TryGetValue(ck.Products, out products))
       {
         // Key not in cache, so get data.
         products = await LoadProducts();
@@ -910,8 +913,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.Products);
-      _cache.Set(subDomain + CacheKeys.Products, products, cacheEntryOptions);
+      _cache.Remove(ck.Products);
+      _cache.Set(ck.Products, products, cacheEntryOptions);
 
       return products;
     }
@@ -921,7 +924,7 @@ namespace EducNotes.API.data {
       List<UserType> usertypes = new List<UserType>();
 
       // Look for cache key.
-      if(!_cache.TryGetValue(subDomain + CacheKeys.UserTypes, out usertypes))
+      if(!_cache.TryGetValue(ck.UserTypes, out usertypes))
       {
         // Key not in cache, so get data.
         usertypes = await LoadUserTypes();
@@ -942,8 +945,8 @@ namespace EducNotes.API.data {
         .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove(subDomain + CacheKeys.UserTypes);
-      _cache.Set(subDomain + CacheKeys.UserTypes, usertypes, cacheEntryOptions);
+      _cache.Remove(ck.UserTypes);
+      _cache.Set(ck.UserTypes, usertypes, cacheEntryOptions);
 
       return usertypes;
     }

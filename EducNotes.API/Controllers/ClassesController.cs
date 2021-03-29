@@ -48,8 +48,8 @@ namespace EducNotes.API.Controllers {
     [HttpGet("{id}")]
     public async Task<IActionResult> GetClass(int Id)
     {
-      List<Class> classes = await _cache.GetClasses();
-      var theclass = classes.FirstOrDefault(c => c.Id == Id);
+      // List<Class> classes = await _cache.GetClasses();
+      var theclass = await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
       return Ok(theclass);
     }
 
@@ -116,12 +116,13 @@ namespace EducNotes.API.Controllers {
       return Ok (items);
     }
 
-    [HttpGet ("{classId}/ScheduleCoursesByDay")]
-    public async Task<IActionResult> GetClassScheduleByDay(int classId) {
-      var scheduleItems = await _context.Schedules
-                                  .Include(i => i.Class)
-                                  .Include(i => i.Course)
-                                  .Where(s => s.ClassId == classId).ToListAsync();
+    [HttpGet("{classId}/ScheduleCoursesByDay")]
+    public async Task<IActionResult> GetClassScheduleByDay(int classId)
+    {
+      var scheduleItems = await _context.Schedules.Include(i => i.Class)
+                                                  .Include(i => i.Course)
+                                                  .Where(s => s.ClassId == classId).ToListAsync();
+      
       var days = scheduleItems.Select(d => d.Day).Distinct();
 
       ScheduleClassDto classSchedule = new ScheduleClassDto();
@@ -286,23 +287,22 @@ namespace EducNotes.API.Controllers {
     [HttpGet ("{classId}/teachers")]
     public async Task<IActionResult> GetClassTeachers(int classId)
     {
-      List<ClassCourse> classCourses = await _cache.GetClassCourses();
-      var teachers = classCourses
-                        .Where(t => t.ClassId == classId && t.Teacher != null)
-                        .Select(t => t.Teacher).Distinct().ToList();
+      // List<ClassCourse> classCourses = await _cache.GetClassCourses();
+      var teachers = await _context.ClassCourses.Where(t => t.ClassId == classId && t.Teacher != null)
+                                                .Select(t => t.Teacher).Distinct().ToListAsync();
 
       var teachersToReturn = _mapper.Map<IEnumerable<UserForDetailedDto>>(teachers);
 
-      return Ok (teachersToReturn);
+      return Ok(teachersToReturn);
     }
 
     [HttpGet ("{classId}/CourseWithTeacher")]
     public async Task<IActionResult> GetCourseWithTeacher (int classId)
     {
-      var teachersData = (await _cache.GetClassCourses()).Where(u => u.ClassId == classId)
-                                                         .Distinct().ToList();
+      var teachersData = await _context.ClassCourses.Where(u => u.ClassId == classId)
+                                                         .Distinct().ToListAsync();
 
-      List<TeacherForListDto> coursesWithTeacher = new List<TeacherForListDto> ();
+      List<TeacherForListDto> coursesWithTeacher = new List<TeacherForListDto>();
       foreach(var data in teachersData)
       {
         TeacherForListDto teacherCourse = new TeacherForListDto ();
@@ -351,27 +351,29 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("{classId}/MovedWeekAgenda")]
-    public async Task<IActionResult> getClassMovedWeekAgenda (int classId, [FromQuery] AgendaParams agendaParams) {
+    public async Task<IActionResult> getClassMovedWeekAgenda (int classId, [FromQuery] AgendaParams agendaParams)
+    {
       var FromDate = agendaParams.DueDate.Date;
       var move = agendaParams.MoveWeek;
-      var date = FromDate.AddDays (move);
+      var date = FromDate.AddDays(move);
       var dateDay = (int) date.DayOfWeek;
 
       var dayInt = dateDay == 0 ? 7 : dateDay;
       DateTime monday = date.AddDays (1 - dayInt);
       var saturday = monday.AddDays (5);
 
-      var itemsFromRepo = await _repo.GetClassAgenda (classId, monday, saturday);
+      var itemsFromRepo = await _repo.GetClassAgenda(classId, monday, saturday);
       var items = _repo.GetAgendaListByDueDate (itemsFromRepo);
 
-      var courses = (await _cache.GetClassCourses())
+      var courses = await _context.ClassCourses
                             .Where(c => c.ClassId == classId)
-                            .Select(s => s.Course).ToList();
+                            .Select(s => s.Course).ToListAsync();
 
-      List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto> ();
-      foreach (var course in courses) {
+      List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto>();
+      foreach (var course in courses)
+      {
         CourseTasksDto ctd = new CourseTasksDto ();
-        var nbItems = itemsFromRepo.Where (a => a.Session.CourseId == course.Id).ToList ().Count ();
+        var nbItems = itemsFromRepo.Where (a => a.Session.CourseId == course.Id).ToList().Count();
         ctd.CourseId = course.Id;
         ctd.CourseName = course.Name;
         ctd.CourseAbbrev = course.Abbreviation;
@@ -380,27 +382,28 @@ namespace EducNotes.API.Controllers {
         coursesWithTasks.Add (ctd);
       }
 
-      var days = new List<string> ();
-      var nbTasks = new List<int> ();
-      for (int i = 0; i <= 5; i++) {
+      var days = new List<string>();
+      var nbTasks = new List<int>();
+      for (int i = 0; i <= 5; i++)
+      {
         DateTime dt = monday.AddDays (i);
-        CultureInfo frC = new CultureInfo ("fr-FR");
-        var shortdate = dt.ToString ("ddd dd MMM", frC);
+        var shortdate = dt.ToString("ddd dd MMM", frC);
         days.Add (shortdate);
 
-        var item = items.FirstOrDefault (a => a.dtDueDate == dt);
-        if (item != null)
-          nbTasks.Add (item.NbTasks);
+        var item = items.FirstOrDefault(a => a.dtDueDate == dt);
+        if(item != null)
+          nbTasks.Add(item.NbTasks);
         else
-          nbTasks.Add (0);
+          nbTasks.Add(0);
       }
 
-      if (itemsFromRepo != null) {
-        return Ok (new {
+      if(itemsFromRepo != null)
+      {
+        return Ok(new {
           agendaItems = items,
             firstDayWeek = monday,
-            strMonday = monday.ToLongDateString (),
-            strSaturday = saturday.ToLongDateString (),
+            strMonday = monday.ToLongDateString(),
+            strSaturday = saturday.ToLongDateString(),
             weekDays = days,
             nbDayTasks = nbTasks,
             coursesWithTasks
@@ -411,22 +414,23 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("{classId}/TodayToNDaysAgenda/{toNbDays}")]
-    public async Task<IActionResult> getTodayToNDaysAgenda (int classId, int toNbDays) {
-      var agendasFromRepo = await _repo.GetClassAgendaTodayToNDays (classId, toNbDays);
-      var items = _repo.GetAgendaListByDueDate (agendasFromRepo);
+    public async Task<IActionResult> getTodayToNDaysAgenda (int classId, int toNbDays)
+    {
+      var agendasFromRepo = await _repo.GetClassAgendaTodayToNDays(classId, toNbDays);
+      var items = _repo.GetAgendaListByDueDate(agendasFromRepo);
 
-      var days = new List<string> ();
-      var nbTasks = new List<int> ();
+      var days = new List<string>();
+      var nbTasks = new List<int>();
       var today = DateTime.Now.Date;
-      for (int i = 0; i < toNbDays; i++) {
-        DateTime dt = today.AddDays (i);
-        CultureInfo frC = new CultureInfo ("fr-FR");
-        var shortdate = dt.ToString ("ddd dd MMM", frC);
-        days.Add (shortdate);
+      for(int i = 0; i < toNbDays; i++)
+      {
+        DateTime dt = today.AddDays(i);
+        var shortdate = dt.ToString("ddd dd MMM", frC);
+        days.Add(shortdate);
 
-        var item = items.FirstOrDefault (a => a.dtDueDate == dt);
-        if (item != null)
-          nbTasks.Add (item.NbTasks);
+        var item = items.FirstOrDefault(a => a.dtDueDate == dt);
+        if(item != null)
+          nbTasks.Add(item.NbTasks);
         else
           nbTasks.Add (0);
       }
@@ -457,9 +461,9 @@ namespace EducNotes.API.Controllers {
       var itemsFromRepo = await _repo.GetClassAgenda(classId, monday, saturday);
       var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
-      var courses = (await _cache.GetClassCourses())
+      var courses = await _context.ClassCourses
                         .Where(c => c.ClassId == classId)
-                        .Select(s => s.Course).ToList();
+                        .Select(s => s.Course).ToListAsync();
 
       List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto> ();
       foreach (var course in courses) {
@@ -818,7 +822,7 @@ namespace EducNotes.API.Controllers {
         cbl.LevelName = level.Name;
 
         cbl.Classes = new List<Class>();
-        var classes = await _repo.GetClassesByLevelId (level.Id);
+        var classes = await _repo.GetClassesByLevelId(level.Id);
         foreach(var aclass in classes)
         {
           cbl.Classes.Add(aclass);
@@ -832,29 +836,30 @@ namespace EducNotes.API.Controllers {
 
     [HttpGet ("{classId}/classCourses")]
     public async Task<IActionResult> GetClassCourses(int classId) {
-      var courses = (await _cache.GetClassCourses())
+      var courses = await _context.ClassCourses
                             .Where(c => c.ClassId == classId)
-                            .Select(s => s.Course).ToList();
+                            .Select(s => s.Course).ToListAsync();
 
       return Ok (courses);
     }
 
     [HttpGet ("{classId}/CoursesWithAgenda/f/{daysToNow}/t/{daysFromNow}")]
-    public async Task<IActionResult> GetClassCoursesWithAgenda (int classId, int daysToNow, int daysFromNow) {
+    public async Task<IActionResult> GetClassCoursesWithAgenda(int classId, int daysToNow, int daysFromNow)
+    {
       var today = DateTime.Now.Date;
-      var startDate = today.AddDays (-daysToNow);
-      var EndDate = today.AddDays (daysFromNow);
+      var startDate = today.AddDays(-daysToNow);
+      var EndDate = today.AddDays(daysFromNow);
 
-      var courses = (await _cache.GetClassCourses())
+      var courses = await _context.ClassCourses
                             .Where(c => c.ClassId == classId)
-                            .Select(s => s.Course).ToList();
+                            .Select(s => s.Course).ToListAsync();
 
       var classAgenda = await _context.Agendas
         .OrderBy (o => o.Session.SessionDate)
         .Where (a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= startDate && a.Session.SessionDate <= EndDate)
-        .ToListAsync ();
+        .ToListAsync();
 
-      List<CourseWithAgendaDto> coursesWithAgenda = new List<CourseWithAgendaDto> ();
+      List<CourseWithAgendaDto> coursesWithAgenda = new List<CourseWithAgendaDto>();
       foreach (var course in courses) {
         CourseWithAgendaDto cwa = new CourseWithAgendaDto ();
         cwa.Id = course.Id;
@@ -862,12 +867,12 @@ namespace EducNotes.API.Controllers {
         cwa.Abbrev = course.Abbreviation;
         cwa.Color = course.Color;
 
-        var items = classAgenda.Where (a => a.Session.CourseId == course.Id).ToList ();
-        List<AgendaItemDto> agendaItems = new List<AgendaItemDto> ();
-        foreach (var item in items) {
-          AgendaItemDto aid = new AgendaItemDto ();
+        var items = classAgenda.Where(a => a.Session.CourseId == course.Id).ToList();
+        List<AgendaItemDto> agendaItems = new List<AgendaItemDto>();
+        foreach (var item in items)
+        {
+          AgendaItemDto aid = new AgendaItemDto();
 
-          CultureInfo frC = new CultureInfo ("fr-FR");
           var strDateAdded = item.DateAdded.ToString ("ddd dd MMM", frC);
           var strDueDate = item.Session.SessionDate.ToString ("ddd dd MMM", frC);
 
@@ -878,7 +883,7 @@ namespace EducNotes.API.Controllers {
           agendaItems.Add (aid);
         }
         cwa.AgendaItems = agendaItems;
-        cwa.NbItems = cwa.AgendaItems.Count ();
+        cwa.NbItems = cwa.AgendaItems.Count();
 
         coursesWithAgenda.Add (cwa);
       }
@@ -928,16 +933,19 @@ namespace EducNotes.API.Controllers {
         }
       }
 
-      var courses = (await _cache.GetClassCourses())
+      var courses = await _context.ClassCourses
                             .Where(c => c.ClassId == classId)
-                            .Select(s => s.Course).ToList();
+                            .Select(s => s.Course).ToListAsync();
 
-      List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto> ();
-      foreach (var course in courses) {
+      List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto>();
+      foreach (var course in courses)
+      {
         var nbItems = 0;
-        foreach (var al in AgendaList) {
-          foreach (var item in al.AgendaItems) {
-            if (item.CourseId == course.Id)
+        foreach(var al in AgendaList)
+        {
+          foreach(var item in al.AgendaItems)
+          {
+            if(item.CourseId == course.Id)
               nbItems++;
           }
         }
@@ -945,22 +953,22 @@ namespace EducNotes.API.Controllers {
         if (nbItems == 0)
           continue;
 
-        CourseTasksDto ctd = new CourseTasksDto ();
+        CourseTasksDto ctd = new CourseTasksDto();
         ctd.CourseId = course.Id;
         ctd.CourseName = course.Name;
         ctd.CourseAbbrev = course.Abbreviation;
         ctd.CourseColor = course.Color;
         ctd.NbTasks = nbItems;
-        coursesWithTasks.Add (ctd);
+        coursesWithTasks.Add(ctd);
       }
 
-      return Ok (new {
+      return Ok(new {
         agendaList = AgendaList,
           startDate = startDate,
           endDate = endDate,
           strStartDate = strStartDate,
           strEndDate = strEndDate,
-          coursesWithTasks = coursesWithTasks.OrderBy (c => c.CourseName),
+          coursesWithTasks = coursesWithTasks.OrderBy(c => c.CourseName),
           dones = dones
       });
     }
@@ -1057,8 +1065,8 @@ namespace EducNotes.API.Controllers {
     [HttpGet ("LevelsWithClasses")]
     public async Task<IActionResult> GetLevelsWithClasses()
     {
-      List<Class> classesCached = await _cache.GetClasses();
-      List<User> studentsCached = await _cache.GetStudents();
+      // List<Class> classesCached = await _cache.GetClasses();
+      // List<User> studentsCached = await _cache.GetStudents();
 
       var classLevels = await _context.Classes
                               .OrderBy(o => o.ClassLevel.DsplSeq)
@@ -1072,12 +1080,12 @@ namespace EducNotes.API.Controllers {
         var res = new ClassLevelDetailDto();
         res.Id = item.Id;
         res.Name = item.Name;
-        List<Class> classes = classesCached.Where(c => c.ClassLevelId == item.Id).ToList();
+        List<Class> classes = await _context.Classes.Where(c => c.ClassLevelId == item.Id).ToListAsync();
         res.TotalClasses = classes.Count();
         res.Classes = new List<ClassDetailDto>();
         foreach (var aclass in classes)
         {
-          List<User> students = studentsCached.Where(u => u.ClassId == aclass.Id).ToList();
+          List<User> students = await _context.Users.Where(u => u.ClassId == aclass.Id).ToListAsync();
           res.TotalStudents += students.Count();
           //add class data
           ClassDetailDto cdd = new ClassDetailDto();
@@ -1101,24 +1109,25 @@ namespace EducNotes.API.Controllers {
     [HttpPost("ClassLevelsWithClasses")]
     public async Task<IActionResult> GetClassLevelWithClasses(List<int> CLIds)
     {
-      List<Class> classesCached = await _cache.GetClasses();
-      List<ClassLevel> classLevelsCached = await _cache.GetClassLevels();
+      // List<Class> classesCached = await _cache.GetClasses();
+      // List<ClassLevel> classLevelsCached = await _cache.GetClassLevels();
 
-      List<ClassLevel> classLevels = classLevelsCached.Where(c => CLIds.Contains(c.Id)).ToList();
+      List<ClassLevel> classLevels = await _context.ClassLevels.Where(c => CLIds.Contains(c.Id)).ToListAsync();
       List<ClassLevelDto> classLevelsDto = _mapper.Map<List<ClassLevelDto>>(classLevels);
 
       foreach(var cl in classLevelsDto)
       {
-        cl.Classes = classesCached
+        cl.Classes = await _context.Classes
                       .OrderBy(c => c.Name)
-                      .Where(c => c.ClassLevelId == cl.Id).ToList();
+                      .Where(c => c.ClassLevelId == cl.Id).ToListAsync();
       }
 
-      return Ok (classLevels);
+      return Ok(classLevels);
     }
 
     [HttpGet ("{classLevelId}/ClassesByLevelId")]
-    public async Task<IActionResult> ClassesByLevelId (int classLevelId) {
+    public async Task<IActionResult> ClassesByLevelId (int classLevelId)
+    {
       var classes = await _context.Classes
         .Where (c => c.ClassLevelId == classLevelId)
         .ToListAsync ();
@@ -1128,11 +1137,12 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpPost ("{classId}/DeleteClass")]
-    public async Task<IActionResult> DeleteClass (int classId) {
-      _repo.Delete (_context.Classes.FirstOrDefault (e => e.Id == classId));
-      if (await _repo.SaveAll ())
+    public async Task<IActionResult> DeleteClass (int classId)
+    {
+      _repo.Delete(_context.Classes.FirstOrDefault(e => e.Id == classId));
+      if (await _repo.SaveAll())
         return Ok (classId);
-      return BadRequest ("impossible de supprimer cette classe");
+      return BadRequest("impossible de supprimer cette classe");
     }
 
     [HttpPost("AddCourse")]
@@ -1159,7 +1169,7 @@ namespace EducNotes.API.Controllers {
 
       if(await _repo.SaveAll())
       {
-        await _cache.LoadCourses();
+        // await _cache.LoadCourses();
         return Ok();
       }
 
@@ -1489,13 +1499,13 @@ namespace EducNotes.API.Controllers {
     [HttpGet ("GetAllCoursesDetails")]
     public async Task<IActionResult> GetAllCoursesDetails()
     {
-      List<Course> coursesCached = await _cache.GetCourses();
-      List<ClassCourse> classcoursesCached = await _cache.GetClassCourses();
-      List<User> studentsCached = await _cache.GetStudents();
+      // List<Course> coursesCached = await _cache.GetCourses();
+      List<ClassCourse> classcourses = await _context.ClassCourses.ToListAsync();
+      // List<User> studentsCached = await _cache.GetStudents();
 
       var data = new List<CoursesDetailsDto>();
-      var courses = coursesCached.OrderBy(c => c.Name).ToList();
-      foreach (var course in courses)
+      var courses = await _context.Courses.OrderBy(c => c.Name).ToListAsync();
+      foreach(var course in courses)
       {
         var courseDto = new CoursesDetailsDto {
           Id = course.Id,
@@ -1503,41 +1513,42 @@ namespace EducNotes.API.Controllers {
           Abbreviation = course.Abbreviation,
           Color = course.Color
         };
-        courseDto.NbTeachers = classcoursesCached.Where (a => a.CourseId == course.Id).Select(s => s.TeacherId).Distinct().Count();
-        List<int> classIds = classcoursesCached.Where(a => a.CourseId == course.Id).Select(a => a.ClassId).ToList();
+        courseDto.NbTeachers = classcourses.Where (a => a.CourseId == course.Id).Select(s => s.TeacherId).Distinct().Count();
+        List<int> classIds = classcourses.Where(a => a.CourseId == course.Id).Select(a => a.ClassId).ToList();
         courseDto.NbClasses = classIds.Count();
-        courseDto.NbStudents = studentsCached.Where(a => classIds.Contains(Convert.ToInt32(a.ClassId))).Count();
+        courseDto.NbStudents = await _context.Users.Where(a => classIds.Contains(Convert.ToInt32(a.ClassId))).CountAsync();
         data.Add(courseDto);
       }
 
       return Ok (data);
     }
 
-    [HttpPost ("SaveClasses")]
-    public async Task<IActionResult> SaveClasses (ClassForSaveDto model)
+    [HttpPost("SaveClasses")]
+    public async Task<IActionResult> SaveClasses(ClassForSaveDto classToSave)
     {
       try
       {
-        List<ClassLevel> classlevels = await _cache.GetClassLevels();
-        var levelName = classlevels.FirstOrDefault(e => e.Id == model.LevelId).Name + " " + model.Name;
+        // List<ClassLevel> classlevels = await _cache.GetClassLevels();
+        var levelName = (await _context.ClassLevels
+                        .FirstOrDefaultAsync(e => e.Id == classToSave.LevelId)).Name + " " + classToSave.Name;
 
-        if (model.suffixe != null)
+        if (classToSave.suffixe != null)
         {
           //suffixe is a letter
-          if (model.suffixe == 1)
+          if (classToSave.suffixe == 1)
           {
             //suffixe alphabetic
             var compteur = 1;
             for (char i = 'A'; i < 'Z'; i++)
             {
-              if(compteur <= model.NbClass)
+              if(compteur <= classToSave.NbClass)
               {
                 var newClass = new Class {
-                  Name = levelName + " " + model.ClassTypeCode + " " + i,
-                  ClassLevelId = model.LevelId,
+                  Name = levelName + " " + classToSave.ClassTypeCode + " " + i,
+                  ClassLevelId = classToSave.LevelId,
                   Active = 1,
-                  ClassTypeId = model.classTypeId,
-                  MaxStudent = model.maxStudent
+                  ClassTypeId = classToSave.classTypeId,
+                  MaxStudent = classToSave.maxStudent
                 };
                 await _context.Classes.AddAsync(newClass);
                 compteur++;
@@ -1547,14 +1558,14 @@ namespace EducNotes.API.Controllers {
           else
           {
             //suffixe numeric
-            for(int i = 1; i <= model.NbClass; i++)
+            for(int i = 1; i <= classToSave.NbClass; i++)
             {
               var newClass = new Class {
-                Name = levelName + " " + model.ClassTypeCode + " " + i,
-                ClassLevelId = model.LevelId,
+                Name = levelName + " " + classToSave.ClassTypeCode + " " + i,
+                ClassLevelId = classToSave.LevelId,
                 Active = 1,
-                ClassTypeId = model.classTypeId,
-                MaxStudent = model.maxStudent
+                ClassTypeId = classToSave.classTypeId,
+                MaxStudent = classToSave.maxStudent
               };
               await _context.Classes.AddAsync(newClass);
             }
@@ -1563,35 +1574,40 @@ namespace EducNotes.API.Controllers {
         else
         {
           var newClass = new Class {
-            Name = levelName + " " + model.ClassTypeCode + " " + model.Name,
-            ClassLevelId = model.LevelId,
-            MaxStudent = model.maxStudent,
+            Name = classToSave.Name != "" ? levelName + " " + classToSave.ClassTypeCode + " " + classToSave.Name :
+              levelName + " " + classToSave.ClassTypeCode,
+            ClassLevelId = classToSave.LevelId,
+            MaxStudent = classToSave.maxStudent,
             Active = 1,
-            ClassTypeId = model.classTypeId
+            ClassTypeId = classToSave.classTypeId
           };
           await _context.Classes.AddAsync(newClass);
         }
-        await _context.SaveChangesAsync();
-        await _cache.LoadClasses();
+        await _repo.SaveAll();
+        // await _cache.LoadClasses();
         return Ok();
       } 
-      catch(System.Exception ex)
+      catch
       {
-        return BadRequest(ex.Message);
+        return BadRequest("problème pour enregistrer les classes");
       }
     }
 
     [HttpGet("TeachersWithCourses")]
     public async Task<IActionResult> GetTeachersWithCourses()
     {
-      List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
-      List<TeacherCourse> teacherCoursesCached = await _cache.GetTeacherCourses();
-      List<User> teachersCached = await _cache.GetTeachers();
+      // List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
+      // List<TeacherCourse> teacherCoursesCached = await _cache.GetTeacherCourses();
+      // List<User> teachersCached = await _cache.GetTeachers();
 
-      List<User> teachers = teachersCached.OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToList();
+      List<User> teachers = await _context.Users.Include(i => i.EducLevel)
+                                                .Include(i => i.Class)
+                                                .Include(i => i.Photos)
+                                                .Where(u => u.UserTypeId == teacherTypeId)
+                                                .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
 
       var teachersToReturn = new List<TeacherForListDto>();
-      foreach (var teacher in teachers)
+      foreach(var teacher in teachers)
       {
         var tdetails = new TeacherForListDto();
         tdetails.PhoneNumber = teacher.PhoneNumber;
@@ -1618,15 +1634,17 @@ namespace EducNotes.API.Controllers {
           tdetails.PhotoUrl = photo.Url;
 
         tdetails.CourseClasses = new List<TeacherCourseClassesDto>();
-        var teacherCourses = teacherCoursesCached.Where(t => t.TeacherId == teacher.Id).ToList();
-
+        var teacherCourses = await _context.TeacherCourses.Include(i => i.Course)
+                                                          .Where(t => t.TeacherId == teacher.Id).ToListAsync();
         foreach(var course in teacherCourses)
         {
           var cdetails = new TeacherCourseClassesDto();
           cdetails.Course = course.Course;
 
           cdetails.Classes = new List<Class>();
-          var classes = classCoursesCached.Where(t => t.TeacherId == teacher.Id && t.CourseId == course.CourseId).ToList();
+          var classes = await _context.ClassCourses.Include(i => i.Class)
+                                                   .Where(t => t.TeacherId == teacher.Id && t.CourseId == course.CourseId)
+                                                   .ToListAsync();
           
           if(classes != null & classes.Count() > 0)
             cdetails.Classes = classes.Select(c => c.Class).ToList();
@@ -1686,10 +1704,11 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpPost("{id}/{courseId}/{levelId}/SaveTeacherAffectation")]
-    public async Task<IActionResult> SaveTeacherAffectation (int id, int courseId, int levelId, [FromBody] List<int> classIds) {
-      var classcourses = (await _cache.GetClassCourses())
+    public async Task<IActionResult> SaveTeacherAffectation (int id, int courseId, int levelId, [FromBody] List<int> classIds)
+    {
+      var classcourses = await _context.ClassCourses
                       .Where(c => c.CourseId == courseId && c.Class.ClassLevelId == levelId)
-                      .ToList();
+                      .ToListAsync();
 
       Boolean dataToBeSaved = false;
 
@@ -1707,27 +1726,30 @@ namespace EducNotes.API.Controllers {
         dataToBeSaved = true;
       }
 
-      if (dataToBeSaved && await _repo.SaveAll ()) {
-        await _cache.LoadUsers();
-        return Ok ();
+      if(dataToBeSaved && await _repo.SaveAll())
+      {
+        // await _cache.LoadUsers();
+        return Ok();
       } else {
-        return NoContent ();
+        return NoContent();
       }
 
       //return BadRequest("problème pour affecter les classes");
     }
 
     [HttpGet ("TeacherClassCoursByLevel/{teacherId}/{levelId}/{courseId}")]
-    public async Task<IActionResult> TeacherClassCoursByLevel (int teacherid, int levelId, int courseId) {
-      var res = (await _cache.GetClassCourses())
+    public async Task<IActionResult> TeacherClassCoursByLevel (int teacherid, int levelId, int courseId)
+    {
+      var res = await _context.ClassCourses
         .Where(c => c.TeacherId == teacherid && c.CourseId == courseId && c.Class.ClassLevelId == levelId)
-        .ToList();
+        .ToListAsync();
 
-      return Ok (res);
+      return Ok(res);
     }
 
     [HttpGet("Course/{courseId}")]
-    public async Task<IActionResult> Course(int courseId) {
+    public async Task<IActionResult> Course(int courseId)
+    {
       var course = await _context.Courses.FirstOrDefaultAsync (c => c.Id == courseId);
       return Ok (course);
     }
@@ -1742,15 +1764,15 @@ namespace EducNotes.API.Controllers {
     [HttpGet("CLClassTypes")]
     public async Task<IActionResult> CLClassTypes()
     {
-      var clclasstypes =  await _cache.GetCLClassTypes();
+      var clclasstypes =  await _context.ClassLevelClassTypes.ToListAsync();
       return Ok(clclasstypes);
     }
 
     [HttpGet("ClassTypesByLevel")]
     public async Task<IActionResult> GetClassTypesByLevel()
     {
-      List<ClassLevelClassType> CLClassTypesCached = await _cache.GetCLClassTypes();
-      List<ClassLevel> levels = await _cache.GetClassLevels();
+      List<ClassLevelClassType> CLClassTypesCached = await _context.ClassLevelClassTypes.ToListAsync();
+      List<ClassLevel> levels = await _context.ClassLevels.ToListAsync();
 
       List<ClassTypesLevelDto> levelsWithClassTypes = new List<ClassTypesLevelDto>();
       foreach (var level in levels)
@@ -1771,17 +1793,19 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpPost("CreateCourseCoefficient")]
-    public async Task<IActionResult> CreateCourseCoefficient (CreateCoefficientDto coefficientToCreate) {
-      var coefficient = _mapper.Map<CourseCoefficient> (coefficientToCreate);
-      _repo.Add (coefficient);
-      if (await _repo.SaveAll ())
-        return Ok ();
+    public async Task<IActionResult> CreateCourseCoefficient(CreateCoefficientDto coefficientToCreate)
+    {
+      var coefficient = _mapper.Map<CourseCoefficient>(coefficientToCreate);
+      _repo.Add(coefficient);
+      if (await _repo.SaveAll())
+        return Ok();
 
       return BadRequest ("impossible de faire l'ajout");
     }
 
     [HttpGet ("ClassLevelCoefficients/{classLevelId}")]
-    public async Task<IActionResult> ClassLevelCoefficients (int classLevelId) {
+    public async Task<IActionResult> ClassLevelCoefficients (int classLevelId)
+    {
       var coefficients = await _context.CourseCoefficients
         .Include (c => c.ClassType)
         .Include (c => c.Course)
@@ -1790,13 +1814,15 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("CourseCoefficient/{id}")]
-    public async Task<IActionResult> CourseCoefficient (int id) {
+    public async Task<IActionResult> CourseCoefficient (int id)
+    {
       var courseCoef = await _context.CourseCoefficients.FirstOrDefaultAsync (a => a.Id == id);
       return Ok (courseCoef);
     }
 
     [HttpPost ("EditCoefficient/{id}/{coeffificient}")]
-    public async Task<IActionResult> EditCoefficient (int id, int coeffificient) {
+    public async Task<IActionResult> EditCoefficient (int id, int coeffificient)
+    {
       var coef = await _context.CourseCoefficients.FirstOrDefaultAsync (i => i.Id == id);
       if (coef != null) {
         coef.Coefficient = coeffificient;
@@ -1809,7 +1835,8 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpPost ("SaveNewTheme")]
-    public async Task<IActionResult> SaveNewTheme (NewThemeDto newThemeDto) {
+    public async Task<IActionResult> SaveNewTheme (NewThemeDto newThemeDto)
+    {
       int themeId = 0;
       if (!string.IsNullOrEmpty (newThemeDto.Name)) {
         //enregistrement du theme

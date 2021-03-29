@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ClassService } from 'src/app/_services/class.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { ActivatedRoute, Router, ROUTER_CONFIGURATION } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { AuthService } from 'src/app/_services/auth.service';
 import { UserService } from 'src/app/_services/user.service';
 
@@ -101,12 +101,15 @@ export class TeacherAssignmentComponent implements OnInit {
   }
 
   assignment() {
+    this.wait = true;
     const courses = this.teacherForm.value.courses;
     this.userService.assignClasses(this.teacher.id, courses).subscribe(() => {
       this.alertify.success('affectation des classes enregistrée');
       this.router.navigate(['/teachers']);
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 
