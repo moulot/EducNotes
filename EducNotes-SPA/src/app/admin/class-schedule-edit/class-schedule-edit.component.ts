@@ -144,7 +144,7 @@ export class ClassScheduleEditComponent implements OnInit {
       formTouched = true;
     }
 
-    console.log(form1IsValid + '-' + form2IsValid + '-' + form3IsValid + '-' + form4IsValid + '-' + form5IsValid + ' t: ' + formTouched);
+    // console.log(form1IsValid + '-' + form2IsValid + '-' + form3IsValid + '-' + form4IsValid + '-' + form5IsValid + ' t: ' + formTouched);
     if (!form1IsValid || !form2IsValid || !form3IsValid || !form4IsValid ||
         !form5IsValid || !teacherIsValid || !courseIsValid || !formTouched) {
       return {'formNOK': true};
@@ -158,20 +158,20 @@ export class ClassScheduleEditComponent implements OnInit {
     const day1 = g.get('day1').value;
     const hourStart1 = g.get('hourStart1').value;
     const hourEnd1 = g.get('hourEnd1').value;
-    console.log(day1 + '-' + hourStart1 + '-' + hourEnd1);
+    // console.log(day1 + '-' + hourStart1 + '-' + hourEnd1);
     if (day1) {
       if (hourStart1 || hourEnd1) {
         const typedHS1 = hourStart1 ? hourStart1.replace('_', '') : '';
         const typedHE1 = hourEnd1 ? hourEnd1.replace('_', '') : '';
         if (day1 !== null && typedHS1.length > 1 && typedHE1.length > 1) {
-          console.log('in line');
+          // console.log('in line');
           if (typedHS1.length !== 5 || typedHE1.length !== 5) {
             return {'line1DatesNOK': true};
           } else {
             return null;
           }
         } else {
-          console.log('line NOK');
+          // console.log('line NOK');
           return {'line1NOK': true};
         }
       }

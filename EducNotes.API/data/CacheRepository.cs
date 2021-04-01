@@ -269,7 +269,7 @@ namespace EducNotes.API.data {
 
       // Save data in cache.
       _cache.Remove (ck.EducLevels);
-      _cache.Set (ck.EducLevels, educLevels, cacheEntryOptions);
+      _cache.Set(ck.EducLevels, educLevels, cacheEntryOptions);
 
       return educLevels;
     }

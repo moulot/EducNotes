@@ -1514,7 +1514,7 @@ namespace EducNotes.API.Controllers {
           Abbreviation = course.Abbreviation,
           Color = course.Color
         };
-        courseDto.NbTeachers = classcourses.Where (a => a.CourseId == course.Id).Select(s => s.TeacherId).Distinct().Count();
+        courseDto.NbTeachers = classcourses.Where(a => a.CourseId == course.Id).Select(s => s.TeacherId).Distinct().Count();
         List<int> classIds = classcourses.Where(a => a.CourseId == course.Id).Select(a => a.ClassId).ToList();
         courseDto.NbClasses = classIds.Count();
         courseDto.NbStudents = await _context.Users.Where(a => classIds.Contains(Convert.ToInt32(a.ClassId))).CountAsync();
@@ -1772,7 +1772,7 @@ namespace EducNotes.API.Controllers {
     [HttpGet("ClassTypesByLevel")]
     public async Task<IActionResult> GetClassTypesByLevel()
     {
-      List<ClassLevelClassType> CLClassTypesCached = await _context.ClassLevelClassTypes.ToListAsync();
+      List<ClassLevelClassType> CLClassTypesCached = await _context.ClassLevelClassTypes.Include(i => i.ClassType).ToListAsync();
       List<ClassLevel> levels = await _context.ClassLevels.ToListAsync();
 
       List<ClassTypesLevelDto> levelsWithClassTypes = new List<ClassTypesLevelDto>();

@@ -143,7 +143,7 @@
       </div>
     </div>
   </div>
-  <div class="col-md-10 mx-auto">
+  <div class="col-md-10 mx-auto" *ngIf="user.phoneNumberConfirmed">
     <div class="card mb-2">
       <div class="card-body">
         <div *ngIf="!teacherOk">
@@ -206,22 +206,23 @@
               <div class="col-md-12">
                 <hr class="mt-2 mb-1">
                 <div class="float-right">
-                  <button type="button" (click)="initialValues()" mdbBtn class="btnBlue" size="sm" mdbWavesEffect>données initiales</button>
+                  <!-- <button type="button" (click)="initialValues()" mdbBtn class="btnBlue" size="sm" mdbWavesEffect>données initiales</button> -->
                   <button type="submit" mdbBtn [disabled]="!userForm.valid || userNameExist" class="btnBlue"
-                    size="sm" mdbWavesEffect>saisir mes données</button>
+                    size="sm" mdbWavesEffect>enregistrer</button>
                 </div>
               </div>
             </div>
           </form>
         </div>
-        <div *ngIf="teacherOk">
-          <div class="text-16">votre compte Educ'Notes est maintenant actif. merci!</div>
+        <div class="row" *ngIf="teacherOk">
+          <div class="col-md-12">
+            <div class="text-16">votre compte Educ'Notes est maintenant actif. merci!</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div *ngIf="teacherOk" class="mt-4 mx-auto">
-    <button type="button" mdbBtn [routerLink]="['/signIn']"  class="btnBlue" mdbWavesEffect>connecter vous à votre compte</button>
-  </div>
+    <div *ngIf="teacherOk" class="mt-4 mx-auto text-center">
+      <button type="button" mdbBtn [routerLink]="['/signIn']"  class="btnBlue" mdbWavesEffect>connecter vous à votre compte</button>
+    </div>
   </div>
 </div>

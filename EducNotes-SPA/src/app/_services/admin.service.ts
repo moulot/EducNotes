@@ -143,28 +143,12 @@ export class AdminService {
     return this.http.put(this.baseUrl + 'admin/saveSchool', school);
   }
 
-  BroadcastMessaging(dataForBroadcast: DataForBroadcast) {
-    return this.http.post(this.baseUrl + 'admin/BroadcastMessaging', dataForBroadcast);
-  }
-
   sendEmail(dataForEmail: DataForEmail) {
     return this.http.post(this.baseUrl + 'admin/SendBatchEmail', dataForEmail);
   }
 
   saveImportedUsers(importedUsers, insertUserId) {
     return this.http.post(this.baseUrl + 'admin/ImportedUsers/' + insertUserId, importedUsers);
-  }
-
-  getEmailBroadCastData() {
-    return this.http.get(this.baseUrl + 'admin/EmailBroadCastData');
-  }
-
-  getEmailTemplatesData() {
-    return this.http.get(this.baseUrl + 'admin/EmailTemplates');
-  }
-
-  getSmsTemplatesData() {
-    return this.http.get(this.baseUrl + 'admin/SmsTemplates');
   }
 
   sendEmailRegistration() {

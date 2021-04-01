@@ -50,7 +50,7 @@
                 </div>
                 <div class="col-md-12"><hr class="my-1"></div>
                 <div class="col-md-12 mb-2" formArrayName="parents" *ngFor="let parent of usersForm.get('parents')['controls'] |
-                  paginate: { id: 'parent', itemsPerPage: parentpageSize, currentPage: parentpage }; let i = index;">
+                  paginate: { id: 'parent1', itemsPerPage: parentpageSize, currentPage: parentpage }; let i = index;">
                   <div class="card" [formGroupName]="i">
                     <div class="card-body p-2">
                     <div class="row">
@@ -106,7 +106,7 @@
                   </div>
                 </div>
                 <div class="col-md-12 mt-1">
-                  <pagination-controls (pageChange)="parentpage = $event" id="parent" responsive="true"
+                  <pagination-controls (pageChange)="parentpage = $event" id="parent1" responsive="true"
                     directionLinks="true" previousLabel="" nextLabel=""></pagination-controls>
                 </div>
               </div>
@@ -129,7 +129,7 @@
                 </div>
                 <div class="col-md-12"><hr class="my-1"></div>
                 <div class="col-md-12 mb-2" formArrayName="teachers" *ngFor="let teacher of usersForm.get('teachers')['controls'] |
-                  paginate: { id: 'teacher', itemsPerPage: teacherpageSize, currentPage: teacherpage }; let i = index;">
+                  paginate: { id: 'teacher1', itemsPerPage: teacherpageSize, currentPage: teacherpage }; let i = index;">
                   <div class="card" [formGroupName]="i">
                     <div class="card-body p-2">
                       <div class="row">
@@ -185,7 +185,7 @@
                   </div>
                 </div>
                 <div class="col-md-12 mt-1">
-                  <pagination-controls (pageChange)="parentpage = $event" id="teacher" responsive="true"
+                  <pagination-controls (pageChange)="parentpage = $event" id="teacher1" responsive="true"
                     directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
                 </div>
               </div>
@@ -203,7 +203,7 @@
                 <div class="col-md-12 text-16"><b>{{type.name}}s</b></div>
                 <div class="col-md-12"><hr class="my-1"></div>
                 <div class="col-md-6 my-2" formArrayName="parents" *ngFor="let parent of usersForm.get('parents')['controls'] |
-                  paginate: { id: 'parent', itemsPerPage: parentpageSize, currentPage: parentpage }; let i = index;">
+                  paginate: { id: 'parent2', itemsPerPage: parentpageSize, currentPage: parentpage }; let i = index;">
                   <div class="card" [formGroupName]="i">
                     <div class="card-body p-2">
                       <div class="d-md-flex">
@@ -261,7 +261,7 @@
                   </div>
                 </div>
                 <div class="col-md-12 mt-1">
-                  <pagination-controls (pageChange)="parentpage = $event" id="parent" responsive="true"
+                  <pagination-controls (pageChange)="parentpage = $event" id="parent2" responsive="true"
                     directionLinks="true" previousLabel="" nextLabel=""></pagination-controls>
                 </div>
               </div>
@@ -275,7 +275,7 @@
                 <div class="col-md-12 text-16"><b>{{type.name}}s</b></div>
                 <div class="col-md-12"><hr class="my-1"></div>
                 <div class="col-md-6 my-2" formArrayName="teachers" *ngFor="let teacher of usersForm.get('teachers')['controls'] |
-                  paginate: { id: 'teacher', itemsPerPage: teacherpageSize, currentPage: teacherpage }; let i = index;">
+                  paginate: { id: 'teacher2', itemsPerPage: teacherpageSize, currentPage: teacherpage }; let i = index;">
                   <div class="card" [formGroupName]="i">
                     <div class="card-body p-2">
                       <div class="d-md-flex">
@@ -328,7 +328,7 @@
                   </div>
                 </div>
                 <div class="col-md-12 mt-1">
-                  <pagination-controls (pageChange)="parentpage = $event" id="teacher" responsive="true"
+                  <pagination-controls (pageChange)="parentpage = $event" id="teacher2" responsive="true"
                     directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
                 </div>
               </div>

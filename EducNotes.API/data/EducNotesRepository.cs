@@ -1120,11 +1120,12 @@ namespace EducNotes.API.Data {
       return true;
     }
 
-    public async Task<bool> SendResetPasswordLink (User user, string token) {
-      var template = await _context.EmailTemplates.FirstAsync (t => t.Id == resetPwdEmailId);
+    public async Task<bool> SendResetPasswordLink (User user, string token)
+    {
+      var template = await _context.EmailTemplates.FirstAsync(t => t.Id == resetPwdEmailId);
       var email = await SetEmailForResetPwdLink (template.Subject, template.Body, user.Id,
         user.LastName, user.FirstName, user.Gender, user.Email, token);
-      _context.Add (email);
+      _context.Add(email);
 
       if(!await SaveAll())
         return false;
@@ -1849,15 +1850,16 @@ namespace EducNotes.API.Data {
       return AgendaList;
     }
 
-    public async Task<int> GetAssignedChildrenCount (int parentId) {
-      var userIds = await _context.UserLinks
-        .Where (u => u.UserPId == parentId)
-        .Select (s => s.UserId).ToListAsync ();
+    public async Task<int> GetAssignedChildrenCount (int parentId)
+    {
+      var userIds = await _context.UserLinks.Where(u => u.UserPId == parentId)
+                                            .Select(s => s.UserId).ToListAsync();
 
-      return userIds.Count ();
+      return userIds.Count();
     }
 
-    public async Task<bool> SaveProductSelection (int userPid, int userId, List<ServiceSelectionDto> products) {
+    public async Task<bool> SaveProductSelection(int userPid, int userId, List<ServiceSelectionDto> products)
+    {
       // insertion dans la table order 
       int total = products.Sum (x => Convert.ToInt32 (x.Price));
       var newOrder = new Order {
@@ -1930,14 +1932,114 @@ namespace EducNotes.API.Data {
     public async Task<List<Absence>> GetAbsencesByDate(DateTime date)
     {
       var absences = await _context.Absences
-        .Include(i => i.User).ThenInclude(i => i.Class)
-        .Include(i => i.User).ThenInclude(i => i.Photos)
-        .Include(i => i.DoneBy)
-        .Include(i => i.AbsenceType)
-        .Include(i => i.Session).ThenInclude(i => i.Course)
-        .Where(a => a.StartDate.Date == date.Date)
-        .ToListAsync();
+                            .Include(i => i.User).ThenInclude(i => i.Class)
+                            .Include(i => i.User).ThenInclude(i => i.Photos)
+                            .Include(i => i.DoneBy)
+                            .Include(i => i.AbsenceType)
+                            .Include(i => i.Session).ThenInclude(i => i.Course)
+                            .Where(a => a.StartDate.Date == date.Date)
+                            .ToListAsync();
       return absences;
+    }
+
+    public async Task<MsgRecipientsDto> GetMsgRecipientsForClasses(List<UserForDetailedDto> users, List<int> educLevelIds, 
+      List<int> schoolIds, List<int> classLevelIds, List<int> classIds, int msgType, Boolean sendToNotValidated)
+    {
+      MsgRecipientsDto recipients = new MsgRecipientsDto();
+      var filteredUsers = new List<UserForDetailedDto>();
+      List<User> usersFromDB = await _context.Users
+                                      .Include(i => i.ClassLevel).ThenInclude(i => i.School)
+                                      .Include(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
+                                      .ToListAsync();
+
+      //is it restricted to selected Education levels?
+      if(educLevelIds.Count() > 0)
+      {
+        var userEducLevels = usersFromDB
+                              .Where(u => educLevelIds.Contains(Convert.ToInt32(u.ClassLevel.EducationLevelId)))
+                              .ToList();
+        var selectedUserIds = userEducLevels.Select(u => u.Id);
+        filteredUsers = users.Where(u => selectedUserIds.Contains(u.Id)).ToList();
+      }
+
+      //is it restricted to selected schools?
+      if(schoolIds.Count() > 0)
+      {
+        var userSchools = usersFromDB
+                              .Where(u => schoolIds.Contains(Convert.ToInt32(u.ClassLevel.SchoolId)))
+                              .ToList();
+        var selectedUserIds = userSchools.Select(u => u.Id);
+        filteredUsers = filteredUsers.Where(u => selectedUserIds.Contains(u.Id)).ToList();
+      }
+
+      //is it restricted to selected classlevels?
+      if(classLevelIds.Count() > 0)
+      {
+        var userClassLevels = usersFromDB
+                              .Where(u => classLevelIds.Contains(Convert.ToInt32(u.ClassLevelId)))
+                              .ToList();
+        var selectedUserIds = userClassLevels.Select(u => u.Id);
+        filteredUsers = filteredUsers.Where(u => selectedUserIds.Contains(u.Id)).ToList();
+      }
+
+      foreach (var user in users)
+      {
+        if(msgType == 1) //email
+        {
+          if(user.EmailConfirmed || sendToNotValidated)
+          {
+            recipients.UsersOK.Add(user);
+          }
+          else
+          {
+            recipients.UsersNOK.Add(user);
+          }
+        }
+        else // sms
+        {
+          if(user.PhoneNumberConfirmed || sendToNotValidated)
+          {
+            recipients.UsersOK.Add(user);
+          }
+          else
+          {
+            recipients.UsersNOK.Add(user);
+          }
+        }
+      }
+      return recipients;
+    }
+
+    public MsgRecipientsDto GetMsgRecipientsForUsers(List<UserForDetailedDto> users, int msgType, Boolean sendToNotValidated)
+    {
+      MsgRecipientsDto recipients = new MsgRecipientsDto();
+
+      foreach (var user in users)
+      {
+        if(msgType == 1) //email
+        {
+          if(user.EmailConfirmed || sendToNotValidated)
+          {
+            recipients.UsersOK.Add(user);
+          }
+          else
+          {
+            recipients.UsersNOK.Add(user);
+          }
+        }
+        else // sms
+        {
+          if(user.PhoneNumberConfirmed || sendToNotValidated)
+          {
+            recipients.UsersOK.Add(user);
+          }
+          else
+          {
+            recipients.UsersNOK.Add(user);
+          }
+        }
+      }
+      return recipients;
     }
 
     public void Clickatell_SendSMS(clickatellParamsDto smsData)
@@ -2125,8 +2227,8 @@ namespace EducNotes.API.Data {
       {
         TokenDto td = new TokenDto();
         td.TokenString = token.TokenString;
-        var subDomain = (await _context.Settings.FirstAsync (s => s.Name.ToLower () == "subdomain")).Value;
-        string teacherId = emailData.Id.ToString ();
+        var subDomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower() == "subdomain")).Value;
+        string teacherId = emailData.Id.ToString();
 
         switch (td.TokenString) {
           case "<N_ENSEIGNANT>":
@@ -2153,11 +2255,11 @@ namespace EducNotes.API.Data {
           case "<CONFIRM_LINK>":
             string url = "";
             if (subDomain != "")
-              url = string.Format (baseUrl, subDomain + ".");
+              url = string.Format(baseUrl, subDomain + ".");
             else
               url = string.Format (baseUrl, "");
-            td.Value = string.Format ("{0}/confirmTeacherEmail?id={1}&token={2}", url,
-              teacherId, HttpUtility.UrlEncode (emailData.Token));
+            td.Value = string.Format("{0}/confirmTeacherEmail?id={1}&token={2}", url,
+              teacherId, HttpUtility.UrlEncode(emailData.Token));
             break;
           default:
             break;
@@ -2302,7 +2404,7 @@ namespace EducNotes.API.Data {
       newEmail.FromAddress = "no-reply@educnotes.com";
       newEmail.Subject = subject;
       List<TokenDto> tags = await GetResetPwdLinkTokenValues(tokens, userId, lastName, firstName, gender, resetToken);
-      newEmail.Body = ReplaceTokens (tags, content);
+      newEmail.Body = ReplaceTokens(tags, content);
       newEmail.InsertUserId = 1;
       newEmail.InsertDate = DateTime.Now;
       newEmail.UpdateUserId = 1;
@@ -2312,7 +2414,8 @@ namespace EducNotes.API.Data {
       return newEmail;
     }
 
-    public List<TokenDto> GetAccountUpdatedTokenValues (IEnumerable<Token> tokens, string lastName, byte gender) {
+    public List<TokenDto> GetAccountUpdatedTokenValues (IEnumerable<Token> tokens, string lastName, byte gender)
+    {
       List<TokenDto> tokenValues = new List<TokenDto> ();
 
       foreach (var token in tokens) {
@@ -2337,7 +2440,7 @@ namespace EducNotes.API.Data {
 
     public async Task<List<TokenDto>> GetResetPwdLinkTokenValues (IEnumerable<Token> tokens, int userId, string lastName,
       string firstName, byte gender, string resetToken) {
-      var subDomain = (await _context.Settings.FirstAsync (s => s.Name.ToLower () == "subdomain")).Value;
+      var subDomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower() == "subdomain")).Value;
       List<TokenDto> tokenValues = new List<TokenDto> ();
 
       foreach (var token in tokens) {

@@ -6,6 +6,7 @@ import { clickatellParams } from '../_models/clickatellParams';
 import { SmsTemplate } from '../_models/smsTemplate';
 import { Observable } from 'rxjs';
 import { EmailTemplate } from '../_models/emailTemplate';
+import { DataForBroadcast } from '../_models/dataForBroadcast';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,10 @@ export class CommService {
 
   getSmsCategories() {
     return this.http.get(this.baseUrl + 'SmsCategories');
+  }
+
+  getEmailBroadCastData() {
+    return this.http.get(this.baseUrl + 'EmailBroadCastData');
   }
 
   getEmailTemplates() {
@@ -60,6 +65,18 @@ export class CommService {
 
   getTokens() {
     return this.http.get(this.baseUrl + 'Tokens');
+  }
+
+  getBroadcastRecap(dataForBroadcast) {
+    return this.http.post(this.baseUrl + 'BroadcastRecap', dataForBroadcast);
+  }
+
+  UsersBroadcastMessaging(dataForBroadcast) {
+    return this.http.post(this.baseUrl + 'UsersBroadcastMessaging', dataForBroadcast);
+  }
+
+  ClassesBroadcastMessaging(dataForBroadcast) {
+    return this.http.post(this.baseUrl + 'ClassesBroadcastMessaging', dataForBroadcast);
   }
 
 }

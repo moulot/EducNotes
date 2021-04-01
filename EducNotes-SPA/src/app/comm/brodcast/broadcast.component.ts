@@ -1,15 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
-import { AdminService } from 'src/app/_services/admin.service';
 import { Email } from 'src/app/_models/email';
-import { UserService } from 'src/app/_services/user.service';
-import { DataForBroadcast } from 'src/app/_models/dataForBroadcast';
 import { ClassForBroadCast } from 'src/app/_models/classForBroadCast';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
+import { CommService } from 'src/app/_services/comm.service';
 
 @Component({
   selector: 'app-broadcast',
@@ -50,9 +47,16 @@ export class BroadcastComponent implements OnInit {
   schoolClassList: any[] = [];
   classLevelClassList: any[] = [];
   toggleEmailSms = true;
+  btnActive = 0;
+  showRecapPage = false;
+  recipients: any;
+  usersNOK: any;
+  subject: string;
+  body: string;
+  sendNotValidatedUsers = false;
 
-  constructor(private classService: ClassService, private alertify: AlertifyService, private router: Router,
-    private adminService: AdminService, private fb: FormBuilder, private userService: UserService) { }
+  constructor(private classService: ClassService, private alertify: AlertifyService,
+    private router: Router, private fb: FormBuilder, private commService: CommService) { }
 
   ngOnInit() {
     this.showTo = true;
@@ -63,8 +67,8 @@ export class BroadcastComponent implements OnInit {
     this.addUserTypeItem();
     this.getData();
     this.getClassLevels();
-    this.getEmailTemplatesData();
-    this.getSmsTemplatesData();
+    this.getEmailTemplates();
+    this.getSmsTemplates();
   }
 
   createMsgForm() {
@@ -75,6 +79,8 @@ export class BroadcastComponent implements OnInit {
       cycles: this.fb.array([]),
       classLevels: this.fb.array([]),
       classes: this.fb.array([]),
+      sendToUsersNOK: [false],
+      msgType: [0],
       msgChoice: [1],
       emailType: [1],
       emailSubject: ['', Validators.required],
@@ -232,7 +238,7 @@ export class BroadcastComponent implements OnInit {
   }
 
   getData() {
-    this.adminService.getEmailBroadCastData().subscribe((data: any) => {
+    this.commService.getEmailBroadCastData().subscribe((data: any) => {
       this.schools = data.schools;
       this.cycles = data.cycles;
       this.educLevels = data.educLevels;
@@ -293,8 +299,8 @@ export class BroadcastComponent implements OnInit {
     });
   }
 
-  getEmailTemplatesData() {
-    this.adminService.getEmailTemplatesData().subscribe(data => {
+  getEmailTemplates() {
+    this.commService.getEmailTemplates().subscribe(data => {
       this.emailTemplates = data;
       for (let i = 0; i < this.emailTemplates.length; i++) {
         const elt = this.emailTemplates[i];
@@ -306,8 +312,8 @@ export class BroadcastComponent implements OnInit {
     });
   }
 
-  getSmsTemplatesData() {
-    this.adminService.getSmsTemplatesData().subscribe(data => {
+  getSmsTemplates() {
+    this.commService.getSmsTemplates().subscribe(data => {
       this.smsTemplates = data;
       for (let i = 0; i < this.smsTemplates.length; i++) {
         const elt = this.smsTemplates[i];
@@ -439,9 +445,8 @@ export class BroadcastComponent implements OnInit {
   }
 
   selectSmsBody() {
-    this.toggleEmailSms = false;
+     this.toggleEmailSms = false;
     this.smsBodyType = this.msgForm.value.smsType;
-    console.log('smsBodyType:' + this.smsBodyType);
     this.msgForm.get('smsBody').setValue('');
     this.msgForm.get('smsTemplate').reset();
   }
@@ -537,8 +542,104 @@ export class BroadcastComponent implements OnInit {
     this.showGroups = true;
   }
 
-  toggleBox() {
+  toggleBox($event) {
     this.toggleEmailSms = !this.toggleEmailSms;
+  }
+
+  selectBtn(index) {
+    this.btnActive = index;
+    this.msgForm.get('msgType').setValue(index);
+  }
+
+  setNotValidatedUsers() {
+    this.sendNotValidatedUsers = !this.sendNotValidatedUsers;
+  }
+
+  getBroadcastRecap() {
+    let userTypeIds = [];
+    for (let i = 0; i < this.msgForm.value.userTypes.length; i++) {
+      const userType = this.msgForm.value.userTypes[i];
+      if (userType.active === true) {
+        userTypeIds = [...userTypeIds, userType.userTypeId];
+      }
+    }
+    let educLevelIds = [];
+    for (let i = 0; i < this.msgForm.value.educLevels.length; i++) {
+      const educLevel = this.msgForm.value.educLevels[i];
+      if (educLevel.active === true) {
+        educLevelIds = [...educLevelIds, educLevel.educLevelId];
+      }
+    }
+    let schoolIds = [];
+    for (let i = 0; i < this.msgForm.value.schools.length; i++) {
+      const school = this.msgForm.value.schools[i];
+      if (school.active === true) {
+        schoolIds = [...schoolIds, school.schoolId];
+      }
+    }
+    let classLevelIds = [];
+    for (let i = 0; i < this.msgForm.value.classLevels.length; i++) {
+      const classLevel = this.msgForm.value.classLevels[i];
+      if (classLevel.active === true) {
+        classLevelIds = [...classLevelIds, classLevel.schoolId];
+      }
+    }
+    let classIds = [];
+    for (let j = 0; j < this.msgForm.value.classes.length; j++) {
+      const aclass = this.msgForm.value.classes[j];
+      if (aclass.selected === true) {
+        classIds = [...classIds, aclass.classId];
+      }
+    }
+
+    const dataForMsgs = <any>{};
+    const msgChoice = this.msgForm.value.msgChoice;
+    if (msgChoice === 1) { // email
+      const subject = this.msgForm.value.emailSubject;
+      const body = this.msgForm.value.emailBody;
+      const templateId = this.msgForm.value.emailTemplate;
+
+      if (Number(this.emailBodyType) === 1) {
+        dataForMsgs.templateId = templateId;
+        dataForMsgs.subject = '';
+        dataForMsgs.body = '';
+      } else {
+        dataForMsgs.emailTemplateId = 0;
+        dataForMsgs.subject = subject;
+        dataForMsgs.body = body;
+      }
+    } else { // sms
+      const body = this.msgForm.value.smsBody;
+      const templateId = this.msgForm.value.smsTemplate;
+
+      if (Number(this.smsBodyType) === 1) {
+        dataForMsgs.templateId = templateId;
+        dataForMsgs.subject = '';
+        dataForMsgs.body = '';
+      } else {
+        dataForMsgs.templateId = 0;
+        dataForMsgs.subject = '';
+        dataForMsgs.body = body;
+      }
+    }
+
+    dataForMsgs.msgToRecipients = this.btnActive;
+    dataForMsgs.msgType = msgChoice;
+    dataForMsgs.sendToUSersNOK = this.msgForm.value.sendToUsersNOK;
+    dataForMsgs.userTypeIds = userTypeIds;
+    dataForMsgs.educLevelIds = educLevelIds;
+    dataForMsgs.schoolIds = schoolIds;
+    dataForMsgs.classLevelIds = classLevelIds;
+    dataForMsgs.classIds = classIds;
+    this.commService.getBroadcastRecap(dataForMsgs).subscribe((data: any) => {
+      this.showRecapPage = true;
+      this.recipients = data.recipients;
+      this.usersNOK = data.usersNOK;
+      this.subject = data.subject;
+      this.body = data.body;
+    }, error => {
+      this.alertify.error('problème avec l\'envoi des emails');
+    });
   }
 
   sendMessages() {
@@ -547,6 +648,27 @@ export class BroadcastComponent implements OnInit {
       const userType = this.msgForm.value.userTypes[i];
       if (userType.active === true) {
         userTypeIds = [...userTypeIds, userType.userTypeId];
+      }
+    }
+    let educLevelIds = [];
+    for (let i = 0; i < this.msgForm.value.educLevels.length; i++) {
+      const educLevel = this.msgForm.value.educLevels[i];
+      if (educLevel.active === true) {
+        educLevelIds = [...educLevelIds, educLevel.educLevelId];
+      }
+    }
+    let schoolIds = [];
+    for (let i = 0; i < this.msgForm.value.schools.length; i++) {
+      const school = this.msgForm.value.schools[i];
+      if (school.active === true) {
+        schoolIds = [...schoolIds, school.schoolId];
+      }
+    }
+    let classLevelIds = [];
+    for (let i = 0; i < this.msgForm.value.classLevels.length; i++) {
+      const classLevel = this.msgForm.value.classLevels[i];
+      if (classLevel.active === true) {
+        classLevelIds = [...classLevelIds, classLevel.schoolId];
       }
     }
     let classIds = [];
@@ -590,8 +712,11 @@ export class BroadcastComponent implements OnInit {
     }
 
     dataForMsgs.userTypeIds = userTypeIds;
+    dataForMsgs.educLevelIds = educLevelIds;
+    dataForMsgs.schoolIds = schoolIds;
+    dataForMsgs.classLevelIds = classLevelIds;
     dataForMsgs.classIds = classIds;
-    this.adminService.BroadcastMessaging(dataForMsgs).subscribe(data => {
+    this.commService.ClassesBroadcastMessaging(dataForMsgs).subscribe(data => {
       this.alertify.success('messages envoyés.');
       this.router.navigate(['/home']);
     }, error => {
