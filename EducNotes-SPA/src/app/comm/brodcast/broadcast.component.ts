@@ -7,6 +7,7 @@ import { ClassForBroadCast } from 'src/app/_models/classForBroadCast';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { CommService } from 'src/app/_services/comm.service';
+import { Utils } from 'src/app/shared/utils';
 
 @Component({
   selector: 'app-broadcast',
@@ -54,11 +55,19 @@ export class BroadcastComponent implements OnInit {
   subject: string;
   body: string;
   sendNotValidatedUsers = false;
+  usersOKpage = 1;
+  usersOKpageSize = 12;
+  usersNOKpage = 1;
+  usersNOKpageSize = 12;
+  msgChoice: number;
+  tokens: any;
+  tokenOptions = [];
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
     private router: Router, private fb: FormBuilder, private commService: CommService) { }
 
   ngOnInit() {
+    this.msgChoice = 1;
     this.showTo = true;
     this.showGroups = true;
     this.emailBodyType = 1;
@@ -69,6 +78,7 @@ export class BroadcastComponent implements OnInit {
     this.getClassLevels();
     this.getEmailTemplates();
     this.getSmsTemplates();
+    this.getBroadcastTokens();
   }
 
   createMsgForm() {
@@ -80,10 +90,11 @@ export class BroadcastComponent implements OnInit {
       classLevels: this.fb.array([]),
       classes: this.fb.array([]),
       sendToUsersNOK: [false],
+      token: [],
       msgType: [0],
       msgChoice: [1],
       emailType: [1],
-      emailSubject: ['', Validators.required],
+      emailSubject: [''],
       emailTemplate: [null],
       emailBody: [''],
       smsType: [1],
@@ -94,6 +105,7 @@ export class BroadcastComponent implements OnInit {
 
   formValidator(g: FormGroup) {
     const userTypes = g.get('userTypes') as FormArray;
+    const msgType = g.get('msgType').value;
     let userserror = false;
     let usersSelected = false;
     for (let i = 0; i < userTypes.length; i++) {
@@ -117,7 +129,7 @@ export class BroadcastComponent implements OnInit {
         break;
       }
     }
-    if (!classesSelected) {
+    if (!classesSelected && msgType === 2) {
       classeserror = true;
     }
 
@@ -126,7 +138,7 @@ export class BroadcastComponent implements OnInit {
     const emailtemplate = g.get('emailTemplate').value;
     const emailbody = g.get('emailBody').value;
     const emailType = g.get('emailType').value;
-    // console.log('email: ' + msgChoice + '-' + emailtemplate + '-' + emailbody + '-' + emailType);
+    console.log('email: ' + msgChoice + '-' + emailtemplate + '-' + emailbody + '-' + emailType);
     if (msgChoice === 1 && emailType === 2) {
       if ((emailtemplate === null || emailtemplate === 'undefined') && emailbody === '') {
         bodyerror = true;
@@ -235,6 +247,22 @@ export class BroadcastComponent implements OnInit {
       active: [false],
       selected: [false]
     });
+  }
+
+  getBroadcastTokens() {
+    this.commService.getBroadcastTokens().subscribe((tokens: any) => {
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        const elt = {value: token.tokenString, label: token.tokenString + ' : ' + token.name };
+        this.tokenOptions = [...this.tokenOptions, elt];
+      }
+    });
+  }
+
+  addTokenToBody(token) {
+    const body = this.msgForm.value.emailBody;
+    this.msgForm.get('emailBody').setValue(body + ' ' + token);
+    // this.msgForm.get('token').setValue(null);
   }
 
   getData() {
@@ -551,6 +579,10 @@ export class BroadcastComponent implements OnInit {
     this.msgForm.get('msgType').setValue(index);
   }
 
+  goBack() {
+    this.showRecapPage = false;
+  }
+
   setNotValidatedUsers() {
     this.sendNotValidatedUsers = !this.sendNotValidatedUsers;
   }
@@ -593,8 +625,8 @@ export class BroadcastComponent implements OnInit {
     }
 
     const dataForMsgs = <any>{};
-    const msgChoice = this.msgForm.value.msgChoice;
-    if (msgChoice === 1) { // email
+    this.msgChoice = this.msgForm.value.msgChoice;
+    if (this.msgChoice === 1) { // email
       const subject = this.msgForm.value.emailSubject;
       const body = this.msgForm.value.emailBody;
       const templateId = this.msgForm.value.emailTemplate;
@@ -624,103 +656,47 @@ export class BroadcastComponent implements OnInit {
     }
 
     dataForMsgs.msgToRecipients = this.btnActive;
-    dataForMsgs.msgType = msgChoice;
-    dataForMsgs.sendToUSersNOK = this.msgForm.value.sendToUsersNOK;
+    dataForMsgs.msgChoice = this.msgChoice;
+    dataForMsgs.msgType = this.msgForm.value.msgType;
+    dataForMsgs.sendToUsersNOK = this.msgForm.value.sendToUsersNOK;
     dataForMsgs.userTypeIds = userTypeIds;
     dataForMsgs.educLevelIds = educLevelIds;
     dataForMsgs.schoolIds = schoolIds;
     dataForMsgs.classLevelIds = classLevelIds;
     dataForMsgs.classIds = classIds;
     this.commService.getBroadcastRecap(dataForMsgs).subscribe((data: any) => {
+      Utils.smoothScrollToTop(20);
       this.showRecapPage = true;
       this.recipients = data.recipients;
       this.usersNOK = data.usersNOK;
       this.subject = data.subject;
       this.body = data.body;
     }, error => {
-      this.alertify.error('problème avec l\'envoi des emails');
+      this.alertify.error('problème avec la sélection des destinataires du message');
     });
   }
 
-  sendMessages() {
-    let userTypeIds = [];
-    for (let i = 0; i < this.msgForm.value.userTypes.length; i++) {
-      const userType = this.msgForm.value.userTypes[i];
-      if (userType.active === true) {
-        userTypeIds = [...userTypeIds, userType.userTypeId];
-      }
+  sendMessage() {
+    let users = [];
+    for (let i = 0; i < this.recipients.length; i++) {
+      const elt = this.recipients[i];
+      const user = <any>{};
+      user.id = elt.id;
+      user.lastName = elt.lastName;
+      user.firstName = elt.firstName;
+      user.gender = elt.gender;
+      user.mobile = elt.phoneNumber;
+      user.email = elt.email;
+      user.msgChoice = this.msgChoice;
+      user.subject = this.subject;
+      user.body = this.body;
+      users = [...users, user];
     }
-    let educLevelIds = [];
-    for (let i = 0; i < this.msgForm.value.educLevels.length; i++) {
-      const educLevel = this.msgForm.value.educLevels[i];
-      if (educLevel.active === true) {
-        educLevelIds = [...educLevelIds, educLevel.educLevelId];
-      }
-    }
-    let schoolIds = [];
-    for (let i = 0; i < this.msgForm.value.schools.length; i++) {
-      const school = this.msgForm.value.schools[i];
-      if (school.active === true) {
-        schoolIds = [...schoolIds, school.schoolId];
-      }
-    }
-    let classLevelIds = [];
-    for (let i = 0; i < this.msgForm.value.classLevels.length; i++) {
-      const classLevel = this.msgForm.value.classLevels[i];
-      if (classLevel.active === true) {
-        classLevelIds = [...classLevelIds, classLevel.schoolId];
-      }
-    }
-    let classIds = [];
-    for (let j = 0; j < this.msgForm.value.classes.length; j++) {
-      const aclass = this.msgForm.value.classes[j];
-      if (aclass.selected === true) {
-        classIds = [...classIds, aclass.classId];
-      }
-    }
-
-    const dataForMsgs = <any>{};
-    const msgChoice = this.msgForm.value.msgChoice;
-    if (msgChoice === 1) {
-      const subject = this.msgForm.value.emailSubject;
-      const body = this.msgForm.value.emailBody;
-      const templateId = this.msgForm.value.emailTemplate;
-
-      dataForMsgs.msgType = msgChoice;
-      if (Number(this.emailBodyType) === 1) {
-        dataForMsgs.templateId = templateId;
-        dataForMsgs.subject = '';
-        dataForMsgs.body = '';
-      } else {
-        dataForMsgs.emailTemplateId = 0;
-        dataForMsgs.subject = subject;
-        dataForMsgs.body = body;
-      }
-    } else {
-      const body = this.msgForm.value.smsBody;
-      const templateId = this.msgForm.value.smsTemplate;
-
-      if (Number(this.smsBodyType) === 1) {
-        dataForMsgs.templateId = templateId;
-        dataForMsgs.subject = '';
-        dataForMsgs.body = '';
-      } else {
-        dataForMsgs.templateId = 0;
-        dataForMsgs.subject = '';
-        dataForMsgs.body = body;
-      }
-    }
-
-    dataForMsgs.userTypeIds = userTypeIds;
-    dataForMsgs.educLevelIds = educLevelIds;
-    dataForMsgs.schoolIds = schoolIds;
-    dataForMsgs.classLevelIds = classLevelIds;
-    dataForMsgs.classIds = classIds;
-    this.commService.ClassesBroadcastMessaging(dataForMsgs).subscribe(data => {
+    this.commService.sendBroadcastMessages(users).subscribe(data => {
       this.alertify.success('messages envoyés.');
       this.router.navigate(['/home']);
     }, error => {
-      this.alertify.error('problème avec l\'envoi des emails');
+      this.alertify.error('problème avec l\'envoi du message');
     });
   }
 

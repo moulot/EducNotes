@@ -205,6 +205,13 @@
                             </div>
                           </div>
                           <div *ngIf="emailBodyType == 2" class="col-md-12">
+                            <div class="row">
+                              <div class="col-md-6 mb-1">
+                                <mdb-select [options]="tokenOptions" formControlName="token" (ngModelChange)="addTokenToBody($event)"
+                                  placeholder="mots clés du message"></mdb-select>
+                              </div>
+                            </div>
+                            <div class="text-15 textDarkRed mb-1">sélectionner le mot clé pour l'ajouter à la fin du message</div>
                             <div class="form-group shadow-textarea">
                               <textarea class="form-control z-depth-1" id="emailBody" formControlName="emailBody"
                                 rows="5" placeholder="message du email..."></textarea>
@@ -215,7 +222,7 @@
                     </div>
                     <div class="col-md-12 mb-1">
                       <button type="submit" size="sm" mdbBtn class="btnBlue" block="true" mdbWavesEffect
-                        >envoyer les emails</button>
+                      [disabled]="!msgForm.valid || msgForm.hasError('formNOK')">envoyer les emails</button>
                     </div>
                   </div>     
                   <div *ngIf="!toggleEmailSms"  class="row">
@@ -251,7 +258,7 @@
                     </div>
                     <div class="col-md-12 mb-1">
                       <button type="submit" size="sm" mdbBtn class="btnBlue" block="true" mdbWavesEffect
-                        >envoyer les sms</button>
+                      [disabled]="!msgForm.valid || msgForm.hasError('formNOK')">envoyer les sms</button>
                     </div>
                   </div>                  
                 </div>
@@ -264,15 +271,71 @@
   </div>
 </div>
 <div *ngIf="showRecapPage">
-  <div>in recap page!</div>
-  <div>{{subject}}</div>
-  <div>{{body}}</div>
-  <div>USER OK</div>
-  <div *ngFor="let user of recipients; let i = index">
-    {{i+1}}. {{user.lastName}} {{user.firstName}}. {{user.email}}
-  </div>
-  <div>UNSERS NOT OK</div>
-  <div *ngFor="let user of usersNOK; let i = index">
-    {{i+1}}. {{user.lastName}} {{user.firstName}}. {{user.email}}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body p-2">
+          <div class="text-15 d-flex">
+            <a (click)="goBack()">
+              <i class="fad fa-undo-alt text-15 mr-2" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+            </a>
+            <b>récapitulatif de la diffusion du message</b>
+          </div>
+          <hr class="my-1">
+          <div *ngIf="recipients.length > 0">
+            <div class="text-16 textBlue">sélection des destinataires : </div>
+            <div *ngIf="recipients.length > 1" class="text-15">le message sera envoyé à <b>{{recipients.length}}</b> personnes.</div>
+            <div *ngIf="recipients.length === 1" class="text-15">le message sera envoyé à <b>{{recipients.length}}</b> personne.</div>
+            <div *ngIf="usersNOK.length > 1" class="text-15"><b>{{usersNOK.length}}</b> personnes non validées ne recevrons pas le message.</div>
+            <div *ngIf="usersNOK.length === 1" class="text-15"><b>{{usersNOK.length}}</b> personne non validée ne recevra pas le message.</div>
+            <hr class="my-1">
+            <div class="text-15 mb-1"><b>destinataires OK pour l'envoi du message</b></div>
+            <div class="row">
+              <div class="col-md-3 mb-2" *ngFor="let user of recipients |
+                paginate: { id: 'usersOK', itemsPerPage: usersOKpageSize, currentPage: usersOKpage }; let i = index">
+                <div class="border rounded-pill selected p-1">
+                  <div class="d-flex">
+                    <img class="child-img mr-2" src="{{user.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
+                    <div class="text-17 my-auto">{{user.lastName}} {{user.firstName}}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12 mt-1">
+                <pagination-controls (pageChange)="usersOKpage = $event" id="usersOK" responsive="true"
+                  directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
+              </div>
+            </div>
+            <hr class="my-1">
+            <div class="text-15 mb-1"><b>personnes non validées ne recevant pas le message</b></div>
+            <div class="row">
+              <div class="col-md-3 mb-2" *ngFor="let user of usersNOK |
+                paginate: { id: 'usersNOK', itemsPerPage: usersNOKpageSize, currentPage: usersNOKpage }; let i = index">
+                <div class="border rounded-pill selected p-1">
+                  <div class="d-flex">
+                    <img class="child-img mr-2" src="{{user.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
+                    <div class="text-17 my-auto">{{user.lastName}} {{user.firstName}}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12 mt-1">
+                <pagination-controls (pageChange)="usersNOKpage = $event" id="usersNOK" responsive="true"
+                  directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
+              </div>
+            </div>
+            <hr class="my-1">
+            <div *ngIf="msgChoice == 1" class="text-15">objet du message : <b>{{subject}}</b></div>
+            <div>corps du message :</div>
+            <div class="text-15">{{body}}</div>
+            <div class="my-1">
+              <button type="button" mdbBtn (click)="sendMessage()" size="sm" block="true" class="btnBlue" mdbWavesEffect>envoyer les messages</button>
+            </div>
+          </div>
+          <div *ngIf="recipients.length === 0">
+            <div class="text-17 text-danger">aucune personne trouvée pour envoyer le message. recommencez la sélection svp.</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

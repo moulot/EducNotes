@@ -304,15 +304,20 @@ namespace EducNotes.API.Controllers
         return Ok();
       }
 
-      // throw new Exception($"Updating/Saving agendaItem failed");
-
       return BadRequest("problème pour ajouter le modèle sms");
     }
 
     [HttpGet("Tokens")]
     public async Task<IActionResult> GetTokens()
     {
-      var tokens = await _context.Tokens.OrderBy(t => t.Name).ToListAsync();
+      var tokens = await _repo.GetTokens();
+      return Ok(tokens);
+    }
+
+    [HttpGet("BroadcastTokens")]
+    public async Task<IActionResult> GetBroadcastTokens()
+    {
+      var tokens = await _repo.GetBroadcastTokens();
       return Ok(tokens);
     }
 
@@ -333,8 +338,8 @@ namespace EducNotes.API.Controllers
       List<int> classLevelIds = new List<int>(); //dataForEmailDto.ClassLevelIds;
       List<int> classIds = dataForMsgDto.ClassIds;
       int msgType = dataForMsgDto.MsgType;
-      int msgToRecipients = dataForMsgDto.MsgToRecipients;
-      Boolean sendToNotValidated = dataForMsgDto.SendToUSersNOK;
+      int msgChoice = dataForMsgDto.MsgChoice;
+      Boolean sendToNotValidated = dataForMsgDto.SendToUsersNOK;
       int templateId = dataForMsgDto.TemplateId;
       string subject = "";
       string body = "";
@@ -342,7 +347,7 @@ namespace EducNotes.API.Controllers
       //did we select a template?
       if(templateId != 0)
       {
-        if(msgType == 1)
+        if(msgChoice == 1)
         {
           var template = await _context.EmailTemplates.FirstAsync(t => t.Id == templateId);
           subject = template.Subject;
@@ -362,23 +367,26 @@ namespace EducNotes.API.Controllers
 
       List<UserForDetailedDto> recipients = new List<UserForDetailedDto>();
       List<UserForDetailedDto> usersNOK = new List<UserForDetailedDto>();
-      var usersFromDB = new List<User>();
-      usersFromDB = await _context.Users.Where(u => userTypeIds.Contains(Convert.ToInt32(u.UserTypeId))).ToListAsync();
-      var usersList = _mapper.Map<List<UserForDetailedDto>>(usersFromDB);
+      var users = await _context.Users
+                            .Include(i => i.Photos)
+                            .Include(i => i.ClassLevel).ThenInclude(i => i.School)
+                            .Include(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
+                            .Where(u => userTypeIds.Contains(Convert.ToInt32(u.UserTypeId))).ToListAsync();
+      // var usersList = _mapper.Map<List<UserForDetailedDto>>(usersFromDB);
 
       MsgRecipientsDto msgRecipients = new MsgRecipientsDto();
-      switch(msgToRecipients)
+      switch(msgType)
       {
         case 0:
-          msgRecipients = _repo.GetMsgRecipientsForUsers(usersList, msgType, sendToNotValidated);
-          recipients = msgRecipients.UsersOK;
-          usersNOK =  msgRecipients.UsersNOK;
+          msgRecipients = _repo.GetMsgRecipientsForUsers(users, educLevelIds, schoolIds, 
+            classLevelIds, classIds, msgChoice, sendToNotValidated);
+          recipients = _mapper.Map<List<UserForDetailedDto>>(msgRecipients.UsersOK);
+          usersNOK = _mapper.Map<List<UserForDetailedDto>>(msgRecipients.UsersNOK);
           break;
         case 1:
-          msgRecipients = await _repo.GetMsgRecipientsForClasses(usersList, educLevelIds, schoolIds, 
-            classLevelIds, classIds, msgType, sendToNotValidated);
-          recipients = msgRecipients.UsersOK;
-          usersNOK =  msgRecipients.UsersNOK;
+          msgRecipients = _repo.GetMsgRecipientsForClasses(users, msgChoice, sendToNotValidated);
+          recipients = _mapper.Map<List<UserForDetailedDto>>(msgRecipients.UsersOK);
+          usersNOK = _mapper.Map<List<UserForDetailedDto>>(msgRecipients.UsersNOK);
           break;
         case 2:
           break;
@@ -392,6 +400,61 @@ namespace EducNotes.API.Controllers
         subject,
         body
       });
+    }
+
+    [HttpPost("sendBroadcastMessages")]
+    public async Task<IActionResult> SendBroadcastMessages(List<UserToSendMsgDto> users)
+    {
+      int loggedUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+      var tokens = await _repo.GetTokens();
+      int emailCommTypeId = _config.GetValue<int>("AppSettings:emailCommTypeId");
+      int smsCommTypeId = _config.GetValue<int>("AppSettings:SmsCommTypeId");
+      int msgChoice = users[0].msgChoice;
+
+      if(msgChoice == 1) //email
+      {
+        foreach(var user in users)
+        {
+          Email email = new Email();
+          email.EmailTypeId = emailCommTypeId;
+          email.ToAddress = user.Email;
+          email.FromAddress = "no-reply@educnotes.com";
+          email.Subject = user.Subject;
+          List<TokenDto> tags = await _repo.GetMessageTokenValues(tokens, user);
+          email.Body = _repo.ReplaceTokens(tags, user.Body);
+          email.InsertUserId = loggedUserId;
+          email.InsertDate = DateTime.Now;
+          email.UpdateUserId = loggedUserId;
+          email.UpdateDate = DateTime.Now;
+          email.ToUserId = user.Id;
+          _repo.Add(email);
+        }
+      }
+      else //sms
+      {
+        foreach(var user in users)
+        {
+          Sms sms = new Sms();
+          sms.SmsTypeId = smsCommTypeId;
+          sms.To = user.Mobile;
+          if(user.ChildId != 0)
+            sms.StudentId = user.ChildId;
+          sms.ToUserId = user.Id;
+          sms.validityPeriod = 1;
+          // replace tokens with dynamic data
+          List<TokenDto> tags = await _repo.GetMessageTokenValues(tokens, user);
+          sms.Content = _repo.ReplaceTokens(tags, user.Body);
+          sms.InsertUserId = loggedUserId;
+          sms.InsertDate = DateTime.Now;
+          sms.UpdateDate = DateTime.Now;
+          _repo.Add(sms);
+        }
+      }
+
+      if(! await _repo.SaveAll())
+        return BadRequest("problème pour envoyer les messages");
+      
+      return Ok();
     }
 
     [HttpPost("ClassesBroadcastMessaging")]

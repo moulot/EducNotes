@@ -49,9 +49,15 @@ namespace EducNotes.API.Data
 
             var emailtypes = new List<EmailType>() {
               new EmailType { Name = "confirmation Email" },
-              new EmailType { Name = "confirmed Email" }
+              new EmailType { Name = "confirmed Email" },
+              new EmailType { Name = "communication" }
             };
             context.AddRange(emailtypes);
+
+            var tokentypes = new List<TokenType>() {
+              new TokenType { Name = "diffusion message" },
+            };
+            context.AddRange(tokentypes);
 
             var classtypes = new List<ClassType>() {
               new ClassType { Name = "série A", Code = "A" },

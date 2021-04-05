@@ -32,10 +32,9 @@
                 </div>
                 <div class="col-md-10">
                   <div class="row">
+                    <div *ngIf="editionMode" class="col-md-12 text-15 text-danger">le mobile et le email sont edités dans le compte de l'utilisateur</div>
                     <div class="col-md-3">
                       <div class="md-form mt-1 mb-0">
-                        <!-- <i class="fad fa-id-card prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
                         <input mdbInput type="text" id="lastName" class="form-control" formControlName="lastName" mdbValidate>
                         <label for="lastName" class="">nom</label>
                       </div>
@@ -45,8 +44,6 @@
                     </div>
                     <div class="col-md-3">
                       <div class="md-form mt-1 mb-0">
-                        <!-- <i class="fad fa-id-card prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
                         <input mdbInput type="text" id="firstName" class="form-control" formControlName="firstName" mdbValidate>
                         <label for="firstName" class="">prénom</label>
                       </div>
@@ -56,8 +53,6 @@
                     </div>
                     <div class="col-md-3">
                       <div class="d-flex">
-                        <!-- <i class="fad fa-venus-mars fa-2x pt-3 mr-2 prefix" style="padding-top: 10px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
                         <mdb-select id="gender" [options]="gender" placeholder="sexe" formControlName="gender"></mdb-select>
                       </div>
                       <div *ngIf="teacherForm.get('gender').errors && teacherForm.get('gender').touched"
@@ -65,8 +60,6 @@
                     </div>
                     <div class="col-md-3">
                       <div class="md-form my-0">
-                        <!-- <i class="fad fa-birthday-cake prefix" style="padding-top: 5px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
                         <mdb-date-picker name="dateOfBirth" [placeholder]="'date de naissance'" [options]="myDatePickerOptions" formControlName="dateOfBirth"></mdb-date-picker>
                         <div *ngIf="teacherForm.get('dateOfBirth').errors && teacherForm.get('dateOfBirth').touched"
                           class="text-small text-danger">la date de naissance est obligatoire</div>
@@ -76,25 +69,19 @@
                   <div class="row">
                     <div class="col-md-3">
                       <div class="md-form mt-1 mb-0">
-                        <!-- <i class="fad fa-mobile-alt prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
-                        <input mdbInput type="text" id="cell" class="form-control" formControlName="cell">
+                        <input mdbInput type="text" [attr.readOnly]="editionMode? true : null" id="cell" class="form-control" formControlName="cell">
                         <label for="cell" class="">portable</label>
                       </div>
                     </div>
                     <div class="col-md-3">
                       <div class="md-form mt-1 mb-0">
-                        <!-- <i class="fad fa-phone-alt fa-1x prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
                         <input mdbInput type="text" id="phone2" class="form-control" formControlName="phone2">
                         <label for="phone2" class="">autre</label>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="md-form mt-1 mb-0">
-                        <!-- <i class="fad fa-at fa-1x prefix" style="padding-top: 4px;--fa-primary-opacity: 1;--fa-secondary-opacity: 1;
-                          --fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
-                        <input mdbInput type="text" id="email" class="form-control" formControlName="email">
+                        <input mdbInput type="text" [attr.readOnly]="editionMode? true : null" id="email" class="form-control" formControlName="email">
                         <label for="email" class="">email</label>
                       </div>
                     </div>
@@ -102,8 +89,6 @@
                   <div class="row">
                     <div class="col-md-3">
                       <div class="md-form mt-1 mb-0">
-                        <!-- <i class="fad fa-users-class fa-1x mr-2 prefix" style="padding-top: 10px;--fa-primary-opacity: 1;
-                          --fa-secondary-opacity: 1;--fa-primary-color: #192C47; --fa-secondary-color:#f89f20;"></i> -->
                         <mdb-select id="educlevelId" [options]="educlevelOptions" (ngModelChange)="changeEducLevel()"
                           placeholder="niveau d'éducation" formControlName="educLevelId"></mdb-select>
                         <div *ngIf="teacherForm.get('educLevelId').errors && teacherForm.get('educLevelId').touched"

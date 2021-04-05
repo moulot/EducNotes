@@ -35,7 +35,7 @@ namespace EducNotes.API.Data {
     string password, baseUrl;
     int teacherTypeId, parentTypeId, studentTypeId, adminTypeId, teacherConfirmEmailId, resetPwdEmailId;
     int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId,
-    schoolInscTypeId, updateAccountEmailId;
+    schoolInscTypeId, updateAccountEmailId, broadcastTokenTypeId;
     CultureInfo frC = new CultureInfo ("fr-FR");
     public ICacheRepository _cache { get; }
 
@@ -64,6 +64,7 @@ namespace EducNotes.API.Data {
       baseUrl = _config.GetValue<String> ("AppSettings:DefaultLink");
       resetPwdEmailId = _config.GetValue<int> ("AppSettings:resetPwdEmailId");
       updateAccountEmailId = _config.GetValue<int> ("AppSettings:updateAccountEmailId");
+      broadcastTokenTypeId = _config.GetValue<int> ("AppSettings:broadcastTokenTypeId");
 
       _cloudinaryConfig = cloudinaryConfig;
       Account acc = new Account (
@@ -1942,20 +1943,18 @@ namespace EducNotes.API.Data {
       return absences;
     }
 
-    public async Task<MsgRecipientsDto> GetMsgRecipientsForClasses(List<UserForDetailedDto> users, List<int> educLevelIds, 
-      List<int> schoolIds, List<int> classLevelIds, List<int> classIds, int msgType, Boolean sendToNotValidated)
+    public MsgRecipientsDto GetMsgRecipientsForUsers(List<User> users, List<int> educLevelIds, 
+      List<int> schoolIds, List<int> classLevelIds, List<int> classIds, int msgChoice, Boolean sendToNotValidated)
     {
       MsgRecipientsDto recipients = new MsgRecipientsDto();
-      var filteredUsers = new List<UserForDetailedDto>();
-      List<User> usersFromDB = await _context.Users
-                                      .Include(i => i.ClassLevel).ThenInclude(i => i.School)
-                                      .Include(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
-                                      .ToListAsync();
+      recipients.UsersOK = new List<User>();
+      recipients.UsersNOK = new List<User>();
+      var filteredUsers = new List<User>();
 
       //is it restricted to selected Education levels?
       if(educLevelIds.Count() > 0)
       {
-        var userEducLevels = usersFromDB
+        var userEducLevels = users
                               .Where(u => educLevelIds.Contains(Convert.ToInt32(u.ClassLevel.EducationLevelId)))
                               .ToList();
         var selectedUserIds = userEducLevels.Select(u => u.Id);
@@ -1965,7 +1964,7 @@ namespace EducNotes.API.Data {
       //is it restricted to selected schools?
       if(schoolIds.Count() > 0)
       {
-        var userSchools = usersFromDB
+        var userSchools = users
                               .Where(u => schoolIds.Contains(Convert.ToInt32(u.ClassLevel.SchoolId)))
                               .ToList();
         var selectedUserIds = userSchools.Select(u => u.Id);
@@ -1975,7 +1974,7 @@ namespace EducNotes.API.Data {
       //is it restricted to selected classlevels?
       if(classLevelIds.Count() > 0)
       {
-        var userClassLevels = usersFromDB
+        var userClassLevels = users
                               .Where(u => classLevelIds.Contains(Convert.ToInt32(u.ClassLevelId)))
                               .ToList();
         var selectedUserIds = userClassLevels.Select(u => u.Id);
@@ -1984,7 +1983,7 @@ namespace EducNotes.API.Data {
 
       foreach (var user in users)
       {
-        if(msgType == 1) //email
+        if(msgChoice == 1) //email
         {
           if(user.EmailConfirmed || sendToNotValidated)
           {
@@ -1995,7 +1994,7 @@ namespace EducNotes.API.Data {
             recipients.UsersNOK.Add(user);
           }
         }
-        else // sms
+        else //sms
         {
           if(user.PhoneNumberConfirmed || sendToNotValidated)
           {
@@ -2010,7 +2009,7 @@ namespace EducNotes.API.Data {
       return recipients;
     }
 
-    public MsgRecipientsDto GetMsgRecipientsForUsers(List<UserForDetailedDto> users, int msgType, Boolean sendToNotValidated)
+    public MsgRecipientsDto GetMsgRecipientsForClasses(List<User> users, int msgType, Boolean sendToNotValidated)
     {
       MsgRecipientsDto recipients = new MsgRecipientsDto();
 
@@ -2181,7 +2180,7 @@ namespace EducNotes.API.Data {
       newEmail.ToAddress = emailData.Email;
       newEmail.FromAddress = "no-reply@educnotes.com";
       newEmail.Subject = subject.Replace("<NOM_ECOLE>", schoolName);
-      List<TokenDto> tags = await GetTeacherEmailTokenValues(tokens.ToList(), emailData);
+      List<TokenDto> tags = await GetTeacherEmailTokenValues(tokens, emailData);
       newEmail.Body = ReplaceTokens(tags, content);
       newEmail.InsertUserId = 1;
       newEmail.InsertDate = DateTime.Now;
@@ -2217,6 +2216,47 @@ namespace EducNotes.API.Data {
       }
 
       return RegEmails;
+    }
+
+    public async Task<List<TokenDto>> GetMessageTokenValues(List<Token> tokens, UserToSendMsgDto user)
+    {
+      List<TokenDto> tokenValues = new List<TokenDto>();
+
+      foreach (var token in tokens)
+      {
+        TokenDto td = new TokenDto();
+        td.TokenString = token.TokenString;
+        var subDomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower() == "subdomain")).Value;
+        string teacherId = user.Id.ToString();
+
+        switch(td.TokenString)
+        {
+          case "<N_UTILISATEUR>":
+            td.Value = user.LastName.FirstLetterToUpper();
+            break;
+          case "<P_UTILISATEUR>":
+            td.Value = user.FirstName.FirstLetterToUpper();
+            break;
+          case "<M_MME>":
+            td.Value = user.Gender == 0 ? "Mme" : "M.";
+            break;
+          case "<CELL_UTILISATEUR>":
+            td.Value = user.Mobile;
+            break;
+          case "<EMAIL_UTILISATEUR>":
+            td.Value = user.Email;
+            break;
+          case "<TOKEN>":
+            td.Value = user.Token;
+            break;
+          default:
+            break;
+        }
+
+        tokenValues.Add (td);
+      }
+
+      return tokenValues;
     }
 
     public async Task<List<TokenDto>> GetTeacherEmailTokenValues(List<Token> tokens, ConfirmTeacherEmailDto emailData)
@@ -2477,16 +2517,19 @@ namespace EducNotes.API.Data {
       return tokenValues;
     }
 
-    public async Task<List<Sms>> SetSmsDataForNewGrade (List<EvalSmsDto> grades, string content, int teacherId) {
-      List<Sms> GradesSms = new List<Sms> ();
-      var tokens = await GetTokens ();
-      int SmsGradeTypeId = _config.GetValue<int> ("AppSettings:SmsGradeTypeId");
+    public async Task<List<Sms>> SetSmsDataForNewGrade (List<EvalSmsDto> grades, string content, int teacherId)
+    {
+      List<Sms> GradesSms = new List<Sms>();
+      var tokens = await GetTokens();
+      int SmsGradeTypeId = _config.GetValue<int>("AppSettings:SmsGradeTypeId");
 
-      foreach (var grade in grades) {
+      foreach(var grade in grades)
+      {
         var oldSms = await _context.Sms.FirstOrDefaultAsync (s => s.StudentId == grade.ChildId &&
           s.ToUserId == grade.ParentId && s.EvaluationId == grade.EvaluationId);
-        if (oldSms == null || grade.ForUpdate) {
-          Sms newSms = new Sms ();
+        if(oldSms == null || grade.ForUpdate)
+        {
+          Sms newSms = new Sms();
           newSms.EvaluationId = grade.EvaluationId;
           newSms.SmsTypeId = SmsGradeTypeId;
           newSms.To = grade.ParentCellPhone;
@@ -2494,12 +2537,12 @@ namespace EducNotes.API.Data {
           newSms.ToUserId = grade.ParentId;
           newSms.validityPeriod = 1;
           // replace tokens with dynamic data
-          List<TokenDto> tags = GetTokenGradeValues (tokens, grade, grade.ForUpdate);
-          newSms.Content = ReplaceTokens (tags, content);
+          List<TokenDto> tags = GetTokenGradeValues(tokens, grade, grade.ForUpdate);
+          newSms.Content = ReplaceTokens(tags, content);
           newSms.InsertUserId = teacherId;
           newSms.InsertDate = DateTime.Now;
           newSms.UpdateDate = DateTime.Now;
-          GradesSms.Add (newSms);
+          GradesSms.Add(newSms);
         }
       }
 
@@ -2569,15 +2612,26 @@ namespace EducNotes.API.Data {
       return tokenValues;
     }
 
-    public string ReplaceTokens (List<TokenDto> tokens, string content) {
-      foreach (var token in tokens) {
-        content = content.Replace (token.TokenString, token.Value);
+    public string ReplaceTokens(List<TokenDto> tokens, string content)
+    {
+      foreach(var token in tokens)
+      {
+        content = content.Replace(token.TokenString, token.Value);
       }
       return content;
     }
 
-    public async Task<IEnumerable<Token>> GetTokens () {
-      var tokens = await _context.Tokens.OrderBy (t => t.Name).ToListAsync ();
+    public async Task<List<Token>> GetTokens()
+    {
+      var tokens = await _context.Tokens.OrderBy(t => t.Name).ToListAsync();
+      return tokens;
+    }
+
+    public async Task<List<Token>> GetBroadcastTokens()
+    {
+      var tokens = await _context.Tokens
+                          .Where(t => t.TokenTypeId == broadcastTokenTypeId)
+                          .OrderBy(t => t.Name).ToListAsync();
       return tokens;
     }
 

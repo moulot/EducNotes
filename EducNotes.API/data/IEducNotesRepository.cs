@@ -133,8 +133,12 @@ namespace EducNotes.API.Data
     Task<LateAmountsDto> GetProductLateAmountsDue(int productId, int levelId);
     Task<LateAmountsDto> GetChildLateAmountsDue(int productId, int childId);
     Task<Boolean> SendTeacherConfirmEmail(int userId);
-    MsgRecipientsDto GetMsgRecipientsForUsers(List<UserForDetailedDto> users, int msgType, Boolean sendToNotValidated);
-    Task<MsgRecipientsDto> GetMsgRecipientsForClasses(List<UserForDetailedDto> users, List<int> educLevelIds, 
-      List<int> schoolIds, List<int> classLevelIds, List<int> classIds, int msgType, Boolean sendToNotValidated);
+    Task<List<Token>> GetTokens();
+    string ReplaceTokens(List<TokenDto> tokens, string content);
+    Task<List<TokenDto>> GetMessageTokenValues(List<Token> tokens, UserToSendMsgDto user);
+    Task<List<Token>> GetBroadcastTokens();
+    MsgRecipientsDto GetMsgRecipientsForClasses(List<User> users, int msgChoice, Boolean sendToNotValidated);
+    MsgRecipientsDto GetMsgRecipientsForUsers(List<User> users, List<int> educLevelIds, 
+      List<int> schoolIds, List<int> classLevelIds, List<int> classIds, int msgChoice, Boolean sendToNotValidated);
   }
 }

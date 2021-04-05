@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using EducNotes.API.Models;
 
 namespace EducNotes.API.Dtos
 {
   public class MsgRecipientsDto
   {
-    public List<UserForDetailedDto> UsersOK { get; set;}
-    public List<UserForDetailedDto> UsersNOK { get; set; }
+    public List<User> UsersOK { get; set;}
+    public List<User> UsersNOK { get; set; }
   }
 }

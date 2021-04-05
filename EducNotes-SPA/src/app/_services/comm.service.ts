@@ -67,8 +67,16 @@ export class CommService {
     return this.http.get(this.baseUrl + 'Tokens');
   }
 
+  getBroadcastTokens() {
+    return this.http.get(this.baseUrl + 'BroadcastTokens');
+  }
+
   getBroadcastRecap(dataForBroadcast) {
     return this.http.post(this.baseUrl + 'BroadcastRecap', dataForBroadcast);
+  }
+
+  sendBroadcastMessages(users) {
+    return this.http.post(this.baseUrl + 'sendBroadcastMessages', users);
   }
 
   UsersBroadcastMessaging(dataForBroadcast) {

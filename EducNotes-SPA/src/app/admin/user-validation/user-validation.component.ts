@@ -21,11 +21,11 @@ export class UserValidationComponent implements OnInit {
   usersDivs: any[] = [];
   btnActive = 0;
   studentpage = 1;
-  studentpageSize = 20;
+  studentpageSize = 5;
   parentpage = 1;
-  parentpageSize = 20;
+  parentpageSize = 5;
   teacherpage = 1;
-  teacherpageSize = 20;
+  teacherpageSize = 5;
   list = true;
   nbTeachers = 0;
   nbParents = 0;

@@ -70,6 +70,7 @@ namespace EducNotes.API.Data
     public DbSet<SmsTemplate> SmsTemplates { get; set; }
     public DbSet<UserSmsTemplate> UserSmsTemplates { get; set; }
     public DbSet<Token> Tokens { get; set; }
+    public DbSet<TokenType> TokenTypes { get; set; }
     public DbSet<TeacherCourse> TeacherCourses { get; set; }
     public DbSet<ClassType> ClassTypes { get; set; }
     public DbSet<InscriptionType> InscriptionTypes { get; set; }
