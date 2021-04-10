@@ -217,7 +217,8 @@ namespace EducNotes.API.Data
               new SmsCategory {Name = "vie de classe"},
               new SmsCategory {Name = "administration"},
               new SmsCategory {Name = "alertes"},
-              new SmsCategory {Name = "communication"}
+              new SmsCategory {Name = "communication"},
+              new SmsCategory {Name = "diffusion messages"}
             };
             context.AddRange(smsCat);
 
@@ -225,7 +226,8 @@ namespace EducNotes.API.Data
               new EmailCategory {Name = "notes"},
               new EmailCategory {Name = "communication"},
               new EmailCategory {Name = "scolarité"},
-              new EmailCategory {Name = "paiement"}
+              new EmailCategory {Name = "paiement"},
+              new EmailCategory {Name = "diffusion messages"}
             };
             context.AddRange(emailCat);
             context.SaveChanges();
@@ -256,14 +258,14 @@ namespace EducNotes.API.Data
             context.AddRange(emailTemplates);
 
             var smsTemplates = new List<SmsTemplate> {
-              new SmsTemplate {Name = "nouvelle note", Content = "", SmsCategoryId = 1},
-              new SmsTemplate {Name = "absence", Content = "", SmsCategoryId = 2},
-              new SmsTemplate {Name = "devoir de maison", Content = "", SmsCategoryId = 2},
-              new SmsTemplate {Name = "alerte note basse", Content = "", SmsCategoryId = 1},
-              new SmsTemplate {Name = "congés et sorties", Content = "", SmsCategoryId = 5},
-              new SmsTemplate {Name = "retard", Content = "", SmsCategoryId = 2},
-              new SmsTemplate {Name = "modification numéro mobile", Content = "", SmsCategoryId = 5},
-              new SmsTemplate {Name = "modification mot de passe", Content = "", SmsCategoryId = 5}
+              new SmsTemplate {Name = "nouvelle note", Content = "", SmsCategoryId = 1, Internal = true},
+              new SmsTemplate {Name = "absence", Content = "", SmsCategoryId = 2, Internal = true},
+              new SmsTemplate {Name = "devoir de maison", Content = "", SmsCategoryId = 2, Internal = true},
+              new SmsTemplate {Name = "alerte note basse", Content = "", SmsCategoryId = 1, Internal = true},
+              new SmsTemplate {Name = "congés et sorties", Content = "", SmsCategoryId = 5, Internal = true},
+              new SmsTemplate {Name = "retard", Content = "", SmsCategoryId = 2, Internal = true},
+              new SmsTemplate {Name = "modification numéro mobile", Content = "", SmsCategoryId = 5, Internal = true},
+              new SmsTemplate {Name = "modification mot de passe", Content = "", SmsCategoryId = 5, Internal = true}
             };
             context.AddRange(smsTemplates);
 

@@ -285,6 +285,7 @@ import { ClassScheduleResolver } from './_resolvers/class-schedule-resolver';
 import { EditLevelClassesComponent } from './admin/class-management/edit-level-classes/edit-level-classes.component';
 import { ConfigProductsComponent } from './admin/config/config-products/config-products.component';
 import { RecoveryComponent } from './admin/treso/recovery/recovery.component';
+import { MdbWysiwygModule } from 'mdb-wysiwyg';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -527,7 +528,8 @@ export function tokenGetter() {
       AppFormsModule,
       MDBBootstrapModulesPro.forRoot(),
       TagInputModule,
-      NgxEditorModule
+      NgxEditorModule,
+      MdbWysiwygModule
    ],
    providers: [
       AuthService,

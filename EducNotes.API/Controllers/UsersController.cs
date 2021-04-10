@@ -1299,19 +1299,19 @@ namespace EducNotes.API.Controllers {
     public async Task<IActionResult> GetAssignedClasses(int teacherId)
     {
       //get teacher with all his classes
-      // List<User> teacherCached = await _cache.GetTeachers();
-      var teacherFromDB = await _context.Users.FirstOrDefaultAsync(u => u.Id == teacherId);
+      List<User> teacherCached = await _cache.GetTeachers();
+      var teacherFromDB = teacherCached.FirstOrDefault(u => u.Id == teacherId);
       var teacher = _mapper.Map<User>(teacherFromDB);
       
       if(teacherFromDB != null)
       {
-        // List<TeacherCourse> teacherCoursesCached = await _cache.GetTeacherCourses();
-        // List<ClassLevel> classLevelsCached = await _cache.GetClassLevels();
-        // List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
-        // List<Class> classesCached = await _cache.GetClasses();
+        List<TeacherCourse> teacherCoursesCached = await _cache.GetTeacherCourses();
+        List<ClassLevel> classLevelsCached = await _cache.GetClassLevels();
+        List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
+        List<Class> classesCached = await _cache.GetClasses();
 
         List<AssignedClassesDto> classes = new List<AssignedClassesDto>();
-        var courses = await _context.TeacherCourses.Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToListAsync();
+        var courses = teacherCoursesCached.Where(t => t.TeacherId == teacherId).Select(c => c.Course).ToList();
         
         foreach(var course in courses)
         {
@@ -1320,23 +1320,25 @@ namespace EducNotes.API.Controllers {
           assignedClasses.CourseName = course.Name;
 
           assignedClasses.Levels = new List<LevelWithClassesDto>();
-          var levels = await _context.ClassLevels.Where(c => c.EducationLevelId == teacher.EducLevelId)
-                                        .OrderBy(c => c.DsplSeq).ToListAsync();
+          var levels = classLevelsCached.Where(c => c.EducationLevelId == teacher.EducLevelId)
+                                        .OrderBy(c => c.DsplSeq).ToList();
           foreach(var level in levels)
           {
             LevelWithClassesDto lwcd = new LevelWithClassesDto();
-            var selectedIds = await _context.ClassCourses.Where(c => c.TeacherId == teacherId && c.CourseId == course.Id &&
-              c.Class.ClassLevelId == level.Id).Select(t => t.ClassId).Distinct().ToListAsync();
-            List<Class> classesLevel = await _context.Classes.Where(c => c.ClassLevelId == level.Id).OrderBy(o => o.Name).ToListAsync();
-            if(classesLevel.Count() > 0)
+            var selectedIds = classCoursesCached.Where(c => c.TeacherId == teacherId && c.CourseId == course.Id &&
+              c.Class.ClassLevelId == level.Id).Select(t => t.ClassId).Distinct().ToList();
+              
+            List<Class> classesByLevel = classesCached.Where(c => c.ClassLevelId == level.Id)
+                                                      .OrderBy(o => o.ClassLevel.DsplSeq).ToList();
+            if(classesByLevel.Count() > 0)
             {
               lwcd.LevelId = level.Id;
               lwcd.LevelName = level.Name;
               lwcd.Classes = new List<ClassIdAndNameDto>();
-              foreach(var aclass in classesLevel)
+              foreach(var aclass in classesByLevel)
               {
-                Boolean assigned = await _context.ClassCourses
-                  .Where(c => c.CourseId == course.Id && c.ClassId == aclass.Id && c.TeacherId != teacherId).CountAsync() > 0;
+                Boolean assigned = classCoursesCached
+                  .Where(c => c.CourseId == course.Id && c.ClassId == aclass.Id && c.TeacherId != teacherId).Count() > 0;
 
                 ClassIdAndNameDto cd = new ClassIdAndNameDto();
                 cd.ClassId = aclass.Id;
@@ -1366,7 +1368,7 @@ namespace EducNotes.API.Controllers {
     [HttpPost("{teacherId}/AssignClasses")]
     public async Task<IActionResult> AssignClasses(int teacherId, [FromBody] List<AssignedClassesDto> courses)
     {
-      // List<ClassCourse> classCourses = await _cache.GetClassCourses();
+      List<ClassCourse> classCourses = await _cache.GetClassCourses();
 
       Boolean dataToBeSaved = false;
       foreach(var course in courses)
@@ -1374,9 +1376,9 @@ namespace EducNotes.API.Controllers {
         foreach(var level in course.Levels)
         {
           //delete previous classes selection
-          List<ClassCourse> prevClasses = await _context.ClassCourses.Where(c => c.CourseId == course.CourseId && 
+          List<ClassCourse> prevClasses = classCourses.Where(c => c.CourseId == course.CourseId && 
                                                         c.Class.ClassLevelId == level.LevelId && c.TeacherId == teacherId)
-                                                      .ToListAsync();
+                                                      .ToList();
           if(prevClasses.Count() > 0)
           {
             _repo.DeleteAll(prevClasses);
@@ -1403,7 +1405,7 @@ namespace EducNotes.API.Controllers {
 
       if(dataToBeSaved && await _repo.SaveAll())
       {
-        // await _cache.LoadClassCourses();
+        await _cache.LoadClassCourses();
         return Ok();
       }
       else
@@ -2014,19 +2016,19 @@ namespace EducNotes.API.Controllers {
     [HttpGet("UsersToValidate")]
     public async Task<IActionResult> GetUsersToValidate()
     {
-      // List<User> usersCached = await _cache.GetUsers();
-      // List<Order> orders = await _cache.GetOrders();
-      // List<UserType> userTypesCached = await _cache.GetUserTypes();
+      List<User> usersCached = await _cache.GetUsers();
+      List<Order> orders = await _cache.GetOrders();
+      List<UserType> userTypesCached = await _cache.GetUserTypes();
 
       // users to validate exclude chidren/students as they are coped by parent on their account
-      var usersFromDB = await _context.Users.Where(u => u.AccountDataValidated == false && u.UserTypeId != studentTypeId)
-                                   .ToListAsync();
-      var activeTuitions = await _context.Orders.Where(t => t.isReg == true && t.Expired == false || t.Cancelled == false)
-                                 .ToListAsync();
+      var usersFromDB =usersCached.Where(u => u.AccountDataValidated == false && u.UserTypeId != studentTypeId)
+                                  .ToList();
+      var activeTuitions = orders.Where(t => t.isReg == true && t.Expired == false || t.Cancelled == false)
+                                 .ToList();
 
-      var userTypes = await _context.UserTypes.Where(u => u.Id != studentTypeId)
+      var userTypes = userTypesCached.Where(u => u.Id != studentTypeId)
                                      .OrderBy(o => o.Name)
-                                     .ToListAsync();
+                                     .ToList();
       List<UserTypeToValidateDto> types = new List<UserTypeToValidateDto>();
       foreach(var type in userTypes) {
         if(type.Name.ToLower() == "admin") { continue; }
@@ -2137,7 +2139,11 @@ namespace EducNotes.API.Controllers {
           {
             var order = await _context.Orders.FirstAsync(o => o.isReg &&(o.MotherId == userid || o.FatherId == userid));
             var reg = await _repo.GetOrder(order.Id);
-            var user = reg.Mother != null ? reg.Mother : reg.Father;
+            User user = new User();
+            if(reg.Mother != null)
+              user = reg.Mother;
+            else
+              user = reg.Father;
 
             var firstDeadline = await _context.ProductDeadLines.OrderBy(o => o.DueDate)
                                                 .FirstAsync(p => p.ProductId == tuitionId);

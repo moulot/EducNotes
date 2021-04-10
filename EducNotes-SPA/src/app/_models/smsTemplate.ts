@@ -3,4 +3,5 @@ export interface SmsTemplate {
     name: string;
     content: string;
     smsCategoryId: number;
+    internal: Boolean;
 }

@@ -19,10 +19,12 @@ export class AddSmsTemplateComponent implements OnInit {
   name: string;
   content: string;
   categoryId: number;
+  internal: Boolean;
   tokens: any;
+  internalOptions = [{value: 0, label: 'OUI'}, {value: 1, label: 'NON'}];
 
-  constructor(private fb: FormBuilder, private alertify: AlertifyService,
-    private commService: CommService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private fb: FormBuilder, private alertify: AlertifyService, private commService: CommService,
+    private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.route.data.subscribe(data => {
@@ -32,18 +34,18 @@ export class AddSmsTemplateComponent implements OnInit {
         this.name = this.template.name;
         this.content = this.template.content;
         this.categoryId = this.template.smsCategoryId;
+        this.internal = this.template.internal;
       }
     });
     this.createTemplateForm();
     this.getCategories();
     this.getTokens();
-
   }
 
   createTemplateForm() {
-
     this.templateForm = this.fb.group({
       name: [this.name, Validators.required],
+      internal: [this.internal],
       category: [this.categoryId, Validators.required],
       content: [this.content, Validators.required]
     });
@@ -74,6 +76,7 @@ export class AddSmsTemplateComponent implements OnInit {
     templateData.id = this.templateId;
     templateData.name = this.templateForm.value.name;
     templateData.smsCategoryId = this.templateForm.value.category;
+    templateData.internal = this.templateForm.value.internal === 0 ? false : true;
     templateData.content = this.templateForm.value.content;
     this.commService.saveSmsTemplate(templateData).subscribe(() => {
       this.alertify.success('le modèle de sms a bien été enregistré.');

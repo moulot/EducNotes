@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { Email } from 'src/app/_models/email';
 import { ClassForBroadCast } from 'src/app/_models/classForBroadCast';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { CommService } from 'src/app/_services/comm.service';
 import { Utils } from 'src/app/shared/utils';
+import { MdbWysiwygComponent } from 'mdb-wysiwyg';
 
 @Component({
   selector: 'app-broadcast',
@@ -15,6 +16,8 @@ import { Utils } from 'src/app/shared/utils';
   styleUrls: ['./broadcast.component.scss']
 })
 export class BroadcastComponent implements OnInit {
+  @ViewChild(MdbWysiwygComponent, { static: false }) emailBody: MdbWysiwygComponent;
+  @ViewChild(MdbWysiwygComponent, { static: true }) smsBody: MdbWysiwygComponent;
   parentTypeId = environment.parentTypeId;
   studentTypeId = environment.studentTypeId;
   teacherTypeId = environment.teacherTypeId;
@@ -33,7 +36,8 @@ export class BroadcastComponent implements OnInit {
   classes: ClassForBroadCast[] = [];
   emailTemplates: any;
   smsTemplates: any;
-  templateOptions = [];
+  emailTemplateOptions = [];
+  smsTemplateOptions = [];
   emailBodyType: number;
   smsBodyType: number;
   showTo = true;
@@ -62,6 +66,8 @@ export class BroadcastComponent implements OnInit {
   msgChoice: number;
   tokens: any;
   tokenOptions = [];
+  wait = false;
+  dataReady = 0;
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
     private router: Router, private fb: FormBuilder, private commService: CommService) { }
@@ -70,8 +76,8 @@ export class BroadcastComponent implements OnInit {
     this.msgChoice = 1;
     this.showTo = true;
     this.showGroups = true;
-    this.emailBodyType = 1;
-    this.smsBodyType = 1;
+    this.emailBodyType = 2;
+    this.smsBodyType = 2;
     this.createMsgForm();
     this.addUserTypeItem();
     this.getData();
@@ -90,14 +96,15 @@ export class BroadcastComponent implements OnInit {
       classLevels: this.fb.array([]),
       classes: this.fb.array([]),
       sendToUsersNOK: [false],
-      token: [],
+      emailToken: [],
+      smsToken: [],
       msgType: [0],
       msgChoice: [1],
-      emailType: [1],
+      emailType: [2],
       emailSubject: [''],
       emailTemplate: [null],
       emailBody: [''],
-      smsType: [1],
+      smsType: [2],
       smsTemplate: [null],
       smsBody: ['']
     }, {validator: this.formValidator});
@@ -134,30 +141,44 @@ export class BroadcastComponent implements OnInit {
     }
 
     const msgChoice = g.get('msgChoice').value;
-    let bodyerror = false;
-    const emailtemplate = g.get('emailTemplate').value;
-    const emailbody = g.get('emailBody').value;
     const emailType = g.get('emailType').value;
-    console.log('email: ' + msgChoice + '-' + emailtemplate + '-' + emailbody + '-' + emailType);
-    if (msgChoice === 1 && emailType === 2) {
-      if ((emailtemplate === null || emailtemplate === 'undefined') && emailbody === '') {
-        bodyerror = true;
+    const smsType = g.get('smsType').value;
+    let bodyerror = false;
+    let templateerror = false;
+
+    const emailtemplate = g.get('emailTemplate').value;
+    if (msgChoice === 1 && emailType === 1) {
+      if (emailtemplate === null || emailtemplate === 'undefined') {
+        templateerror = true;
       }
     }
 
     const smstemplate = g.get('smsTemplate').value;
-    const smsbody = g.get('smsBody').value;
-    const smsType = g.get('smsType').value;
-    // console.log('sms: ' + msgChoice + '-' + smstemplate + '-' + smsbody + '-' + smsType);
-    if (msgChoice === 2 && smsType === 2) {
-      if ((smstemplate === null || smstemplate === 'undefined') && smsbody === '') {
+    if (msgChoice === 2 && smsType === 1) {
+      if (smstemplate === null || smstemplate === 'undefined') {
+        templateerror = true;
+      }
+    }
+
+    const subject = g.get('emailSubject').value;
+    const emailbody = g.get('emailBody').value;
+    if (msgChoice === 1 && emailType === 2) {
+      if (subject === '' || emailbody === '') {
         bodyerror = true;
       }
     }
 
-    // console.log('errors: usersNOK:' + userserror + ' classesNOK:' + classeserror + ' bodyerror:' + bodyerror);
-    if (userserror === true || classeserror === true || bodyerror === true) {
-      return {'usersNOK': userserror, 'classesNOK': classeserror, 'bodyNOK': bodyerror, 'formNOK': true};
+    const smsbody = g.get('smsBody').value;
+    if (msgChoice === 2 && smsType === 2) {
+      if (smsbody === '') {
+        bodyerror = true;
+      }
+    }
+
+    // console.log('usererror: ' + userserror + ' - templateerror: ' + templateerror +
+    //   ' - classeserror: ' + classeserror + ' - bodyerror: ' + bodyerror);
+    if (userserror === true || templateerror === true || classeserror === true || bodyerror === true) {
+      return {'usersNOK': userserror, 'templateNOK': templateerror, 'classesNOK': classeserror, 'bodyNOK': bodyerror, 'formNOK': true};
     }
 
     return null;
@@ -249,24 +270,26 @@ export class BroadcastComponent implements OnInit {
     });
   }
 
-  getBroadcastTokens() {
-    this.commService.getBroadcastTokens().subscribe((tokens: any) => {
-      for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i];
-        const elt = {value: token.tokenString, label: token.tokenString + ' : ' + token.name };
-        this.tokenOptions = [...this.tokenOptions, elt];
-      }
-    });
+  addTokenToEmailBody(token) {
+    const body = this.msgForm.value.emailBody;
+    console.log(token);
+    console.log(body);
+    this.emailBody.value = this.emailBody.value + ' ' + token;
+    this.msgForm.get('emailBody').setValue(this.emailBody.value);
   }
 
-  addTokenToBody(token) {
-    const body = this.msgForm.value.emailBody;
-    this.msgForm.get('emailBody').setValue(body + ' ' + token);
-    // this.msgForm.get('token').setValue(null);
+  addTokenToSmsBody(token) {
+    const body = this.msgForm.value.smsBody;
+    this.msgForm.get('smsBody').setValue(body + ' ' + token);
   }
 
   getData() {
+    this.wait = true;
     this.commService.getEmailBroadCastData().subscribe((data: any) => {
+      this.dataReady++;
+      if (this.dataReady === 5) {
+        this.wait = false;
+      }
       this.schools = data.schools;
       this.cycles = data.cycles;
       this.educLevels = data.educLevels;
@@ -294,7 +317,12 @@ export class BroadcastComponent implements OnInit {
   }
 
   getClassLevels() {
+    this.wait = true;
     this.classService.getLevelsWithClasses().subscribe(data => {
+      this.dataReady++;
+      if (this.dataReady === 5) {
+        this.wait = false;
+      }
       this.classLevels = data;
       for (let i = 0; i < this.classLevels.length; i++) {
         const cl = this.classLevels[i];
@@ -328,12 +356,17 @@ export class BroadcastComponent implements OnInit {
   }
 
   getEmailTemplates() {
-    this.commService.getEmailTemplates().subscribe(data => {
+    this.wait = true;
+    this.commService.getEmailBroadcastTemplates().subscribe(data => {
+      this.dataReady++;
+      if (this.dataReady === 5) {
+        this.wait = false;
+      }
       this.emailTemplates = data;
       for (let i = 0; i < this.emailTemplates.length; i++) {
         const elt = this.emailTemplates[i];
         const tpl = {value: elt.id, label: elt.name + ' (' + elt.emailCategoryName + ')'};
-        this.templateOptions = [...this.templateOptions, tpl];
+        this.emailTemplateOptions = [...this.emailTemplateOptions, tpl];
       }
     }, error => {
       this.alertify.error(error);
@@ -341,15 +374,36 @@ export class BroadcastComponent implements OnInit {
   }
 
   getSmsTemplates() {
-    this.commService.getSmsTemplates().subscribe(data => {
+    this.wait = true;
+    this.commService.getSmsBroadcastTemplates().subscribe(data => {
+      this.dataReady++;
+      if (this.dataReady === 5) {
+        this.wait = false;
+      }
       this.smsTemplates = data;
       for (let i = 0; i < this.smsTemplates.length; i++) {
         const elt = this.smsTemplates[i];
         const tpl = {value: elt.id, label: elt.name + ' (' + elt.emailCategoryName + ')'};
-        this.templateOptions = [...this.templateOptions, tpl];
+        this.smsTemplateOptions = [...this.smsTemplateOptions, tpl];
       }
     }, error => {
       this.alertify.error(error);
+    });
+  }
+
+  getBroadcastTokens() {
+    this.wait = true;
+    this.commService.getBroadcastTokens().subscribe((tokens: any) => {
+      this.dataReady++;
+      if (this.dataReady === 5) {
+        this.wait = false;
+      }
+    this.tokens = tokens;
+      for (let i = 0; i < this.tokens.length; i++) {
+        const token = tokens[i];
+        const elt = {value: token.tokenString, label: token.name + ' : ' + token.tokenString };
+        this.tokenOptions = [...this.tokenOptions, elt];
+      }
     });
   }
 
@@ -466,7 +520,6 @@ export class BroadcastComponent implements OnInit {
 
   selectEmailBody() {
     this.emailBodyType = this.msgForm.value.emailType;
-    console.log('emailBodyType:' + this.emailBodyType);
     this.msgForm.get('emailSubject').setValue('');
     this.msgForm.get('emailBody').setValue('');
     this.msgForm.get('emailTemplate').reset();
@@ -482,8 +535,11 @@ export class BroadcastComponent implements OnInit {
   setEmailTemplateData() {
     const id = this.msgForm.value.emailTemplate;
     if (id) {
-      const tplSubject = this.emailTemplates.find(t => t.id === id).subject;
+      const template = this.emailTemplates.find(t => t.id === id);
+      const tplSubject = template.subject;
+      const tplBody = template.bodyContent;
       this.msgForm.get('emailSubject').setValue(tplSubject);
+      this.msgForm.get('emailBody').setValue(tplBody);
     }
   }
 

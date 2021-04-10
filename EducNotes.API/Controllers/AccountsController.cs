@@ -213,6 +213,7 @@ namespace EducNotes.API.Controllers {
     [HttpPost("ConfirmPhoneNumber")]
     public async Task<IActionResult> ConfirmPhoneNumber(ConfirmTokenDto confirmTokenDto)
     {
+      // List<User> users = await _cache.GetUsers();
       int userId = Convert.ToInt32(confirmTokenDto.UserId);
       string token = confirmTokenDto.Token;
 
@@ -227,7 +228,7 @@ namespace EducNotes.API.Controllers {
 
       if(phoneNumValidated && await _repo.SaveAll())
       {
-        // await _cache.LoadUsers();
+        await _cache.LoadUsers();
       }
 
       return Ok(new {
@@ -309,7 +310,7 @@ namespace EducNotes.API.Controllers {
         }
       }
 
-      // await _cache.LoadUsers();
+      await _cache.LoadUsers();
       return Ok(new {
         emailOK = success,
         accountValidated = validated,

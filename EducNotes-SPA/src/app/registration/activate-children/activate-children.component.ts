@@ -1,9 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { Validators, FormGroup, FormArray, FormBuilder } from '@angular/forms';
-import { ClassService } from 'src/app/_services/class.service';
 import { AuthService } from 'src/app/_services/auth.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from 'src/app/_services/user.service';
 import { Utils } from 'src/app/shared/utils';
 
@@ -29,9 +27,8 @@ export class ActivateChildrenComponent implements OnInit {
   confirmedPwd: boolean;
   wait = false;
 
-  constructor(private fb: FormBuilder, private alertify: AlertifyService, private userService: UserService,
-    private classService: ClassService, private route: ActivatedRoute, private router: Router,
-    private authService: AuthService) { }
+  constructor(private fb: FormBuilder, private alertify: AlertifyService,
+    private userService: UserService, private authService: AuthService) { }
 
   ngOnInit() {
     this.createChildrenForm();

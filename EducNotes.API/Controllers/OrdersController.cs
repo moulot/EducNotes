@@ -208,20 +208,20 @@ namespace EducNotes.API.Controllers
       {
         try
         {
-          // List<ProductDeadLine> ProdDeadLines = await _cache.GetProductDeadLines();
-          // List<Setting> settings = await _cache.GetSettings();
-          // List<ClassLevel> classlevels = await _cache.GetClassLevels();
-          // List<ClassLevelProduct> levelProducts = await _cache.GetClassLevelProducts();
+          List<ProductDeadLine> ProdDeadLines = await _cache.GetProductDeadLines();
+          List<Setting> settings = await _cache.GetSettings();
+          List<ClassLevel> classlevels = await _cache.GetClassLevels();
+          List<ClassLevelProduct> levelProducts = await _cache.GetClassLevelProducts();
           List<Role> roles = await _context.Roles.ToListAsync();
-          // List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
+          List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
 
-          List<Setting> settings = await _context.Settings.ToListAsync();
+          // List<Setting> settings = await _context.Settings.ToListAsync();
           var schoolName = settings.First(s => s.Name.ToLower() == "schoolname").Value;
           string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
 
-          var deadlines = await _context.ProductDeadLines
+          var deadlines = ProdDeadLines
                                 .OrderBy(o => o.DueDate)
-                                .Where(p => p.ProductId == tuitionId).ToListAsync();
+                                .Where(p => p.ProductId == tuitionId).ToList();
           var firstDeadline = deadlines.First();
           var firstDeadlineDate = firstDeadline.DueDate.Date;
 
@@ -278,8 +278,8 @@ namespace EducNotes.API.Controllers
             _repo.Update(user);
             ChildList.Add(user);
 
-            var nextClassLevel = await _context.ClassLevels.FirstAsync(c => c.Id == child.ClassLevelId);
-            var classProduct = await _context.ClassLevelProducts.FirstAsync(c => c.ClassLevelId == nextClassLevel.Id && c.ProductId == tuitionId);
+            var nextClassLevel = classlevels.First(c => c.Id == child.ClassLevelId);
+            var classProduct = levelProducts.First(c => c.ClassLevelId == nextClassLevel.Id && c.ProductId == tuitionId);
             decimal tuitionFee = Convert.ToDecimal(classProduct.Price);
             decimal DPPct = firstDeadline.Percentage;
             decimal DownPayment = DPPct * tuitionFee;
@@ -359,7 +359,7 @@ namespace EducNotes.API.Controllers
             children.Add(crd);
           }
 
-          var template = await _context.EmailTemplates.FirstAsync(t => t.Id == newRegToBePaidEmailId);
+          var template = emailTemplates.First(t => t.Id == newRegToBePaidEmailId);
 
           //father
           if (newTuition.FEmail != "")
@@ -485,11 +485,11 @@ namespace EducNotes.API.Controllers
 
           if (await _repo.SaveAll())
           {
-            // await _cache.LoadOrders();
-            // await _cache.LoadOrderLines();
-            // await _cache.LoadOrderLineDeadLines();
-            // await _cache.LoadUsers();
-            // await _cache.LoadUserLinks();
+            await _cache.LoadOrders();
+            await _cache.LoadOrderLines();
+            await _cache.LoadOrderLineDeadLines();
+            await _cache.LoadUsers();
+            await _cache.LoadUserLinks();
             identityContextTransaction.Commit();
             return Ok(new {
               orderId = order.Id,

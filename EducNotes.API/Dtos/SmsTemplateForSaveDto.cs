@@ -1,3 +1,5 @@
+using System;
+
 namespace EducNotes.API.Dtos
 {
     public class SmsTemplateForSaveDto
@@ -6,5 +8,6 @@ namespace EducNotes.API.Dtos
         public string Name { get; set; }
         public string Content { get; set; }
         public int SmsCategoryId { get; set; }
+        public Boolean Internal { get; set; }
     }
 }

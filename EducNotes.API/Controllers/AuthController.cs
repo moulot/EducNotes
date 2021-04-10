@@ -500,21 +500,16 @@ namespace EducNotes.API.Controllers
         var res = await _userManager.UpdateAsync(user);
         if (res.Succeeded)
         {
-          var template = await _context.EmailTemplates.FirstAsync(t => t.Id == updateAccountEmailId);
-          var email = await _repo.SetEmailForAccountUpdated(template.Subject, template.Body,
-            user.LastName, user.Gender, user.Email, user.Id);
-          _context.Add(email);
+          // var template = emailTemplates.First(t => t.Id == updateAccountEmailId);
+          // var email = await _repo.SetEmailForAccountUpdated(template.Subject, template.Body,
+          //   user.LastName, user.Gender, user.Email, user.Id);
+          // _context.Add(email);
 
           var userToReturn = _mapper.Map<UserForListDto>(user);
-          if (await _repo.SaveAll())
-          {
-            // await _cache.LoadUsers();
-            return Ok(new
-            {
-              token = await GenerateJwtToken(user),
-              user = userToReturn
-            });
-          }
+          await _cache.LoadUsers();
+          return Ok(new {
+            user = userToReturn
+          });
         }
 
         return BadRequest("problème pour mettre à jour les données");

@@ -125,15 +125,16 @@ namespace EducNotes.API.Data {
 
     public async Task<List<UserForDetailedDto>> GetAccountChildren(int parentId)
     {
-      // List<Order> orders = await _cache.GetOrders();
-      // List<OrderLine> lines = await _cache.GetOrderLines();
+      List<Order> orders = await _cache.GetOrders();
+      List<OrderLine> lines = await _cache.GetOrderLines();
 
       // MANAGEMENT OF TUITION AND NEXT YEAR TUITION TO BE TREATED!!!!!!!!!!!!!!
-      var order = await _context.Orders.FirstAsync(o => o.isReg == true && (o.MotherId == parentId || o.FatherId == parentId));
-      var usersFromDB = await _context.OrderLines.Include(i => i.Child)
-                                                 .Include(i => i.ClassLevel)
-                                                 .Where(o => o.OrderId == order.Id)
-                                                 .ToListAsync();
+      var order = orders.First(o => o.isReg == true && (o.MotherId == parentId || o.FatherId == parentId));
+      var usersFromDB = lines
+                              // .Include(i => i.Child)
+                              // .Include(i => i.ClassLevel)
+                              .Where(o => o.OrderId == order.Id)
+                              .ToList();
       List<UserForDetailedDto> children = new List<UserForDetailedDto>();
       for(int i = 0; i < usersFromDB.Count (); i++)
       {
@@ -179,15 +180,15 @@ namespace EducNotes.API.Data {
 
     public async Task<List<User>> GetParents(int ChildId)
     {
-      // List<User> parentsCached = await _cache.GetParents();
-      // List<UserLink> userlinks = await _cache.GetUserLinks();
+      List<User> parentsCached = await _cache.GetParents();
+      List<UserLink> userLinks = await _cache.GetUserLinks();
 
-      var links = await _context.UserLinks.Where(u => u.UserId == ChildId).ToListAsync();
+      var links = userLinks.Where(u => u.UserId == ChildId).ToList();
 
       List<User> parents = new List<User>();
       foreach(var link in links)
       {
-        var parent = await _context.Users.FirstOrDefaultAsync(p => p.Id == link.UserPId);
+        var parent = parentsCached.FirstOrDefault(p => p.Id == link.UserPId);
         parents.Add(parent);
       }
 
@@ -703,87 +704,112 @@ namespace EducNotes.API.Data {
     //     return resultStatus;
     // }
 
-    public async Task<bool> UpdateChildren (ChildrenForEditDto users) {
+    public async Task<bool> UpdateChildren(ChildrenForEditDto users)
+    {
+      List<User> usersCached = await _cache.GetUsers();
+      List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
+
       bool resultStatus = false;
-      using (var identityContextTransaction = _context.Database.BeginTransaction ()) {
-        try {
-          for (int i = 0; i < users.Id.Count (); i++) {
+      using(var identityContextTransaction = _context.Database.BeginTransaction())
+      {
+        try
+        {
+          for(int i = 0; i < users.Id.Count(); i++)
+          {
             var childid = users.Id[i];
-            var child = await _context.Users.Include (p => p.Photos).FirstAsync (u => u.Id == childid);
+            var child = usersCached.First(u => u.Id == childid);
             child.UserName = users.UserName[i];
-            child.NormalizedUserName = users.UserName[i].ToUpper ();
+            child.NormalizedUserName = users.UserName[i].ToUpper();
             child.LastName = users.LastName[i];
             child.FirstName = users.FirstName[i];
             child.Gender = users.Gender[i];
-            var dateArray = users.strDateOfBirth[i].Split ("/");
-            var day = Convert.ToInt32 (dateArray[0]);
-            var month = Convert.ToInt32 (dateArray[1]);
-            var year = Convert.ToInt32 (dateArray[2]);
-            child.DateOfBirth = new DateTime (year, month, day);
+            var dateArray = users.strDateOfBirth[i].Split("/");
+            var day = Convert.ToInt32(dateArray[0]);
+            var month = Convert.ToInt32(dateArray[1]);
+            var year = Convert.ToInt32(dateArray[2]);
+            child.DateOfBirth = new DateTime(year, month, day);
             child.Email = users.Email[i];
             if (child.NormalizedEmail != null)
-              child.NormalizedEmail = users.Email[i].ToUpper ();
+              child.NormalizedEmail = users.Email[i].ToUpper();
             child.PhoneNumber = users.PhoneNumber[i];
             var pwd = users.Password[i];
             // validate user
-            var newPassword = _userManager.PasswordHasher.HashPassword (child, users.Password[i]);
+            var newPassword = _userManager.PasswordHasher.HashPassword(child, users.Password[i]);
             child.PasswordHash = newPassword;
-            if (child.Email != "" && child.Email != null)
+            if(child.Email != "" && child.Email != null)
               child.EmailConfirmed = true;
             child.AccountDataValidated = true;
-            Update (child);
+            Update(child);
             resultStatus = true;
 
             //does the current user has photo?
-            if (users.PhotoIndex != null) {
-              var photoIndex = users.PhotoIndex.IndexOf (childid);
-              if (photoIndex != -1) {
+            if (users.PhotoIndex != null)
+            {
+              var photoIndex = users.PhotoIndex.IndexOf(childid);
+              if(photoIndex != -1)
+              {
                 var photoFile = users.PhotoFiles[photoIndex];
-                if (photoFile.Length > 0) {
-                  var uploadResult = new ImageUploadResult ();
-                  using (var stream = photoFile.OpenReadStream ()) {
-                    var uploadParams = new ImageUploadParams () {
-                    File = new FileDescription (photoFile.Name, stream),
-                    Transformation = new Transformation ().Width (500).Height (500).Crop ("fill").Gravity ("face")
+                if(photoFile.Length > 0)
+                {
+                  var uploadResult = new ImageUploadResult();
+                  using(var stream = photoFile.OpenReadStream())
+                  {
+                    var uploadParams = new ImageUploadParams()
+                    {
+                      File = new FileDescription(photoFile.Name, stream),
+                      Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
                     };
 
-                    uploadResult = _cloudinary.Upload (uploadParams);
-                    if (uploadResult.StatusCode == HttpStatusCode.OK) {
+                    uploadResult = _cloudinary.Upload(uploadParams);
+                    if(uploadResult.StatusCode == HttpStatusCode.OK)
+                    {
                       //remove tag 'Main' from child photo if it exists
-                      if (child.Photos.Any (u => u.IsMain)) {
-                        var oldPhoto = await _context.Photos.FirstAsync (p => p.UserId == child.Id && p.IsMain == true);
+                      if(child.Photos.Any(u => u.IsMain))
+                      {
+                        var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == child.Id && p.IsMain == true);
                         oldPhoto.IsMain = false;
-                        Update (oldPhoto);
+                        Update(oldPhoto);
                       }
-                      Photo photo = new Photo ();
-                      photo.Url = uploadResult.SecureUri.ToString ();
+                      Photo photo = new Photo();
+                      photo.Url = uploadResult.SecureUri.ToString();
                       photo.PublicId = uploadResult.PublicId;
                       photo.UserId = child.Id;
                       photo.DateAdded = DateTime.Now;
                       photo.IsMain = true;
                       photo.IsApproved = true;
-                      Add (photo);
+                      Add(photo);
                     }
                   }
                 }
-              } else {
+              }
+              else
+              {
                 resultStatus = true;
               }
             }
           }
 
-          User parent = await _context.Users.FirstAsync (u => u.Id == users.ParentId);
+          User parent = usersCached.First(u => u.Id == users.ParentId);
           parent.Validated = true;
-          Update (parent);
+          Update(parent);
 
-          if (await SaveAll ()) {
+          var template = emailTemplates.First(t => t.Id == updateAccountEmailId);
+          var email = await SetEmailForAccountUpdated(template.Subject, template.Body,
+            parent.LastName, parent.Gender, parent.Email, parent.Id);
+          Add(email);
+
+
+          if(await SaveAll())
+          {
+            await _cache.LoadUsers();
             // validate transaction
-            identityContextTransaction.Commit ();
+            identityContextTransaction.Commit();
             resultStatus = true;
           } else
             resultStatus = false;
-        } catch (System.Exception) {
-          identityContextTransaction.Rollback ();
+        } catch (System.Exception ex) {
+          var sde = ex.Message;
+          identityContextTransaction.Rollback();
           resultStatus = false;
         }
       }
@@ -875,9 +901,9 @@ namespace EducNotes.API.Data {
 
     public async Task<bool> AddTeacher(TeacherForEditDto user)
     {
-      // List<Role> roles = await _cache.GetRoles();
-      // List<Course> courses = await _cache.GetCourses();
-      // List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
+      List<Role> roles = await _cache.GetRoles();
+      List<Course> coursesCached = await _cache.GetCourses();
+      List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
 
       bool resultStatus = false;
       using (var identityContextTransaction = _context.Database.BeginTransaction())
@@ -910,7 +936,7 @@ namespace EducNotes.API.Data {
             if(result.Succeeded)
             {
               // enregistrement du RoleTeacher
-              var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
+              var role = roles.FirstOrDefault(a => a.Id == teacherRoleId);
               appUser = await _userManager.Users.Include(i => i.Photos)
                                                 .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
               _userManager.AddToRoleAsync(appUser, role.Name).Wait();
@@ -919,7 +945,7 @@ namespace EducNotes.API.Data {
               teacherCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
               Update(appUser);
 
-              var courses = await _context.Courses.Where(c => ids.Contains(c.Id.ToString())).ToListAsync();
+              var courses = coursesCached.Where(c => ids.Contains(c.Id.ToString())).ToList();
               var coursesName = courses.Select(s => s.Name).ToList();
               string coursenames = "";
               foreach (var name in coursesName)
@@ -944,7 +970,7 @@ namespace EducNotes.API.Data {
                   Courses = coursenames
                 };
 
-                var template = await _context.EmailTemplates.FirstAsync(t => t.Id == teacherConfirmEmailId);
+                var template = emailTemplates.First(t => t.Id == teacherConfirmEmailId);
                 Email emailToSend = await SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
                 Add(emailToSend);
               }
@@ -970,12 +996,12 @@ namespace EducNotes.API.Data {
             appUser.Email = user.Email;
             Update(appUser);
 
-            // delete previous teacher courses
+            //delete previous teacher courses
             List<TeacherCourse> prevCourses = await _context.TeacherCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
             DeleteAll(prevCourses);
-            // delete previous class courses
-            List<ClassCourse> prevClassCourses = await _context.ClassCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
-            DeleteAll(prevClassCourses);
+            //delete previous class courses
+            // List<ClassCourse> prevClassCourses = await _context.ClassCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
+            // DeleteAll(prevClassCourses);
           }
 
           if (ids.Count() > 0)
@@ -998,6 +1024,8 @@ namespace EducNotes.API.Data {
               }
             }
           }
+
+          
 
           //add user photo
           var photoFile = user.PhotoFile;
@@ -1040,10 +1068,10 @@ namespace EducNotes.API.Data {
 
           if(await SaveAll())
           {
-            // await _cache.LoadUsers();
-            // await _cache.LoadTeacherCourses();
-            // await _cache.LoadClassLevels();
-            // fin de la transaction
+            await _cache.LoadUsers();
+            await _cache.LoadTeacherCourses();
+            await _cache.LoadClassLevels();
+            //fin de la transaction
             identityContextTransaction.Commit();
             resultStatus = true;
           } else
@@ -1265,10 +1293,10 @@ namespace EducNotes.API.Data {
 
     public async Task<bool> UserNameExist(string userName, int currentUserId)
     {
-      // List<User> users = await _cache.GetUsers();
+      List<User> users = await _cache.GetUsers();
 
-      var user = await _context.Users.Where(u => u.Id != currentUserId)
-                      .FirstOrDefaultAsync(e => e.UserName.ToLower() == userName.ToLower());
+      var user = users.Where(u => u.Id != currentUserId)
+                      .FirstOrDefault(e => e.UserName.ToLower() == userName.ToLower());
       
       if(user != null)
       {
@@ -1943,49 +1971,129 @@ namespace EducNotes.API.Data {
       return absences;
     }
 
-    public MsgRecipientsDto GetMsgRecipientsForUsers(List<User> users, List<int> educLevelIds, 
+    public async Task<MsgRecipientsDto> GetMsgRecipientsForUsers(List<User> users, List<int> educLevelIds, 
       List<int> schoolIds, List<int> classLevelIds, List<int> classIds, int msgChoice, Boolean sendToNotValidated)
     {
+      List<ClassCourse> classCourses = await _context.ClassCourses
+                                      .Include(i => i.Class).ThenInclude(i => i.ClassLevel).ThenInclude(i => i.School)
+                                      .Include(i => i.Class).ThenInclude(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
+                                      .ToListAsync();
       MsgRecipientsDto recipients = new MsgRecipientsDto();
       recipients.UsersOK = new List<User>();
       recipients.UsersNOK = new List<User>();
-      var filteredUsers = new List<User>();
+      List<User> filteredUsers = new List<User>();
 
-      //is it restricted to selected Education levels?
-      if(educLevelIds.Count() > 0)
+      foreach(var user in users)
       {
-        var userEducLevels = users
-                              .Where(u => educLevelIds.Contains(Convert.ToInt32(u.ClassLevel.EducationLevelId)))
-                              .ToList();
-        var selectedUserIds = userEducLevels.Select(u => u.Id);
-        filteredUsers = users.Where(u => selectedUserIds.Contains(u.Id)).ToList();
+        List<Class> userClassCourses = classCourses.Where(c => c.TeacherId == user.Id).Select(s => s.Class).ToList();
+
+        //selected Education levels?
+        List<User> userEducLevels = new List<User>();
+        if(educLevelIds.Count() > 0)
+        {
+          if(user.ClassId != null)
+          {
+            if(educLevelIds.Contains(Convert.ToInt32(user.Class.ClassLevel.EducationLevelId)))
+              userEducLevels.Add(user);
+          }
+          
+          if(user.ClassLevelId != null)
+          {
+            if(educLevelIds.Contains(Convert.ToInt32(user.ClassLevel.EducationLevelId)))
+              userEducLevels.Add(user);
+          }
+          
+          if(user.EducLevelId != null)
+          {
+            if(educLevelIds.Contains(Convert.ToInt32(Convert.ToInt32(user.EducLevelId))))
+              userEducLevels.Add(user);
+          }
+
+          foreach (var aclass in userClassCourses)
+          {
+            if(educLevelIds.Contains(Convert.ToInt32(aclass.ClassLevel.EducationLevelId)))
+              userEducLevels.Add(user);
+          }
+
+          var selectedUserIds = userEducLevels.Select(u => u.Id);
+          filteredUsers = users.Where(u => selectedUserIds.Contains(u.Id)).ToList();
+        }
+
+        //selected schools?
+        List<User> userSchools = new List<User>();
+        if(schoolIds.Count() > 0)
+        {
+          if(user.ClassId != null)
+          {
+            if(schoolIds.Contains(Convert.ToInt32(user.Class.ClassLevel.SchoolId)))
+              userSchools.Add(user);
+          }
+
+          foreach(var aclass in userClassCourses)
+          {
+            if(schoolIds.Contains(Convert.ToInt32(aclass.ClassLevel.SchoolId)))
+              userEducLevels.Add(user);
+          }
+
+          var selectedUserIds = userSchools.Select(u => u.Id);
+          List<User> selectedUsers = users.Where(u => selectedUserIds.Contains(u.Id)).ToList();
+          filteredUsers.AddRange(selectedUsers);
+        }
+
+        //selected classlevels?
+        List<User> userClassLevels = new List<User>();
+        if(classLevelIds.Count() > 0)
+        {
+          if(user.ClassId != null)
+          {
+            if(classLevelIds.Contains(Convert.ToInt32(user.Class.ClassLevelId)))
+              userClassLevels.Add(user);
+          }
+          if(user.ClassLevelId != null)
+          {
+            if(classLevelIds.Contains(Convert.ToInt32(user.ClassLevelId)))
+              userClassLevels.Add(user);
+          }
+
+          foreach(var aclass in userClassCourses)
+          {
+            if(classLevelIds.Contains(Convert.ToInt32(aclass.ClassLevelId)))
+              userEducLevels.Add(user);
+          }
+
+          var selectedUserIds = userClassLevels.Select(u => u.Id);
+          List<User> selectedUsers = users.Where(u => selectedUserIds.Contains(u.Id)).ToList();
+          filteredUsers.AddRange(selectedUsers);
+        }
+
+        //selected classes?
+        List<User> userClasses = new List<User>();
+        if(classIds.Count() > 0)
+        {
+          if(user.ClassId != null)
+          {
+            if(classIds.Contains(Convert.ToInt32(user.ClassId)))
+              userClasses.Add(user);
+          }
+
+          foreach(var aclass in userClassCourses)
+          {
+            if(classIds.Contains(Convert.ToInt32(aclass.Id)))
+              userClasses.Add(user);
+          }
+
+          var selectedUserIds = userClasses.Select(u => u.Id);
+          List<User> selectedUsers = users.Where(u => selectedUserIds.Contains(u.Id)).ToList();
+          filteredUsers.AddRange(selectedUsers);
+        }
       }
 
-      //is it restricted to selected schools?
-      if(schoolIds.Count() > 0)
-      {
-        var userSchools = users
-                              .Where(u => schoolIds.Contains(Convert.ToInt32(u.ClassLevel.SchoolId)))
-                              .ToList();
-        var selectedUserIds = userSchools.Select(u => u.Id);
-        filteredUsers = filteredUsers.Where(u => selectedUserIds.Contains(u.Id)).ToList();
-      }
-
-      //is it restricted to selected classlevels?
-      if(classLevelIds.Count() > 0)
-      {
-        var userClassLevels = users
-                              .Where(u => classLevelIds.Contains(Convert.ToInt32(u.ClassLevelId)))
-                              .ToList();
-        var selectedUserIds = userClassLevels.Select(u => u.Id);
-        filteredUsers = filteredUsers.Where(u => selectedUserIds.Contains(u.Id)).ToList();
-      }
-
-      foreach (var user in users)
+      filteredUsers = filteredUsers.Distinct().ToList();
+      foreach(var user in filteredUsers)
       {
         if(msgChoice == 1) //email
         {
-          if(user.EmailConfirmed || sendToNotValidated)
+          if(!string.IsNullOrEmpty(user.Email) && (user.EmailConfirmed || sendToNotValidated))
           {
             recipients.UsersOK.Add(user);
           }
@@ -1996,7 +2104,7 @@ namespace EducNotes.API.Data {
         }
         else //sms
         {
-          if(user.PhoneNumberConfirmed || sendToNotValidated)
+          if(!string.IsNullOrEmpty(user.PhoneNumber) && (user.PhoneNumberConfirmed || sendToNotValidated))
           {
             recipients.UsersOK.Add(user);
           }
@@ -2006,9 +2114,43 @@ namespace EducNotes.API.Data {
           }
         }
       }
+
       return recipients;
     }
 
+    public MsgRecipientsDto setRecipientsList(List<User> users, int msgChoice, Boolean sendToNotValidated)
+    {
+      MsgRecipientsDto recipients = new MsgRecipientsDto();
+      recipients.UsersOK = new List<User>();
+      recipients.UsersNOK = new List<User>();
+      foreach(var user in users)
+      {
+        if(msgChoice == 1) //email
+        {
+          if(!string.IsNullOrEmpty(user.Email) && (user.EmailConfirmed || sendToNotValidated))
+          {
+            recipients.UsersOK.Add(user);
+          }
+          else
+          {
+            recipients.UsersNOK.Add(user);
+          }
+        }
+        else //sms
+        {
+          if(!string.IsNullOrEmpty(user.PhoneNumber) && (user.PhoneNumberConfirmed || sendToNotValidated))
+          {
+            recipients.UsersOK.Add(user);
+          }
+          else
+          {
+            recipients.UsersNOK.Add(user);
+          }
+        }
+      }
+
+      return recipients;
+    }
     public MsgRecipientsDto GetMsgRecipientsForClasses(List<User> users, int msgType, Boolean sendToNotValidated)
     {
       MsgRecipientsDto recipients = new MsgRecipientsDto();
@@ -2218,7 +2360,7 @@ namespace EducNotes.API.Data {
       return RegEmails;
     }
 
-    public async Task<List<TokenDto>> GetMessageTokenValues(List<Token> tokens, UserToSendMsgDto user)
+    public List<TokenDto> GetMessageTokenValues(List<Token> tokens, UserToSendMsgDto user)
     {
       List<TokenDto> tokenValues = new List<TokenDto>();
 
@@ -2226,8 +2368,6 @@ namespace EducNotes.API.Data {
       {
         TokenDto td = new TokenDto();
         td.TokenString = token.TokenString;
-        var subDomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower() == "subdomain")).Value;
-        string teacherId = user.Id.ToString();
 
         switch(td.TokenString)
         {
@@ -2629,9 +2769,11 @@ namespace EducNotes.API.Data {
 
     public async Task<List<Token>> GetBroadcastTokens()
     {
-      var tokens = await _context.Tokens
+      List<Token> tokensCached = await _cache.GetTokens();
+
+      var tokens = tokensCached
                           .Where(t => t.TokenTypeId == broadcastTokenTypeId)
-                          .OrderBy(t => t.Name).ToListAsync();
+                          .OrderBy(t => t.Name).ToList();
       return tokens;
     }
 
@@ -3017,11 +3159,11 @@ namespace EducNotes.API.Data {
 
     public async Task<IEnumerable<SchoolDto>> GetSchools()
     {
-      // List<School> schoolsCached = await _cache.GetSchools();
-      // List<ClassLevel> classlevelsCached = await _cache.GetClassLevels();
-      // List<Class> classesCached = await _cache.GetClasses();
+      List<School> schoolsCached = await _cache.GetSchools();
+      List<ClassLevel> classlevelsCached = await _cache.GetClassLevels();
+      List<Class> classesCached = await _cache.GetClasses();
 
-      var schoolsFromDB = await _context.Schools.OrderBy(s => s.DsplSeq).ToListAsync();
+      var schoolsFromDB = schoolsCached.OrderBy(s => s.DsplSeq).ToList();
 
       List<SchoolDto> schools = new List<SchoolDto>();
       foreach(var school in schoolsFromDB)
@@ -3030,14 +3172,14 @@ namespace EducNotes.API.Data {
         sd.Id = school.Id;
         sd.Name = school.Name;
 
-        var classLevels = await _context.ClassLevels
+        var classLevels = classlevelsCached
                           .Where(cl => cl.SchoolId == school.Id)
                           .OrderBy(o => o.DsplSeq)
-                          .ToListAsync();
+                          .ToList();
         sd.Classes = new List<ClassDetailDto>();
         foreach (var cl in classLevels)
         {
-          var classes = await _context.Classes.Where(c => c.ClassLevelId == cl.Id).ToListAsync();
+          var classes = classesCached.Where(c => c.ClassLevelId == cl.Id).ToList();
           foreach (var aclass in classes)
           {
             ClassDetailDto cdd = new ClassDetailDto();
@@ -3094,11 +3236,11 @@ namespace EducNotes.API.Data {
 
     public async Task<Order> GetOrder(int id)
     {
-      // List<Order> orders = await _cache.GetOrders();
-      // List<OrderLine> lines = await _cache.GetOrderLines();
+      List<Order> orders = await _cache.GetOrders();
+      List<OrderLine> lines = await _cache.GetOrderLines();
       
-      var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
-      order.Lines = await _context.OrderLines.Where(o => o.OrderId == order.Id).ToListAsync();
+      var order = orders.FirstOrDefault(o => o.Id == id);
+      order.Lines = lines.Where(o => o.OrderId == order.Id).ToList();
 
       return order;
     }
@@ -3125,8 +3267,8 @@ namespace EducNotes.API.Data {
 
     public async Task<List<OrderLine>> GetOrderLines(int orderId)
     {
-      // List<OrderLine> linesCached = await _cache.GetOrderLines();
-      var lines = await _context.OrderLines.Where(ol => ol.OrderId == orderId).ToListAsync();
+      List<OrderLine> linesCached = await _cache.GetOrderLines();
+      var lines = linesCached.Where(ol => ol.OrderId == orderId).ToList();
       return lines;
     }
 

@@ -32,7 +32,11 @@ export class CommService {
   }
 
   getEmailBroadCastData() {
-    return this.http.get(this.baseUrl + 'EmailBroadCastData');
+    return this.http.get(this.baseUrl + 'BroadCastData');
+  }
+
+  getEmailBroadcastTemplates() {
+    return this.http.get(this.baseUrl + 'EmailBroadcastTemplates');
   }
 
   getEmailTemplates() {
@@ -45,6 +49,10 @@ export class CommService {
 
   saveEmailTemplate(emailTemplate: EmailTemplate) {
     return this.http.put(this.baseUrl + 'SaveEmailTemplate', emailTemplate);
+  }
+
+  getSmsBroadcastTemplates() {
+    return this.http.get(this.baseUrl + 'SmsBroadcastTemplates');
   }
 
   getSmsTemplates() {

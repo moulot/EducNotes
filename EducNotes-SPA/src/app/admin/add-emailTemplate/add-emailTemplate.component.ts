@@ -20,7 +20,9 @@ export class AddEmailTemplateComponent implements OnInit {
   subject: string;
   body: string;
   categoryId: number;
+  internal: Boolean;
   tokens: any;
+  internalOptions = [{value: 0, label: 'OUI'}, {value: 1, label: 'NON'}];
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
     private commService: CommService, private router: Router, private route: ActivatedRoute) { }
@@ -34,6 +36,7 @@ export class AddEmailTemplateComponent implements OnInit {
         this.subject = this.template.subject;
         this.body = this.template.body;
         this.categoryId = this.template.emailCategoryId;
+        this.internal = this.template.internal;
       }
     });
     this.createTemplateForm();
@@ -45,6 +48,7 @@ export class AddEmailTemplateComponent implements OnInit {
   createTemplateForm() {
     this.templateForm = this.fb.group({
       name: [this.name, Validators.required],
+      internal: [null],
       category: [this.categoryId, Validators.required],
       subject: [this.subject, Validators.required],
       body: [this.body, Validators.required]
@@ -76,6 +80,7 @@ export class AddEmailTemplateComponent implements OnInit {
     templateData.id = this.templateId;
     templateData.name = this.templateForm.value.name;
     templateData.emailCategoryId = this.templateForm.value.category;
+    templateData.internal = this.templateForm.value.internal === 0 ? false : true;
     templateData.subject = this.templateForm.value.subject;
     templateData.body = this.templateForm.value.body;
     this.commService.saveEmailTemplate(templateData).subscribe(() => {

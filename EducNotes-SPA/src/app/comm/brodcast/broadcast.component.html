@@ -1,338 +1,388 @@
-<div class="col-md-12 d-flex">
-  <i class="fad fa-at fa-2x mr-2" style="--fa-secondary-opacity: 1;
-    --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-  <i class="fad fa-sms fa-2x mr-2" style="--fa-secondary-opacity: 1;
-    --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-  <div class="text-18 mb-1">messagerie de diffusion</div>
-</div>
-<div *ngIf="!showRecapPage" class="row">
-  <div class="col-md-12">
-    <div class="row">
-      <div class="col-md-4 mb-1">
-        <button type="button" (click)=selectBtn(0) [ngClass]="(btnActive == 0)?'btnBlue':'btnWhiteB'" mdbBtn
-          size="sm" block="true" mdbWavesEffect>messages par utilisateurs</button>
+<div *ngIf="wait" class="spinning-preloader-container">
+  <div class="preloader-wrapper big active">
+    <div class="spinner-layer spinner-blue">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
       </div>
-      <div class="col-md-4 mb-1">
-        <button type="button" (click)=selectBtn(1) [ngClass]="(btnActive == 1)?'btnBlue':'btnWhiteB'" mdbBtn
-          size="sm" block="true" mdbWavesEffect>messages par classes</button>
-        </div>
-      <div class="col-md-4 mb-1">
-        <button type="button" (click)=selectBtn(2) [ngClass]="(btnActive == 2)?'btnBlue':'btnWhiteB'" mdbBtn
-          size="sm" block="true" mdbWavesEffect>messages aux employés</button>
+    </div>
+    <div class="spinner-layer spinner-red">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
       </div>
-      <div class="col-md-12 my-2">
-        <div *ngIf="btnActive == 0" class="text-16 textDarkRed">les messages sont envoyés aux utilisateurs sélectionnés</div>
-        <div *ngIf="btnActive == 1" class="text-16 textDarkRed">les messages sont envoyés aux utilisateurs selon les classes sélectionnées</div>
-        <div *ngIf="btnActive == 2" class="text-16 textDarkRed">les messages sont envoyés aux employés sélectionnés</div>
+    </div>
+    <div class="spinner-layer spinner-yellow">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-green">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
       </div>
     </div>
   </div>
-  <div class="animated zoomInDown col-lg-12 col-md-12">
-    <form [formGroup]="msgForm" (ngSubmit)="getBroadcastRecap()">
+</div>
+
+<div *ngIf="!wait">
+  <div class="col-md-12 d-flex">
+    <i class="fad fa-at fa-2x mr-2" style="--fa-secondary-opacity: 1;
+      --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    <i class="fad fa-sms fa-2x mr-2" style="--fa-secondary-opacity: 1;
+      --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    <div class="text-18 mb-1">messagerie de diffusion</div>
+  </div>
+  <div *ngIf="!showRecapPage" class="row">
+    <div class="col-md-12">
       <div class="row">
-        <div class="col-md-12">
-          <div class="row">
-            <div *ngIf="showTo" class="col-md-12 mb-2">
-              <div class="card">
-                <div class="card-body p-2">
-                  <div class="row">
-                    <div class="col-md-8 text-16 text-muted my-auto">destinataires...</div>
-                    <input type="hidden" formControlName="msgType" name="msgType">
-                    <div class="col-md-4 my-auto"> 
-                      <div class="text-center text-md-right">
-                        <button type="button" (click)="getRecipients()" mdbBtn size="sm"
-                          [disabled]="msgForm.hasError('usersNOK')" class="btnBlue" mdbWavesEffect>saisir vos choix</button>
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <hr class="my-1">
-                    </div>
-                    <div formArrayName="userTypes" *ngFor="let ut of msgForm.get('userTypes')['controls'];
-                      let i = index;" class="col-md-2 my-auto">
-                      <div [formGroupName]="i">
-                        <mdb-checkbox formControlName="active">{{ut.value.name}}</mdb-checkbox>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div *ngIf="!showTo" class="col-md-12 mb-2">
-              <div class="card">
+        <div class="col-md-4 mb-1">
+          <button type="button" (click)=selectBtn(0) [ngClass]="(btnActive == 0)?'btnBlue':'btnWhiteB'" mdbBtn
+            size="sm" block="true" mdbWavesEffect>messages par utilisateurs</button>
+        </div>
+        <div class="col-md-4 mb-1">
+          <button type="button" (click)=selectBtn(1) [ngClass]="(btnActive == 1)?'btnBlue':'btnWhiteB'" mdbBtn
+            size="sm" block="true" mdbWavesEffect>messages par classes</button>
+          </div>
+        <div class="col-md-4 mb-1">
+          <button type="button" (click)=selectBtn(2) [ngClass]="(btnActive == 2)?'btnBlue':'btnWhiteB'" mdbBtn
+            size="sm" block="true" mdbWavesEffect>messages aux employés</button>
+        </div>
+        <div class="col-md-12 my-2">
+          <div *ngIf="btnActive == 0" class="text-16 textDarkRed">les messages sont envoyés aux utilisateurs sélectionnés</div>
+          <div *ngIf="btnActive == 1" class="text-16 textDarkRed">les messages sont envoyés aux utilisateurs selon les classes sélectionnées</div>
+          <div *ngIf="btnActive == 2" class="text-16 textDarkRed">les messages sont envoyés aux employés sélectionnés</div>
+        </div>
+      </div>
+    </div>
+    <div class="animated zoomInDown col-lg-12 col-md-12">
+      <form [formGroup]="msgForm" (ngSubmit)="getBroadcastRecap()">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="row">
+              <div *ngIf="showTo" class="col-md-12 mb-2">
+                <div class="card">
                   <div class="card-body p-2">
                     <div class="row">
-                    <div class="col-md-8 my-auto">
-                      <div class="text-16 text-muted">destinataires: <b>{{this.toData}}</b></div>
-                    </div>
-                    <div class="col-md-4 my-auto">
-                      <div class="text-right">
-                        <button type="button" (click)="showToForm()" mdbBtn size="sm" class="btnBlue" mdbWavesEffect>modifier vos choix</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div *ngIf="showGroups" class="col-md-12 mb-2">
-              <div class="card">
-                <div class="card-body p-2">
-                  <div class="row">
-                    <div class="col-md-8 text-16 text-muted my-auto">groupes...</div>
-                    <div class="col-md-4 my-auto"> 
-                      <div class="text-right">
-                        <button type="button" (click)="getGroups()" mdbBtn size="sm"
-                          [disabled]="msgForm.hasError('classesNOK')" class="btnBlue" mdbWavesEffect>saisir vos choix</button>
-                      </div>
-                    </div>
-                    <div class="col-md-12">
-                      <hr class="my-1">
-                    </div>
-                    <div class="col-md-2"><b>niveau education</b></div>
-                    <div formArrayName="educLevels" *ngFor="let el of msgForm.get('educLevels')['controls'];
-                      let i = index;" class="col-md-2">
-                      <div [formGroupName]="i">
-                        <mdb-checkbox (change)="educLevelSelect(el.value)" formControlName="active">{{el.value.name}}</mdb-checkbox>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="my-1">
-                  <div class="row">
-                    <div class="col-md-2"><b>écoles</b></div>
-                    <div formArrayName="schools" *ngFor="let school of msgForm.get('schools')['controls'];
-                      let i = index;" class="col-md-2">
-                      <div [formGroupName]="i">
-                        <mdb-checkbox (change)="schoolSelect(school.value)" formControlName="active">{{school.value.name}}</mdb-checkbox>
-                      </div>
-                    </div>
-                  </div>
-                 
-                  <hr class="my-1">
-                  <div class="row">
-                    <div class="col-md-2"><b>niveau classe</b></div>
-                    <div class="col-md-10">
-                      <div class="row">
-                        <div formArrayName="classLevels" *ngFor="let cl of msgForm.get('classLevels')['controls'];
-                          let i = index;" class="col-md-2">
-                          <div [formGroupName]="i">
-                            <mdb-checkbox (change)="classLevelSelect(cl.value)" formControlName="active">{{cl.value.name}}</mdb-checkbox>
-                          </div>
+                      <div class="col-md-8 text-16 text-muted my-auto">destinataires...</div>
+                      <input type="hidden" formControlName="msgType" name="msgType">
+                      <div class="col-md-4 my-auto"> 
+                        <div class="text-center text-md-right">
+                          <button type="button" (click)="getRecipients()" mdbBtn size="sm"
+                            [disabled]="msgForm.hasError('usersNOK')" class="btnBlue" mdbWavesEffect>saisir vos choix</button>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  <hr class="my-1">
-                  <div class="row">
-                    <div class="col-md-2"><b>classes</b></div>
-                    <div class="col-md-10">
-                      <div class="row">
-                        <div formArrayName="classes" *ngFor="let class of msgForm.get('classes')['controls'];
-                          let i = index;" class="col-md-2">
-                          <div [formGroupName]="i">
-                            <mdb-checkbox formControlName="selected">{{class.value.name}}</mdb-checkbox>
-                          </div>
+                      <div class="col-md-12">
+                        <hr class="my-1">
+                      </div>
+                      <div formArrayName="userTypes" *ngFor="let ut of msgForm.get('userTypes')['controls'];
+                        let i = index;" class="col-md-2 my-auto">
+                        <div [formGroupName]="i">
+                          <mdb-checkbox formControlName="active">{{ut.value.name}}</mdb-checkbox>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div *ngIf="!showGroups" class="col-md-12 mb-2">
-              <div class="card">
+              <div *ngIf="!showTo" class="col-md-12 mb-2">
+                <div class="card">
+                    <div class="card-body p-2">
+                      <div class="row">
+                      <div class="col-md-8 my-auto">
+                        <div class="text-16 text-muted">destinataires: <b>{{this.toData}}</b></div>
+                      </div>
+                      <div class="col-md-4 my-auto">
+                        <div class="text-right">
+                          <button type="button" (click)="showToForm()" mdbBtn size="sm" class="btnBlue" mdbWavesEffect>modifier vos choix</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12 mb-2">
+                <div class="card">
+                  <div class="card-body p-2">
+                    <div class="border rounded-lg p-2 mb-2">
+                      <mdb-checkbox (change)="setNotValidatedUsers()" formControlName="sendToUsersNOK">envoyer message aux utilisateurs non validés</mdb-checkbox>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="showGroups" class="col-md-12 mb-2">
+                <div class="card">
                   <div class="card-body p-2">
                     <div class="row">
-                    <div class="col-md-8 my-auto">
-                      <div class="text-16 text-muted">classes: <b>{{groupData}}</b></div>
-                    </div>
-                    <div class="col-md-4 my-auto">
-                      <div class="text-right">
-                        <button type="button" (click)="showGroupForm()" mdbBtn size="sm" class="btnBlue" mdbWavesEffect>modifier vos choix</button>
+                      <div class="col-md-8 text-16 text-muted my-auto">groupes...</div>
+                      <div class="col-md-4 my-auto"> 
+                        <div class="text-right">
+                          <button type="button" (click)="getGroups()" mdbBtn size="sm"
+                            [disabled]="msgForm.hasError('classesNOK')" class="btnBlue" mdbWavesEffect>saisir vos choix</button>
                         </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-12">
-              <div class="card">
-                <div class="card-body p-2">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div class="border rounded-lg p-2 mb-2">
-                        <mdb-checkbox (change)="setNotValidatedUsers()" formControlName="sendToUsersNOK">envoyer message aux utilisateurs non validés</mdb-checkbox>
                       </div>
-                      <div class="border rounded-lg p-2 mb-2">
-                        <span class="text-15">envoyer les messages par</span>
-                        <div class="form-check form-check-inline">
-                          <input type="radio" class="form-check-input" id="smstemplate" [checked]="true" [value]="1"
-                            (change)="toggleBox($event)" formControlName="msgChoice" name="msgChoice"  mdbInput>
-                          <label class="form-check-label pl-4" for="smstemplate">EMAIL</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                          <input type="radio" class="form-check-input" id="smstxt" [value]="2"
-                            (change)="toggleBox($event)" formControlName="msgChoice" name="msgChoice" mdbInput>
-                          <label class="form-check-label pl-4" for="smstxt">SMS</label>
+                      <div class="col-md-12">
+                        <hr class="my-1">
+                      </div>
+                      <div class="col-md-2"><b>niveau education</b></div>
+                      <div formArrayName="educLevels" *ngFor="let el of msgForm.get('educLevels')['controls'];
+                        let i = index;" class="col-md-2">
+                        <div [formGroupName]="i">
+                          <mdb-checkbox (change)="educLevelSelect(el.value)" formControlName="active">{{el.value.name}}</mdb-checkbox>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div *ngIf="toggleEmailSms" class="row">
-                    <div class="col-md-12">
-                      <div class="border rounded-lg p-2 mb-2">
+                    <hr class="my-1">
+                    <div class="row">
+                      <div class="col-md-2"><b>écoles</b></div>
+                      <div formArrayName="schools" *ngFor="let school of msgForm.get('schools')['controls'];
+                        let i = index;" class="col-md-2">
+                        <div [formGroupName]="i">
+                          <mdb-checkbox (change)="schoolSelect(school.value)" formControlName="active">{{school.value.name}}</mdb-checkbox>
+                        </div>
+                      </div>
+                    </div>
+                  
+                    <hr class="my-1">
+                    <div class="row">
+                      <div class="col-md-2"><b>niveau classe</b></div>
+                      <div class="col-md-10">
                         <div class="row">
-                          <div class="col-md-12 text-15"><b>EMAIL</b></div>
-                          <div class="col-md-12"><hr class="my-1"></div>
-                          <div class="col-md-12 mb-2 pl-0">
-                            <div class="form-check form-check-inline">
-                              <input type="radio" class="form-check-input" id="emailtemplate" [value]="1"
-                                (change)="selectEmailBody($event)" formControlName="emailType" name="emailType"  mdbInput>
-                              <label class="form-check-label pl-4" for="emailtemplate">template</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <input type="radio" class="form-check-input" id="txt" [value]="2"
-                                (change)="selectEmailBody($event)" formControlName="emailType" name="emailType" mdbInput>
-                              <label class="form-check-label pl-4" for="txt">texte libre</label>
+                          <div formArrayName="classLevels" *ngFor="let cl of msgForm.get('classLevels')['controls'];
+                            let i = index;" class="col-md-2">
+                            <div [formGroupName]="i">
+                              <mdb-checkbox (change)="classLevelSelect(cl.value)" formControlName="active">{{cl.value.name}}</mdb-checkbox>
                             </div>
                           </div>
-                          <div *ngIf="emailBodyType == 1" class="col-md-6 mb-3">
-                            <mdb-select [options]="templateOptions" formControlName="emailTemplate"
-                              (ngModelChange)="setEmailTemplateData()"  placeholder="choisir le modèle d'email"></mdb-select>
-                          </div>
-                          <div *ngIf="emailBodyType == 2" class="col-md-7 mb-2">
-                            <div class="form-group shadow-textarea">
-                              <textarea class="form-control z-depth-1" id="emailSubject" formControlName="emailSubject"
-                                rows="1" placeholder="objet du email..."></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <hr class="my-1">
+                    <div class="row">
+                      <div class="col-md-2"><b>classes</b></div>
+                      <div class="col-md-10">
+                        <div class="row">
+                          <div formArrayName="classes" *ngFor="let class of msgForm.get('classes')['controls'];
+                            let i = index;" class="col-md-2">
+                            <div [formGroupName]="i">
+                              <mdb-checkbox formControlName="selected">{{class.value.name}}</mdb-checkbox>
                             </div>
                           </div>
-                          <div *ngIf="emailBodyType == 2" class="col-md-12">
-                            <div class="row">
-                              <div class="col-md-6 mb-1">
-                                <mdb-select [options]="tokenOptions" formControlName="token" (ngModelChange)="addTokenToBody($event)"
-                                  placeholder="mots clés du message"></mdb-select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!showGroups" class="col-md-12 mb-2">
+                <div class="card">
+                    <div class="card-body p-2">
+                      <div class="row">
+                      <div class="col-md-8 my-auto">
+                        <div class="text-16 text-muted">classes: <b>{{groupData}}</b></div>
+                      </div>
+                      <div class="col-md-4 my-auto">
+                        <div class="text-right">
+                          <button type="button" (click)="showGroupForm()" mdbBtn size="sm" class="btnBlue" mdbWavesEffect>modifier vos choix</button>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="card">
+                  <div class="card-body p-2">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="border rounded-lg p-2 mb-2">
+                          <span class="text-15">envoyer les messages par</span>
+                          <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" id="smstemplate" [checked]="true" [value]="1"
+                              (change)="toggleBox($event)" formControlName="msgChoice" name="msgChoice"  mdbInput>
+                            <label class="form-check-label pl-4" for="smstemplate">EMAIL</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input type="radio" class="form-check-input" id="smstxt" [value]="2"
+                              (change)="toggleBox($event)" formControlName="msgChoice" name="msgChoice" mdbInput>
+                            <label class="form-check-label pl-4" for="smstxt">SMS</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="toggleEmailSms" class="row">
+                      <div class="col-md-12">
+                        <div class="border rounded-lg p-2 mb-2">
+                          <div class="row">
+                            <div class="col-md-12 text-15"><b>EMAIL</b></div>
+                            <div class="col-md-12"><hr class="my-1"></div>
+                            <div class="col-md-12 mb-2 pl-0">
+                              <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="txt" [value]="2"
+                                  (change)="selectEmailBody($event)" formControlName="emailType" name="emailType" mdbInput>
+                                <label class="form-check-label pl-4" for="txt">texte libre</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="emailtemplate" [value]="1"
+                                  (change)="selectEmailBody($event)" formControlName="emailType" name="emailType"  mdbInput>
+                                <label class="form-check-label pl-4" for="emailtemplate">template</label>
                               </div>
                             </div>
-                            <div class="text-15 textDarkRed mb-1">sélectionner le mot clé pour l'ajouter à la fin du message</div>
-                            <div class="form-group shadow-textarea">
-                              <textarea class="form-control z-depth-1" id="emailBody" formControlName="emailBody"
-                                rows="5" placeholder="message du email..."></textarea>
+                            <div *ngIf="emailBodyType == 1" class="col-md-6 mb-3">
+                              <mdb-select [options]="emailTemplateOptions" formControlName="emailTemplate"
+                                (ngModelChange)="setEmailTemplateData()"  placeholder="choisir le modèle d'email"></mdb-select>
+                            </div>
+                            <div *ngIf="emailBodyType == 2" class="col-md-7 mb-2">
+                              <div class="form-group shadow-textarea">
+                                <textarea class="form-control z-depth-1" id="emailSubject" formControlName="emailSubject"
+                                  rows="1" placeholder="objet du email..."></textarea>
+                              </div>
+                            </div>
+                            <div *ngIf="emailBodyType == 2" class="col-md-12">
+                              <div class="row">
+                                <div class="col-md-5 mb-1">
+                                  <mdb-select [options]="tokenOptions" formControlName="emailToken" (ngModelChange)="addTokenToEmailBody($event)"
+                                    placeholder="mots clés du message"></mdb-select>
+                                </div>
+                              </div>
+                              <div class="text-15 textDarkRed mb-1">sélectionner le mot clé pour l'ajouter à la fin du message</div>
+                              <!-- <div class="form-group shadow-textarea">
+                                <textarea class="form-control z-depth-1" id="emailBody" formControlName="emailBody"
+                                  rows="5" placeholder="message du email..."></textarea>
+                              </div> -->
+                              <mdb-wysiwyg #emailBody formControlName="emailBody"></mdb-wysiwyg>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="col-md-12 mb-1">
-                      <button type="submit" size="sm" mdbBtn class="btnBlue" block="true" mdbWavesEffect
-                      [disabled]="!msgForm.valid || msgForm.hasError('formNOK')">envoyer les emails</button>
-                    </div>
-                  </div>     
-                  <div *ngIf="!toggleEmailSms"  class="row">
-                    <div class="col-md-12">
-                      <div class="border rounded-lg p-2 mb-2">
-                        <div class="row">
-                          <div class="col-md-12 text-15"><b>SMS</b></div>
-                          <div class="col-md-12"><hr class="my-1"></div>
-                          <div class="col-md-12 mb-2 pl-0">
-                            <div class="form-check form-check-inline">
-                              <input type="radio" class="form-check-input" id="smstemplatechoice" [value]="1"  [checked]="true"
-                                (change)="selectSmsBody($event)" formControlName="smsType" name="smsType"  mdbInput>
-                              <label class="form-check-label pl-4" for="smstemplatechoice">template</label>
+                      <div class="col-md-12 mb-1">
+                        <button type="submit" size="sm" mdbBtn class="btnBlue" block="true" mdbWavesEffect
+                        [disabled]="!msgForm.valid || msgForm.hasError('formNOK')">envoyer les emails</button>
+                      </div>
+                    </div>     
+                    <div *ngIf="!toggleEmailSms"  class="row">
+                      <div class="col-md-12">
+                        <div class="border rounded-lg p-2 mb-2">
+                          <div class="row">
+                            <div class="col-md-12 text-15"><b>SMS</b></div>
+                            <div class="col-md-12"><hr class="my-1"></div>
+                            <div class="col-md-12 mb-2 pl-0">
+                              <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="smstxtchoice" [value]="2"
+                                  (change)="selectSmsBody($event)" formControlName="smsType" name="smsType" mdbInput>
+                                <label class="form-check-label pl-4" for="smstxtchoice">texte libre</label>
+                              </div>
+                              <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="smstemplatechoice" [value]="1"
+                                  (change)="selectSmsBody($event)" formControlName="smsType" name="smsType"  mdbInput>
+                                <label class="form-check-label pl-4" for="smstemplatechoice">template</label>
+                              </div>
                             </div>
-                            <div class="form-check form-check-inline">
-                              <input type="radio" class="form-check-input" id="smstxtchoice" [value]="2"
-                                (change)="selectSmsBody($event)" formControlName="smsType" name="smsType" mdbInput>
-                              <label class="form-check-label pl-4" for="smstxtchoice">texte libre</label>
+                            <div *ngIf="smsBodyType == 1" class="col-md-6 mb-3">
+                              <mdb-select [options]="smsTemplateOptions" formControlName="smsTemplate"
+                                placeholder="choisir le modèle de sms"></mdb-select>
                             </div>
-                          </div>
-                          <div *ngIf="smsBodyType == 1" class="col-md-6 mb-3">
-                            <mdb-select [options]="templateOptions" formControlName="smsTemplate"
-                              placeholder="choisir le modèle de sms"></mdb-select>
-                          </div>
-                          <div *ngIf="smsBodyType == 2" class="col-md-12">
-                            <div class="form-group shadow-textarea">
-                              <textarea class="form-control z-depth-1" id="smsBody" formControlName="smsBody"
-                                rows="5" placeholder="message du sms..."></textarea>
+                            <div *ngIf="smsBodyType == 2" class="col-md-12">
+                              <div class="row">
+                                <div class="col-md-5 mb-1">
+                                  <mdb-select [options]="tokenOptions" formControlName="smsToken" (ngModelChange)="addTokenToSmsBody($event)"
+                                    placeholder="mots clés du message"></mdb-select>
+                                </div>
+                              </div>
+                              <div class="text-15 textDarkRed mb-1">sélectionner le mot clé pour l'ajouter à la fin du message</div>
+                              <!-- <div class="form-group shadow-textarea">
+                                <textarea class="form-control z-depth-1" id="smsBody" formControlName="smsBody"
+                                  rows="5" placeholder="message du sms..."></textarea>
+                              </div> -->
+                              <mdb-wysiwyg #smsBody formControlName="smsBody"></mdb-wysiwyg>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="col-md-12 mb-1">
-                      <button type="submit" size="sm" mdbBtn class="btnBlue" block="true" mdbWavesEffect
-                      [disabled]="!msgForm.valid || msgForm.hasError('formNOK')">envoyer les sms</button>
-                    </div>
-                  </div>                  
+                      <div class="col-md-12 mb-1">
+                        <button type="submit" size="sm" mdbBtn class="btnBlue" block="true" mdbWavesEffect
+                        [disabled]="!msgForm.valid || msgForm.hasError('formNOK')">envoyer les sms</button>
+                      </div>
+                    </div>                  
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
-</div>
-<div *ngIf="showRecapPage">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-body p-2">
-          <div class="text-15 d-flex">
-            <a (click)="goBack()">
-              <i class="fad fa-undo-alt text-15 mr-2" style="--fa-secondary-opacity: 1;
-                --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-            </a>
-            <b>récapitulatif de la diffusion du message</b>
-          </div>
-          <hr class="my-1">
-          <div *ngIf="recipients.length > 0">
-            <div class="text-16 textBlue">sélection des destinataires : </div>
-            <div *ngIf="recipients.length > 1" class="text-15">le message sera envoyé à <b>{{recipients.length}}</b> personnes.</div>
-            <div *ngIf="recipients.length === 1" class="text-15">le message sera envoyé à <b>{{recipients.length}}</b> personne.</div>
-            <div *ngIf="usersNOK.length > 1" class="text-15"><b>{{usersNOK.length}}</b> personnes non validées ne recevrons pas le message.</div>
-            <div *ngIf="usersNOK.length === 1" class="text-15"><b>{{usersNOK.length}}</b> personne non validée ne recevra pas le message.</div>
+  <div *ngIf="showRecapPage">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body p-2">
+            <div class="text-15 d-flex">
+              <a (click)="goBack()">
+                <i class="fad fa-undo-alt text-15 mr-2" style="--fa-secondary-opacity: 1;
+                  --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+              </a>
+              <b>récapitulatif de la diffusion du message</b>
+            </div>
             <hr class="my-1">
-            <div class="text-15 mb-1"><b>destinataires OK pour l'envoi du message</b></div>
-            <div class="row">
-              <div class="col-md-3 mb-2" *ngFor="let user of recipients |
-                paginate: { id: 'usersOK', itemsPerPage: usersOKpageSize, currentPage: usersOKpage }; let i = index">
-                <div class="border rounded-pill selected p-1">
-                  <div class="d-flex">
-                    <img class="child-img mr-2" src="{{user.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
-                    <div class="text-17 my-auto">{{user.lastName}} {{user.firstName}}</div>
+            <div *ngIf="recipients.length > 0">
+              <div class="text-16 textBlue">sélection des destinataires : </div>
+              <div *ngIf="recipients.length > 1" class="text-15">le message sera envoyé à <b>{{recipients.length}}</b> personnes.</div>
+              <div *ngIf="recipients.length === 1" class="text-15">le message sera envoyé à <b>{{recipients.length}}</b> personne.</div>
+              <div *ngIf="usersNOK.length > 1" class="text-15"><b>{{usersNOK.length}}</b> personnes non validées ne recevrons pas le message.</div>
+              <div *ngIf="usersNOK.length === 1" class="text-15"><b>{{usersNOK.length}}</b> personne non validée ne recevra pas le message.</div>
+              <hr class="my-1">
+              <div class="text-15 mb-1"><b>destinataires OK pour l'envoi du message</b></div>
+              <div class="row">
+                <div class="col-md-3 mb-2" *ngFor="let user of recipients |
+                  paginate: { id: 'usersOK', itemsPerPage: usersOKpageSize, currentPage: usersOKpage }; let i = index">
+                  <div class="border rounded-pill selected p-1">
+                    <div class="d-flex">
+                      <img class="child-img mr-2" src="{{user.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
+                      <div class="text-17 my-auto">{{user.lastName}} {{user.firstName}}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="col-md-12 mt-1">
-                <pagination-controls (pageChange)="usersOKpage = $event" id="usersOK" responsive="true"
-                  directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
-              </div>
-            </div>
-            <hr class="my-1">
-            <div class="text-15 mb-1"><b>personnes non validées ne recevant pas le message</b></div>
-            <div class="row">
-              <div class="col-md-3 mb-2" *ngFor="let user of usersNOK |
-                paginate: { id: 'usersNOK', itemsPerPage: usersNOKpageSize, currentPage: usersNOKpage }; let i = index">
-                <div class="border rounded-pill selected p-1">
-                  <div class="d-flex">
-                    <img class="child-img mr-2" src="{{user.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
-                    <div class="text-17 my-auto">{{user.lastName}} {{user.firstName}}</div>
-                  </div>
+                <div class="col-md-12 mt-1">
+                  <pagination-controls (pageChange)="usersOKpage = $event" id="usersOK" responsive="true"
+                    directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
                 </div>
               </div>
-              <div class="col-md-12 mt-1">
-                <pagination-controls (pageChange)="usersNOKpage = $event" id="usersNOK" responsive="true"
-                  directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
+              <hr class="my-1">
+              <div class="text-15 mb-1"><b>personnes non validées ne recevant pas le message</b></div>
+              <div class="row">
+                <div class="col-md-3 mb-2" *ngFor="let user of usersNOK |
+                  paginate: { id: 'usersNOK', itemsPerPage: usersNOKpageSize, currentPage: usersNOKpage }; let i = index">
+                  <div class="border rounded-pill selected p-1">
+                    <div class="d-flex">
+                      <img class="child-img mr-2" src="{{user.photoUrl || '../../../../../../assets/user.png'}}" alt="Contact Person">
+                      <div class="text-17 my-auto">{{user.lastName}} {{user.firstName}}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12 mt-1">
+                  <pagination-controls (pageChange)="usersNOKpage = $event" id="usersNOK" responsive="true"
+                    directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
+                </div>
+              </div>
+              <hr class="my-1">
+              <div *ngIf="msgChoice == 1" class="text-15">objet du message : <b>{{subject}}</b></div>
+              <div>corps du message :</div>
+              <div class="text-15">{{body}}</div>
+              <div class="my-1">
+                <button type="button" mdbBtn (click)="sendMessage()" size="sm" block="true" class="btnBlue" mdbWavesEffect>envoyer les messages</button>
               </div>
             </div>
-            <hr class="my-1">
-            <div *ngIf="msgChoice == 1" class="text-15">objet du message : <b>{{subject}}</b></div>
-            <div>corps du message :</div>
-            <div class="text-15">{{body}}</div>
-            <div class="my-1">
-              <button type="button" mdbBtn (click)="sendMessage()" size="sm" block="true" class="btnBlue" mdbWavesEffect>envoyer les messages</button>
+            <div *ngIf="recipients.length === 0">
+              <div class="text-17 text-danger">aucune personne trouvée pour envoyer le message. recommencez la sélection svp.</div>
             </div>
-          </div>
-          <div *ngIf="recipients.length === 0">
-            <div class="text-17 text-danger">aucune personne trouvée pour envoyer le message. recommencez la sélection svp.</div>
           </div>
         </div>
       </div>

@@ -30,7 +30,7 @@ namespace EducNotes.API.Controllers
     private readonly IEducNotesRepository _repo;
     private readonly IConfiguration _config;
     public readonly ICacheRepository _cache;
-    int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
+    int teacherTypeId, parentTypeId, studentTypeId, adminTypeId, emailBroacastCatId, smsBroacastCatId;
 
     public CommController(DataContext context, IMapper mapper, IEducNotesRepository repo,
       IConfiguration config, ICacheRepository cache)
@@ -44,6 +44,8 @@ namespace EducNotes.API.Controllers
       parentTypeId = _config.GetValue<int> ("AppSettings:parentTypeId");
       adminTypeId = _config.GetValue<int> ("AppSettings:adminTypeId");
       studentTypeId = _config.GetValue<int> ("AppSettings:studentTypeId");
+      emailBroacastCatId = _config.GetValue<int> ("AppSettings:emailBroadcastCatId");
+      smsBroacastCatId = _config.GetValue<int> ("AppSettings:smsBroadcastCatId");
     }
 
     [HttpPost("Twilio_SendSMS")]
@@ -122,17 +124,17 @@ namespace EducNotes.API.Controllers
     {
       string query = Request.QueryString.ToString();
 
-      String messageId = HttpUtility.ParseQueryString(query).Get("messageId");
-      String integrationName = HttpUtility.ParseQueryString(query).Get("integrationName");
-      String clientMsgId = HttpUtility.ParseQueryString(query).Get("clientMessageId");
-      String status = HttpUtility.ParseQueryString(query).Get("status");
-      String statusDesc = HttpUtility.ParseQueryString(query).Get("statusDesc");
+      string messageId = HttpUtility.ParseQueryString(query).Get("messageId");
+      string integrationName = HttpUtility.ParseQueryString(query).Get("integrationName");
+      string clientMsgId = HttpUtility.ParseQueryString(query).Get("clientMessageId");
+      string status = HttpUtility.ParseQueryString(query).Get("status");
+      string statusDesc = HttpUtility.ParseQueryString(query).Get("statusDesc");
       string timeStamp = HttpUtility.ParseQueryString(query).Get("timeStamp");
       string statusCode = HttpUtility.ParseQueryString(query).Get("statusCode");
       string requestId = HttpUtility.ParseQueryString(query).Get("requestId");
 
       var sms = await _context.Sms.FirstOrDefaultAsync(s => s.res_ApiMsgId == messageId);
-      if (sms != null)
+      if(sms != null)
       {
         if (Convert.ToInt64(timeStamp) > Convert.ToInt64(sms.cb_TimeStamp))
         {
@@ -143,7 +145,7 @@ namespace EducNotes.API.Controllers
           sms.cb_RequestId = requestId;
           sms.cb_TimeStamp = timeStamp;
           _context.Update(sms);
-          if (await _repo.SaveAll())
+          if(await _repo.SaveAll())
             return NoContent();
         }
       }
@@ -167,8 +169,8 @@ namespace EducNotes.API.Controllers
 
     }
 
-    [HttpGet("EmailBroadCastData")]
-    public async Task<IActionResult> GetEmailBroadCastData()
+    [HttpGet("BroadCastData")]
+    public async Task<IActionResult> GetBroadCastData()
     {
       var schools = await _repo.GetSchools();
       var cycles = await _repo.GetCycles();
@@ -180,7 +182,29 @@ namespace EducNotes.API.Controllers
       });
     }
 
-    [HttpGet ("EmailTemplates")]
+    [HttpGet("EmailBroadcastTemplates")]
+    public async Task<IActionResult> GetEmailBroadcastTemplates()
+    {
+      List<EmailTemplate> templatesCached = await _cache.GetEmailTemplates();
+
+      var emailTemplates = templatesCached.Where(t => t.EmailCategoryId == emailBroacastCatId)
+                                                        .OrderBy(o => o.Name).ToList();
+
+      List<BroadcastMessageDto> templates = new List<BroadcastMessageDto>();
+      foreach(var tpl in emailTemplates)
+      {
+        BroadcastMessageDto ebdd = new BroadcastMessageDto();
+        ebdd.Id = tpl.Id;
+        ebdd.Name = tpl.Name;
+        ebdd.Subject = tpl.Subject;
+        ebdd.BodyContent = tpl.Body;
+        ebdd.EmailCategoryName = tpl.EmailCategory.Name;
+        templates.Add(ebdd);
+      }
+      return Ok(templates);
+    }
+
+    [HttpGet("EmailTemplates")]
     public async Task<IActionResult> GetEmailTemplates()
     {
       var emailTemplates = await _context.EmailTemplates.Include(i => i.EmailCategory)
@@ -200,16 +224,6 @@ namespace EducNotes.API.Controllers
       return Ok(templates);
     }
 
-    // [HttpGet("EmailTemplates")]
-    // public async Task<IActionResult> GetEmailTemplates()
-    // {
-    //   var templates = await _context.EmailTemplates
-    //                           .Include(i => i.EmailCategory)
-    //                           .OrderBy(s => s.Name).ToListAsync();
-    //   var templatesToReturn = _mapper.Map<IEnumerable<EmailTemplateForListDto>>(templates);
-    //   return Ok(templatesToReturn);
-    // }
-
     [HttpGet("EmailTemplates/{id}")]
     public async Task<IActionResult> GetEmailTemplate(int id)
     {
@@ -221,7 +235,7 @@ namespace EducNotes.API.Controllers
     public async Task<IActionResult> AddEmailTemplate([FromBody] EmailTemplateForSaveDto emailTemplateDto)
     {
       var id = emailTemplateDto.Id;
-      if (id == 0)
+      if(id == 0)
       {
         EmailTemplate newTemplate = new EmailTemplate();
         _mapper.Map(emailTemplateDto, newTemplate);
@@ -234,15 +248,38 @@ namespace EducNotes.API.Controllers
         _repo.Update(templateFromRepo);
       }
 
-      if (await _repo.SaveAll())
+      if(await _repo.SaveAll())
       {
-        // await _cache.LoadEmailTemplates();
+        await _cache.LoadEmailTemplates();
         return Ok();
       }
 
       // throw new Exception($"Updating/Saving agendaItem failed");
 
       return BadRequest("problème pour ajouter le modèle");
+    }
+
+    [HttpGet("SmsBroadcastTemplates")]
+    public async Task<IActionResult> GetSmsBroadcastTemplates()
+    {
+      List<SmsTemplate> tempaltesCached = await _cache.GetSmsTemplates();
+
+      var smsTemplates = tempaltesCached.Where(t => t.SmsCategoryId == smsBroacastCatId)
+                                                    .OrderBy(o => o.Name)
+                                                    .ToList();
+
+      List<BroadcastMessageDto> templates = new List<BroadcastMessageDto>();
+      foreach(var tpl in smsTemplates)
+      {
+        BroadcastMessageDto msg = new BroadcastMessageDto();
+        msg.Id = tpl.Id;
+        msg.Name = tpl.Name;
+        msg.BodyContent = tpl.Content;
+        msg.SmsCategoryName = tpl.SmsCategory.Name;
+        templates.Add(msg);
+      }
+
+      return Ok(templates);
     }
 
     [HttpGet("SmsTemplates")]
@@ -263,16 +300,6 @@ namespace EducNotes.API.Controllers
       }
       return Ok(templates);
     }
-
-    // [HttpGet("SmsTemplates")]
-    // public async Task<IActionResult> GetSmsTemplates()
-    // {
-    //   var templates = await _context.SmsTemplates
-    //                           .Include(i => i.SmsCategory)
-    //                           .OrderBy(s => s.Name).ToListAsync();
-    //   var templatesToReturn = _mapper.Map<IEnumerable<SmsTemplateForListDto>>(templates);
-    //   return Ok(templatesToReturn);
-    // }
 
     [HttpGet("SmsTemplates/{id}")]
     public async Task<IActionResult> GetSmsTemplate(int id)
@@ -335,7 +362,7 @@ namespace EducNotes.API.Controllers
       List<int> userTypeIds = dataForMsgDto.UserTypeIds;
       List<int> educLevelIds = dataForMsgDto.EducLevelIds;
       List<int> schoolIds = dataForMsgDto.SchoolIds;
-      List<int> classLevelIds = new List<int>(); //dataForEmailDto.ClassLevelIds;
+      List<int> classLevelIds = new List<int>();
       List<int> classIds = dataForMsgDto.ClassIds;
       int msgType = dataForMsgDto.MsgType;
       int msgChoice = dataForMsgDto.MsgChoice;
@@ -343,6 +370,8 @@ namespace EducNotes.API.Controllers
       int templateId = dataForMsgDto.TemplateId;
       string subject = "";
       string body = "";
+      Boolean onlyUserTypesSelected = educLevelIds.Count() == 0 && schoolIds.Count() == 0 &&
+        classLevelIds.Count() == 0 && classIds.Count() == 0;
 
       //did we select a template?
       if(templateId != 0)
@@ -351,7 +380,7 @@ namespace EducNotes.API.Controllers
         {
           var template = await _context.EmailTemplates.FirstAsync(t => t.Id == templateId);
           subject = template.Subject;
-          body = template.Subject;
+          body = template.Body;
         }
         else
         {
@@ -368,18 +397,25 @@ namespace EducNotes.API.Controllers
       List<UserForDetailedDto> recipients = new List<UserForDetailedDto>();
       List<UserForDetailedDto> usersNOK = new List<UserForDetailedDto>();
       var users = await _context.Users
+                            .Include(i => i.ClassLevel)
+                            .Include(i => i.Class).ThenInclude(i => i.ClassLevel).ThenInclude(i => i.School)
+                            .Include(i => i.Class).ThenInclude(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
                             .Include(i => i.Photos)
-                            .Include(i => i.ClassLevel).ThenInclude(i => i.School)
-                            .Include(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
                             .Where(u => userTypeIds.Contains(Convert.ToInt32(u.UserTypeId))).ToListAsync();
-      // var usersList = _mapper.Map<List<UserForDetailedDto>>(usersFromDB);
 
       MsgRecipientsDto msgRecipients = new MsgRecipientsDto();
       switch(msgType)
       {
         case 0:
-          msgRecipients = _repo.GetMsgRecipientsForUsers(users, educLevelIds, schoolIds, 
-            classLevelIds, classIds, msgChoice, sendToNotValidated);
+          if(onlyUserTypesSelected)
+          {
+            msgRecipients = _repo.setRecipientsList(users, msgChoice, sendToNotValidated);
+          }
+          else
+          {
+            msgRecipients = await _repo.GetMsgRecipientsForUsers(users, educLevelIds, schoolIds, classLevelIds,
+              classIds, msgChoice, sendToNotValidated);
+          }
           recipients = _mapper.Map<List<UserForDetailedDto>>(msgRecipients.UsersOK);
           usersNOK = _mapper.Map<List<UserForDetailedDto>>(msgRecipients.UsersNOK);
           break;
@@ -420,7 +456,7 @@ namespace EducNotes.API.Controllers
           email.ToAddress = user.Email;
           email.FromAddress = "no-reply@educnotes.com";
           email.Subject = user.Subject;
-          List<TokenDto> tags = await _repo.GetMessageTokenValues(tokens, user);
+          List<TokenDto> tags = _repo.GetMessageTokenValues(tokens, user);
           email.Body = _repo.ReplaceTokens(tags, user.Body);
           email.InsertUserId = loggedUserId;
           email.InsertDate = DateTime.Now;
@@ -442,7 +478,7 @@ namespace EducNotes.API.Controllers
           sms.ToUserId = user.Id;
           sms.validityPeriod = 1;
           // replace tokens with dynamic data
-          List<TokenDto> tags = await _repo.GetMessageTokenValues(tokens, user);
+          List<TokenDto> tags = _repo.GetMessageTokenValues(tokens, user);
           sms.Content = _repo.ReplaceTokens(tags, user.Body);
           sms.InsertUserId = loggedUserId;
           sms.InsertDate = DateTime.Now;

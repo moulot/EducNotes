@@ -1066,14 +1066,13 @@ namespace EducNotes.API.Controllers {
     [HttpGet ("LevelsWithClasses")]
     public async Task<IActionResult> GetLevelsWithClasses()
     {
-      // List<Class> classesCached = await _cache.GetClasses();
-      // List<User> studentsCached = await _cache.GetStudents();
+      List<Class> classesCached = await _cache.GetClasses();
+      List<User> studentsCached = await _cache.GetStudents();
 
-      var classLevels = await _context.Classes
+      var classLevels = classesCached
                               .OrderBy(o => o.ClassLevel.DsplSeq)
                               .Select(s => s.ClassLevel)
-                              // .Include(i => i.Classes).ThenInclude(i => i.Students)
-                              .Distinct().ToListAsync();
+                              .Distinct().ToList();
 
       var dataToReturn = new List<ClassLevelDetailDto>();
       foreach(var item in classLevels)
@@ -1081,12 +1080,12 @@ namespace EducNotes.API.Controllers {
         var res = new ClassLevelDetailDto();
         res.Id = item.Id;
         res.Name = item.Name;
-        List<Class> classes = await _context.Classes.Where(c => c.ClassLevelId == item.Id).ToListAsync();
+        List<Class> classes = classesCached.Where(c => c.ClassLevelId == item.Id).ToList();
         res.TotalClasses = classes.Count();
         res.Classes = new List<ClassDetailDto>();
         foreach (var aclass in classes)
         {
-          List<User> students = await _context.Users.Where(u => u.ClassId == aclass.Id).ToListAsync();
+          List<User> students = studentsCached.Where(u => u.ClassId == aclass.Id).ToList();
           res.TotalStudents += students.Count();
           //add class data
           ClassDetailDto cdd = new ClassDetailDto();
@@ -1597,15 +1596,16 @@ namespace EducNotes.API.Controllers {
     [HttpGet("TeachersWithCourses")]
     public async Task<IActionResult> GetTeachersWithCourses()
     {
-      // List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
-      // List<TeacherCourse> teacherCoursesCached = await _cache.GetTeacherCourses();
-      // List<User> teachersCached = await _cache.GetTeachers();
+      List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
+      List<TeacherCourse> teacherCoursesCached = await _cache.GetTeacherCourses();
+      List<User> teachersCached = await _cache.GetTeachers();
 
-      List<User> teachers = await _context.Users.Include(i => i.EducLevel)
-                                                .Include(i => i.Class)
-                                                .Include(i => i.Photos)
-                                                .Where(u => u.UserTypeId == teacherTypeId)
-                                                .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToListAsync();
+      List<User> teachers = teachersCached
+                                                // .Include(i => i.EducLevel)
+                                                // .Include(i => i.Class)
+                                                // .Include(i => i.Photos)
+                                                // .Where(u => u.UserTypeId == teacherTypeId)
+                                                .OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToList();
 
       var teachersToReturn = new List<TeacherForListDto>();
       foreach(var teacher in teachers)
@@ -1635,17 +1635,20 @@ namespace EducNotes.API.Controllers {
           tdetails.PhotoUrl = photo.Url;
 
         tdetails.CourseClasses = new List<TeacherCourseClassesDto>();
-        var teacherCourses = await _context.TeacherCourses.Include(i => i.Course)
-                                                          .Where(t => t.TeacherId == teacher.Id).ToListAsync();
+        var teacherCourses = teacherCoursesCached
+                                                  // .Include(i => i.Course)
+                                                          .Where(t => t.TeacherId == teacher.Id).ToList();
         foreach(var course in teacherCourses)
         {
           var cdetails = new TeacherCourseClassesDto();
           cdetails.Course = course.Course;
 
           cdetails.Classes = new List<Class>();
-          var classes = await _context.ClassCourses.Include(i => i.Class)
+          var classes = classCoursesCached
+                                        // .Include(i => i.Class)
                                                    .Where(t => t.TeacherId == teacher.Id && t.CourseId == course.CourseId)
-                                                   .ToListAsync();
+                                                   .OrderBy(o => o.Class.ClassLevel.DsplSeq)
+                                                   .ToList();
           
           if(classes != null & classes.Count() > 0)
             cdetails.Classes = classes.Select(c => c.Class).ToList();

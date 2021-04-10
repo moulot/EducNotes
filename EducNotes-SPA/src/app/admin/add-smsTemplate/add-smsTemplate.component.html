@@ -1,12 +1,9 @@
 <div class="row m-2">
-
   <div class="col-md-12 mb-2">
-    <p class="text-20 font-weight-450">modèles Sms</p>
+    <div class="text-20 font-weight-450">modèles Sms</div>
   </div>
-
   <div class="col-md-12">
     <form [formGroup]="templateForm" (ngSubmit)="saveTemplate()">
-
       <div class="row">
         <div class="col-md-3">
           <div class="md-form mt-0">
@@ -15,13 +12,16 @@
           </div>
         </div>
       </div>
-
+      <div class="row">
+        <div class="col-md-4">
+          <mdb-select [options]="internalOptions" formControlName="internal" placeholder="modèle accessible à l'administration"></mdb-select>
+        </div>
+      </div>
       <div class="row">
         <div class="col-md-3">
           <mdb-select [options]="optionsSmsCategory" formControlName="category" placeholder="catégorie du sms"></mdb-select>
         </div>
       </div>
-
       <div class="row">
         <div class="col-md-3">
           <div class="md-form">
@@ -38,13 +38,11 @@
           </div>
         </div>
       </div>
-
       <div class="row">
         <div class="col-md-6">
           <button type="button" class="mr-2" mdbBtn size="sm" color="primary" (click)="cancelForm()" mdbWavesEffect>annuler</button>
           <button type="submit" [disabled]="!templateForm.valid" mdbBtn size="sm" color="primary" mdbWavesEffect>valider</button>
         </div>
       </div>
-
     </form>
 </div>

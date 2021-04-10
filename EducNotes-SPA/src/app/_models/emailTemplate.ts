@@ -4,4 +4,5 @@ export interface EmailTemplate {
   subject: string;
   body: string;
   emailCategoryId: number;
+  internal: Boolean;
 }
