@@ -19,7 +19,11 @@ export class OrderService {
   }
 
   getBalanceData() {
-    return this.http.get(this.baseUrl + 'balanceData');
+    return this.http.get(this.baseUrl + 'BalanceData');
+  }
+
+  getRecoveryData() {
+    return this.http.get(this.baseUrl + 'RecoveryData');
   }
 
   getTuitionData() {

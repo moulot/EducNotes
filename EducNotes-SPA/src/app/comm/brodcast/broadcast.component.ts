@@ -17,7 +17,7 @@ import { MdbWysiwygComponent } from 'mdb-wysiwyg';
 })
 export class BroadcastComponent implements OnInit {
   @ViewChild(MdbWysiwygComponent, { static: false }) emailBody: MdbWysiwygComponent;
-  @ViewChild(MdbWysiwygComponent, { static: true }) smsBody: MdbWysiwygComponent;
+  @ViewChild(MdbWysiwygComponent, { static: false }) smsBody: MdbWysiwygComponent;
   parentTypeId = environment.parentTypeId;
   studentTypeId = environment.studentTypeId;
   teacherTypeId = environment.teacherTypeId;
@@ -272,10 +272,13 @@ export class BroadcastComponent implements OnInit {
 
   addTokenToEmailBody(token) {
     const body = this.msgForm.value.emailBody;
-    console.log(token);
-    console.log(body);
-    this.emailBody.value = this.emailBody.value + ' ' + token;
-    this.msgForm.get('emailBody').setValue(this.emailBody.value);
+    // console.log(this.emailBody.textarea.nativeElement.innerTEXT);
+    // console.log(this.emailBody.textarea.nativeElement.innerHTML);
+    // this.emailBody.textarea.nativeElement.innerTEXT = body + ' ' + token;
+    // this.emailBody.textarea.nativeElement.innerHTML = body + ' ' + token;
+    // console.log(this.emailBody.textarea.nativeElement.innerTEXT);
+    // console.log(this.emailBody.textarea.nativeElement.innerHTML);
+    // this.msgForm.get('emailBody').setValue(this.emailBody.value);
   }
 
   addTokenToSmsBody(token) {

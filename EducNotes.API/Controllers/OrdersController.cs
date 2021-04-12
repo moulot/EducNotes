@@ -96,9 +96,9 @@ namespace EducNotes.API.Controllers
     [HttpGet("tuitionFromChild/{id}")]
     public async Task<IActionResult> GetTuitionFromChild(int id)
     {
-      // List<Order> orders = await _cache.GetOrders();
-      // List<OrderLineDeadline> lineDeadlines = await _cache.GetOrderLineDeadLines();
-      // List<User> students = await _cache.GetStudents();
+      List<Order> orders = await _cache.GetOrders();
+      List<OrderLineDeadline> lineDeadlines = await _cache.GetOrderLineDeadLines();
+      List<User> students = await _cache.GetStudents();
 
       var parents = await _repo.GetParents(id);
       int fatherId = 0;
@@ -109,7 +109,7 @@ namespace EducNotes.API.Controllers
       var mother = parents.FirstOrDefault(p => p.Gender == 0);
       if (mother != null)
         motherId = mother.Id;
-      var order = await _context.Orders.FirstOrDefaultAsync(t => t.isReg && (t.MotherId == motherId || t.FatherId == fatherId));
+      var order = orders.FirstOrDefault(t => t.isReg && (t.MotherId == motherId || t.FatherId == fatherId));
       var tuition = _mapper.Map<OrderDto>(order);
 
       var lines = await _repo.GetOrderLines(tuition.Id);
@@ -135,15 +135,15 @@ namespace EducNotes.API.Controllers
       var baba = _context.OrderLineHistories.Sum(s => s.Delta);
       tuition.strBalance = tuition.Balance.ToString("N0") + " F";
       tuition.AmountToValidate = tuition.LinePayments
-                                .Where(p => p.FinOpTypeId == finOpTypePayment && p.Cashed == false && p.Rejected == false)
+                    .Where(p => p.FinOpTypeId == finOpTypePayment && p.Cashed == false && p.Rejected == false)
                                 .Sum(s => s.Amount);
       tuition.strAmountToValidate = tuition.AmountToValidate.ToString("N0") + " F";
-      var lineDeadline = await _context.OrderLineDeadlines
+      var lineDeadline = lineDeadlines
                               .Where(l => l.OrderLine.ChildId == id)
                               .OrderBy(o => o.DueDate)
-                              .FirstAsync();
+                              .First();
       tuition.DownPayment = lineDeadline.Amount + lineDeadline.ProductFee;
-      tuition.Validated = (await _context.Users.Where(u => u.Id == id).FirstAsync()).Validated;
+      tuition.Validated = (students.First(u => u.Id == id)).Validated;
 
       return Ok(tuition);
     }
@@ -168,35 +168,42 @@ namespace EducNotes.API.Controllers
       return Ok(order);
     }
 
-    [HttpGet("balanceData")]
+    [HttpGet("RecoveryData")]
+    public async Task<IActionResult> GetRecoveryData()
+    {
+      LateAmountsDto lateAmounts = await _repo.GetLateAmountsDue();
+      return Ok(lateAmounts);
+    }
+
+    [HttpGet("BalanceData")]
     public async Task<IActionResult> GetBalanceData()
     {
-      // List<Order> orders = await _cache.GetOrders();
-      // List<FinOp> finOps = await _cache.GetFinOps();
+      List<Order> orders = await _cache.GetOrders();
+      List<FinOp> finOps = await _cache.GetFinOps();
       var today = DateTime.Now.Date;
 
       // invoiced amount
-      var invoiced = await _context.Orders.SumAsync(s => s.AmountTTC);
+      var invoiced = orders.Sum(s => s.AmountTTC);
       // cashed amount
-      var cashed = await _context.FinOps
+      var cashed = finOps
                     .Where(o => o.Cashed == true && o.FinOpTypeId == finOpTypePayment)
-                    .SumAsync(s => s.Amount);
+                    .Sum(s => s.Amount);
       // in validation amount
-      var toBeValidated = await _context.FinOps
+      var toBeValidated = finOps
                           .Where(o => o.Cashed == false && o.Rejected == false && o.FinOpTypeId == finOpTypePayment)
-                          .SumAsync(s => s.Amount);
+                          .Sum(s => s.Amount);
       // outstanding balance
       var openBalance = await _context.OrderLineHistories.Where(f => f.Cashed == true).SumAsync(b => b.Delta);
 
-      LateAmountsDto lateAmounts = await _repo.GetLateAmountsDue();
+      // LateAmountsDto lateAmounts = await _repo.GetLateAmountsDue();
 
       return Ok(new
       {
         invoiced,
         cashed,
         openBalance,
-        toBeValidated,
-        lateAmounts
+        toBeValidated
+        // lateAmounts
       });
     }
 
@@ -510,17 +517,17 @@ namespace EducNotes.API.Controllers
     [HttpGet("TuitionFigures")]
     public async Task<IActionResult> GetTuitionFigures()
     {
-      // List<Order> orders = await _cache.GetOrders();
-      // List<OrderLine> lines = await _cache.GetOrderLines();
-      // List<Class> classes = await _cache.GetClasses();
+      List<Order> ordersCached = await _cache.GetOrders();
+      List<OrderLine> lines = await _cache.GetOrderLines();
+      List<Class> classes = await _cache.GetClasses();
 
-      List<Order> orders = await _context.Orders.Where(t => t.OrderTypeId == tuitionTypeId).ToListAsync();
+      List<Order> orders = ordersCached.Where(t => t.OrderTypeId == tuitionTypeId).ToList();
       var tuitionIds = orders.Select(s => s.Id).ToList();
-      var tuitions = await _context.OrderLines.Where(t => tuitionIds.Contains(t.OrderId)).ToListAsync();
+      var tuitions = lines.Where(t => tuitionIds.Contains(t.OrderId)).ToList();
       var totalTuitions = tuitions.Count();
       var tuitionsNotValidated = tuitions.Where(t => t.Validated == false).Count();
       var tuitionsValidated = tuitions.Where(t => t.Validated == true).Count();
-      var classSpaces = await _context.Classes.SumAsync(c => c.MaxStudent);
+      var classSpaces = classes.Sum(c => c.MaxStudent);
 
       return Ok(new
       {
@@ -534,31 +541,35 @@ namespace EducNotes.API.Controllers
     [HttpGet("TuitionList")]
     public async Task<IActionResult> GetTuitionList()
     {
-      // List<Class> classes = await _cache.GetClasses();
-      // List<OrderLine> lines = await _cache.GetOrderLines();
-      // List<FinOpOrderLine> finOpLinesCached = await _cache.GetFinOpOrderLines();
+      List<Class> classes = await _cache.GetClasses();
+      List<OrderLine> lines = await _cache.GetOrderLines();
+      List<FinOpOrderLine> finOpLinesCached = await _cache.GetFinOpOrderLines();
 
-      var classlevels = await _context.Classes.OrderBy(o => o.ClassLevel.DsplSeq)
-                               .Select(c => c.ClassLevel).Distinct().ToListAsync();
+      var classlevels = classes.OrderBy(o => o.ClassLevel.DsplSeq)
+                               .Select(c => c.ClassLevel).Distinct().ToList();
       List<TuitionListDto> tuitionList = new List<TuitionListDto>();
-      var orderlines = await _context.OrderLines.Where(o => o.Order.isReg == true).ToListAsync();
-      var finOpLines = await _context.FinOpOrderLines.Where(f => f.FinOp.Cashed).ToListAsync();
+      var orderlines = lines.Where(o => o.Order.isReg == true).ToList();
+      var finOpLines = finOpLinesCached.Where(f => f.FinOp.Cashed).ToList();
       decimal totalInvoiced = orderlines.Sum(s => s.AmountTTC);
       decimal totalPaid = finOpLines.Sum(s => s.Amount);
       decimal totalTuitions = orderlines.Count();
       decimal totalTuitionsOK = orderlines.Where(s => s.Validated).Count();
-      foreach (var level in classlevels)
+      foreach(var level in classlevels)
       {
-        TuitionListDto tld = new TuitionListDto();
-        tld.ClassLevelId = level.Id;
-        tld.ClassLevelName = level.Name;
-        tld.NbTuitions = orderlines.Where(o => o.ClassLevelId == level.Id).Count();
-        tld.NbTuitionsOK = orderlines.Where(o => o.Validated == true && o.ClassLevelId == level.Id).Count();
-        tld.LevelAmount = orderlines.Where(f => f.ClassLevelId == level.Id).Sum(o => o.AmountTTC);
-        tld.strLevelAmount = tld.LevelAmount.ToString("N0") + " F";
-        tld.LevelAmountOK = finOpLines.Where(o => o.OrderLine.ClassLevelId == level.Id && o.OrderLine.Validated).Sum(o => o.Amount);
-        tld.strLevelAmountOK = tld.LevelAmountOK.ToString("N0") + " F";
-        tuitionList.Add(tld);
+        int nbTuitions = orderlines.Where(o => o.ClassLevelId == level.Id).Count();
+        if(nbTuitions > 0)
+        {
+          TuitionListDto tld = new TuitionListDto();
+          tld.ClassLevelId = level.Id;
+          tld.ClassLevelName = level.Name;
+          tld.NbTuitions = nbTuitions;
+          tld.NbTuitionsOK = orderlines.Where(o => o.Validated == true && o.ClassLevelId == level.Id).Count();
+          tld.LevelAmount = orderlines.Where(f => f.ClassLevelId == level.Id).Sum(o => o.AmountTTC);
+          tld.strLevelAmount = tld.LevelAmount.ToString("N0") + " F";
+          tld.LevelAmountOK = finOpLines.Where(o => o.OrderLine.ClassLevelId == level.Id && o.OrderLine.Validated).Sum(o => o.Amount);
+          tld.strLevelAmountOK = tld.LevelAmountOK.ToString("N0") + " F";
+          tuitionList.Add(tld);
+        }
       }
 
       return Ok(new {
@@ -573,11 +584,11 @@ namespace EducNotes.API.Controllers
     [HttpGet("AmountByDeadline")]
     public async Task<IActionResult> GetOrderAmountWithDeadlines()
     {
-      // List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
+      List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
 
       var balanceLinesPaid = await _repo.GetOrderLinesPaid();
       var today = DateTime.Now.Date;
-      List<OrderLineDeadline> lineDeadLines = await _context.OrderLineDeadlines.ToListAsync();
+      List<OrderLineDeadline> lineDeadLines = lineDeadlinesCached.ToList();
       var duedates = lineDeadLines.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
       List<AmountWithDeadlinesDto> amountDeadlines = new List<AmountWithDeadlinesDto>();
       int i = 0;
@@ -592,7 +603,7 @@ namespace EducNotes.API.Controllers
         else
         {
           linedeadlines = lineDeadLines.OrderBy(o => o.DueDate)
-                                             .Where(o => o.DueDate > olddate && o.DueDate <= duedate).ToList();
+                                       .Where(o => o.DueDate > olddate && o.DueDate <= duedate).ToList();
         }
 
         decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
@@ -638,7 +649,7 @@ namespace EducNotes.API.Controllers
     }
 
     [HttpGet("LevelLatePayments")]
-    public async Task<IActionResult> GetRecoveryData()
+    public async Task<IActionResult> GetLevelLatePayments()
     {
       var today = DateTime.Now.Date;
       var activelevels = await _repo.GetActiveClassLevels();
@@ -673,12 +684,12 @@ namespace EducNotes.API.Controllers
     [HttpGet("ChildLatePayments")]
     public async Task<IActionResult> GetChildrenRecoveryData()
     {
-      // List<User> students = await _cache.GetStudents();
+      List<User> students = await _cache.GetStudents();
 
       var today = DateTime.Now.Date;
-      var childrenFromDB = await _context.Users.Where(o => o.UserTypeId == studentTypeId)
+      var childrenFromDB = students.Where(o => o.UserTypeId == studentTypeId)
                                    .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
-                                   .ToListAsync();
+                                   .ToList();
       var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(childrenFromDB);
       List<RecoveryForChildDto> childRecovery = new List<RecoveryForChildDto>();
       foreach (var child in children)

@@ -1,43 +1,10 @@
 using System.Linq;
 using EducNotes.API.Data;
 
-namespace EducNotes.API.Helpers {
-  public class CacheKeys {
-
-    // public CacheKeys(DataContext context)
-    // {
-    //   string subDomain = context.Settings.FirstOrDefault(s => s.Name.ToLower () == "subdomain").Value;
-    //   Users = subDomain + "Users";
-    //   TeacherCourses = subDomain + "TeacherCourses";
-    //   ClassCourses = subDomain + "ClassCourses";
-    //   ClassLevels = subDomain + "ClassLevels";
-    //   ClassLevelProducts = subDomain + "ClassLevelProducts";
-    //   Classes = subDomain + "Classes";
-    //   EducLevels = subDomain + "EducLevels";
-    //   Schools = subDomain + "Schools";
-    //   Cycles = subDomain + "Cycles";
-    //   Courses = subDomain + "Courses";
-    //   ClassTypes = subDomain + "ClassTypes";
-    //   CLClassTypes = subDomain + "CLClassTypes";
-    //   EmailTemplates = subDomain + "EmailTemplates";
-    //   SmsTemplates = subDomain + "SmsTemplates";
-    //   Settings = subDomain + "Settings";
-    //   Tokens = subDomain + "Tokens";
-    //   ProductDeadLines = subDomain + "ProductDeadLines";
-    //   Roles = subDomain + "Roles";
-    //   Orders = subDomain + "Orders";
-    //   OrderLines = subDomain + "OrderLines";
-    //   OrderLineDeadLines = subDomain + "OrderLineDeadLines";
-    //   UserLinks = subDomain + "UserLinks";
-    //   FinOps = subDomain + "FinOps";
-    //   FinOpOrderLines = subDomain + "FinOpOrderLines";
-    //   Cheques = subDomain + "Cheques";
-    //   Banks = subDomain + "Banks";
-    //   PaymentTypes = subDomain + "PaymentTypes";
-    //   Products = subDomain + "Products";
-    //   UserTypes = subDomain + "UserTypes";
-    // }
-
+namespace EducNotes.API.Helpers
+{
+  public class CacheKeys
+  {
     public static string Users { get; set; }
     public static string TeacherCourses { get; set; }
     public static string ClassCourses { get; set; }

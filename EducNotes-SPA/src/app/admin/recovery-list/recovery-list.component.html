@@ -22,28 +22,63 @@
   </div>
 </div>
 
-<div *ngIf="toggleLevelChild" class="row">
-  <div class="col-md-12 text-17 mb-2">paiements en retard par niveau</div>
-  <div class="col-md-12 mb-1" *ngFor="let level of levelRecovery">
-    <div *ngIf="level.lateAmountDue > 0" class="border rounded-lg p-2">
-      <div class="text-16">
-        niveau {{level.levelName}} 
-        <span class="ml-2 text-13">
-          <a [routerLink]="['/paymentLevelChild', level.levelId]" routerLinkActive="router-link-active" >voir détails</a>
-        </span>
-      </div>
-      <hr class="my-1" style="background-color: #f89f20;">
-      <div class="row">
-        <div class="col-md-12" *ngFor="let prod of level.productRecovery">
+<div *ngIf="toggleLevelChild">
+  <div class="text-17 mb-2">paiements en retard par niveau</div>
+  <div class="mb-1" *ngFor="let level of levelRecovery">
+    <div class="card">
+      <div *ngIf="level.lateAmountDue > 0" class="card-body p-2">
+        <div class="text-16">
+          niveau {{level.levelName}} 
+          <span class="ml-2 text-13">
+            <a [routerLink]="['/paymentLevelChild', level.levelId]" routerLinkActive="router-link-active" >voir détails</a>
+          </span>
+        </div>
+        <hr class="my-1">
+        <div *ngFor="let prod of level.productRecovery">
           <div *ngIf="prod.lateAmounts.totalLateAmount> 0" class="text-14">
-            <div class="row">
-              <div class="col-md-12"><b>retard {{prod.productName}}</b></div>
-              <div class="col-md-2 text-13">total dû: <span class="text-danger">{{prod.lateAmounts.totalLateAmount | number:'':'fr-FR'}} F</span></div>
-              <div class="col-md-2 text-13">7 jours: <span class="text-danger">{{prod.lateAmounts.lateAmount7Days | number:'':'fr-FR'}} F</span></div>
-              <div class="col-md-2 text-13">15 jours: <span class="text-danger">{{prod.lateAmounts.lateAmount15Days | number:'':'fr-FR'}} F</span></div>
-              <div class="col-md-2 text-13">30 jours: <span class="text-danger">{{prod.lateAmounts.lateAmount30Days | number:'':'fr-FR'}} F</span></div>
-              <div class="col-md-2 text-13">60 jours: <span class="text-danger">{{prod.lateAmounts.lateAmount60Days | number:'':'fr-FR'}} F</span></div>
-              <div class="col-md-2 text-13">60+ jours: <span class="text-danger">{{prod.lateAmounts.lateAmount60DaysPlus | number:'':'fr-FR'}} F</span></div>
+            <div class="d-none d-md-block">
+              <div class="row">
+                <div class="col-md-12"><b>retard {{prod.productName}}</b></div>
+                <div class="col-md-2 text-13">total dû: <span class="text-danger">{{prod.lateAmounts.totalLateAmount | number:'':'fr-FR'}} F</span></div>
+                <div class="col-md-2 text-13">7 jours: <span class="text-danger">{{prod.lateAmounts.lateAmount7Days | number:'':'fr-FR'}} F</span></div>
+                <div class="col-md-2 text-13">15 jours: <span class="text-danger">{{prod.lateAmounts.lateAmount15Days | number:'':'fr-FR'}} F</span></div>
+                <div class="col-md-2 text-13">30 jours: <span class="text-danger">{{prod.lateAmounts.lateAmount30Days | number:'':'fr-FR'}} F</span></div>
+                <div class="col-md-2 text-13">60 jours: <span class="text-danger">{{prod.lateAmounts.lateAmount60Days | number:'':'fr-FR'}} F</span></div>
+                <div class="col-md-2 text-13">60+ jours: <span class="text-danger">{{prod.lateAmounts.lateAmount60DaysPlus | number:'':'fr-FR'}} F</span></div>
+              </div>
+            </div>
+            <div class="d-md-none">
+              <div class="row">
+                <div class="col-12 my-1"><b>retard {{prod.productName}}</b></div>
+                <div class="col-4 text-15"><b>total dû</b></div>
+                <div class="col-1 text-15"><b>:</b></div>
+                <div class="col-6 text-15 text-danger text-right"><b>{{prod.lateAmounts.totalLateAmount | number:'':'fr-FR'}} F</b></div>
+              </div>
+              <div class="row">
+                <div class="col-4 text-15">7 jours</div>
+                <div class="col-1 text-15">:</div>
+                <div class="col-6 text-15 text-danger text-right">{{prod.lateAmounts.lateAmount7Days | number:'':'fr-FR'}} F</div>
+              </div>
+              <div class="row">
+                <div class="col-4 text-15">15 jours</div>
+                <div class="col-1 text-15">:</div>
+                <div class="col-6 text-15 text-danger text-right">{{prod.lateAmounts.lateAmount15Days | number:'':'fr-FR'}} F</div>
+              </div>
+              <div class="row">
+                <div class="col-4 text-15">30 jours</div>
+                <div class="col-1 text-15">:</div>
+                <div class="col-6 text-15 text-danger text-right">{{prod.lateAmounts.lateAmount30Days | number:'':'fr-FR'}} F</div>
+              </div>
+              <div class="row">
+                <div class="col-4 text-15">60 jours</div>
+                <div class="col-1 text-15">:</div>
+                <div class="col-6 text-15 text-danger text-right">{{prod.lateAmounts.lateAmount60Days | number:'':'fr-FR'}} F</div>
+              </div>
+              <div class="row">
+                <div class="col-4 text-15">60+ jours</div>
+                <div class="col-1 text-15">:</div>
+                <div class="col-6 text-15 text-danger text-right">{{prod.lateAmounts.lateAmount60DaysPlus | number:'':'fr-FR'}} F</div>
+              </div>
             </div>
           </div>
         </div>

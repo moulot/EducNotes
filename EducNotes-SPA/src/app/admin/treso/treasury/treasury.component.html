@@ -1,134 +1,103 @@
-<div class="row">
-  <div class="col-md-12 d-flex">
-    <i class="fad fa-sack-dollar fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-    <div class="text-19">trésorerie</div>
+<div *ngIf="wait" class="spinning-preloader-container">
+  <div class="preloader-wrapper big active">
+    <div class="spinner-layer spinner-blue">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-red">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-yellow">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-green">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
   </div>
+</div>
+<div *ngIf="!wait">
+  <div class="row">
+    <div class="col-md-12 d-flex">
+      <i class="fad fa-sack-dollar fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+      <div class="text-19">trésorerie</div>
+    </div>
+    <div class="col-md-12 text-17 text-muted mt-2">situation des paiements</div>
+    <div class="col-md-12"><hr class="my-1"></div>
+    <div class="col-md-3 my-2">
+      <div class="card">
+        <div class="card-body p-1 text-center">
+          <div class="text-15">montant facturé</div>
+          <div class="text-17 text-success text-sucess">{{invoiced | number: '1.0-0': 'fr-FR'}} F CFA</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 my-1">
+      <div class="card">
+        <div class="card-body p-1 text-center">
+          <div class="text-15">montant encaissé</div>
+          <div class="text-17 text-success text-sucess">{{cashed | number: '1.0-0': 'fr-FR'}} F CFA</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 my-1">
+      <div class="card">
+        <div class="card-body p-1 text-center">
+          <div class="text-15">en cours de validation</div>
+          <div class="text-17 text-success text-danger">{{toBeValidated | number: '1.0-0': 'fr-FR'}} F CFA</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 my-1">
+      <div class="card">
+        <div class="card-body p-1 text-center">
+          <div class="text-15">solde à payer</div>
+          <div class="text-17 text-success text-danger">{{tuitionBalance | number: '1.0-0': 'fr-FR'}} F CFA</div>
+        </div>
+      </div>
+    </div>
 
-  <div class="col-md-12 text-17 text-muted mt-2">situation des paiements</div>
-  <div class="col-md-12"><hr class="my-1" style="background-color: #f89f20;"></div>
-
-  <div class="col-md-3 my-2">
-    <div class="card">
-      <div class="card-body p-1 text-center">
-        <div class="text-15">montant facturé</div>
-        <div class="text-17 text-success text-sucess">{{invoiced | number: '1.0-0': 'fr-FR'}} F CFA</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-3 my-2">
-    <div class="card">
-      <div class="card-body p-1 text-center">
-        <div class="text-15">montant encaissé</div>
-        <div class="text-17 text-success text-sucess">{{cashed | number: '1.0-0': 'fr-FR'}} F CFA</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-3 my-2">
-    <div class="card">
-      <div class="card-body p-1 text-center">
-        <div class="text-15">en cours de validation</div>
-        <div class="text-17 text-success text-danger">{{toBeValidated | number: '1.0-0': 'fr-FR'}} F CFA</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-3 my-2">
-    <div class="card">
-      <div class="card-body p-1 text-center">
-        <div class="text-15">solde à payer</div>
-        <div class="text-17 text-success text-danger">{{tuitionBalance | number: '1.0-0': 'fr-FR'}} F CFA</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-2 my-2">
-    <div class="card">
-      <div class="card-body p-1 text-center">
-        <div class="text-15">en recouvrement</div>
-        <div class="text-15 text-danger">{{ lateAmountsDue?.totalLateAmount | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-small"><a [routerLink]="['/latePayments']">voir les détails</a></div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-2 my-2">
-    <div class="card">
-      <div class="card-body p-1 text-center">
-        <div class="text-15">7 jours</div>
-        <div class="text-15">{{ lateAmountsDue?.lateAmount7Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-small"><a>voir les détails</a></div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-2 my-2">
-    <div class="card">
-      <div class="card-body p-1 text-center">
-        <div class="text-15">8 à 15 jours</div>
-        <div class="text-15">{{ lateAmountsDue?.lateAmount15Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-small"><a>voir les détails</a></div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-2 my-2">
-    <div class="card">
-      <div class="card-body p-1 text-center">
-        <div class="text-15">16 à 30 jours</div>
-        <div class="text-15">{{ lateAmountsDue?.lateAmount30Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-small"><a>voir les détails</a></div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-2 my-2">
-    <div class="card">
-      <div class="card-body p-1 text-center">
-        <div class="text-15">31 à 60 jours</div>
-        <div class="text-15">{{ lateAmountsDue?.lateAmount60Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-small"><a>voir les détails</a></div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-2 my-2">
-    <div class="card">
-      <div class="card-body p-1 text-center">
-        <div class="text-15">60 jours et plus</div>
-        <div class="text-15">{{ lateAmountsDue?.lateAmount60DaysPlus | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-small"><a>voir les détails</a></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-12 text-17 text-muted">échéances</div>
-  <div class="col-md-12"><hr class="my-1" style="background-color: #f89f20;"></div>
-  <div class="col-md-3 my-2" *ngFor="let item of amountByDeadline; let i = index">
-    <div class="card">
-      <div class="card-body p-2">
-        <div class="d-flex">
-          <div class="flex-grow-1 text-15">échéance: <b>{{item.strDueDate}}</b></div>
-          <!-- <div *ngIf="i > 0" class="flex-grow-1 text-15">{{i+1}}e échéance</div> -->
-          <div><a class="text-14 small-link">voir détails</a></div>
+    <div class="col-md-12 text-17 text-muted">échéances</div>
+    <div class="col-md-12"><hr class="my-1"></div>
+    <div class="col-md-3 my-2" *ngFor="let item of amountByDeadline; let i = index">
+      <div class="card">
+        <div class="card-body p-2">
+          <div class="d-flex">
+            <div class="flex-grow-1 text-15">échéance: <b>{{item.strDueDate}}</b></div>
+            <div><a class="text-14 small-link">voir détails</a></div>
+          </div>
+          <hr class="my-1">
+          <div class="row">
+            <div class="col-6">facturé</div>
+            <div class="col-6 text-right">{{item.invoiced | number:'':'fr-FR'}} F</div>
+          </div>
+          <div class="row">
+            <div class="col-6">payé</div>
+            <div class="col-6 text-right">{{item.paid | number:'':'fr-FR'}} F</div>
+          </div>
+          <div *ngIf="!item.isLate" class="row">
+            <div class="col-6">solde à payer</div>
+            <div class="col-6 text-right">{{item.balance | number:'':'fr-FR'}} F</div>
+          </div>
+          <div *ngIf="item.isLate" class="row text-danger">
+            <div class="col-6">à recouvrer</div>
+            <div class="col-6 text-right">{{item.balance | number:'':'fr-FR'}} F</div>
+          </div>
         </div>
-        <hr class="my-1">
-        <!-- <div class="row">
-          <div class="col-6"><b>date limite</b></div>
-          <div class="col-6 text-right"><b>{{item.strDueDate}}</b></div>
-        </div> -->
-        <div class="row">
-          <div class="col-6">facturé</div>
-          <div class="col-6 text-right">{{item.invoiced | number:'':'fr-FR'}} F</div>
-        </div>
-        <div class="row">
-          <div class="col-6">payé</div>
-          <div class="col-6 text-right">{{item.paid | number:'':'fr-FR'}} F</div>
-        </div>
-        <div *ngIf="!item.isLate" class="row">
-          <div class="col-6">solde à payer</div>
-          <div class="col-6 text-right">{{item.balance | number:'':'fr-FR'}} F</div>
-        </div>
-        <div *ngIf="item.isLate" class="row text-danger">
-          <div class="col-6">à recouvrer</div>
-          <div class="col-6 text-right">{{item.balance | number:'':'fr-FR'}} F</div>
-        </div>
-        <!-- <hr class="my-1">
-        <div class="text-13 text-muted">emails envoyés</div>
-        <div class="text-13 text-muted">factures envoyées</div> -->
       </div>
     </div>
   </div>

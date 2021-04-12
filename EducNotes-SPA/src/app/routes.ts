@@ -150,6 +150,7 @@ import { ConfigComponent } from './admin/config/config/config.component';
 import { ClassScheduleResolver } from './_resolvers/class-schedule-resolver';
 import { EditLevelClassesComponent } from './admin/class-management/edit-level-classes/edit-level-classes.component';
 import { RecoveryComponent } from './admin/treso/recovery/recovery.component';
+import { RecoveryResolver } from './_resolvers/recovery-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -222,7 +223,7 @@ export const appRoutes: Routes = [
         { path: 'studentGradesP/:id', component: GradeStudentComponent},
         { path: 'tuitions', component: TuitionPanelComponent },
         { path: 'treasury', component: TreasuryComponent },
-        { path: 'recovery', component: RecoveryComponent },
+        { path: 'recovery', component: RecoveryComponent, resolve: { lateAmounts: RecoveryResolver }  },
         { path: 'productsList', component: ProductsListComponent, resolve: { products: ProductsListResolver } },
         { path: 'createProduct', component: ProductFormComponent },
         { path: 'editProduct/:id', component: ProductFormComponent, resolve: { product: ProductFormResolver } },

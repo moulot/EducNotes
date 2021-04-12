@@ -30,6 +30,8 @@ export class TuitionPanelComponent implements OnInit {
   tuitionsNotValidated: any;
   tuitionsValidated: any;
   classSpaces: any;
+  wait = false;
+  dataReady = 0;
 
   constructor(private authService: AuthService, private orderService: OrderService,
     private alertify: AlertifyService, private adminService: AdminService) { }
@@ -46,7 +48,12 @@ export class TuitionPanelComponent implements OnInit {
   }
 
   getUSersRecap() {
+    this.wait = true;
     this.adminService.getUsersRecap().subscribe((data: any) => {
+      this.dataReady++;
+      if (this.dataReady === 2) {
+        this.wait = false;
+      }
       this.admins = data.find(i => i.userTypeId === this.adminTypeId);
       this.parents = data.find(i => i.userTypeId === this.parentTypeId);
       this.teachers = data.find(i => i.userTypeId === this.teacherTypeId);
@@ -57,7 +64,12 @@ export class TuitionPanelComponent implements OnInit {
   }
 
   getTuitionFigures() {
+    this.wait = true;
     this.orderService.getTuitionFigures().subscribe((data: any) => {
+      this.dataReady++;
+      if (this.dataReady === 2) {
+        this.wait = false;
+      }
       this.totalTuitions = data.totalTuitions;
       this.tuitionsNotValidated = data.tuitionsNotValidated;
       this.tuitionsValidated = data.tuitionsValidated;

@@ -1,81 +1,115 @@
-<div class="row animated zoomInUp">
-  <div class="col-md-12 d-flex">
-    <div>
-      <a appBtnBack>
-        <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;
-          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-      </a>
+<div *ngIf="wait" class="spinning-preloader-container">
+  <div class="preloader-wrapper big active">
+    <div class="spinner-layer spinner-blue">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
     </div>
-    <div class="lead">ajout de classes par niveau</div>
+    <div class="spinner-layer spinner-red">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-yellow">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-green">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
   </div>
-  <div class="col-md-12 mb-2"><hr class="my-2"></div>
-  <div class="col-md-9">
-    <div class="card">
-      <div class="card-body p-2">
-        <div class="col-md-12">
-          <form [formGroup]="classForm" (ngSubmit)="saveClass()">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="md-form m-0">
-                  <mdb-select [options]="levelOptions" (ngModelChange)="levelChanged()" formControlName="levelId" placeholder="niveau des classes">
-                  </mdb-select>
-                  <div *ngIf="classForm.get('levelId').errors && classForm.get('levelId').touched"
-                    class="text-small text-danger">le niveau de la classe est obligatoire</div>
+</div>
+<div *ngIf="!wait">
+  <div class="row animated zoomInUp">
+    <div class="col-md-12 d-flex">
+      <div>
+        <a appBtnBack>
+          <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        </a>
+      </div>
+      <div class="lead">ajout de classes par niveau</div>
+    </div>
+    <div class="col-md-12 mb-2"><hr class="my-2"></div>
+    <div class="col-md-9">
+      <div class="card">
+        <div class="card-body p-2">
+          <div class="col-md-12">
+            <form [formGroup]="classForm" (ngSubmit)="saveClass()">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="md-form m-0">
+                    <mdb-select [options]="levelOptions" (ngModelChange)="levelChanged()" formControlName="levelId" placeholder="niveau des classes">
+                    </mdb-select>
+                    <div *ngIf="classForm.get('levelId').errors && classForm.get('levelId').touched"
+                      class="text-small text-danger">le niveau de la classe est obligatoire</div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="md-form m-0">
+                    <mdb-select [options]="classTypeOptions" formControlName="classTypeId" placeholder="série des classes">
+                    </mdb-select>
+                    <div *ngIf="classForm.hasError('classTypeNOK') && classForm.get('classTypeId').touched"
+                      class="text-small text-danger">la série de la classe est obligatoire</div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="md-form m-0">
+                    <input mdbInput type="text" id="name" class="form-control" formControlName="name">
+                    <label for="name" class="">nom des classes (avant le suffixe)</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="md-form m-0">
+                    <mdb-select [options]="suffixes" formControlName="suffixe" placeholder="suffixe des classes">
+                    </mdb-select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="md-form m-0">
+                    <input mdbInput type="number" id="nbClass" class="form-control" formControlName="nbClass" min="1" max="10">
+                    <label for="nbClass" class="">nombre de classes à créer</label>
+                    <div *ngIf="classForm.get('nbClass').errors && classForm.get('nbClass').touched"
+                      class="text-small text-danger">le nombre de classes est obligatoire</div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="md-form m-0">
+                    <input mdbInput type="number" id="maxStudent" class="form-control" formControlName="maxStudent" min="1" max="100">
+                    <label for="maxStudent" class="">nombre max d'élèves</label>
+                    <div *ngIf="classForm.get('maxStudent').errors && classForm.get('maxStudent').touched"
+                      class="text-small text-danger">le nombre de classes est obligatoire</div>
+                  </div>
+                </div>
+                <div class="col-md-12"><hr class="my-2"></div>
+                <div class="col-md-12">
+                  <div class="float-right">
+                    <button type="button" [disabled]="wait" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
+                      [routerLink]="['/classesPanel']">
+                      <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      annuler
+                    </button>
+                    <button type="submit" [disabled]="!classForm.valid || wait" mdbBtn
+                      class="btnBlue" size="sm" mdbWavesEffect>
+                      <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      enregistrer
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="md-form m-0">
-                  <mdb-select [options]="classTypeOptions" formControlName="classTypeId" placeholder="série des classes">
-                  </mdb-select>
-                  <div *ngIf="classForm.hasError('classTypeNOK') && classForm.get('classTypeId').touched"
-                    class="text-small text-danger">la série de la classe est obligatoire</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="md-form m-0">
-                  <input mdbInput type="text" id="name" class="form-control" formControlName="name">
-                  <label for="name" class="">nom des classes (avant le suffixe)</label>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="md-form m-0">
-                  <mdb-select [options]="suffixes" formControlName="suffixe" placeholder="suffixe des classes">
-                  </mdb-select>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="md-form m-0">
-                  <input mdbInput type="number" id="nbClass" class="form-control" formControlName="nbClass" min="1" max="10">
-                  <label for="nbClass" class="">nombre de classes à créer</label>
-                  <div *ngIf="classForm.get('nbClass').errors && classForm.get('nbClass').touched"
-                    class="text-small text-danger">le nombre de classes est obligatoire</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="md-form m-0">
-                  <input mdbInput type="number" id="maxStudent" class="form-control" formControlName="maxStudent" min="1" max="100">
-                  <label for="maxStudent" class="">nombre max d'élèves</label>
-                  <div *ngIf="classForm.get('maxStudent').errors && classForm.get('maxStudent').touched"
-                    class="text-small text-danger">le nombre de classes est obligatoire</div>
-                </div>
-              </div>
-              <div class="col-md-12"><hr class="my-2"></div>
-              <div class="col-md-12">
-                <div class="float-right">
-                  <button type="button" [disabled]="wait" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
-                    [routerLink]="['/classesPanel']">
-                    <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    annuler
-                  </button>
-                  <button type="submit" [disabled]="!classForm.valid || wait" mdbBtn
-                    class="btnBlue" size="sm" mdbWavesEffect>
-                    <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    enregistrer
-                  </button>
-                </div>
-              </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </div>

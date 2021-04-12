@@ -22,7 +22,6 @@ export class ValidatePaymentsComponent implements OnInit {
     this.createPaymentsForm();
     this.route.data.subscribe(data => {
       this.payments = data['payments'];
-      // console.log(this.payments);
       for (let i = 0; i < this.payments.length; i++) {
         const pay = this.payments[i];
 
@@ -109,7 +108,6 @@ export class ValidatePaymentsComponent implements OnInit {
       }
       payments = [...payments, payment];
     }
-    console.log(payments);
     this.paymentService.updatePayments(payments).subscribe(() => {
       this.router.navigate(['/treasury']);
       this.alertify.success('les paiements ont été mis à jour');

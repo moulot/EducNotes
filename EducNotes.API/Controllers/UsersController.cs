@@ -150,10 +150,13 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("UsersByLevel/{levelId}")]
-    public async Task<IActionResult> GetStudentsByClasslevel(int levelId) {
+    public async Task<IActionResult> GetStudentsByClasslevel(int levelId)
+    {
+      List<ClassLevel> levels =  await _cache.GetClassLevels();
+
       var usersFromRepo = await _repo.GetUsersByClasslevel(levelId);
       var students = _mapper.Map<List<UserForDetailedDto>>(usersFromRepo);
-      var level = await _context.ClassLevels.FirstOrDefaultAsync(c => c.Id == levelId);
+      ClassLevel level = levels.FirstOrDefault(c => c.Id == levelId);
       return Ok(new {
         students,
         level
@@ -1344,7 +1347,8 @@ namespace EducNotes.API.Controllers {
                 cd.ClassId = aclass.Id;
                 cd.ClassName = aclass.Name;
                 cd.Active = selectedIds.IndexOf(aclass.Id) != -1 ? true : false;
-                if(assigned) {
+                if(assigned)
+                {
                   cd.Assigned = assigned;
                   cd.Active = true;
                 }
@@ -2030,7 +2034,8 @@ namespace EducNotes.API.Controllers {
                                      .OrderBy(o => o.Name)
                                      .ToList();
       List<UserTypeToValidateDto> types = new List<UserTypeToValidateDto>();
-      foreach(var type in userTypes) {
+      foreach(var type in userTypes)
+      {
         if(type.Name.ToLower() == "admin") { continue; }
 
         UserTypeToValidateDto userType = new UserTypeToValidateDto();
@@ -2038,7 +2043,8 @@ namespace EducNotes.API.Controllers {
         userType.Name = type.Name;
         userType.Users = new List<UserToValidateDto>();
         var users = usersFromDB.OrderBy(o => o.LastName).ThenBy(o => o.FirstName).Where(u => u.UserTypeId == type.Id).ToList();
-        foreach(var user in users) {
+        foreach(var user in users)
+        {
           UserToValidateDto userToValidate = new UserToValidateDto();
           userToValidate.Id = user.Id;
           userToValidate.LastName = user.LastName;
@@ -2048,10 +2054,12 @@ namespace EducNotes.API.Controllers {
           userToValidate.UserType = user.UserType.Name;
           userToValidate.Email = user.Email;
           userToValidate.Cell = user.PhoneNumber;
-          if(user.UserTypeId == studentTypeId) {
+          if(user.UserTypeId == studentTypeId)
+          {
             var parents = await _repo.GetParents(user.Id);
             var mother = parents.FirstOrDefault(m => m.Gender == 0);
-            if(mother != null) {
+            if(mother != null)
+            {
               userToValidate.MotherId = mother.Id;
               userToValidate.MotherLastName = mother.LastName;
               userToValidate.MotherFirstName = mother.FirstName;
@@ -2059,7 +2067,8 @@ namespace EducNotes.API.Controllers {
               userToValidate.MotherCell = mother.PhoneNumber.FormatPhoneNumber();
             }
             var father = parents.FirstOrDefault(m => m.Gender == 1);
-            if(father != null) {
+            if(father != null)
+            {
               userToValidate.FatherId = father.Id;
               userToValidate.FatherLastName = father.LastName;
               userToValidate.FatherFirstName = father.FirstName;
@@ -2068,7 +2077,8 @@ namespace EducNotes.API.Controllers {
             }
           }
 
-          if(user.UserTypeId == parentTypeId) {
+          if(user.UserTypeId == parentTypeId)
+          {
             var childrenFromDB = await _repo.GetChildren(user.Id);
             var children = _mapper.Map<List<ChildParentDto>>(childrenFromDB);
             userToValidate.Children = new List<ChildParentDto>();
@@ -2076,14 +2086,18 @@ namespace EducNotes.API.Controllers {
           }
 
           Order userTuition = new Order();
-          if(type.Id == parentTypeId) {
+          if(type.Id == parentTypeId)
+          {
             userTuition = activeTuitions.FirstOrDefault(t => t.MotherId == user.Id || t.FatherId == user.Id);
-          } else if(type.Id == studentTypeId) {
+          }
+          else if(type.Id == studentTypeId)
+          {
             var parents = await _repo.GetParents(user.Id);
             userTuition = activeTuitions.FirstOrDefault(t => t.MotherId == parents[0].Id || t.FatherId == parents[0].Id);
           }
 
-          if(userTuition != null) {
+          if(userTuition != null)
+          {
             userToValidate.Tuition = _mapper.Map<OrderUserToValidateDto>(userTuition);
             var lines = await _repo.GetOrderLines(userToValidate.Tuition.Id);
             userToValidate.Tuition.Lines = _mapper.Map<List<LineUserToValidateDto>>(lines);
@@ -2117,36 +2131,34 @@ namespace EducNotes.API.Controllers {
     [HttpPost("ResendConfirmEmail")]
     public async Task<IActionResult> ResendConfirmEmail(List<SendConfirmEmailDto> usersData)
     {
-      // List<Setting> settings = await _cache.GetSettings();
-      // List<Order> orders = await _cache.GetOrders();
-      // List<ProductDeadLine> productdeadlines = await _cache.GetProductDeadLines();
+      List<Setting> settings = await _cache.GetSettings();
+      List<Order> orders = await _cache.GetOrders();
+      List<ProductDeadLine> productDeadLines = await _cache.GetProductDeadLines();
       List<EmailTemplate> emailTemplates= await _context.EmailTemplates.ToListAsync();
-      // List<User> users = await _cache.GetUsers();
+      List<User> users = await _cache.GetUsers();
 
       List<RegistrationEmailDto> emails = new List<RegistrationEmailDto>();
 
-      List<Setting> settings = await _context.Settings.ToListAsync();
       var schoolName = settings.First(s => s.Name == "SchoolName").Value;
       string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
 
       foreach(var data in usersData)
       {
         var userType = data.UserTypeId;
-
         if(userType == parentTypeId)
         {
           foreach(var userid in data.UserIds)
           {
-            var order = await _context.Orders.FirstAsync(o => o.isReg &&(o.MotherId == userid || o.FatherId == userid));
+            var order = orders.First(o => o.isReg &&(o.MotherId == userid || o.FatherId == userid));
             var reg = await _repo.GetOrder(order.Id);
-            User user = new User();
-            if(reg.Mother != null)
-              user = reg.Mother;
-            else
-              user = reg.Father;
+            User user = users.First(u => u.Id == userid);
+            // if(reg.Mother != null)
+            //   user = reg.Mother;
+            // else
+            //   user = reg.Father;
 
-            var firstDeadline = await _context.ProductDeadLines.OrderBy(o => o.DueDate)
-                                                .FirstAsync(p => p.ProductId == tuitionId);
+            var firstDeadline = productDeadLines.OrderBy(o => o.DueDate)
+                                                .First(p => p.ProductId == tuitionId);
             var firstDeadlineDate = firstDeadline.DueDate;
             decimal DPPct = firstDeadline.Percentage;
 
@@ -2196,7 +2208,7 @@ namespace EducNotes.API.Controllers {
           // send the mail to update userName/pwd - add to Email table
           foreach(var userid in data.UserIds)
           {
-            var appUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userid);
+            var appUser = users.FirstOrDefault(u => u.Id == userid);
             var teacherCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
 
             ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {

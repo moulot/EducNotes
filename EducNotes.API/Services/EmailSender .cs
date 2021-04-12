@@ -10,7 +10,6 @@ namespace EducNotes.API.Services
      public class EmailSender : IEmailSender
     {
         private readonly IConfiguration _config;
-
         public EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor, IConfiguration config)
         {
           Options = optionsAccessor.Value;

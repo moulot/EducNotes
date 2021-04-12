@@ -8,23 +8,34 @@
   </div>
   <div class="col-md-12"><hr class="my-2"></div>
   <div class="col-md-3 mb-1" *ngFor="let child of students">
-    <div class="border rounded-lg p-1">
-      <div class="row">
-        <div class="col-md-3 pr-0 my-auto text-center d-none d-md-block">
-          <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="" width="40" class="rounded-circle img-responsive">
-        </div>
-        <div class="col-md-3 pr-0 text-center d-md-none">
-          <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="" width="60" class="rounded-circle img-responsive">
-        </div>
-        <div class="col-md-9 my-auto pl-0 d-none d-md-block">
-          <div><a [routerLink]="['/childFile', child.id]">voir le dossier</a></div>
-          <span class="text-14 text-capitalize" style="color: #192C47;">
-            {{child.lastName}} {{child.firstName}} ({{child.age}} ans).</span>
+    <div class="card">
+      <div class="card-body p-1">
+        <div class="row">
+          <div class="col-md-3 pr-0 my-auto text-center d-none d-md-block">
+            <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="" width="40" class="rounded-circle img-responsive">
           </div>
-        <div class="col-md-9 text-center d-md-none">
-          <span class="text-14 text-capitalize" style="color: #192C47;">
-            {{child.lastName}} {{child.firstName}}</span> ({{child.age}} ans).
-          <div><a [routerLink]="['/childFile', child.id]">voir le dossier</a></div>
+          <div class="col-md-3 pr-0 text-center d-md-none">
+            <img src="{{child.photoUrl || '../../../../../../assets/user.png'}}" alt="" width="60" class="rounded-circle img-responsive">
+          </div>
+          <div class="col-md-9 my-auto pl-0 d-none d-md-block">
+            <div [ngClass]="child.validated? 'text-success' : 'text-danger'">
+              <span *ngIf="child.validated" class="text-14"><b>validé</b></span>
+              <span *ngIf="!child.validated" class="text-14"><b>non validé</b></span>
+            </div>
+            <span class="text-14 text-capitalize" style="color: #192C47;">
+              {{child.lastName}} {{child.firstName}} ({{child.age}} ans).
+            </span>
+            <div><a [routerLink]="['/childFile', child.id]">voir le dossier</a></div>
+          </div>
+          <div class="col-md-9 text-center d-md-none">
+            <div [ngClass]="child.validated? 'text-success' : 'text-danger'">
+              <span *ngIf="child.validated" class="text-14"><b>validé</b></span>
+              <span *ngIf="!child.validated" class="text-14"><b>non validé</b></span>
+            </div>
+            <span class="text-14 text-capitalize" style="color: #192C47;">
+              {{child.lastName}} {{child.firstName}}</span> ({{child.age}} ans).
+            <div><a [routerLink]="['/childFile', child.id]">voir le dossier</a></div>
+          </div>
         </div>
       </div>
     </div>

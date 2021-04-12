@@ -1,1 +1,63 @@
-<p>recovery works!</p>
+<div class="row">
+  <div class="col-md-12 d-flex">
+    <i class="fad fa-search-dollar fa-2x mr-2" style="--fa-secondary-opacity: 1;
+      --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    <div class="text-19">recouvrement</div>
+  </div>
+
+  <div class="col-md-12 text-17 text-muted mt-2">situation des recouvrements</div>
+  <div class="col-md-12"><hr class="my-1"></div>
+  <div class="col-md-2 my-2">
+    <div class="card">
+      <div class="card-body p-1 text-center">
+        <div class="text-15">en recouvrement</div>
+        <div class="text-15 text-danger">{{ lateAmountsDue?.totalLateAmount | number: '1.0-0': 'fr-FR' }} F CFA</div>
+        <div class="text-14"><a [routerLink]="['/latePayments']">voir les détails</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2 my-2">
+    <div class="card">
+      <div class="card-body p-1 text-center">
+        <div class="text-15">7 jours</div>
+        <div class="text-15">{{ lateAmountsDue?.lateAmount7Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
+        <div class="text-14"><a>voir les détails</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2 my-2">
+    <div class="card">
+      <div class="card-body p-1 text-center">
+        <div class="text-15">8 à 15 jours</div>
+        <div class="text-15">{{ lateAmountsDue?.lateAmount15Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
+        <div class="text-14"><a>voir les détails</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2 my-2">
+    <div class="card">
+      <div class="card-body p-1 text-center">
+        <div class="text-15">16 à 30 jours</div>
+        <div class="text-15">{{ lateAmountsDue?.lateAmount30Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
+        <div class="text-14"><a>voir les détails</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2 my-2">
+    <div class="card">
+      <div class="card-body p-1 text-center">
+        <div class="text-15">31 à 60 jours</div>
+        <div class="text-15">{{ lateAmountsDue?.lateAmount60Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
+        <div class="text-14"><a>voir les détails</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2 my-2">
+    <div class="card">
+      <div class="card-body p-1 text-center">
+        <div class="text-15">60 jours et plus</div>
+        <div class="text-15">{{ lateAmountsDue?.lateAmount60DaysPlus | number: '1.0-0': 'fr-FR' }} F CFA</div>
+        <div class="text-14"><a>voir les détails</a></div>
+      </div>
+    </div>
+  </div>

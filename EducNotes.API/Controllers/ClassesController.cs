@@ -1169,7 +1169,7 @@ namespace EducNotes.API.Controllers {
 
       if(await _repo.SaveAll())
       {
-        // await _cache.LoadCourses();
+        await _cache.LoadCourses();
         return Ok();
       }
 
@@ -1496,15 +1496,15 @@ namespace EducNotes.API.Controllers {
       return Ok(absences);
     }
 
-    [HttpGet ("GetAllCoursesDetails")]
+    [HttpGet("GetAllCoursesDetails")]
     public async Task<IActionResult> GetAllCoursesDetails()
     {
-      // List<Course> coursesCached = await _cache.GetCourses();
+      List<Course> coursesCached = await _cache.GetCourses();
       List<ClassCourse> classcourses = await _context.ClassCourses.ToListAsync();
-      // List<User> studentsCached = await _cache.GetStudents();
+      List<User> studentsCached = await _cache.GetStudents();
 
       var data = new List<CoursesDetailsDto>();
-      var courses = await _context.Courses.OrderBy(c => c.Name).ToListAsync();
+      var courses = coursesCached.OrderBy(c => c.Name).ToList();
       foreach(var course in courses)
       {
         var courseDto = new CoursesDetailsDto {
@@ -1516,7 +1516,7 @@ namespace EducNotes.API.Controllers {
         courseDto.NbTeachers = classcourses.Where(a => a.CourseId == course.Id).Select(s => s.TeacherId).Distinct().Count();
         List<int> classIds = classcourses.Where(a => a.CourseId == course.Id).Select(a => a.ClassId).ToList();
         courseDto.NbClasses = classIds.Count();
-        courseDto.NbStudents = await _context.Users.Where(a => classIds.Contains(Convert.ToInt32(a.ClassId))).CountAsync();
+        courseDto.NbStudents = studentsCached.Where(a => classIds.Contains(Convert.ToInt32(a.ClassId))).Count();
         data.Add(courseDto);
       }
 
@@ -1528,9 +1528,8 @@ namespace EducNotes.API.Controllers {
     {
       try
       {
-        // List<ClassLevel> classlevels = await _cache.GetClassLevels();
-        var levelName = (await _context.ClassLevels
-                        .FirstOrDefaultAsync(e => e.Id == classToSave.LevelId)).Name + " " + classToSave.Name;
+        List<ClassLevel> classlevels = await _cache.GetClassLevels();
+        var levelName = (classlevels.FirstOrDefault(e => e.Id == classToSave.LevelId)).Name + " " + classToSave.Name;
 
         if (classToSave.suffixe != null)
         {
@@ -1583,8 +1582,9 @@ namespace EducNotes.API.Controllers {
           };
           await _context.Classes.AddAsync(newClass);
         }
+        
         await _repo.SaveAll();
-        // await _cache.LoadClasses();
+        await _cache.LoadClasses();
         return Ok();
       } 
       catch

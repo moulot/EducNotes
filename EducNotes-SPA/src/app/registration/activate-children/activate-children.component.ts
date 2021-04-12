@@ -38,7 +38,6 @@ export class ActivateChildrenComponent implements OnInit {
       // initialize photo file data
       this.photoFile[i] = null;
     }
-  // this.getClassLevels();
   }
 
   createChildrenForm() {

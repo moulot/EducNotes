@@ -286,6 +286,7 @@ import { EditLevelClassesComponent } from './admin/class-management/edit-level-c
 import { ConfigProductsComponent } from './admin/config/config-products/config-products.component';
 import { RecoveryComponent } from './admin/treso/recovery/recovery.component';
 import { MdbWysiwygModule } from 'mdb-wysiwyg';
+import { RecoveryResolver } from './_resolvers/recovery-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -595,6 +596,7 @@ export function tokenGetter() {
       UserValidationResolver,
       EditAccountResolver,
       ClassScheduleResolver,
+      RecoveryResolver,
       { provide: NZ_I18N, useValue: fr_FR }
       // { provide: NZ_ICON_DEFAULT_TWOTONE_COLOR, useValue: '#00ff00' },
       // { provide: NZ_ICONS, useValue: icons }

@@ -5,8 +5,7 @@
   </div>
   <div class="content">
       <div class="text-20 text-center text-capitalize">{{course.name}}</div>
-      <hr class="mt-1 mb-0" style="background-color: #f89f20;">
-      <!-- <div [ngStyle]="{'background-color': course.color}" class="m-0" style="height: 15px;"></div> -->
+      <hr class="mt-1 mb-0">
       <div class="row mt-3">
         <div class="col-5">
           <div class="text-15 text-muted">abbrév.</div>
@@ -34,7 +33,7 @@
         </div>
       </div>
       <div class="text-center">
-        <button class="" size="sm" mdbBtn class="btnWhiteO" mdbWavesEffect (click)="showEditForm(course);card.toggle()">editer</button>
+        <button class="" size="sm" mdbBtn class="btnBlue" mdbWavesEffect (click)="showEditForm(course);card.toggle()">editer</button>
       </div>
     </div>
   </div>
@@ -50,7 +49,7 @@
           </a>
         </div>
       </div>
-      <hr class="my-1" style="background-color: #f89f20;">
+      <hr class="my-1">
       <form [formGroup]="courseForm" style="color: #757575;" (ngSubmit)="addCourse();card.toggle()">
         <div formArrayName="course" *ngFor="let course of courseForm.get('course')['controls']; let i = index;">
           <div [formGroupName]="i">
@@ -69,7 +68,7 @@
         </div>
         <div class="tex-center">
           <div class="d-flex">
-            <button type="submit" [disabled]="!courseForm.valid" mdbBtn class="btnBlue" size="sm" mdbWavesEffect>editer</button>
+            <button type="submit" [disabled]="!courseForm.valid" mdbBtn class="btnBlue" size="sm" mdbWavesEffect>OK</button>
             <button type="button" mdbBtn class="btnOrange" size="sm" mdbWavesEffect (click)="resetValues()">annuler</button>
           </div>
         </div>

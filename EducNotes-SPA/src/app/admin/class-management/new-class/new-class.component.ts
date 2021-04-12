@@ -83,26 +83,6 @@ export class NewClassComponent implements OnInit {
     }
   }
 
-  // save() {
-  //   this.errorMessage = '';
-  //   const classFromForm = Object.assign({}, this.classForm.value);
-  //   if (classFromForm.suffixe) {
-  //     if (!classFromForm.number) {
-  //       this.alertify.error('veuillez saisir le nombre de classe');
-  //     } else {
-  //       this.saveClass(classFromForm);
-  //     }
-  //   } else if (!classFromForm.name) {
-  //     if (!classFromForm.suffixe) {
-  //       this.alertify.error('veuillez saisir au moins le nom de la classe');
-  //     } else {
-  //       this.saveClass(classFromForm);
-  //     }
-  //   } else {
-  //     this.saveClass(classFromForm);
-  //   }
-  // }
-
   saveClass() {
     // this.wait = true;
     const levelid = this.classForm.value.levelId;

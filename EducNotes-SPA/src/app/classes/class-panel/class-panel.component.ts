@@ -76,29 +76,24 @@ export class ClassPanelComponent implements OnInit {
   getNextCoursesByClass(teacherId) {
     this.userService.getNextCoursesByClass(teacherId).subscribe((data: any) => {
       this.nextCourses = data;
-      // console.log(this.nextCourses);
       for (let i = 0; i < this.teacherClasses.length; i++) {
         const aclass = this.teacherClasses[i];
         const index = this.nextCourses.findIndex(item => item.classId === aclass.classId);
-        // console.log(index);
         const coursesByClass = this.nextCourses[index];
         let classOptions = [];
         for (let j = 0; j < coursesByClass.courses.length; j++) {
           const course = coursesByClass.courses[j];
-          // console.log(course);
           const option = {value: course.scheduleId, label: aclass.className + '. ' + course.courseName + '. '
             + course.startHourMin + ' à ' + course.endHourMin};
           classOptions = [...classOptions, option];
         }
         this.courseOptions = [...this.courseOptions, classOptions];
       }
-      // console.log(this.courseOptions);
     });
   }
 
   goToClass() {
     const scheduleId = this.sessionForm.value.course;
-    // console.log(scheduleId);
     this.router.navigate(['/classSession', scheduleId]);
   }
 
@@ -110,12 +105,10 @@ export class ClassPanelComponent implements OnInit {
       this.loadWeekAgenda();
       this.loadAbsences(aclass.classId);
       this.loadSanctions(aclass.classId);
-      // this.scheduleCmp.loadWeekSchedule(aclass.classId);
       this.loadWeekSchedule(aclass.classId);
       }, error => {
       this.alertify.error(error);
     });
-
   }
 
   loadWeekSchedule(classId) {
@@ -158,42 +151,34 @@ export class ClassPanelComponent implements OnInit {
           }
         }
       }
-
     }, error => {
       this.alertify.error(error);
     });
   }
 
   loadWeekAgenda() {
-
     this.classService.getClassCurrWeekAgenda(this.selectedClass.classId).subscribe((response: any) => {
-
       this.classAgendaDays = response.agendaItems;
       this.monday = response.firstDayWeek;
       this.strMonday = response.strMonday;
       this.strSaturday = response.strSaturday;
       this.weekDays = response.weekDays;
       this.nbDayTasks = response.nbDayTasks;
-
     }, error => {
       this.alertify.error(error);
     });
   }
 
   loadMovedWeek(move: number) {
-
     this.agendaParams.dueDate = this.monday;
     this.agendaParams.moveWeek = move;
-
     this.classService.getClassMovedWeekAgenda(this.selectedClass.classId, this.agendaParams).subscribe((response: any) => {
-
       this.classAgendaDays = response.agendaItems;
       this.monday = response.firstDayWeek;
       this.strMonday = response.strMonday;
       this.strSaturday = response.strSaturday;
       this.weekDays = response.weekDays;
       this.nbDayTasks = response.nbDayTasks;
-
     }, error => {
       this.alertify.error(error);
     });
@@ -241,6 +226,6 @@ export class ClassPanelComponent implements OnInit {
     this.friCourses = [];
     this.satCourses = [];
     this.sunCourses = [];
-    }
+  }
 
 }

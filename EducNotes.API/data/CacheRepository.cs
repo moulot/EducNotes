@@ -878,31 +878,34 @@ namespace EducNotes.API.data {
       return products;
     }
 
-    public async Task<List<UserType>> GetUserTypes () {
-      List<UserType> usertypes = new List<UserType> ();
+    public async Task<List<UserType>> GetUserTypes()
+    {
+      List<UserType> usertypes = new List<UserType>();
 
       // Look for cache key.
-      if (!_cache.TryGetValue (subDomain + CacheKeys.UserTypes, out usertypes)) {
+      if(!_cache.TryGetValue (subDomain + CacheKeys.UserTypes, out usertypes))
+      {
         // Key not in cache, so get data.
-        usertypes = await LoadUserTypes ();
+        usertypes = await LoadUserTypes();
       }
 
       return usertypes;
     }
 
-    public async Task<List<UserType>> LoadUserTypes () {
+    public async Task<List<UserType>> LoadUserTypes()
+    {
       List<UserType> usertypes = await _context.UserTypes
-        .Include (i => i.Users)
-        .ToListAsync ();
+                                        .Include(i => i.Users)
+                                        .ToListAsync();
 
       // Set cache options.
-      var cacheEntryOptions = new MemoryCacheEntryOptions ()
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
         // Keep in cache for this time, reset time if accessed.
-        .SetSlidingExpiration (TimeSpan.FromDays (7));
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove (subDomain + CacheKeys.UserTypes);
-      _cache.Set (subDomain + CacheKeys.UserTypes, usertypes, cacheEntryOptions);
+      _cache.Remove(subDomain + CacheKeys.UserTypes);
+      _cache.Set(subDomain + CacheKeys.UserTypes, usertypes, cacheEntryOptions);
 
       return usertypes;
     }

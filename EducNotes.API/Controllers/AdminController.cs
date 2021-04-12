@@ -316,8 +316,8 @@ namespace EducNotes.API.Controllers {
     [HttpGet("GetClassLevels")]
     public async Task<IActionResult> GetClassLevels()
     {
-      // List<Class> classesCached = await _cache.GetClasses();
-      // List<User> studentsCached = await _cache.GetStudents();
+      List<Class> classesCached = await _cache.GetClasses();
+      List<User> studentsCached = await _cache.GetStudents();
       List<ClassLevel> classlevels = await _cache.GetClassLevels();
 
       var levels = classlevels.ToList();
@@ -330,10 +330,10 @@ namespace EducNotes.API.Controllers {
         res.TotalEnrolled = item.Inscriptions.Count();
         res.TotalStudents = 0;
         res.Classes = new List<ClassDetailDto>();
-        List<Class> classes = await _context.Classes.Where(c => c.ClassLevelId == item.Id).ToListAsync();
+        List<Class> classes = classesCached.Where(c => c.ClassLevelId == item.Id).ToList();
         foreach (var aclass in classes)
         {
-          var students = await _context.Users.Where(s => s.UserTypeId == studentTypeId && s.ClassId == aclass.Id).ToListAsync();
+          var students = studentsCached.Where(s => s.ClassId == aclass.Id).ToList();
           var nbStudents = students.Count();
           res.TotalStudents += nbStudents;
           //add class data
@@ -763,7 +763,7 @@ namespace EducNotes.API.Controllers {
     [HttpGet ("UsersRecap")]
     public async Task<IActionResult> UsersRecap()
     {
-      List<UserType> userTypes = await _context.UserTypes.Include(i => i.Users).ToListAsync();
+      List<UserType> userTypes = await _cache.GetUserTypes();
 
       var dataToReturn = new List<UsersRecapDto>();
       foreach(var item in userTypes)

@@ -37,11 +37,13 @@ namespace EducNotes.API.Data {
     int parentRoleId, memberRoleId, moderatorRoleId, adminRoleId, teacherRoleId,
     schoolInscTypeId, updateAccountEmailId, broadcastTokenTypeId;
     CultureInfo frC = new CultureInfo ("fr-FR");
-    public ICacheRepository _cache { get; }
+    public readonly ICacheRepository _cache;
+    public readonly IHttpContextAccessor _httpContext;
 
     public EducNotesRepository (DataContext context, IConfiguration config, IEmailSender emailSender,
       UserManager<User> userManager, IMapper mapper, IOptions<CloudinarySettings> cloudinaryConfig,
-      ICacheRepository cache) {
+      ICacheRepository cache, IHttpContextAccessor httpContext) {
+      _httpContext = httpContext;
       _cache = cache;
       _context = context;
       _config = config;
@@ -91,142 +93,130 @@ namespace EducNotes.API.Data {
       _context.Remove (entity);
     }
 
-    public void DeleteAll<T>(List<T> entities) where T : class {
+    public void DeleteAll<T> (List<T> entities) where T : class {
       _context.RemoveRange (entities);
     }
 
-    public async Task<bool> SaveAll()
-    {
-      return await _context.SaveChangesAsync() > 0;
+    public async Task<bool> SaveAll () {
+      return await _context.SaveChangesAsync () > 0;
     }
 
     public async Task<Photo> GetPhoto (int id) {
-      var photo = await _context.Photos.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.Id == id);
+      var photo = await _context.Photos.IgnoreQueryFilters ().FirstOrDefaultAsync (p => p.Id == id);
       return photo;
     }
 
     public async Task<Photo> GetMainPhotoForUser (int userId) {
-      return await _context.Photos.Where (u => u.UserId == userId).FirstOrDefaultAsync(p => p.IsMain);
+      return await _context.Photos.Where (u => u.UserId == userId).FirstOrDefaultAsync (p => p.IsMain);
     }
 
-    public async Task<User> GetUser(int id, bool isCurrentUser)
-    {
+    public async Task<User> GetUser (int id, bool isCurrentUser) {
       var query = _context.Users
-                      .Include(c => c.Class)
-                      .Include(c => c.ClassLevel)
-                      .Include(c => c.District)
-                      .Include(c => c.City)
-                      .Include(p => p.Photos).AsQueryable();
+        .Include (c => c.Class)
+        .Include (c => c.ClassLevel)
+        .Include (c => c.District)
+        .Include (c => c.City)
+        .Include (p => p.Photos).AsQueryable ();
 
-      if (isCurrentUser) { query = query.IgnoreQueryFilters(); }
-      var user = await query.FirstOrDefaultAsync(u => u.Id == id);
+      if (isCurrentUser) { query = query.IgnoreQueryFilters (); }
+      var user = await query.FirstOrDefaultAsync (u => u.Id == id);
       return user;
     }
 
-    public async Task<List<UserForDetailedDto>> GetAccountChildren(int parentId)
-    {
-      List<Order> orders = await _cache.GetOrders();
-      List<OrderLine> lines = await _cache.GetOrderLines();
+    public async Task<List<UserForDetailedDto>> GetAccountChildren (int parentId) {
+      List<Order> orders = await _cache.GetOrders ();
+      List<OrderLine> lines = await _cache.GetOrderLines ();
 
       // MANAGEMENT OF TUITION AND NEXT YEAR TUITION TO BE TREATED!!!!!!!!!!!!!!
-      var order = orders.First(o => o.isReg == true && (o.MotherId == parentId || o.FatherId == parentId));
+      var order = orders.First (o => o.isReg == true && (o.MotherId == parentId || o.FatherId == parentId));
       var usersFromDB = lines
-                              // .Include(i => i.Child)
-                              // .Include(i => i.ClassLevel)
-                              .Where(o => o.OrderId == order.Id)
-                              .ToList();
-      List<UserForDetailedDto> children = new List<UserForDetailedDto>();
-      for(int i = 0; i < usersFromDB.Count (); i++)
-      {
+        // .Include(i => i.Child)
+        // .Include(i => i.ClassLevel)
+        .Where (o => o.OrderId == order.Id)
+        .ToList ();
+      List<UserForDetailedDto> children = new List<UserForDetailedDto> ();
+      for (int i = 0; i < usersFromDB.Count (); i++) {
         var user = usersFromDB[i];
-        UserForDetailedDto child = new UserForDetailedDto();
-        child = _mapper.Map<UserForDetailedDto>(user.Child);
-        child.ClassLevelId = Convert.ToInt32(user.ClassLevelId);
+        UserForDetailedDto child = new UserForDetailedDto ();
+        child = _mapper.Map<UserForDetailedDto> (user.Child);
+        child.ClassLevelId = Convert.ToInt32 (user.ClassLevelId);
         child.ClassLevelName = user.ClassLevel.Name;
-        children.Add(child);
+        children.Add (child);
       }
 
       return children;
     }
 
-    public async Task<IEnumerable<User>> GetSiblings(int childId)
-    {
-      var childFromRepo = await GetUser(childId, false);
-      var parents = await GetParents(childId);
-      int motherId = parents.First(p => p.UserTypeId == parentTypeId && p.Gender == 0).Id;
-      int fatherId = parents.First(p => p.UserTypeId == parentTypeId && p.Gender == 1).Id;
-      var siblings = await GetParentsChildren(motherId, fatherId);
+    public async Task<IEnumerable<User>> GetSiblings (int childId) {
+      var childFromRepo = await GetUser (childId, false);
+      var parents = await GetParents (childId);
+      int motherId = parents.First (p => p.UserTypeId == parentTypeId && p.Gender == 0).Id;
+      int fatherId = parents.First (p => p.UserTypeId == parentTypeId && p.Gender == 1).Id;
+      var siblings = await GetParentsChildren (motherId, fatherId);
       // siblings.Remove(childFromRepo);
       return siblings;
     }
 
-    public async Task<IEnumerable<User>> GetChildren(int parentId)
-    {
-      var userIds = await _context.UserLinks.Where(u => u.UserPId == parentId).Select (s => s.UserId).ToListAsync();
-      return await _context.Users.Where(u => userIds.Contains(u.Id)).ToListAsync();
+    public async Task<IEnumerable<User>> GetChildren (int parentId) {
+      List<UserLink> userLinks = await _cache.GetUserLinks ();
+      List<User> users = await _cache.GetUsers ();
+
+      var userIds = userLinks.Where (u => u.UserPId == parentId).Select (s => s.UserId).ToList ();
+      return users.Where (u => userIds.Contains (u.Id)).ToList ();
     }
 
-    public async Task<List<User>> GetParentsChildren (int motherId, int fatherId)
-    {
-      // List<UserLink> userLinks = await _cache.GetUserLinks();
-      // List<User> users = await _cache.GetUsers();
+    public async Task<List<User>> GetParentsChildren (int motherId, int fatherId) {
+      List<UserLink> userLinks = await _cache.GetUserLinks ();
+      List<User> users = await _cache.GetUsers ();
 
-      var userIds = await _context.UserLinks.Where(u => u.UserPId == motherId || u.UserPId == fatherId)
-                             .Select(s => s.UserId)
-                             .ToListAsync();
+      var userIds = userLinks.Where (u => u.UserPId == motherId || u.UserPId == fatherId)
+        .Select (s => s.UserId)
+        .ToList ();
 
-      return await _context.Users.Where(u => userIds.Contains(u.Id)).Distinct().ToListAsync();
+      return users.Where (u => userIds.Contains (u.Id)).Distinct ().ToList ();
     }
 
-    public async Task<List<User>> GetParents(int ChildId)
-    {
-      List<User> parentsCached = await _cache.GetParents();
-      List<UserLink> userLinks = await _cache.GetUserLinks();
+    public async Task<List<User>> GetParents (int ChildId) {
+      List<User> parentsCached = await _cache.GetParents ();
+      List<UserLink> userLinks = await _cache.GetUserLinks ();
 
-      var links = userLinks.Where(u => u.UserId == ChildId).ToList();
+      var links = userLinks.Where (u => u.UserId == ChildId).ToList ();
 
-      List<User> parents = new List<User>();
-      foreach(var link in links)
-      {
-        var parent = parentsCached.FirstOrDefault(p => p.Id == link.UserPId);
-        parents.Add(parent);
+      List<User> parents = new List<User> ();
+      foreach (var link in links) {
+        var parent = parentsCached.FirstOrDefault (p => p.Id == link.UserPId);
+        parents.Add (parent);
       }
 
       return parents;
     }
 
-    public async Task<PagedList<User>> GetUsers (UserParams userParams)
-    {
-      var users = _context.Users.Include(p => p.Photos)
-        .OrderByDescending(u => u.LastActive).AsQueryable();
+    public async Task<PagedList<User>> GetUsers (UserParams userParams) {
+      var users = _context.Users.Include (p => p.Photos)
+        .OrderByDescending (u => u.LastActive).AsQueryable ();
 
-      users = users.Where(u => u.Id != userParams.userId);
-      users = users.Where(u => u.Gender == userParams.Gender);
+      users = users.Where (u => u.Id != userParams.userId);
+      users = users.Where (u => u.Gender == userParams.Gender);
 
-      if (userParams.Likers)
-      {
+      if (userParams.Likers) {
         var userLikers = await GetUserLikes (userParams.userId, userParams.Likers);
         users = users.Where (u => userLikers.Contains (u.Id));
       }
 
-      if (userParams.Likees)
-      {
+      if (userParams.Likees) {
         var userLikees = await GetUserLikes (userParams.userId, userParams.Likers);
         users = users.Where (u => userLikees.Contains (u.Id));
       }
 
-      if(userParams.MinAge != 18 || userParams.MaxAge != 99)
-      {
+      if (userParams.MinAge != 18 || userParams.MaxAge != 99) {
         var minDob = DateTime.Today.AddYears (-userParams.MaxAge - 1);
         var maxDob = DateTime.Today.AddYears (-userParams.MinAge);
 
         users = users.Where (u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob);
       }
 
-      if (!string.IsNullOrEmpty (userParams.OrderBy))
-      {
-        switch(userParams.OrderBy)
-        {
+      if (!string.IsNullOrEmpty (userParams.OrderBy)) {
+        switch (userParams.OrderBy) {
           case "created":
             users = users.OrderByDescending (u => u.Created);
             break;
@@ -236,132 +226,116 @@ namespace EducNotes.API.Data {
         }
       }
 
-      return await PagedList<User>.CreateAsync(users, userParams.PageNumber, userParams.PageSize);
+      return await PagedList<User>.CreateAsync (users, userParams.PageNumber, userParams.PageSize);
     }
 
-    public async Task<Like> GetLike(int userId, int recipientId)
-    {
-      return await _context.Likes.FirstOrDefaultAsync(u => u.LikerId == userId && u.LikeeId == recipientId);
+    public async Task<Like> GetLike (int userId, int recipientId) {
+      return await _context.Likes.FirstOrDefaultAsync (u => u.LikerId == userId && u.LikeeId == recipientId);
     }
-    public async Task<User> GetSingleUser(string userName)
-    {
-      return await _context.Users.FirstAsync(u => u.UserName == userName);
+    public async Task<User> GetSingleUser (string userName) {
+      return await _context.Users.FirstAsync (u => u.UserName == userName);
     }
 
-    private async Task<IEnumerable<int>> GetUserLikes(int id, bool likers)
-    {
+    private async Task<IEnumerable<int>> GetUserLikes (int id, bool likers) {
       var user = await _context.Users
         .Include (x => x.Likers)
         .Include (x => x.Likees)
         .FirstOrDefaultAsync (u => u.Id == id);
 
-      if (likers)
-      {
+      if (likers) {
         return user.Likers.Where (u => u.LikeeId == id).Select (i => i.LikerId);
-      }
-      else
-      {
+      } else {
         return user.Likees.Where (u => u.LikerId == id).Select (i => i.LikeeId);
       }
     }
 
-    public async Task<Class> GetClass(int Id)
-    {
+    public async Task<Class> GetClass (int Id) {
       // List<Class> classes = await _cache.GetClasses();
-      return await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
+      return await _context.Classes.FirstOrDefaultAsync (c => c.Id == Id);
     }
 
-    public async Task<List<Class>> GetClassesByLevelId(int levelId)
-    {
+    public async Task<List<Class>> GetClassesByLevelId (int levelId) {
       // List<Class> classes = await _cache.GetClasses();
-      return await _context.Classes.Where(c => c.ClassLevelId == levelId)
-                    .OrderBy(o => o.Name)
-                    .ToListAsync();
+      return await _context.Classes.Where (c => c.ClassLevelId == levelId)
+        .OrderBy (o => o.Name)
+        .ToListAsync ();
     }
 
-    public async Task<List<Class>> GetFreePrimaryClasses(int teacherId)
-    {
-      List<ClassCourse> classCourses = await _context.ClassCourses.ToListAsync();
+    public async Task<List<Class>> GetFreePrimaryClasses (int teacherId) {
+      List<ClassCourse> classCourses = await _context.ClassCourses.ToListAsync ();
       // List<Class> classesCached = await _cache.GetClasses();
 
-      var assignedClassIds = classCourses.Select(c => c.ClassId).Distinct().ToList();
-      var teacherClassIds = classCourses.Where(c => c.TeacherId == teacherId).Select(c => c.ClassId).Distinct().ToList();
+      var assignedClassIds = classCourses.Select (c => c.ClassId).Distinct ().ToList ();
+      var teacherClassIds = classCourses.Where (c => c.TeacherId == teacherId).Select (c => c.ClassId).Distinct ().ToList ();
       var availableClasses = await _context.Classes
-                              .Where(c => !assignedClassIds.Contains(c.Id) || teacherClassIds.Contains(c.Id))
-                              .ToListAsync();
+        .Where (c => !assignedClassIds.Contains (c.Id) || teacherClassIds.Contains (c.Id))
+        .ToListAsync ();
       return availableClasses;
     }
 
-    public async Task<IEnumerable<Schedule>> GetScheduleDay(int classId, int day)
-    {
+    public async Task<IEnumerable<Schedule>> GetScheduleDay (int classId, int day) {
       return await _context.Schedules
-                    .Include(i => i.Class)
-                    .Include(c => c.Course)
-                    .Include(i => i.Teacher)
-                    .Where(d => d.Day == day && d.Class.Id == classId)
-                    .OrderBy(s => s.StartHourMin).ToListAsync();
+        .Include (i => i.Class)
+        .Include (c => c.Course)
+        .Include (i => i.Teacher)
+        .Where (d => d.Day == day && d.Class.Id == classId)
+        .OrderBy (s => s.StartHourMin).ToListAsync ();
     }
 
-    public async Task<Agenda> GetAgenda(int agendaId)
-    {
-      return await _context.Agendas.FirstOrDefaultAsync(a => a.Id == agendaId);
+    public async Task<Agenda> GetAgenda (int agendaId) {
+      return await _context.Agendas.FirstOrDefaultAsync (a => a.Id == agendaId);
     }
 
-    public async Task<List<User>> GetUsersByClasslevel(int levelId)
-    {
+    public async Task<List<User>> GetUsersByClasslevel (int levelId) {
       // List<User> users = await _cache.GetUsers();
-      return await _context.Users.Where(u => u.ClassLevelId == levelId)
-                  .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
-                  .ToListAsync();
+      return await _context.Users.Where (u => u.ClassLevelId == levelId)
+        .OrderBy (o => o.LastName).ThenBy (o => o.FirstName)
+        .ToListAsync ();
     }
 
     public async Task<List<Product>> GetActiveProducts()
     {
-      // List<Product> productsCached = await _cache.GetProducts();
-      var products = await _context.Products.Where(p => p.Active)
-                                   .OrderBy(o => o.DsplSeq).ThenBy(p => p.Name).ToListAsync();
+      List<Product> productsCached = await _cache.GetProducts();
+
+      var products = productsCached.Where(p => p.Active)
+                                   .OrderBy(o => o.DsplSeq).ThenBy(p => p.Name)
+                                   .ToList();
       return products;
     }
 
-    public async Task<EmailTemplate> GetEmailTemplate(int id)
-    {
+    public async Task<EmailTemplate> GetEmailTemplate (int id) {
       // List<EmailTemplate> templates = await _cache.GetEmailTemplates();
-      return await _context.EmailTemplates.FirstOrDefaultAsync(s => s.Id == id);
+      return await _context.EmailTemplates.FirstOrDefaultAsync (s => s.Id == id);
     }
 
-    public async Task<SmsTemplate> GetSmsTemplate(int id)
-    {
+    public async Task<SmsTemplate> GetSmsTemplate (int id) {
       // List<SmsTemplate> templates = await _context.SmsTemplates.ToListAsync();
-      return await _context.SmsTemplates.FirstOrDefaultAsync(s => s.Id == id);
+      return await _context.SmsTemplates.FirstOrDefaultAsync (s => s.Id == id);
     }
 
-    public List<int> GetWeekDays(DateTime date)
-    {
+    public List<int> GetWeekDays (DateTime date) {
       var dayDate = (int) date.DayOfWeek;
       var dayInt = dayDate == 0 ? 7 : dayDate;
       DateTime monday = date.AddDays (1 - dayInt);
 
       var days = new List<int> ();
-      for (int i = 0; i < 6; i++)
-      {
+      for (int i = 0; i < 6; i++) {
         days.Add (monday.AddDays (i).Day);
       }
 
       return days;
     }
 
-    public async Task<IEnumerable<Schedule>> GetClassSchedule(int classId)
-    {
+    public async Task<IEnumerable<Schedule>> GetClassSchedule (int classId) {
       return await _context.Schedules
-        .Include(i => i.Class)
-        .Include(i => i.Course)
-        .Include(i => i.Teacher)
-        .Where(s => s.ClassId == classId)
-        .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin).ToListAsync();
+        .Include (i => i.Class)
+        .Include (i => i.Course)
+        .Include (i => i.Teacher)
+        .Where (s => s.ClassId == classId)
+        .OrderBy (o => o.Day).ThenBy (o => o.StartHourMin).ToListAsync ();
     }
 
-    public async Task<IEnumerable<ClassLevelSchedule>> GetClassLevelSchedule(int classLevelId)
-    {
+    public async Task<IEnumerable<ClassLevelSchedule>> GetClassLevelSchedule (int classLevelId) {
       return await _context.ClassLevelSchedules
         .Include (i => i.ClassLevel)
         .Include (i => i.Course)
@@ -369,8 +343,7 @@ namespace EducNotes.API.Data {
         .OrderBy (o => o.Day).ThenBy (o => o.StartHourMin).ToListAsync ();
     }
 
-    public async Task<IEnumerable<Agenda>> GetClassAgenda(int classId, DateTime StartDate, DateTime EndDate)
-    {
+    public async Task<IEnumerable<Agenda>> GetClassAgenda (int classId, DateTime StartDate, DateTime EndDate) {
       return await _context.Agendas
         .Include (i => i.Session.Course)
         .Where (a => a.Session.ClassId == classId && a.Session.SessionDate.Date >= StartDate.Date &&
@@ -380,7 +353,7 @@ namespace EducNotes.API.Data {
 
     public async Task<IEnumerable<Agenda>> GetClassAgendaTodayToNDays (int classId, int toNbDays) {
       DateTime today = DateTime.Now.Date;
-      DateTime EndDate = today.AddDays(toNbDays).Date;
+      DateTime EndDate = today.AddDays (toNbDays).Date;
 
       return await _context.Agendas
         .Include (i => i.Session).ThenInclude (i => i.Course)
@@ -388,51 +361,43 @@ namespace EducNotes.API.Data {
         .OrderBy (o => o.Session.SessionDate).ToListAsync ();
     }
 
-    public async Task<IEnumerable<User>> GetClassStudents(int classId)
-    {
+    public async Task<IEnumerable<User>> GetClassStudents (int classId) {
       // List<User> users = await _cache.GetUsers();
-      return await _context.Users.Where(u => u.ClassId == classId && u.UserTypeId == studentTypeId)
-                  .OrderBy (e => e.LastName).ThenBy (e => e.FirstName)
-                  .ToListAsync();
+      return await _context.Users.Where (u => u.ClassId == classId && u.UserTypeId == studentTypeId)
+        .OrderBy (e => e.LastName).ThenBy (e => e.FirstName)
+        .ToListAsync ();
     }
 
-    public async Task<IEnumerable<CourseSkill>> GetCourseSkills(int courseId)
-    {
+    public async Task<IEnumerable<CourseSkill>> GetCourseSkills (int courseId) {
       return await _context.CourseSkills
         .Include (i => i.Skill)
         .Include (i => i.Course)
         .Where (s => s.CourseId == courseId)
         .OrderBy (o => o.Course.Name).ToListAsync ();
     }
-    public async Task<User> GetUserByEmail(string email)
-    {
+    public async Task<User> GetUserByEmail (string email) {
       // List<User> users = await _cache.GetUsers();
-      return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToUpper() == email.ToUpper());
+      return await _context.Users.FirstOrDefaultAsync (u => u.Email.ToUpper () == email.ToUpper ());
     }
 
-    public async Task<User> GetUserByEmailAndLogin(string username, string email)
-    {
+    public async Task<User> GetUserByEmailAndLogin (string username, string email) {
       // List<User> users = await _cache.GetUsers();
-      return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToUpper() == email.ToUpper() &&
-        u.UserName.ToUpper() == username.ToUpper());
+      return await _context.Users.FirstOrDefaultAsync (u => u.Email.ToUpper () == email.ToUpper () &&
+        u.UserName.ToUpper () == username.ToUpper ());
     }
 
-    public async Task<Session> GetSessionFromSchedule(int scheduleId, int teacherId, DateTime sessionDate)
-    {
-      var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == scheduleId);
+    public async Task<Session> GetSessionFromSchedule (int scheduleId, int teacherId, DateTime sessionDate) {
+      var schedule = await _context.Schedules.FirstOrDefaultAsync (s => s.Id == scheduleId);
       var scheduleDay = schedule.Day;
 
       // get session by schedule and date
       var sessionFromDB = await _context.Sessions
-                                .Include(i => i.Class)
-                                .Include(i => i.Course)
-                                .FirstOrDefaultAsync(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == sessionDate);
-      if (sessionFromDB != null)
-      {
+        .Include (i => i.Class)
+        .Include (i => i.Course)
+        .FirstOrDefaultAsync (s => s.ScheduleId == schedule.Id && s.SessionDate.Date == sessionDate);
+      if (sessionFromDB != null) {
         return (sessionFromDB);
-      }
-      else
-      {
+      } else {
         var newSession = new Session {
           ScheduleId = schedule.Id,
           TeacherId = teacherId,
@@ -444,7 +409,7 @@ namespace EducNotes.API.Data {
         };
         _context.Add (newSession);
 
-        if (await SaveAll()) {
+        if (await SaveAll ()) {
           return newSession;
         }
 
@@ -452,8 +417,7 @@ namespace EducNotes.API.Data {
       }
     }
 
-    public async Task<IEnumerable<Agenda>> GetClassAgenda(int classId)
-    {
+    public async Task<IEnumerable<Agenda>> GetClassAgenda (int classId) {
       return await _context.Agendas
         .Include (i => i.Session.Class)
         .Include (i => i.Session.Course)
@@ -461,77 +425,67 @@ namespace EducNotes.API.Data {
         .OrderBy (o => o.Session.SessionDate).ToListAsync ();
     }
 
-    public async Task<IEnumerable<User>> GetStudentsForClass(int classId)
-    {
+    public async Task<IEnumerable<User>> GetStudentsForClass (int classId) {
       // List<User> users = await _cache.GetUsers();
-      return await _context.Users.Where(u => u.ClassId == classId)
-                  .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
-                  .ToListAsync();
+      return await _context.Users.Where (u => u.ClassId == classId)
+        .OrderBy (e => e.LastName).ThenBy (e => e.FirstName)
+        .ToListAsync ();
     }
 
-    public async Task<IEnumerable<UserType>> getUserTypes()
-    {
+    public async Task<IEnumerable<UserType>> getUserTypes () {
       // List<UserType> userTypes = await _cache.GetUserTypes();
-      return await _context.UserTypes.Where(u => u.Name != "Admin").ToListAsync();
+      return await _context.UserTypes.Where (u => u.Name != "Admin").ToListAsync ();
     }
 
-    public async Task<bool> EmailExist(string email)
-    {
+    public async Task<bool> EmailExist (string email) {
       // List<User> users = await _cache.GetUsers();
-      var user = await _context.Users.FirstOrDefaultAsync(e => e.Email == email);
+      var user = await _context.Users.FirstOrDefaultAsync (e => e.Email == email);
       if (user != null)
         return true;
 
       return false;
     }
 
-    public async Task<List<Course>> GetTeacherCourses(int teacherId)
-    {
+    public async Task<List<Course>> GetTeacherCourses (int teacherId) {
       // List<TeacherCourse> teacherCourses = await _cache.GetTeacherCourses();
-      var courses = await _context.TeacherCourses.Where(c => c.TeacherId == teacherId)
-                                  .Select(s => s.Course).ToListAsync();
+      var courses = await _context.TeacherCourses.Where (c => c.TeacherId == teacherId)
+        .Select (s => s.Course).ToListAsync ();
       return courses;
     }
 
-    public async Task<List<TeacherClassesDto>> GetTeacherClasses(int teacherId)
-    {
+    public async Task<List<TeacherClassesDto>> GetTeacherClasses (int teacherId) {
       // List<User> users = await _cache.GetStudents();
-      var classesData = await (from courses in _context.ClassCourses
-                        join classes in _context.Classes on courses.ClassId equals classes.Id
-                        where courses.TeacherId == teacherId
-                        select new {
-                          ClassId = classes.Id,
-                          ClassLevelId = classes.ClassLevelId,
-                          ClassName = classes.Name,
-                          NbStudents = _context.Users.Where(u => u.ClassId == classes.Id).Count()
-                        })
-                        .OrderBy(o => o.ClassName)
-                        .Distinct().ToListAsync();
+      var classesData = await (from courses in _context.ClassCourses join classes in _context.Classes on courses.ClassId equals classes.Id where courses.TeacherId == teacherId select new {
+          ClassId = classes.Id,
+            ClassLevelId = classes.ClassLevelId,
+            ClassName = classes.Name,
+            NbStudents = _context.Users.Where (u => u.ClassId == classes.Id).Count ()
+        })
+        .OrderBy (o => o.ClassName)
+        .Distinct ().ToListAsync ();
 
-      List<TeacherClassesDto> teacherClasses = new List<TeacherClassesDto>();
-      foreach(var aclass in classesData)
-      {
-        TeacherClassesDto tcd = new TeacherClassesDto();
+      List<TeacherClassesDto> teacherClasses = new List<TeacherClassesDto> ();
+      foreach (var aclass in classesData) {
+        TeacherClassesDto tcd = new TeacherClassesDto ();
         tcd.ClassId = aclass.ClassId;
         tcd.ClassLevelId = aclass.ClassLevelId;
         tcd.ClassName = aclass.ClassName;
         tcd.NbStudents = aclass.NbStudents;
-        teacherClasses.Add(tcd);
+        teacherClasses.Add (tcd);
       }
 
       return teacherClasses;
     }
 
-    public async Task<List<NextCoursesByClassDto>> GetNextCoursesByClass(int teacherId)
-    {
+    public async Task<List<NextCoursesByClassDto>> GetNextCoursesByClass (int teacherId) {
       var nextCourses = 10; // next coming courses
       var today = DateTime.Now;
       // monday=1, tue=2, ...
       var todayDay = ((int) today.DayOfWeek == 0) ? 7 : (int) DateTime.Now.DayOfWeek;
       var todayHourMin = today.TimeOfDay;
 
-      var teacher = await _context.Users.FirstAsync(u => u.Id == teacherId);
-      var teacherClasses = await GetTeacherClasses(teacherId);
+      var teacher = await _context.Users.FirstAsync (u => u.Id == teacherId);
+      var teacherClasses = await GetTeacherClasses (teacherId);
       List<NextCoursesByClassDto> nextCoursesByClass = new List<NextCoursesByClassDto> ();
       foreach (var aclass in teacherClasses) {
         NextCoursesByClassDto coursesByClass = new NextCoursesByClassDto ();
@@ -583,31 +537,30 @@ namespace EducNotes.API.Data {
       return nextCoursesByClass;
     }
 
-    public async Task<List<ClassesWithEvalsDto>> GetTeacherClassesWithEvalsByPeriod (int teacherId, int periodId)
-    {
+    public async Task<List<ClassesWithEvalsDto>> GetTeacherClassesWithEvalsByPeriod (int teacherId, int periodId) {
       // List<User> studentsCached = await _cache.GetStudents();
       // List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
-      var Classes = await _context.ClassCourses.Where(c => c.TeacherId == teacherId).Distinct().ToListAsync();
+      var Classes = await _context.ClassCourses.Where (c => c.TeacherId == teacherId).Distinct ().ToListAsync ();
 
-      List<ClassesWithEvalsDto> classesWithEvals = new List<ClassesWithEvalsDto>();
+      List<ClassesWithEvalsDto> classesWithEvals = new List<ClassesWithEvalsDto> ();
       foreach (var aclass in Classes) {
         List<Evaluation> ClassEvals = await _context.Evaluations
-                                            .Include(i => i.Course)
-                                            .Include(i => i.EvalType)
-                                            .Where(e => e.ClassId == aclass.ClassId && e.PeriodId == periodId)
-                                            .ToListAsync();
+          .Include (i => i.Course)
+          .Include (i => i.EvalType)
+          .Where (e => e.ClassId == aclass.ClassId && e.PeriodId == periodId)
+          .ToListAsync ();
 
         if (ClassEvals.Count > 0) {
-          var OpenedEvals = ClassEvals.FindAll(e => e.Closed == false);
-          var OpenedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(OpenedEvals);
-          var ToBeGradedEvals = ClassEvals.FindAll(e => e.Closed == true);
-          var ToBeGradedEvalsDto = _mapper.Map<List<EvaluationForListDto>>(ToBeGradedEvals);
-          var NbEvals = OpenedEvals.Count() + ToBeGradedEvals.Count();
+          var OpenedEvals = ClassEvals.FindAll (e => e.Closed == false);
+          var OpenedEvalsDto = _mapper.Map<List<EvaluationForListDto>> (OpenedEvals);
+          var ToBeGradedEvals = ClassEvals.FindAll (e => e.Closed == true);
+          var ToBeGradedEvalsDto = _mapper.Map<List<EvaluationForListDto>> (ToBeGradedEvals);
+          var NbEvals = OpenedEvals.Count () + ToBeGradedEvals.Count ();
 
-          ClassesWithEvalsDto classDto = new ClassesWithEvalsDto();
-          classDto.ClassId = Convert.ToInt32(aclass.ClassId);
+          ClassesWithEvalsDto classDto = new ClassesWithEvalsDto ();
+          classDto.ClassId = Convert.ToInt32 (aclass.ClassId);
           classDto.ClassName = aclass.Class.Name;
-          classDto.NbStudents = await _context.Users.Where(s => s.ClassId == aclass.ClassId).CountAsync();
+          classDto.NbStudents = await _context.Users.Where (s => s.ClassId == aclass.ClassId).CountAsync ();
           classDto.NbEvals = NbEvals;
           classDto.OpenedEvals = OpenedEvalsDto;
           classDto.ToBeGradedEvals = ToBeGradedEvalsDto;
@@ -704,112 +657,97 @@ namespace EducNotes.API.Data {
     //     return resultStatus;
     // }
 
-    public async Task<bool> UpdateChildren(ChildrenForEditDto users)
-    {
-      List<User> usersCached = await _cache.GetUsers();
-      List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
+    public async Task<bool> UpdateChildren (ChildrenForEditDto users) {
+      List<User> usersCached = await _cache.GetUsers ();
+      List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates ();
 
       bool resultStatus = false;
-      using(var identityContextTransaction = _context.Database.BeginTransaction())
-      {
-        try
-        {
-          for(int i = 0; i < users.Id.Count(); i++)
-          {
+      using (var identityContextTransaction = _context.Database.BeginTransaction ()) {
+        try {
+          for (int i = 0; i < users.Id.Count (); i++) {
             var childid = users.Id[i];
-            var child = usersCached.First(u => u.Id == childid);
+            var child = usersCached.First (u => u.Id == childid);
             child.UserName = users.UserName[i];
-            child.NormalizedUserName = users.UserName[i].ToUpper();
+            child.NormalizedUserName = users.UserName[i].ToUpper ();
             child.LastName = users.LastName[i];
             child.FirstName = users.FirstName[i];
             child.Gender = users.Gender[i];
-            var dateArray = users.strDateOfBirth[i].Split("/");
-            var day = Convert.ToInt32(dateArray[0]);
-            var month = Convert.ToInt32(dateArray[1]);
-            var year = Convert.ToInt32(dateArray[2]);
-            child.DateOfBirth = new DateTime(year, month, day);
+            var dateArray = users.strDateOfBirth[i].Split ("/");
+            var day = Convert.ToInt32 (dateArray[0]);
+            var month = Convert.ToInt32 (dateArray[1]);
+            var year = Convert.ToInt32 (dateArray[2]);
+            child.DateOfBirth = new DateTime (year, month, day);
             child.Email = users.Email[i];
             if (child.NormalizedEmail != null)
-              child.NormalizedEmail = users.Email[i].ToUpper();
+              child.NormalizedEmail = users.Email[i].ToUpper ();
             child.PhoneNumber = users.PhoneNumber[i];
             var pwd = users.Password[i];
             // validate user
-            var newPassword = _userManager.PasswordHasher.HashPassword(child, users.Password[i]);
+            var newPassword = _userManager.PasswordHasher.HashPassword (child, users.Password[i]);
             child.PasswordHash = newPassword;
-            if(child.Email != "" && child.Email != null)
+            if (child.Email != "" && child.Email != null)
               child.EmailConfirmed = true;
             child.AccountDataValidated = true;
-            Update(child);
+            Update (child);
             resultStatus = true;
 
             //does the current user has photo?
-            if (users.PhotoIndex != null)
-            {
-              var photoIndex = users.PhotoIndex.IndexOf(childid);
-              if(photoIndex != -1)
-              {
+            if (users.PhotoIndex != null) {
+              var photoIndex = users.PhotoIndex.IndexOf (childid);
+              if (photoIndex != -1) {
                 var photoFile = users.PhotoFiles[photoIndex];
-                if(photoFile.Length > 0)
-                {
-                  var uploadResult = new ImageUploadResult();
-                  using(var stream = photoFile.OpenReadStream())
-                  {
-                    var uploadParams = new ImageUploadParams()
-                    {
-                      File = new FileDescription(photoFile.Name, stream),
-                      Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+                if (photoFile.Length > 0) {
+                  var uploadResult = new ImageUploadResult ();
+                  using (var stream = photoFile.OpenReadStream ()) {
+                    var uploadParams = new ImageUploadParams () {
+                    File = new FileDescription (photoFile.Name, stream),
+                    Transformation = new Transformation ().Width (500).Height (500).Crop ("fill").Gravity ("face")
                     };
 
-                    uploadResult = _cloudinary.Upload(uploadParams);
-                    if(uploadResult.StatusCode == HttpStatusCode.OK)
-                    {
+                    uploadResult = _cloudinary.Upload (uploadParams);
+                    if (uploadResult.StatusCode == HttpStatusCode.OK) {
                       //remove tag 'Main' from child photo if it exists
-                      if(child.Photos.Any(u => u.IsMain))
-                      {
-                        var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == child.Id && p.IsMain == true);
+                      if (child.Photos.Any (u => u.IsMain)) {
+                        var oldPhoto = await _context.Photos.FirstAsync (p => p.UserId == child.Id && p.IsMain == true);
                         oldPhoto.IsMain = false;
-                        Update(oldPhoto);
+                        Update (oldPhoto);
                       }
-                      Photo photo = new Photo();
-                      photo.Url = uploadResult.SecureUri.ToString();
+                      Photo photo = new Photo ();
+                      photo.Url = uploadResult.SecureUri.ToString ();
                       photo.PublicId = uploadResult.PublicId;
                       photo.UserId = child.Id;
                       photo.DateAdded = DateTime.Now;
                       photo.IsMain = true;
                       photo.IsApproved = true;
-                      Add(photo);
+                      Add (photo);
                     }
                   }
                 }
-              }
-              else
-              {
+              } else {
                 resultStatus = true;
               }
             }
           }
 
-          User parent = usersCached.First(u => u.Id == users.ParentId);
+          User parent = usersCached.First (u => u.Id == users.ParentId);
           parent.Validated = true;
-          Update(parent);
+          Update (parent);
 
-          var template = emailTemplates.First(t => t.Id == updateAccountEmailId);
-          var email = await SetEmailForAccountUpdated(template.Subject, template.Body,
+          var template = emailTemplates.First (t => t.Id == updateAccountEmailId);
+          var email = await SetEmailForAccountUpdated (template.Subject, template.Body,
             parent.LastName, parent.Gender, parent.Email, parent.Id);
-          Add(email);
+          Add (email);
 
-
-          if(await SaveAll())
-          {
-            await _cache.LoadUsers();
+          if (await SaveAll ()) {
+            await _cache.LoadUsers ();
             // validate transaction
-            identityContextTransaction.Commit();
+            identityContextTransaction.Commit ();
             resultStatus = true;
           } else
             resultStatus = false;
         } catch (System.Exception ex) {
           var sde = ex.Message;
-          identityContextTransaction.Rollback();
+          identityContextTransaction.Rollback ();
           resultStatus = false;
         }
       }
@@ -818,12 +756,13 @@ namespace EducNotes.API.Data {
 
     public async Task<bool> EditUserAccount(UserAccountForEditDto user)
     {
+      List<User> users = await _cache.GetUsers();
       bool resultStatus = false;
       using(var identityContextTransaction = _context.Database.BeginTransaction())
       {
         try
         {
-          User appUser = await _context.Users.Include(i => i.Photos).FirstOrDefaultAsync(u => u.Id == user.Id);
+          User appUser = users.FirstOrDefault(u => u.Id == user.Id);
           appUser.LastName = user.LastName;
           appUser.FirstName = user.FirstName;
           appUser.Gender = user.Gender;
@@ -848,28 +787,30 @@ namespace EducNotes.API.Data {
               var uploadResult = new ImageUploadResult();
               using (var stream = photoFile.OpenReadStream())
               {
-                var uploadParams = new ImageUploadParams() {
+                var uploadParams = new ImageUploadParams()
+                {
                   File = new FileDescription(photoFile.Name, stream),
-                  Transformation = new Transformation().Width (500).Height (500).Crop ("fill").Gravity("face")
+                  Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
                 };
-                var subdomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower () == "subdomain")).Value;
-                if(subdomain != "")
+                var subdomain = GetAppSubDomain();
+                if (subdomain != "")
                   uploadParams.Folder = subdomain + "/";
                 else
                   uploadParams.Folder = "localDemo/";
 
-                uploadResult = _cloudinary.Upload (uploadParams);
-                if (uploadResult.StatusCode == HttpStatusCode.OK) {
+                uploadResult = _cloudinary.Upload(uploadParams);
+                if(uploadResult.StatusCode == HttpStatusCode.OK)
+                {
                   Photo photo = new Photo();
                   photo.Url = uploadResult.SecureUri.ToString();
                   photo.PublicId = uploadResult.PublicId;
                   photo.UserId = appUser.Id;
                   photo.DateAdded = DateTime.Now;
-                  if (appUser.Photos.Any (u => u.IsMain))
+                  if(appUser.Photos.Any (u => u.IsMain))
                   {
                     var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
                     oldPhoto.IsMain = false;
-                    Update(oldPhoto);
+                    Update (oldPhoto);
                   }
                   photo.IsMain = true;
                   photo.IsApproved = true;
@@ -877,7 +818,9 @@ namespace EducNotes.API.Data {
                 }
               }
             }
-          } else {
+          }
+          else
+          {
             resultStatus = true;
           }
 
@@ -887,7 +830,8 @@ namespace EducNotes.API.Data {
             // fin de la transaction
             identityContextTransaction.Commit();
             resultStatus = true;
-          } else
+          }
+          else
             resultStatus = false;
         }
         catch
@@ -906,11 +850,11 @@ namespace EducNotes.API.Data {
       List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
 
       bool resultStatus = false;
-      using (var identityContextTransaction = _context.Database.BeginTransaction())
+      using(var identityContextTransaction = _context.Database.BeginTransaction())
       {
         try
         {
-          var ids = user.CourseIds.Split(",").ToList();
+          var ids = user.CourseIds.Split (",").ToList();
           User appUser = new User();
 
           //is it a new user
@@ -919,9 +863,9 @@ namespace EducNotes.API.Data {
             var userToSave = _mapper.Map<User>(user);
             string strDoB = user.strDateOfBirth;
             var dateArray = user.strDateOfBirth.Split("/");
-            int year = Convert.ToInt32 (dateArray[2]);
-            int month = Convert.ToInt32 (dateArray[1]);
-            int day = Convert.ToInt32 (dateArray[0]);
+            int year = Convert.ToInt32(dateArray[2]);
+            int month = Convert.ToInt32(dateArray[1]);
+            int day = Convert.ToInt32(dateArray[0]);
             DateTime birthDay = new DateTime(year, month, day);
             userToSave.DateOfBirth = birthDay;
             var code = Guid.NewGuid();
@@ -936,9 +880,9 @@ namespace EducNotes.API.Data {
             if(result.Succeeded)
             {
               // enregistrement du RoleTeacher
-              var role = roles.FirstOrDefault(a => a.Id == teacherRoleId);
-              appUser = await _userManager.Users.Include(i => i.Photos)
-                                                .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
+              var role = roles.FirstOrDefault (a => a.Id == teacherRoleId);
+              appUser = await _userManager.Users.Include (i => i.Photos)
+                .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
               _userManager.AddToRoleAsync(appUser, role.Name).Wait();
 
               appUser.IdNum = GetUserIDNumber(appUser.Id, appUser.LastName, appUser.FirstName);
@@ -948,7 +892,7 @@ namespace EducNotes.API.Data {
               var courses = coursesCached.Where(c => ids.Contains(c.Id.ToString())).ToList();
               var coursesName = courses.Select(s => s.Name).ToList();
               string coursenames = "";
-              foreach (var name in coursesName)
+              foreach(var name in coursesName)
               {
                 if(coursenames == "")
                   coursenames = name;
@@ -970,15 +914,13 @@ namespace EducNotes.API.Data {
                   Courses = coursenames
                 };
 
-                var template = emailTemplates.First(t => t.Id == teacherConfirmEmailId);
-                Email emailToSend = await SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
+                var template = emailTemplates.First (t => t.Id == teacherConfirmEmailId);
+                Email emailToSend = await SetDataForConfirmTeacherEmail (emailData, template.Body, template.Subject);
                 Add(emailToSend);
               }
             }
-          }
-          else
-          {
-            appUser = await _context.Users.Include(i => i.Photos).FirstOrDefaultAsync(u => u.Id == user.Id);
+          } else {
+            appUser = await _context.Users.Include (i => i.Photos).FirstOrDefaultAsync (u => u.Id == user.Id);
             appUser.LastName = user.LastName;
             appUser.FirstName = user.FirstName;
             appUser.Gender = user.Gender;
@@ -986,7 +928,7 @@ namespace EducNotes.API.Data {
             int year = Convert.ToInt32 (dateArray[2]);
             int month = Convert.ToInt32 (dateArray[1]);
             int day = Convert.ToInt32 (dateArray[0]);
-            DateTime birthDay = new DateTime(year, month, day);
+            DateTime birthDay = new DateTime (year, month, day);
             appUser.DateOfBirth = birthDay;
             appUser.EducLevelId = user.EducLevelId;
             if (user.ClassId != 0)
@@ -994,97 +936,86 @@ namespace EducNotes.API.Data {
             appUser.PhoneNumber = user.PhoneNumber;
             appUser.SecondPhoneNumber = user.SecondPhoneNumber;
             appUser.Email = user.Email;
-            Update(appUser);
+            Update (appUser);
 
             //delete previous teacher courses
-            List<TeacherCourse> prevCourses = await _context.TeacherCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
-            DeleteAll(prevCourses);
+            List<TeacherCourse> prevCourses = await _context.TeacherCourses.Where (c => c.TeacherId == appUser.Id).ToListAsync ();
+            DeleteAll (prevCourses);
             //delete previous class courses
             // List<ClassCourse> prevClassCourses = await _context.ClassCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
             // DeleteAll(prevClassCourses);
           }
 
-          if (ids.Count() > 0)
-          {
-            foreach(var courseId in ids)
-            {
+          if (ids.Count () > 0) {
+            foreach (var courseId in ids) {
               // add new selected courses
-              TeacherCourse tc = new TeacherCourse();
-              tc.CourseId = Convert.ToInt32(courseId);
+              TeacherCourse tc = new TeacherCourse ();
+              tc.CourseId = Convert.ToInt32 (courseId);
               tc.TeacherId = appUser.Id;
-              Add(tc);
+              Add (tc);
 
               // add class courses if it's a primary class
               if (user.EducLevelId == 1) {
-                ClassCourse cc = new ClassCourse();
-                cc.ClassId = Convert.ToInt32(appUser.ClassId);
+                ClassCourse cc = new ClassCourse ();
+                cc.ClassId = Convert.ToInt32 (appUser.ClassId);
                 cc.TeacherId = appUser.Id;
-                cc.CourseId = Convert.ToInt32(courseId);
-                Add(cc);
+                cc.CourseId = Convert.ToInt32 (courseId);
+                Add (cc);
               }
             }
           }
-
-          
 
           //add user photo
           var photoFile = user.PhotoFile;
-          if(photoFile != null)
-          {
-            if(photoFile.Length > 0)
-            {
-              var uploadResult = new ImageUploadResult();
-              using (var stream = photoFile.OpenReadStream()) {
-                var uploadParams = new ImageUploadParams() {
-                File = new FileDescription(photoFile.Name, stream),
-                Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+          if (photoFile != null) {
+            if (photoFile.Length > 0) {
+              var uploadResult = new ImageUploadResult ();
+              using (var stream = photoFile.OpenReadStream ()) {
+                var uploadParams = new ImageUploadParams () {
+                File = new FileDescription (photoFile.Name, stream),
+                Transformation = new Transformation ().Width (500).Height (500).Crop ("fill").Gravity ("face")
                 };
 
                 uploadResult = _cloudinary.Upload (uploadParams);
-                if (uploadResult.StatusCode == HttpStatusCode.OK)
-                {
-                  Photo photo = new Photo();
-                  photo.Url = uploadResult.SecureUri.ToString();
+                if (uploadResult.StatusCode == HttpStatusCode.OK) {
+                  Photo photo = new Photo ();
+                  photo.Url = uploadResult.SecureUri.ToString ();
                   photo.PublicId = uploadResult.PublicId;
                   photo.UserId = appUser.Id;
                   photo.DateAdded = DateTime.Now;
-                  if (appUser.Photos.Any (u => u.IsMain))
-                  {
-                    var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                  if (appUser.Photos.Any (u => u.IsMain)) {
+                    var oldPhoto = await _context.Photos.FirstAsync (p => p.UserId == user.Id && p.IsMain == true);
                     oldPhoto.IsMain = false;
-                    Update(oldPhoto);
+                    Update (oldPhoto);
                   }
                   photo.IsMain = true;
                   photo.IsApproved = true;
-                  Add(photo);
+                  Add (photo);
                 }
               }
             }
-          }
-          else
-          {
+          } else {
             resultStatus = true;
           }
 
-          if(await SaveAll())
-          {
-            await _cache.LoadUsers();
-            await _cache.LoadTeacherCourses();
-            await _cache.LoadClassLevels();
+          if (await SaveAll ()) {
+            await _cache.LoadUsers ();
+            await _cache.LoadTeacherCourses ();
+            await _cache.LoadClassLevels ();
             //fin de la transaction
-            identityContextTransaction.Commit();
+            identityContextTransaction.Commit ();
             resultStatus = true;
           } else
             resultStatus = false;
         } catch {
-          identityContextTransaction.Rollback();
+          identityContextTransaction.Rollback ();
           return resultStatus = false;
         }
       }
       return resultStatus;
     }
 
-    public async Task<bool> AddPhoto(int userId, IFormFile photoFile) {
+    public async Task<bool> AddPhoto (int userId, IFormFile photoFile) {
       if (photoFile.Length > 0) {
         var uploadResult = new ImageUploadResult ();
         var user = await _context.Users.Include (p => p.Photos).FirstOrDefaultAsync (a => a.Id == userId);
@@ -1110,7 +1041,7 @@ namespace EducNotes.API.Data {
             photo.IsApproved = true;
             Add (photo);
 
-            if (await SaveAll())
+            if (await SaveAll ())
               return true;
             else
               return false;
@@ -1124,12 +1055,11 @@ namespace EducNotes.API.Data {
       return await _context.Courses.FirstOrDefaultAsync (c => c.Id == Id);
     }
 
-    public async Task<Boolean> SendTeacherConfirmEmail(int userId)
-    {
-      var appUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-      var teacherCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+    public async Task<Boolean> SendTeacherConfirmEmail (int userId) {
+      var appUser = await _context.Users.FirstOrDefaultAsync (u => u.Id == userId);
+      var teacherCode = await _userManager.GenerateEmailConfirmationTokenAsync (appUser);
 
-      ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {
+      ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto () {
         Id = appUser.Id,
         LastName = appUser.LastName,
         FirstName = appUser.FirstName,
@@ -1139,33 +1069,31 @@ namespace EducNotes.API.Data {
         Token = teacherCode
       };
 
-      var template = await _context.EmailTemplates.FirstAsync(t => t.Id == teacherConfirmEmailId);
-      Email emailToSend = await SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
-      Add(emailToSend);
+      var template = await _context.EmailTemplates.FirstAsync (t => t.Id == teacherConfirmEmailId);
+      Email emailToSend = await SetDataForConfirmTeacherEmail (emailData, template.Body, template.Subject);
+      Add (emailToSend);
 
-      if(!await SaveAll())
+      if (!await SaveAll ())
         return false;
 
       return true;
     }
 
-    public async Task<bool> SendResetPasswordLink (User user, string token)
-    {
-      var template = await _context.EmailTemplates.FirstAsync(t => t.Id == resetPwdEmailId);
+    public async Task<bool> SendResetPasswordLink (User user, string token) {
+      var template = await _context.EmailTemplates.FirstAsync (t => t.Id == resetPwdEmailId);
       var email = await SetEmailForResetPwdLink (template.Subject, template.Body, user.Id,
         user.LastName, user.FirstName, user.Gender, user.Email, token);
-      _context.Add(email);
+      _context.Add (email);
 
-      if(!await SaveAll())
+      if (!await SaveAll ())
         return false;
       else
         return true;
     }
 
-    public async Task<bool> SendEmail(EmailFormDto emailFormDto)
-    {
+    public async Task<bool> SendEmail (EmailFormDto emailFormDto) {
       try {
-        await _emailSender.SendEmailAsync(emailFormDto.toEmail, emailFormDto.subject, emailFormDto.content);
+        await _emailSender.SendEmailAsync (emailFormDto.toEmail, emailFormDto.subject, emailFormDto.content);
         return true;
       } catch (System.Exception) {
         return false;
@@ -1270,13 +1198,12 @@ namespace EducNotes.API.Data {
       return agendasToReturn;
     }
 
-    public async Task<IEnumerable<ClassType>> GetClassTypes()
-    {
-      return await _context.ClassTypes.ToListAsync();
+    public async Task<IEnumerable<ClassType>> GetClassTypes () {
+      return await _context.ClassTypes.ToListAsync ();
     }
 
     public async Task<List<string>> GetEmails () {
-      return await _context.Users.Where(a => a.Email != null).Select (a => a.Email).ToListAsync ();
+      return await _context.Users.Where (a => a.Email != null).Select (a => a.Email).ToListAsync ();
     }
 
     public async Task<List<string>> GetUserNames () {
@@ -1291,22 +1218,19 @@ namespace EducNotes.API.Data {
       return await _context.ClassLevels.OrderBy (c => c.DsplSeq).ToListAsync ();
     }
 
-    public async Task<bool> UserNameExist(string userName, int currentUserId)
-    {
-      List<User> users = await _cache.GetUsers();
+    public async Task<bool> UserNameExist (string userName, int currentUserId) {
+      List<User> users = await _cache.GetUsers ();
 
-      var user = users.Where(u => u.Id != currentUserId)
-                      .FirstOrDefault(e => e.UserName.ToLower() == userName.ToLower());
-      
-      if(user != null)
-      {
+      var user = users.Where (u => u.Id != currentUserId)
+        .FirstOrDefault (e => e.UserName.ToLower () == userName.ToLower ());
+
+      if (user != null) {
         return true;
       }
       return false;
     }
 
-    public async Task sendOk(int userTypeId, int userId)
-    {
+    public async Task sendOk (int userTypeId, int userId) {
       if (userTypeId == studentTypeId) {
         // envoi de mail de l'affectation de l'eleve au professeur
 
@@ -1342,7 +1266,7 @@ namespace EducNotes.API.Data {
       }
     }
 
-    public async Task<List<UserSpaCodeDto>> ParentSelfInscription(int parentId, List<UserForUpdateDto> userToUpdate) {
+    public async Task<List<UserSpaCodeDto>> ParentSelfInscription (int parentId, List<UserForUpdateDto> userToUpdate) {
       var usersSpaCode = new List<UserSpaCodeDto> ();
       var children = await _context.UserLinks.Where (u => u.UserPId == parentId).Select (u => u.User).ToListAsync ();
       int cpt = 0;
@@ -1445,8 +1369,7 @@ namespace EducNotes.API.Data {
       return userCourses;
     }
 
-    public async Task<List<UserCourseEvalsDto>> GetUserGrades(int userId, int classId)
-    {
+    public async Task<List<UserCourseEvalsDto>> GetUserGrades (int userId, int classId) {
       //get user courses
       var userCourses = await GetUserCourses (classId);
       var aclass = await _context.Classes.FirstOrDefaultAsync (c => c.Id == classId);
@@ -1879,16 +1802,14 @@ namespace EducNotes.API.Data {
       return AgendaList;
     }
 
-    public async Task<int> GetAssignedChildrenCount (int parentId)
-    {
-      var userIds = await _context.UserLinks.Where(u => u.UserPId == parentId)
-                                            .Select(s => s.UserId).ToListAsync();
+    public async Task<int> GetAssignedChildrenCount (int parentId) {
+      var userIds = await _context.UserLinks.Where (u => u.UserPId == parentId)
+        .Select (s => s.UserId).ToListAsync ();
 
-      return userIds.Count();
+      return userIds.Count ();
     }
 
-    public async Task<bool> SaveProductSelection(int userPid, int userId, List<ServiceSelectionDto> products)
-    {
+    public async Task<bool> SaveProductSelection (int userPid, int userId, List<ServiceSelectionDto> products) {
       // insertion dans la table order 
       int total = products.Sum (x => Convert.ToInt32 (x.Price));
       var newOrder = new Order {
@@ -1958,159 +1879,133 @@ namespace EducNotes.API.Data {
       return result;
     }
 
-    public async Task<List<Absence>> GetAbsencesByDate(DateTime date)
-    {
+    public async Task<List<Absence>> GetAbsencesByDate (DateTime date) {
       var absences = await _context.Absences
-                            .Include(i => i.User).ThenInclude(i => i.Class)
-                            .Include(i => i.User).ThenInclude(i => i.Photos)
-                            .Include(i => i.DoneBy)
-                            .Include(i => i.AbsenceType)
-                            .Include(i => i.Session).ThenInclude(i => i.Course)
-                            .Where(a => a.StartDate.Date == date.Date)
-                            .ToListAsync();
+        .Include (i => i.User).ThenInclude (i => i.Class)
+        .Include (i => i.User).ThenInclude (i => i.Photos)
+        .Include (i => i.DoneBy)
+        .Include (i => i.AbsenceType)
+        .Include (i => i.Session).ThenInclude (i => i.Course)
+        .Where (a => a.StartDate.Date == date.Date)
+        .ToListAsync ();
       return absences;
     }
 
-    public async Task<MsgRecipientsDto> GetMsgRecipientsForUsers(List<User> users, List<int> educLevelIds, 
-      List<int> schoolIds, List<int> classLevelIds, List<int> classIds, int msgChoice, Boolean sendToNotValidated)
-    {
+    public async Task<MsgRecipientsDto> GetMsgRecipientsForUsers (List<User> users, List<int> educLevelIds,
+      List<int> schoolIds, List<int> classLevelIds, List<int> classIds, int msgChoice, Boolean sendToNotValidated) {
       List<ClassCourse> classCourses = await _context.ClassCourses
-                                      .Include(i => i.Class).ThenInclude(i => i.ClassLevel).ThenInclude(i => i.School)
-                                      .Include(i => i.Class).ThenInclude(i => i.ClassLevel).ThenInclude(i => i.EducationLevel)
-                                      .ToListAsync();
-      MsgRecipientsDto recipients = new MsgRecipientsDto();
-      recipients.UsersOK = new List<User>();
-      recipients.UsersNOK = new List<User>();
-      List<User> filteredUsers = new List<User>();
+        .Include (i => i.Class).ThenInclude (i => i.ClassLevel).ThenInclude (i => i.School)
+        .Include (i => i.Class).ThenInclude (i => i.ClassLevel).ThenInclude (i => i.EducationLevel)
+        .ToListAsync ();
+      MsgRecipientsDto recipients = new MsgRecipientsDto ();
+      recipients.UsersOK = new List<User> ();
+      recipients.UsersNOK = new List<User> ();
+      List<User> filteredUsers = new List<User> ();
 
-      foreach(var user in users)
-      {
-        List<Class> userClassCourses = classCourses.Where(c => c.TeacherId == user.Id).Select(s => s.Class).ToList();
+      foreach (var user in users) {
+        List<Class> userClassCourses = classCourses.Where (c => c.TeacherId == user.Id).Select (s => s.Class).ToList ();
 
         //selected Education levels?
-        List<User> userEducLevels = new List<User>();
-        if(educLevelIds.Count() > 0)
-        {
-          if(user.ClassId != null)
-          {
-            if(educLevelIds.Contains(Convert.ToInt32(user.Class.ClassLevel.EducationLevelId)))
-              userEducLevels.Add(user);
-          }
-          
-          if(user.ClassLevelId != null)
-          {
-            if(educLevelIds.Contains(Convert.ToInt32(user.ClassLevel.EducationLevelId)))
-              userEducLevels.Add(user);
-          }
-          
-          if(user.EducLevelId != null)
-          {
-            if(educLevelIds.Contains(Convert.ToInt32(Convert.ToInt32(user.EducLevelId))))
-              userEducLevels.Add(user);
+        List<User> userEducLevels = new List<User> ();
+        if (educLevelIds.Count () > 0) {
+          if (user.ClassId != null) {
+            if (educLevelIds.Contains (Convert.ToInt32 (user.Class.ClassLevel.EducationLevelId)))
+              userEducLevels.Add (user);
           }
 
-          foreach (var aclass in userClassCourses)
-          {
-            if(educLevelIds.Contains(Convert.ToInt32(aclass.ClassLevel.EducationLevelId)))
-              userEducLevels.Add(user);
+          if (user.ClassLevelId != null) {
+            if (educLevelIds.Contains (Convert.ToInt32 (user.ClassLevel.EducationLevelId)))
+              userEducLevels.Add (user);
           }
 
-          var selectedUserIds = userEducLevels.Select(u => u.Id);
-          filteredUsers = users.Where(u => selectedUserIds.Contains(u.Id)).ToList();
+          if (user.EducLevelId != null) {
+            if (educLevelIds.Contains (Convert.ToInt32 (Convert.ToInt32 (user.EducLevelId))))
+              userEducLevels.Add (user);
+          }
+
+          foreach (var aclass in userClassCourses) {
+            if (educLevelIds.Contains (Convert.ToInt32 (aclass.ClassLevel.EducationLevelId)))
+              userEducLevels.Add (user);
+          }
+
+          var selectedUserIds = userEducLevels.Select (u => u.Id);
+          filteredUsers = users.Where (u => selectedUserIds.Contains (u.Id)).ToList ();
         }
 
         //selected schools?
-        List<User> userSchools = new List<User>();
-        if(schoolIds.Count() > 0)
-        {
-          if(user.ClassId != null)
-          {
-            if(schoolIds.Contains(Convert.ToInt32(user.Class.ClassLevel.SchoolId)))
-              userSchools.Add(user);
+        List<User> userSchools = new List<User> ();
+        if (schoolIds.Count () > 0) {
+          if (user.ClassId != null) {
+            if (schoolIds.Contains (Convert.ToInt32 (user.Class.ClassLevel.SchoolId)))
+              userSchools.Add (user);
           }
 
-          foreach(var aclass in userClassCourses)
-          {
-            if(schoolIds.Contains(Convert.ToInt32(aclass.ClassLevel.SchoolId)))
-              userEducLevels.Add(user);
+          foreach (var aclass in userClassCourses) {
+            if (schoolIds.Contains (Convert.ToInt32 (aclass.ClassLevel.SchoolId)))
+              userEducLevels.Add (user);
           }
 
-          var selectedUserIds = userSchools.Select(u => u.Id);
-          List<User> selectedUsers = users.Where(u => selectedUserIds.Contains(u.Id)).ToList();
-          filteredUsers.AddRange(selectedUsers);
+          var selectedUserIds = userSchools.Select (u => u.Id);
+          List<User> selectedUsers = users.Where (u => selectedUserIds.Contains (u.Id)).ToList ();
+          filteredUsers.AddRange (selectedUsers);
         }
 
         //selected classlevels?
-        List<User> userClassLevels = new List<User>();
-        if(classLevelIds.Count() > 0)
-        {
-          if(user.ClassId != null)
-          {
-            if(classLevelIds.Contains(Convert.ToInt32(user.Class.ClassLevelId)))
-              userClassLevels.Add(user);
+        List<User> userClassLevels = new List<User> ();
+        if (classLevelIds.Count () > 0) {
+          if (user.ClassId != null) {
+            if (classLevelIds.Contains (Convert.ToInt32 (user.Class.ClassLevelId)))
+              userClassLevels.Add (user);
           }
-          if(user.ClassLevelId != null)
-          {
-            if(classLevelIds.Contains(Convert.ToInt32(user.ClassLevelId)))
-              userClassLevels.Add(user);
+          if (user.ClassLevelId != null) {
+            if (classLevelIds.Contains (Convert.ToInt32 (user.ClassLevelId)))
+              userClassLevels.Add (user);
           }
 
-          foreach(var aclass in userClassCourses)
-          {
-            if(classLevelIds.Contains(Convert.ToInt32(aclass.ClassLevelId)))
-              userEducLevels.Add(user);
+          foreach (var aclass in userClassCourses) {
+            if (classLevelIds.Contains (Convert.ToInt32 (aclass.ClassLevelId)))
+              userEducLevels.Add (user);
           }
 
-          var selectedUserIds = userClassLevels.Select(u => u.Id);
-          List<User> selectedUsers = users.Where(u => selectedUserIds.Contains(u.Id)).ToList();
-          filteredUsers.AddRange(selectedUsers);
+          var selectedUserIds = userClassLevels.Select (u => u.Id);
+          List<User> selectedUsers = users.Where (u => selectedUserIds.Contains (u.Id)).ToList ();
+          filteredUsers.AddRange (selectedUsers);
         }
 
         //selected classes?
-        List<User> userClasses = new List<User>();
-        if(classIds.Count() > 0)
-        {
-          if(user.ClassId != null)
-          {
-            if(classIds.Contains(Convert.ToInt32(user.ClassId)))
-              userClasses.Add(user);
+        List<User> userClasses = new List<User> ();
+        if (classIds.Count () > 0) {
+          if (user.ClassId != null) {
+            if (classIds.Contains (Convert.ToInt32 (user.ClassId)))
+              userClasses.Add (user);
           }
 
-          foreach(var aclass in userClassCourses)
-          {
-            if(classIds.Contains(Convert.ToInt32(aclass.Id)))
-              userClasses.Add(user);
+          foreach (var aclass in userClassCourses) {
+            if (classIds.Contains (Convert.ToInt32 (aclass.Id)))
+              userClasses.Add (user);
           }
 
-          var selectedUserIds = userClasses.Select(u => u.Id);
-          List<User> selectedUsers = users.Where(u => selectedUserIds.Contains(u.Id)).ToList();
-          filteredUsers.AddRange(selectedUsers);
+          var selectedUserIds = userClasses.Select (u => u.Id);
+          List<User> selectedUsers = users.Where (u => selectedUserIds.Contains (u.Id)).ToList ();
+          filteredUsers.AddRange (selectedUsers);
         }
       }
 
-      filteredUsers = filteredUsers.Distinct().ToList();
-      foreach(var user in filteredUsers)
-      {
-        if(msgChoice == 1) //email
+      filteredUsers = filteredUsers.Distinct ().ToList ();
+      foreach (var user in filteredUsers) {
+        if (msgChoice == 1) //email
         {
-          if(!string.IsNullOrEmpty(user.Email) && (user.EmailConfirmed || sendToNotValidated))
-          {
-            recipients.UsersOK.Add(user);
+          if (!string.IsNullOrEmpty (user.Email) && (user.EmailConfirmed || sendToNotValidated)) {
+            recipients.UsersOK.Add (user);
+          } else {
+            recipients.UsersNOK.Add (user);
           }
-          else
-          {
-            recipients.UsersNOK.Add(user);
-          }
-        }
-        else //sms
+        } else //sms
         {
-          if(!string.IsNullOrEmpty(user.PhoneNumber) && (user.PhoneNumberConfirmed || sendToNotValidated))
-          {
-            recipients.UsersOK.Add(user);
-          }
-          else
-          {
-            recipients.UsersNOK.Add(user);
+          if (!string.IsNullOrEmpty (user.PhoneNumber) && (user.PhoneNumberConfirmed || sendToNotValidated)) {
+            recipients.UsersOK.Add (user);
+          } else {
+            recipients.UsersNOK.Add (user);
           }
         }
       }
@@ -2118,127 +2013,104 @@ namespace EducNotes.API.Data {
       return recipients;
     }
 
-    public MsgRecipientsDto setRecipientsList(List<User> users, int msgChoice, Boolean sendToNotValidated)
-    {
-      MsgRecipientsDto recipients = new MsgRecipientsDto();
-      recipients.UsersOK = new List<User>();
-      recipients.UsersNOK = new List<User>();
-      foreach(var user in users)
-      {
-        if(msgChoice == 1) //email
+    public MsgRecipientsDto setRecipientsList (List<User> users, int msgChoice, Boolean sendToNotValidated) {
+      MsgRecipientsDto recipients = new MsgRecipientsDto ();
+      recipients.UsersOK = new List<User> ();
+      recipients.UsersNOK = new List<User> ();
+      foreach (var user in users) {
+        if (msgChoice == 1) //email
         {
-          if(!string.IsNullOrEmpty(user.Email) && (user.EmailConfirmed || sendToNotValidated))
-          {
-            recipients.UsersOK.Add(user);
+          if (!string.IsNullOrEmpty (user.Email) && (user.EmailConfirmed || sendToNotValidated)) {
+            recipients.UsersOK.Add (user);
+          } else {
+            recipients.UsersNOK.Add (user);
           }
-          else
-          {
-            recipients.UsersNOK.Add(user);
-          }
-        }
-        else //sms
+        } else //sms
         {
-          if(!string.IsNullOrEmpty(user.PhoneNumber) && (user.PhoneNumberConfirmed || sendToNotValidated))
-          {
-            recipients.UsersOK.Add(user);
-          }
-          else
-          {
-            recipients.UsersNOK.Add(user);
+          if (!string.IsNullOrEmpty (user.PhoneNumber) && (user.PhoneNumberConfirmed || sendToNotValidated)) {
+            recipients.UsersOK.Add (user);
+          } else {
+            recipients.UsersNOK.Add (user);
           }
         }
       }
 
       return recipients;
     }
-    public MsgRecipientsDto GetMsgRecipientsForClasses(List<User> users, int msgType, Boolean sendToNotValidated)
-    {
-      MsgRecipientsDto recipients = new MsgRecipientsDto();
+    public MsgRecipientsDto GetMsgRecipientsForClasses (List<User> users, int msgType, Boolean sendToNotValidated) {
+      MsgRecipientsDto recipients = new MsgRecipientsDto ();
 
-      foreach (var user in users)
-      {
-        if(msgType == 1) //email
+      foreach (var user in users) {
+        if (msgType == 1) //email
         {
-          if(user.EmailConfirmed || sendToNotValidated)
-          {
-            recipients.UsersOK.Add(user);
+          if (user.EmailConfirmed || sendToNotValidated) {
+            recipients.UsersOK.Add (user);
+          } else {
+            recipients.UsersNOK.Add (user);
           }
-          else
-          {
-            recipients.UsersNOK.Add(user);
-          }
-        }
-        else // sms
+        } else // sms
         {
-          if(user.PhoneNumberConfirmed || sendToNotValidated)
-          {
-            recipients.UsersOK.Add(user);
-          }
-          else
-          {
-            recipients.UsersNOK.Add(user);
+          if (user.PhoneNumberConfirmed || sendToNotValidated) {
+            recipients.UsersOK.Add (user);
+          } else {
+            recipients.UsersNOK.Add (user);
           }
         }
       }
       return recipients;
     }
 
-    public void Clickatell_SendSMS(clickatellParamsDto smsData)
-    {
-      Dictionary<string, string> Params = new Dictionary<string, string>();
-      Params.Add("content", smsData.Content);
-      Params.Add("to", smsData.To);
-      Params.Add("validityPeriod", "1");
+    public void Clickatell_SendSMS (clickatellParamsDto smsData) {
+      Dictionary<string, string> Params = new Dictionary<string, string> ();
+      Params.Add ("content", smsData.Content);
+      Params.Add ("to", smsData.To);
+      Params.Add ("validityPeriod", "1");
 
-      Params["to"] = CreateRecipientList(Params["to"]);
-      string JsonArray = JsonConvert.SerializeObject(Params, Formatting.None);
-      JsonArray = JsonArray.Replace("\\\"", "\"").Replace("\"[", "[").Replace("]\"", "]");
+      Params["to"] = CreateRecipientList (Params["to"]);
+      string JsonArray = JsonConvert.SerializeObject (Params, Formatting.None);
+      JsonArray = JsonArray.Replace ("\\\"", "\"").Replace ("\"[", "[").Replace ("]\"", "]");
 
-      string Token = _config.GetValue<string>("AppSettings:CLICKATELL_TOKEN");
+      string Token = _config.GetValue<string> ("AppSettings:CLICKATELL_TOKEN");
 
       ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-      var httpWebRequest = (HttpWebRequest) WebRequest.Create("https://platform.clickatell.com/messages");
+      var httpWebRequest = (HttpWebRequest) WebRequest.Create ("https://platform.clickatell.com/messages");
       httpWebRequest.ContentType = "application/json";
       httpWebRequest.Method = "POST";
       httpWebRequest.Accept = "application/json";
       httpWebRequest.PreAuthenticate = true;
       httpWebRequest.Headers.Add ("Authorization", Token);
 
-      using (var streamWriter = new StreamWriter (httpWebRequest.GetRequestStream ()))
-      {
-        streamWriter.Write(JsonArray);
-        streamWriter.Flush();
-        streamWriter.Close();
+      using (var streamWriter = new StreamWriter (httpWebRequest.GetRequestStream ())) {
+        streamWriter.Write (JsonArray);
+        streamWriter.Flush ();
+        streamWriter.Close ();
       }
 
-      var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-      using(var streamReader = new StreamReader (httpResponse.GetResponseStream()))
-      {
-        var result = streamReader.ReadToEnd();
+      var httpResponse = (HttpWebResponse) httpWebRequest.GetResponse ();
+      using (var streamReader = new StreamReader (httpResponse.GetResponseStream ())) {
+        var result = streamReader.ReadToEnd ();
       }
     }
 
-    public async Task<List<Sms>> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, int sessionId, int teacherId)
-    {
-      List<Sms> AbsencesSms = new List<Sms>();
-      var tokens = await GetTokens();
-      int absenceSmsId = _config.GetValue<int>("AppSettings:AbsenceSms");
-      int lateSmsId = _config.GetValue<int>("AppSettings:LateSms");
-      var AbsenceSms = await _context.SmsTemplates.FirstAsync(s => s.Id == absenceSmsId);
-      var LateSms = await _context.SmsTemplates.FirstAsync(s => s.Id == lateSmsId);
-      int absTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
-      int lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
-      int smsAbsTypeId = _config.GetValue<int>("AppSettings:SmsAbsTypeId");
+    public async Task<List<Sms>> SetSmsDataForAbsences (List<AbsenceSmsDto> absences, int sessionId, int teacherId) {
+      List<Sms> AbsencesSms = new List<Sms> ();
+      var tokens = await GetTokens ();
+      int absenceSmsId = _config.GetValue<int> ("AppSettings:AbsenceSms");
+      int lateSmsId = _config.GetValue<int> ("AppSettings:LateSms");
+      var AbsenceSms = await _context.SmsTemplates.FirstAsync (s => s.Id == absenceSmsId);
+      var LateSms = await _context.SmsTemplates.FirstAsync (s => s.Id == lateSmsId);
+      int absTypeId = _config.GetValue<int> ("AppSettings:AbsenceTypeId");
+      int lateTypeId = _config.GetValue<int> ("AppSettings:LateTypeId");
+      int smsAbsTypeId = _config.GetValue<int> ("AppSettings:SmsAbsTypeId");
 
-      foreach(var abs in absences)
-      {
+      foreach (var abs in absences) {
         //did you already sent the sms?
-        Sms oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.SessionId == sessionId && s.ToUserId == abs.ParentId &&
+        Sms oldSms = await _context.Sms.FirstOrDefaultAsync (s => s.SessionId == sessionId && s.ToUserId == abs.ParentId &&
           s.StudentId == abs.ChildId && s.StatusFlag == 1);
         if (oldSms != null)
           continue;
 
-        Sms newSms = new Sms();
+        Sms newSms = new Sms ();
         newSms.SmsTypeId = smsAbsTypeId;
         newSms.To = abs.ParentCellPhone;
         newSms.StudentId = abs.ChildId;
@@ -2246,32 +2118,27 @@ namespace EducNotes.API.Data {
         newSms.SessionId = sessionId;
         newSms.validityPeriod = 1;
         string smsContent;
-        if(abs.AbsenceTypeId == absTypeId)
-        {
+        if (abs.AbsenceTypeId == absTypeId) {
           smsContent = AbsenceSms.Content;
-        }
-        else
-        {
+        } else {
           smsContent = LateSms.Content;
         }
         // replace tokens with dynamic data
-        List<TokenDto> tags = GetTokenAbsenceValues(tokens.ToList(), abs);
-        newSms.Content = ReplaceTokens(tags, smsContent);
+        List<TokenDto> tags = GetTokenAbsenceValues (tokens.ToList (), abs);
+        newSms.Content = ReplaceTokens (tags, smsContent);
         newSms.InsertUserId = teacherId;
         newSms.InsertDate = DateTime.Now;
         newSms.UpdateDate = DateTime.Now;
-        AbsencesSms.Add(newSms);
+        AbsencesSms.Add (newSms);
       }
 
       return AbsencesSms;
     }
 
-    public List<TokenDto> GetTokenAbsenceValues(List<Token> tokens, AbsenceSmsDto absSms)
-    {
-      List<TokenDto> tokenValues = new List<TokenDto>();
+    public List<TokenDto> GetTokenAbsenceValues (List<Token> tokens, AbsenceSmsDto absSms) {
+      List<TokenDto> tokenValues = new List<TokenDto> ();
 
-      foreach(var token in tokens)
-      {
+      foreach (var token in tokens) {
         TokenDto td = new TokenDto ();
         td.TokenString = token.TokenString;
 
@@ -2313,17 +2180,16 @@ namespace EducNotes.API.Data {
       return tokenValues;
     }
 
-    public async Task<Email> SetDataForConfirmTeacherEmail(ConfirmTeacherEmailDto emailData, string content, string subject)
-    {
-      var tokens = await GetTokens();
-      var schoolName = _context.Settings.First(s => s.Name == "SchoolName").Value;
-      Email newEmail = new Email();
+    public async Task<Email> SetDataForConfirmTeacherEmail (ConfirmTeacherEmailDto emailData, string content, string subject) {
+      var tokens = await GetTokens ();
+      var schoolName = _context.Settings.First (s => s.Name == "SchoolName").Value;
+      Email newEmail = new Email ();
       newEmail.EmailTypeId = 1;
       newEmail.ToAddress = emailData.Email;
       newEmail.FromAddress = "no-reply@educnotes.com";
-      newEmail.Subject = subject.Replace("<NOM_ECOLE>", schoolName);
-      List<TokenDto> tags = await GetTeacherEmailTokenValues(tokens, emailData);
-      newEmail.Body = ReplaceTokens(tags, content);
+      newEmail.Subject = subject.Replace ("<NOM_ECOLE>", schoolName);
+      List<TokenDto> tags = GetTeacherEmailTokenValues (tokens, emailData);
+      newEmail.Body = ReplaceTokens (tags, content);
       newEmail.InsertUserId = 1;
       newEmail.InsertDate = DateTime.Now;
       newEmail.UpdateUserId = 1;
@@ -2347,8 +2213,8 @@ namespace EducNotes.API.Data {
         newEmail.ToAddress = data.ParentEmail;
         newEmail.FromAddress = "no-reply@educnotes.com";
         newEmail.Subject = data.EmailSubject;
-        List<TokenDto> tags = await GetRegistrationTokenValues(tokens, data, RegDeadLine);
-        newEmail.Body = ReplaceTokens(tags, content);
+        List<TokenDto> tags = await GetRegistrationTokenValues (tokens, data, RegDeadLine);
+        newEmail.Body = ReplaceTokens (tags, content);
         newEmail.InsertUserId = 1;
         newEmail.InsertDate = DateTime.Now;
         newEmail.UpdateUserId = 1;
@@ -2364,51 +2230,49 @@ namespace EducNotes.API.Data {
     {
       List<TokenDto> tokenValues = new List<TokenDto>();
 
-      foreach (var token in tokens)
+      foreach(var token in tokens)
       {
         TokenDto td = new TokenDto();
         td.TokenString = token.TokenString;
 
         switch(td.TokenString)
         {
-          case "<N_UTILISATEUR>":
+          case "#N_UTILISATEUR#":
             td.Value = user.LastName.FirstLetterToUpper();
             break;
-          case "<P_UTILISATEUR>":
+          case "#P_UTILISATEUR#":
             td.Value = user.FirstName.FirstLetterToUpper();
             break;
-          case "<M_MME>":
+          case "#M_MME#":
             td.Value = user.Gender == 0 ? "Mme" : "M.";
             break;
-          case "<CELL_UTILISATEUR>":
+          case "#CELL_UTILISATEUR#":
             td.Value = user.Mobile;
             break;
-          case "<EMAIL_UTILISATEUR>":
+          case "#EMAIL_UTILISATEUR#":
             td.Value = user.Email;
             break;
-          case "<TOKEN>":
+          case "#TOKEN#":
             td.Value = user.Token;
             break;
           default:
             break;
         }
 
-        tokenValues.Add (td);
+        tokenValues.Add(td);
       }
 
       return tokenValues;
     }
 
-    public async Task<List<TokenDto>> GetTeacherEmailTokenValues(List<Token> tokens, ConfirmTeacherEmailDto emailData)
-    {
-      List<TokenDto> tokenValues = new List<TokenDto>();
+    public List<TokenDto> GetTeacherEmailTokenValues (List<Token> tokens, ConfirmTeacherEmailDto emailData) {
+      List<TokenDto> tokenValues = new List<TokenDto> ();
 
-      foreach (var token in tokens)
-      {
-        TokenDto td = new TokenDto();
+      foreach (var token in tokens) {
+        TokenDto td = new TokenDto ();
         td.TokenString = token.TokenString;
-        var subDomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower() == "subdomain")).Value;
-        string teacherId = emailData.Id.ToString();
+        var subDomain = GetAppSubDomain();
+        string teacherId = emailData.Id.ToString ();
 
         switch (td.TokenString) {
           case "<N_ENSEIGNANT>":
@@ -2435,11 +2299,11 @@ namespace EducNotes.API.Data {
           case "<CONFIRM_LINK>":
             string url = "";
             if (subDomain != "")
-              url = string.Format(baseUrl, subDomain + ".");
+              url = string.Format (baseUrl, subDomain + ".");
             else
               url = string.Format (baseUrl, "");
-            td.Value = string.Format("{0}/confirmTeacherEmail?id={1}&token={2}", url,
-              teacherId, HttpUtility.UrlEncode(emailData.Token));
+            td.Value = string.Format ("{0}/confirmTeacherEmail?id={1}&token={2}", url,
+              teacherId, HttpUtility.UrlEncode (emailData.Token));
             break;
           default:
             break;
@@ -2453,12 +2317,11 @@ namespace EducNotes.API.Data {
 
     public async Task<List<TokenDto>> GetRegistrationTokenValues (IEnumerable<Token> tokens, RegistrationEmailDto regEmail, string RegDeadLine)
     {
-      // List<Setting> settings = await _cache.GetSettings();
-      // List<PaymentType> paymentTypes = await _cache.GetPaymentTypes();
+      List<PaymentType> paymentTypesCached = await _cache.GetPaymentTypes();
       List<TokenDto> tokenValues = new List<TokenDto>();
 
-      List<Setting> settings = await _context.Settings.ToListAsync();
-      var subDomain = (settings.First(s => s.Name.ToLower () == "subdomain")).Value;
+      // List<Setting> settings = await _context.Settings.ToListAsync ();
+      var subDomain = GetAppSubDomain();// (settings.First (s => s.Name.ToLower () == "subdomain")).Value;
 
       //set children registration data
       string childrenInfos = "";
@@ -2478,31 +2341,28 @@ namespace EducNotes.API.Data {
       }
 
       string payments = "<ul>";
-      var paymentTypes = await _context.PaymentTypes.OrderBy(o => o.DsplSeq).ToListAsync();
-      foreach(var type in paymentTypes)
-      {
-        payments += "<li>"+ type.Name + "</li>";
+      var paymentTypes = paymentTypesCached.OrderBy (o => o.DsplSeq).ToList();
+      foreach (var type in paymentTypes) {
+        payments += "<li>" + type.Name + "</li>";
       }
       payments += "</ul>";
 
-      foreach(var token in tokens)
-      {
-        TokenDto td = new TokenDto();
+      foreach (var token in tokens) {
+        TokenDto td = new TokenDto ();
         td.TokenString = token.TokenString;
 
-        string parentId = regEmail.ParentId.ToString();
-        string orderid = regEmail.OrderId.ToString();
+        string parentId = regEmail.ParentId.ToString ();
+        string orderid = regEmail.OrderId.ToString ();
 
-        switch (td.TokenString)
-        {
+        switch (td.TokenString) {
           case "<USER_ID>":
             td.Value = parentId;
             break;
           case "<N_PARENT>":
-            td.Value = regEmail.ParentLastName.FirstLetterToUpper();
+            td.Value = regEmail.ParentLastName.FirstLetterToUpper ();
             break;
           case "<P_PARENT>":
-            td.Value = regEmail.ParentFirstName.FirstLetterToUpper();
+            td.Value = regEmail.ParentFirstName.FirstLetterToUpper ();
             break;
           case "<M_MME>":
             td.Value = regEmail.ParentGender == 0 ? "Mme" : "M.";
@@ -2523,7 +2383,7 @@ namespace EducNotes.API.Data {
             td.Value = orderid;
             break;
           case "<ORDER_NUM>":
-            td.Value = regEmail.OrderNum.ToString();
+            td.Value = regEmail.OrderNum.ToString ();
             break;
           case "<TOKEN>":
             td.Value = regEmail.Token;
@@ -2534,7 +2394,7 @@ namespace EducNotes.API.Data {
           case "<CONFIRM_LINK>":
             string url = "";
             if (subDomain != "")
-              url = string.Format(baseUrl, subDomain + ".");
+              url = string.Format (baseUrl, subDomain + ".");
             else
               url = string.Format (baseUrl, "");
             td.Value = string.Format ("{0}/confirmEmail?id={1}&orderid={2}&token={3}", url,
@@ -2550,20 +2410,19 @@ namespace EducNotes.API.Data {
       return tokenValues;
     }
 
-    public async Task<Email> SetEmailForAccountUpdated(string subject, string content, string lastName,
-      byte gender, string parentEmail, int userId)
-    {
-      List<Setting> settings = await _context.Settings.ToListAsync();
-      var schoolName = (settings.First(s => s.Name.ToLower() == "schoolname")).Value;
-      var tokens = await GetTokens();
+    public async Task<Email> SetEmailForAccountUpdated (string subject, string content, string lastName,
+      byte gender, string parentEmail, int userId) {
+      List<Setting> settings = await _context.Settings.ToListAsync ();
+      var schoolName = (settings.First (s => s.Name.ToLower () == "schoolname")).Value;
+      var tokens = await GetTokens ();
 
-      Email newEmail = new Email();
+      Email newEmail = new Email ();
       newEmail.EmailTypeId = 1;
       newEmail.ToAddress = parentEmail;
       newEmail.FromAddress = "no-reply@educnotes.com";
-      newEmail.Subject = subject.Replace("<NOM_ECOLE>", schoolName);
-      List<TokenDto> tags = GetAccountUpdatedTokenValues(tokens, lastName, gender);
-      newEmail.Body = ReplaceTokens(tags, content);
+      newEmail.Subject = subject.Replace ("<NOM_ECOLE>", schoolName);
+      List<TokenDto> tags = GetAccountUpdatedTokenValues (tokens, lastName, gender);
+      newEmail.Body = ReplaceTokens (tags, content);
       newEmail.InsertUserId = 1;
       newEmail.InsertDate = DateTime.Now;
       newEmail.UpdateUserId = 1;
@@ -2573,18 +2432,17 @@ namespace EducNotes.API.Data {
       return newEmail;
     }
 
-    public async Task<Email> SetEmailForResetPwdLink(string subject, string content, int userId, string lastName,
-      string firstName, byte gender, string userEmail, string resetToken)
-    {
-      var tokens = await GetTokens();
+    public async Task<Email> SetEmailForResetPwdLink (string subject, string content, int userId, string lastName,
+      string firstName, byte gender, string userEmail, string resetToken) {
+      var tokens = await GetTokens ();
 
-      Email newEmail = new Email();
+      Email newEmail = new Email ();
       newEmail.EmailTypeId = 1;
       newEmail.ToAddress = userEmail;
       newEmail.FromAddress = "no-reply@educnotes.com";
       newEmail.Subject = subject;
-      List<TokenDto> tags = await GetResetPwdLinkTokenValues(tokens, userId, lastName, firstName, gender, resetToken);
-      newEmail.Body = ReplaceTokens(tags, content);
+      List<TokenDto> tags = GetResetPwdLinkTokenValues (tokens, userId, lastName, firstName, gender, resetToken);
+      newEmail.Body = ReplaceTokens (tags, content);
       newEmail.InsertUserId = 1;
       newEmail.InsertDate = DateTime.Now;
       newEmail.UpdateUserId = 1;
@@ -2594,8 +2452,7 @@ namespace EducNotes.API.Data {
       return newEmail;
     }
 
-    public List<TokenDto> GetAccountUpdatedTokenValues (IEnumerable<Token> tokens, string lastName, byte gender)
-    {
+    public List<TokenDto> GetAccountUpdatedTokenValues (IEnumerable<Token> tokens, string lastName, byte gender) {
       List<TokenDto> tokenValues = new List<TokenDto> ();
 
       foreach (var token in tokens) {
@@ -2618,10 +2475,11 @@ namespace EducNotes.API.Data {
       return tokenValues;
     }
 
-    public async Task<List<TokenDto>> GetResetPwdLinkTokenValues (IEnumerable<Token> tokens, int userId, string lastName,
-      string firstName, byte gender, string resetToken) {
-      var subDomain = (await _context.Settings.FirstAsync(s => s.Name.ToLower() == "subdomain")).Value;
-      List<TokenDto> tokenValues = new List<TokenDto> ();
+    public List<TokenDto> GetResetPwdLinkTokenValues (IEnumerable<Token> tokens, int userId, string lastName,
+      string firstName, byte gender, string resetToken)
+    {
+      var subDomain = GetAppSubDomain();
+      List<TokenDto> tokenValues = new List<TokenDto>();
 
       foreach (var token in tokens) {
         TokenDto td = new TokenDto ();
@@ -2657,18 +2515,16 @@ namespace EducNotes.API.Data {
       return tokenValues;
     }
 
-    public async Task<List<Sms>> SetSmsDataForNewGrade (List<EvalSmsDto> grades, string content, int teacherId)
+    public async Task<List<Sms>> SetSmsDataForNewGrade(List<EvalSmsDto> grades, string content, int teacherId)
     {
       List<Sms> GradesSms = new List<Sms>();
       var tokens = await GetTokens();
       int SmsGradeTypeId = _config.GetValue<int>("AppSettings:SmsGradeTypeId");
 
-      foreach(var grade in grades)
-      {
-        var oldSms = await _context.Sms.FirstOrDefaultAsync (s => s.StudentId == grade.ChildId &&
+      foreach (var grade in grades) {
+        var oldSms = await _context.Sms.FirstOrDefaultAsync(s => s.StudentId == grade.ChildId &&
           s.ToUserId == grade.ParentId && s.EvaluationId == grade.EvaluationId);
-        if(oldSms == null || grade.ForUpdate)
-        {
+        if (oldSms == null || grade.ForUpdate) {
           Sms newSms = new Sms();
           newSms.EvaluationId = grade.EvaluationId;
           newSms.SmsTypeId = SmsGradeTypeId;
@@ -2689,22 +2545,28 @@ namespace EducNotes.API.Data {
       return GradesSms;
     }
 
-    public List<TokenDto> GetTokenGradeValues (IEnumerable<Token> tokens, EvalSmsDto gradeSms, Boolean forUpdate) {
-      List<TokenDto> tokenValues = new List<TokenDto> ();
+    public List<TokenDto> GetTokenGradeValues(IEnumerable<Token> tokens, EvalSmsDto gradeSms, Boolean forUpdate)
+    {
+      List<TokenDto> tokenValues = new List<TokenDto>();
 
-      foreach (var token in tokens) {
+      foreach(var token in tokens)
+      {
         TokenDto td = new TokenDto ();
         td.TokenString = token.TokenString;
 
         string grade;
-        if (forUpdate) {
+        if(forUpdate)
+        {
           grade = gradeSms.OldEvalGrade.ToString () + "/" + gradeSms.GradedOutOf + " -> " +
             gradeSms.EvalGrade.ToString () + "/" + gradeSms.GradedOutOf;
-        } else {
+        }
+        else
+        {
           grade = gradeSms.EvalGrade.ToString () + "/" + gradeSms.GradedOutOf;
         }
 
-        switch (td.TokenString) {
+        switch (td.TokenString)
+        {
           case "<P_ENFANT>":
             td.Value = gradeSms.ChildFirstName;
             break;
@@ -2752,28 +2614,24 @@ namespace EducNotes.API.Data {
       return tokenValues;
     }
 
-    public string ReplaceTokens(List<TokenDto> tokens, string content)
-    {
-      foreach(var token in tokens)
-      {
-        content = content.Replace(token.TokenString, token.Value);
+    public string ReplaceTokens (List<TokenDto> tokens, string content) {
+      foreach (var token in tokens) {
+        content = content.Replace (token.TokenString, token.Value);
       }
       return content;
     }
 
-    public async Task<List<Token>> GetTokens()
-    {
-      var tokens = await _context.Tokens.OrderBy(t => t.Name).ToListAsync();
+    public async Task<List<Token>> GetTokens () {
+      var tokens = await _context.Tokens.OrderBy (t => t.Name).ToListAsync ();
       return tokens;
     }
 
-    public async Task<List<Token>> GetBroadcastTokens()
-    {
-      List<Token> tokensCached = await _cache.GetTokens();
+    public async Task<List<Token>> GetBroadcastTokens () {
+      List<Token> tokensCached = await _cache.GetTokens ();
 
       var tokens = tokensCached
-                          .Where(t => t.TokenTypeId == broadcastTokenTypeId)
-                          .OrderBy(t => t.Name).ToList();
+        .Where (t => t.TokenTypeId == broadcastTokenTypeId)
+        .OrderBy (t => t.Name).ToList ();
       return tokens;
     }
 
@@ -3105,51 +2963,46 @@ namespace EducNotes.API.Data {
     }
 
     public async Task<IEnumerable<Setting>> GetSettings () {
-      var settings = await _context.Settings.OrderBy(s => s.Name).ToListAsync();
+      var settings = await _context.Settings.OrderBy (s => s.Name).ToListAsync ();
       return settings;
     }
 
-    public async Task<List<EducationLevel>> GetEducationLevels()
-    {
-      var educlevels = await _context.EducationLevels.OrderBy(s => s.Name).ToListAsync();
+    public async Task<List<EducationLevel>> GetEducationLevels () {
+      var educlevels = await _context.EducationLevels.OrderBy (s => s.Name).ToListAsync ();
       return educlevels;
     }
 
-    public async Task<IEnumerable<EducationLevelDto>> GetEducationLevelsWithClasses()
-    {
+    public async Task<IEnumerable<EducationLevelDto>> GetEducationLevelsWithClasses () {
       // List<EducationLevel> educlevelsCached = await _cache.GetEducLevels();
       // List<ClassLevel> classlevelsCached = await _cache.GetClassLevels();
       // List<Class> classesCached = await _cache.GetClasses();
       // List<User> studentsCached = await _cache.GetStudents();
 
-      var educLevelsFromDB = await _context.EducationLevels.OrderBy(s => s.Name).ToListAsync();
+      var educLevelsFromDB = await _context.EducationLevels.OrderBy (s => s.Name).ToListAsync ();
 
-      List<EducationLevelDto> educLevels = new List<EducationLevelDto>();
-      foreach(var educLevel in educLevelsFromDB)
-      {
-        EducationLevelDto eld = new EducationLevelDto();
+      List<EducationLevelDto> educLevels = new List<EducationLevelDto> ();
+      foreach (var educLevel in educLevelsFromDB) {
+        EducationLevelDto eld = new EducationLevelDto ();
         eld.Id = educLevel.Id;
         eld.Name = educLevel.Name;
 
         var classLevels = await _context.ClassLevels
-                          .Where(cl => cl.EducationLevelId == educLevel.Id)
-                          .OrderBy(o => o.DsplSeq)
-                          .ToListAsync();
-        eld.Classes = new List<ClassDetailDto>();
-        foreach (var cl in classLevels)
-        {
-          var classes = await _context.Classes.Where(c => c.ClassLevelId == cl.Id).ToListAsync();
-          foreach (var aclass in classes)
-          {
-            ClassDetailDto cdd = new ClassDetailDto();
+          .Where (cl => cl.EducationLevelId == educLevel.Id)
+          .OrderBy (o => o.DsplSeq)
+          .ToListAsync ();
+        eld.Classes = new List<ClassDetailDto> ();
+        foreach (var cl in classLevels) {
+          var classes = await _context.Classes.Where (c => c.ClassLevelId == cl.Id).ToListAsync ();
+          foreach (var aclass in classes) {
+            ClassDetailDto cdd = new ClassDetailDto ();
             cdd.Id = aclass.Id;
             cdd.Name = aclass.Name;
             cdd.ClassLevelId = cl.Id;
-            cdd.CycleId = Convert.ToInt32(cl.CycleId);
-            cdd.EducationLevelId = Convert.ToInt32(cl.EducationLevelId);
-            cdd.SchoolId = Convert.ToInt32(cl.SchoolId);
-            cdd.TotalStudents = await _context.Users.Where(s => s.ClassId == aclass.Id).CountAsync();
-            eld.Classes.Add(cdd);
+            cdd.CycleId = Convert.ToInt32 (cl.CycleId);
+            cdd.EducationLevelId = Convert.ToInt32 (cl.EducationLevelId);
+            cdd.SchoolId = Convert.ToInt32 (cl.SchoolId);
+            cdd.TotalStudents = await _context.Users.Where (s => s.ClassId == aclass.Id).CountAsync ();
+            eld.Classes.Add (cdd);
           }
         }
         educLevels.Add (eld);
@@ -3157,415 +3010,367 @@ namespace EducNotes.API.Data {
       return educLevels;
     }
 
-    public async Task<IEnumerable<SchoolDto>> GetSchools()
-    {
-      List<School> schoolsCached = await _cache.GetSchools();
-      List<ClassLevel> classlevelsCached = await _cache.GetClassLevels();
-      List<Class> classesCached = await _cache.GetClasses();
+    public async Task<IEnumerable<SchoolDto>> GetSchools () {
+      List<School> schoolsCached = await _cache.GetSchools ();
+      List<ClassLevel> classlevelsCached = await _cache.GetClassLevels ();
+      List<Class> classesCached = await _cache.GetClasses ();
 
-      var schoolsFromDB = schoolsCached.OrderBy(s => s.DsplSeq).ToList();
+      var schoolsFromDB = schoolsCached.OrderBy (s => s.DsplSeq).ToList ();
 
-      List<SchoolDto> schools = new List<SchoolDto>();
-      foreach(var school in schoolsFromDB)
-      {
+      List<SchoolDto> schools = new List<SchoolDto> ();
+      foreach (var school in schoolsFromDB) {
         SchoolDto sd = new SchoolDto ();
         sd.Id = school.Id;
         sd.Name = school.Name;
 
         var classLevels = classlevelsCached
-                          .Where(cl => cl.SchoolId == school.Id)
-                          .OrderBy(o => o.DsplSeq)
-                          .ToList();
-        sd.Classes = new List<ClassDetailDto>();
-        foreach (var cl in classLevels)
-        {
-          var classes = classesCached.Where(c => c.ClassLevelId == cl.Id).ToList();
-          foreach (var aclass in classes)
-          {
-            ClassDetailDto cdd = new ClassDetailDto();
-            cdd.Id = aclass.Id;
-            cdd.Name = aclass.Name;
-            cdd.ClassLevelId = cl.Id;
-            cdd.CycleId = Convert.ToInt32(cl.CycleId);
-            cdd.EducationLevelId = Convert.ToInt32(cl.EducationLevelId);
-            cdd.SchoolId = Convert.ToInt32(cl.SchoolId);
-            sd.Classes.Add(cdd);
-          }
-        }
-        schools.Add(sd);
-      }
-      return schools;
-    }
-
-    public async Task<IEnumerable<CycleDto>> GetCycles()
-    {
-      // List<Cycle> cyclesCached = await _cache.GetCycles();
-      // List<ClassLevel> classlevelsCached = await _cache.GetClassLevels();
-      // List<Class> classesCached = await _cache.GetClasses();
-
-      var cyclesFromDB = await _context.Cycles.OrderBy(s => s.Name).ToListAsync();
-
-      List<CycleDto> cycles = new List<CycleDto>();
-      foreach(var cycle in cyclesFromDB)
-      {
-        CycleDto cd = new CycleDto();
-        cd.Id = cycle.Id;
-        cd.Name = cycle.Name;
-
-        var classLevels = await _context.ClassLevels.Where(cl => cl.EducationLevelId == cycle.Id).OrderBy(o => o.DsplSeq).ToListAsync();
-        cd.Classes = new List<ClassDetailDto>();
-        foreach(var cl in classLevels)
-        {
-          var classes = await _context.Classes.Where(c => c.ClassLevelId == cl.Id).ToListAsync();
-          foreach (var aclass in classes)
-          {
+          .Where (cl => cl.SchoolId == school.Id)
+          .OrderBy (o => o.DsplSeq)
+          .ToList ();
+        sd.Classes = new List<ClassDetailDto> ();
+        foreach (var cl in classLevels) {
+          var classes = classesCached.Where (c => c.ClassLevelId == cl.Id).ToList ();
+          foreach (var aclass in classes) {
             ClassDetailDto cdd = new ClassDetailDto ();
             cdd.Id = aclass.Id;
             cdd.Name = aclass.Name;
             cdd.ClassLevelId = cl.Id;
-            cdd.CycleId = Convert.ToInt32(cl.CycleId);
-            cdd.EducationLevelId = Convert.ToInt32(cl.EducationLevelId);
-            cdd.SchoolId = Convert.ToInt32(cl.SchoolId);
-            cd.Classes.Add(cdd);
+            cdd.CycleId = Convert.ToInt32 (cl.CycleId);
+            cdd.EducationLevelId = Convert.ToInt32 (cl.EducationLevelId);
+            cdd.SchoolId = Convert.ToInt32 (cl.SchoolId);
+            sd.Classes.Add (cdd);
           }
         }
-        cycles.Add(cd);
+        schools.Add (sd);
+      }
+      return schools;
+    }
+
+    public async Task<IEnumerable<CycleDto>> GetCycles () {
+      // List<Cycle> cyclesCached = await _cache.GetCycles();
+      // List<ClassLevel> classlevelsCached = await _cache.GetClassLevels();
+      // List<Class> classesCached = await _cache.GetClasses();
+
+      var cyclesFromDB = await _context.Cycles.OrderBy (s => s.Name).ToListAsync ();
+
+      List<CycleDto> cycles = new List<CycleDto> ();
+      foreach (var cycle in cyclesFromDB) {
+        CycleDto cd = new CycleDto ();
+        cd.Id = cycle.Id;
+        cd.Name = cycle.Name;
+
+        var classLevels = await _context.ClassLevels.Where (cl => cl.EducationLevelId == cycle.Id).OrderBy (o => o.DsplSeq).ToListAsync ();
+        cd.Classes = new List<ClassDetailDto> ();
+        foreach (var cl in classLevels) {
+          var classes = await _context.Classes.Where (c => c.ClassLevelId == cl.Id).ToListAsync ();
+          foreach (var aclass in classes) {
+            ClassDetailDto cdd = new ClassDetailDto ();
+            cdd.Id = aclass.Id;
+            cdd.Name = aclass.Name;
+            cdd.ClassLevelId = cl.Id;
+            cdd.CycleId = Convert.ToInt32 (cl.CycleId);
+            cdd.EducationLevelId = Convert.ToInt32 (cl.EducationLevelId);
+            cdd.SchoolId = Convert.ToInt32 (cl.SchoolId);
+            cd.Classes.Add (cdd);
+          }
+        }
+        cycles.Add (cd);
       }
       return cycles;
     }
 
-    public async Task<Order> GetOrder(int id)
-    {
-      List<Order> orders = await _cache.GetOrders();
-      List<OrderLine> lines = await _cache.GetOrderLines();
-      
-      var order = orders.FirstOrDefault(o => o.Id == id);
-      order.Lines = lines.Where(o => o.OrderId == order.Id).ToList();
+    public async Task<Order> GetOrder (int id) {
+      List<Order> orders = await _cache.GetOrders ();
+      List<OrderLine> lines = await _cache.GetOrderLines ();
+
+      var order = orders.FirstOrDefault (o => o.Id == id);
+      order.Lines = lines.Where (o => o.OrderId == order.Id).ToList ();
 
       return order;
     }
 
-    public async Task<List<FinOpOrderLine>> GetChildPayments (int childId)
-    {
+    public async Task<List<FinOpOrderLine>> GetChildPayments (int childId) {
       // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
       var payments = await _context.FinOpOrderLines
-                          .Include(i => i.OrderLine)
-                          .Include(i => i.FinOp)
-                          .Where(f => f.OrderLine.ChildId == childId)
-                          .OrderBy(o => o.FinOp.FinOpDate)
-                          .ToListAsync();
+        .Include (i => i.OrderLine)
+        .Include (i => i.FinOp)
+        .Where (f => f.OrderLine.ChildId == childId)
+        .OrderBy (o => o.FinOp.FinOpDate)
+        .ToListAsync ();
       return payments;
     }
 
-    public async Task<List<FinOpDto>> GetOrderPayments(int orderId)
-    {
+    public async Task<List<FinOpDto>> GetOrderPayments (int orderId) {
       // List<FinOp> finOps = await _cache.GetFinOps();
-      var paymentsFromDB = await _context.FinOps.Where(f => f.OrderId == orderId).ToListAsync();
-      var payments = _mapper.Map<List<FinOpDto>>(paymentsFromDB);
+      var paymentsFromDB = await _context.FinOps.Where (f => f.OrderId == orderId).ToListAsync ();
+      var payments = _mapper.Map<List<FinOpDto>> (paymentsFromDB);
       return payments;
     }
 
-    public async Task<List<OrderLine>> GetOrderLines(int orderId)
-    {
-      List<OrderLine> linesCached = await _cache.GetOrderLines();
-      var lines = linesCached.Where(ol => ol.OrderId == orderId).ToList();
+    public async Task<List<OrderLine>> GetOrderLines (int orderId) {
+      List<OrderLine> linesCached = await _cache.GetOrderLines ();
+      var lines = linesCached.Where (ol => ol.OrderId == orderId).ToList ();
       return lines;
     }
 
-    public string GetInvoiceNumber (int invoiceId)
-    {
+    public string GetInvoiceNumber (int invoiceId) {
       var today = DateTime.Now;
-      string year = today.Year.ToString().Substring(2);
+      string year = today.Year.ToString ().Substring (2);
       var todaymonth = today.Month;
-      string month = todaymonth.ToString().Length == 1 ? "0" + todaymonth : todaymonth.ToString();
+      string month = todaymonth.ToString ().Length == 1 ? "0" + todaymonth : todaymonth.ToString ();
       var todayday = today.Day;
-      string day = todayday.ToString().Length == 1 ? "0" + todayday : todayday.ToString();
+      string day = todayday.ToString ().Length == 1 ? "0" + todayday : todayday.ToString ();
 
-      var num = year + month + day + "-" + invoiceId.ToString();
+      var num = year + month + day + "-" + invoiceId.ToString ();
       return num;
     }
 
-    public async Task<IEnumerable<PaymentType>> GetPaymentTypes()
-    {
-      var types = await _context.PaymentTypes.ToListAsync();
+    public async Task<IEnumerable<PaymentType>> GetPaymentTypes () {
+      var types = await _context.PaymentTypes.ToListAsync ();
       return types;
     }
 
-    public async Task<IEnumerable<ClassLevel>> GetClasslevels()
-    {
+    public async Task<IEnumerable<ClassLevel>> GetClasslevels () {
       // var levels = await _cache.GetClassLevels();
-      return await _context.ClassLevels.ToListAsync();
+      return await _context.ClassLevels.ToListAsync ();
     }
 
-    public async Task<IEnumerable<Bank>> GetBanks()
-    {
-      var banks = await _context.Banks.ToListAsync();
+    public async Task<IEnumerable<Bank>> GetBanks () {
+      var banks = await _context.Banks.ToListAsync ();
       return banks;
     }
 
-    public async Task<NextDueAmountDto> GetChildDueAmount(int lineId, decimal paidAmount)
-    {
+    public async Task<NextDueAmountDto> GetChildDueAmount (int lineId, decimal paidAmount) {
       var today = DateTime.Now.Date;
       // var lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
       var lineDeadlines = await _context.OrderLineDeadlines
-                                .Where(o => o.OrderLineId == lineId)
-                                .OrderBy(o => o.DueDate)
-                                .ToListAsync();
-      decimal amountOK = lineDeadlines.Where(o => o.Paid == true).Sum(s => s.Amount + s.ProductFee);
-      var deadline = new DateTime();
-      var firstUnPaid = lineDeadlines.Where(o => o.Paid == false).FirstOrDefault();
-      if(firstUnPaid != null)
-      {
+        .Where (o => o.OrderLineId == lineId)
+        .OrderBy (o => o.DueDate)
+        .ToListAsync ();
+      decimal amountOK = lineDeadlines.Where (o => o.Paid == true).Sum (s => s.Amount + s.ProductFee);
+      var deadline = new DateTime ();
+      var firstUnPaid = lineDeadlines.Where (o => o.Paid == false).FirstOrDefault ();
+      if (firstUnPaid != null) {
         amountOK += firstUnPaid.Amount + firstUnPaid.ProductFee;
-        deadline = lineDeadlines.Where(o => o.Paid == false).First().DueDate;
+        deadline = lineDeadlines.Where (o => o.Paid == false).First ().DueDate;
       }
 
-      NextDueAmountDto nextDueAmount = new NextDueAmountDto();
+      NextDueAmountDto nextDueAmount = new NextDueAmountDto ();
       nextDueAmount.DueAmount = amountOK - paidAmount;
       nextDueAmount.Deadline = deadline;
 
       return nextDueAmount;
     }
 
-    public async Task<List<ClassLevel>> GetActiveClassLevels()
-    {
-      List<Class> classes = await _context.Classes.Include(i => i.ClassLevel).ToListAsync();
-      var classLevels = classes.OrderBy(o => o.ClassLevel.DsplSeq)
-                               .Select(s => s.ClassLevel).Distinct().ToList();
+    public async Task<List<ClassLevel>> GetActiveClassLevels () {
+      List<Class> classes = await _context.Classes.Include (i => i.ClassLevel).ToListAsync ();
+      var classLevels = classes.OrderBy (o => o.ClassLevel.DsplSeq)
+        .Select (s => s.ClassLevel).Distinct ().ToList ();
       return classLevels;
     }
 
-    public async Task<List<OrderLinePaidDto>> GetOrderLinesPaid()
-    {
+    public async Task<List<OrderLinePaidDto>> GetOrderLinesPaid () {
       // List<OrderLine> lines = await _cache.GetOrderLines();
       // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
 
-      var lines = await _context.OrderLines.ToListAsync();
-      List<OrderLinePaidDto> linesPaid = new List<OrderLinePaidDto>();
-      foreach(var line in lines)
-      {
-        OrderLinePaidDto olpd = new OrderLinePaidDto();
+      var lines = await _context.OrderLines.ToListAsync ();
+      List<OrderLinePaidDto> linesPaid = new List<OrderLinePaidDto> ();
+      foreach (var line in lines) {
+        OrderLinePaidDto olpd = new OrderLinePaidDto ();
         olpd.OrderLineId = line.Id;
-        olpd.Amount = await _context.FinOpOrderLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
-                                .SumAsync(s => s.Amount);
-        linesPaid.Add(olpd);
+        olpd.Amount = await _context.FinOpOrderLines.Where (f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+          .SumAsync (s => s.Amount);
+        linesPaid.Add (olpd);
       }
       return linesPaid;
     }
 
-    public string CalculateCourseTop (DateTime startHourMin, string startCourseHourMin)
-    {
-      var scheduleHourSize = Convert.ToDouble(Startup.StaticConfig.GetSection ("AppSettings:DimHourSchedule").Value);
+    public string CalculateCourseTop (DateTime startHourMin, string startCourseHourMin) {
+      var scheduleHourSize = Convert.ToDouble (Startup.StaticConfig.GetSection ("AppSettings:DimHourSchedule").Value);
 
-      var startData = startCourseHourMin.Split(":");
-      int startCourseHour = Convert.ToInt32(startData[0]);
-      int startCourseMin = Convert.ToInt32(startData[1]);
-      DateTime startCourseHM = new DateTime(1, 01, 01, Convert.ToInt32 (startCourseHour), Convert.ToInt32 (startCourseMin), 0);
+      var startData = startCourseHourMin.Split (":");
+      int startCourseHour = Convert.ToInt32 (startData[0]);
+      int startCourseMin = Convert.ToInt32 (startData[1]);
+      DateTime startCourseHM = new DateTime (1, 01, 01, Convert.ToInt32 (startCourseHour), Convert.ToInt32 (startCourseMin), 0);
 
-      TimeSpan span = startHourMin.Subtract(startCourseHM);
+      TimeSpan span = startHourMin.Subtract (startCourseHM);
       double totalMins = span.TotalMinutes;
       // var netHours = Math.Abs(startHourMin.Hour - startCourseHour);
       // var netMins = Math.Abs(startCourseMin - startHourMin.Minute);
       var top = scheduleHourSize * (totalMins / 60); // + 1 * netHours;
       top = Math.Round (top, 2);
-      return (top + "px").Replace(",", ".");
+      return (top + "px").Replace (",", ".");
     }
 
-    public async Task<LateAmountsDto> GetLateAmountsDue()
-    {
-      List<OrderLine> lines = await _context.OrderLines.ToListAsync();
-      // List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines();
-      // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+    public async Task<LateAmountsDto> GetLateAmountsDue () {
+      List<OrderLine> lines = await _context.OrderLines.ToListAsync ();
+      List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines ();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines ();
       var today = DateTime.Now.Date;
 
-      LateAmountsDto lateAmounts = new LateAmountsDto();
+      LateAmountsDto lateAmounts = new LateAmountsDto ();
       // get amount due today
-      foreach(var line in lines)
-      {
-        var lineDeadlines = await _context.OrderLineDeadlines.Where(o => o.OrderLineId == line.Id)
-                                               .OrderBy(o => o.DueDate)
-                                               .ToListAsync();
-        var amountPaid = await _context.FinOpOrderLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
-                                   .SumAsync(s => s.Amount);
-        
+      foreach (var line in lines) {
+        var lineDeadlines = lineDeadLinesCached.Where (o => o.OrderLineId == line.Id)
+          .OrderBy (o => o.DueDate)
+          .ToList ();
+        var amountPaid = finOpLines.Where (f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+          .Sum (s => s.Amount);
+
         decimal lineDueAmount = 0;
         decimal balance = amountPaid;
-        if(lineDeadlines.Count() > 0)
-        {
-          foreach(var lineD in lineDeadlines)
-          {
-            if(lineD.DueDate.Date < today && !lineD.Paid)
-            {
+        if (lineDeadlines.Count () > 0) {
+          foreach (var lineD in lineDeadlines) {
+            if (lineD.DueDate.Date < today && !lineD.Paid) {
               lineDueAmount = lineD.Amount + lineD.ProductFee;
 
-              if(lineDueAmount >= balance)
-              {
+              if (lineDueAmount >= balance) {
                 decimal lateAmount = lineDueAmount - balance;
                 lateAmounts.TotalLateAmount += lateAmount;
                 balance = 0;
-              
+
                 // split late amount in amounts of days late
-                var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
-                if(nbDaysLate <= 7)
+                var nbDaysLate = Math.Abs ((today - lineD.DueDate.Date).TotalDays);
+                if (nbDaysLate <= 7)
                   lateAmounts.LateAmount7Days += lateAmount;
-                else if(nbDaysLate > 7 && nbDaysLate <= 15)
+                else if (nbDaysLate > 7 && nbDaysLate <= 15)
                   lateAmounts.LateAmount15Days += lateAmount;
-                else if(nbDaysLate > 15 && nbDaysLate <= 30)
+                else if (nbDaysLate > 15 && nbDaysLate <= 30)
                   lateAmounts.LateAmount30Days += lateAmount;
-                else if(nbDaysLate > 30 && nbDaysLate <= 60)
+                else if (nbDaysLate > 30 && nbDaysLate <= 60)
                   lateAmounts.LateAmount60Days += lateAmount;
-                else if(nbDaysLate > 60)
+                else if (nbDaysLate > 60)
                   lateAmounts.LateAmount60DaysPlus += lateAmount;
-              }
-              else
-              {
+              } else {
                 balance = balance - lineDueAmount;
               }
             }
           }
-        }
-        else // orderline has only one deadline (no split payments)
+        } else // orderline has only one deadline (no split payments)
         {
-          if(line.Deadline.Date < today)
-          {
-            if(line.AmountTTC >= balance)
-            {
+          if (line.Deadline.Date < today) {
+            if (line.AmountTTC >= balance) {
               decimal lateAmount = line.AmountTTC - balance;
               lateAmounts.TotalLateAmount += lateAmount;
               balance = 0;
 
               // split late amount in amounts of days late
-              var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
-              if(nbDaysLate <= 7)
+              var nbDaysLate = Math.Abs ((today - line.Deadline.Date).TotalDays);
+              if (nbDaysLate <= 7)
                 lateAmounts.LateAmount7Days += lateAmount;
-              else if(nbDaysLate > 7 && nbDaysLate <= 15)
+              else if (nbDaysLate > 7 && nbDaysLate <= 15)
                 lateAmounts.LateAmount15Days += lateAmount;
-              else if(nbDaysLate > 15 && nbDaysLate <= 30)
+              else if (nbDaysLate > 15 && nbDaysLate <= 30)
                 lateAmounts.LateAmount30Days += lateAmount;
-              else if(nbDaysLate > 30 && nbDaysLate <= 60)
+              else if (nbDaysLate > 30 && nbDaysLate <= 60)
                 lateAmounts.LateAmount60Days += lateAmount;
-              else if(nbDaysLate > 60)
+              else if (nbDaysLate > 60)
                 lateAmounts.LateAmount60DaysPlus += lateAmount;
-            }
-            else
-            {
+            } else {
               balance = balance - line.AmountTTC;
             }
           }
         }
       }
-    
+
       return lateAmounts;
     }
 
-    public async Task<LateAmountsDto> GetProductLateAmountsDue(int productId, int levelId)
-    {
+    public async Task<LateAmountsDto> GetProductLateAmountsDue (int productId, int levelId) {
       // List<OrderLine> linesCached = await _cache.GetOrderLines();
       // List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines();
       // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
       var today = DateTime.Now.Date;
 
-      LateAmountsDto lateAmounts = new LateAmountsDto();
+      LateAmountsDto lateAmounts = new LateAmountsDto ();
       // get amount due today
-      var lines = await _context.OrderLines.Where(o => o.ClassLevelId == levelId && o.ProductId == productId)
-                             .ToListAsync();
-      foreach(var line in lines)
-      {
-        var lineDeadlines = await _context.OrderLineDeadlines.Where(o => o.OrderLineId == line.Id)
-                                               .OrderBy(o => o.DueDate)
-                                               .ToListAsync();
-        var amountPaid = await _context.FinOpOrderLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
-                                   .SumAsync(s => s.Amount);
-        
+      var lines = await _context.OrderLines.Where (o => o.ClassLevelId == levelId && o.ProductId == productId)
+        .ToListAsync ();
+      foreach (var line in lines) {
+        var lineDeadlines = await _context.OrderLineDeadlines.Where (o => o.OrderLineId == line.Id)
+          .OrderBy (o => o.DueDate)
+          .ToListAsync ();
+        var amountPaid = await _context.FinOpOrderLines.Where (f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+          .SumAsync (s => s.Amount);
+
         decimal lineDueAmount = 0;
         decimal balance = amountPaid;
-        if(lineDeadlines.Count() > 0)
-        {
-          foreach(var lineD in lineDeadlines)
-          {
-            if(lineD.DueDate.Date < today && !lineD.Paid)
-            {
+        if (lineDeadlines.Count () > 0) {
+          foreach (var lineD in lineDeadlines) {
+            if (lineD.DueDate.Date < today && !lineD.Paid) {
               lineDueAmount = lineD.Amount + lineD.ProductFee;
 
-              if(lineDueAmount >= balance)
-              {
+              if (lineDueAmount >= balance) {
                 decimal lateAmount = lineDueAmount - balance;
                 lateAmounts.TotalLateAmount += lateAmount;
                 balance = 0;
-              
+
                 // split late amount in amounts of days late
-                var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
-                if(nbDaysLate <= 7)
+                var nbDaysLate = Math.Abs ((today - lineD.DueDate.Date).TotalDays);
+                if (nbDaysLate <= 7)
                   lateAmounts.LateAmount7Days += lateAmount;
-                else if(nbDaysLate > 7 && nbDaysLate <= 15)
+                else if (nbDaysLate > 7 && nbDaysLate <= 15)
                   lateAmounts.LateAmount15Days += lateAmount;
-                else if(nbDaysLate > 15 && nbDaysLate <= 30)
+                else if (nbDaysLate > 15 && nbDaysLate <= 30)
                   lateAmounts.LateAmount30Days += lateAmount;
-                else if(nbDaysLate > 30 && nbDaysLate <= 60)
+                else if (nbDaysLate > 30 && nbDaysLate <= 60)
                   lateAmounts.LateAmount60Days += lateAmount;
-                else if(nbDaysLate > 60)
+                else if (nbDaysLate > 60)
                   lateAmounts.LateAmount60DaysPlus += lateAmount;
-              }
-              else
-              {
+              } else {
                 balance = balance - lineDueAmount;
               }
             }
           }
-        }
-        else // orderline has only one deadline (no split payments)
+        } else // orderline has only one deadline (no split payments)
         {
-          if(line.Deadline.Date < today)
-          {
-            if(line.AmountTTC >= balance)
-            {
+          if (line.Deadline.Date < today) {
+            if (line.AmountTTC >= balance) {
               decimal lateAmount = line.AmountTTC - balance;
               lateAmounts.TotalLateAmount += lateAmount;
               balance = 0;
 
               // split late amount in amounts of days late
-              var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
-              if(nbDaysLate <= 7)
+              var nbDaysLate = Math.Abs ((today - line.Deadline.Date).TotalDays);
+              if (nbDaysLate <= 7)
                 lateAmounts.LateAmount7Days += lateAmount;
-              else if(nbDaysLate > 7 && nbDaysLate <= 15)
+              else if (nbDaysLate > 7 && nbDaysLate <= 15)
                 lateAmounts.LateAmount15Days += lateAmount;
-              else if(nbDaysLate > 15 && nbDaysLate <= 30)
+              else if (nbDaysLate > 15 && nbDaysLate <= 30)
                 lateAmounts.LateAmount30Days += lateAmount;
-              else if(nbDaysLate > 30 && nbDaysLate <= 60)
+              else if (nbDaysLate > 30 && nbDaysLate <= 60)
                 lateAmounts.LateAmount60Days += lateAmount;
-              else if(nbDaysLate > 60)
+              else if (nbDaysLate > 60)
                 lateAmounts.LateAmount60DaysPlus += lateAmount;
-            }
-            else
-            {
+            } else {
               balance = balance - line.AmountTTC;
             }
           }
         }
       }
-    
+
       return lateAmounts;
     }
 
     public async Task<LateAmountsDto> GetChildLateAmountsDue(int productId, int childId)
     {
-      // List<OrderLine> linesCached = await _cache.GetOrderLines();
-      // List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines();
-      // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+      List<OrderLine> linesCached = await _cache.GetOrderLines();
+      List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
       var today = DateTime.Now.Date;
 
       LateAmountsDto lateAmounts = new LateAmountsDto();
       // get amount due today
-      var lines = await _context.OrderLines.Where(o => o.ChildId == childId && o.ProductId == productId)
-                             .ToListAsync();
+      var lines = linesCached.Where(o => o.ChildId == childId && o.ProductId == productId)
+                             .ToList();
       foreach(var line in lines)
       {
-        var lineDeadlines = await _context.OrderLineDeadlines.Where(o => o.OrderLineId == line.Id)
+        var lineDeadlines = lineDeadLinesCached.Where(o => o.OrderLineId == line.Id)
                                                .OrderBy(o => o.DueDate)
-                                               .ToListAsync();
-        var amountPaid = await _context.FinOpOrderLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
-                                   .SumAsync(s => s.Amount);
-        
+                                               .ToList();
+        var amountPaid = finOpLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+                                   .Sum(s => s.Amount);
+
         decimal lineDueAmount = 0;
         decimal balance = amountPaid;
         if(lineDeadlines.Count() > 0)
@@ -3581,18 +3386,18 @@ namespace EducNotes.API.Data {
                 decimal lateAmount = lineDueAmount - balance;
                 lateAmounts.TotalLateAmount += lateAmount;
                 balance = 0;
-              
+
                 // split late amount in amounts of days late
-                var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
-                if(nbDaysLate <= 7)
+                var nbDaysLate = Math.Abs ((today - lineD.DueDate.Date).TotalDays);
+                if (nbDaysLate <= 7)
                   lateAmounts.LateAmount7Days += lateAmount;
-                else if(nbDaysLate > 7 && nbDaysLate <= 15)
+                else if (nbDaysLate > 7 && nbDaysLate <= 15)
                   lateAmounts.LateAmount15Days += lateAmount;
-                else if(nbDaysLate > 15 && nbDaysLate <= 30)
+                else if (nbDaysLate > 15 && nbDaysLate <= 30)
                   lateAmounts.LateAmount30Days += lateAmount;
-                else if(nbDaysLate > 30 && nbDaysLate <= 60)
+                else if (nbDaysLate > 30 && nbDaysLate <= 60)
                   lateAmounts.LateAmount60Days += lateAmount;
-                else if(nbDaysLate > 60)
+                else if (nbDaysLate > 60)
                   lateAmounts.LateAmount60DaysPlus += lateAmount;
               }
               else
@@ -3613,16 +3418,16 @@ namespace EducNotes.API.Data {
               balance = 0;
 
               // split late amount in amounts of days late
-              var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
-              if(nbDaysLate <= 7)
+              var nbDaysLate = Math.Abs ((today - line.Deadline.Date).TotalDays);
+              if (nbDaysLate <= 7)
                 lateAmounts.LateAmount7Days += lateAmount;
-              else if(nbDaysLate > 7 && nbDaysLate <= 15)
+              else if (nbDaysLate > 7 && nbDaysLate <= 15)
                 lateAmounts.LateAmount15Days += lateAmount;
-              else if(nbDaysLate > 15 && nbDaysLate <= 30)
+              else if (nbDaysLate > 15 && nbDaysLate <= 30)
                 lateAmounts.LateAmount30Days += lateAmount;
-              else if(nbDaysLate > 30 && nbDaysLate <= 60)
+              else if (nbDaysLate > 30 && nbDaysLate <= 60)
                 lateAmounts.LateAmount60Days += lateAmount;
-              else if(nbDaysLate > 60)
+              else if (nbDaysLate > 60)
                 lateAmounts.LateAmount60DaysPlus += lateAmount;
             }
             else
@@ -3632,8 +3437,25 @@ namespace EducNotes.API.Data {
           }
         }
       }
-    
+
       return lateAmounts;
+    }
+
+    public string GetAppSubDomain()
+    {
+      string subdomain = "";
+      //To get subdomain
+      string[] fullAddress = _httpContext.HttpContext?.Request?.Headers?["Host"].ToString()?.Split('.');
+      if(fullAddress != null)
+      {
+        subdomain = fullAddress[0].ToLower();
+        if(subdomain == "localhost:5000" || subdomain == "www" || subdomain == "educnotes")
+        {
+          subdomain = "";
+        }
+      }
+
+      return subdomain;
     }
   }
 }

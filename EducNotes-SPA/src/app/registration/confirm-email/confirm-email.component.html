@@ -77,7 +77,10 @@
               </div>
               <div class="col-md-6 mt-3">
                 <button type="button" [disabled]="wait || phoneForm.get('phone').errors" mdbBtn size="sm" (click)="sendPhoneNumber()"
-                  class="btnBlue" mdbWavesEffect>confirmer mon numero</button>
+                  class="btnBlue" mdbWavesEffect>
+                  <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  confirmer mon numero
+                </button>
               </div>
             </div>
             <div *ngIf="phoneValidationSteps == 1" class="row">
@@ -96,7 +99,10 @@
               </div>
               <div class="col-md-6 mt-3">
                 <button type="submit" [disabled]="wait || phoneForm.get('code').hasError('empty')" mdbBtn size="sm"
-                  class="btnBlue" mdbWavesEffect>valider mon numero</button>
+                  class="btnBlue" mdbWavesEffect>
+                  <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  valider mon numero
+                </button>
               </div>
             </div>
           </form>
@@ -176,7 +182,10 @@
                 <div class="float-right">
                   <!-- <button type="button" (click)="initialValues()" mdbBtn class="btnBlue" size="sm" mdbWavesEffect>données initiales</button> -->
                   <button type="submit" mdbBtn [disabled]="wait || !userForm.valid || userNameExist" class="btnBlue"
-                    size="sm" mdbWavesEffect>enregistrer</button>
+                    size="sm" mdbWavesEffect>
+                    <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    enregistrer
+                  </button>
                 </div>
               </div>
             </div>

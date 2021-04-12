@@ -21,7 +21,8 @@ export class TreasuryComponent implements OnInit {
   toBeValidated: string;
   amountByDeadline: any;
   lateAmountsDue: any;
-
+  wait = false;
+  dataReady = 0;
 
   constructor(private authService: AuthService, private orderService: OrderService,
     private alertify: AlertifyService) { }
@@ -40,19 +41,28 @@ export class TreasuryComponent implements OnInit {
   }
 
   getBalanceData() {
+    this.wait = true;
     this.orderService.getBalanceData().subscribe((data: any) => {
+      this.dataReady++;
+      if (this.dataReady === 2) {
+        this.wait = false;
+      }
       this.invoiced = data.invoiced;
       this.cashed = data.cashed;
       this.tuitionBalance = data.openBalance;
       this.toBeValidated = data.toBeValidated;
-      this.lateAmountsDue = data.lateAmounts;
     }, error => {
       this.alertify.error(error);
     });
   }
 
   getAmountByDeadline() {
+    this.wait = true;
     this.orderService.getOrderAmountByDeadline().subscribe(data => {
+      this.dataReady++;
+      if (this.dataReady === 2) {
+        this.wait = false;
+      }
       this.amountByDeadline = data;
     }, error => {
       this.alertify.error(error);

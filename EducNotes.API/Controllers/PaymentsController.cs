@@ -284,18 +284,18 @@ namespace EducNotes.API.Controllers
     [HttpGet("PaymentsToValidate")]
     public async Task<IActionResult> GetPaymentsToBeValidated()
     {
-      // List<FinOp> finOps = await _cache.GetFinOps();
-      // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+      List<FinOp> finOps = await _cache.GetFinOps();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
 
-      var paymentsFromDB = await _context.FinOps
+      var paymentsFromDB = finOps
                             .Where(f => f.Rejected == false && f.Cashed == false)
                             .OrderBy(o => o.FinOpDate)
-                            .ToListAsync();
+                            .ToList();
       var payments = _mapper.Map<List<FinOpDto>>(paymentsFromDB);
       for (int i = 0; i < payments.Count(); i++)
       {
         var pay = payments[i];
-        var linesFromDB = await _context.FinOpOrderLines.Where(f => f.FinOpId == pay.Id).ToListAsync();
+        var linesFromDB = finOpLines.Where(f => f.FinOpId == pay.Id).ToList();
         var lines = _mapper.Map<List<PaymentDto>>(linesFromDB);
         payments[i].LinePayments = new List<PaymentDto>();
         foreach (var line in lines)
@@ -310,16 +310,16 @@ namespace EducNotes.API.Controllers
     [HttpPost("UpdatePayments")]
     public async Task<IActionResult> UpdatePaymentsStatus(List<FinOpForUpdateStatusDto> finOps)
     {
-      // List<FinOp> finOpsCached = await _cache.GetFinOps();
-      // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
-      // List<OrderLineDeadline> lineDeadLines = await _cache.GetOrderLineDeadLines();
-      // List<OrderLine> lines = await _cache.GetOrderLines();
-      // List<User> students = await _cache.GetStudents();
-      // List<Order> orders = await _cache.GetOrders();
+      List<FinOp> finOpsCached = await _cache.GetFinOps();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+      List<OrderLineDeadline> lineDeadLines = await _cache.GetOrderLineDeadLines();
+      List<OrderLine> lines = await _cache.GetOrderLines();
+      List<User> students = await _cache.GetStudents();
+      List<Order> orders = await _cache.GetOrders();
 
       foreach (var fo in finOps)
       {
-        var finOp = await _context.FinOps.FirstAsync(f => f.Id == fo.Id);
+        var finOp = finOpsCached.First(f => f.Id == fo.Id);
         finOp.Received = fo.Received;
         finOp.DepositedToBank = fo.DepositedToBank;
         finOp.Rejected = fo.Rejected;
@@ -329,19 +329,19 @@ namespace EducNotes.API.Controllers
         if (finOp.Cashed == true)
         {
           _context.SaveChanges();
-          var finOplines = await _context.FinOpOrderLines.Where(f => f.FinOpId == finOp.Id).ToListAsync();
+          var finOplines = finOpLines.Where(f => f.FinOpId == finOp.Id).ToList();
           foreach (var finOpline in finOplines)
           {
             var allLinesValidated = true;
             Boolean orderPaid = true;
-            var deadlines = await _context.OrderLineDeadlines
+            var deadlines = lineDeadLines
                               .Where(d => d.OrderLineId == finOpline.OrderLineId)
                               .OrderBy(o => o.DueDate)
-                              .ToListAsync();
-            var line = await _context.OrderLines.FirstAsync(o => o.Id == finOpline.OrderLineId);
-            var allPaid = await _context.FinOpOrderLines
-                                .Where(f => f.FinOp.Cashed && f.FinOp.FinOpTypeId == finOpTypePayment && f.OrderLineId == line.Id)
-                                .SumAsync(s => s.Amount);
+                              .ToList();
+            var line = lines.First(o => o.Id == finOpline.OrderLineId);
+            var allPaid = finOpLines
+                            .Where(f => f.FinOp.Cashed && f.FinOp.FinOpTypeId == finOpTypePayment && f.OrderLineId == line.Id)
+                            .Sum(s => s.Amount);
             decimal paidBalance = allPaid;
             // registration validation
             if (!line.Validated)
@@ -357,7 +357,7 @@ namespace EducNotes.API.Controllers
                 _repo.Update(firstdeadline);
 
                 // validate user tuition
-                var child = await _context.Users.FirstAsync(u => u.Id == line.ChildId);
+                var child = students.First(u => u.Id == line.ChildId);
                 child.Validated = true;
                 _repo.Update(child);
 
@@ -414,7 +414,7 @@ namespace EducNotes.API.Controllers
 
             if (allLinesValidated)
             {
-              var order = await _context.Orders.FirstAsync(o => o.Id == line.OrderId);
+              var order = orders.First(o => o.Id == line.OrderId);
               order.Validated = true;
               if (orderPaid)
               {
@@ -440,11 +440,11 @@ namespace EducNotes.API.Controllers
 
       if (await _repo.SaveAll())
       {
-        // await _cache.LoadFinOps();
-        // await _cache.LoadOrderLines();
-        // await _cache.LoadOrderLineDeadLines();
-        // await _cache.LoadUsers();
-        // await _cache.LoadOrders();
+        await _cache.LoadFinOps();
+        await _cache.LoadOrderLines();
+        await _cache.LoadOrderLineDeadLines();
+        await _cache.LoadUsers();
+        await _cache.LoadOrders();
         return NoContent();
       }
 
