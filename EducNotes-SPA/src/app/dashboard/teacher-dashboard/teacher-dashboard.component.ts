@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserService } from 'src/app/_services/user.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { User } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
 import { CourseUser } from 'src/app/_models/courseUser';
 import { Period } from 'src/app/_models/period';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EvaluationService } from 'src/app/_services/evaluation.service';
 
@@ -35,7 +35,7 @@ export class TeacherDashboardComponent implements OnInit {
 
   constructor(private userService: UserService, private authService: AuthService,
     public alertify: AlertifyService, private router: Router, private fb: FormBuilder,
-    private evalService: EvaluationService, private route: ActivatedRoute) { }
+    private evalService: EvaluationService) { }
 
   ngOnInit() {
     this.dayIndex = 0;

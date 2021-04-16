@@ -631,42 +631,45 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{teacherId}/ScheduleByDay")]
-    public async Task<IActionResult> GetTeacherScheduleByDay(int teacherId) {
-      var scheduleItems = await _context.Schedules
-        .Include(i => i.Teacher)
-        .Include(i => i.Class)
-        .Include(i => i.Course)
-        .Where(s => s.TeacherId == teacherId).ToListAsync();
+    public async Task<IActionResult> GetTeacherScheduleByDay(int teacherId)
+    {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
+
+      var scheduleItems = schedules.Where(s => s.TeacherId == teacherId).ToList();
       var days = scheduleItems.Select(d => d.Day).Distinct().OrderBy(o => o);
 
       TeacherScheduleDto teacherSchedule = new TeacherScheduleDto();
-      if(scheduleItems.Count() > 0) {
+      if(scheduleItems.Count() > 0)
+      {
         teacherSchedule.TeacherId = teacherId;
         teacherSchedule.TeacherName = scheduleItems[0].Teacher.LastName + " " + scheduleItems[0].Teacher.FirstName;
 
         teacherSchedule.Days = new List<ScheduleDayDto>();
-        foreach(var day in days) {
+        foreach(var day in days)
+        {
           ScheduleDayDto sdd = new ScheduleDayDto();
           sdd.Day = day;
           sdd.DayName = day.DayIntToName();
 
-          var courses = scheduleItems.Where(s => s.Day == day)
-            .OrderBy(o => o.StartHourMin.ToString("HH:mm", frC));
+          List<Schedule> dayScheduleItems = scheduleItems.Where(s => s.Day == day).ToList();
           sdd.Courses = new List<ScheduleCourseDto>();
-          foreach(var course in courses) {
-            ScheduleCourseDto courseDto = new ScheduleCourseDto();
-            courseDto.CourseId = course.Id;
-            courseDto.CourseName = course.Course.Name;
-            courseDto.ClassId = course.ClassId;
-            courseDto.ClassName = course.Class.Name;
-            courseDto.CourseAbbrev = course.Course.Abbreviation;
-            courseDto.CourseColor = course.Course.Color;
-            courseDto.StartHour = course.StartHourMin;
-            courseDto.StartH = course.StartHourMin.ToString("HH:mm", frC);
-            courseDto.EndHour = course.EndHourMin;
-            courseDto.EndH = course.EndHourMin.ToString("HH:mm", frC);
-            courseDto.InConflict = false;
-            sdd.Courses.Add(courseDto);
+          foreach(var item in dayScheduleItems)
+          {
+            List<ScheduleCourse> courses = scheduleCourses.Where(s => s.ScheduleId == item.Id).ToList();
+            foreach(var course in courses)
+            {
+              ScheduleCourseDto courseDto = new ScheduleCourseDto();
+              courseDto.Course = course.Course;
+              courseDto.ClassId = item.ClassId;
+              courseDto.ClassName = item.Class.Name;
+              courseDto.StartHour = item.StartHourMin;
+              courseDto.StartH = item.StartHourMin.ToString("HH:mm", frC);
+              courseDto.EndHour = item.EndHourMin;
+              courseDto.EndH = item.EndHourMin.ToString("HH:mm", frC);
+              courseDto.InConflict = false;
+              sdd.Courses.Add(courseDto);
+            }
           }
 
           teacherSchedule.Days.Add(sdd);
@@ -677,45 +680,51 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{teacherId}/ScheduleByClassByDay")]
-    public async Task<IActionResult> GetTeacherScheduleByClassByDay(int teacherId) {
-      var scheduleItems = await _context.Schedules
-        .Include(i => i.Teacher)
-        .Include(i => i.Class)
-        .Include(i => i.Course)
-        .Where(s => s.TeacherId == teacherId).ToListAsync();
+    public async Task<IActionResult> GetTeacherScheduleByClassByDay(int teacherId)
+    {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
+
+      var scheduleItems = schedules.Where(s => s.TeacherId == teacherId).ToList();
       var classes = scheduleItems.Select(c => c.Class).Distinct().OrderBy(o => o.Name);
 
       TeacherScheduleDto teacherSchedule = new TeacherScheduleDto();
-      if(scheduleItems.Count() > 0) {
+      if(scheduleItems.Count() > 0)
+      {
         teacherSchedule.TeacherId = teacherId;
         teacherSchedule.TeacherName = scheduleItems[0].Teacher.LastName + " " + scheduleItems[0].Teacher.FirstName;
 
         teacherSchedule.Classes = new List<ScheduleClassDto>();
-        foreach(var aclass in classes) {
+        foreach(var aclass in classes)
+        {
           ScheduleClassDto scd = new ScheduleClassDto();
           scd.ClassId = aclass.Id;
           scd.ClassName = aclass.Name;
 
           var days = scheduleItems.Where(s => s.ClassId == aclass.Id).Select(d => d.Day).Distinct().OrderBy(o => o);
           scd.Days = new List<ScheduleDayDto>();
-          foreach(var day in days) {
+          foreach(var day in days)
+          {
             ScheduleDayDto sdd = new ScheduleDayDto();
             sdd.Day = day;
             sdd.DayName = day.DayIntToName();
 
-            var courses = scheduleItems.Where(s => s.ClassId == aclass.Id && s.Day == day)
-              .OrderBy(o => o.StartHourMin.ToString("HH:mm", frC));
+            List<Schedule> dayScheduleItems = scheduleItems.Where(s => s.ClassId == aclass.Id && s.Day == day).ToList();
             sdd.Courses = new List<ScheduleCourseDto>();
-            foreach(var course in courses) {
-              ScheduleCourseDto courseDto = new ScheduleCourseDto();
-              courseDto.CourseId = course.Id;
-              courseDto.CourseName = course.Course.Name;
-              courseDto.CourseAbbrev = course.Course.Abbreviation;
-              courseDto.StartHour = course.StartHourMin;
-              courseDto.StartH = course.StartHourMin.ToString("HH:mm", frC);
-              courseDto.EndHour = course.EndHourMin;
-              courseDto.EndH = course.EndHourMin.ToString("HH:mm", frC);
-              sdd.Courses.Add(courseDto);
+            foreach (var item in dayScheduleItems)
+            {
+              List<ScheduleCourse> courses = scheduleCourses.Where(s => s.ScheduleId == item.Id).ToList();
+              foreach (var course in courses)
+              {
+                ScheduleCourseDto courseDto = new ScheduleCourseDto();
+                courseDto.Course = course.Course;
+                courseDto.ItemName = course.ItemName;
+                courseDto.StartHour = item.StartHourMin;
+                courseDto.StartH = item.StartHourMin.ToString("HH:mm", frC);
+                courseDto.EndHour = item.EndHourMin;
+                courseDto.EndH = item.EndHourMin.ToString("HH:mm", frC);
+                sdd.Courses.Add(courseDto);
+              }
             }
 
             scd.Days.Add(sdd);
@@ -729,29 +738,53 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{teacherId}/NextCourses")]
-    public async Task<IActionResult> GetTeacherNextCourses(int teacherId) {
+    public async Task<IActionResult> GetTeacherNextCourses(int teacherId)
+    {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
+
       var nextCourses = 10; // next coming courses
       var today = DateTime.Now;
       // monday=1, tue=2, ...
-      var todayDay =((int) today.DayOfWeek == 0) ? 7 :(int) DateTime.Now.DayOfWeek;
+      var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
       var todayHourMin = today.TimeOfDay;
 
-      var CoursesFromDB = await _context.Schedules
-        .Include(i => i.Class)
-        .Include(i => i.Teacher)
-        .Include(i => i.Course)
-        .Where(c => c.TeacherId == teacherId && c.Day == todayDay)
-        .OrderBy(o => o.StartHourMin)
-        .Take(nextCourses)
-        .ToListAsync();
+      var scheduleItems = schedules.Where(c => c.TeacherId == teacherId && c.Day == todayDay)
+                                   .OrderBy(o => o.StartHourMin)
+                                   .Take(nextCourses)
+                                   .ToList();
 
-      var teacherCourses = _mapper.Map<IEnumerable<TeacherClassSessionDto>>(CoursesFromDB);
+      List<TeacherClassSessionDto> teacherCourses = new List<TeacherClassSessionDto>();
+      foreach (var item in scheduleItems)
+      {
+        ScheduleCourse itemCourse = scheduleCourses.First(c => c.ScheduleId == item.Id);
+        TeacherClassSessionDto teacherSession = new TeacherClassSessionDto();
+        teacherSession.ScheduleId = item.Id;
+        teacherSession.TeacherId = Convert.ToInt32(item.TeacherId);
+        teacherSession.TeacherName = item.Teacher.LastName + ' ' + item.Teacher.FirstName;
+        if(itemCourse.CourseId != null)
+        {
+          teacherSession.CourseId = Convert.ToInt32(itemCourse.CourseId);
+          teacherSession.CourseName = itemCourse.Course.Name;
+        }
+        teacherSession.ItemName = itemCourse.ItemName;
+        teacherSession.ClassId = item.ClassId;
+        teacherSession.ClassName = item.Class.Name;
+        teacherSession.Day = item.Day;
+        teacherSession.CourseStartHM = item.StartHourMin;
+        teacherSession.CourseEndHM = item.EndHourMin;
+        teacherSession.StartHourMin = item.StartHourMin.ToString("HH:mm", frC);
+        teacherSession.EndHourMin = item.EndHourMin.ToString("HH:mm", frC);
+
+        teacherCourses.Add(teacherSession);
+      }
 
       return Ok(teacherCourses);
     }
 
     [HttpGet("{teacherId}/NextCoursesByClass")]
-    public async Task<IActionResult> GetTeacherNextCoursesByClass(int teacherId) {
+    public async Task<IActionResult> GetTeacherNextCoursesByClass(int teacherId)
+    {
       var teacherCourses = await _repo.GetNextCoursesByClass(teacherId);
       return Ok(teacherCourses);
     }
@@ -769,129 +802,179 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{teacherId}/ScheduleDay/{day}")]
-    public async Task<IActionResult> GetTeacherScheduleDay(int teacherId, int day) {
-      var teacherCourses = await(from courses in _context.ClassCourses join Schedule in _context.Schedules on courses.CourseId equals Schedule.CourseId select new {
-          TeacherId = courses.TeacherId,
-            TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
-            CourseId = courses.CourseId,
-            CourseName = courses.Course.Name,
-            ClassId = Schedule.ClassId,
-            ClassName = Schedule.Class.Name,
-            Day = Schedule.Day,
-            StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
-            EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
-        })
-        .Where(w => w.TeacherId == teacherId && w.Day == day)
-        .OrderBy(o => o.StartHourMin)
-        .ToListAsync();
+    public async Task<IActionResult> GetTeacherScheduleDay(int teacherId, int day)
+    {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
 
-      return Ok(teacherCourses);
+      var scheduleItems = schedules.Where(s => s.TeacherId == teacherId && s.Day == day)
+                                   .OrderBy(o => o.StartHourMin)
+                                   .ToList();
+
+      List<TeacherDayCoursesDto> teacherDayCourses = new List<TeacherDayCoursesDto>();
+      if(scheduleItems.Count() > 0)
+      {
+        TeacherDayCoursesDto teacherDayCourse = new TeacherDayCoursesDto();
+        foreach (var item in scheduleItems)
+        {
+          List<ScheduleCourse> itemCourses = scheduleCourses.Where(c => c.ScheduleId == item.Id).ToList();
+          foreach (var course in itemCourses)
+          {
+            teacherDayCourse.TeacherId = Convert.ToInt32(item.TeacherId);
+            teacherDayCourse.TeacherName = item.Teacher.LastName + " " + item.Teacher.FirstName;
+            teacherDayCourse.ClassId = item.ClassId;
+            teacherDayCourse.ClassName = item.Class.Name;
+            if(course.Course != null)
+            {
+              teacherDayCourse.CourseId = Convert.ToInt32(course.CourseId);
+              teacherDayCourse.CourseName = course.Course.Name;
+            }
+            teacherDayCourse.ItemName = course.ItemName;
+            teacherDayCourse.Day = item.Day;
+            teacherDayCourse.StartHourMin = item.StartHourMin.ToString("HH:mm", frC);
+            teacherDayCourse.EndHourMin = item.EndHourMin.ToString("HH:mm", frC);
+            teacherDayCourses.Add(teacherDayCourse);
+          }
+        }
+      }
+
+      return Ok(teacherDayCourses);
     }
 
     [HttpGet("{teacherId}/Schedule")]
-    public async Task<IActionResult> GetTeacherSchedule(int teacherId) {
-      var teacherCourses = await(from courses in _context.ClassCourses join Schedule in _context.Schedules on courses.CourseId equals Schedule.CourseId select new {
-          TeacherId = courses.TeacherId,
-            TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
-            CourseId = courses.CourseId,
-            CourseName = courses.Course.Name,
-            ClassId = Schedule.ClassId,
-            ClassName = Schedule.Class.Name,
-            Day = Schedule.Day,
-            StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
-            EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
-        })
-        .Where(w => w.TeacherId == teacherId)
-        .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin)
-        .ToListAsync();
+    public async Task<IActionResult> GetTeacherSchedule(int teacherId)
+    {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
+
+      var scheduleItems = schedules.Where(s => s.TeacherId == teacherId)
+                                   .OrderBy(o => o.StartHourMin)
+                                   .ToList();
+
+      List<TeacherDayCoursesDto> teacherCourses = new List<TeacherDayCoursesDto>();
+      if(scheduleItems.Count() > 0)
+      {
+        TeacherDayCoursesDto teacherCourse = new TeacherDayCoursesDto();
+        foreach (var item in scheduleItems)
+        {
+          List<ScheduleCourse> itemCourses = scheduleCourses.Where(c => c.ScheduleId == item.Id).ToList();
+          foreach (var course in itemCourses)
+          {
+            teacherCourse.TeacherId = Convert.ToInt32(item.TeacherId);
+            teacherCourse.TeacherName = item.Teacher.LastName + " " + item.Teacher.FirstName;
+            teacherCourse.ClassId = item.ClassId;
+            teacherCourse.ClassName = item.Class.Name;
+            if(course.Course != null)
+            {
+              teacherCourse.CourseId = Convert.ToInt32(course.CourseId);
+              teacherCourse.CourseName = course.Course.Name;
+            }
+            teacherCourse.ItemName = course.ItemName;
+            teacherCourse.Day = item.Day;
+            teacherCourse.StartHourMin = item.StartHourMin.ToString("HH:mm", frC);
+            teacherCourse.EndHourMin = item.EndHourMin.ToString("HH:mm", frC);
+            teacherCourses.Add(teacherCourse);
+          }
+        }
+      }
 
       return Ok(teacherCourses);
     }
 
     [HttpGet("{teacherId}/CurrWeekSessions/{classId}")]
-    public async Task<IActionResult> GetTeacherSessions(int teacherId, int classId) {
-      var teacherSchedule = await _context.Schedules
-        .Include(i => i.Course)
-        .Include(i => i.Teacher)
-        .Include(i => i.Class)
-        .Where(s => s.TeacherId == teacherId && s.ClassId == classId)
-        .ToListAsync();
+    public async Task<IActionResult> GetTeacherSessions(int teacherId, int classId)
+    {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
+      List<Agenda> agendasCached = await _cache.GetAgendas();
+      List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
+
+      var teacherSchedule = schedules.Where(s => s.TeacherId == teacherId && s.ClassId == classId)
+                                     .ToList();
 
       var today = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-      var dayInt =(int) today.DayOfWeek == 0 ? 7 :(int) today.DayOfWeek;
+      var dayInt =(int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
       var monday = today.AddDays(1 - dayInt);
       var saturday = monday.AddDays(5);
 
       var agendas = new List<SessionForListDto>();
-      for(int i = 0; i < 7; i++) {
+      for(int i = 0; i < 7; i++)
+      {
         var currentDate = monday.AddDays(i).Date;
-        var day =((int) currentDate.DayOfWeek == 0) ? 7 :(int) currentDate.DayOfWeek;
+        var day =((int)currentDate.DayOfWeek == 0) ? 7 :(int)currentDate.DayOfWeek;
         if(day == 7) { continue; }
 
-        SessionForListDto sfld = new SessionForListDto();
-        sfld.DueDate = currentDate;
-        sfld.ShortDueDate = currentDate.ToString("ddd dd MMM", frC);
-        sfld.LongDueDate = currentDate.ToString("dd MMMM yyyy", frC);
-        sfld.DueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
+        SessionForListDto sessionDto = new SessionForListDto();
+        sessionDto.DueDate = currentDate;
+        sessionDto.ShortDueDate = currentDate.ToString("ddd dd MMM", frC);
+        sessionDto.LongDueDate = currentDate.ToString("dd MMMM yyyy", frC);
+        sessionDto.DueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
         //get agenda tasks Done Status
-        sfld.AgendaItems = new List<AgendaToReturnDto>();
+        sessionDto.AgendaItems = new List<AgendaToReturnDto>();
 
         //agenda items retrieved from schedule items
-        var daySchedule = teacherSchedule
-          .Where(d => d.Day == day && d.ClassId == classId)
-          .OrderBy(d => d.StartHourMin.Hour)
-          .ThenBy(d => d.StartHourMin.Minute);
+        var daySchedule = teacherSchedule.Where(d => d.Day == day && d.ClassId == classId)
+                                         .OrderBy(d => d.StartHourMin.Hour)
+                                         .ThenBy(d => d.StartHourMin.Minute);
 
-        foreach(var scheduleItem in daySchedule) {
-          string startHour = scheduleItem.StartHourMin.ToString("HH:mm", frC);
-          string endHour = scheduleItem.EndHourMin.ToString("HH:mm", frC);
-          var tasks = "";
-          var id = 0;
-          var agenda = await _context.Agendas.SingleOrDefaultAsync(a => a.Session.SessionDate.Date == currentDate &&
-            a.Session.TeacherId == teacherId && a.Session.ClassId == scheduleItem.ClassId &&
-            a.Session.StartHourMin.ToString("HH:mm", frC) == startHour &&
-            a.Session.EndHourMin.ToString("HH:mm", frC) == endHour);
-          if(agenda != null) {
-            tasks = agenda.TaskDesc;
-            id = agenda.Id;
+        foreach(var scheduleItem in daySchedule)
+        {
+          List<ScheduleCourse> dayCourses = scheduleCourses.Where(c => c.ScheduleId == scheduleItem.Id).ToList();
+          foreach (var course in dayCourses)
+          {
+            string startHour = scheduleItem.StartHourMin.ToString("HH:mm", frC);
+            string endHour = scheduleItem.EndHourMin.ToString("HH:mm", frC);
+            var tasks = "";
+            var id = 0;
+            var agenda = agendasCached.SingleOrDefault(a => a.Session.SessionDate.Date == currentDate &&
+              a.Session.TeacherId == teacherId && a.Session.ClassId == scheduleItem.ClassId &&
+              a.Session.StartHourMin.ToString("HH:mm", frC) == startHour &&
+              a.Session.EndHourMin.ToString("HH:mm", frC) == endHour);
+            if(agenda != null)
+            {
+              tasks = agenda.TaskDesc;
+              id = agenda.Id;
+            }
+
+            var session = await _repo.GetSessionFromSchedule(scheduleItem, course, currentDate);
+            var newAgenda = new AgendaToReturnDto
+            {
+              Id = id,
+              SessionId = session.Id,
+              TeacherId = Convert.ToInt32(scheduleItem.TeacherId),
+              TeacherName = scheduleItem.Teacher.LastName + ' ' + scheduleItem.Teacher.FirstName,
+              CourseId = Convert.ToInt32(course.CourseId),
+              strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
+              DayDate = currentDate,
+              Day = scheduleItem.Day,
+              CourseName = course.Course.Name,
+              CourseColor = course.Course.Color,
+              ClassId = Convert.ToInt32(scheduleItem.ClassId),
+              ClassName = scheduleItem.Class.Name,
+              Tasks = tasks,
+              StartHourMin = scheduleItem.StartHourMin.ToString("HH:mm", frC),
+              EndHourMin = scheduleItem.EndHourMin.ToString("HH:mm", frC)
+            };
+
+            sessionDto.AgendaItems.Add(newAgenda);
           }
-
-          var session = await _repo.GetSessionFromSchedule(scheduleItem.Id, teacherId, currentDate);
-          var newAgenda = new AgendaToReturnDto {
-            Id = id,
-            SessionId = session.Id,
-            TeacherId = Convert.ToInt32(scheduleItem.TeacherId),
-            TeacherName = scheduleItem.Teacher.LastName + ' ' + scheduleItem.Teacher.FirstName,
-            CourseId = Convert.ToInt32(scheduleItem.CourseId),
-            strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
-            DayDate = currentDate,
-            Day = scheduleItem.Day,
-            CourseName = scheduleItem.Course.Name,
-            CourseColor = scheduleItem.Course.Color,
-            ClassId = Convert.ToInt32(scheduleItem.ClassId),
-            ClassName = scheduleItem.Class.Name,
-            Tasks = tasks,
-            StartHourMin = scheduleItem.StartHourMin.ToString("HH:mm", frC),
-            EndHourMin = scheduleItem.EndHourMin.ToString("HH:mm", frC)
-          };
-
-          sfld.AgendaItems.Add(newAgenda);
         }
 
         //retrieve agenda items with lost shceduleId(schedule item has been deleted/updated)
-        var itemsWithNoScheduleId = await _context.Agendas
-          .Include(a => a.Session)
-          .Where(a => a.Session.SessionDate.Date == currentDate.Date &&
-            a.Session.ScheduleId == null)
-          .OrderBy(o => o.Session.StartHourMin.Hour)
-          .ThenBy(o => o.Session.StartHourMin.Minute)
-          .ToListAsync();
+        var itemsWithNoScheduleId = agendasCached
+                                      .Where(a => a.Session.SessionDate.Date == currentDate.Date &&
+                                        a.Session.ScheduleId == null)
+                                      .OrderBy(o => o.Session.StartHourMin.Hour)
+                                      .ThenBy(o => o.Session.StartHourMin.Minute)
+                                      .ToList();
 
-        foreach(var item in itemsWithNoScheduleId) {
+        foreach(var item in itemsWithNoScheduleId)
+        {
           var itemDayInt =((int) item.Session.SessionDate.DayOfWeek == 0) ? 7 :(int) currentDate.DayOfWeek;
           if(day == 7) { continue; }
 
-          var newAgenda = new AgendaToReturnDto {
+          var newAgenda = new AgendaToReturnDto
+          {
             Id = item.Id,
             SessionId = item.SessionId,
             TeacherId = Convert.ToInt32(item.Session.TeacherId),
@@ -909,10 +992,10 @@ namespace EducNotes.API.Controllers {
             EndHourMin = item.Session.EndHourMin.ToString("HH:mm", frC)
           };
 
-          sfld.AgendaItems.Add(newAgenda);
+          sessionDto.AgendaItems.Add(newAgenda);
         }
 
-        agendas.Add(sfld);
+        agendas.Add(sessionDto);
       }
 
       var days = new List<string>();
@@ -928,10 +1011,9 @@ namespace EducNotes.API.Controllers {
       var itemsFromRepo = await _repo.GetClassAgenda(classId, monday, saturday);
       var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
-      List<ClassCourse> classCoursesFromDB = await _context.ClassCourses.ToListAsync();
-      var classCourses = classCoursesFromDB
-                        .Where(c => c.ClassId == classId && c.TeacherId == teacherId)
-                        .Select(s => s.Course).ToList();
+      List<ClassCourse> classCoursesFromDB = classCoursesCached.ToList();
+      var classCourses = classCoursesFromDB.Where(c => c.ClassId == classId && c.TeacherId == teacherId)
+                                           .Select(s => s.Course).ToList();
 
       List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto>();
       foreach(var course in classCourses) {
@@ -959,96 +1041,107 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{teacherId}/ScheduleNDays")]
-    public async Task<IActionResult> GetScheduleNDays(int teacherId) {
+    public async Task<IActionResult> GetScheduleNDays(int teacherId)
+    {
       var events = await _repo.GetTeacherScheduleNDays(teacherId);
       return Ok(events);
     }
 
     [HttpGet("{teacherId}/SessionsFromToday/{classId}")]
-    public async Task<IActionResult> GetTeacherSessionsFromToday(int teacherId, int classId) {
-      var teacherSchedule = await _context.Schedules
-        .Include(i => i.Course)
-        .Include(i => i.Teacher)
-        .Include(i => i.Class)
-        .Where(s => s.TeacherId == teacherId && s.ClassId == classId)
-        .ToListAsync();
+    public async Task<IActionResult> GetTeacherSessionsFromToday(int teacherId, int classId)
+    {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
+      List<Agenda> agendasCached = await _cache.GetAgendas();
+      List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
+
+      var teacherSchedule = schedules.Where(s => s.TeacherId == teacherId && s.ClassId == classId)
+                                     .ToList();
 
       var today = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-      var dayInt =(int) today.DayOfWeek == 0 ? 7 :(int) today.DayOfWeek;
+      var dayInt = (int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
       if(dayInt == 7)
         today = today.AddDays(1);
 
       var agendas = new List<SessionForListDto>();
-      for(int i = 0; i < 7; i++) {
+      for(int i = 0; i < 7; i++)
+      {
         var currentDate = today.AddDays(i).Date;
-        var day =((int) currentDate.DayOfWeek == 0) ? 7 :(int) currentDate.DayOfWeek;
+        var day =((int)currentDate.DayOfWeek == 0) ? 7 :(int)currentDate.DayOfWeek;
         if(day == 7) { continue; }
 
-        SessionForListDto sfld = new SessionForListDto();
-        sfld.DueDate = currentDate;
-        sfld.ShortDueDate = currentDate.ToString("ddd dd MMM", frC);
-        sfld.LongDueDate = currentDate.ToString("dd MMMM yyyy", frC);
-        sfld.DueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
+        SessionForListDto sessionDto = new SessionForListDto();
+        sessionDto.DueDate = currentDate;
+        sessionDto.ShortDueDate = currentDate.ToString("ddd dd MMM", frC);
+        sessionDto.LongDueDate = currentDate.ToString("dd MMMM yyyy", frC);
+        sessionDto.DueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
         //get agenda tasks Done Status
-        sfld.AgendaItems = new List<AgendaToReturnDto>();
+        sessionDto.AgendaItems = new List<AgendaToReturnDto>();
 
         //agenda items retrieved from schedule items
-        var daySchedule = teacherSchedule
-          .Where(d => d.Day == day && d.ClassId == classId)
-          .OrderBy(d => d.StartHourMin.Hour)
-          .ThenBy(d => d.StartHourMin.Minute)
-          .ToList();
+        var daySchedule = teacherSchedule.Where(d => d.Day == day && d.ClassId == classId)
+                                         .OrderBy(d => d.StartHourMin.Hour)
+                                         .ThenBy(d => d.StartHourMin.Minute)
+                                         .ToList();
 
-        foreach(var scheduleItem in daySchedule) {
-          string startHour = scheduleItem.StartHourMin.ToString("HH:mm", frC);
-          string endHour = scheduleItem.EndHourMin.ToString("HH:mm", frC);
-          var tasks = "";
-          var id = 0;
-          var agenda = await _context.Agendas.SingleOrDefaultAsync(a => a.Session.SessionDate.Date == currentDate &&
-            a.Session.TeacherId == teacherId && a.Session.ClassId == scheduleItem.ClassId &&
-            a.Session.StartHourMin.ToString("HH:mm", frC) == startHour &&
-            a.Session.EndHourMin.ToString("HH:mm", frC) == endHour);
-          if(agenda != null) {
-            tasks = agenda.TaskDesc;
-            id = agenda.Id;
+        foreach(var scheduleItem in daySchedule)
+        {
+          List<ScheduleCourse> dayCourses = scheduleCourses.Where(c => c.ScheduleId == scheduleItem.Id).ToList();
+          foreach (var course in dayCourses)
+          {
+            string startHour = scheduleItem.StartHourMin.ToString("HH:mm", frC);
+            string endHour = scheduleItem.EndHourMin.ToString("HH:mm", frC);
+            var tasks = "";
+            var id = 0;
+            var agenda = agendasCached.SingleOrDefault(a => a.Session.SessionDate.Date == currentDate &&
+              a.Session.TeacherId == teacherId && a.Session.ClassId == scheduleItem.ClassId &&
+              a.Session.StartHourMin.ToString("HH:mm", frC) == startHour &&
+              a.Session.EndHourMin.ToString("HH:mm", frC) == endHour);
+            if(agenda != null)
+            {
+              tasks = agenda.TaskDesc;
+              id = agenda.Id;
+            }
+
+            var session = await _repo.GetSessionFromSchedule(scheduleItem, course, currentDate);
+            var newAgenda = new AgendaToReturnDto
+            {
+              Id = id,
+              SessionId = session.Id,
+              TeacherId = Convert.ToInt32(scheduleItem.TeacherId),
+              TeacherName = scheduleItem.Teacher.LastName + ' ' + scheduleItem.Teacher.FirstName,
+              CourseId = Convert.ToInt32(course.CourseId),
+              strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
+              DayDate = currentDate,
+              Day = scheduleItem.Day,
+              CourseName = course.Course.Name,
+              CourseColor = course.Course.Color,
+              ClassId = Convert.ToInt32(scheduleItem.ClassId),
+              ClassName = scheduleItem.Class.Name,
+              Tasks = tasks,
+              StartHourMin = scheduleItem.StartHourMin.ToString("HH:mm", frC),
+              EndHourMin = scheduleItem.EndHourMin.ToString("HH:mm", frC)
+            };
+
+            sessionDto.AgendaItems.Add(newAgenda);
           }
-
-          var session = await _repo.GetSessionFromSchedule(scheduleItem.Id, teacherId, currentDate);
-          var newAgenda = new AgendaToReturnDto {
-            Id = id,
-            SessionId = session.Id,
-            TeacherId = Convert.ToInt32(scheduleItem.TeacherId),
-            TeacherName = scheduleItem.Teacher.LastName + ' ' + scheduleItem.Teacher.FirstName,
-            CourseId = Convert.ToInt32(scheduleItem.CourseId),
-            strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
-            DayDate = currentDate,
-            Day = scheduleItem.Day,
-            CourseName = scheduleItem.Course.Name,
-            CourseColor = scheduleItem.Course.Color,
-            ClassId = Convert.ToInt32(scheduleItem.ClassId),
-            ClassName = scheduleItem.Class.Name,
-            Tasks = tasks,
-            StartHourMin = scheduleItem.StartHourMin.ToString("HH:mm", frC),
-            EndHourMin = scheduleItem.EndHourMin.ToString("HH:mm", frC)
-          };
-
-          sfld.AgendaItems.Add(newAgenda);
         }
 
         //retrieve agenda items with lost shceduleId(schedule item has been deleted/updated)
-        var itemsWithNoScheduleId = await _context.Agendas
-          .Include(a => a.Session)
-          .Where(a => a.Session.SessionDate.Date == currentDate.Date &&
-            a.Session.ScheduleId == null)
-          .OrderBy(o => o.Session.StartHourMin.Hour)
-          .ThenBy(o => o.Session.StartHourMin.Minute)
-          .ToListAsync();
+        var itemsWithNoScheduleId = agendasCached
+                                    .Where(a => a.Session.SessionDate.Date == currentDate.Date &&
+                                      a.Session.ScheduleId == null)
+                                    .OrderBy(o => o.Session.StartHourMin.Hour)
+                                    .ThenBy(o => o.Session.StartHourMin.Minute)
+                                    .ToList();
 
-        foreach(var item in itemsWithNoScheduleId) {
-          var itemDayInt =((int) item.Session.SessionDate.DayOfWeek == 0) ? 7 :(int) currentDate.DayOfWeek;
+        foreach(var item in itemsWithNoScheduleId)
+        {
+          var itemDayInt =((int)item.Session.SessionDate.DayOfWeek == 0) ? 7 :(int)currentDate.DayOfWeek;
           if(day == 7) { continue; }
 
-          var newAgenda = new AgendaToReturnDto {
+          var newAgenda = new AgendaToReturnDto
+          {
             Id = item.Id,
             SessionId = item.SessionId,
             TeacherId = Convert.ToInt32(item.Session.TeacherId),
@@ -1066,10 +1159,10 @@ namespace EducNotes.API.Controllers {
             EndHourMin = item.Session.EndHourMin.ToString("HH:mm", frC)
           };
 
-          sfld.AgendaItems.Add(newAgenda);
+          sessionDto.AgendaItems.Add(newAgenda);
         }
 
-        agendas.Add(sfld);
+        agendas.Add(sessionDto);
       }
 
       var days = new List<string>();
@@ -1087,12 +1180,12 @@ namespace EducNotes.API.Controllers {
       var itemsFromRepo = await _repo.GetClassAgenda(classId, today, today.AddDays(6));
       var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
-      var classCourses = await _context.ClassCourses
-                        .Where(c => c.ClassId == classId && c.TeacherId == teacherId)
-                        .Select(s => s.Course).ToListAsync();
+      var classCourses = classCoursesCached.Where(c => c.ClassId == classId && c.TeacherId == teacherId)
+                                           .Select(s => s.Course).ToList();
 
       List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto>();
-      foreach(var course in classCourses) {
+      foreach(var course in classCourses)
+      {
         CourseTasksDto ctd = new CourseTasksDto();
         var nbItems = itemsFromRepo.Where(a => a.Session.CourseId == course.Id).ToList().Count();
         ctd.CourseId = course.Id;
@@ -1103,7 +1196,8 @@ namespace EducNotes.API.Controllers {
         coursesWithTasks.Add(ctd);
       }
 
-      foreach(var item in agendas) {
+      foreach(var item in agendas)
+      {
         item.AgendaItems = item.AgendaItems.OrderBy(o => o.StartHourMin).ToList();
       }
 
@@ -1117,13 +1211,15 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{teacherId}/MovedWeekSessions/{classId}")]
-    public async Task<IActionResult> getClassMovedWeekAgenda(int teacherId, int classId, [FromQuery] AgendaParams agendaParams) {
-      var teacherSchedule = await _context.Schedules
-        .Include(i => i.Course)
-        .Include(i => i.Teacher)
-        .Include(i => i.Class)
-        .Where(s => s.TeacherId == teacherId && s.ClassId == classId)
-        .ToListAsync();
+    public async Task<IActionResult> getClassMovedWeekAgenda(int teacherId, int classId, [FromQuery] AgendaParams agendaParams)
+    {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
+      List<ClassCourse> classCoursesCached = await _cache.GetClassCourses();
+      List<Agenda> agendasCached = await _cache.GetAgendas();
+
+      var teacherSchedule = schedules.Where(s => s.TeacherId == teacherId && s.ClassId == classId)
+                                     .ToList();
 
       var FromDate = agendaParams.DueDate.Date;
       var move = agendaParams.MoveWeek;
@@ -1137,58 +1233,68 @@ namespace EducNotes.API.Controllers {
       var agendas = new List<SessionForListDto>();
 
       // cahier de textes - periode de sessions des cours du professeur
-      for(int i = 0; i < 7; i++) {
+      for(int i = 0; i < 7; i++)
+      {
         var currentDate = date.AddDays(i);
-        var day =((int) currentDate.DayOfWeek == 0) ? 7 :(int) currentDate.DayOfWeek;
+        var day =((int)currentDate.DayOfWeek == 0) ? 7 :(int)currentDate.DayOfWeek;
         if(day == 7) { continue; }
 
-        SessionForListDto sfld = new SessionForListDto();
-        sfld.DueDate = currentDate;
-        sfld.ShortDueDate = currentDate.ToString("ddd dd MMM", frC);
-        sfld.LongDueDate = currentDate.ToString("dd MMMM yyyy", frC);
-        sfld.DueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
+        SessionForListDto sessionDto = new SessionForListDto();
+        sessionDto.DueDate = currentDate;
+        sessionDto.ShortDueDate = currentDate.ToString("ddd dd MMM", frC);
+        sessionDto.LongDueDate = currentDate.ToString("dd MMMM yyyy", frC);
+        sessionDto.DueDateAbbrev = currentDate.ToString("ddd dd", frC).Replace(".", "");
 
         //get agenda tasks Done Status
-        sfld.AgendaItems = new List<AgendaToReturnDto>();
-        var daySessions = teacherSchedule.Where(d => d.Day == day).OrderBy(d => d.StartHourMin);
-        if(daySessions.Count() == 0) { continue; }
+        sessionDto.AgendaItems = new List<AgendaToReturnDto>();
+        var daySchedule = teacherSchedule.Where(d => d.Day == day).OrderBy(d => d.StartHourMin);
+        if(daySchedule.Count() == 0) { continue; }
 
-        foreach(var session in daySessions) {
-          string startHour = session.StartHourMin.ToString("HH:mm", frC);
-          string endHour = session.EndHourMin.ToString("HH:mm", frC);
-          var tasks = "";
-          var id = 0;
-          var agenda = await _context.Agendas.SingleOrDefaultAsync(a => a.Session.SessionDate.Date == currentDate &&
-            a.Session.StartHourMin.ToString("HH:mm", frC) == startHour &&
-            a.Session.EndHourMin.ToString("HH:mm", frC) == endHour);
-          if(agenda != null) {
-            tasks = agenda.TaskDesc;
-            id = agenda.Id;
+        foreach(var scheduleItem in daySchedule)
+        {
+          List<ScheduleCourse> dayCourses = scheduleCourses.Where(c => c.ScheduleId == scheduleItem.Id).ToList();
+          foreach (var course in dayCourses)
+          {
+            string startHour = scheduleItem.StartHourMin.ToString("HH:mm", frC);
+            string endHour = scheduleItem.EndHourMin.ToString("HH:mm", frC);
+            var tasks = "";
+            var id = 0;
+            var agenda = agendasCached.SingleOrDefault(a => a.Session.SessionDate.Date == currentDate &&
+              a.Session.TeacherId == teacherId && a.Session.ClassId == scheduleItem.ClassId &&
+              a.Session.StartHourMin.ToString("HH:mm", frC) == startHour &&
+              a.Session.EndHourMin.ToString("HH:mm", frC) == endHour);
+            if(agenda != null)
+            {
+              tasks = agenda.TaskDesc;
+              id = agenda.Id;
+            }
+
+            var session = await _repo.GetSessionFromSchedule(scheduleItem, course, currentDate);
+            var newAgenda = new AgendaToReturnDto
+            {
+              Id = id,
+              SessionId = session.Id,
+              TeacherId = Convert.ToInt32(scheduleItem.TeacherId),
+              TeacherName = scheduleItem.Teacher.LastName + ' ' + scheduleItem.Teacher.FirstName,
+              CourseId = Convert.ToInt32(course.CourseId),
+              strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
+              DayDate = currentDate,
+              Day = scheduleItem.Day,
+              CourseName = course.Course.Name,
+              CourseColor = course.Course.Color,
+              ClassId = Convert.ToInt32(scheduleItem.ClassId),
+              ClassName = scheduleItem.Class.Name,
+              Tasks = tasks,
+              StartHourMin = scheduleItem.StartHourMin.ToString("HH:mm", frC),
+              EndHourMin = scheduleItem.EndHourMin.ToString("HH:mm", frC)
+            };
+
+            sessionDto.AgendaItems.Add(newAgenda);
           }
-
-          var newAgenda = new AgendaToReturnDto {
-            Id = id,
-            SessionId = session.Id,
-            TeacherId = Convert.ToInt32(session.TeacherId),
-            TeacherName = session.Teacher.LastName + ' ' + session.Teacher.FirstName,
-            CourseId = Convert.ToInt32(session.CourseId),
-            strDayDate = currentDate.ToString("dd/MM/yyyy", frC),
-            DayDate = currentDate,
-            Day = session.Day,
-            CourseName = session.Course.Name,
-            CourseColor = session.Course.Color,
-            ClassId = Convert.ToInt32(session.ClassId),
-            ClassName = session.Class.Name,
-            Tasks = tasks,
-            StartHourMin = session.StartHourMin.ToString("HH:mm", frC),
-            EndHourMin = session.EndHourMin.ToString("HH:mm", frC)
-          };
-
-          sfld.AgendaItems.Add(newAgenda);
         }
-        sfld.NbItems = daySessions.Count();
 
-        agendas.Add(sfld);
+        sessionDto.NbItems = daySchedule.Count();
+        agendas.Add(sessionDto);
       }
 
       var days = new List<string>();
@@ -1206,12 +1312,12 @@ namespace EducNotes.API.Controllers {
       var itemsFromRepo = await _repo.GetClassAgenda(classId, date, date.AddDays(6));
       //var items = _repo.GetAgendaListByDueDate(itemsFromRepo);
 
-      var classCourses = await _context.ClassCourses
-                      .Where(c => c.ClassId == classId && c.TeacherId == teacherId)
-                      .Select(s => s.Course).ToListAsync();
+      var classCourses = classCoursesCached.Where(c => c.ClassId == classId && c.TeacherId == teacherId)
+                                           .Select(s => s.Course).ToList();
 
       List<CourseTasksDto> coursesWithTasks = new List<CourseTasksDto>();
-      foreach(var course in classCourses) {
+      foreach(var course in classCourses)
+      {
         CourseTasksDto ctd = new CourseTasksDto();
         var nbItems = itemsFromRepo.Where(a => a.Session.CourseId == course.Id).ToList().Count();
         ctd.CourseId = course.Id;
@@ -1222,7 +1328,8 @@ namespace EducNotes.API.Controllers {
         coursesWithTasks.Add(ctd);
       }
 
-      if(itemsFromRepo != null) {
+      if(itemsFromRepo != null)
+      {
         return Ok(new {
           agendas,
           date,
@@ -2025,14 +2132,13 @@ namespace EducNotes.API.Controllers {
       List<UserType> userTypesCached = await _cache.GetUserTypes();
 
       // users to validate exclude chidren/students as they are coped by parent on their account
-      var usersFromDB =usersCached.Where(u => u.AccountDataValidated == false && u.UserTypeId != studentTypeId)
-                                  .ToList();
-      var activeTuitions = orders.Where(t => t.isReg == true && t.Expired == false || t.Cancelled == false)
-                                 .ToList();
+      // var usersFromDB = usersCached.Where(u => u.AccountDataValidated == false && u.UserTypeId != studentTypeId).ToList();
+      var activeTuitions = orders.Where(t => t.isReg == true && t.Expired == false || t.Cancelled == false).ToList();
 
       var userTypes = userTypesCached.Where(u => u.Id != studentTypeId)
                                      .OrderBy(o => o.Name)
                                      .ToList();
+
       List<UserTypeToValidateDto> types = new List<UserTypeToValidateDto>();
       foreach(var type in userTypes)
       {
@@ -2042,7 +2148,8 @@ namespace EducNotes.API.Controllers {
         userType.Id = type.Id;
         userType.Name = type.Name;
         userType.Users = new List<UserToValidateDto>();
-        var users = usersFromDB.OrderBy(o => o.LastName).ThenBy(o => o.FirstName).Where(u => u.UserTypeId == type.Id).ToList();
+        var users = usersCached.OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
+                               .Where(u => u.AccountDataValidated == false && u.UserTypeId == type.Id).ToList();
         foreach(var user in users)
         {
           UserToValidateDto userToValidate = new UserToValidateDto();
@@ -2054,28 +2161,28 @@ namespace EducNotes.API.Controllers {
           userToValidate.UserType = user.UserType.Name;
           userToValidate.Email = user.Email;
           userToValidate.Cell = user.PhoneNumber;
-          if(user.UserTypeId == studentTypeId)
-          {
-            var parents = await _repo.GetParents(user.Id);
-            var mother = parents.FirstOrDefault(m => m.Gender == 0);
-            if(mother != null)
-            {
-              userToValidate.MotherId = mother.Id;
-              userToValidate.MotherLastName = mother.LastName;
-              userToValidate.MotherFirstName = mother.FirstName;
-              userToValidate.MotherEmail = mother.Email;
-              userToValidate.MotherCell = mother.PhoneNumber.FormatPhoneNumber();
-            }
-            var father = parents.FirstOrDefault(m => m.Gender == 1);
-            if(father != null)
-            {
-              userToValidate.FatherId = father.Id;
-              userToValidate.FatherLastName = father.LastName;
-              userToValidate.FatherFirstName = father.FirstName;
-              userToValidate.FatherEmail = father.Email;
-              userToValidate.FatherCell = father.PhoneNumber.FormatPhoneNumber();
-            }
-          }
+          // if(user.UserTypeId == studentTypeId)
+          // {
+          //   var parents = await _repo.GetParents(user.Id);
+          //   var mother = parents.FirstOrDefault(m => m.Gender == 0);
+          //   if(mother != null)
+          //   {
+          //     userToValidate.MotherId = mother.Id;
+          //     userToValidate.MotherLastName = mother.LastName;
+          //     userToValidate.MotherFirstName = mother.FirstName;
+          //     userToValidate.MotherEmail = mother.Email;
+          //     userToValidate.MotherCell = mother.PhoneNumber.FormatPhoneNumber();
+          //   }
+          //   var father = parents.FirstOrDefault(m => m.Gender == 1);
+          //   if(father != null)
+          //   {
+          //     userToValidate.FatherId = father.Id;
+          //     userToValidate.FatherLastName = father.LastName;
+          //     userToValidate.FatherFirstName = father.FirstName;
+          //     userToValidate.FatherEmail = father.Email;
+          //     userToValidate.FatherCell = father.PhoneNumber.FormatPhoneNumber();
+          //   }
+          // }
 
           if(user.UserTypeId == parentTypeId)
           {
@@ -2114,14 +2221,14 @@ namespace EducNotes.API.Controllers {
     [HttpPost("EditUserToValidate")]
     public async Task<IActionResult> EditUserToValidate(EditUserToValidateDto userData)
     {
-      // List<User> users = await _cache.GetUsers();
-      var user = await _context.Users.FirstAsync(u => u.Id == userData.Id);
+      List<User> users = await _cache.GetUsers();
+      var user = users.First(u => u.Id == userData.Id);
       user.Email = userData.Email;
       user.PhoneNumber = userData.Cell;
       _context.Update(user);
       if(await _repo.SaveAll())
       {
-        // await _cache.LoadUsers();
+        await _cache.LoadUsers();
         return Ok();
       }
       else

@@ -38,9 +38,9 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.TeacherName, opt => {
                   opt.MapFrom(src => src.Teacher.LastName + ' ' + src.Teacher.FirstName);
                 })
-                .ForMember(dest => dest.CourseName, opt => {
-                  opt.MapFrom(d => d.Course.Name);
-                })
+                // .ForMember(dest => dest.Courses, opt => {
+                //   opt.MapFrom(d => d.Course.Name);
+                // })
                 .ForMember(dest => dest.ClassName, opt => {
                     opt.MapFrom(d => d.Class.Name);
                 })

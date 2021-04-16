@@ -39,6 +39,7 @@ namespace EducNotes.API.Data {
       public DbSet<UserLink> UserLinks { get; set; }
       public DbSet<UserType> UserTypes { get; set; }
       public DbSet<Schedule> Schedules { get; set; }
+      public DbSet<ScheduleCourse> ScheduleCourses { get; set; }
       public DbSet<Absence> Absences { get; set; }
       public DbSet<AbsenceType> AbsenceTypes { get; set; }
       public DbSet<ClassEvent> ClassEvents { get; set; }
@@ -111,6 +112,9 @@ namespace EducNotes.API.Data {
       public DbSet<LoginPageInfo> LoginPageInfos { get; set; }
       public DbSet<ClassLevelCourse> ClassLevelCourses { get; set; }
       public DbSet<ClassLevelClassType> ClassLevelClassTypes { get; set; }
+      public DbSet<MenuItem> MenuItems { get; set; }
+      public DbSet<Capability> Capabilities { get; set; }
+      public DbSet<RoleCapability> RoleCapabilities { get; set; }
 
       protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder)
       {

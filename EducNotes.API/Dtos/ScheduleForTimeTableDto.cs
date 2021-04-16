@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace EducNotes.API.Dtos
 {
@@ -7,8 +8,6 @@ namespace EducNotes.API.Dtos
     public int Id { get; set; }
     public int ClassId { get; set; }
     public string ClassName { get; set; }
-    public int CourseId { get; set; }
-    public string CourseName { get; set; }
     public string ClassLevel { get; set; }
     public int? TeacherId { get; set; }
     public string TeacherName { get; set; }
@@ -21,5 +20,6 @@ namespace EducNotes.API.Dtos
     public string Color { get; set; }
     public Boolean IsDarkColor { get; set; }
     public string DelInfo { get; set; }
+    public List<ScheduleCourseDto> Courses { get; set; }
   }
 }

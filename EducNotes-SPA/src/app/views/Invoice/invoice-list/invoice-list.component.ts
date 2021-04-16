@@ -9,7 +9,7 @@ import { ToastrService } from 'ngx-toastr';
     styleUrls: ['./invoice-list.component.scss']
 })
 export class InvoiceListComponent implements OnInit {
-    invoices: any[]
+    invoices: any[];
 
     constructor(
         private dl: DataLayerService,
@@ -18,7 +18,7 @@ export class InvoiceListComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        this.loadInvoices()
+        this.loadInvoices();
     }
     loadInvoices() {
         this.dl.getInvoices()

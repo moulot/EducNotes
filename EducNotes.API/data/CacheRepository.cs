@@ -909,5 +909,204 @@ namespace EducNotes.API.data {
 
       return usertypes;
     }
+
+    public async Task<List<MenuItem>> GetMenuItems()
+    {
+      List<MenuItem> menuItems = new List<MenuItem>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue (subDomain + CacheKeys.MenuItems, out menuItems))
+      {
+        // Key not in cache, so get data.
+        menuItems = await LoadMenuItems();
+      }
+
+      return menuItems;
+    }
+
+    public async Task<List<MenuItem>> LoadMenuItems()
+    {
+      List<MenuItem> menuItems = await _context.MenuItems
+                                        .Include(i => i.ParentMenu)
+                                        .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.MenuItems);
+      _cache.Set(subDomain + CacheKeys.MenuItems, menuItems, cacheEntryOptions);
+
+      return menuItems;
+    }
+
+    public async Task<List<Capability>> GetCapabilities()
+    {
+      List<Capability> capabilities = new List<Capability>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue (subDomain + CacheKeys.Capabilities, out capabilities))
+      {
+        // Key not in cache, so get data.
+        capabilities = await LoadCapabilities();
+      }
+
+      return capabilities;
+    }
+
+    public async Task<List<Capability>> LoadCapabilities()
+    {
+      List<Capability> capabilities = await _context.Capabilities
+                                        .Include(i => i.MenuItem)
+                                        .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Capabilities);
+      _cache.Set(subDomain + CacheKeys.Capabilities, capabilities, cacheEntryOptions);
+
+      return capabilities;
+    }
+
+    public async Task<List<Schedule>> GetSchedules()
+    {
+      List<Schedule> schedules = new List<Schedule>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue (subDomain + CacheKeys.Schedules, out schedules))
+      {
+        // Key not in cache, so get data.
+        schedules = await LoadSchedules();
+      }
+
+      return schedules;
+    }
+
+    public async Task<List<Schedule>> LoadSchedules()
+    {
+      List<Schedule> schedules = await _context.Schedules
+                                        .Include(i => i.Teacher)
+                                        .Include(i => i.Class)
+                                        .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Schedules);
+      _cache.Set(subDomain + CacheKeys.Schedules, schedules, cacheEntryOptions);
+
+      return schedules;
+    }
+
+    public async Task<List<ScheduleCourse>> GetScheduleCourses()
+    {
+      List<ScheduleCourse> schedules = new List<ScheduleCourse>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue (subDomain + CacheKeys.ScheduleCourses, out schedules))
+      {
+        // Key not in cache, so get data.
+        schedules = await LoadScheduleCourses();
+      }
+
+      return schedules;
+    }
+
+    public async Task<List<ScheduleCourse>> LoadScheduleCourses()
+    {
+      List<ScheduleCourse> scheduleCourses = await _context.ScheduleCourses
+                                        .Include(i => i.Course)
+                                        .Include(i => i.Schedule)
+                                        .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.ScheduleCourses);
+      _cache.Set(subDomain + CacheKeys.ScheduleCourses, scheduleCourses, cacheEntryOptions);
+
+      return scheduleCourses;
+    }
+
+    public async Task<List<Agenda>> GetAgendas()
+    {
+      List<Agenda> agendas = new List<Agenda>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue (subDomain + CacheKeys.Agendas, out agendas))
+      {
+        // Key not in cache, so get data.
+        agendas = await LoadAgendas();
+      }
+
+      return agendas;
+    }
+
+    public async Task<List<Agenda>> LoadAgendas()
+    {
+      List<Agenda> agendas = await _context.Agendas
+                                        .Include(i => i.Session).ThenInclude(i => i.Class)
+                                        .Include(i => i.Session).ThenInclude(i => i.Course)
+                                        .Include(i => i.DoneSetBy)
+                                        .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Agendas);
+      _cache.Set(subDomain + CacheKeys.Agendas, agendas, cacheEntryOptions);
+
+      return agendas;
+    }
+
+    public async Task<List<Session>> GetSessions()
+    {
+      List<Session> sessions = new List<Session>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(subDomain + CacheKeys.Sessions, out sessions))
+      {
+        // Key not in cache, so get data.
+        sessions = await LoadSessions();
+      }
+
+      return sessions;
+    }
+
+    public async Task<List<Session>> LoadSessions()
+    {
+      List<Session> sessions = await _context.Sessions
+                                        .Include(i => i.Schedule)
+                                        .Include(i => i.Teacher)
+                                        .Include(i => i.Course)
+                                        .Include(i => i.Class)
+                                        .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Sessions);
+      _cache.Set(subDomain + CacheKeys.Sessions, sessions, cacheEntryOptions);
+
+      return sessions;
+    }
   }
 }

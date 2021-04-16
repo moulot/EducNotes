@@ -85,7 +85,7 @@ namespace EducNotes.API.Data
     Task<bool> SaveProductSelection(int userPid, int userId,List<ServiceSelectionDto> products);
     Task<List<Period>> GetPeriods();
     Task<Period> GetPeriodFromDate(DateTime date);
-    Task<Session> GetSessionFromSchedule(int scheduleId, int teacherId, DateTime sessionDate);
+    Task<Session> GetSessionFromSchedule(Schedule scheduleItem, ScheduleCourse course, DateTime sessionDate);
     Task<List<Class>> GetClassesByLevelId(int levelId);
     Task<IEnumerable<Theme>> ClassLevelCourseThemes(int classLevelId, int courseId);
     Task<IEnumerable<Lesson>> ClassLevelCourseLessons(int classLevelId, int courseId);

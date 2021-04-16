@@ -67,5 +67,17 @@ namespace EducNotes.API.data
     Task<List<Product>> LoadProducts();
     Task<List<UserType>> GetUserTypes();
     Task<List<UserType>> LoadUserTypes();
+    Task<List<MenuItem>> GetMenuItems();
+    Task<List<MenuItem>> LoadMenuItems();
+    Task<List<Capability>> GetCapabilities();
+    Task<List<Capability>> LoadCapabilities();
+    Task<List<Schedule>> GetSchedules();
+    Task<List<Schedule>> LoadSchedules();
+    Task<List<ScheduleCourse>> GetScheduleCourses();
+    Task<List<ScheduleCourse>> LoadScheduleCourses();
+    Task<List<Agenda>> GetAgendas();
+    Task<List<Agenda>> LoadAgendas();
+    Task<List<Session>> GetSessions();
+    Task<List<Session>> LoadSessions();
   }
 }

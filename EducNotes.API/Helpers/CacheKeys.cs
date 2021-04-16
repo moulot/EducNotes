@@ -34,5 +34,11 @@ namespace EducNotes.API.Helpers
      public static string PaymentTypes  { get; set; }
     public static string Products { get; set; }
     public static string UserTypes { get; set; }
+    public static string MenuItems { get; set; }
+    public static string Capabilities { get; set; }
+    public static string Schedules { get; set; }
+    public static string ScheduleCourses { get; set; }
+    public static string Agendas { get; set; }
+    public static string Sessions { get; set; }
   }
 }

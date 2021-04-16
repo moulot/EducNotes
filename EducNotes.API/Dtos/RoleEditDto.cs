@@ -1,7 +1,7 @@
 namespace EducNotes.API.Dtos
 {
-    public class RoleEditDto
-    {
-        public string[] RoleNames { get; set; }
-    }
+  public class RoleEditDto
+  {
+    public string[] RoleNames { get; set; }
+  }
 }

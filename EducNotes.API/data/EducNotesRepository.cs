@@ -157,12 +157,13 @@ namespace EducNotes.API.Data {
       return siblings;
     }
 
-    public async Task<IEnumerable<User>> GetChildren (int parentId) {
-      List<UserLink> userLinks = await _cache.GetUserLinks ();
-      List<User> users = await _cache.GetUsers ();
+    public async Task<IEnumerable<User>> GetChildren(int parentId)
+    {
+      List<UserLink> userLinks = await _cache.GetUserLinks();
+      List<User> users = await _cache.GetUsers();
 
-      var userIds = userLinks.Where (u => u.UserPId == parentId).Select (s => s.UserId).ToList ();
-      return users.Where (u => userIds.Contains (u.Id)).ToList ();
+      var userIds = userLinks.Where(u => u.UserPId == parentId).Select(s => s.UserId).ToList();
+      return users.Where(u => userIds.Contains(u.Id)).ToList();
     }
 
     public async Task<List<User>> GetParentsChildren (int motherId, int fatherId) {
@@ -176,27 +177,30 @@ namespace EducNotes.API.Data {
       return users.Where (u => userIds.Contains (u.Id)).Distinct ().ToList ();
     }
 
-    public async Task<List<User>> GetParents (int ChildId) {
-      List<User> parentsCached = await _cache.GetParents ();
-      List<UserLink> userLinks = await _cache.GetUserLinks ();
+    public async Task<List<User>> GetParents(int ChildId)
+    {
+      List<User> parentsCached = await _cache.GetParents();
+      List<UserLink> userLinks = await _cache.GetUserLinks();
 
-      var links = userLinks.Where (u => u.UserId == ChildId).ToList ();
+      var links = userLinks.Where(u => u.UserId == ChildId).ToList();
 
-      List<User> parents = new List<User> ();
-      foreach (var link in links) {
-        var parent = parentsCached.FirstOrDefault (p => p.Id == link.UserPId);
-        parents.Add (parent);
+      List<User> parents = new List<User>();
+      foreach(var link in links)
+      {
+        var parent = parentsCached.FirstOrDefault(p => p.Id == link.UserPId);
+        parents.Add(parent);
       }
 
       return parents;
     }
 
-    public async Task<PagedList<User>> GetUsers (UserParams userParams) {
+    public async Task<PagedList<User>> GetUsers(UserParams userParams)
+    {
       var users = _context.Users.Include (p => p.Photos)
-        .OrderByDescending (u => u.LastActive).AsQueryable ();
+        .OrderByDescending (u => u.LastActive).AsQueryable();
 
-      users = users.Where (u => u.Id != userParams.userId);
-      users = users.Where (u => u.Gender == userParams.Gender);
+      users = users.Where(u => u.Id != userParams.userId);
+      users = users.Where(u => u.Gender == userParams.Gender);
 
       if (userParams.Likers) {
         var userLikers = await GetUserLikes (userParams.userId, userParams.Likers);
@@ -386,30 +390,34 @@ namespace EducNotes.API.Data {
         u.UserName.ToUpper () == username.ToUpper ());
     }
 
-    public async Task<Session> GetSessionFromSchedule (int scheduleId, int teacherId, DateTime sessionDate) {
-      var schedule = await _context.Schedules.FirstOrDefaultAsync (s => s.Id == scheduleId);
+    public async Task<Session> GetSessionFromSchedule(Schedule schedule, ScheduleCourse course, DateTime sessionDate)
+    {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<Session> sessions = await _cache.GetSessions();
       var scheduleDay = schedule.Day;
 
       // get session by schedule and date
-      var sessionFromDB = await _context.Sessions
-        .Include (i => i.Class)
-        .Include (i => i.Course)
-        .FirstOrDefaultAsync (s => s.ScheduleId == schedule.Id && s.SessionDate.Date == sessionDate);
-      if (sessionFromDB != null) {
-        return (sessionFromDB);
-      } else {
+      var sessionFromDB = sessions.FirstOrDefault(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == sessionDate);
+      if(sessionFromDB != null)
+      {
+        return(sessionFromDB);
+      }
+      else
+      {
         var newSession = new Session {
           ScheduleId = schedule.Id,
-          TeacherId = teacherId,
+          TeacherId = Convert.ToInt32(schedule.TeacherId),
           ClassId = schedule.ClassId,
-          CourseId = schedule.CourseId,
+          CourseId = course.CourseId,
+          CourseName = course.ItemName,
           StartHourMin = schedule.StartHourMin,
           EndHourMin = schedule.EndHourMin,
           SessionDate = sessionDate
         };
-        _context.Add (newSession);
+        _context.Add(newSession);
 
-        if (await SaveAll ()) {
+        if(await SaveAll())
+        {
           return newSession;
         }
 
@@ -417,19 +425,21 @@ namespace EducNotes.API.Data {
       }
     }
 
-    public async Task<IEnumerable<Agenda>> GetClassAgenda (int classId) {
-      return await _context.Agendas
-        .Include (i => i.Session.Class)
-        .Include (i => i.Session.Course)
-        .Where (a => a.Session.ClassId == classId)
-        .OrderBy (o => o.Session.SessionDate).ToListAsync ();
+    public async Task<IEnumerable<Agenda>> GetClassAgenda(int classId)
+    {
+      List<Agenda> agendas = await _cache.GetAgendas();
+
+      return agendas.Where(a => a.Session.ClassId == classId)
+                    .OrderBy(o => o.Session.SessionDate).ToList();
     }
 
-    public async Task<IEnumerable<User>> GetStudentsForClass (int classId) {
-      // List<User> users = await _cache.GetUsers();
-      return await _context.Users.Where (u => u.ClassId == classId)
-        .OrderBy (e => e.LastName).ThenBy (e => e.FirstName)
-        .ToListAsync ();
+    public async Task<IEnumerable<User>> GetStudentsForClass(int classId)
+    {
+      List<User> users = await _cache.GetUsers();
+
+      return users.Where(u => u.ClassId == classId)
+                  .OrderBy(e => e.LastName).ThenBy (e => e.FirstName)
+                  .ToList();
     }
 
     public async Task<IEnumerable<UserType>> getUserTypes () {
@@ -453,49 +463,62 @@ namespace EducNotes.API.Data {
       return courses;
     }
 
-    public async Task<List<TeacherClassesDto>> GetTeacherClasses (int teacherId) {
-      // List<User> users = await _cache.GetStudents();
-      var classesData = await (from courses in _context.ClassCourses join classes in _context.Classes on courses.ClassId equals classes.Id where courses.TeacherId == teacherId select new {
-          ClassId = classes.Id,
-            ClassLevelId = classes.ClassLevelId,
-            ClassName = classes.Name,
-            NbStudents = _context.Users.Where (u => u.ClassId == classes.Id).Count ()
-        })
-        .OrderBy (o => o.ClassName)
-        .Distinct ().ToListAsync ();
+    public async Task<List<TeacherClassesDto>> GetTeacherClasses(int teacherId)
+    {
+      List<User> users = await _cache.GetStudents();
+      List<Class> classesCached = await _cache.GetClasses();
+      List<ClassCourse> classesCourses = await _cache.GetClassCourses();
 
-      List<TeacherClassesDto> teacherClasses = new List<TeacherClassesDto> ();
-      foreach (var aclass in classesData) {
-        TeacherClassesDto tcd = new TeacherClassesDto ();
+      var classesData = (from courses in classesCourses join classes in classesCached
+                        on courses.ClassId equals classes.Id where courses.TeacherId == teacherId
+                        select new {
+                          ClassId = classes.Id,
+                          ClassLevelId = classes.ClassLevelId,
+                          ClassName = classes.Name,
+                          NbStudents = users.Where(u => u.ClassId == classes.Id).Count()
+                        })
+        .OrderBy(o => o.ClassName)
+        .Distinct().ToList();
+
+      List<TeacherClassesDto> teacherClasses = new List<TeacherClassesDto>();
+      foreach(var aclass in classesData)
+      {
+        TeacherClassesDto tcd = new TeacherClassesDto();
         tcd.ClassId = aclass.ClassId;
         tcd.ClassLevelId = aclass.ClassLevelId;
         tcd.ClassName = aclass.ClassName;
         tcd.NbStudents = aclass.NbStudents;
-        teacherClasses.Add (tcd);
+        teacherClasses.Add(tcd);
       }
 
       return teacherClasses;
     }
 
-    public async Task<List<NextCoursesByClassDto>> GetNextCoursesByClass (int teacherId) {
+    public async Task<List<NextCoursesByClassDto>> GetNextCoursesByClass(int teacherId)
+    {
+      List<User> teachers = await _cache.GetTeachers();
+
       var nextCourses = 10; // next coming courses
       var today = DateTime.Now;
       // monday=1, tue=2, ...
-      var todayDay = ((int) today.DayOfWeek == 0) ? 7 : (int) DateTime.Now.DayOfWeek;
+      var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
       var todayHourMin = today.TimeOfDay;
 
-      var teacher = await _context.Users.FirstAsync (u => u.Id == teacherId);
-      var teacherClasses = await GetTeacherClasses (teacherId);
-      List<NextCoursesByClassDto> nextCoursesByClass = new List<NextCoursesByClassDto> ();
-      foreach (var aclass in teacherClasses) {
-        NextCoursesByClassDto coursesByClass = new NextCoursesByClassDto ();
+      var teacher = teachers.First(u => u.Id == teacherId);
+      var teacherClasses = await GetTeacherClasses(teacherId);
+      List<NextCoursesByClassDto> nextCoursesByClass = new List<NextCoursesByClassDto>();
+      foreach(var aclass in teacherClasses)
+      {
+        NextCoursesByClassDto coursesByClass = new NextCoursesByClassDto();
         coursesByClass.TeacherId = teacherId;
         coursesByClass.TeacherName = teacher.LastName + ' ' + teacher.FirstName;
         coursesByClass.ClassId = aclass.ClassId;
         coursesByClass.ClassName = aclass.ClassName;
-        coursesByClass.Courses = new List<ClassNextCoursesDto> ();
+        coursesByClass.Courses = new List<ClassNextCoursesDto>();
 
-        var teacherCourses = await (from courses in _context.ClassCourses join Schedule in _context.Schedules on courses.CourseId equals Schedule.CourseId select new {
+        var teacherCourses = await (from courses in _context.ClassCourses
+                              join Schedule in _context.Schedules on courses.CourseId equals Schedule.CourseId
+                              select new {
             ScheduleId = Schedule.Id,
               TeacherId = courses.TeacherId,
               TeacherName = courses.Teacher.LastName + ' ' + courses.Teacher.FirstName,
@@ -506,15 +529,15 @@ namespace EducNotes.API.Data {
               Day = Schedule.Day,
               CourseStartHM = Schedule.StartHourMin,
               CourseEndHM = Schedule.EndHourMin,
-              StartHourMin = Schedule.StartHourMin.ToString ("HH:mm", frC),
-              EndHourMin = Schedule.EndHourMin.ToString ("HH:mm", frC)
+              StartHourMin = Schedule.StartHourMin.ToString("HH:mm", frC),
+              EndHourMin = Schedule.EndHourMin.ToString("HH:mm", frC)
           })
-          .Where (w => w.TeacherId == teacherId && w.ClassId == aclass.ClassId && w.Day == todayDay)
+          .Where(w => w.TeacherId == teacherId && w.ClassId == aclass.ClassId && w.Day == todayDay)
           //&& w.CourseStartHM.TimeOfDay >= todayHourMin)
           .OrderBy (o => o.StartHourMin)
-          .Distinct ()
-          .Take (nextCourses)
-          .ToListAsync ();
+          .Distinct()
+          .Take(nextCourses)
+          .ToListAsync();
 
         foreach (var course in teacherCourses) {
           ClassNextCoursesDto cncd = new ClassNextCoursesDto ();
@@ -806,15 +829,19 @@ namespace EducNotes.API.Data {
                   photo.PublicId = uploadResult.PublicId;
                   photo.UserId = appUser.Id;
                   photo.DateAdded = DateTime.Now;
-                  if(appUser.Photos.Any (u => u.IsMain))
+                  if(appUser.Photos.Any(u => u.IsMain))
                   {
                     var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
                     oldPhoto.IsMain = false;
-                    Update (oldPhoto);
+                    Update(oldPhoto);
                   }
                   photo.IsMain = true;
                   photo.IsApproved = true;
                   Add(photo);
+                }
+                else
+                {
+                  resultStatus = false;
                 }
               }
             }
@@ -824,15 +851,38 @@ namespace EducNotes.API.Data {
             resultStatus = true;
           }
 
-          if(await SaveAll())
+          if(photoFile!= null && await SaveAll())
           {
-            // await _cache.LoadUsers();
-            // fin de la transaction
-            identityContextTransaction.Commit();
-            resultStatus = true;
+            var result = await _userManager.UpdateAsync(appUser);
+            if(result.Succeeded)
+            {
+              await _cache.LoadUsers();
+              // fin de la transaction
+              identityContextTransaction.Commit();
+              resultStatus = true;
+            }
+            else
+            {
+              identityContextTransaction.Rollback();
+              resultStatus = false;
+            }
           }
           else
-            resultStatus = false;
+          {
+            var result = await _userManager.UpdateAsync(appUser);
+            if(result.Succeeded)
+            {
+              await _cache.LoadUsers();
+              // fin de la transaction
+              identityContextTransaction.Commit();
+              resultStatus = true;
+            }
+            else
+            {
+              identityContextTransaction.Rollback();
+              resultStatus = false;
+            }
+          }
         }
         catch
         {
@@ -1165,41 +1215,46 @@ namespace EducNotes.API.Data {
         " <a href=" + _config.GetValue<String> ("AppSettings:DefaultEmailValidationLink") + code + " /> cliquer ici</a></p> <br>";
     }
 
-    public IEnumerable<ClassAgendaToReturnDto> GetAgendaListByDueDate (IEnumerable<Agenda> agendaItems) {
-      //selection de toutes les differentes dates
-      var dueDates = agendaItems.OrderBy (o => o.Session.SessionDate).Select (e => e.Session.SessionDate).Distinct ();
+    public IEnumerable<ClassAgendaToReturnDto> GetAgendaListByDueDate(IEnumerable<Agenda> agendaItems)
+    {
+      //select all distinct dates
+      var dueDates = agendaItems.OrderBy(o => o.Session.SessionDate).Select(e => e.Session.SessionDate).Distinct();
 
-      var agendasToReturn = new List<ClassAgendaToReturnDto> ();
-      foreach (var currDate in dueDates) {
-        var currentDateAgendas = agendaItems.Where (e => e.Session.SessionDate == currDate);
-        var agenda = new ClassAgendaToReturnDto ();
+      var agendasToReturn = new List<ClassAgendaToReturnDto>();
+      foreach(var currDate in dueDates)
+      {
+        var currentDateAgendas = agendaItems.Where(e => e.Session.SessionDate == currDate);
+        var agenda = new ClassAgendaToReturnDto();
         agenda.dtDueDate = currDate;
-        agenda.DueDate = currDate.ToLongDateString ();
-        agenda.ShortDueDate = currDate.ToString ("ddd dd MMM", frC);
+        agenda.DueDate = currDate.ToLongDateString();
+        agenda.ShortDueDate = currDate.ToString("ddd dd MMM", frC);
         agenda.DueDateDay = currDate.Day;
-        agenda.NbTasks = currentDateAgendas.Count ();
+        agenda.NbTasks = currentDateAgendas.Count();
         var dayInt = (int) currDate.DayOfWeek;
         agenda.DayInt = dayInt == 0 ? 7 : dayInt;
-        agenda.Courses = new List<CourseTask> ();
-        foreach (var a in currentDateAgendas) {
-          agenda.Courses.Add (new CourseTask {
+        agenda.Courses = new List<CourseTask>();
+        foreach(var a in currentDateAgendas)
+        {
+          agenda.Courses.Add (new CourseTask
+          {
             CourseId = a.Session.Course.Id,
               CourseName = a.Session.Course.Name,
               CourseColor = a.Session.Course.Color,
               TaskDesc = a.TaskDesc,
-              DateAdded = a.DateAdded.ToLongDateString (),
-              ShortDateAdded = a.DateAdded.ToString ("dd/MM/yyyy", frC)
+              DateAdded = a.DateAdded.ToLongDateString(),
+              ShortDateAdded = a.DateAdded.ToString("dd/MM/yyyy", frC)
           });
         }
 
-        agendasToReturn.Add (agenda);
+        agendasToReturn.Add(agenda);
       }
 
       return agendasToReturn;
     }
 
-    public async Task<IEnumerable<ClassType>> GetClassTypes () {
-      return await _context.ClassTypes.ToListAsync ();
+    public async Task<IEnumerable<ClassType>> GetClassTypes()
+    {
+      return await _context.ClassTypes.ToListAsync();
     }
 
     public async Task<List<string>> GetEmails () {
@@ -3079,12 +3134,13 @@ namespace EducNotes.API.Data {
       return cycles;
     }
 
-    public async Task<Order> GetOrder (int id) {
-      List<Order> orders = await _cache.GetOrders ();
-      List<OrderLine> lines = await _cache.GetOrderLines ();
+    public async Task<Order> GetOrder(int id)
+    {
+      List<Order> orders = await _cache.GetOrders();
+      List<OrderLine> lines = await _cache.GetOrderLines();
 
-      var order = orders.FirstOrDefault (o => o.Id == id);
-      order.Lines = lines.Where (o => o.OrderId == order.Id).ToList ();
+      var order = orders.FirstOrDefault(o => o.Id == id);
+      order.Lines = lines.Where(o => o.OrderId == order.Id).ToList();
 
       return order;
     }
@@ -3107,9 +3163,10 @@ namespace EducNotes.API.Data {
       return payments;
     }
 
-    public async Task<List<OrderLine>> GetOrderLines (int orderId) {
-      List<OrderLine> linesCached = await _cache.GetOrderLines ();
-      var lines = linesCached.Where (ol => ol.OrderId == orderId).ToList ();
+    public async Task<List<OrderLine>> GetOrderLines(int orderId)
+    {
+      List<OrderLine> linesCached = await _cache.GetOrderLines();
+      var lines = linesCached.Where(ol => ol.OrderId == orderId).ToList();
       return lines;
     }
 
@@ -3169,17 +3226,18 @@ namespace EducNotes.API.Data {
       return classLevels;
     }
 
-    public async Task<List<OrderLinePaidDto>> GetOrderLinesPaid () {
-      // List<OrderLine> lines = await _cache.GetOrderLines();
-      // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+    public async Task<List<OrderLinePaidDto>> GetOrderLinesPaid()
+    {
+      List<OrderLine> lines = await _cache.GetOrderLines();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
 
-      var lines = await _context.OrderLines.ToListAsync ();
-      List<OrderLinePaidDto> linesPaid = new List<OrderLinePaidDto> ();
-      foreach (var line in lines) {
-        OrderLinePaidDto olpd = new OrderLinePaidDto ();
+      // var lines = await _context.OrderLines.ToListAsync ();
+      List<OrderLinePaidDto> linesPaid = new List<OrderLinePaidDto>();
+      foreach(var line in lines)
+      {
+        OrderLinePaidDto olpd = new OrderLinePaidDto();
         olpd.OrderLineId = line.Id;
-        olpd.Amount = await _context.FinOpOrderLines.Where (f => f.OrderLineId == line.Id && f.FinOp.Cashed)
-          .SumAsync (s => s.Amount);
+        olpd.Amount = finOpLines.Where (f => f.OrderLineId == line.Id && f.FinOp.Cashed).Sum(s => s.Amount);
         linesPaid.Add (olpd);
       }
       return linesPaid;

@@ -48,13 +48,14 @@ namespace EducNotes.API.Controllers {
     [HttpGet("{id}")]
     public async Task<IActionResult> GetClass(int Id)
     {
-      // List<Class> classes = await _cache.GetClasses();
-      var theclass = await _context.Classes.FirstOrDefaultAsync(c => c.Id == Id);
+      List<Class> classes = await _cache.GetClasses();
+      var theclass = classes.FirstOrDefault(c => c.Id == Id);
       return Ok(theclass);
     }
 
     [HttpGet ("{classId}/schedule/today")]
-    public async Task<IActionResult> GetScheduleToday (int classId) {
+    public async Task<IActionResult> GetScheduleToday(int classId)
+    {
       // monday=1, tue=2, ...
       var today = ((int) DateTime.Now.DayOfWeek == 0) ? 7 : (int) DateTime.Now.DayOfWeek;
 
@@ -68,25 +69,25 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("{classId}/schedule/{day}")]
-    public async Task<IActionResult> GetScheduleDay (int classId, int day) {
-      var theclass = await GetClass (classId);
+    public async Task<IActionResult> GetScheduleDay(int classId, int day)
+    {
+      var theclass = await GetClass(classId);
 
       if (theclass == null)
         return BadRequest ("la classe n'existe pas");
 
       if (day < 1 || day > 7)
-        return BadRequest ("le jour de la semaine est incorrect.");
+        return BadRequest("le jour de la semaine est incorrect.");
 
       var courses = await _context.Schedules
-        .Include (i => i.Class).ThenInclude (i => i.ClassLevel)
-        .Include (i => i.Course)
-        .Where (d => d.Day == day && d.ClassId == classId)
-        .OrderBy (s => s.StartHourMin).ToListAsync ();
+                          .Include(i => i.Class).ThenInclude(i => i.ClassLevel)
+                          .Where(d => d.Day == day && d.ClassId == classId)
+                          .OrderBy(s => s.StartHourMin).ToListAsync();
 
-      if (courses.Count == 0)
-        return Unauthorized ();
+      if(courses.Count == 0)
+        return Unauthorized();
 
-      var coursesToReturn = _mapper.Map<IEnumerable<ScheduleForTimeTableDto>> (courses);
+      var coursesToReturn = _mapper.Map<IEnumerable<ScheduleForTimeTableDto>>(courses);
       return Ok (coursesToReturn);
     }
 
@@ -119,10 +120,10 @@ namespace EducNotes.API.Controllers {
     [HttpGet("{classId}/ScheduleCoursesByDay")]
     public async Task<IActionResult> GetClassScheduleByDay(int classId)
     {
-      var scheduleItems = await _context.Schedules.Include(i => i.Class)
-                                                  .Include(i => i.Course)
-                                                  .Where(s => s.ClassId == classId).ToListAsync();
-      
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
+
+      var scheduleItems = schedules.Where(s => s.ClassId == classId).ToList();
       var days = scheduleItems.Select(d => d.Day).Distinct();
 
       ScheduleClassDto classSchedule = new ScheduleClassDto();
@@ -132,33 +133,35 @@ namespace EducNotes.API.Controllers {
         classSchedule.ClassName = scheduleItems[0].Class.Name;
 
         classSchedule.Days = new List<ScheduleDayDto>();
-        foreach (var day in days) {
-          ScheduleDayDto sdd = new ScheduleDayDto();
-          sdd.Day = day;
-          sdd.DayName = day.DayIntToName();
+        foreach(var day in days)
+        {
+          ScheduleDayDto scheduleDay = new ScheduleDayDto();
+          scheduleDay.Day = day;
+          scheduleDay.DayName = day.DayIntToName();
 
-          var courses = scheduleItems.Where(s => s.Day == day).OrderBy (o => o.StartHourMin.ToString("HH:mm", frC));
-          sdd.Courses = new List<ScheduleCourseDto>();
-          foreach(var course in courses)
+          var scheduleDayItems = scheduleItems.Where(s => s.Day == day).OrderBy(o => o.StartHourMin.ToString("HH:mm", frC));
+          scheduleDay.Courses = new List<ScheduleCourseDto>();
+          foreach(var item in scheduleDayItems)
           {
-            ScheduleCourseDto courseDto = new ScheduleCourseDto();
-            courseDto.CourseId = course.CourseId;
-            courseDto.CourseName = course.Course.Name;
-            courseDto.ClassId = course.ClassId;
-            courseDto.ClassName = course.Class.Name;
-            courseDto.TeacherId = Convert.ToInt32(course.TeacherId);
-            courseDto.CourseAbbrev = course.Course.Abbreviation;
-            courseDto.CourseColor = course.Course.Color;
-            courseDto.IsDarkColor = course.Course.Color.IsDarkColor();
-            courseDto.StartHour = course.StartHourMin;
-            courseDto.StartH = course.StartHourMin.ToString("HH:mm", frC);
-            courseDto.EndHour = course.EndHourMin;
-            courseDto.EndH = course.EndHourMin.ToString("HH:mm", frC);
-            courseDto.InConflict = false;
-            sdd.Courses.Add(courseDto);
+            List<ScheduleCourse> courses = scheduleCourses.Where(c => c.ScheduleId == item.Id).ToList();
+            foreach (var course in courses)
+            {
+              ScheduleCourseDto courseDto = new ScheduleCourseDto();
+              courseDto.Course = course.Course;
+              courseDto.ItemName = course.ItemName;
+              courseDto.ClassId = item.ClassId;
+              courseDto.ClassName = item.Class.Name;
+              courseDto.IsDarkColor = course.Course.Color.IsDarkColor();
+              courseDto.StartHour = item.StartHourMin;
+              courseDto.StartH = item.StartHourMin.ToString("HH:mm", frC);
+              courseDto.EndHour = item.EndHourMin;
+              courseDto.EndH = item.EndHourMin.ToString("HH:mm", frC);
+              courseDto.InConflict = false;
+              scheduleDay.Courses.Add(courseDto);
+            }
           }
 
-          classSchedule.Days.Add(sdd);
+          classSchedule.Days.Add(scheduleDay);
         }
       }
 
@@ -227,22 +230,29 @@ namespace EducNotes.API.Controllers {
       return BadRequest ("aucun emploi du temps trouvé");
     }
 
-    [HttpPut ("DelCourseFromSchedule/{scheduleId}")]
-    public async Task<IActionResult> DeleteScheduleItem (int scheduleId) {
+    [HttpPut("DelCourseFromSchedule/{scheduleId}")]
+    public async Task<IActionResult> DeleteScheduleItem(int scheduleId)
+    {
       bool deleteOK = false;
-      var schedule = await _context.Schedules.FirstOrDefaultAsync (s => s.Id == scheduleId);
-      if (schedule != null) {
-        using (var identityContextTransaction = _context.Database.BeginTransaction ()) {
-          try {
+      var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == scheduleId);
+      if(schedule != null)
+      {
+        using(var identityContextTransaction = _context.Database.BeginTransaction())
+        {
+          try
+          {
             _repo.Delete (schedule);
-            if (await _repo.SaveAll ()) {
-              identityContextTransaction.Commit ();
+            if(await _repo.SaveAll())
+            {
+              identityContextTransaction.Commit();
               deleteOK = true;
-              return Ok (deleteOK);
+              return Ok(deleteOK);
             }
-          } catch {
-            identityContextTransaction.Rollback ();
-            return Ok (deleteOK);
+          }
+          catch
+          {
+            identityContextTransaction.Rollback();
+            return Ok(deleteOK);
           }
         }
       }
@@ -708,10 +718,12 @@ namespace EducNotes.API.Controllers {
 
     }
 
-    [HttpPut ("saveSchedules")]
-    public async Task<IActionResult> saveSchedules ([FromBody] ScheduleDataDto[] schedules) {
-      foreach (var sch in schedules) {
-        Schedule schedule = new Schedule ();
+    [HttpPut("saveSchedules")]
+    public async Task<IActionResult> saveSchedules([FromBody] ScheduleDataDto[] schedules)
+    {
+      foreach(var sch in schedules)
+      {
+        Schedule schedule = new Schedule();
         //set the dates proprerly
         var StartHour = sch.StartHour;
         var StartMin = sch.StartMin;
@@ -722,55 +734,74 @@ namespace EducNotes.API.Controllers {
 
         schedule.ClassId = sch.ClassId;
         schedule.TeacherId = sch.TeacherId;
-        schedule.CourseId = sch.CourseId;
         schedule.Day = sch.Day;
         schedule.StartHourMin = StartHourMin;
         schedule.EndHourMin = EndHourMin;
+        _repo.Add(schedule);
+        await _context.SaveChangesAsync();
 
-        _repo.Add (schedule);
+        ScheduleCourse scheduleCourse = new ScheduleCourse();
+        scheduleCourse.ScheduleId = schedule.Id;
+        scheduleCourse.CourseId = sch.CourseId;
+        scheduleCourse.ItemName = sch.ItemName;
+        _repo.Add(scheduleCourse);
       }
 
-      if (await _repo.SaveAll ())
-        return NoContent ();
+      if(await _repo.SaveAll())
+      {
+        await _cache.LoadSchedules();
+        await _cache.LoadScheduleCourses();
+        return NoContent();
+      }
 
-      return BadRequest ("problème d'enregistrement des données");
+      return BadRequest("problème d'enregistrement des données");
     }
 
     [HttpPut ("SaveAgenda")]
-    public async Task<IActionResult> SaveAgendaItem ([FromBody] AgendaForSaveDto agendaForSaveDto) {
+    public async Task<IActionResult> SaveAgendaItem([FromBody] AgendaForSaveDto agendaForSaveDto)
+    {
       var id = agendaForSaveDto.Id;
-      Agenda newAgendaItem = new Agenda ();
-      if (id == 0) {
+      Agenda newAgendaItem = new Agenda();
+      if(id == 0)
+      {
         _mapper.Map (agendaForSaveDto, newAgendaItem);
         newAgendaItem.DateAdded = DateTime.Now;
-        newAgendaItem.DoneSetById = int.Parse (User.FindFirst (ClaimTypes.NameIdentifier).Value);
-        _repo.Add (newAgendaItem);
-      } else {
-        var agendaItemFromRepo = await _repo.GetAgenda (id);
+        newAgendaItem.DoneSetById = int.Parse(User.FindFirst (ClaimTypes.NameIdentifier).Value);
+        _repo.Add(newAgendaItem);
+      }
+      else
+      {
+        var agendaItemFromRepo = await _repo.GetAgenda(id);
         _mapper.Map (agendaForSaveDto, agendaItemFromRepo);
         agendaItemFromRepo.DateAdded = DateTime.Now;
       }
 
-      if (await _repo.SaveAll ()) {
-        if (id == 0)
-          return Ok (newAgendaItem.Id);
+      if(await _repo.SaveAll())
+      {
+        await _cache.LoadAgendas();
+        if(id == 0)
+          return Ok(newAgendaItem.Id);
         else
-          return Ok (id);
+          return Ok(id);
       }
 
       throw new Exception ($"Updating/Saving agendaItem failed");
     }
 
-    [HttpGet ("GetCourses")]
-    public async Task<IActionResult> GetCourses () {
-      var courses = await _context.Courses.OrderBy (a => a.Name).ToListAsync ();
-      return Ok (courses);
+    [HttpGet("GetCourses")]
+    public async Task<IActionResult> GetCourses()
+    {
+      List<Course> coursesCached = await _cache.GetCourses();
+      var courses = coursesCached.OrderBy(a => a.Name).ToList();
+      return Ok(courses);
     }
 
     [HttpGet ("AllClasses")]
-    public async Task<IActionResult> GetAllClasses () {
-      var les_classes = _context.Classes.Include (e => e.ClassLevel).OrderBy (a => a.Name);
-      return Ok (await les_classes.ToListAsync ());
+    public async Task<IActionResult> GetAllClasses()
+    {
+      List<Class> classes = await _cache.GetClasses();
+      var les_classes = classes.OrderBy (a => a.Name).ToList();
+      return Ok(les_classes);
     }
 
     [HttpGet("{teacherId}/FreePrimaryClasses/{educLevelId}")]
@@ -1241,7 +1272,6 @@ namespace EducNotes.API.Controllers {
     public async Task<IActionResult> GetSchedule (int id) {
       var schedule = await _context.Schedules
         .Include (i => i.Class)
-        .Include (i => i.Course)
         .FirstOrDefaultAsync (s => s.Id == id);;
       var scheduleToReturn = _mapper.Map<ScheduleToReturnDto> (schedule);
 
@@ -1255,29 +1285,31 @@ namespace EducNotes.API.Controllers {
       return Ok (session);
     }
 
-    [HttpGet ("Schedule/{scheduleId}/Session")]
-    public async Task<IActionResult> GetSessionFromSchedule (int scheduleId) {
-      var schedule = await _context.Schedules.FirstOrDefaultAsync (s => s.Id == scheduleId);
-      if (schedule == null)
-        return BadRequest ("problème pour créer la session du cours.");
+    [HttpGet("Schedule/{scheduleId}/Session")]
+    public async Task<IActionResult> GetSessionFromSchedule(int scheduleId)
+    {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
+      List<Session> sessions = await _cache.GetSessions();
+
+      var schedule = schedules.FirstOrDefault(s => s.Id == scheduleId);
+      if(schedule == null)
+        return BadRequest("problème pour créer la session du cours.");
 
       var scheduleDay = schedule.Day;
       var today = DateTime.Now.Date;
       // monday=1, tue=2, ...
-      var todayDay = ((int) today.DayOfWeek == 0) ? 7 : (int) DateTime.Now.DayOfWeek;
-
-      // if (todayDay != scheduleDay)
-      //   return BadRequest("l'emploi du temps du jour est incohérent.");
+      var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
 
       // get session by schedule and date
-      var sessionFromDB = await _context.Sessions
-        .Include (i => i.Class)
-        .Include (i => i.Course)
-        .FirstOrDefaultAsync (s => s.ScheduleId == schedule.Id && s.SessionDate.Date == today);
-      if (sessionFromDB != null) {
-        var session = _mapper.Map<SessionToReturnDto> (sessionFromDB);
-        return Ok (session);
-      } else {
+      var sessionFromDB = sessions.FirstOrDefault(s => s.ScheduleId == schedule.Id && s.SessionDate.Date == today);
+      if(sessionFromDB != null)
+      {
+        var session = _mapper.Map<SessionToReturnDto>(sessionFromDB);
+        return Ok(session);
+      }
+      else
+      {
         var newSession = _context.Add (new Session {
           ScheduleId = schedule.Id,
             TeacherId = int.Parse (User.FindFirst (ClaimTypes.NameIdentifier).Value),
@@ -1288,17 +1320,20 @@ namespace EducNotes.API.Controllers {
             SessionDate = today
         });
 
-        if (await _repo.SaveAll ()) {
-          var session = _mapper.Map<SessionToReturnDto> (newSession);
-          return Ok (session);
+        if(await _repo.SaveAll())
+        {
+          await _cache.LoadSessions();
+          var session = _mapper.Map<SessionToReturnDto>(newSession);
+          return Ok(session);
         }
 
-        return BadRequest ("problème pour récupérer la session");
+        return BadRequest("problème pour récupérer la session");
       }
     }
 
-    [HttpGet ("courses/{courseId}/teacher/{teacherId}/Program")]
-    public async Task<IActionResult> ClassesWithProgram (int courseId, int teacherId) {
+    [HttpGet("courses/{courseId}/teacher/{teacherId}/Program")]
+    public async Task<IActionResult> ClassesWithProgram (int courseId, int teacherId)
+    {
       // course data
       var course = await _context.Courses.FirstAsync (c => c.Id == courseId);
       //get teacher data (classes & courses)

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
@@ -17,7 +17,7 @@ import { MdbWysiwygComponent } from 'mdb-wysiwyg';
 })
 export class BroadcastComponent implements OnInit {
   @ViewChild(MdbWysiwygComponent, { static: false }) emailBody: MdbWysiwygComponent;
-  @ViewChild(MdbWysiwygComponent, { static: false }) smsBody: MdbWysiwygComponent;
+  // @ViewChild(MdbWysiwygComponent, { static: false }) smsBody: MdbWysiwygComponent;
   parentTypeId = environment.parentTypeId;
   studentTypeId = environment.studentTypeId;
   teacherTypeId = environment.teacherTypeId;
@@ -272,18 +272,13 @@ export class BroadcastComponent implements OnInit {
 
   addTokenToEmailBody(token) {
     const body = this.msgForm.value.emailBody;
-    // console.log(this.emailBody.textarea.nativeElement.innerTEXT);
-    // console.log(this.emailBody.textarea.nativeElement.innerHTML);
-    // this.emailBody.textarea.nativeElement.innerTEXT = body + ' ' + token;
-    // this.emailBody.textarea.nativeElement.innerHTML = body + ' ' + token;
-    // console.log(this.emailBody.textarea.nativeElement.innerTEXT);
-    // console.log(this.emailBody.textarea.nativeElement.innerHTML);
-    // this.msgForm.get('emailBody').setValue(this.emailBody.value);
+    this.emailBody.textarea.nativeElement.focus();
+    this.msgForm.controls.emailBody.setValue(body + ' ' + token);
   }
 
   addTokenToSmsBody(token) {
     const body = this.msgForm.value.smsBody;
-    this.msgForm.get('smsBody').setValue(body + ' ' + token);
+    this.msgForm.controls.smsBody.setValue(body + ' ' + token);
   }
 
   getData() {

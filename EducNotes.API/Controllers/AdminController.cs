@@ -77,8 +77,8 @@ namespace EducNotes.API.Controllers {
       _cloudinary = new Cloudinary (acc);
     }
 
-    [Authorize (Policy = "RequireAdminRole")]
-    [HttpGet ("usersWithRoles")]
+    [Authorize(Policy = "RequireAdminRole")]
+    [HttpGet("usersWithRoles")]
     public async Task<IActionResult> GetUsersWithRoles () {
       var userList = await (from user in _context.Users orderby user.UserName select new {
         Id = user.Id,
@@ -89,46 +89,49 @@ namespace EducNotes.API.Controllers {
       return Ok (userList);
     }
 
-    [Authorize (Policy = "RequireAdminRole")]
-    [HttpPost ("editRoles/{userName}")]
-    public async Task<IActionResult> EditRoles (string userName, RoleEditDto roleEditDto) {
-      var user = await _userManager.FindByNameAsync (userName);
+    [Authorize(Policy = "RequireAdminRole")]
+    [HttpPost("editRoles/{userName}")]
+    public async Task<IActionResult> EditRoles(string userName, RoleEditDto roleEditDto)
+    {
+      var user = await _userManager.FindByNameAsync(userName);
 
-      var userRoles = await _userManager.GetRolesAsync (user);
+      var userRoles = await _userManager.GetRolesAsync(user);
 
       var selectedRoles = roleEditDto.RoleNames;
 
       //selected = selectedRoles != null? selectedRoles : new string[] {};
       selectedRoles = selectedRoles ?? new string[] { };
 
-      var result = await _userManager.AddToRolesAsync (user, selectedRoles.Except (userRoles));
+      var result = await _userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
 
       if (!result.Succeeded)
-        return BadRequest ("Failed to add to roles");
+        return BadRequest("Failed to add to roles");
 
-      result = await _userManager.RemoveFromRolesAsync (user, userRoles.Except (selectedRoles));
+      result = await _userManager.RemoveFromRolesAsync(user, userRoles.Except (selectedRoles));
 
       if (!result.Succeeded)
-        return BadRequest ("Failed to remove roles");
+        return BadRequest("Failed to remove roles");
 
-      return Ok (await _userManager.GetRolesAsync (user));
+      return Ok(await _userManager.GetRolesAsync(user));
     }
 
-    [Authorize (Policy = "ModeratePhotoRole")]
-    [HttpGet ("photosForModeration")]
-    public async Task<IActionResult> GetPhotosForModeration () {
+    [Authorize(Policy = "ModeratePhotoRole")]
+    [HttpGet("photosForModeration")]
+    public async Task<IActionResult> GetPhotosForModeration()
+    {
       var photos = await _context.Photos
-        .Include (u => u.User)
-        .IgnoreQueryFilters ()
-        .Where (p => p.IsApproved == false)
-        .Select (u => new {
-          Id = u.Id,
-            userName = u.User.UserName,
-            Url = u.Url,
-            IsApproved = u.IsApproved
-        }).ToListAsync ();
+                          .Include(u => u.User)
+                          .IgnoreQueryFilters()
+                          .Where(p => p.IsApproved == false)
+                          .Select(u => new {
+                            Id = u.Id,
+                            userName = u.User.UserName,
+                            Url = u.Url,
+                            IsApproved = u.IsApproved
+                          })
+                          .ToListAsync();
 
-      return Ok (photos);
+      return Ok(photos);
     }
 
     [Authorize (Policy = "ModeratePhotoRole")]
