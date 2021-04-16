@@ -2,7 +2,7 @@ using System;
 
 namespace EducNotes.API.Models
 {
-  public class MenuItem : BaseClass
+  public class MenuItem : BaseEntity
   {
     public MenuItem()
     {

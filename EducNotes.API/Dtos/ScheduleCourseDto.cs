@@ -6,7 +6,8 @@ namespace EducNotes.API.Dtos
   public class ScheduleCourseDto
   {
     public Course Course { get; set; }
-    public string ItemName { get; set; }
+    // public int ActivityId { get; set; }
+    public string ActivityName { get; set; }
     public int ClassId { get; set; }
     public string ClassName { get; set; }
     public DateTime StartHour { get; set; }

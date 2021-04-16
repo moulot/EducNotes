@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EducNotes.API.Models
 {
-  public class BaseClass
+  public class BaseEntity
   {
-    public BaseClass()
+    public BaseEntity()
     {
       InsertUserId = 1;
       UpdateUserId = 1;

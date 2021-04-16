@@ -1,6 +1,6 @@
 namespace EducNotes.API.Models
 {
-  public class RoleCapability : BaseClass
+  public class RoleCapability : BaseEntity
   {
     public int RoleId { get; set; }
     public Role Role { get; set; }

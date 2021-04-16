@@ -991,7 +991,6 @@ namespace EducNotes.API.data {
     public async Task<List<Schedule>> LoadSchedules()
     {
       List<Schedule> schedules = await _context.Schedules
-                                        .Include(i => i.Teacher)
                                         .Include(i => i.Class)
                                         .ToListAsync();
 
@@ -1026,6 +1025,8 @@ namespace EducNotes.API.data {
       List<ScheduleCourse> scheduleCourses = await _context.ScheduleCourses
                                         .Include(i => i.Course)
                                         .Include(i => i.Schedule)
+                                        .Include(i => i.Teacher)
+                                        .Include(i => i.Activity)
                                         .ToListAsync();
 
       // Set cache options.
@@ -1059,6 +1060,7 @@ namespace EducNotes.API.data {
       List<Agenda> agendas = await _context.Agendas
                                         .Include(i => i.Session).ThenInclude(i => i.Class)
                                         .Include(i => i.Session).ThenInclude(i => i.Course)
+                                        .Include(i => i.Session).ThenInclude(i => i.Activity)
                                         .Include(i => i.DoneSetBy)
                                         .ToListAsync();
 
@@ -1095,6 +1097,7 @@ namespace EducNotes.API.data {
                                         .Include(i => i.Teacher)
                                         .Include(i => i.Course)
                                         .Include(i => i.Class)
+                                        .Include(i => i.Activity)
                                         .ToListAsync();
 
       // Set cache options.
@@ -1107,6 +1110,42 @@ namespace EducNotes.API.data {
       _cache.Set(subDomain + CacheKeys.Sessions, sessions, cacheEntryOptions);
 
       return sessions;
+    }
+
+    public async Task<List<Event>> GetEvents()
+    {
+      List<Event> events = new List<Event>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(subDomain + CacheKeys.Events, out events))
+      {
+        // Key not in cache, so get data.
+        events = await LoadEvents();
+      }
+
+      return events;
+    }
+
+    public async Task<List<Event>> LoadEvents()
+    {
+      List<Event> events = await _context.Events
+                                        .Include(i => i.User)
+                                        .Include(i => i.EventType)
+                                        .Include(i => i.Evaluation)
+                                        .Include(i => i.Class)
+                                        .Include(i => i.Session)
+                                        .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Events);
+      _cache.Set(subDomain + CacheKeys.Events, events, cacheEntryOptions);
+
+      return events;
     }
   }
 }

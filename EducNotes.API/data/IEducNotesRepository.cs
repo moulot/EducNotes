@@ -25,7 +25,7 @@ namespace EducNotes.API.Data
     Task<IEnumerable<User>> GetClassStudents(int classId);
     Task<IEnumerable<Agenda>> GetClassAgenda(int classId, DateTime StartDate, DateTime EndDate);
     Task<IEnumerable<Agenda>> GetClassAgendaTodayToNDays(int classId, int toNbDays);
-    Task<IEnumerable<Schedule>> GetClassSchedule(int classId);
+    Task<IEnumerable<ScheduleCourse>> GetClassSchedule(int classId);
     Task<IEnumerable<ClassLevelSchedule>> GetClassLevelSchedule(int classLevelId);
     Task<IEnumerable<CourseSkill>> GetCourseSkills(int courseId);
     Task<Agenda> GetAgenda(int agendaId);
@@ -33,7 +33,7 @@ namespace EducNotes.API.Data
     Task<Photo> GetMainPhotoForUser(int userId);
     Task<Class> GetClass(int Id);
     List<int> GetWeekDays(DateTime date);
-    Task<IEnumerable<Schedule>> GetScheduleDay(int classId, int day);
+    Task<IEnumerable<ScheduleCourse>> GetScheduleDay(int classId, int day);
     Task<Like> GetLike(int userId, int recipientId);
     Task<bool> EmailExist(string email);
     Task<bool> UserNameExist(string userName, int currentUserId);
@@ -85,7 +85,7 @@ namespace EducNotes.API.Data
     Task<bool> SaveProductSelection(int userPid, int userId,List<ServiceSelectionDto> products);
     Task<List<Period>> GetPeriods();
     Task<Period> GetPeriodFromDate(DateTime date);
-    Task<Session> GetSessionFromSchedule(Schedule scheduleItem, ScheduleCourse course, DateTime sessionDate);
+    Task<Session> GetSessionFromSchedule(ScheduleCourse course, DateTime sessionDate);
     Task<List<Class>> GetClassesByLevelId(int levelId);
     Task<IEnumerable<Theme>> ClassLevelCourseThemes(int classLevelId, int courseId);
     Task<IEnumerable<Lesson>> ClassLevelCourseLessons(int classLevelId, int courseId);

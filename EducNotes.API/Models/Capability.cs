@@ -1,6 +1,6 @@
 namespace EducNotes.API.Models
 {
-  public class Capability : BaseClass
+  public class Capability : BaseEntity
   {
     public string Name { get; set; }
     public int MenuItemId { get; set; }

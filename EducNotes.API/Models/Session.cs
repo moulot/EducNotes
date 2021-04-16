@@ -13,7 +13,8 @@ namespace EducNotes.API.Models
     public Class Class { get; set; }
     public int? CourseId { get; set; }
     public Course Course { get; set; }
-    public string ActivityName { get; set; }
+    public int? ActivityId { get; set; }
+    public Activity Activity { get; set; }
     public DateTime StartHourMin { get; set; }
     public DateTime SessionDate { get; set; }
     public DateTime EndHourMin { get; set; }

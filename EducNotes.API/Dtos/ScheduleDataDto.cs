@@ -7,8 +7,8 @@ namespace EducNotes.API.Dtos
     public int Id { get; set; }
     public int ClassId { get; set; }
     public int CourseId { get; set; }
-    public int? TeacherId { get; set; }
-    public string ItemName { get; set; }
+    public int TeacherId { get; set; }
+    public int ActivityId { get; set; }
     public int Day { get; set; }
     public int StartHour { get; set; }
     public int StartMin { get; set; }

@@ -62,9 +62,9 @@ export class ClassService {
     return this.http.get(this.baseUrl + classId + '/ScheduleNDays');
   }
 
-  getSchedule(id) {
-    return this.http.get(this.baseUrl + 'Schedule/' + id);
-  }
+  // getSchedule(id) {
+  //   return this.http.get(this.baseUrl + 'Schedule/' + id);
+  // }
 
   getSessionData(scheduleId) {
     return this.http.get(this.baseUrl + 'SessionData/' + scheduleId);
@@ -383,13 +383,11 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'DayAbsences', date);
   }
 
-  getUserClassLife(childId)
-  {
+  getUserClassLife(childId) {
     return this.http.get(this.baseUrl + 'UserClassLife/' + childId);
   }
 
-  getScheduleCoursesByDay(classId)
-  {
+  getScheduleCoursesByDay(classId) {
     return this.http.get(this.baseUrl + classId + '/ScheduleCoursesByDay');
   }
 
