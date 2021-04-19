@@ -28,21 +28,22 @@ namespace EducNotes.API.Controllers {
     int absenceTypeId, lateTypeId;
     private readonly ICacheRepository _cache;
 
-    public ClassesController (DataContext context, IMapper mapper, IEducNotesRepository repo, IConfiguration config,
-      ICacheRepository cache) {
+    public ClassesController(DataContext context, IMapper mapper, IEducNotesRepository repo,
+      IConfiguration config, ICacheRepository cache)
+    {
       _cache = cache;
       _config = config;
       _context = context;
       _mapper = mapper;
       _repo = repo;
-      teacherTypeId = _config.GetValue<int> ("AppSettings:teacherTypeId");
-      parentTypeId = _config.GetValue<int> ("AppSettings:parentTypeId");
-      adminTypeId = _config.GetValue<int> ("AppSettings:adminTypeId");
-      studentTypeId = _config.GetValue<int> ("AppSettings:studentTypeId");
-      parentRoleId = _config.GetValue<int> ("AppSettings:parentRoleId");
-      memberRoleId = _config.GetValue<int> ("AppSettings:memberRoleId");
-      absenceTypeId = _config.GetValue<int> ("AppSettings:AbsenceTypeId");
-      lateTypeId = _config.GetValue<int> ("AppSettings:LateTypeId");
+      teacherTypeId = _config.GetValue<int>("AppSettings:teacherTypeId");
+      parentTypeId = _config.GetValue<int>("AppSettings:parentTypeId");
+      adminTypeId = _config.GetValue<int>("AppSettings:adminTypeId");
+      studentTypeId = _config.GetValue<int>("AppSettings:studentTypeId");
+      parentRoleId = _config.GetValue<int>("AppSettings:parentRoleId");
+      memberRoleId = _config.GetValue<int>("AppSettings:memberRoleId");
+      absenceTypeId = _config.GetValue<int>("AppSettings:AbsenceTypeId");
+      lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
     }
 
     [HttpGet("{id}")]
@@ -91,7 +92,7 @@ namespace EducNotes.API.Controllers {
       return Ok (coursesToReturn);
     }
 
-    [HttpGet ("{classId}/ScheduleByDay")]
+    [HttpGet("{classId}/ScheduleByDay")]
     public async Task<IActionResult> GetClassScheduleNDays(int classId)
     {
       int daysRange = 14;
@@ -110,13 +111,35 @@ namespace EducNotes.API.Controllers {
         item.DayDate = currentDate;
         item.strDayDate = currentDate.ToString("ddd dd MMM", frC);
         item.Courses = new List<ClassDayCoursesDto>();
-        var dayCourses = itemsFromRepo.Where(s => s.Schedule.Day == dayInt);
-        var courses = _mapper.Map<List<ClassDayCoursesDto>>(dayCourses);
-        item.Courses = courses;
+        var daySchedules = itemsFromRepo.Where(s => s.Day == dayInt);
+        // var courses = new List<ClassDayCoursesDto>();
+        // foreach(var daySchedule in daySchedules)
+        // {
+        //   ClassDayCoursesDto dayCourse = new ClassDayCoursesDto();
+        //   foreach (var course in daySchedule.Courses)
+        //   {
+        //     if(course.CourseId > 0)
+        //     {
+        //       dayCourse.CourseId = course.CourseId;
+        //       dayCourse.CourseName = course.CourseName;
+        //       dayCourse.CourseAbbrev = course.CourseAbbrev;
+        //     }
+        //     else
+        //     {
+        //       dayCourse.ActivityId = course.ActivityId;
+        //       dayCourse.ActivityName = course.ActivityName;
+        //       dayCourse.ActivityAbbrev = course.ActivityAbbrev;
+        //     }
+        //     dayCourse.TeacherId = course.TeacherId;
+        //     dayCourse.TeacherName = course.TeacherName;
+        //     courses.Add(dayCourse);
+        //   }
+        // }
+        item.Courses = _repo.GetCoursesFromSchedules(daySchedules);
         items.Add(item);
       }
 
-      return Ok (items);
+      return Ok(items);
     }
 
     [HttpGet("{classId}/ScheduleCoursesByDay")]
@@ -149,7 +172,10 @@ namespace EducNotes.API.Controllers {
             foreach(var course in courses)
             {
               ScheduleCourseDto courseDto = new ScheduleCourseDto();
-              courseDto.Course = course.Course;
+              courseDto.CourseId = course.Course.Id;
+              courseDto.CourseName = course.Course.Name;
+              courseDto.CourseAbbrev = course.Course.Abbreviation;
+              courseDto.CourseColor = course.Course.Color;
               if(course.Activity != null)
                 courseDto.ActivityName = course.Activity.Name;
               courseDto.ClassId = item.ClassId;
@@ -172,18 +198,21 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{classId}/TimeTable")]
-    public async Task<IActionResult> GetClassTimeTable (int classId)
+    public async Task<IActionResult> GetClassTimeTable(int classId)
     {
-      var settings = await _context.Settings.ToListAsync();
-      var startCourseHourMin = settings.FirstOrDefault(s => s.Name.ToLower () == "starthourmin").Value;
-      var endCourseHourMin = settings.FirstOrDefault(s => s.Name.ToLower () == "endhourmin").Value;
+      List<Setting> settings = await _cache.GetSettings();
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
+
+      var startCourseHourMin = settings.FirstOrDefault(s => s.Name.ToLower() == "starthourmin").Value;
+      var endCourseHourMin = settings.FirstOrDefault(s => s.Name.ToLower() == "endhourmin").Value;
 
       List<int> schoolHours = new List<int>();
       if(startCourseHourMin != null)
       {
         var startHM = startCourseHourMin.Split(":");
-        schoolHours.Add(Convert.ToInt32 (startHM[0]));
-        schoolHours.Add(Convert.ToInt32 (startHM[1]));
+        schoolHours.Add(Convert.ToInt32(startHM[0]));
+        schoolHours.Add(Convert.ToInt32(startHM[1]));
       }
       if(endCourseHourMin != null)
       {
@@ -192,45 +221,49 @@ namespace EducNotes.API.Controllers {
         schoolHours.Add(Convert.ToInt32(endHM[1]));
       }
 
-      var scheduleHourSize = Convert.ToDouble(Startup.StaticConfig.GetSection("AppSettings:DimHourSchedule").Value);
+      var scheduleHourSize = _config.GetValue<double>("AppSettings:DimHourSchedule");
       var startToEndHeigth = ((schoolHours[2] * 60 + schoolHours[3]) - (schoolHours[0] * 60 + schoolHours[1])) * scheduleHourSize / 60;
-      var height = Convert.ToDouble(Math.Round (startToEndHeigth, 2));
-      var scheduleHeight = (height + "px").Replace (",", ".");
+      var height = Convert.ToDouble(Math.Round(startToEndHeigth, 2));
+      var scheduleHeight = (height + "px").Replace(",", ".");
 
       DateTime today = DateTime.Now.Date;
-      var dayInt = (int) today.DayOfWeek == 0 ? 7 : (int) today.DayOfWeek;
-      var monday = today.AddDays (1 - dayInt);
-      var sunday = monday.AddDays (6);
+      var dayInt = (int)today.DayOfWeek == 0 ? 7 : (int)today.DayOfWeek;
+      var monday = today.AddDays(1 - dayInt);
+      var sunday = monday.AddDays(6);
 
-      var itemsFromRepo = await _repo.GetClassSchedule(classId);
-      var itemsToReturn = _mapper.Map<List<ScheduleForTimeTableDto>>(itemsFromRepo);
+      var scheduleItems = await _repo.GetClassSchedule(classId);
       // setup course box top in schedule
-      for (int i = 0; i < itemsToReturn.Count(); i++) {
-        itemsToReturn[i].Top = _repo.CalculateCourseTop(itemsToReturn[i].StartHourMin, startCourseHourMin);
+      for(int i = 0; i < scheduleItems.Count(); i++)
+      {
+        ScheduleForTimeTableDto scheduleItem = scheduleItems[i];
+        scheduleItem.Top = _repo.CalculateCourseTop(scheduleItem.StartHourMin, startCourseHourMin);
+        scheduleItem.Height = scheduleItem.StartHourMin.CalculateHeight(scheduleItem.EndHourMin);
       }
 
       var days = new List<string>();
-      for (int i = 0; i <= 6; i++) {
-        DateTime dt = monday.AddDays (i);
+      for(int i = 0; i <= 6; i++)
+      {
+        DateTime dt = monday.AddDays(i);
         var shortdate = dt.ToString("ddd dd MMM", frC);
-        days.Add (shortdate);
+        days.Add(shortdate);
       }
 
-      if (itemsToReturn != null) {
-        return Ok (new {
-          scheduleItems = itemsToReturn,
-            firstDayWeek = monday,
-            strMonday = monday.ToString ("dddd dd MMM yyy", frC),
-            strSunday = sunday.ToString ("dddd dd MMM yyy", frC),
-            strShortMonday = monday.ToString ("ddd dd MMM", frC),
-            strShortSunday = sunday.ToString ("ddd dd MMM", frC),
-            weekDays = days,
-            schoolHours,
-            scheduleHeight
+      if(scheduleItems != null)
+      {
+        return Ok(new {
+          scheduleItems,
+          firstDayWeek = monday,
+          strMonday = monday.ToString ("dddd dd MMM yyy", frC),
+          strSunday = sunday.ToString ("dddd dd MMM yyy", frC),
+          strShortMonday = monday.ToString ("ddd dd MMM", frC),
+          strShortSunday = sunday.ToString ("ddd dd MMM", frC),
+          weekDays = days,
+          schoolHours,
+          scheduleHeight
         });
       }
 
-      return BadRequest ("aucun emploi du temps trouvé");
+      return BadRequest("aucun emploi du temps trouvé");
     }
 
     [HttpPut("DelCourseFromSchedule/{scheduleId}")]
@@ -244,7 +277,7 @@ namespace EducNotes.API.Controllers {
         {
           try
           {
-            _repo.Delete (schedule);
+            _repo.Delete(schedule);
             if(await _repo.SaveAll())
             {
               identityContextTransaction.Commit();
@@ -724,37 +757,65 @@ namespace EducNotes.API.Controllers {
     [HttpPut("saveSchedules")]
     public async Task<IActionResult> saveSchedules([FromBody] ScheduleDataDto[] schedules)
     {
-      foreach(var sch in schedules)
+      var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+      using(var identityContextTransaction = _context.Database.BeginTransaction())
       {
-        Schedule schedule = new Schedule();
-        //set the dates proprerly
-        var StartHour = sch.StartHour;
-        var StartMin = sch.StartMin;
-        var StartHourMin = new DateTime (1, 1, 1, StartHour, StartMin, 0);
-        var EndHour = sch.EndHour;
-        var EndMin = sch.EndMin;
-        var EndHourMin = new DateTime (1, 1, 1, EndHour, EndMin, 0);
+        try
+        {
+          foreach(var sch in schedules)
+          {
+            Schedule schedule = new Schedule();
+            //set the dates proprerly
+            var StartHour = sch.StartHour;
+            var StartMin = sch.StartMin;
+            var StartHourMin = new DateTime (1, 1, 1, StartHour, StartMin, 0);
+            var EndHour = sch.EndHour;
+            var EndMin = sch.EndMin;
+            var EndHourMin = new DateTime (1, 1, 1, EndHour, EndMin, 0);
 
-        schedule.ClassId = sch.ClassId;
-        schedule.Day = sch.Day;
-        schedule.StartHourMin = StartHourMin;
-        schedule.EndHourMin = EndHourMin;
-        _repo.Add(schedule);
-        await _context.SaveChangesAsync();
+            schedule.ClassId = sch.ClassId;
+            schedule.Day = sch.Day;
+            schedule.StartHourMin = StartHourMin;
+            schedule.EndHourMin = EndHourMin;
+            schedule.InsertDate = DateTime.Now;
+            schedule.InsertUserId = currentUserId;
+            schedule.UpdateDate = DateTime.Now;
+            schedule.UpdateUserId = currentUserId;
+            var GUID = Guid.NewGuid();
+            schedule.Version = GUID.ToString();
+            _repo.Add(schedule);
+            await _context.SaveChangesAsync();
 
-        ScheduleCourse scheduleCourse = new ScheduleCourse();
-        scheduleCourse.ScheduleId = schedule.Id;
-        scheduleCourse.TeacherId = sch.TeacherId;
-        scheduleCourse.CourseId = sch.CourseId;
-        scheduleCourse.ActivityId = sch.ActivityId;
-        _repo.Add(scheduleCourse);
-      }
+            ScheduleCourse scheduleCourse = new ScheduleCourse();
+            scheduleCourse.ScheduleId = schedule.Id;
+            scheduleCourse.TeacherId = sch.TeacherId;
+            if(sch.CourseId > 0)
+              scheduleCourse.CourseId = sch.CourseId;
+            else
+              scheduleCourse.ActivityId = sch.ActivityId;
+            scheduleCourse.InsertDate = DateTime.Now;
+            scheduleCourse.InsertUserId = currentUserId;
+            scheduleCourse.UpdateDate = DateTime.Now;
+            scheduleCourse.UpdateUserId = currentUserId;
+            var GUID1 = Guid.NewGuid();
+            scheduleCourse.Version = GUID1.ToString();
+            _repo.Add(scheduleCourse);
+          }
 
-      if(await _repo.SaveAll())
-      {
-        await _cache.LoadSchedules();
-        await _cache.LoadScheduleCourses();
-        return NoContent();
+          if(await _repo.SaveAll())
+          {
+            await _cache.LoadSchedules();
+            await _cache.LoadScheduleCourses();
+            identityContextTransaction.Commit();
+            return NoContent();
+          }
+        }
+        catch(Exception ex)
+        {
+          var sddaz = ex.Message; 
+          identityContextTransaction.Rollback();
+        }
       }
 
       return BadRequest("problème d'enregistrement des données");
@@ -1027,55 +1088,118 @@ namespace EducNotes.API.Controllers {
       return Ok (levels);
     }
 
-    [HttpGet ("ClassLevelCourses")]
-    public async Task<IActionResult> GetClassLevelCourses () {
-      var levelcourses = await _context.ClassLevelCourses.ToListAsync ();
-      return Ok (levelcourses);
+    [HttpGet("ClassLevelCourses")]
+    public async Task<IActionResult> GetClassLevelCourses()
+    {
+      var levelcourses = await _context.ClassLevelCourses.ToListAsync();
+      return Ok(levelcourses);
     }
 
-    [HttpPost ("saveCLCourses")]
-    public async Task<IActionResult> SaveCLCourses (List<ClassLevelCourseDto> clCourses) {
+    [HttpPost("saveActivities")]
+    public async Task<IActionResult> SaveActivities(List<ActivityForSaveDto> activities)
+    {
+      List<Activity> activitiesCached = await _cache.GetActivities();
+      var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+      using(var identityContextTransaction = _context.Database.BeginTransaction())
+      {
+        try
+        {
+          foreach(var item in activities)
+          {
+            if(item.Id != 0)
+            {
+              Activity activity = activitiesCached.First(a => a.Id == item.Id);
+              if(item.ToBeDeleted)
+              {
+                _repo.Delete(activity);
+              }
+              else
+              {
+                activity.Name = item.Name;
+                activity.Abbreviation = item.Abbrev;
+                activity.UpdateDate = DateTime.Now;
+                activity.UpdateUserId = currentUserId;
+                _repo.Update(activity);
+              }
+            }
+            else
+            {
+              Activity activity = new Activity();
+              activity.Name = item.Name;
+              activity.Abbreviation = item.Abbrev;
+              activity.InsertDate = DateTime.Now;
+              activity.InsertUserId = currentUserId;
+              activity.UpdateDate = DateTime.Now;
+              activity.UpdateUserId = currentUserId;
+              _repo.Add(activity);
+            }
+          }
+
+          await _repo.SaveAll();
+          await _cache.LoadActivities();
+          identityContextTransaction.Commit();
+          return Ok();
+        }
+        catch
+        {
+          identityContextTransaction.Rollback();
+          return BadRequest("problème pour enregistrer les activités");
+        }
+      }
+    }
+
+    [HttpPost("saveCLCourses")]
+    public async Task<IActionResult> SaveCLCourses(List<ClassLevelCourseDto> clCourses)
+    {
       Boolean dbUpdated = false;
-      foreach (var clcourse in clCourses) {
-        var oldCourses = await _context.ClassLevelCourses.Where (c => c.ClassLevelId == clcourse.LevelId).ToListAsync ();
-        List<int> oldCourseIds = new List<int> ();
-        foreach (var course in oldCourses) {
+      foreach(var clcourse in clCourses)
+      {
+        var oldCourses = await _context.ClassLevelCourses.Where(c => c.ClassLevelId == clcourse.LevelId).ToListAsync();
+        List<int> oldCourseIds = new List<int>();
+        foreach(var course in oldCourses)
+        {
           oldCourseIds.Add (course.CourseId);
         }
 
-        List<int> newCourseIds = new List<int> ();
-        foreach (var course in clcourse.Courses) {
+        List<int> newCourseIds = new List<int>();
+        foreach(var course in clcourse.Courses)
+        {
           newCourseIds.Add (course.Id);
         }
 
         //add new selected courses for the current classLevel
-        foreach (var courseid in newCourseIds.Except (oldCourseIds)) {
-          ClassLevelCourse newCLCourse = new ClassLevelCourse ();
+        foreach(var courseid in newCourseIds.Except (oldCourseIds))
+        {
+          ClassLevelCourse newCLCourse = new ClassLevelCourse();
           newCLCourse.ClassLevelId = clcourse.LevelId;
           newCLCourse.CourseId = courseid;
-          _repo.Add (newCLCourse);
+          _repo.Add(newCLCourse);
           dbUpdated = true;
         }
 
         //remove old selection
-        if (oldCourseIds.Count () > 0) {
-          List<ClassLevelCourse> oldCLCourses = new List<ClassLevelCourse> ();
-          foreach (var courseid in oldCourseIds.Except (newCourseIds)) {
+        if(oldCourseIds.Count() > 0)
+        {
+          List<ClassLevelCourse> oldCLCourses = new List<ClassLevelCourse>();
+          foreach(var courseid in oldCourseIds.Except(newCourseIds))
+          {
             ClassLevelCourse levelcourse = await _context.ClassLevelCourses
-              .FirstAsync (c => c.ClassLevelId == clcourse.LevelId && c.CourseId == courseid);
-            oldCLCourses.Add (levelcourse);
+              .FirstAsync(c => c.ClassLevelId == clcourse.LevelId && c.CourseId == courseid);
+            oldCLCourses.Add(levelcourse);
           }
-          if (oldCLCourses.Count () > 0) {
+          if(oldCLCourses.Count() > 0)
+          {
             dbUpdated = true;
-            _repo.DeleteAll (oldCLCourses);
+            _repo.DeleteAll(oldCLCourses);
           }
         }
       }
 
-      if (dbUpdated && await _repo.SaveAll ())
-        return Ok ();
+      if(dbUpdated && await _repo.SaveAll())
+        return Ok();
       else
-        return BadRequest ("problème pour enregistrer les courses");
+        return BadRequest("problème pour enregistrer les courses");
     }
 
     [HttpGet ("CoursesByLevelId/{levelId}")]
@@ -1240,19 +1364,22 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("{classId}/ScheduleNDays")]
-    public async Task<IActionResult> GetScheduleNDays (int classId) {
+    public async Task<IActionResult> GetScheduleNDays (int classId)
+    {
       int daysRange = 14;
       DateTime today = DateTime.Now.Date;
-      var startDate = today.AddDays (-daysRange);
-      var endDate = today.AddDays (daysRange);
-      var itemsFromRepo = await _repo.GetClassSchedule (classId);
+      var startDate = today.AddDays(-daysRange);
+      var endDate = today.AddDays(daysRange);
+      var itemsFromRepo = await _repo.GetClassSchedule(classId);
 
       int todayIndex = 0;
-      List<ClassScheduleNDaysDto> scheduleDays = new List<ClassScheduleNDaysDto> ();
-      for (int i = 0; i < 2 * daysRange; i++) {
-        ClassScheduleNDaysDto item = new ClassScheduleNDaysDto ();
-        var currentDate = startDate.AddDays (i);
-        if (currentDate.Date == today) {
+      List<ClassScheduleNDaysDto> scheduleDays = new List<ClassScheduleNDaysDto>();
+      for(int i = 0; i < 2 * daysRange; i++)
+      {
+        ClassScheduleNDaysDto item = new ClassScheduleNDaysDto();
+        var currentDate = startDate.AddDays(i);
+        if(currentDate.Date == today)
+        {
           todayIndex = i;
         }
         var dayInt = (int)currentDate.DayOfWeek == 0 ? 7 : (int)currentDate.DayOfWeek;
@@ -1260,9 +1387,8 @@ namespace EducNotes.API.Controllers {
         item.DayDate = currentDate;
         item.strDayDate = currentDate.ToString("ddd dd MMM", frC);
         item.Courses = new List<ClassDayCoursesDto>();
-        var dayCourses = itemsFromRepo.Where(s => s.Schedule.Day == dayInt);
-        var courses = _mapper.Map<List<ClassDayCoursesDto>>(dayCourses);
-        item.Courses = courses;
+        var daySchedules = itemsFromRepo.Where(s => s.Day == dayInt);
+        item.Courses = _repo.GetCoursesFromSchedules(daySchedules);
         scheduleDays.Add(item);
       }
       return Ok(new {
@@ -2209,6 +2335,13 @@ namespace EducNotes.API.Controllers {
       }
 
       return Ok (absences);
+    }
+
+    [HttpGet("Activities")]
+    public async Task<IActionResult> GetActivities()
+    {
+      List<Activity> activities = await _cache.GetActivities();
+      return Ok(activities.OrderBy(o => o.Name).ToList());
     }
 
   }

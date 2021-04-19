@@ -7,8 +7,8 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
   styleUrls: ['./config.component.scss']
 })
 export class ConfigComponent implements OnInit {
-  activeTabs = [false, false, false];
-  buttons = [false, false, false];
+  activeTabs = [false, false, false, false];
+  buttons = [false, false, false, false];
 
   constructor(private alertify: AlertifyService) { }
 

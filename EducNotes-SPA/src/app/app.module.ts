@@ -287,6 +287,7 @@ import { ConfigProductsComponent } from './admin/config/config-products/config-p
 import { RecoveryComponent } from './admin/treso/recovery/recovery.component';
 import { MdbWysiwygModule } from 'mdb-wysiwyg';
 import { RecoveryResolver } from './_resolvers/recovery-resolver';
+import { ConfigActivitiesComponent } from './admin/config/config-activities/config-activities.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -479,7 +480,8 @@ export function tokenGetter() {
       ConfigComponent,
       EditLevelClassesComponent,
       ConfigProductsComponent,
-      RecoveryComponent
+      RecoveryComponent,
+      ConfigActivitiesComponent
    ],
    imports: [
       FormWizardModule,

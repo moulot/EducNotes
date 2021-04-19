@@ -367,6 +367,10 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'saveCLCourses', levelCourses);
   }
 
+  saveActivities(activities) {
+    return this.http.post(this.baseUrl + 'saveActivities', activities);
+  }
+
   getCoursesByLevelId(levelid) {
     return this.http.get(this.baseUrl + 'CoursesByLevelId/' + levelid);
   }
@@ -389,6 +393,10 @@ export class ClassService {
 
   getScheduleCoursesByDay(classId) {
     return this.http.get(this.baseUrl + classId + '/ScheduleCoursesByDay');
+  }
+
+  getActivities() {
+    return this.http.get(this.baseUrl + 'Activities');
   }
 
 }

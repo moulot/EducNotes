@@ -87,11 +87,11 @@ export class ClassScheduleComponent implements OnInit {
     this.resetSchedule();
     this.classService.getClassTimeTable(classId).subscribe((data: any) => {
       this.scheduleItems = data.scheduleItems;
+      console.log(this.scheduleItems);
       this.strMonday = data.strMonday;
       this.strSunday = data.strSunday;
       this.strShortMonday = data.strShortMonday;
       this.strShortSunday = data.strShortSunday;
-      // this.weekDays = data.weekDays;
       this.schoolHours = data.schoolHours;
       this.tableHeight = data.scheduleHeight;
 
@@ -132,6 +132,7 @@ export class ClassScheduleComponent implements OnInit {
       }
 
       this.dayItems = [this.monCourses, this.tueCourses, this.wedCourses, this.thuCourses, this.friCourses, this.satCourses];
+      console.log(this.dayItems);
     }, error => {
       this.alertify.error(error);
     });

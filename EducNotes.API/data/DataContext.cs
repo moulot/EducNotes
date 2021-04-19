@@ -115,6 +115,7 @@ namespace EducNotes.API.Data {
       public DbSet<MenuItem> MenuItems { get; set; }
       public DbSet<Capability> Capabilities { get; set; }
       public DbSet<RoleCapability> RoleCapabilities { get; set; }
+      public DbSet<Activity> Activities { get; set; }
 
       protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder)
       {

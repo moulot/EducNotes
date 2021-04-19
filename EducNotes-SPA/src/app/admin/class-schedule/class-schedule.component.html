@@ -1,7 +1,7 @@
 <div class="row mb-2">
   <div class="col-md-12 d-flex">
     <i class="fad fa-calendar-alt fa-2x mr-2" style="--fa-secondary-opacity: 1; --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
-    <p class="text-20 font-weight-300">classes - emplois du temps</p>
+    <div class="text-20 font-weight-300">classes - emplois du temps</div>
   </div>
   <div class="col-md-3">
     <mdb-select [options]="optionsClass" [formControl]="classControl" [visibleOptions]="6"
@@ -9,7 +9,6 @@
   </div>
   <div class="col-md-9">
     <div *ngIf="showTimeline">
-      <!-- <button type="button" mdbBtn size="sm" class="btnBlue" (click)="openModal()" mdbWavesEffect>ajouter des cours</button> -->
       <button type="button" mdbBtn size="sm" class="btnBlue" [routerLink]="['/classScheduleEdit', classControl.value]" 
         mdbWavesEffect>modifier l'emploi du temps</button>
     </div>    

@@ -171,9 +171,6 @@
                       </div>
                       <div class="col-md-2">
                         <div class="md-form my-0">
-                          <!-- <input mdbInput type="text" id="dob" [textMask]="{mask: birthDateMask}"
-                            class="form-control" formControlName="dob" mdbValidate>
-                          <label for="dob" class="">date de naissance</label> -->
                           <div class=""><mdb-date-picker name="dob" [placeholder]="'date de naissance'" [options]="myDatePickerOptions" formControlName="dob"></mdb-date-picker></div>
                           <div *ngIf="child.get('dob').errors && child.get('dob').touched"
                             class="text-small text-danger">saisir la date de nais. svp</div>

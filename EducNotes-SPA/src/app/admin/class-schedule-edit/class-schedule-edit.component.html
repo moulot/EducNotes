@@ -1,6 +1,15 @@
 <form [formGroup]="scheduleForm" (ngSubmit)="saveScheduleItem()">
-  <div class="">
-    <div class="text-16">modification de l'emploi du temps</div>
+  <div class="d-md-flex mb-2">
+    <div class="d-flex">
+      <a appBtnBack>
+        <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+      </a>
+      <i class="fad fa-calendar-edit fa-2x mr-2" style="--fa-secondary-opacity: 1;
+        --fa-primary-color: #192C47; --fa-secondary-color: #f89f20"></i>
+      <div class="text-16"><b>classe {{class?.name}}</b></div>
+    </div>
+    <div class="text-16 ml-2">modifier l'emploi du temps</div>
   </div>
   <div class="row">
     <div class="col-md-12 mb-1">
@@ -8,7 +17,7 @@
         <div class="card-body p-2">
           <div class="row">
             <div class="col-md-3 mb-1">
-              <mdb-select [options]="teacherOptions" formControlName="teacher" name="teacher" [visibleOptions]="9"
+              <mdb-select [options]="teacherOptions" formControlName="teacher" name="teacher" [visibleOptions]="7"
                 (selected)="onTeacherChanged($event)" placeholder="choisir l'enseignant"></mdb-select>
             </div>
           </div>
@@ -45,9 +54,9 @@
             <div class="row">
               <div class="col-md-4">
                 <div class="border rounded-lg p-2">
-                  <div class="row">
-                    <div class="form-group col-md-6 mb-0">
-                      <mdb-select [options]="courseOptions" placeholder="choisir le cours" name="course" formControlName="course"></mdb-select>
+                  <div class="row mb-1">
+                    <div class="form-group col-md-12 mb-0">
+                      <mdb-select [options]="courseOptions" placeholder="choisir le cours / activité" name="course" formControlName="course"></mdb-select>
                     </div>
                   </div>
                   <div class="row">
@@ -87,6 +96,9 @@
                             </div>
                           </div>
                         </div>
+                        <div class="text-15" *ngIf="validateConflict[0]">
+                          <mdb-checkbox (change)="isConflict(1)" formControlName="conflictOK1">accepter le conflit</mdb-checkbox>
+                        </div>
                       </div>
                     </div>
                     <div class="col-md-12">
@@ -121,6 +133,9 @@
                               </div>
                             </div>
                           </div>
+                        </div>
+                        <div class="text-15" *ngIf="validateConflict[1]">
+                          <mdb-checkbox formControlName="conflictOK1">accepter le conflit</mdb-checkbox>
                         </div>
                       </div>
                     </div>
@@ -157,6 +172,9 @@
                             </div>
                           </div>
                         </div>
+                        <div class="text-15" *ngIf="validateConflict[2]">
+                          <mdb-checkbox formControlName="conflictOK1">accepter le conflit</mdb-checkbox>
+                        </div>
                       </div>
                     </div>
                     <div class="col-md-12">
@@ -191,6 +209,9 @@
                               </div>
                             </div>
                           </div>
+                        </div>
+                        <div class="text-15" *ngIf="validateConflict[3]">
+                          <mdb-checkbox formControlName="conflictOK1">accepter le conflit</mdb-checkbox>
                         </div>
                       </div>
                     </div>
@@ -227,6 +248,9 @@
                             </div>
                           </div>
                         </div>
+                        <div class="text-15" *ngIf="validateConflict[4]">
+                          <mdb-checkbox formControlName="conflictOK1">accepter le conflit</mdb-checkbox>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -257,7 +281,7 @@
               <div class="col-md-12 text-center text-md-right">
                 <button type="button" mdbBtn size="sm" class="btnOrange mr-2" (click)="goBackToSchedule()" mdbWavesEffect>Cancel</button>
                 <button type="submit" size="sm" [disabled]="scheduleForm.hasError('formNOK') || periodConflict"
-                  mdbBtn class="btnBlue" mdbWavesEffect>Ok</button>
+                  mdbBtn class="btnBlue" mdbWavesEffect>SAISIR EMPLOI DU TEMPS</button>
               </div>
             </div>
           </div>

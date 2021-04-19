@@ -25,7 +25,7 @@ namespace EducNotes.API.Data
     Task<IEnumerable<User>> GetClassStudents(int classId);
     Task<IEnumerable<Agenda>> GetClassAgenda(int classId, DateTime StartDate, DateTime EndDate);
     Task<IEnumerable<Agenda>> GetClassAgendaTodayToNDays(int classId, int toNbDays);
-    Task<IEnumerable<ScheduleCourse>> GetClassSchedule(int classId);
+    Task<List<ScheduleForTimeTableDto>> GetClassSchedule(int classId);
     Task<IEnumerable<ClassLevelSchedule>> GetClassLevelSchedule(int classLevelId);
     Task<IEnumerable<CourseSkill>> GetCourseSkills(int courseId);
     Task<Agenda> GetAgenda(int agendaId);
@@ -141,6 +141,7 @@ namespace EducNotes.API.Data
     Task<MsgRecipientsDto> GetMsgRecipientsForUsers(List<User> users, List<int> educLevelIds, 
       List<int> schoolIds, List<int> classLevelIds, List<int> classIds, int msgChoice, Boolean sendToNotValidated);
     MsgRecipientsDto setRecipientsList(List<User> users, int msgChoice, Boolean sendToNotValidated);
+    List<ClassDayCoursesDto> GetCoursesFromSchedules(IEnumerable<ScheduleForTimeTableDto> schedules);
     string GetAppSubDomain();
   }
 }

@@ -991,7 +991,7 @@ namespace EducNotes.API.data {
     public async Task<List<Schedule>> LoadSchedules()
     {
       List<Schedule> schedules = await _context.Schedules
-                                        .Include(i => i.Class)
+                                        .Include(i => i.Class).ThenInclude(i => i.ClassLevel)
                                         .ToListAsync();
 
       // Set cache options.
@@ -1146,6 +1146,36 @@ namespace EducNotes.API.data {
       _cache.Set(subDomain + CacheKeys.Events, events, cacheEntryOptions);
 
       return events;
+    }
+
+    public async Task<List<Activity>> GetActivities()
+    {
+      List<Activity> activities = new List<Activity>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(subDomain + CacheKeys.Activities, out activities))
+      {
+        // Key not in cache, so get data.
+        activities = await LoadActivities();
+      }
+
+      return activities;
+    }
+
+    public async Task<List<Activity>> LoadActivities()
+    {
+      List<Activity> activities = await _context.Activities.ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Activities);
+      _cache.Set(subDomain + CacheKeys.Activities, activities, cacheEntryOptions);
+
+      return activities;
     }
   }
 }

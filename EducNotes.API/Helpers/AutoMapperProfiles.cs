@@ -246,8 +246,14 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.Color, opt => opt
                   .MapFrom(src => src.Course.Color));
             CreateMap<ScheduleCourse, ScheduleForTimeTableDto>()
-                .ForMember(dest => dest.TeacherName, opt => {
-                  opt.MapFrom(src => src.Teacher.LastName + ' ' + src.Teacher.FirstName);
+                .ForMember(dest => dest.ClassId, opt => {
+                  opt.MapFrom(d => d.Schedule.Class.Id);
+                })
+                .ForMember(dest => dest.ClassName, opt => {
+                  opt.MapFrom(d => d.Schedule.Class.Name);
+                })
+                .ForMember(dest => dest.Day, opt => {
+                  opt.MapFrom(src => src.Schedule.Day);
                 })
                 .ForMember(dest => dest.StartHourMin, opt => {
                   opt.MapFrom(d => d.Schedule.StartHourMin);
@@ -258,22 +264,11 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.strEndHourMin, opt => {
                   opt.MapFrom(d => d.Schedule.EndHourMin.ToString("HH:mm", frC));
                 })
-                // .ForMember(dest => dest.CourseName, opt => {
-                //   opt.MapFrom(d => d.Course.Name.Length > 10 ? d.Course.Abbreviation : d.Course.Name);
-                // })
-                .ForMember(dest => dest.IsDarkColor, opt => {
-                  opt.MapFrom(d => d.Course.Color.IsDarkColor());
-                })
                 .ForMember(dest => dest.Height, opt => {
                   opt.MapFrom(d => d.Schedule.StartHourMin.CalculateHeight(d.Schedule.EndHourMin));
                 })
-                .ForMember(dest => dest.Color, opt => opt
-                  .MapFrom(src => src.Course.Color))
-                .ForMember(s => s.ClassLevel, opt => opt
-                  .MapFrom(d => d.Schedule.Class.ClassLevel.Name))
-                .ForMember(s => s.DelInfo, opt => opt
-                  .MapFrom(d => d.Course.Name + " de " + d.Schedule.StartHourMin.ToString("HH:mm", frC) +
-                    " à " + d.Schedule.EndHourMin.ToString("HH:mm", frC)));
+                .ForMember(s => s.ClassLevelName, opt => opt
+                  .MapFrom(d => d.Schedule.Class.ClassLevel.Name));
             CreateMap<ScheduleCourse, ClassScheduleForTimeTableDto>()
                 .ForMember(dest => dest.StartHourMin, opt => {
                   opt.MapFrom(d => d.Schedule.StartHourMin.ToString("HH:mm", frC));

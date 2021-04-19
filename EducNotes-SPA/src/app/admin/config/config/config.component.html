@@ -12,17 +12,21 @@
 </div>
 <hr class="my-1">
 <div class="row">
-  <div class="col-md-2">
-    <button type='button' mdbBtn (click)="showTab(0)" [ngClass]="activeTabs[0] ? 'btnBlue' : 'btnWhiteBbtnBlue'"
+  <div class="col-md-2 mb-1">
+    <button type='button' mdbBtn (click)="showTab(0)" [ngClass]="activeTabs[0] ? 'btnBlueW' : 'btnWhiteB'"
       size="sm" block="true">cours par niveau</button>
   </div>
-  <div class="col-md-2">
-    <button type='button' mdbBtn (click)="showTab(1)" [ngClass]="activeTabs[1] ? 'btnBlue' : 'btnWhiteBbtnBlue'"
+  <div class="col-md-2 mb-1">
+    <button type='button' mdbBtn (click)="showTab(1)" [ngClass]="activeTabs[1] ? 'btnBlueW' : 'btnWhiteB'"
       size="sm" block="true">menu</button>
   </div>
-  <div class="col-md-2">
-    <button type='button' mdbBtn (click)="showTab(2)" [ngClass]="activeTabs[2] ? 'btnBlue' : 'btnWhiteBbtnBlue'"
+  <div class="col-md-2 mb-1">
+    <button type='button' mdbBtn (click)="showTab(2)" [ngClass]="activeTabs[2] ? 'btnBlueW' : 'btnWhiteB'"
       size="sm" block="true">produits</button>
+  </div>
+  <div class="col-md-2 mb-1">
+    <button type='button' mdbBtn (click)="showTab(3)" [ngClass]="activeTabs[3] ? 'btnBlueW' : 'btnWhiteB'"
+      size="sm" block="true">activités</button>
   </div>
   <div class="col-md-12 mt-3">
     <div *ngIf="activeTabs[0]">
@@ -38,6 +42,9 @@
     </div>
     <div *ngIf="activeTabs[2]">
       <app-config-products></app-config-products>
+    </div>
+    <div *ngIf="activeTabs[3]">
+      <app-config-activities></app-config-activities>
     </div>
   </div>
 </div>

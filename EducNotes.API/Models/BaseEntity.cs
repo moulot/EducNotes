@@ -19,7 +19,6 @@ namespace EducNotes.API.Models
     public int InsertUserId { get; set; }
     public DateTime UpdateDate { get; set; }
     public int UpdateUserId { get; set; }
-    [Timestamp]
     public string Version { get; set; }
   }
 }

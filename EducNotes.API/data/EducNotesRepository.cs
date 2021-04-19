@@ -331,11 +331,68 @@ namespace EducNotes.API.Data {
       return days;
     }
 
-    public async Task<IEnumerable<ScheduleCourse>> GetClassSchedule(int classId)
+    public async Task<List<ScheduleForTimeTableDto>> GetClassSchedule(int classId)
     {
+      List<Schedule> schedules = await _cache.GetSchedules();
       List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
-      return scheduleCourses.Where(s => s.Schedule.ClassId == classId)
-                            .OrderBy(o => o.Schedule.Day).ThenBy(o => o.Schedule.StartHourMin).ToList();
+
+      List<Schedule> classSchedule = schedules.Where(s => s.ClassId == classId)
+                                              .OrderBy(o => o.Day).ThenBy(o => o.StartHourMin).ToList();
+      List<ScheduleForTimeTableDto> classCourses = new List<ScheduleForTimeTableDto>();
+      foreach(var schedule in classSchedule)
+      {
+        ScheduleForTimeTableDto scheduleItem = new ScheduleForTimeTableDto();
+        scheduleItem.Id = schedule.Id;
+        scheduleItem.ClassId = schedule.ClassId;
+        scheduleItem.ClassName = schedule.Class.Name;
+        scheduleItem.ClassLevelName = schedule.Class.ClassLevel.Name;
+        scheduleItem.Day = schedule.Day;
+        scheduleItem.StartHourMin = schedule.StartHourMin;
+        scheduleItem.strStartHourMin = schedule.StartHourMin.ToString("HH:mm", frC);
+        scheduleItem.EndHourMin = schedule.EndHourMin;
+        scheduleItem.strEndHourMin = schedule.EndHourMin.ToString("HH:mm", frC);
+        scheduleItem.Courses = new List<ScheduleCourseDto>();
+        List<ScheduleCourse> courses = scheduleCourses.Where(s => s.ScheduleId == schedule.Id).ToList();
+        foreach(var course in courses)
+        {
+          ScheduleCourseDto courseDto = new ScheduleCourseDto();
+          if(course.Course != null)
+          {
+            if(course.Course != null)
+            {
+              courseDto.CourseId = Convert.ToInt32(course.CourseId);
+              courseDto.CourseName = course.Course.Name;
+              courseDto.CourseColor = course.Course.Color;
+              courseDto.CourseAbbrev = course.Course.Abbreviation;
+              courseDto.DelInfo = course.Course.Name + " de " + schedule.StartHourMin.ToString("HH:mm", frC) +
+                " à " + schedule.EndHourMin.ToString("HH:mm", frC);
+            }
+            else
+            {
+              courseDto.ActivityId = Convert.ToInt32(course.ActivityId);
+              courseDto.ActivityName = course.Activity.Name;
+              courseDto.ActivityAbbrev = course.Activity.Abbreviation;
+              courseDto.DelInfo = course.Activity.Name + " de " + schedule.StartHourMin.ToString("HH:mm", frC) +
+                " à " + schedule.EndHourMin.ToString("HH:mm", frC);
+            }
+            courseDto.TeacherId = course.TeacherId;
+            courseDto.TeacherName = course.Teacher.LastName + " " + course.Teacher.FirstName;
+          }
+          else
+          {
+            courseDto.ActivityId = Convert.ToInt32(course.ActivityId);
+            courseDto.ActivityName = course.Activity.Name;
+            courseDto.ActivityAbbrev = course.Activity.Abbreviation;
+            courseDto.DelInfo = course.Activity.Name + " de " + schedule.StartHourMin.ToString("HH:mm", frC) +
+              " à " + schedule.EndHourMin.ToString("HH:mm", frC);
+          }
+          scheduleItem.Courses.Add(courseDto);
+        }
+
+        classCourses.Add(scheduleItem);
+      }
+
+      return classCourses;
     }
 
     public async Task<IEnumerable<ClassLevelSchedule>> GetClassLevelSchedule(int classLevelId)
@@ -3343,7 +3400,8 @@ namespace EducNotes.API.Data {
       return lateAmounts;
     }
 
-    public async Task<LateAmountsDto> GetProductLateAmountsDue (int productId, int levelId) {
+    public async Task<LateAmountsDto> GetProductLateAmountsDue(int productId, int levelId)
+    {
       // List<OrderLine> linesCached = await _cache.GetOrderLines();
       // List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines();
       // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
@@ -3506,6 +3564,34 @@ namespace EducNotes.API.Data {
       }
 
       return lateAmounts;
+    }
+
+    public List<ClassDayCoursesDto> GetCoursesFromSchedules(IEnumerable<ScheduleForTimeTableDto> schedules)
+    {
+      var courses = new List<ClassDayCoursesDto>();
+      foreach(var daySchedule in schedules)
+      {
+        ClassDayCoursesDto dayCourse = new ClassDayCoursesDto();
+        foreach (var course in daySchedule.Courses)
+        {
+          if(course.CourseId > 0)
+          {
+            dayCourse.CourseId = course.CourseId;
+            dayCourse.CourseName = course.CourseName;
+            dayCourse.CourseAbbrev = course.CourseAbbrev;
+          }
+          else
+          {
+            dayCourse.ActivityId = course.ActivityId;
+            dayCourse.ActivityName = course.ActivityName;
+            dayCourse.ActivityAbbrev = course.ActivityAbbrev;
+          }
+          dayCourse.TeacherId = course.TeacherId;
+          dayCourse.TeacherName = course.TeacherName;
+          courses.Add(dayCourse);
+        }
+      }
+      return courses.ToList();
     }
 
     public string GetAppSubDomain()

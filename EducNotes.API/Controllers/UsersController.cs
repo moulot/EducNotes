@@ -401,9 +401,8 @@ namespace EducNotes.API.Controllers {
         item.DayDate = currentDate;
         item.strDayDate = currentDate.ToString("ddd dd MMM", frC);
         item.Courses = new List<ClassDayCoursesDto>();
-        var dayCourses = itemsFromRepo.Where(s => s.Schedule.Day == dayInt);
-        var courses = _mapper.Map<List<ClassDayCoursesDto>>(dayCourses);
-        item.Courses = courses;
+        var daySchedules = itemsFromRepo.Where(s => s.Day == dayInt);
+        item.Courses = _repo.GetCoursesFromSchedules(daySchedules);
         scheduleDays.Add(item);
       }
 
@@ -656,9 +655,13 @@ namespace EducNotes.API.Controllers {
           scheduleDay.Courses = new List<ScheduleCourseDto>();
           foreach(var item in dayScheduleItems)
           {
+            Course course = item.Course;
             Schedule schedule = item.Schedule;
             ScheduleCourseDto courseDto = new ScheduleCourseDto();
-            courseDto.Course = item.Course;
+            courseDto.CourseId = course.Id;
+            courseDto.CourseName = course.Name;
+            courseDto.CourseAbbrev = course.Abbreviation;
+            courseDto.CourseColor = course.Color;
             courseDto.ClassId = schedule.ClassId;
             courseDto.ClassName = schedule.Class.Name;
             courseDto.StartHour = schedule.StartHourMin;
@@ -714,7 +717,10 @@ namespace EducNotes.API.Controllers {
             {
               Schedule schedule = course.Schedule;
               ScheduleCourseDto courseDto = new ScheduleCourseDto();
-              courseDto.Course = course.Course;
+              courseDto.CourseId = course.Course.Id;
+              courseDto.CourseName = course.Course.Name;
+              courseDto.CourseAbbrev = course.Course.Abbreviation;
+              courseDto.CourseColor = course.Course.Color;
               if(course.Activity != null)
                 courseDto.ActivityName = course.Activity.Name;
               courseDto.StartHour = schedule.StartHourMin;
