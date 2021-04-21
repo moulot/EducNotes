@@ -168,10 +168,12 @@ namespace EducNotes.API.Controllers {
           scheduleDay.Courses = new List<ScheduleCourseDto>();
           foreach(var item in scheduleDayItems)
           {
-            List<ScheduleCourse> courses = scheduleCourses.Where(c => c.ScheduleId == item.Id).ToList();
+            List<ScheduleCourse> courses = scheduleCourses.Where(c => c.ScheduleId == item.Id)
+                                                          .OrderBy(o => o.Schedule.StartHourMin).ToList();
             foreach(var course in courses)
             {
               ScheduleCourseDto courseDto = new ScheduleCourseDto();
+              courseDto.ScheduleId = course.ScheduleId;
               courseDto.CourseId = course.Course.Id;
               courseDto.CourseName = course.Course.Name;
               courseDto.CourseAbbrev = course.Course.Abbreviation;
@@ -180,6 +182,8 @@ namespace EducNotes.API.Controllers {
                 courseDto.ActivityName = course.Activity.Name;
               courseDto.ClassId = item.ClassId;
               courseDto.ClassName = item.Class.Name;
+              courseDto.TeacherId = course.TeacherId;
+              courseDto.TeacherName = course.Teacher.LastName + " " + course.Teacher.FirstName;
               courseDto.IsDarkColor = course.Course.Color.IsDarkColor();
               courseDto.StartHour = item.StartHourMin;
               courseDto.StartH = item.StartHourMin.ToString("HH:mm", frC);
@@ -754,6 +758,66 @@ namespace EducNotes.API.Controllers {
 
     }
 
+    [HttpPost("SaveCourseWithConflict")]
+    public async Task<IActionResult> SaveCourseWithConflict(ConflictDataDto data)
+    {
+      int currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+      DateTime today = DateTime.Now;
+
+      using(var identityContextTransaction = _context.Database.BeginTransaction())
+      {
+        try
+        {
+          int scheduleId = data.ScheduleId;
+
+          //course added with tehe same schedule period
+          if(scheduleId == 0)
+          {
+            Schedule schedule = new Schedule();
+            schedule.ClassId = data.ClassId;
+            schedule.Day = data.Day;
+            schedule.StartHourMin = data.StartHourMin;
+            schedule.EndHourMin = data.EndHourMin;
+            schedule.InsertDate = today;
+            schedule.InsertUserId = currentUserId;
+            schedule.UpdateDate = today;
+            schedule.UpdateUserId = currentUserId;
+            Guid GUID = Guid.NewGuid();
+            schedule.Version = GUID.ToString();
+            _repo.Add(schedule);
+            await _context.SaveChangesAsync();
+            scheduleId = schedule.Id;
+          }
+
+          ScheduleCourse course = new ScheduleCourse();
+          course.ScheduleId = scheduleId;
+          course.TeacherId = data.TeacherId;
+          course.CourseId = data.CourseId;
+          course.InsertDate = today;
+          course.InsertUserId = currentUserId;
+          course.UpdateDate = today;
+          course.UpdateUserId = currentUserId;
+          Guid GUID1 = Guid.NewGuid();
+          course.Version = GUID1.ToString();
+          _repo.Add(course);
+
+          if(await _repo.SaveAll())
+          {
+            await _cache.LoadScheduleCourses();
+            await _cache.LoadSchedules();
+            identityContextTransaction.Commit();
+            return NoContent();
+          }
+        }
+        catch
+        {
+          identityContextTransaction.Rollback();
+        }
+
+        return BadRequest("problème d'enregistrement des données");
+      }
+    }
+
     [HttpPut("saveSchedules")]
     public async Task<IActionResult> saveSchedules([FromBody] ScheduleDataDto[] schedules)
     {
@@ -811,9 +875,8 @@ namespace EducNotes.API.Controllers {
             return NoContent();
           }
         }
-        catch(Exception ex)
+        catch
         {
-          var sddaz = ex.Message; 
           identityContextTransaction.Rollback();
         }
       }

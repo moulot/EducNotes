@@ -399,4 +399,8 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'Activities');
   }
 
+  addCourseWithConflict(data) {
+    return this.http.post(this.baseUrl + 'SaveCourseWithConflict', data);
+  }
+
 }

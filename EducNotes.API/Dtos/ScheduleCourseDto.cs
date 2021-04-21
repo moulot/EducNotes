@@ -5,6 +5,7 @@ namespace EducNotes.API.Dtos
 {
   public class ScheduleCourseDto
   {
+    public int ScheduleId { get; set; }
     public int CourseId { get; set; }
     public string CourseName { get; set; }
     public string CourseAbbrev { get; set; }

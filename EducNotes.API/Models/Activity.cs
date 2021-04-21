@@ -4,5 +4,6 @@ namespace EducNotes.API.Models
     {
       public string Name { get; set; }
       public string Abbreviation { get; set; }
+      public string Color { get; set; }
     }
 }

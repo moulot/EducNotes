@@ -515,10 +515,11 @@ namespace EducNotes.API.Data {
       return false;
     }
 
-    public async Task<List<Course>> GetTeacherCourses (int teacherId) {
-      // List<TeacherCourse> teacherCourses = await _cache.GetTeacherCourses();
-      var courses = await _context.TeacherCourses.Where (c => c.TeacherId == teacherId)
-        .Select (s => s.Course).ToListAsync ();
+    public async Task<List<Course>> GetTeacherCourses(int teacherId)
+    {
+      List<TeacherCourse> teacherCourses = await _cache.GetTeacherCourses();
+      var courses = teacherCourses.Where(c => c.TeacherId == teacherId)
+                                  .Select (s => s.Course).ToList();
       return courses;
     }
 

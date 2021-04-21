@@ -651,7 +651,8 @@ namespace EducNotes.API.Controllers {
           scheduleDay.Day = day;
           scheduleDay.DayName = day.DayIntToName();
 
-          List<ScheduleCourse> dayScheduleItems = scheduleItems.Where(s => s.Schedule.Day == day).ToList();
+          List<ScheduleCourse> dayScheduleItems = scheduleItems.Where(s => s.Schedule.Day == day)
+                                                               .OrderBy(o => o.Schedule.StartHourMin).ToList();
           scheduleDay.Courses = new List<ScheduleCourseDto>();
           foreach(var item in dayScheduleItems)
           {

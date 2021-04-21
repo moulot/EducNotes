@@ -1024,7 +1024,7 @@ namespace EducNotes.API.data {
     {
       List<ScheduleCourse> scheduleCourses = await _context.ScheduleCourses
                                         .Include(i => i.Course)
-                                        .Include(i => i.Schedule)
+                                        .Include(i => i.Schedule).ThenInclude(i => i.Class)
                                         .Include(i => i.Teacher)
                                         .Include(i => i.Activity)
                                         .ToListAsync();

@@ -119,7 +119,7 @@ namespace EducNotes.API.Data {
 
       protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder)
       {
-        string subdomain = "Demo";
+        string subdomain = "EducNotes";
         //To get subdomain
         string[] fullAddress = _httpContext.HttpContext?.Request?.Headers?["Host"].ToString ()?.Split ('.');
         if (fullAddress != null)

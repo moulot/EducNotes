@@ -18,14 +18,17 @@ export class ClassScheduleEditComponent implements OnInit {
   educLevelPrimary = environment.educLevelPrimary;
   classId: number;
   class: any;
+  classEducLevel: number;
   courses: Course[];
   teachers: User[];
   teacherName: string;
   scheduleForm: FormGroup;
+  conflictForm: FormGroup;
   formTouched = false;
   periodConflict = false;
   teacherSchedule: any;
   scheduleCourses: any;
+  oldCourseOptions: any = [];
   timeMask = [/\d/, /\d/, ':', /\d/, /\d/];
   agendaItems: ScheduleData[] = [];
   teacherOptions: any = [];
@@ -45,6 +48,19 @@ export class ClassScheduleEditComponent implements OnInit {
   sunCourses = [];
   wait = false;
   activities: any;
+  showConflictDiv = false;
+  oldCourseColor: any;
+  oldCourseInfo = 'N/D';
+  conflictCourseColor: any;
+  conflictCourseInfo = 'N/D';
+  conflictDay: any;
+  oldConflictStartHM: any;
+  oldConflictEndHM: any;
+  conflictStartHM: any;
+  conflictEndHM: any;
+  showConflictInfo = false;
+  editPeriodDiv = false;
+  periodChanged = false;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private route: ActivatedRoute,
     private classService: ClassService, private userService: UserService) { }
@@ -58,6 +74,34 @@ export class ClassScheduleEditComponent implements OnInit {
       this.getScheduleCourses(this.classId);
     });
     this.createScheduleForm();
+    this.createConflictForm();
+  }
+
+  createConflictForm() {
+    this.conflictForm = this.fb.group({
+      oldCourse: [null],
+      conflictCourse: [null],
+      startHM: [],
+      endHM: []
+    }, {validator: this.conflictValidator});
+  }
+
+  conflictValidator(g: FormGroup) {
+    const startHM = g.get('startHM').value;
+    const endHM = g.get('endHM').value;
+    if (startHM || endHM) {
+      const typedHS = startHM ? startHM.replace('_', '') : '';
+      const typedHE = endHM ? endHM.replace('_', '') : '';
+      if (typedHS.length > 1 && typedHE.length > 1) {
+        if (typedHS.length !== 5 || typedHE.length !== 5) {
+          return {'datesNOK': true};
+        } else {
+          return null;
+        }
+      } else {
+        return {'lineNOK': true};
+      }
+    }
   }
 
   createScheduleForm() {
@@ -166,20 +210,17 @@ export class ClassScheduleEditComponent implements OnInit {
     const day1 = g.get('day1').value;
     const hourStart1 = g.get('hourStart1').value;
     const hourEnd1 = g.get('hourEnd1').value;
-    // console.log(day1 + '-' + hourStart1 + '-' + hourEnd1);
     if (day1) {
       if (hourStart1 || hourEnd1) {
         const typedHS1 = hourStart1 ? hourStart1.replace('_', '') : '';
         const typedHE1 = hourEnd1 ? hourEnd1.replace('_', '') : '';
         if (day1 !== null && typedHS1.length > 1 && typedHE1.length > 1) {
-          // console.log('in line');
           if (typedHS1.length !== 5 || typedHE1.length !== 5) {
             return {'line1DatesNOK': true};
           } else {
             return null;
           }
         } else {
-          // console.log('line NOK');
           return {'line1NOK': true};
         }
       }
@@ -414,40 +455,6 @@ export class ClassScheduleEditComponent implements OnInit {
     }
   }
 
-  saveScheduleItem() {
-    this.agendaItems = [];
-    for (let i = 1; i <= 5; i++) {
-      // is the schedule item line empty?
-      if (this.scheduleForm.controls['item' + i].get('day' + i).value !== null) {
-        const sch = <ScheduleData>{};
-        sch.classId = this.classId;
-        sch.teacherId = this.scheduleForm.value.teacher;
-        sch.courseId = this.scheduleForm.value.course;
-        sch.day = this.scheduleForm.controls['item' + i].get('day' + i).value;
-        const hStart = this.scheduleForm.controls['item' + i].get('hourStart' + i).value.split(':');
-        const hEnd = this.scheduleForm.controls['item' + i].get('hourEnd' + i).value.split(':');
-        sch.startHour = hStart[0];
-        sch.startMin = hStart[1];
-        sch.endHour = hEnd[0];
-        sch.endMin = hEnd[1];
-        this.agendaItems = [...this.agendaItems, sch];
-      }
-    }
-    this.saveSchedule(this.agendaItems);
-  }
-
-  saveSchedule(schedules: ScheduleData[]) {
-    this.classService.saveSchedules(schedules).subscribe(() => {
-      const teacherId = this.scheduleForm.value.teacher;
-      this.getTeacherSchedule(teacherId);
-      this.getScheduleCourses(this.classId);
-      this.resetForm();
-      this.alertify.success('cours de l\'emploi du temps enregistrés');
-    }, error => {
-      this.alertify.error(error);
-    });
-  }
-
   resetForm() {
     // this.scheduleForm.reset();
     this.scheduleForm.get('course').setValue('');
@@ -467,6 +474,7 @@ export class ClassScheduleEditComponent implements OnInit {
     this.courseConflicts = [];
     this.validateConflict = [false, false, false, false, false];
     this.courseOptions = [];
+    this.resetConflictDiv();
     this.teacherName = selected.label;
     const teacherId = this.scheduleForm.value.teacher;
     this.getTeacherCourses(teacherId);
@@ -494,6 +502,18 @@ export class ClassScheduleEditComponent implements OnInit {
     this.resetSchedule();
     this.classService.getScheduleCoursesByDay(classId).subscribe((data: any) => {
       this.scheduleCourses = data;
+      // console.log(data);
+      // data for existing courses select (conflict section)
+      for (let i = 0; i < this.scheduleCourses.days.length; i++) {
+        const day = this.scheduleCourses.days[i];
+        for (let j = 0; j < day.courses.length; j++) {
+          const elt = day.courses[j];
+          const oldCourse = {value: elt.scheduleId, label: elt.courseName.toUpperCase() + ' le ' + day.dayName +
+            ' de ' + elt.startH + ' à ' + elt.endH + ' - ' + elt.teacherName.toUpperCase(), day: day.day, dayName: day.dayName,
+            color: elt.courseColor, teacher: elt.teacherName, startHM: elt.startH, endHM: elt.endH};
+          this.oldCourseOptions = [...this.oldCourseOptions, oldCourse];
+        }
+      }
       // add courses on the schedule
       if (this.scheduleCourses.days) {
         for (let i = 1; i <= 7; i++) {
@@ -543,6 +563,51 @@ export class ClassScheduleEditComponent implements OnInit {
     this.sunCourses = [];
   }
 
+  toggleConflictDiv() {
+    this.showConflictDiv = !this.showConflictDiv;
+    if (this.showConflictDiv === false) {
+      this.resetConflictDiv();
+    }
+  }
+
+  resetConflictDiv() {
+    this.conflictForm.get('oldCourse').setValue(null);
+    this.conflictForm.get('conflictCourse').setValue(null);
+
+    this.showConflictInfo = false;
+    this.conflictDay = '';
+    this.conflictStartHM = '';
+    this.conflictEndHM = '';
+    this.oldCourseColor = '';
+    this.oldCourseInfo = 'N/D';
+    this.conflictCourseColor = '';
+    this.conflictCourseInfo = 'N/D';
+}
+
+  setConflictInfo(index, value) {
+    this.showConflictInfo = true;
+    // oldCourse changed?
+    if (index === 0 && value) {
+      const data = this.oldCourseOptions.find(c => c.value === value);
+      if (data) {
+        this.conflictDay = data.dayName;
+        this.oldConflictStartHM = data.startHM;
+        this.oldConflictEndHM = data.endHM;
+        this.conflictStartHM = data.startHM;
+        this.conflictEndHM = data.endHM;
+        this.oldCourseColor = data.color;
+        this.oldCourseInfo = data.label;
+      }
+    } else {
+      // course to be added changed?
+      const data = this.courseOptions.find(c => c.value === value);
+      if (data) {
+        this.conflictCourseColor = data.color;
+        this.conflictCourseInfo = data.label.toUpperCase();
+      }
+    }
+  }
+
   getClassTeachers(classId) {
     this.classService.getClassTeachers(classId).subscribe((teachers: User[]) => {
       this.teachers = teachers;
@@ -559,18 +624,19 @@ export class ClassScheduleEditComponent implements OnInit {
     this.courseOptions = [...this.courseOptions, {value: '', label: 'COURS', group: true}];
     for (let i = 0; i < this.courses.length; i++) {
       const elt = this.courses[i];
-      this.courseOptions = [...this.courseOptions, {value: elt.id, label: elt.name}];
+      this.courseOptions = [...this.courseOptions, {value: elt.id, label: elt.name, color: elt.color}];
     }
     this.courseOptions = [...this.courseOptions, {value: '', label: 'ACTIVITES', group: true}];
     for (let i = 0; i < this.activities.length; i++) {
       const elt = this.activities[i];
-      this.courseOptions = [...this.courseOptions, {value: elt.id, label: elt.name}];
+      this.courseOptions = [...this.courseOptions, {value: elt.id, label: elt.name, color: elt.color}];
     }
   }
 
   getClass(classid) {
     this.classService.getClass(classid).subscribe(data => {
       this.class = data;
+      this.classEducLevel = this.class.classLevel.educationLevelId;
     }, error => {
       this.alertify.error(error);
     });
@@ -585,6 +651,94 @@ export class ClassScheduleEditComponent implements OnInit {
   }
 
   goBackToSchedule() {
+  }
+
+  editPeriod() {
+    this.conflictForm.get('startHM').setValue(this.conflictStartHM);
+    this.conflictForm.get('endHM').setValue(this.conflictEndHM);
+    this.editPeriodDiv = true;
+  }
+
+  setPeriod() {
+    this.editPeriodDiv = false;
+    this.conflictStartHM = this.conflictForm.value.startHM;
+    this.conflictEndHM = this.conflictForm.value.endHM;
+    if (this.oldConflictStartHM !== this.conflictStartHM || this.oldConflictEndHM !== this.conflictEndHM) {
+      this.periodChanged = true;
+    } else {
+      this.periodChanged = false;
+    }
+  }
+
+  resetPeriod() {
+    this.conflictStartHM = this.oldConflictStartHM;
+    this.conflictEndHM = this.oldConflictEndHM;
+    this.periodChanged = false;
+  }
+
+  saveScheduleItem() {
+    this.agendaItems = [];
+    for (let i = 1; i <= 5; i++) {
+      // is the schedule item line empty?
+      if (this.scheduleForm.controls['item' + i].get('day' + i).value !== null) {
+        const sch = <ScheduleData>{};
+        sch.classId = this.classId;
+        sch.teacherId = this.scheduleForm.value.teacher;
+        sch.courseId = this.scheduleForm.value.course;
+        sch.day = this.scheduleForm.controls['item' + i].get('day' + i).value;
+        const hStart = this.scheduleForm.controls['item' + i].get('hourStart' + i).value.split(':');
+        const hEnd = this.scheduleForm.controls['item' + i].get('hourEnd' + i).value.split(':');
+        sch.startHour = hStart[0];
+        sch.startMin = hStart[1];
+        sch.endHour = hEnd[0];
+        sch.endMin = hEnd[1];
+        this.agendaItems = [...this.agendaItems, sch];
+      }
+    }
+    this.saveSchedule(this.agendaItems);
+  }
+
+  saveSchedule(schedules: ScheduleData[]) {
+    this.classService.saveSchedules(schedules).subscribe(() => {
+      const teacherId = this.scheduleForm.value.teacher;
+      this.getTeacherSchedule(teacherId);
+      this.getScheduleCourses(this.classId);
+      this.resetForm();
+      this.alertify.success('cours ajouté dans l\'emploi du temps');
+    }, error => {
+      this.alertify.error('problème pour ajouter le cours dans l\'emploi du temps');
+    });
+  }
+
+  addCourseWithConflict() {
+    const scheduleId = this.conflictForm.value.oldCourse;
+    const data = this.oldCourseOptions.find(c => c.value === scheduleId);
+    const startHM = this.conflictStartHM;
+    const endHM = this.conflictEndHM;
+    const conflictData = <any>{};
+    if (this.periodChanged) {
+      conflictData.scheduleId = 0;
+      conflictData.day = data.day;
+      conflictData.classId = this.classId;
+      conflictData.startHourMin = startHM;
+      conflictData.endHourMin = endHM;
+    } else {
+      conflictData.scheduleId = scheduleId;
+      conflictData.startHourMin = data.startHM;
+      conflictData.endHourMin = data.endHM;
+    }
+    conflictData.teacherId = this.scheduleForm.value.teacher;
+    conflictData.CourseId = this.conflictForm.value.conflictCourse;
+    this.classService.addCourseWithConflict(conflictData).subscribe(() => {
+      const teacherId = this.scheduleForm.value.teacher;
+      this.getTeacherSchedule(teacherId);
+      this.getScheduleCourses(this.classId);
+      this.resetForm();
+      this.showConflictDiv = false;
+      this.alertify.success('cours ajouté dans l\'emploi du temps');
+    }, error => {
+      this.alertify.error('problème pour saisir l\'emploi du temps');
+    });
   }
 
 }
