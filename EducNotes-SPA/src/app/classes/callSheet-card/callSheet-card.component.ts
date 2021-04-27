@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Renderer2, ElementRef, Output, EventEmitter, ViewChild } from '@angular/core';
-import { first } from 'rxjs/operators';
 import { CardRotatingComponent } from 'ng-uikit-pro-standard';
-import { FormControl, Validators, FormBuilder, FormGroup } from '@angular/forms';
+import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-callSheet-card',

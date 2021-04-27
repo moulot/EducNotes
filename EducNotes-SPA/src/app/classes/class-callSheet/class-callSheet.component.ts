@@ -21,7 +21,6 @@ export class ClassCallSheetComponent implements OnInit {
   lateType = environment.lateType;
   classRoom: Class;
   searchControl: FormControl = new FormControl();
-  // schedule: any;
   session: any;
   sessionData: any;
   students: any = [];
@@ -31,26 +30,16 @@ export class ClassCallSheetComponent implements OnInit {
   touched = -1;
   nbAbsents = 0;
   nbLate = 0;
-  // visible = true;
-  // date = new Date();
-  // today = this.date.getDate() + '/' + (this.date.getMonth() + 1) + '/' + this.date.getFullYear();
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
     private route: ActivatedRoute, private router: Router, private authService: AuthService) { }
 
   ngOnInit() {
-    // setTimeout(() => {
-    //   this.visible = false;
-    //   }, 3000);
     this.route.data.subscribe((data: any) => {
       this.sessionData = data['session'];
       this.session = this.sessionData.session;
-      // console.log(this.session);
       this.sessionAbsents = this.sessionData.sessionAbsences;
-      // console.log(this.sessionAbsents);
-      // this.getStudents(this.session.classId, this.sessionAbsents);
       this.students = this.sessionData.classStudents;
-      // console.log('nb students:' + this.students.length);
       if (this.sessionAbsents.length > 0) {
         for (let i = 0; i < this.students.length; i++) {
           const id = this.students[i].id;
@@ -81,7 +70,6 @@ export class ClassCallSheetComponent implements OnInit {
         }
       }
       this.filteredStudents = this.students;
-      // console.log(this.students);
     });
 
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
@@ -112,11 +100,9 @@ export class ClassCallSheetComponent implements OnInit {
   }
 
   getStudents(classId, absents) {
-    console.log('in getStudents');
     this.classService.getCallSheetStudents(classId).subscribe(data => {
       this.students = data;
       this.filteredStudents = data;
-      console.log('nb students:' + this.students.length);
       for (let i = 0; i < this.students.length; i++) {
         console.log('i:' + i);
         const id = this.students[i].id;
@@ -216,7 +202,7 @@ export class ClassCallSheetComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
     }, () => {
-      this.router.navigate(['/classSession', this.session.scheduleId]);
+      this.router.navigate(['/classSession', this.session.scheduleCourseId]);
     });
   }
 

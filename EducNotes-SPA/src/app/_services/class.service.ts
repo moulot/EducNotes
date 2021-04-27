@@ -70,8 +70,8 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'SessionData/' + scheduleId);
   }
 
-  getSessionFromSchedule(scheduleId) {
-    return this.http.get(this.baseUrl + 'Schedule/' + scheduleId + '/Session');
+  getSessionFromSchedule(courseId) {
+    return this.http.get(this.baseUrl + 'Course/' + courseId + '/Session');
   }
 
   getSession(id) {
@@ -401,6 +401,14 @@ export class ClassService {
 
   addCourseWithConflict(data) {
     return this.http.post(this.baseUrl + 'SaveCourseWithConflict', data);
+  }
+
+  getCourseTypes() {
+    return this.http.get(this.baseUrl + 'CourseTypes');
+  }
+
+  saveCourseTypes(courseTypes) {
+    return this.http.post(this.baseUrl + 'saveCourseTypes', courseTypes);
   }
 
 }

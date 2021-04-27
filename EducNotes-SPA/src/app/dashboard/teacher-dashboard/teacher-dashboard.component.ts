@@ -92,7 +92,7 @@ export class TeacherDashboardComponent implements OnInit {
       this.nextCourses = data;
       for (let i = 0; i < data.length; i++) {
         const elt = data[i];
-        const option = {value: elt.scheduleId, label: elt.className + ' ' + elt.courseName + ' ' +
+        const option = {value: elt.scheduleCourseId, label: elt.className + ' ' + elt.courseName + ' ' +
           elt.startHourMin + ' - ' + elt.endHourMin};
         this.optionsCourse = [...this.optionsCourse, option];
       }
@@ -119,8 +119,8 @@ export class TeacherDashboardComponent implements OnInit {
   }
 
   goToClass() {
-    const scheduleId = this.sessionForm.value.course;
-    this.router.navigate(['/classSession', scheduleId]);
+    const scheduleCourseId = this.sessionForm.value.course;
+    this.router.navigate(['/classSession', scheduleCourseId]);
   }
 
   prevDay() {

@@ -1,12 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
-import { UserService } from 'src/app/_services/user.service';
-import { Utils } from 'src/app/shared/utils';
-import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 import { AuthService } from 'src/app/_services/auth.service';
-import { OrderToValidate } from 'src/app/_models/orderToValidate';
-import { OrderlineToValidate } from 'src/app/_models/orderlineToValidate';
 
 @Component({
   selector: 'app-user-account',

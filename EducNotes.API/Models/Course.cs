@@ -5,6 +5,8 @@ namespace EducNotes.API.Models
   public class Course
   {
     public int Id { get; set; }
+    public int? CourseTypeId { get; set; }
+    public CourseType CourseType { get; set; }
     public string Name { get; set; }
     public string Abbreviation { get; set; }
     public string Color { get; set; }

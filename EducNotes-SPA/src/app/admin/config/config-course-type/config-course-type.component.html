@@ -1,25 +1,25 @@
 <div class="card">
   <div class="card-body p-2">
     <div class="d-md-flex">
-      <div class="text-15"><b>activités</b></div>
-      <a (click)="addActivity()" class="ml-2 text-15 textBlue text-center text-md-left"><u><b>ajouter une activité</b></u></a>
+      <div class="text-15"><b>types de cours</b></div>
+      <a (click)="addCourseType()" class="ml-2 text-15 textBlue text-center text-md-left"><u><b>ajouter un type de cours</b></u></a>
     </div>
     <hr class="my-1">
-    <form [formGroup]="activityForm" (ngSubmit)="save()">
+    <form [formGroup]="courseTypeForm" (ngSubmit)="save()">
       <div class="row">
-        <div class="col-md-12" formArrayName="activities" *ngFor="let activity of activityForm.get('activities')['controls']; let i = index;">
+        <div class="col-md-12" formArrayName="coursetypes" *ngFor="let type of courseTypeForm.get('coursetypes')['controls']; let i = index;">
           <div [formGroupName]="i">
             <input type="hidden" formControlName="id">
             <input type="hidden" formControlName="toBeDeleted">
             <div class="border rounded-lg p-2 mb-1">
-              <div *ngIf="activity.value.toBeDeleted" class="text-danger text-15">supprimé</div>
+              <div *ngIf="type.value.toBeDeleted" class="text-danger text-15">supprimé</div>
               <div class="row">
                 <div class="col-md-1 my-auto">
-                  <a *ngIf="!activity.value.toBeDeleted" (click)="removeActivitytem(i)">
+                  <a *ngIf="!type.value.toBeDeleted" (click)="removeActivitytem(i)">
                     <i class="fad fa-trash-alt fa-2x" style="--fa-secondary-opacity: 1;
                       --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
                   </a>
-                  <a *ngIf="activity.value.toBeDeleted" (click)="resetActivitytem(i)">
+                  <a *ngIf="type.value.toBeDeleted" (click)="resetCourseTypetem(i)">
                     <i class="fad fa-times-circle fa-2x" style="--fa-secondary-opacity: 1;
                       --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
                   </a>
@@ -27,13 +27,7 @@
                 <div class="col-md-4">
                   <div class="md-form my-0">
                     <input type="text" id="name" class="form-control" formControlName="name" mdbInput>
-                    <label for="name">nom activité</label>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="md-form my-0">
-                    <input type="text" id="abbrev" class="form-control" formControlName="abbrev" mdbInput>
-                    <label for="abbrev">abbréviation activité</label>
+                    <label for="name">nom type cours</label>
                   </div>
                 </div>
               </div>
@@ -42,7 +36,7 @@
         </div>
       </div>
       <div class="my-2">
-        <button type="submit" mdbBtn block="true" class="btnBlue" size="sm" mdbWavesEffect>enregistrer les activités</button>
+        <button type="submit" mdbBtn block="true" class="btnBlue" size="sm" mdbWavesEffect>enregistrer les types de cours</button>
       </div>
     </form>
   </div>

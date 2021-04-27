@@ -5,6 +5,7 @@ namespace EducNotes.API.Dtos
   public class ConflictDataDto
   {
     public int ScheduleId { get; set; }
+    public int ConflictedCourseId { get; set; }
     public int ClassId { get; set; }
     public int Day { get; set; }
     public DateTime StartHourMin { get; set; }

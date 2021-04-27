@@ -415,6 +415,10 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.EvalDate, opt => {
                     opt.MapFrom(src => src.EvalDate.ToString("dd/MM/yyyy", frC));
                 });
+            CreateMap<Course, CourseDto>()
+                .ForMember(dest => dest.Abbrev, opt => {
+                    opt.MapFrom(src => src.Abbreviation);
+                });
             CreateMap<ProductDto, Product>();
             CreateMap<DeadLineDto, DeadLine>();
             CreateMap<PayableDto, PayableAt>();

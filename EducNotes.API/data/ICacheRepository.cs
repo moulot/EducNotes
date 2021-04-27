@@ -81,7 +81,11 @@ namespace EducNotes.API.data
     Task<List<Session>> LoadSessions();
     Task<List<Event>> GetEvents();
     Task<List<Event>> LoadEvents();
-    Task<List<Activity>> GetActivities();
-    Task<List<Activity>> LoadActivities();
+    Task<List<CourseType>> GetCourseTypes();
+    Task<List<CourseType>> LoadCourseTypes();
+    Task<List<Conflict>> GetConflicts();
+    Task<List<Conflict>> LoadConflicts();
+    Task<List<CourseConflict>> GetCourseConflicts();
+    Task<List<CourseConflict>> LoadCourseConflicts();
   }
 }

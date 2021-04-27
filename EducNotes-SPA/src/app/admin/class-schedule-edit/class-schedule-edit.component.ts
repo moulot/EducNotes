@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Course } from 'src/app/_models/course';
 import { ScheduleData } from 'src/app/_models/scheduleData';
 import { User } from 'src/app/_models/user';
 import { AlertifyService } from 'src/app/_services/alertify.service';
@@ -19,7 +18,8 @@ export class ClassScheduleEditComponent implements OnInit {
   classId: number;
   class: any;
   classEducLevel: number;
-  courses: Course[];
+  courses: any = [];
+  activities: any = [];
   teachers: User[];
   teacherName: string;
   scheduleForm: FormGroup;
@@ -30,7 +30,7 @@ export class ClassScheduleEditComponent implements OnInit {
   scheduleCourses: any;
   oldCourseOptions: any = [];
   timeMask = [/\d/, /\d/, ':', /\d/, /\d/];
-  agendaItems: ScheduleData[] = [];
+  scheduleItems: ScheduleData[] = [];
   teacherOptions: any = [];
   courseOptions: any = [];
   courseConflicts: any = [];
@@ -47,7 +47,6 @@ export class ClassScheduleEditComponent implements OnInit {
   satCourses = [];
   sunCourses = [];
   wait = false;
-  activities: any;
   showConflictDiv = false;
   oldCourseColor: any;
   oldCourseInfo = 'N/D';
@@ -61,6 +60,7 @@ export class ClassScheduleEditComponent implements OnInit {
   showConflictInfo = false;
   editPeriodDiv = false;
   periodChanged = false;
+  conflictData: any = [];
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private route: ActivatedRoute,
     private classService: ClassService, private userService: UserService) { }
@@ -70,7 +70,6 @@ export class ClassScheduleEditComponent implements OnInit {
       this.classId = params['classId'];
       this.getClass(this.classId);
       this.getClassTeachers(this.classId);
-      this.getActivities();
       this.getScheduleCourses(this.classId);
     });
     this.createScheduleForm();
@@ -233,9 +232,9 @@ export class ClassScheduleEditComponent implements OnInit {
     const hourStart2 = g.get('hourStart2').value;
     const hourEnd2 = g.get('hourEnd2').value;
     if (day2) {
-      if (hourStart2.length > 0 || hourEnd2.length > 0) {
-        const typedHS2 = hourStart2.replace('_', '');
-        const typedHE2 = hourEnd2.replace('_', '');
+      if (hourStart2 || hourEnd2) {
+        const typedHS2 = hourStart2 ? hourStart2.replace('_', '') : '';
+        const typedHE2 = hourEnd2 ? hourEnd2.replace('_', '') : '';
         if (day2 !== null && typedHS2.length > 1 && typedHE2.length > 1) {
           if (typedHS2.length !== 5 || typedHE2.length !== 5) {
             return {'line2DatesNOK': true};
@@ -255,10 +254,10 @@ export class ClassScheduleEditComponent implements OnInit {
     const hourStart3 = g.get('hourStart3').value;
     const hourEnd3 = g.get('hourEnd3').value;
     if (day3) {
-      if (hourStart3.length > 0 || hourEnd3.length > 0) {
-        if (day3 !== null && hourStart3.length > 0 && hourEnd3.length > 0) {
-          const typedHS3 = hourStart3.replace('_', '');
-          const typedHE3 = hourEnd3.replace('_', '');
+      if (hourStart3 || hourEnd3) {
+        const typedHS3 = hourStart3 ? hourStart3.replace('_', '') : '';
+        const typedHE3 = hourEnd3 ? hourEnd3.replace('_', '') : '';
+        if (day3 !== null && typedHS3.length > 1 && typedHS3.length > 1) {
           if (typedHS3.length !== 5 || typedHE3.length !== 5) {
             return {'line3DatesNOK': true};
           } else {
@@ -277,10 +276,10 @@ export class ClassScheduleEditComponent implements OnInit {
     const hourStart4 = g.get('hourStart4').value;
     const hourEnd4 = g.get('hourEnd4').value;
     if (day4) {
-      if (hourStart4.length > 0 || hourEnd4.length > 0) {
-        if (day4 !== null && hourStart4.length > 0 && hourEnd4.length > 0) {
-          const typedHS4 = hourStart4.replace('_', '');
-          const typedHE4 = hourEnd4.replace('_', '');
+      if (hourStart4 || hourEnd4) {
+        const typedHS4 = hourStart4 ? hourStart4.replace('_', '') : '';
+        const typedHE4 = hourEnd4 ? hourEnd4.replace('_', '') : '';
+        if (day4 !== null && typedHS4.length > 1 && typedHS4.length > 1) {
           if (typedHS4.length !== 5 || typedHE4.length !== 5) {
             return {'line4DatesNOK': true};
           } else {
@@ -299,10 +298,10 @@ export class ClassScheduleEditComponent implements OnInit {
     const hourStart5 = g.get('hourStart5').value;
     const hourEnd5 = g.get('hourEnd5').value;
     if (day5) {
-      if (hourStart5.length > 0 || hourEnd5.length > 0) {
-        if (day5 !== null && hourStart5.length > 0 && hourEnd5.length > 0) {
-          const typedHS5 = hourStart5.replace('_', '');
-          const typedHE5 = hourEnd5.replace('_', '');
+      if (hourStart5 || hourEnd5) {
+        const typedHS5 = hourStart5 ? hourStart5.replace('_', '') : '';
+        const typedHE5 = hourEnd5 ? hourEnd5.replace('_', '') : '';
+        if (day5 !== null && typedHS5.length > 1 && typedHS5.length > 1) {
           if (typedHS5.length !== 5 || typedHE5.length !== 5) {
             return {'line5DatesNOK': true};
           } else {
@@ -322,17 +321,22 @@ export class ClassScheduleEditComponent implements OnInit {
     if (formIsValid && day) {
       const startH = this.scheduleForm.controls['item' + index].get('hourStart' + index).value;
       const endH = this.scheduleForm.controls['item' + index].get('hourEnd' + index).value;
-      if (startH) {
+      if (startH && endH) {
         const startHNum = Number(startH.replace(':', ''));
         const endHNum = Number(endH.replace(':', ''));
+
         // cope with teacher schedule
         let teacherDayCourses = [];
+        // console.log('teacher days');
+        // console.log(this.teacherSchedule.days);
         if (this.teacherSchedule.days) {
           const teacherDayIndex = this.teacherSchedule.days.findIndex(elt => elt.day === day);
           if (teacherDayIndex !== -1) {
             teacherDayCourses = [...teacherDayCourses, this.teacherSchedule.days[teacherDayIndex]];
           }
         }
+        // console.log('teacher courses');
+        // console.log(teacherDayCourses);
 
         // then with class schedule (remove courses already treated with teacher)
         let classDayCourses = <any>{};
@@ -340,25 +344,20 @@ export class ClassScheduleEditComponent implements OnInit {
           const classDayIndex = this.scheduleCourses.days.findIndex(elt => elt.day === day);
           classDayCourses = classDayIndex !== -1 ? this.scheduleCourses.days[classDayIndex] : [];
         }
+        // console.log('classes courses');
+        // console.log(classDayCourses);
 
+        // remove courses from classDayCourses that are already in teacherDayCourses
         let filteredClassDayCourses = [];
-        if (classDayCourses.length > 0) {
+        if (classDayCourses.courses) {
           if (teacherDayCourses.length > 0) {
             for (let i = 0; i < classDayCourses.courses.length; i++) {
               const elt = classDayCourses.courses[i];
-              if (teacherDayCourses.length > 0) {
-                for (let j = 0; j < teacherDayCourses.length; j++) {
-                  const elt1 = teacherDayCourses[j];
-                  for (let k = 0; k < elt1.courses.length; k++) {
-                    const course = elt1.courses[k];
-                    const courseIndex = teacherDayCourses.findIndex(c => c.courseId === elt.courseId);
-                    if (courseIndex === -1) {
-                      filteredClassDayCourses = [...filteredClassDayCourses, elt];
-                    }
-                  }
-                }
+              const courseIndex = teacherDayCourses.findIndex(c => c.courseId === elt.courseId);
+              if (courseIndex === -1) {
+                filteredClassDayCourses = [...filteredClassDayCourses, elt];
               }
-            }
+          }
           } else {
             filteredClassDayCourses = [...filteredClassDayCourses, classDayCourses];
           }
@@ -369,68 +368,106 @@ export class ClassScheduleEditComponent implements OnInit {
         const classDayName = classDayCourses.dayName;
         this.resetConflicts(day);
 
-        // let conflict = false;
+        let conflict = false;
         this.periodConflict = false;
         const conflictIsOK = this.scheduleForm.controls['item' + index].get('conflictOK' + index).value;
-
-        if (teacherDayCourses.length > 0) {
-          if (day || startH.length === 5 || endH.length === 5) {
-            for (let i = 0; i < teacherDayCourses.length; i++) {
-              const elt = teacherDayCourses[i];
-              for (let j = 0; j < elt.courses.length; j++) {
-                const course = elt.courses[j];
-                const courseStartH = Number(course.startH.replace(':', ''));
-                const courseEndH = Number(course.endH.replace(':', ''));
-                if (!conflictIsOK) {
-                  if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH &&
-                    endHNum <= courseEndH) || (startHNum < courseStartH && endHNum > courseEndH)) {
-                    const conflictElt = { day: day, data: 'ligne ' + index + '. conflit avec le cours ' + course.courseAbbrev +
-                      ' du ' + this.teacherName + '. horaire : ' + course.startH + ' - ' + course.endH };
-                    this.courseConflicts = [...this.courseConflicts, conflictElt];
-                    this.validateConflict[index - 1] = true;
-                    teacherDayCourses[i].courses[j].inConflict = true;
-                    // conflict = true;
-                    this.periodConflict = true;
-                  } else {
-                    this.validateConflict[index - 1] = false;
-                  }
-                }
-              }
-            }
+        if (conflictIsOK === false) {
+          // remove conflict data for the current line
+          const conflictIndex = this.conflictData.findIndex(c => c.line === index);
+          if (conflictIndex !== -1) {
+            this.conflictData.splice(conflictIndex, 1);
           }
         }
 
+        if (teacherDayCourses.length > 0) {
+          for (let i = 0; i < teacherDayCourses.length; i++) {
+            const elt = teacherDayCourses[i];
+            for (let j = 0; j < elt.courses.length; j++) {
+              const course = elt.courses[j];
+              const courseStartH = Number(course.startH.replace(':', ''));
+              const courseEndH = Number(course.endH.replace(':', ''));
+              if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH &&
+                endHNum <= courseEndH) || (startHNum < courseStartH && endHNum > courseEndH)) {
+                // console.log('teacher');
+                // console.log(course);
+                conflict = true;
+                if (!conflictIsOK) {
+                  const conflictElt = { day: day, data: 'ligne ' + index + '. conflit avec le programme de  ' + this.teacherName +
+                  '. cours : ' + course.courseAbbrev + ' du ' + classDayName + ' de ' + course.startH + ' à ' + course.endH };
+                  this.courseConflicts = [...this.courseConflicts, conflictElt];
+                  this.validateConflict[index - 1] = true;
+                  // console.log('teacher index-1: ' + (index - 1));
+                  // console.log(this.validateConflict);
+                  teacherDayCourses[i].courses[j].inConflict = true;
+                  this.periodConflict = true;
+                } else {
+                  // set conflict data
+                  const conflictdata = <any>{};
+                  conflictdata.line = index;
+                  conflictdata.id = course.id;
+                  conflictdata.scheduleId = course.scheduleId;
+                  conflictdata.conflictedCourseId = course.courseId;
+                  this.conflictData = [...this.conflictData, conflictdata];
+                }
+              }
+            }
+          }
+          if (!conflict) {
+            this.validateConflict[index - 1] = false;
+            this.scheduleForm.controls['item' + index].get('conflictOK' + index).setValue(false);
+          }
+          // console.log(this.conflictData);
+        }
+
         if (filteredClassDayCourses.length > 0) {
-          if (day || startH.length === 5 || endH.length === 5) {
-            for (let i = 0; i < filteredClassDayCourses.length; i++) {
-              const elt = filteredClassDayCourses[i];
-              if (elt.courses) {
-                for (let j = 0; j < elt.courses.length; j++) {
-                  const course = elt.courses[j];
+          for (let i = 0; i < filteredClassDayCourses.length; i++) {
+            const elt = filteredClassDayCourses[i];
+            if (elt.courses) {
+              for (let j = 0; j < elt.courses.length; j++) {
+                const course = elt.courses[j];
                   const courseStartH = Number(course.startH.replace(':', ''));
-                  const courseEndH = Number(course.endH.replace(':', ''));
+                const courseEndH = Number(course.endH.replace(':', ''));
+                if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH &&
+                  endHNum <= courseEndH) || (startHNum < courseStartH && endHNum > courseEndH)) {
+                  // console.log('class');
+                  // console.log(course);
+                  conflict = true;
                   if (!conflictIsOK) {
-                    if ((startHNum >= courseStartH && startHNum <= courseEndH) || (endHNum >= courseStartH &&
-                      endHNum <= courseEndH) || (startHNum < courseStartH && endHNum > courseEndH)) {
-                      const conflictElt = { day: day, data: 'ligne classe ' + index + '. conflit avec le cours ' +
-                      course.courseAbbrev + ' du ' + classDayName + '. horaire : ' + course.startH + ' - ' + course.endH };
-                      this.courseConflicts = [...this.courseConflicts, conflictElt];
-                      this.validateConflict[index - 1] = true;
-                      filteredClassDayCourses[i].courses[j].inConflict = true;
-                      this.periodConflict = true;
-                    } else {
-                      this.validateConflict[index - 1] = false;
-                    }
+                    const conflictElt = { day: day, data: 'ligne ' + index + '. conflit dans l\'emploi du temps de la classe avec le cours ' +
+                    course.courseAbbrev + ' du ' + classDayName + ' de ' + course.startH + ' à ' + course.endH };
+                    this.courseConflicts = [...this.courseConflicts, conflictElt];
+                    this.validateConflict[index - 1] = true;
+                    // console.log('class-index-1: ' + (index - 1));
+                    // console.log(this.validateConflict);
+                    filteredClassDayCourses[i].courses[j].inConflict = true;
+                    this.periodConflict = true;
+                    // remove conflict data for the current line
+                    // const conflictIndex = this.conflictData.findIndex(c => c.line === index);
+                    // if (conflictIsOK !== -1) {
+                    //   this.conflictData.splice(conflictIndex, 1);
+                    // }
+                  } else {
+                    // set conflict data
+                    const conflictdata = <any>{};
+                    conflictdata.line = index;
+                    conflictdata.id = course.id;
+                    conflictdata.scheduleId = course.scheduleId;
+                    conflictdata.conflictedCourseId = course.courseId;
+                    this.conflictData = [...this.conflictData, conflictdata];
                   }
                 }
               }
             }
           }
+          if (!conflict) {
+            this.validateConflict[index - 1] = false;
+            this.scheduleForm.controls['item' + index].get('conflictOK' + index).setValue(false);
+          }
+          // console.log(this.conflictData);
         }
       }
     } else {
       this.courseConflicts = [];
-      this.validateConflict = [false, false, false, false, false];
     }
   }
 
@@ -468,11 +505,12 @@ export class ClassScheduleEditComponent implements OnInit {
     this.scheduleForm.controls['item3'].markAsUntouched();
     this.scheduleForm.controls['item4'].markAsUntouched();
     this.scheduleForm.controls['item5'].markAsUntouched();
+    this.validateConflict = [false, false, false, false, false];
   }
 
   onTeacherChanged(selected) {
+    this.resetForm();
     this.courseConflicts = [];
-    this.validateConflict = [false, false, false, false, false];
     this.courseOptions = [];
     this.resetConflictDiv();
     this.teacherName = selected.label;
@@ -490,8 +528,9 @@ export class ClassScheduleEditComponent implements OnInit {
   }
 
   getTeacherCourses(teacherId) {
-    this.userService.getTeacherCourses(teacherId).subscribe((courses: Course[]) => {
-      this.courses = courses;
+    this.userService.getTeacherCourses(teacherId).subscribe((data: any) => {
+      this.courses = data.courses;
+      this.activities = data.activities;
       this.loadCourseSelect();
     }, error => {
       this.alertify.error(error);
@@ -502,15 +541,15 @@ export class ClassScheduleEditComponent implements OnInit {
     this.resetSchedule();
     this.classService.getScheduleCoursesByDay(classId).subscribe((data: any) => {
       this.scheduleCourses = data;
-      // console.log(data);
+      // console.log(this.scheduleCourses);
       // data for existing courses select (conflict section)
       for (let i = 0; i < this.scheduleCourses.days.length; i++) {
         const day = this.scheduleCourses.days[i];
         for (let j = 0; j < day.courses.length; j++) {
           const elt = day.courses[j];
-          const oldCourse = {value: elt.scheduleId, label: elt.courseName.toUpperCase() + ' le ' + day.dayName +
-            ' de ' + elt.startH + ' à ' + elt.endH + ' - ' + elt.teacherName.toUpperCase(), day: day.day, dayName: day.dayName,
-            color: elt.courseColor, teacher: elt.teacherName, startHM: elt.startH, endHM: elt.endH};
+          const oldCourse = {value: elt.id, label: elt.courseName.toUpperCase() + ' le ' + day.dayName + ' de ' + elt.startH +
+            ' à ' + elt.endH + ' - ' + elt.teacherName.toUpperCase(), scheduleId: elt.scheduleId, day: day.day,
+            dayName: day.dayName, color: elt.courseColor, teacher: elt.teacherName, startHM: elt.startH, endHM: elt.endH};
           this.oldCourseOptions = [...this.oldCourseOptions, oldCourse];
         }
       }
@@ -626,10 +665,13 @@ export class ClassScheduleEditComponent implements OnInit {
       const elt = this.courses[i];
       this.courseOptions = [...this.courseOptions, {value: elt.id, label: elt.name, color: elt.color}];
     }
-    this.courseOptions = [...this.courseOptions, {value: '', label: 'ACTIVITES', group: true}];
-    for (let i = 0; i < this.activities.length; i++) {
-      const elt = this.activities[i];
-      this.courseOptions = [...this.courseOptions, {value: elt.id, label: elt.name, color: elt.color}];
+
+    if (this.activities.length > 0) {
+      this.courseOptions = [...this.courseOptions, {value: '', label: 'ACTIVITES', group: true}];
+      for (let i = 0; i < this.activities.length; i++) {
+        const elt = this.activities[i];
+        this.courseOptions = [...this.courseOptions, {value: elt.id, label: elt.name, color: elt.color}];
+      }
     }
   }
 
@@ -639,14 +681,6 @@ export class ClassScheduleEditComponent implements OnInit {
       this.classEducLevel = this.class.classLevel.educationLevelId;
     }, error => {
       this.alertify.error(error);
-    });
-  }
-
-  getActivities() {
-    this.classService.getActivities().subscribe(data => {
-      this.activities = data;
-    }, error => {
-      this.alertify.error('problème pour récupérer les données de la page');
     });
   }
 
@@ -677,11 +711,18 @@ export class ClassScheduleEditComponent implements OnInit {
   }
 
   saveScheduleItem() {
-    this.agendaItems = [];
+    this.scheduleItems = [];
     for (let i = 1; i <= 5; i++) {
       // is the schedule item line empty?
       if (this.scheduleForm.controls['item' + i].get('day' + i).value !== null) {
+        // do we have a conflict for this line?
+        const conflict = this.conflictData.find(c => c.line === i);
         const sch = <ScheduleData>{};
+        if (conflict && conflict.line !== - 1) {
+          sch.id = conflict.id;
+          sch.scheduleId = conflict.scheduleId;
+          sch.conflictedCourseId = conflict.conflictedCourseId;
+        }
         sch.classId = this.classId;
         sch.teacherId = this.scheduleForm.value.teacher;
         sch.courseId = this.scheduleForm.value.course;
@@ -692,10 +733,11 @@ export class ClassScheduleEditComponent implements OnInit {
         sch.startMin = hStart[1];
         sch.endHour = hEnd[0];
         sch.endMin = hEnd[1];
-        this.agendaItems = [...this.agendaItems, sch];
+        this.scheduleItems = [...this.scheduleItems, sch];
       }
     }
-    this.saveSchedule(this.agendaItems);
+    // console.log(this.scheduleItems);
+    this.saveSchedule(this.scheduleItems);
   }
 
   saveSchedule(schedules: ScheduleData[]) {
@@ -711,22 +753,23 @@ export class ClassScheduleEditComponent implements OnInit {
   }
 
   addCourseWithConflict() {
-    const scheduleId = this.conflictForm.value.oldCourse;
-    const data = this.oldCourseOptions.find(c => c.value === scheduleId);
+    const scheduleCourseId = this.conflictForm.value.oldCourse;
+    const data = this.oldCourseOptions.find(c => c.value === scheduleCourseId);
     const startHM = this.conflictStartHM;
     const endHM = this.conflictEndHM;
     const conflictData = <any>{};
     if (this.periodChanged) {
-      conflictData.scheduleId = 0;
+      conflictData.conflictedCourseId = 0;
       conflictData.day = data.day;
-      conflictData.classId = this.classId;
       conflictData.startHourMin = startHM;
       conflictData.endHourMin = endHM;
     } else {
-      conflictData.scheduleId = scheduleId;
+      conflictData.conflictedCourseId = scheduleCourseId;
+      conflictData.scheduleId = data.scheduleId;
       conflictData.startHourMin = data.startHM;
       conflictData.endHourMin = data.endHM;
     }
+    conflictData.classId = this.classId;
     conflictData.teacherId = this.scheduleForm.value.teacher;
     conflictData.CourseId = this.conflictForm.value.conflictCourse;
     this.classService.addCourseWithConflict(conflictData).subscribe(() => {

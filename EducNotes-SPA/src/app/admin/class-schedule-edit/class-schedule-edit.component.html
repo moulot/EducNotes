@@ -18,42 +18,22 @@
         <div class="card">
           <div class="card-body p-2">
             <div class="row">
-              <div class="col-md-5 mb-1">
+              <div class="col-md-12 mb-1">
                 <div class="border rounded-lg p-2">
-                <div class="d-md-flex">
-                  <div class="mt-md-3 text-15 mr-md-5"><b>enseignant</b></div>
-                  <mdb-select [options]="teacherOptions" formControlName="teacher" name="teacher" [visibleOptions]="7"
-                    (selected)="onTeacherChanged($event)" placeholder="choisir l'enseignant"></mdb-select>
-                </div>
+                  <div class="row">
+                    <div class="col-md-5">
+                      <div class="d-md-flex">
+                        <div class="mt-md-3 text-15 mr-md-5"><b>enseignant</b></div>
+                        <mdb-select [options]="teacherOptions" formControlName="teacher" name="teacher" [visibleOptions]="7"
+                          (selected)="onTeacherChanged($event)" placeholder="choisir l'enseignant"></mdb-select>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             <div *ngIf="teacherSchedule">
               <div *ngIf="!showConflictDiv">
-                <div class="border rounded-lg p-2 mb-1">
-                  <div class="row">
-                    <div class="col-md-6 text-16 textBlue my-1">
-                      <b>cours donnés par <span class="text-capitalize">{{teacherName}}</span></b>
-                    </div>
-                    <div class="col-md-6 text-right">
-                      <button type="button" (click)="toggleConflictDiv()" mdbBtn size="sm"
-                        class="btnBlue" mdbWavesEffect>ajouter cours avec conflit</button>
-                    </div>
-                  </div>
-                  <hr class="my-1">
-                  <div class="row">
-                    <div class="col-2" *ngFor="let day of teacherSchedule.days">
-                      <div class="border rounded-lg p-1 text-center text-12 mb-1 blueWhite">{{day.dayName}}</div>
-                      <hr class="my-1">
-                      <div *ngFor="let course of day.courses">
-                        <div class="border rounded-lg p-1 text-12 text-white mb-1" [ngStyle]="{'background-color': course.courseColor}"
-                          [ngClass]="course.inConflict ? 'inConflict' : ''">
-                          {{course.startH}} à {{course.endH}} {{course.courseAbbrev}} {{course.className}}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
                 <div class="row">
                   <div class="col-md-12" *ngIf="courseConflicts.length > 0">
                     <div class="card animated shake alert-div mb-1">
@@ -146,7 +126,7 @@
                               </div>
                             </div>
                             <div class="text-15" *ngIf="validateConflict[1]">
-                              <mdb-checkbox formControlName="conflictOK1">accepter le conflit</mdb-checkbox>
+                              <mdb-checkbox (change)="isConflict(2)" formControlName="conflictOK2">accepter le conflit</mdb-checkbox>
                             </div>
                           </div>
                         </div>
@@ -184,7 +164,7 @@
                               </div>
                             </div>
                             <div class="text-15" *ngIf="validateConflict[2]">
-                              <mdb-checkbox formControlName="conflictOK1">accepter le conflit</mdb-checkbox>
+                              <mdb-checkbox (change)="isConflict(3)" formControlName="conflictOK3">accepter le conflit</mdb-checkbox>
                             </div>
                           </div>
                         </div>
@@ -222,7 +202,7 @@
                               </div>
                             </div>
                             <div class="text-15" *ngIf="validateConflict[3]">
-                              <mdb-checkbox formControlName="conflictOK1">accepter le conflit</mdb-checkbox>
+                              <mdb-checkbox (change)="isConflict(4)" formControlName="conflictOK4">accepter le conflit</mdb-checkbox>
                             </div>
                           </div>
                         </div>
@@ -260,7 +240,7 @@
                               </div>
                             </div>
                             <div class="text-15" *ngIf="validateConflict[4]">
-                              <mdb-checkbox formControlName="conflictOK1">accepter le conflit</mdb-checkbox>
+                              <mdb-checkbox (change)="isConflict(5)" formControlName="conflictOK5">accepter le conflit</mdb-checkbox>
                             </div>
                           </div>
                         </div>
@@ -268,21 +248,55 @@
                     </div>
                   </div>
                   <div class="col-md-8">
-                    <div class="border rounded-lg p-2">
-                      <div class="text-16 textBlue"><b>emploi du temps de la classe {{scheduleCourses.className}}</b></div>
-                      <hr class="my-1">
-                      <div class="row">
-                        <div *ngFor="let item of weekDays; let i = index" class="col">
-                          <div class="border rounded-lg p-1 text-center text-12 mb-1 blueWhite">{{item}}</div>
+                    <div class="row">
+                      <div class="col-md-12 mb-2">
+                        <div class="border rounded-lg p-2">
+                          <div class="row">
+                            <div class="col-md-6 text-16 textBlue my-1">
+                              <b>cours donnés par <span class="text-capitalize">{{teacherName}}</span></b>
+                            </div>
+                            <!-- <div class="col-md-6 text-right">
+                              <button type="button" (click)="toggleConflictDiv()" mdbBtn size="sm"
+                                class="btnBlue" mdbWavesEffect>ajouter cours avec conflit</button>
+                            </div> -->
+                          </div>
+                          <hr class="my-1">
+                          <div class="row">
+                            <div class="col-2" *ngFor="let day of teacherSchedule.days">
+                              <div class="border rounded-lg p-1 text-center text-12 mb-1 blueWhite">{{day.dayName}}</div>
+                              <hr class="my-1">
+                              <div *ngFor="let course of day.courses">
+                                <div class="border rounded-lg p-1 text-12 text-white mb-1" [ngStyle]="{'background-color': course.courseColor}"
+                                  [ngClass]="course.inConflict ? 'inConflict' : ''">
+                                  {{course.startH}} à {{course.endH}} {{course.courseAbbrev}} {{course.className}}
+                                </div>
+                              </div>
+                            </div>
+                          
+                          
+                          
+                          
+                          </div>
                         </div>
                       </div>
-                      <div class="row">
-                        <div *ngFor="let index of [0, 1, 2, 3, 4]" class="col">
-                          <div *ngFor="let courses of dayItems[index]">
-                          <div *ngFor="let course of courses" class="border rounded-lg p-1 text-12 text-white mb-1"
-                            [ngStyle]="{'background-color': course.courseColor}">
-                            {{course.startH}} à {{course.endH}}<br>{{course.courseAbbrev | uppercase}}
+                      <div class="col-md-12">
+                        <div class="border rounded-lg p-2">
+                          <div class="text-16 textBlue"><b>emploi du temps de la classe {{scheduleCourses.className}}</b></div>
+                          <hr class="my-1">
+                          <div class="row">
+                            <div *ngFor="let item of weekDays; let i = index" class="col">
+                              <div class="border rounded-lg p-1 text-center text-12 mb-1 blueWhite">{{item}}</div>
+                            </div>
                           </div>
+                          <div class="row">
+                            <div *ngFor="let index of [0, 1, 2, 3, 4]" class="col">
+                              <div *ngFor="let courses of dayItems[index]">
+                              <div *ngFor="let course of courses" class="border rounded-lg p-1 text-12 text-white mb-1"
+                                [ngStyle]="{'background-color': course.courseColor}">
+                                {{course.startH}} à {{course.endH}}<br>{{course.courseAbbrev | uppercase}}
+                              </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

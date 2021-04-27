@@ -36,7 +36,7 @@ namespace EducNotes.API.Controllers {
     private Cloudinary _cloudinary;
     private readonly UserManager<User> _userManager;
     int tuitionId, nextYearTuitionId, newRegToBePaidEmailId, teacherConfirmEmailId;
-    int absenceTypeId, lateTypeId, educLevelPrimary, educLevelSecondary;
+    int absenceTypeId, lateTypeId, educLevelPrimary, educLevelSecondary, courseTypeId, activityTypeId;
     public readonly ICacheRepository _cache;
 
     public UsersController(IConfiguration config, DataContext context, IEducNotesRepository repo, ICacheRepository cache,
@@ -65,6 +65,8 @@ namespace EducNotes.API.Controllers {
       lateTypeId = _config.GetValue<int>("AppSettings:LateTypeId");
       educLevelPrimary = _config.GetValue<int>("AppSettings:educLevelPrimary");
       educLevelSecondary = _config.GetValue<int>("AppSettings:educLevelSecondary");
+      courseTypeId = _config.GetValue<int>("AppSettings:courseTypeId");
+      activityTypeId = _config.GetValue<int>("AppSettings:activityTypeId");
 
       _cloudinaryConfig = cloudinaryConfig;
       Account acc = new Account(
@@ -659,6 +661,8 @@ namespace EducNotes.API.Controllers {
             Course course = item.Course;
             Schedule schedule = item.Schedule;
             ScheduleCourseDto courseDto = new ScheduleCourseDto();
+            courseDto.Id = item.Id;
+            courseDto.ScheduleId = item.ScheduleId;
             courseDto.CourseId = course.Id;
             courseDto.CourseName = course.Name;
             courseDto.CourseAbbrev = course.Abbreviation;
@@ -722,8 +726,6 @@ namespace EducNotes.API.Controllers {
               courseDto.CourseName = course.Course.Name;
               courseDto.CourseAbbrev = course.Course.Abbreviation;
               courseDto.CourseColor = course.Course.Color;
-              if(course.Activity != null)
-                courseDto.ActivityName = course.Activity.Name;
               courseDto.StartHour = schedule.StartHourMin;
               courseDto.StartH = schedule.StartHourMin.ToString("HH:mm", frC);
               courseDto.EndHour = schedule.EndHourMin;
@@ -747,7 +749,7 @@ namespace EducNotes.API.Controllers {
       List<Schedule> schedules = await _cache.GetSchedules();
       List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
 
-      var nextCourses = 10; // next coming courses
+      // var nextCourses = 10; // next coming courses
       var today = DateTime.Now;
       // monday=1, tue=2, ...
       var todayDay = ((int)today.DayOfWeek == 0) ? 7 : (int)DateTime.Now.DayOfWeek;
@@ -755,24 +757,19 @@ namespace EducNotes.API.Controllers {
 
       var scheduleItems = scheduleCourses.Where(c => c.TeacherId == teacherId && c.Schedule.Day == todayDay)
                                          .OrderBy(o => o.Schedule.StartHourMin)
-                                         .Take(nextCourses)
+                                        //  .Take(nextCourses)
                                          .ToList();
 
       List<TeacherClassSessionDto> teacherCourses = new List<TeacherClassSessionDto>();
-      foreach (var course in scheduleItems)
+      foreach(var course in scheduleItems)
       {
         Schedule schedule = course.Schedule;
         TeacherClassSessionDto teacherSession = new TeacherClassSessionDto();
         teacherSession.ScheduleCourseId = course.Id;
         teacherSession.TeacherId = course.TeacherId;
         teacherSession.TeacherName = course.Teacher.LastName + ' ' + course.Teacher.FirstName;
-        if(course.CourseId != null)
-        {
-          teacherSession.CourseId = Convert.ToInt32(course.CourseId);
-          teacherSession.CourseName = course.Course.Name;
-        }
-        if(course.Activity != null)
-          teacherSession.ActivityName = course.Activity.Name;
+        teacherSession.CourseId = course.CourseId;
+        teacherSession.CourseName = course.Course.Name;
         teacherSession.ClassId = schedule.ClassId;
         teacherSession.ClassName = schedule.Class.Name;
         teacherSession.Day = schedule.Day;
@@ -823,17 +820,12 @@ namespace EducNotes.API.Controllers {
         foreach (var course in scheduleItems)
         {
           Schedule schedule = course.Schedule;
-          teacherDayCourse.TeacherId = Convert.ToInt32(course.TeacherId);
+          teacherDayCourse.TeacherId = course.TeacherId;
           teacherDayCourse.TeacherName = course.Teacher.LastName + " " + course.Teacher.FirstName;
           teacherDayCourse.ClassId = schedule.ClassId;
           teacherDayCourse.ClassName = schedule.Class.Name;
-          if(course.Course != null)
-          {
-            teacherDayCourse.CourseId = Convert.ToInt32(course.CourseId);
-            teacherDayCourse.CourseName = course.Course.Name;
-          }
-          if(course.Activity != null)
-            teacherDayCourse.ItemName = course.Activity.Name;
+          teacherDayCourse.CourseId = Convert.ToInt32(course.CourseId);
+          teacherDayCourse.CourseName = course.Course.Name;
           teacherDayCourse.Day = schedule.Day;
           teacherDayCourse.StartHourMin = schedule.StartHourMin.ToString("HH:mm", frC);
           teacherDayCourse.EndHourMin = schedule.EndHourMin.ToString("HH:mm", frC);
@@ -865,13 +857,8 @@ namespace EducNotes.API.Controllers {
           teacherCourse.TeacherName = course.Teacher.LastName + " " + course.Teacher.FirstName;
           teacherCourse.ClassId = schedule.ClassId;
           teacherCourse.ClassName = schedule.Class.Name;
-          if(course.Course != null)
-          {
-            teacherCourse.CourseId = Convert.ToInt32(course.CourseId);
-            teacherCourse.CourseName = course.Course.Name;
-          }
-          if(course.Activity != null)
-            teacherCourse.ItemName = course.Activity.Name;
+          teacherCourse.CourseId = course.CourseId;
+          teacherCourse.CourseName = course.Course.Name;
           teacherCourse.Day = schedule.Day;
           teacherCourse.StartHourMin = schedule.StartHourMin.ToString("HH:mm", frC);
           teacherCourse.EndHourMin = schedule.EndHourMin.ToString("HH:mm", frC);
@@ -961,7 +948,7 @@ namespace EducNotes.API.Controllers {
         //retrieve agenda items with lost shceduleId(schedule item has been deleted/updated)
         var itemsWithNoScheduleId = agendasCached
                                       .Where(a => a.Session.SessionDate.Date == currentDate.Date &&
-                                        a.Session.ScheduleId == null)
+                                        a.Session.ScheduleCourseId == null)
                                       .OrderBy(o => o.Session.StartHourMin.Hour)
                                       .ThenBy(o => o.Session.StartHourMin.Minute)
                                       .ToList();
@@ -1125,7 +1112,7 @@ namespace EducNotes.API.Controllers {
         //retrieve agenda items with lost shceduleId(schedule item has been deleted/updated)
         var itemsWithNoScheduleId = agendasCached
                                     .Where(a => a.Session.SessionDate.Date == currentDate.Date &&
-                                      a.Session.ScheduleId == null)
+                                      a.Session.ScheduleCourseId == null)
                                     .OrderBy(o => o.Session.StartHourMin.Hour)
                                     .ThenBy(o => o.Session.StartHourMin.Minute)
                                     .ToList();
@@ -1349,9 +1336,16 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{teacherId}/Courses")]
-    public async Task<IActionResult> GetTeacherCourses(int teacherId) {
-      var courses = await _repo.GetTeacherCourses(teacherId);
-      return Ok(courses);
+    public async Task<IActionResult> GetTeacherCourses(int teacherId)
+    {
+      var coursesFromRepo = await _repo.GetTeacherCourses(teacherId);
+      List<CourseDto> allCourses = _mapper.Map<List<CourseDto>>(coursesFromRepo);
+      List<CourseDto> courses = allCourses.Where(c => c.CourseTypeId == courseTypeId).ToList();
+      List<CourseDto> activities = allCourses.Where(c => c.CourseTypeId == activityTypeId).ToList();
+      return Ok(new {
+        courses,
+        activities
+      });
     }
 
     [HttpGet("{teacherId}/teacherWithCourses")]

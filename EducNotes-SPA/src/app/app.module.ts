@@ -287,8 +287,8 @@ import { ConfigProductsComponent } from './admin/config/config-products/config-p
 import { RecoveryComponent } from './admin/treso/recovery/recovery.component';
 import { MdbWysiwygModule } from 'mdb-wysiwyg';
 import { RecoveryResolver } from './_resolvers/recovery-resolver';
-import { ConfigActivitiesComponent } from './admin/config/config-activities/config-activities.component';
 import { ScheduleAddConflictComponent } from './admin/schedule-add-conflict/schedule-add-conflict.component';
+import { ConfigCourseTypeComponent } from './admin/config/config-course-type/config-course-type.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -482,8 +482,8 @@ export function tokenGetter() {
       EditLevelClassesComponent,
       ConfigProductsComponent,
       RecoveryComponent,
-      ConfigActivitiesComponent,
-      ScheduleAddConflictComponent
+      ScheduleAddConflictComponent,
+      ConfigCourseTypeComponent
    ],
    imports: [
       FormWizardModule,

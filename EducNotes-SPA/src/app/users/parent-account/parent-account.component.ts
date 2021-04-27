@@ -36,7 +36,6 @@ export class ParentAccountComponent implements OnInit {
     this.settings = this.authService.settings;
     this.daysToValidateReg = this.settings.find(s => s.name === 'DaysToValidateReg').value;
     this.regFee = this.settings.find(s => s.name === 'RegFee').value;
-    // this.downPayment = Number(this.regFee);
     this.createRegForm();
     this.userService.getParentAccount(this.parentid).subscribe((data: any) => {
       const account = data;

@@ -41,6 +41,8 @@ namespace EducNotes.API.Helpers
     public static string Agendas { get; set; }
     public static string Sessions { get; set; }
     public static string Events { get; set; }
-    public static string Activities { get; set; }
+    public static string CourseTypes { get; set; }
+    public static string Conflicts { get; set; }
+    public static string CourseConflicts { get; set; }
   }
 }

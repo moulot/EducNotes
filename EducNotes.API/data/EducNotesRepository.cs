@@ -356,36 +356,16 @@ namespace EducNotes.API.Data {
         foreach(var course in courses)
         {
           ScheduleCourseDto courseDto = new ScheduleCourseDto();
-          if(course.Course != null)
-          {
-            if(course.Course != null)
-            {
-              courseDto.CourseId = Convert.ToInt32(course.CourseId);
-              courseDto.CourseName = course.Course.Name;
-              courseDto.CourseColor = course.Course.Color;
-              courseDto.CourseAbbrev = course.Course.Abbreviation;
-              courseDto.DelInfo = course.Course.Name + " de " + schedule.StartHourMin.ToString("HH:mm", frC) +
-                " à " + schedule.EndHourMin.ToString("HH:mm", frC);
-            }
-            else
-            {
-              courseDto.ActivityId = Convert.ToInt32(course.ActivityId);
-              courseDto.ActivityName = course.Activity.Name;
-              courseDto.ActivityAbbrev = course.Activity.Abbreviation;
-              courseDto.DelInfo = course.Activity.Name + " de " + schedule.StartHourMin.ToString("HH:mm", frC) +
-                " à " + schedule.EndHourMin.ToString("HH:mm", frC);
-            }
-            courseDto.TeacherId = course.TeacherId;
-            courseDto.TeacherName = course.Teacher.LastName + " " + course.Teacher.FirstName;
-          }
-          else
-          {
-            courseDto.ActivityId = Convert.ToInt32(course.ActivityId);
-            courseDto.ActivityName = course.Activity.Name;
-            courseDto.ActivityAbbrev = course.Activity.Abbreviation;
-            courseDto.DelInfo = course.Activity.Name + " de " + schedule.StartHourMin.ToString("HH:mm", frC) +
-              " à " + schedule.EndHourMin.ToString("HH:mm", frC);
-          }
+          courseDto.CourseId = Convert.ToInt32(course.CourseId);
+          courseDto.CourseName = course.Course.Name;
+          courseDto.CourseColor = course.Course.Color;
+          courseDto.CourseAbbrev = course.Course.Abbreviation;
+          courseDto.DelInfo = course.Course.Name + " de " + schedule.StartHourMin.ToString("HH:mm", frC) +
+            " à " + schedule.EndHourMin.ToString("HH:mm", frC);
+          courseDto.TeacherId = course.TeacherId;
+          courseDto.TeacherName = course.Teacher.LastName + " " + course.Teacher.FirstName;
+          courseDto.TeacherLastName = course.Teacher.LastName;
+          courseDto.TeacherFirstName = course.Teacher.FirstName;
           scheduleItem.Courses.Add(courseDto);
         }
 
@@ -452,11 +432,9 @@ namespace EducNotes.API.Data {
     {
       List<Schedule> scheduleCourses = await _cache.GetSchedules();
       List<Session> sessions = await _cache.GetSessions();
-      Schedule schedule= course.Schedule;
-      var scheduleDay = schedule.Day;
 
       // get session by schedule and date
-      var sessionFromDB = sessions.FirstOrDefault(s => s.ScheduleId == course.Schedule.Id && s.SessionDate.Date == sessionDate);
+      var sessionFromDB = sessions.FirstOrDefault(s => s.ScheduleCourseId == course.Id && s.SessionDate.Date == sessionDate);
       if(sessionFromDB != null)
       {
         return(sessionFromDB);
@@ -464,15 +442,15 @@ namespace EducNotes.API.Data {
       else
       {
         var newSession = new Session {
-          ScheduleId = schedule.Id,
+          ScheduleCourseId = course.Id,
           TeacherId = Convert.ToInt32(course.TeacherId),
-          ClassId = schedule.ClassId,
+          ClassId = course.Schedule.ClassId,
           CourseId = course.CourseId,
-          ActivityId = course.ActivityId,
-          StartHourMin = schedule.StartHourMin,
-          EndHourMin = schedule.EndHourMin,
+          StartHourMin = course.Schedule.StartHourMin,
+          EndHourMin = course.Schedule.EndHourMin,
           SessionDate = sessionDate
         };
+
         _context.Add(newSession);
 
         if(await SaveAll())
@@ -519,7 +497,7 @@ namespace EducNotes.API.Data {
     {
       List<TeacherCourse> teacherCourses = await _cache.GetTeacherCourses();
       var courses = teacherCourses.Where(c => c.TeacherId == teacherId)
-                                  .Select (s => s.Course).ToList();
+                                  .Select(s => s.Course).ToList();
       return courses;
     }
 
@@ -589,15 +567,8 @@ namespace EducNotes.API.Data {
           cncd.ScheduleId = course.ScheduleId;
           cncd.ClassId = schedule.ClassId;
           cncd.ClassName = schedule.Class.Name;
-          if(course.Course != null)
-          {
-            cncd.CourseId = Convert.ToInt32(course.CourseId);
-            cncd.CourseName = course.Course.Name;
-          }
-          else
-          {
-            cncd.CourseName = course.Activity.Name;
-          }
+          cncd.CourseId = course.CourseId;
+          cncd.CourseName = course.Course.Name;
           cncd.Day = schedule.Day;
           cncd.CourseStartHM = schedule.StartHourMin;
           cncd.CourseEndHM = schedule.EndHourMin;
@@ -2205,7 +2176,8 @@ namespace EducNotes.API.Data {
       }
     }
 
-    public async Task<List<Sms>> SetSmsDataForAbsences (List<AbsenceSmsDto> absences, int sessionId, int teacherId) {
+    public async Task<List<Sms>> SetSmsDataForAbsences(List<AbsenceSmsDto> absences, int sessionId, int teacherId)
+    {
       List<Sms> AbsencesSms = new List<Sms> ();
       var tokens = await GetTokens ();
       int absenceSmsId = _config.GetValue<int> ("AppSettings:AbsenceSms");
@@ -3575,18 +3547,9 @@ namespace EducNotes.API.Data {
         ClassDayCoursesDto dayCourse = new ClassDayCoursesDto();
         foreach (var course in daySchedule.Courses)
         {
-          if(course.CourseId > 0)
-          {
-            dayCourse.CourseId = course.CourseId;
-            dayCourse.CourseName = course.CourseName;
-            dayCourse.CourseAbbrev = course.CourseAbbrev;
-          }
-          else
-          {
-            dayCourse.ActivityId = course.ActivityId;
-            dayCourse.ActivityName = course.ActivityName;
-            dayCourse.ActivityAbbrev = course.ActivityAbbrev;
-          }
+          dayCourse.CourseId = course.CourseId;
+          dayCourse.CourseName = course.CourseName;
+          dayCourse.CourseAbbrev = course.CourseAbbrev;
           dayCourse.TeacherId = course.TeacherId;
           dayCourse.TeacherName = course.TeacherName;
           courses.Add(dayCourse);

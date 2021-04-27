@@ -15,6 +15,8 @@ export class ScheduleDayComponent implements OnInit {
   constructor(private alertify: AlertifyService, private classService: ClassService) { }
 
   ngOnInit() {
+    console.log('tt');
+    console.log(this.items);
   }
 
   deleteCourse(scheduleId, dayName, delInfo) {
@@ -31,5 +33,9 @@ export class ScheduleDayComponent implements OnInit {
         this.reloadSchedule.emit();
       });
     }
+  }
+
+  showConflictDetails() {
+    alert('conflict details');
   }
 }
