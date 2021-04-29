@@ -81,7 +81,6 @@ import { GradeListComponent } from './grades/grade-list/grade-list.component';
 import { FirstStepFinishmentComponent } from './registration/firstStep-finishment/firstStep-finishment.component';
 import { ConfirmEmailComponent } from './registration/confirm-email/confirm-email.component';
 import { MemberPasswordSettingComponent } from './members/member-password-setting/member-password-setting.component';
-import { PreInscriptionComponent } from './admin/pre-inscription/pre-inscription.component';
 import { SigninComponent } from './views/sessions/signin/signin.component';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
@@ -102,26 +101,20 @@ import { InscriptionComponent } from './views/forms/inscription/inscription.comp
 import { WizardComponent } from './views/forms/wizard/wizard.component';
 import { FormWizardModule } from './shared/components/form-wizard/form-wizard.module';
 import { TextMaskModule } from 'angular2-text-mask';
-import { EmailConfirmResolver } from './_resolvers/email-confirm.resolver';
 import { ForgotComponent } from './views/sessions/forgot/forgot.component';
 import { UiKitsModule } from './views/ui-kits/ui-kits.module';
 // MDB Angular Pro
 import { StepperModule, ToastModule, WavesModule, CarouselModule } from 'ng-uikit-pro-standard';
 import { ResetPasswordComponent } from './registration/reset-password/reset-password.component';
-import { ResetPasswordResolver } from './_resolvers/reset-password.resolver';
 import { EvalAddFormComponent } from './grades/eval-addForm/eval-addForm.component';
 import { ClassCallSheetComponent } from './classes/class-callSheet/class-callSheet.component';
 import { FlipModule } from 'ngx-flip';
 import { InscriptionsListComponent } from './admin/inscriptions-list/inscriptions-list.component';
-import { AccountHistoryComponent } from './admin/account-history/account-history.component';
 import { InscriptionPanelComponent } from './admin/inscription-panel/inscription-panel.component';
 import { ClassesPanelComponent } from './admin/class-management/classes-panel/classes-panel.component';
 import { NewClassComponent } from './admin/class-management/new-class/new-class.component';
 import { CoursesPanelComponent } from './admin/courses-management/courses-panel/courses-panel.component';
 import { NewCourseComponent } from './admin/courses-management/new-course/new-course.component';
-// import { NewTeacherComponent } from './admin/teacher-management/new-teacher/new-teacher.component';
-import { PreRegisterComponent } from './admin/selfs-registers/pre-register/pre-register.component';
-import { SelfRegisterComponent } from './admin/selfs-registers/self-register/self-register.component';
 import { ClassesListResolver } from './_resolvers/classes-list-resolver';
 import { CoursesListResolver } from './_resolvers/courses-list.resolver';
 import { TeacherManagementResolver } from './_resolvers/teacher-management.resolver';
@@ -131,8 +124,6 @@ import { NavGPanelComponent } from './nav/navGPanel/navGPanel.component';
 import { SideBarComponent } from './nav/SideBar/SideBar.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { GradeStudentComponent } from './grades/grade-student/grade-student.component';
-import { NewUserComponent } from './admin/user-management/new-user/new-user.component';
-import { ParentRegisterComponent } from './admin/selfs-registers/parent-register/parent-register.component';
 import { TeacherAssignmentComponent } from './admin/teacher-management/teacher-assignment/teacher-assignment.component';
 import localeFr from '@angular/common/locales/fr';
 import { LevelClassesComponent } from './classes/level-classes/level-classes.component';
@@ -140,7 +131,6 @@ import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 import { ClassLifeComponent } from './classes/class-life/class-life.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { SchoolComponent } from './admin/school/school.component';
-import { SchoolResolver } from './_resolvers/school-resolver';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { ClassResolver } from './_resolvers/class-resolver';
 import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-schedule.component';
@@ -348,7 +338,6 @@ export function tokenGetter() {
       ShowErrorsComponent,
       FirstStepFinishmentComponent,
       ConfirmEmailComponent,
-      PreInscriptionComponent,
       MemberPasswordSettingComponent,
       TeacherManagementComponent,
       SigninComponent,
@@ -370,21 +359,15 @@ export function tokenGetter() {
       ClassCallSheetComponent,
       InscriptionsListComponent,
       InscriptionPanelComponent,
-      AccountHistoryComponent,
       ClassesPanelComponent,
       NewClassComponent,
       CoursesPanelComponent,
       NewCourseComponent,
       NewTeacherComponent,
-      PreRegisterComponent,
-      SelfRegisterComponent,
       NavGPanelComponent,
       SideBarComponent,
       GradeStudentComponent,
-      NewUserComponent,
-      ParentRegisterComponent,
       TeacherAssignmentComponent,
-      AccountHistoryComponent,
       LevelClassesComponent,
       ClassLifeComponent,
       SchoolComponent,
@@ -550,20 +533,16 @@ export function tokenGetter() {
       PreventUnSavedChanges,
       ListsResolver,
       MessagesResolver,
-      EmailConfirmResolver,
-      ResetPasswordResolver,
+      SchoolSettingsResolver,
       AdminService,
       ClassService,
       EvaluationService,
       UserHomeResolver,
-      EmailConfirmResolver,
-      ResetPasswordResolver,
       ClassesListResolver,
       CoursesListResolver,
       TeacherManagementResolver,
       LevelClassesResolver,
       CallSheetResolver,
-      SchoolResolver,
       ClassResolver,
       StudentResolver,
       MDBSpinningPreloader,

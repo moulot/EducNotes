@@ -12,6 +12,7 @@ namespace EducNotes.API.Models
       Validated = false;
       RegCreated = false;
       NextRegCreated = false;
+      Created = DateTime.Now;
     }
     public string IdNum { get; set; }
     public string FirstName { get; set; }

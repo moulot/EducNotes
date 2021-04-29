@@ -28,6 +28,7 @@ export class ClassScheduleEditComponent implements OnInit {
   periodConflict = false;
   teacherSchedule: any;
   scheduleCourses: any;
+  coursesByDay: any;
   oldCourseOptions: any = [];
   timeMask = [/\d/, /\d/, ':', /\d/, /\d/];
   scheduleItems: ScheduleData[] = [];
@@ -71,6 +72,7 @@ export class ClassScheduleEditComponent implements OnInit {
       this.getClass(this.classId);
       this.getClassTeachers(this.classId);
       this.getScheduleCourses(this.classId);
+      this.getCoursesByDay(this.classId);
     });
     this.createScheduleForm();
     this.createConflictForm();
@@ -340,9 +342,9 @@ export class ClassScheduleEditComponent implements OnInit {
 
         // then with class schedule (remove courses already treated with teacher)
         let classDayCourses = <any>{};
-        if (this.scheduleCourses.days) {
-          const classDayIndex = this.scheduleCourses.days.findIndex(elt => elt.day === day);
-          classDayCourses = classDayIndex !== -1 ? this.scheduleCourses.days[classDayIndex] : [];
+        if (this.coursesByDay.days) {
+          const classDayIndex = this.coursesByDay.days.findIndex(elt => elt.day === day);
+          classDayCourses = classDayIndex !== -1 ? this.coursesByDay.days[classDayIndex] : [];
         }
         // console.log('classes courses');
         // console.log(classDayCourses);
@@ -534,6 +536,14 @@ export class ClassScheduleEditComponent implements OnInit {
       this.loadCourseSelect();
     }, error => {
       this.alertify.error(error);
+    });
+  }
+
+  getCoursesByDay(classId) {
+    this.classService.getScheduleCoursesByDay(classId).subscribe((data: any) => {
+      this.coursesByDay = data;
+    }, error => {
+      this.alertify.error('problème pour récupérer les données');
     });
   }
 
@@ -742,14 +752,17 @@ export class ClassScheduleEditComponent implements OnInit {
   }
 
   saveSchedule(schedules: ScheduleData[]) {
+    this.wait = true;
     this.classService.saveSchedules(schedules).subscribe(() => {
       const teacherId = this.scheduleForm.value.teacher;
       this.getTeacherSchedule(teacherId);
       this.getScheduleCourses(this.classId);
       this.resetForm();
       this.alertify.success('cours ajouté dans l\'emploi du temps');
+      this.wait = false;
     }, error => {
       this.alertify.error('problème pour ajouter le cours dans l\'emploi du temps');
+      this.wait = false;
     });
   }
 

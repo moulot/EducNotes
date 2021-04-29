@@ -1298,19 +1298,22 @@ namespace EducNotes.API.Data {
       return await _context.ClassLevels.OrderBy (c => c.DsplSeq).ToListAsync ();
     }
 
-    public async Task<bool> UserNameExist (string userName, int currentUserId) {
-      List<User> users = await _cache.GetUsers ();
+    public async Task<bool> UserNameExist(string userName, int currentUserId)
+    {
+      List<User> users = await _cache.GetUsers();
 
-      var user = users.Where (u => u.Id != currentUserId)
-        .FirstOrDefault (e => e.UserName.ToLower () == userName.ToLower ());
+      var user = users.Where(u => u.Id != currentUserId)
+                      .FirstOrDefault(e => e.UserName.ToLower() == userName.ToLower());
 
-      if (user != null) {
+      if(user != null)
+      {
         return true;
       }
       return false;
     }
 
-    public async Task sendOk (int userTypeId, int userId) {
+    public async Task sendOk (int userTypeId, int userId)
+    {
       if (userTypeId == studentTypeId) {
         // envoi de mail de l'affectation de l'eleve au professeur
 
@@ -1449,7 +1452,8 @@ namespace EducNotes.API.Data {
       return userCourses;
     }
 
-    public async Task<List<UserCourseEvalsDto>> GetUserGrades (int userId, int classId) {
+    public async Task<List<UserCourseEvalsDto>> GetUserGrades (int userId, int classId)
+    {
       //get user courses
       var userCourses = await GetUserCourses (classId);
       var aclass = await _context.Classes.FirstOrDefaultAsync (c => c.Id == classId);
@@ -1504,19 +1508,21 @@ namespace EducNotes.API.Data {
       return coursesWithEvals;
     }
 
-    public async Task<ClassAvgDto> GetClassAvgs (int classId) {
+    public async Task<ClassAvgDto> GetClassAvgs(int classId)
+    {
       double avgMin = 1000;
       double avgMax = -1000;
-      var students = await GetClassStudents (classId);
-      foreach (var student in students) {
+      var students = await GetClassStudents(classId);
+      foreach(var student in students)
+      {
         var avg = await GetStudentAvg (student.Id, Convert.ToInt32 (student.ClassId));
-        if (avg > avgMax)
+        if(avg > avgMax)
           avgMax = avg;
-        if (avg < avgMin)
+        if(avg < avgMin)
           avgMin = avg;
       }
 
-      ClassAvgDto classAvgs = new ClassAvgDto ();
+      ClassAvgDto classAvgs = new ClassAvgDto();
       classAvgs.ClassAvgMin = avgMin;
       classAvgs.ClassAvgMax = avgMax;
 

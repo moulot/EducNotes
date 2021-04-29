@@ -20,12 +20,9 @@ import { ClassStudentsComponent } from './classes/class-students/class-students.
 import { ClassAgendaComponent } from './classes/class-agenda/class-agenda.component';
 import { UserHomeResolver } from './_resolvers/user-home-resolver';
 import { TeacherDashboardComponent } from './dashboard/teacher-dashboard/teacher-dashboard.component';
-
 import { InscriptionComponent } from './views/forms/inscription/inscription.component';
 import { ConfirmEmailComponent } from './registration/confirm-email/confirm-email.component';
-import { EmailConfirmResolver } from './_resolvers/email-confirm.resolver';
 import { ForgotComponent } from './views/sessions/forgot/forgot.component';
-import { ResetPasswordResolver } from './_resolvers/reset-password.resolver';
 import { ResetPasswordComponent } from './registration/reset-password/reset-password.component';
 import { EvalAddFormComponent } from './grades/eval-addForm/eval-addForm.component';
 import { ClassCallSheetComponent } from './classes/class-callSheet/class-callSheet.component';
@@ -35,9 +32,7 @@ import { ClassesPanelComponent } from './admin/class-management/classes-panel/cl
 import { ClassesListResolver } from './_resolvers/classes-list-resolver';
 import { CoursesPanelComponent } from './admin/courses-management/courses-panel/courses-panel.component';
 import { CoursesListResolver } from './_resolvers/courses-list.resolver';
-import { PreRegisterComponent } from './admin/selfs-registers/pre-register/pre-register.component';
 import { TeacherManagementResolver } from './_resolvers/teacher-management.resolver';
-import { SelfRegisterComponent } from './admin/selfs-registers/self-register/self-register.component';
 import { CallSheetResolver } from './_resolvers/callSheet-resolver';
 import { GradeStudentComponent } from './grades/grade-student/grade-student.component';
 import { SigninComponent } from './views/sessions/signin/signin.component';
@@ -117,8 +112,6 @@ import { EditChildrenComponent } from './users/edit-children/edit-children.compo
 import { EditChildrenResolver } from './_resolvers/edit-children-resolver';
 import { InvalidAccountComponent } from './registration/invalid-account/invalid-account.component';
 import { TreasuryComponent } from './admin/treso/treasury/treasury.component';
-import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
-import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
 import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-email/confirm-teacher-email.component';
 import { RolesComponent } from './admin/roles/roles.component';
 import { ChildFileResolver } from './_resolvers/child-file-resolver';
@@ -151,6 +144,8 @@ import { ClassScheduleResolver } from './_resolvers/class-schedule-resolver';
 import { EditLevelClassesComponent } from './admin/class-management/edit-level-classes/edit-level-classes.component';
 import { RecoveryComponent } from './admin/treso/recovery/recovery.component';
 import { RecoveryResolver } from './_resolvers/recovery-resolver';
+import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
+import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -161,7 +156,6 @@ export const appRoutes: Routes = [
     {path: 'contactus', component: ContactUsComponent},
     { path: 'resetPassword', component: ResetPasswordComponent},
     { path: 'lockout', component: LockoutComponent},
-    { path: 'selfRegister/:code', component: SelfRegisterComponent, resolve: { user: EmailConfirmResolver } },
 
     {
       path: '',
@@ -217,7 +211,6 @@ export const appRoutes: Routes = [
         { path: 'courseShowing', component: CourseShowingComponent },
         { path: 'editCourse/:id', component: NewCourseComponent, resolve: { course: CourseFormResolver } },
         { path: 'editTeacher/:id', component: NewTeacherComponent, resolve: { teacher: EditTeacherResolver } },
-        { path: 'preregister', component: PreRegisterComponent },
         { path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve: { classes: LevelClassesResolver } },
         { path: 'studentGrades/:id', component: GradeStudentComponent}, // , resolve: { student: StudentResolver } },
         { path: 'studentGradesP/:id', component: GradeStudentComponent},

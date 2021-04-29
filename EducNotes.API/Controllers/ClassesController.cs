@@ -311,6 +311,43 @@ namespace EducNotes.API.Controllers {
       return BadRequest ("problème pour supprimer le cours de l'emploi du temps");
     }
 
+    [HttpGet("GetClassLevels")]
+    public async Task<IActionResult> GetClassLevels()
+    {
+      List<Class> classesCached = await _cache.GetClasses();
+      List<User> studentsCached = await _cache.GetStudents();
+      List<ClassLevel> classlevels = await _cache.GetClassLevels();
+
+      var levels = classlevels.ToList();
+      var dataToReturn = new List<ClassLevelDetailDto>();
+      foreach(var item in levels)
+      {
+        var res = new ClassLevelDetailDto();
+        res.Id = item.Id;
+        res.Name = item.Name;
+        res.TotalEnrolled = item.Inscriptions.Count();
+        res.TotalStudents = 0;
+        res.Classes = new List<ClassDetailDto>();
+        List<Class> classes = classesCached.Where(c => c.ClassLevelId == item.Id).ToList();
+        foreach (var aclass in classes)
+        {
+          var students = studentsCached.Where(s => s.ClassId == aclass.Id).ToList();
+          var nbStudents = students.Count();
+          res.TotalStudents += nbStudents;
+          //add class data
+          ClassDetailDto cdd = new ClassDetailDto ();
+          cdd.Id = aclass.Id;
+          cdd.Name = aclass.Name;
+          cdd.MaxStudent = aclass.MaxStudent;
+          cdd.TotalStudents = nbStudents;
+          res.Classes.Add(cdd);
+        }
+
+        dataToReturn.Add(res);
+      }
+      return Ok(dataToReturn);
+    }
+
     [HttpGet ("{classId}/getClassScheduleMovedWeek")]
     public async Task<IActionResult> getClassScheduleMovedWeek (int classId, [FromQuery] ScheduleParams agendaParams) {
       var FromDate = agendaParams.DueDate.Date;

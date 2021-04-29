@@ -1,6 +1,6 @@
 <div *ngFor="let item of items">
   <div *ngIf="item.courses.length == 1">
-    <div class="border rounded-lg" style="position:absolute; width: 100%"
+    <div class="rounded-lg" style="position:absolute; width: 100%"
       [ngStyle]="{'top': item.top, 'height': item.height, 'background-color': item.courses[0].courseColor}">
       <div class="d-flex">
         <div class="text-12 text-white flex-grow-1">
@@ -18,7 +18,7 @@
     <div class="border rounded-lg" style="position:absolute; width: 100%"
       [ngStyle]="{'top': item.top, 'height': item.height}">
       <div class="d-flex">
-        <div *ngFor="let course of item.courses; let i = index" class="border rounded-lg w-50 text-12 text-white flex-grow-1"
+        <div *ngFor="let course of item.courses; let i = index" class="rounded-lg w-50 text-12 text-white"
           [ngStyle]="{'background-color': course.courseColor}">
           <b>{{course.courseAbbrev | uppercase}}</b>
         </div>

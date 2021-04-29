@@ -31,8 +31,6 @@ export class ResetPasswordComponent implements OnInit {
   ngOnInit() {
     this.userid = this.route.snapshot.queryParamMap.get('id');
     this.token = this.route.snapshot.queryParamMap.get('token');
-    // console.log(id);
-    // console.log(token);
     if (this.userid !== null && this.token !== null) {
       this.dataAvailable = true;
     }

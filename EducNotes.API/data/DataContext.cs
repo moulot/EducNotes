@@ -127,17 +127,17 @@ namespace EducNotes.API.Data {
         if (fullAddress != null)
         {
           subdomain = fullAddress[0].ToLower();
-          if(subdomain == "localhost:5000" || subdomain == "educnotes-test2")
+          if(subdomain == "localhost:5000" || subdomain == "test2")
           {
             subdomain = "educnotes";
           }
-          else if (subdomain == "educnotes-test1" || subdomain == "www" || subdomain == "educnotes") {
+          else if (subdomain == "test1" || subdomain == "www" || subdomain == "educnotes") {
             subdomain = "demo";
           }
         }
         string tenantConnString = string.Format(_config.GetConnectionString("DefaultConnection"), $"{subdomain}");
         optionsBuilder.UseSqlServer(tenantConnString);
-        base.OnConfiguring (optionsBuilder);
+        base.OnConfiguring(optionsBuilder);
       }
 
       protected override void OnModelCreating (ModelBuilder builder)

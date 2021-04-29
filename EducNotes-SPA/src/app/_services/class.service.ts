@@ -395,6 +395,10 @@ export class ClassService {
     return this.http.get(this.baseUrl + classId + '/ScheduleCoursesByDay');
   }
 
+  getClassLevelsDetails() {
+    return this.http.get(this.baseUrl + 'GetClassLevels');
+  }
+
   getActivities() {
     return this.http.get(this.baseUrl + 'Activities');
   }
