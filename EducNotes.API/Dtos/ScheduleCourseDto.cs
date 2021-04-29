@@ -12,6 +12,7 @@ namespace EducNotes.API.Dtos
     public string CourseAbbrev { get; set; }
     public string CourseColor { get; set; }
     public int TeacherId { get; set; }
+    public byte Gender { get; set; }
     public string TeacherName { get; set; }
     public string TeacherLastName { get; set; }
     public string TeacherFirstName { get; set; }

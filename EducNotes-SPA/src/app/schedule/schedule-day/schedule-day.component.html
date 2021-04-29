@@ -1,29 +1,31 @@
 <div *ngFor="let item of items">
-  <div class="border rounded-lg" style="position:absolute; width: 100%"
-    [ngStyle]="{'top': item.top, 'height': item.height, 'background-color': item.courses[0].courseColor}">
-    <div *ngIf="item.courses.length == 1">
+  <div *ngIf="item.courses.length == 1">
+    <div class="border rounded-lg" style="position:absolute; width: 100%"
+      [ngStyle]="{'top': item.top, 'height': item.height, 'background-color': item.courses[0].courseColor}">
       <div class="d-flex">
         <div class="text-12 text-white flex-grow-1">
           <b>{{item.courses[0].courseName | uppercase}} de {{item.strStartHourMin}} à {{item.strEndHourMin}}</b>
         </div>
         <div>
           <div class="text-12"><i class="fa fa-trash text-12 text-white pr-1" style="cursor: pointer;" aria-hidden="true"
-            (click)="deleteCourse(item.id, dayName, item.courses[0].delInfo)"></i></div>
+            (click)="deleteCourse(item.courses[0].id, item.courses[0].delInfo)"></i></div>
         </div>
       </div>
       <div class="text-11 text-white">{{item.courses[0].teacherName | uppercase}}</div>
     </div>
-    <div *ngIf="item.courses.length > 1">
+  </div>
+  <div *ngIf="item.courses.length > 1">
+    <div class="border rounded-lg" style="position:absolute; width: 100%"
+      [ngStyle]="{'top': item.top, 'height': item.height}">
       <div class="d-flex">
-        <div class="text-12 text-white flex-grow-1">
-          <b *ngFor="let course of item.courses; let i = index">
-            {{course.courseAbbrev | uppercase}}
-            <span *ngIf="i < item.courses.length - 1" class="mx-1">/</span>
-          </b>
+        <div *ngFor="let course of item.courses; let i = index" class="border rounded-lg w-50 text-12 text-white flex-grow-1"
+          [ngStyle]="{'background-color': course.courseColor}">
+          <b>{{course.courseAbbrev | uppercase}}</b>
         </div>
-        <i class="fa fa-external-link text-12 text-white pr-1" style="cursor: pointer;" (click)="showConflictDetails()"></i>
+        <i class="fa fa-external-link text-12 p-1" style="cursor: pointer;"
+          (click)="openModal(item.courses, item.strStartHourMin, item.strEndHourMin)"></i>
       </div>
-      <div class="text-12 text-white"><b>{{item.strStartHourMin}} à {{item.strEndHourMin}}</b></div>
+      <div class="text-12"><b>{{item.strStartHourMin}} à {{item.strEndHourMin}}</b></div>
     </div>
   </div>
 </div>

@@ -1,0 +1,26 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="activeModal.hide()">
+      <span aria-hidden="true">×</span>
+    </button>
+    <h4 class="text-15 w-100" id="myModalLabel"><b>détails des cours avec conflict</b></h4>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-1 text-15">période</div>
+      <div class="col-md-1 d-none d-md-block px-0">:</div>
+      <div class="col-md-9 px-0"><b>{{startHM}} à {{endHM}}</b></div>
+    </div>
+    <div *ngFor="let course of courses" class="text-15">
+      <div class="row mb-1">
+        <div class="col-md-1 text-15 my-auto">cours</div>
+        <div class="col-md-1 px-0 my-auto d-none d-md-block">:</div>
+        <div class="col-md-9 px-0 text-white border rounded-lg p-1" [ngStyle]="{'background-color': course.courseColor}">
+          <b>{{course.courseName}} avec <span>{{course.gender === 0 ? 'Mme' : 'M.'}}</span> {{course.teacherName}}</b>
+          <span class="ml-3 text-12"><i class="fa fa-trash text-12 pr-1" style="cursor: pointer;" aria-hidden="true"
+            (click)="deleteCourse(course.id, course.delInfo)"></i></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

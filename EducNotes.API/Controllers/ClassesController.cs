@@ -269,20 +269,32 @@ namespace EducNotes.API.Controllers {
       return BadRequest("aucun emploi du temps trouvé");
     }
 
-    [HttpPut("DelCourseFromSchedule/{scheduleId}")]
-    public async Task<IActionResult> DeleteScheduleItem(int scheduleId)
+    [HttpPut("DelCourseFromSchedule/{scheduleCourseId}")]
+    public async Task<IActionResult> DeleteScheduleItem(int scheduleCourseId)
     {
+      List<Schedule> schedules = await _cache.GetSchedules();
+      List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
       bool deleteOK = false;
-      var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == scheduleId);
-      if(schedule != null)
+
+      ScheduleCourse course = scheduleCourses.FirstOrDefault(s => s.Id == scheduleCourseId);
+      if(course != null)
       {
         using(var identityContextTransaction = _context.Database.BeginTransaction())
         {
           try
           {
-            _repo.Delete(schedule);
+            // is there another course with the current schedule?
+            _repo.Delete(course);
+            Boolean scheduleBusy = (scheduleCourses.Where(s => s.ScheduleId == course.ScheduleId).Count()) > 1;
+            if(!scheduleBusy)
+            {
+              _repo.Delete(course.Schedule);
+            }
+
             if(await _repo.SaveAll())
             {
+              await _cache.LoadSchedules();
+              await _cache.LoadScheduleCourses();
               identityContextTransaction.Commit();
               deleteOK = true;
               return Ok(deleteOK);
@@ -892,7 +904,7 @@ namespace EducNotes.API.Controllers {
               scheduleCourse.Version = GUID1.ToString();
               _repo.Add(scheduleCourse);
             }
-            else // add course with conflict
+            else //add course with conflict
             {
               List<ScheduleCourse> scheduleCourses = await _cache.GetScheduleCourses();
               DateTime today = DateTime.Now;
@@ -901,12 +913,12 @@ namespace EducNotes.API.Controllers {
               int scheduleCourseId = sch.Id;
               ScheduleCourse oldCourse = scheduleCourses.First(c => c.Id == scheduleCourseId);
 
-              Conflict conflict = new Conflict();
-              conflict.ClassId = sch.ClassId;
-              conflict.Day = sch.Day;
-              conflict.ScheduleId = scheduleId;
-              _repo.Add(conflict);
-              await _context.SaveChangesAsync();
+              // Conflict conflict = new Conflict();
+              // conflict.ClassId = sch.ClassId;
+              // conflict.Day = sch.Day;
+              // conflict.ScheduleId = scheduleId;
+              // _repo.Add(conflict);
+              // await _context.SaveChangesAsync();
 
               ScheduleCourse course = new ScheduleCourse();
               course.ScheduleId = scheduleId;
@@ -919,17 +931,17 @@ namespace EducNotes.API.Controllers {
               Guid GUID = Guid.NewGuid();
               course.Version = GUID.ToString();
               _repo.Add(course);
-              await _context.SaveChangesAsync();
+              // await _context.SaveChangesAsync();
 
-              CourseConflict courseConflict1 = new CourseConflict();
-              courseConflict1.ConflictId = conflict.Id;
-              courseConflict1.ScheduleCourseId = oldCourse.Id;
-              _repo.Add(courseConflict1);
+              // CourseConflict courseConflict1 = new CourseConflict();
+              // courseConflict1.ConflictId = conflict.Id;
+              // courseConflict1.ScheduleCourseId = oldCourse.Id;
+              // _repo.Add(courseConflict1);
 
-              CourseConflict courseConflict2 = new CourseConflict();
-              courseConflict2.ConflictId = conflict.Id;
-              courseConflict2.ScheduleCourseId = course.Id;
-              _repo.Add(courseConflict2);
+              // CourseConflict courseConflict2 = new CourseConflict();
+              // courseConflict2.ConflictId = conflict.Id;
+              // courseConflict2.ScheduleCourseId = course.Id;
+              // _repo.Add(courseConflict2);
             }
           }
 
@@ -937,8 +949,8 @@ namespace EducNotes.API.Controllers {
           {
             await _cache.LoadSchedules();
             await _cache.LoadScheduleCourses();
-            await _cache.LoadConflicts();
-            await _cache.LoadCourseConflicts();
+            // await _cache.LoadConflicts();
+            // await _cache.LoadCourseConflicts();
             identityContextTransaction.Commit();
             return NoContent();
           }

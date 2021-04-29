@@ -3,7 +3,6 @@ import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Schedule } from 'src/app/_models/schedule';
-import { ModalScheduleComponent } from '../modal-schedule/modal-schedule.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MDBModalService, MDBModalRef } from 'ng-uikit-pro-standard';
 
@@ -45,7 +44,7 @@ export class ClassScheduleComponent implements OnInit {
   optionsClass: any[] = [];
 
   constructor(private classService: ClassService, public alertify: AlertifyService,
-    private modalService1: MDBModalService, private route: ActivatedRoute) { }
+    private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.route.data.subscribe(data => {
@@ -87,7 +86,6 @@ export class ClassScheduleComponent implements OnInit {
     this.resetSchedule();
     this.classService.getClassTimeTable(classId).subscribe((data: any) => {
       this.scheduleItems = data.scheduleItems;
-      console.log(this.scheduleItems);
       this.strMonday = data.strMonday;
       this.strSunday = data.strSunday;
       this.strShortMonday = data.strShortMonday;
@@ -132,40 +130,11 @@ export class ClassScheduleComponent implements OnInit {
       }
 
       this.dayItems = [this.monCourses, this.tueCourses, this.wedCourses, this.thuCourses, this.friCourses, this.satCourses];
-      console.log(this.dayItems);
+      // console.log(this.dayItems);
     }, error => {
       this.alertify.error(error);
     });
   }
-
-  openModal() {
-    const modalOptions = {
-      backdrop: true,
-      keyboard: false,
-      focus: true,
-      show: false,
-      scroll: true,
-      ignoreBackdropClick: false,
-      class: 'modal-xl',
-      containerClass: '',
-      animated: true,
-      data: { classId: this.classId }
-    };
-    this.modalRef = this.modalService1.show(ModalScheduleComponent, modalOptions);
-    this.modalRef.content.saveSchedule.subscribe((data) => {
-      // this.saveSchedules(data);
-    });
-  }
-
-  // saveSchedules(schedules: Schedule[]) {
-  //   this.classService.saveSchedules(schedules).subscribe(() => {
-  //     this.alertify.success('cours de l\'emploi du temps enregistrés');
-  //     this.loadWeekSchedule(this.classId);
-  //   }, error => {
-  //     this.alertify.error(error);
-  //     this.router.navigate(['/home']);
-  //   });
-  // }
 
   resetSchedule() {
     this.monCourses = [];

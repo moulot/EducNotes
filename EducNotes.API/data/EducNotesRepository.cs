@@ -356,16 +356,19 @@ namespace EducNotes.API.Data {
         foreach(var course in courses)
         {
           ScheduleCourseDto courseDto = new ScheduleCourseDto();
-          courseDto.CourseId = Convert.ToInt32(course.CourseId);
+          courseDto.Id = course.Id;
+          courseDto.ScheduleId = course.ScheduleId;
+          courseDto.CourseId = course.CourseId;
           courseDto.CourseName = course.Course.Name;
           courseDto.CourseColor = course.Course.Color;
           courseDto.CourseAbbrev = course.Course.Abbreviation;
           courseDto.DelInfo = course.Course.Name + " de " + schedule.StartHourMin.ToString("HH:mm", frC) +
             " à " + schedule.EndHourMin.ToString("HH:mm", frC);
           courseDto.TeacherId = course.TeacherId;
-          courseDto.TeacherName = course.Teacher.LastName + " " + course.Teacher.FirstName;
-          courseDto.TeacherLastName = course.Teacher.LastName;
-          courseDto.TeacherFirstName = course.Teacher.FirstName;
+          courseDto.Gender = course.Teacher.Gender;
+          courseDto.TeacherName = (course.Teacher.LastName + " " + course.Teacher.FirstName).UppercaseWords();
+          courseDto.TeacherLastName = course.Teacher.LastName.UppercaseWords();
+          courseDto.TeacherFirstName = course.Teacher.FirstName.UppercaseWords();
           scheduleItem.Courses.Add(courseDto);
         }
 

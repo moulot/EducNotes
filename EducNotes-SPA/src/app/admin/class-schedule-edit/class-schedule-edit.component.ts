@@ -539,54 +539,55 @@ export class ClassScheduleEditComponent implements OnInit {
 
   getScheduleCourses(classId) {
     this.resetSchedule();
-    this.classService.getScheduleCoursesByDay(classId).subscribe((data: any) => {
-      this.scheduleCourses = data;
+    this.classService.getClassTimeTable(classId).subscribe((data: any) => {
+      this.scheduleCourses = data.scheduleItems;
+      // console.log('class schedule');
       // console.log(this.scheduleCourses);
       // data for existing courses select (conflict section)
-      for (let i = 0; i < this.scheduleCourses.days.length; i++) {
-        const day = this.scheduleCourses.days[i];
-        for (let j = 0; j < day.courses.length; j++) {
-          const elt = day.courses[j];
-          const oldCourse = {value: elt.id, label: elt.courseName.toUpperCase() + ' le ' + day.dayName + ' de ' + elt.startH +
-            ' à ' + elt.endH + ' - ' + elt.teacherName.toUpperCase(), scheduleId: elt.scheduleId, day: day.day,
-            dayName: day.dayName, color: elt.courseColor, teacher: elt.teacherName, startHM: elt.startH, endHM: elt.endH};
-          this.oldCourseOptions = [...this.oldCourseOptions, oldCourse];
-        }
-      }
+      // for (let i = 0; i < this.scheduleCourses.days.length; i++) {
+      //   const day = this.scheduleCourses.days[i];
+      //   for (let j = 0; j < day.courses.length; j++) {
+      //     const elt = day.courses[j];
+      //     const oldCourse = {value: elt.id, label: elt.courseName.toUpperCase() + ' le ' + day.dayName + ' de ' + elt.startH +
+      //       ' à ' + elt.endH + ' - ' + elt.teacherName.toUpperCase(), scheduleId: elt.scheduleId, day: day.day,
+      //       dayName: day.dayName, color: elt.courseColor, teacher: elt.teacherName, startHM: elt.startH, endHM: elt.endH};
+      //     this.oldCourseOptions = [...this.oldCourseOptions, oldCourse];
+      //   }
+      // }
       // add courses on the schedule
-      if (this.scheduleCourses.days) {
-        for (let i = 1; i <= 7; i++) {
-          const filtered = this.scheduleCourses.days.filter(item => item.day === i);
-          if (filtered.length > 0) {
-            switch (i) {
-              case 1:
-                this.monCourses.push(filtered[0].courses);
-                break;
-              case 2:
-                this.tueCourses.push(filtered[0].courses);
-                break;
-              case 3:
-                this.wedCourses.push(filtered[0].courses);
-                break;
-              case 4:
-                this.thuCourses.push(filtered[0].courses);
-                break;
-              case 5:
-                this.friCourses.push(filtered[0].courses);
-                break;
-              case 6:
-                this.satCourses.push(filtered[0].courses);
-                break;
-              case 7:
-                this.sunCourses.push(filtered[0].courses);
-                break;
-              default:
-                break;
-            }
+      for (let i = 1; i <= 7; i++) {
+        const filtered = this.scheduleCourses.filter(items => items.day === i);
+        for (let j = 0; j < filtered.length; j++) {
+          switch (i) {
+            case 1:
+            this.monCourses.push(filtered[j]);
+            break;
+            case 2:
+            this.tueCourses.push(filtered[j]);
+            break;
+            case 3:
+            this.wedCourses.push(filtered[j]);
+            break;
+            case 4:
+            this.thuCourses.push(filtered[j]);
+            break;
+            case 5:
+            this.friCourses.push(filtered[j]);
+            break;
+            case 6:
+            this.satCourses.push(filtered[j]);
+            break;
+            case 7:
+            this.sunCourses.push(filtered[j]);
+            break;
+            default:
+              break;
           }
         }
       }
+
       this.dayItems = [this.monCourses, this.tueCourses, this.wedCourses, this.thuCourses, this.friCourses, this.satCourses];
+      // console.log(this.dayItems);
     }, error => {
       this.alertify.error(error);
     });

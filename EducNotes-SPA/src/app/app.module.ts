@@ -289,6 +289,7 @@ import { MdbWysiwygModule } from 'mdb-wysiwyg';
 import { RecoveryResolver } from './_resolvers/recovery-resolver';
 import { ScheduleAddConflictComponent } from './admin/schedule-add-conflict/schedule-add-conflict.component';
 import { ConfigCourseTypeComponent } from './admin/config/config-course-type/config-course-type.component';
+import { ModalConflictComponent } from './admin/modal-conflict/modal-conflict.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -483,7 +484,8 @@ export function tokenGetter() {
       ConfigProductsComponent,
       RecoveryComponent,
       ScheduleAddConflictComponent,
-      ConfigCourseTypeComponent
+      ConfigCourseTypeComponent,
+      ModalConflictComponent
    ],
    imports: [
       FormWizardModule,
@@ -609,7 +611,8 @@ export function tokenGetter() {
       RolesModalComponent,
       SkillsModalComponent,
       AgendaModalComponent,
-      ModalScheduleComponent
+      ModalScheduleComponent,
+      ModalConflictComponent
    ],
    bootstrap: [AppComponent],
    schemas: [ NO_ERRORS_SCHEMA ]

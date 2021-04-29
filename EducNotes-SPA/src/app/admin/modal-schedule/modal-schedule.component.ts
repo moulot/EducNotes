@@ -5,7 +5,6 @@ import { ClassService } from 'src/app/_services/class.service';
 import { UserService } from 'src/app/_services/user.service';
 import { User } from 'src/app/_models/user';
 import { Course } from 'src/app/_models/course';
-import { Schedule } from 'src/app/_models/schedule';
 import { MDBModalRef } from 'ng-uikit-pro-standard';
 import { ScheduleData } from 'src/app/_models/scheduleData';
 
