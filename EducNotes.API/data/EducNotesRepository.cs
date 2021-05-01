@@ -473,26 +473,29 @@ namespace EducNotes.API.Data {
                     .OrderBy(o => o.Session.SessionDate).ToList();
     }
 
-    public async Task<IEnumerable<User>> GetStudentsForClass(int classId)
+    // public async Task<IEnumerable<User>> GetStudentsForClass(int classId)
+    // {
+    //   List<User> students = await _cache.GetStudents();
+
+    //   return students.Where(u => u.ClassId == classId)
+    //                  .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
+    //                  .ToList();
+    // }
+
+    public async Task<IEnumerable<UserType>> getUserTypes()
+    {
+      List<UserType> userTypes = await _cache.GetUserTypes();
+      return userTypes.Where(u => u.Name != "Admin").ToList();
+    }
+
+    public async Task<bool> EmailExist (string email)
     {
       List<User> users = await _cache.GetUsers();
-
-      return users.Where(u => u.ClassId == classId)
-                  .OrderBy(e => e.LastName).ThenBy (e => e.FirstName)
-                  .ToList();
-    }
-
-    public async Task<IEnumerable<UserType>> getUserTypes () {
-      // List<UserType> userTypes = await _cache.GetUserTypes();
-      return await _context.UserTypes.Where (u => u.Name != "Admin").ToListAsync ();
-    }
-
-    public async Task<bool> EmailExist (string email) {
-      // List<User> users = await _cache.GetUsers();
-      var user = await _context.Users.FirstOrDefaultAsync (e => e.Email == email);
+      var user = users.FirstOrDefault(e => e.NormalizedEmail == email.ToUpper());
+      
       if (user != null)
         return true;
-
+      
       return false;
     }
 
@@ -1573,27 +1576,32 @@ namespace EducNotes.API.Data {
       return lastGrades;
     }
 
-    public async Task<double> GetStudentAvg (int userId, int classId) {
-      var userCourses = await GetUserCourses (classId);
-      var userClass = await GetClass (classId);
+    public async Task<double> GetStudentAvg(int userId, int classId)
+    {
+      var userCourses = await GetUserCourses(classId);
+      var userClass = await GetClass(classId);
 
       double courseAvgSum = 0;
       double courseCoeffSum = 0;
       double GeneralAvg = -1000;
-      List<CourseAvgDto> coursesAvg = new List<CourseAvgDto> ();
-      if (userCourses.Count () > 0) {
-        foreach (var course in userCourses) {
+      List<CourseAvgDto> coursesAvg = new List<CourseAvgDto>();
+      if (userCourses.Count () > 0)
+      {
+        foreach (var course in userCourses)
+        {
           var userEvals = await _context.UserEvaluations
-            .Include (e => e.Evaluation)
-            .OrderBy (o => o.Evaluation.EvalDate)
-            .Where (e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
+            .Include(e => e.Evaluation)
+            .OrderBy(o => o.Evaluation.EvalDate)
+            .Where(e => e.UserId == userId && e.Evaluation.GradeInLetter == false &&
               e.Evaluation.CourseId == course.Id && e.Evaluation.Graded == true && e.Grade.IsNumeric ())
             .Distinct ().ToListAsync ();
 
           double gradesSum = 0;
           double coeffSum = 0;
-          foreach (var userEval in userEvals) {
-            if (userEval.Grade.IsNumeric ()) {
+          foreach (var userEval in userEvals)
+          {
+            if(userEval.Grade.IsNumeric())
+            {
               double maxGrade = Convert.ToDouble (userEval.Evaluation.MaxGrade);
               double gradeValue = Convert.ToDouble (userEval.Grade.Replace (".", ","));
               // grade are ajusted to 20 as MAx. Avg is on 20
@@ -1606,13 +1614,14 @@ namespace EducNotes.API.Data {
           }
 
           double courseAvg = 0;
-          if (coeffSum > 0) {
-            courseAvg = Math.Round (gradesSum / coeffSum, 2);
-            CourseAvgDto courseAvgDto = new CourseAvgDto ();
+          if(coeffSum > 0)
+          {
+            courseAvg = Math.Round(gradesSum / coeffSum, 2);
+            CourseAvgDto courseAvgDto = new CourseAvgDto();
             courseAvgDto.Name = course.Name;
             courseAvgDto.Abbrev = course.Abbreviation;
             courseAvgDto.Avg = courseAvg;
-            coursesAvg.Add (courseAvgDto);
+            coursesAvg.Add(courseAvgDto);
 
             //get course coeff
             var courseCoeffData = await _context.CourseCoefficients

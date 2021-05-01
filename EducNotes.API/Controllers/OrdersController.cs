@@ -559,16 +559,19 @@ namespace EducNotes.API.Controllers
         int nbTuitions = orderlines.Where(o => o.ClassLevelId == level.Id).Count();
         if(nbTuitions > 0)
         {
-          TuitionListDto tld = new TuitionListDto();
-          tld.ClassLevelId = level.Id;
-          tld.ClassLevelName = level.Name;
-          tld.NbTuitions = nbTuitions;
-          tld.NbTuitionsOK = orderlines.Where(o => o.Validated == true && o.ClassLevelId == level.Id).Count();
-          tld.LevelAmount = orderlines.Where(f => f.ClassLevelId == level.Id).Sum(o => o.AmountTTC);
-          tld.strLevelAmount = tld.LevelAmount.ToString("N0") + " F";
-          tld.LevelAmountOK = finOpLines.Where(o => o.OrderLine.ClassLevelId == level.Id && o.OrderLine.Validated).Sum(o => o.Amount);
-          tld.strLevelAmountOK = tld.LevelAmountOK.ToString("N0") + " F";
-          tuitionList.Add(tld);
+          TuitionListDto tuitionLevel = new TuitionListDto();
+          tuitionLevel.ClassLevelId = level.Id;
+          tuitionLevel.ClassLevelName = level.Name;
+          tuitionLevel.NbTuitions = nbTuitions;
+          tuitionLevel.NbTuitionsOK = orderlines.Where(o => o.Validated == true && o.ClassLevelId == level.Id).Count();
+          tuitionLevel.NbMaxTuitions = classes.Where(c => c.ClassLevelId == level.Id).Sum(s => s.MaxStudent);
+          tuitionLevel.PctTotalOfMax = Math.Round(((decimal)nbTuitions / (decimal)tuitionLevel.NbMaxTuitions) * 100, 1);
+          tuitionLevel.PctValidatedOfMax = Math.Round(((decimal)tuitionLevel.NbTuitionsOK / (decimal)tuitionLevel.NbMaxTuitions) * 100, 1);
+          tuitionLevel.LevelAmount = orderlines.Where(f => f.ClassLevelId == level.Id).Sum(o => o.AmountTTC);
+          tuitionLevel.strLevelAmount = tuitionLevel.LevelAmount.ToString("N0") + " F";
+          tuitionLevel.LevelAmountOK = finOpLines.Where(o => o.OrderLine.ClassLevelId == level.Id && o.OrderLine.Validated).Sum(o => o.Amount);
+          tuitionLevel.strLevelAmountOK = tuitionLevel.LevelAmountOK.ToString("N0") + " F";
+          tuitionList.Add(tuitionLevel);
         }
       }
 
@@ -768,6 +771,30 @@ namespace EducNotes.API.Controllers
 
       return Ok(childRecovery);
     }
+
+    [HttpGet("LastTuitions")]
+    public async Task<IActionResult> LastTuitions()
+    {
+      List<User> students = await _cache.GetStudents();
+
+      var added = students.OrderByDescending(a => a.Created).Take(20).ToList();
+      var lastAdded = _mapper.Map<IEnumerable<UserForDetailedDto>>(added);
+
+      var validated = students.OrderByDescending(a => a.ValidationDate).Take(20).ToList();
+      var lastValidated = _mapper.Map<IEnumerable<UserForDetailedDto>>(validated);
+      return Ok(new {
+        lastAdded,
+        lastValidated
+      });
+    }
+
+    // [HttpGet("LastTuitionsValidated")]
+    // public async Task<IActionResult> LastTuitionsValidated()
+    // {
+    //   List<User> students = await _cache.GetStudents();
+    //   var usersToReturn = students.OrderByDescending(a => a.ValidationDate).Take(20).ToList();
+    //   return Ok(_mapper.Map<IEnumerable<UserForDetailedDto>>(usersToReturn));
+    // }
 
   }
 }

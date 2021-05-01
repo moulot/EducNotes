@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { ImageCropperComponent, CropperSettings } from 'ngx-img-cropper';
+import { CropperSettings } from 'ngx-img-cropper';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({

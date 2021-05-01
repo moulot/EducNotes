@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
@@ -16,6 +17,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 
@@ -718,5 +721,73 @@ namespace EducNotes.API.Controllers
       });
     }
 
+    [HttpPost ("SendBatchEmail")]
+    public async Task<IActionResult> SendBatchEmail (DataForEmail dataForEmail) {
+      var currentUserId = int.Parse (User.FindFirst (ClaimTypes.NameIdentifier).Value);
+
+      Email newEmail = new Email ();
+      newEmail.EmailTypeId = 1;
+      newEmail.FromAddress = "no-reply@educnotes.com";
+      newEmail.Subject = dataForEmail.Subject;
+      newEmail.Body = dataForEmail.Body;
+      newEmail.ToAddress = dataForEmail.Tos;
+      newEmail.CCAddress = dataForEmail.Ccs;
+      newEmail.TimeToSend = DateTime.Now;
+      newEmail.InsertUserId = currentUserId;
+      newEmail.InsertDate = DateTime.Now;
+      newEmail.UpdateUserId = currentUserId;
+      newEmail.UpdateDate = DateTime.Now;
+
+      _context.Add (newEmail);
+
+      var apiKey = _config.GetValue<string> ("AppSettings:SENDGRID_APIKEY");
+      var client = new SendGridClient (apiKey);
+      var from = new EmailAddress ("no-reply@educnotes.com");
+      var subject = "first email with attached file from EducNotes";
+      var to = new EmailAddress ("georges.moulot@albatrostechnologies.com");
+      var body = "hmmmmm... getting ready for the covid-19 battle!";
+      var msg = MailHelper.CreateSingleEmail (from, to, subject, body, "");
+      //var bytes = System.IO.File.ReadAllBytes("");
+      // msg.AddAttachment("moulot.jpg", file);
+      // var response = await client.SendEmailAsync(msg);
+      //var req = System.Net.WebRequest.Create("https://res.cloudinary.com/educnotes/image/upload/v1578173397/d2zw9ozmtxgtaqrtvbss.jpg");
+      // WebClient wc = new WebClient();
+      // using (Stream stream = wc.OpenRead("http://res.cloudinary.com/educnotes/image/upload/v1578173397/d2zw9ozmtxgtaqrtvbss.jpg"))
+      // {
+      //   await msg.AddAttachmentAsync("pic.jpg", stream);
+      //   var response = await client.SendEmailAsync(msg);
+      // }
+      var httpWebRequest = (HttpWebRequest) WebRequest.Create ("http://res.cloudinary.com/educnotes/image/upload/v1578173397/e4m74eppwjyv2eei88d6.jpg");
+      var httpResponse = (HttpWebResponse) httpWebRequest.GetResponse ();
+      using (var contentStream = httpResponse.GetResponseStream ()) {
+        var contentLength = 230400;
+        var streamBytes = new byte[contentLength];
+        var output = new StringBuilder ();
+        int bytesRead = 0;
+        do {
+          // read one block from the input stream
+          bytesRead = contentStream.Read (streamBytes, 0, streamBytes.Length);
+          if (bytesRead > 0) {
+            // encode the base64 string
+            string base64String = Convert.ToBase64String (streamBytes, 0, bytesRead);
+            output.Append (base64String);
+          }
+        } while (bytesRead > 0);
+
+        // await contentStream.ReadAsync(streamBytes, 0, contentLength);
+        // var base64Content = Convert.ToBase64String(streamBytes);
+
+        msg.AddAttachment ("pic.jpg", output.ToString (), "image/jpeg");
+
+        //await msg.AddAttachmentAsync("pic.jpg", stream);
+        var response = await client.SendEmailAsync (msg);
+      }
+
+      if (await _repo.SaveAll ()) {
+        return NoContent ();
+      } else {
+        return BadRequest ("problème pour envoyer l\' email");
+      }
+    }
   }
 }

@@ -130,14 +130,12 @@ import { LevelClassesComponent } from './classes/level-classes/level-classes.com
 import { LevelClassesResolver } from './_resolvers/level-classes_resolver';
 import { ClassLifeComponent } from './classes/class-life/class-life.component';
 import { ColorPickerModule } from 'ngx-color-picker';
-import { SchoolComponent } from './admin/school/school.component';
 import { ClassScheduleComponent } from './admin/class-schedule/class-schedule.component';
 import { ClassResolver } from './_resolvers/class-resolver';
 import { ClassdayScheduleComponent } from './admin/classday-schedule/classday-schedule.component';
 import { AppFormsModule } from './views/forms/forms.module';
 import { ModalScheduleComponent } from './admin/modal-schedule/modal-schedule.component';
 import { SharedComponentsModule } from './shared/components/shared-components.module';
-import { StudentResolver } from './_resolvers/student-resolver';
 import { ProductsListComponent } from './admin/product/products-list/products-list.component';
 import { ProductFormComponent } from './admin/product/product-form/product-form.component';
 import { ClassLevelProductsComponent } from './admin/treso/class-level-products/class-level-products.component';
@@ -280,6 +278,7 @@ import { RecoveryResolver } from './_resolvers/recovery-resolver';
 import { ScheduleAddConflictComponent } from './admin/schedule-add-conflict/schedule-add-conflict.component';
 import { ConfigCourseTypeComponent } from './admin/config/config-course-type/config-course-type.component';
 import { ModalConflictComponent } from './admin/modal-conflict/modal-conflict.component';
+import { TuitionDataComponent } from './admin/tuition/tuition-data/tuition-data.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -370,7 +369,6 @@ export function tokenGetter() {
       TeacherAssignmentComponent,
       LevelClassesComponent,
       ClassLifeComponent,
-      SchoolComponent,
       ClassScheduleComponent,
       ClassdayScheduleComponent,
       ModalScheduleComponent,
@@ -468,7 +466,8 @@ export function tokenGetter() {
       RecoveryComponent,
       ScheduleAddConflictComponent,
       ConfigCourseTypeComponent,
-      ModalConflictComponent
+      ModalConflictComponent,
+      TuitionDataComponent
    ],
    imports: [
       FormWizardModule,
@@ -544,7 +543,6 @@ export function tokenGetter() {
       LevelClassesResolver,
       CallSheetResolver,
       ClassResolver,
-      StudentResolver,
       MDBSpinningPreloader,
       DeadLineListResolver,
       DeadLineFormResolver,

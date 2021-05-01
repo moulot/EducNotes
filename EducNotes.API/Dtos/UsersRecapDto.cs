@@ -6,5 +6,6 @@ namespace EducNotes.API.Dtos
         public string  UserTypeName { get; set; }
         public int TotalAccount { get; set; }
         public int TotalActive { get; set; }
+        public int TotalValidated { get; set; }
     }
 }

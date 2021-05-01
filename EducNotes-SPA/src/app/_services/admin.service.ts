@@ -3,6 +3,7 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { User } from '../_models/user';
 import { Setting } from '../_models/setting';
+import { DataForEmail } from '../_models/dataForEmail';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,16 @@ export class AdminService {
 
   searchUsers(data: any) {
     return this.http.post(this.baseUrl + 'admin/SearchUsers', data);
+  }
+
+  // recherche des incription en fonction du niveau, du nom ou du prenom
+  searchIncription(searchParams) {
+    let params = new HttpParams();
+    params = params.append('levelId', searchParams.levelId);
+    params = params.append('lastName', searchParams.lastName);
+    params = params.append('firstName', searchParams.firstName);
+
+    return this.http.get(this.baseUrl + 'admin/SearchInscription', { params });
   }
 
   studentAffectation(classid, ids) {

@@ -177,11 +177,6 @@ namespace EducNotes.API.Controllers {
       return Ok ();
     }
 
-    [HttpGet ("GetUserTypes")]
-    public async Task<IActionResult> GetUserTypes () {
-      return Ok (await _context.UserTypes.OrderBy (e => e.Name).ToListAsync ());
-    }
-
     [HttpGet ("GetAllTeachers")]
     public async Task<IActionResult> GetAllTeachers () {
       //recuperation de tous les professeurs
@@ -294,26 +289,6 @@ namespace EducNotes.API.Controllers {
       }
 
       return NotFound ();
-    }
-
-    [HttpGet ("LastUsersAdded")]
-    public async Task<IActionResult> LastUsersAdded () {
-      var usersToReturn = await _context.Users
-        .Include (t => t.UserType)
-        .OrderByDescending (a => a.Created)
-        .Take (20)
-        .ToListAsync ();
-      return Ok (_mapper.Map<IEnumerable<UserForDetailedDto>> (usersToReturn));
-    }
-
-    [HttpGet ("LastUsersActivated")]
-    public async Task<IActionResult> LastUsersActivated () {
-      var usersToReturn = await _context.Users
-        .Include (t => t.UserType)
-        .OrderByDescending (a => a.ValidationDate)
-        .Take (20)
-        .ToListAsync ();
-      return Ok (_mapper.Map<IEnumerable<UserForDetailedDto>> (usersToReturn));
     }
 
     // enregistrement de préinscription : perer , mere et enfants
@@ -478,75 +453,6 @@ namespace EducNotes.API.Controllers {
         return Ok ("done");
 
       return BadRequest ("impossible d'envoyer le mail");
-    }
-
-    [HttpPost ("SendBatchEmail")]
-    public async Task<IActionResult> SendBatchEmail (DataForEmail dataForEmail) {
-      var currentUserId = int.Parse (User.FindFirst (ClaimTypes.NameIdentifier).Value);
-
-      Email newEmail = new Email ();
-      newEmail.EmailTypeId = 1;
-      newEmail.FromAddress = "no-reply@educnotes.com";
-      newEmail.Subject = dataForEmail.Subject;
-      newEmail.Body = dataForEmail.Body;
-      newEmail.ToAddress = dataForEmail.Tos;
-      newEmail.CCAddress = dataForEmail.Ccs;
-      newEmail.TimeToSend = DateTime.Now;
-      newEmail.InsertUserId = currentUserId;
-      newEmail.InsertDate = DateTime.Now;
-      newEmail.UpdateUserId = currentUserId;
-      newEmail.UpdateDate = DateTime.Now;
-
-      _context.Add (newEmail);
-
-      var apiKey = _config.GetValue<string> ("AppSettings:SENDGRID_APIKEY");
-      var client = new SendGridClient (apiKey);
-      var from = new EmailAddress ("no-reply@educnotes.com");
-      var subject = "first email with attached file from EducNotes";
-      var to = new EmailAddress ("georges.moulot@albatrostechnologies.com");
-      var body = "hmmmmm... getting ready for the covid-19 battle!";
-      var msg = MailHelper.CreateSingleEmail (from, to, subject, body, "");
-      //var bytes = System.IO.File.ReadAllBytes("");
-      // msg.AddAttachment("moulot.jpg", file);
-      // var response = await client.SendEmailAsync(msg);
-      //var req = System.Net.WebRequest.Create("https://res.cloudinary.com/educnotes/image/upload/v1578173397/d2zw9ozmtxgtaqrtvbss.jpg");
-      // WebClient wc = new WebClient();
-      // using (Stream stream = wc.OpenRead("http://res.cloudinary.com/educnotes/image/upload/v1578173397/d2zw9ozmtxgtaqrtvbss.jpg"))
-      // {
-      //   await msg.AddAttachmentAsync("pic.jpg", stream);
-      //   var response = await client.SendEmailAsync(msg);
-      // }
-      var httpWebRequest = (HttpWebRequest) WebRequest.Create ("http://res.cloudinary.com/educnotes/image/upload/v1578173397/e4m74eppwjyv2eei88d6.jpg");
-      var httpResponse = (HttpWebResponse) httpWebRequest.GetResponse ();
-      using (var contentStream = httpResponse.GetResponseStream ()) {
-        var contentLength = 230400;
-        var streamBytes = new byte[contentLength];
-        var output = new StringBuilder ();
-        int bytesRead = 0;
-        do {
-          // read one block from the input stream
-          bytesRead = contentStream.Read (streamBytes, 0, streamBytes.Length);
-          if (bytesRead > 0) {
-            // encode the base64 string
-            string base64String = Convert.ToBase64String (streamBytes, 0, bytesRead);
-            output.Append (base64String);
-          }
-        } while (bytesRead > 0);
-
-        // await contentStream.ReadAsync(streamBytes, 0, contentLength);
-        // var base64Content = Convert.ToBase64String(streamBytes);
-
-        msg.AddAttachment ("pic.jpg", output.ToString (), "image/jpeg");
-
-        //await msg.AddAttachmentAsync("pic.jpg", stream);
-        var response = await client.SendEmailAsync (msg);
-      }
-
-      if (await _repo.SaveAll ()) {
-        return NoContent ();
-      } else {
-        return BadRequest ("problème pour envoyer l\' email");
-      }
     }
 
     [HttpPost ("EmailRegistration/{RegTypeId}")]
@@ -724,26 +630,6 @@ namespace EducNotes.API.Controllers {
       }
 
       return BadRequest ("problème pour créer les inscriptions et envoyer les emails");
-    }
-
-    [HttpGet ("UsersRecap")]
-    public async Task<IActionResult> UsersRecap()
-    {
-      List<UserType> userTypes = await _cache.GetUserTypes();
-
-      var dataToReturn = new List<UsersRecapDto>();
-      foreach(var item in userTypes)
-      {
-        UsersRecapDto userRecap = new UsersRecapDto {
-          UserTypeId = item.Id,
-          UserTypeName = item.Name,
-          TotalAccount = item.Users.Count(),
-          TotalActive = item.Users.Where(u => u.AccountDataValidated == true).Count()
-        };
-
-        dataToReturn.Add(userRecap);
-      }
-      return Ok(dataToReturn);
     }
 
     [HttpGet ("SearchInscription")]

@@ -62,4 +62,12 @@ export class OrderService {
     return this.http.get(this.baseUrl + 'ChildLatePaymentByLevel/' + levelid);
   }
 
+  getLastTuitions() {
+    return this.http.get(this.baseUrl + 'LastTuitions');
+  }
+
+  // getLastTuitionsValidated() {
+  //   return this.http.get(this.baseUrl + 'LastTuitionsValidated');
+  // }
+
 }

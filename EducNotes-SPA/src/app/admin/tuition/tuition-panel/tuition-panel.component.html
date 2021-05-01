@@ -63,7 +63,7 @@
             <i class="fad fa-user-check fa-3x mr-3" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
             <div>
               <p class="text-17 text-muted line-height-1 mb-1">élèves inscrits</p>
-              <p class="text-24 text-primary line-height-1 mt-0 mb-0">{{students?.totalActive}}/{{students?.totalAccount}}</p>
+              <p class="text-24 text-primary line-height-1 mt-0 mb-0">{{students?.totalValidated}}/{{students?.totalAccount}}</p>
             </div>
           </div>
         </div>
@@ -86,7 +86,8 @@
       <div class="card">
         <div class="card-body p-2">
           <div class="d-flex ml-4">
-            <i class="fad fa-chalkboard-teacher fa-3x mr-3" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+            <i class="fad fa-chalkboard-teacher fa-3x mr-3" style="--fa-secondary-opacity: 1;
+              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
             <div>
               <p class="text-17 text-muted line-height-1 mb-1">enseignants inscrits</p>
               <p class="text-24 text-primary line-height-1 mt-0 mb-0">{{teachers?.totalActive}}/{{teachers?.totalAccount}}</p>
@@ -108,34 +109,105 @@
         </div>
       </div>
     </div>
-    <div class="col-md-5 my-2">
-      <div class="card">
+    <div class="col-md-6 my-2">
+      <div class="card mb-2">
         <div class="card-body p-2">
           <div class="d-flex">
-            <div class="text-15 flex-grow-1">situation des inscriptions</div>
+            <div class="text-15 flex-grow-1"><b>situation des inscriptions</b></div>
             <div>
               <a [routerLink]="['/tuitionList']" class="text-15">voir les details</a>
             </div>
           </div>
           <hr class="my-1">
-          <div class="text-16 text-muted">
-            {{totalTuitions}} inscriptions sur {{classSpaces}} places disponibles
-            <!-- <span class="text-small text-danger"><a [routerLink]="['/tuitionList']">voir les détails</a></span> -->
-          </div>
-          <div class="text-16 text-muted">
-            {{tuitionsValidated}} inscriptions validés sur {{totalTuitions}}
-            <!-- <span class="text-small text-danger"><a>voir les détails</a></span> -->
+          <div style="display: block">
+            <canvas mdbChart
+              [chartType]="chartType"
+              [datasets]="chartDatasets"
+              [labels]="chartLabels"
+              [colors]="chartColors"
+              [options]="chartOptions"
+              [legend]="true"
+              (chartHover)="chartHovered($event)"
+              (chartClick)="chartClicked($event)">
+            </canvas>
           </div>
         </div>
       </div>
-    </div>
-    <div *ngIf="regActive" class="col-md-7 my-2">
       <div class="card">
         <div class="card-body p-2">
-          <div class="text-15">dernières inscripitons</div>
+          <div class="text-15"><b>dernières inscriptions</b></div>
           <hr class="my-1">
-          <div class="text-15 text-muted">liste des n dernières inscriptions</div>
-          <div class="text-15 text-muted"></div>
+          <div class="d-none d-md-block">
+            <div class="row text-center">
+              <div class="col textDarkBlue"><b>date</b></div>
+              <div class="col textDarkBlue"><b>photo</b></div>
+              <div class="col textDarkBlue"><b>nom</b></div>
+              <div class="col textDarkBlue"><b>classe</b></div>
+              <div class="col textDarkBlue"><b>statut</b></div>
+            </div>
+            <div *ngFor="let user of lastAdded | paginate: { itemsPerPage: studentpageSize, currentPage: studentpage }">
+              <div class="border rounded-lg p-1 mb-1">
+                <div class="row text-center">
+                  <div class="col my-auto">{{user.strCreated}}</div>
+                  <div class="col my-auto zoom">
+                    <img class="rounded-circle m-0" width="35" src="{{user.photoUrl || '../../../../assets/user.png'}}" alt>
+                  </div>
+                  <div class="col my-auto">{{user.lastName}}<br>{{user.firstName}}</div>
+                  <div class="col my-auto">{{user.className || user.classLevelName}}</div>
+                  <div class="col my-auto">
+                    <i *ngIf="user.validated" class="fad fa-user-check fa-2x" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+                    <i *ngIf="!user.validated" class="fad fa-user-times fa-2x" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+                    <br>  
+                    {{user.validated ? 'validé' : 'non validé'}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 mt-1">
+              <pagination-controls (pageChange)="studentpage = $event" responsive="true" directionLinks="true"
+                autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
+            </div>
+          </div>
+          <div class="d-md-none"></div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="regActive" class="col-md-6 my-2">
+      <div class="card mb-2">
+        <div class="card-body p-2">
+          <div class="d-flex">
+            <div class="text-15 flex-grow-1"><b>situation des inscriptions</b></div>
+            <div>
+              <a [routerLink]="['/tuitionData']" class="text-15">voir les details</a>
+            </div>
+          </div>
+          <hr class="my-1">
+          <div class="text-15 textBlue">
+            {{totalTuitions}} inscriptions sur {{classSpaces}} places disponibles
+          </div>
+          <div class="text-16 textBlue">
+            {{tuitionsValidated}} inscriptions validés sur {{totalTuitions}}
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body p-2">
+          <div class="text-15"><b>taux des inscriptions par niveau</b></div>
+          <hr class="my-1">
+          <div style="display: block">
+            <canvas mdbChart
+              [chartType]="chartPctType"
+              [datasets]="chartPctDatasets"
+              [labels]="chartLabels"
+              [colors]="chartPctColors"
+              [options]="chartPctOptions"
+              [legend]="true"
+              (chartHover)="chartPctHovered($event)"
+              (chartClick)="chartPctClicked($event)">
+            </canvas>
+          </div>
         </div>
       </div>
     </div>

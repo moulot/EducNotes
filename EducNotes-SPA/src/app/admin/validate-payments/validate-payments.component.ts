@@ -12,6 +12,7 @@ import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 export class ValidatePaymentsComponent implements OnInit {
   payments: any;
   paymentsForm: FormGroup;
+  wait = false;
   statusOptions = [{value: 0, label: 'reçu'}, {value: 1, label: 'déposé en banque'},
     {value: 2, label: 'rejeté'}, {value: 3, label: 'encaissé'}];
 
@@ -86,6 +87,7 @@ export class ValidatePaymentsComponent implements OnInit {
   }
 
   validatePayments() {
+    this.wait = true;
     let payments = [];
     for (let i = 0; i < this.paymentsForm.value.payments.length; i++) {
       const pay = this.paymentsForm.value.payments[i];
@@ -111,8 +113,10 @@ export class ValidatePaymentsComponent implements OnInit {
     this.paymentService.updatePayments(payments).subscribe(() => {
       this.router.navigate(['/treasury']);
       this.alertify.success('les paiements ont été mis à jour');
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 }

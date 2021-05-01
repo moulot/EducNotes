@@ -146,14 +146,15 @@ import { RecoveryComponent } from './admin/treso/recovery/recovery.component';
 import { RecoveryResolver } from './_resolvers/recovery-resolver';
 import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
 import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
+import { TuitionDataComponent } from './admin/tuition/tuition-data/tuition-data.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
     { path: 'imgCropper', component: AppImgCropperComponent },
     { path: 'signIn', component: SigninComponent },
-    {path: 'confirmEmail', component: ConfirmEmailComponent},
-    {path: 'confirmTeacherEmail', component: ConfirmTeacherEmailComponent},
-    {path: 'contactus', component: ContactUsComponent},
+    { path: 'confirmEmail', component: ConfirmEmailComponent},
+    { path: 'confirmTeacherEmail', component: ConfirmTeacherEmailComponent},
+    { path: 'contactus', component: ContactUsComponent},
     { path: 'resetPassword', component: ResetPasswordComponent},
     { path: 'lockout', component: LockoutComponent},
 
@@ -178,7 +179,7 @@ export const appRoutes: Routes = [
         { path: 'classes', component: ClassPanelComponent },
         { path: 'grades', component: GradePanelComponent },
         { path: 'classLife/:classId', component: ClassLifeComponent },
-        { path: 'studentLife/:id', component: StudentLifeComponent }, // resolve: { student: StudentResolver } },
+        { path: 'studentLife/:id', component: StudentLifeComponent },
         { path: 'studentLifeP/:id', component: StudentLifeComponent },
         { path: 'studentNotes/:id', component: GradeStudentComponent },
         { path: 'classSchedules', component: ClassScheduleComponent, resolve: {classes: ClassScheduleResolver} },
@@ -212,7 +213,7 @@ export const appRoutes: Routes = [
         { path: 'editCourse/:id', component: NewCourseComponent, resolve: { course: CourseFormResolver } },
         { path: 'editTeacher/:id', component: NewTeacherComponent, resolve: { teacher: EditTeacherResolver } },
         { path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve: { classes: LevelClassesResolver } },
-        { path: 'studentGrades/:id', component: GradeStudentComponent}, // , resolve: { student: StudentResolver } },
+        { path: 'studentGrades/:id', component: GradeStudentComponent},
         { path: 'studentGradesP/:id', component: GradeStudentComponent},
         { path: 'tuitions', component: TuitionPanelComponent },
         { path: 'treasury', component: TreasuryComponent },
@@ -225,7 +226,7 @@ export const appRoutes: Routes = [
         { path: 'deadLines', component: DeadLineListComponent, resolve: { deadlines: DeadLineListResolver } },
         { path: 'createDeadLine', component: DeadLineFormComponent },
         { path: 'editDeadLine/:id', component: DeadLineFormComponent, resolve: { deadline: DeadLineFormResolver } },
-        { path: 'studentAgenda/:id', component: StudentAgendaComponent }, // resolve: { student: StudentResolver } },
+        { path: 'studentAgenda/:id', component: StudentAgendaComponent },
         { path: 'studentAgendaP/:id', component: StudentAgendaComponent },
         { path: 'coefficients', component: CourseCoefficientsComponent },
         { path: 'addCoefficient', component: CoefficientFormComponent },
@@ -264,6 +265,7 @@ export const appRoutes: Routes = [
         { path: 'addFinOp/:id', component: AddPaymentComponent, resolve: {file: AddPaymentResolver} },
         { path: 'validatePayments', component: ValidatePaymentsComponent, resolve: {payments: ValidatePaymentsResolver}},
         { path: 'tuitionList', component: TuitionListComponent, resolve: {list: TuitionListResolver}},
+        { path: 'tuitionData', component: TuitionDataComponent},
         { path: 'tuitionDetails/:levelId', component: TuitionDetailsComponent, resolve: {users: TuitionDetailsResolver}},
         { path: 'tuitionFees', component: TuitionFeesComponent, resolve: {fees: TuitionFeesResolver}},
         { path: 'latePayments', component: RecoveryListComponent},
@@ -271,6 +273,7 @@ export const appRoutes: Routes = [
         { path: 'absences', component: AbsencesComponent},
         { path: 'editAccount/:id', component: EditAccountComponent, resolve: {user: EditAccountResolver}},
         { path: 'usersValidation', component: UserValidationComponent, resolve: {users: UserValidationResolver}},
+        { path: 'usersProfile', component: UserValidationComponent, resolve: {users: UserValidationResolver}},
         { path: 'config', component: ConfigComponent},
         { path: 'editClasses', component: EditLevelClassesComponent}
       ]

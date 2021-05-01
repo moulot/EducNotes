@@ -65,7 +65,10 @@
       </div>
     </div>
     <div class="col-md-8 mt-1">
-      <button type="submit" mdbBtn class="btnBlue" size="sm" block="true" mdbWavesEffect>saisir les paiements</button>
+      <button type="submit" mdbBtn [disabled]="wait" class="btnBlue" size="sm" block="true" mdbWavesEffect>
+        <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        saisir les paiements
+      </button>
     </div>
   </div>
 </form>

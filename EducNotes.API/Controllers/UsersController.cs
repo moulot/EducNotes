@@ -570,7 +570,8 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("Types")]
-    public async Task<IActionResult> GetUserTypes() {
+    public async Task<IActionResult> GetUserTypes()
+    {
       var userTypes = await _context.UserTypes.OrderBy(o => o.Name).ToListAsync();
       return Ok(userTypes);
     }
@@ -682,6 +683,27 @@ namespace EducNotes.API.Controllers {
       }
 
       return Ok(teacherSchedule);
+    }
+
+    [HttpGet ("UsersRecap")]
+    public async Task<IActionResult> UsersRecap()
+    {
+      List<UserType> userTypes = await _cache.GetUserTypes();
+
+      var dataToReturn = new List<UsersRecapDto>();
+      foreach(var item in userTypes)
+      {
+        UsersRecapDto userRecap = new UsersRecapDto {
+          UserTypeId = item.Id,
+          UserTypeName = item.Name,
+          TotalAccount = item.Users.Count(),
+          TotalActive = item.Users.Where(u => u.AccountDataValidated == true).Count(),
+          TotalValidated = item.Users.Where(u => u.Validated == true).Count()
+        };
+
+        dataToReturn.Add(userRecap);
+      }
+      return Ok(dataToReturn);
     }
 
     [HttpGet("{teacherId}/ScheduleByClassByDay")]

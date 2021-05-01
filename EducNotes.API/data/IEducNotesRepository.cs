@@ -41,7 +41,7 @@ namespace EducNotes.API.Data
     Task<bool> UpdateChildren(ChildrenForEditDto users);
     Task<bool> AddTeacher(TeacherForEditDto userForRegister);
     Task<bool> EditUserAccount(UserAccountForEditDto user);
-    Task<IEnumerable<User>> GetStudentsForClass(int classId);
+    // Task<IEnumerable<User>> GetStudentsForClass(int classId);
     Task<IEnumerable<Agenda>> GetClassAgenda(int classId);
     Task<List<AgendaForListDto>> GetUserClassAgenda(int classId, DateTime startDate, DateTime endDate);
     Task<IEnumerable<UserType>> getUserTypes();

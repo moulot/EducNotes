@@ -3,11 +3,11 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
-import { AdminService } from 'src/app/_services/admin.service';
 import { Email } from 'src/app/_models/email';
 import { DataForEmail } from 'src/app/_models/dataForEmail';
 import { ClassLevel } from 'src/app/_models/classLevel';
 import { UserService } from 'src/app/_services/user.service';
+import { CommService } from 'src/app/_services/comm.service';
 
 @Component({
   selector: 'app-email',
@@ -27,7 +27,7 @@ export class EmailComponent implements OnInit {
 
 
   constructor(private classService: ClassService, private alertify: AlertifyService,
-    private adminService: AdminService, private fb: FormBuilder, private userService: UserService) { }
+    private commService: CommService, private fb: FormBuilder, private userService: UserService) { }
 
 
   ngOnInit() {
@@ -87,7 +87,7 @@ export class EmailComponent implements OnInit {
     dataForEmail.tos = toEmails;
     dataForEmail.ccs = ccEmails;
 
-    this.adminService.sendEmail(dataForEmail).subscribe(() => {
+    this.commService.sendEmail(dataForEmail).subscribe(() => {
       this.alertify.successBar('message envoyé.');
     }, error => {
       this.alertify.errorBar('problème avec l\'envoi du email');
@@ -107,7 +107,7 @@ export class EmailComponent implements OnInit {
   }
 
   getUserTypes() {
-    this.adminService.getUserTypes().subscribe((data: any) => {
+    this.userService.getUserTypes().subscribe((data: any) => {
       for (let i = 0; i < data.length; i++) {
         const elt = data[i];
         const option = {value: elt.id, label: elt.name};

@@ -7,7 +7,6 @@ import { User } from 'src/app/_models/user';
 import { debounceTime } from 'rxjs/operators';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { Class } from 'src/app/_models/class';
-import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
@@ -18,9 +17,8 @@ import { AuthService } from 'src/app/_services/auth.service';
 })
 export class InscriptionsListComponent implements OnInit {
 
-  constructor(private adminService: AdminService, private alertify: AlertifyService,
-    private fb: FormBuilder, private classService: ClassService,
-    private toastr: ToastrService, private authService: AuthService) { }
+  constructor(private adminService: AdminService, private alertify: AlertifyService, private fb: FormBuilder,
+    private classService: ClassService, private authService: AuthService) { }
 
   levels: any[] = [];
   searchForm: FormGroup;
@@ -42,6 +40,7 @@ export class InscriptionsListComponent implements OnInit {
   pageSize = 8;
   className = '';
   userId;
+  wait = false;
 
   ngOnInit() {
     this.userId = this.authService.decodedToken.nameid;
@@ -71,7 +70,8 @@ export class InscriptionsListComponent implements OnInit {
     });
   }
 
-  checkValid(content) {
+  checkValid() {
+    this.wait = true;
     this.selectedIds = [];
     for (let index = 0; index < this.filteredStudents.length; index++) {
       if (this.filteredStudents[index].isSelected) {
@@ -82,38 +82,31 @@ export class InscriptionsListComponent implements OnInit {
 
     if (this.selectedIds.length === 0) {
       this.alertify.warning('Veuillez sélectionnez au moins un élève...');
+      this.wait = false;
     } else {
-
       const room = this.classes.find(item => item.id === Number(this.classId));
       this.className = room.name;
-
       const diff = (room.maxStudent - room.totalStudents);
 
       if (diff < this.selectedIds.length) {
         this.alertify.warning('il reste seulement ' + diff + 'place(s) disponible(s) pour cette classe');
+        this.wait = false;
       } else {
-        // this.modalService.open(content, { ariaLabelledBy: 'confirmation', centered: true })
-        //   .result.then((result) => {
-        //     this.confirmResut = `Closed with: ${result}`;
-        //     this.studentAffectation();
-        //   }, (reason) => {
-
-        //     this.confirmResut = `Dismissed with: ${reason}`;
-        //     this.toastr.info('annuler', 'Erreur de saisie', { timeOut: 3000 });
-
-        //   });
         this.studentAffectation();
       }
     }
   }
 
   studentAffectation() {
+    this.wait = true;
     this.adminService.studentAffectation(this.classId, this.selectedIds).subscribe(() => {
       this.searchStudents();
-      this.alertify.success('enegistrement terminé...');
+      this.alertify.success('affectation des élèves enregistrée');
       this.classId = null;
+      this.wait = false;
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 

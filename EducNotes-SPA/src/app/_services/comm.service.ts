@@ -7,6 +7,7 @@ import { SmsTemplate } from '../_models/smsTemplate';
 import { Observable } from 'rxjs';
 import { EmailTemplate } from '../_models/emailTemplate';
 import { DataForBroadcast } from '../_models/dataForBroadcast';
+import { DataForEmail } from '../_models/dataForEmail';
 
 @Injectable({
   providedIn: 'root'
@@ -95,4 +96,7 @@ export class CommService {
     return this.http.post(this.baseUrl + 'ClassesBroadcastMessaging', dataForBroadcast);
   }
 
+  sendEmail(dataForEmail: DataForEmail) {
+    return this.http.post(this.baseUrl + 'SendBatchEmail', dataForEmail);
+  }
 }

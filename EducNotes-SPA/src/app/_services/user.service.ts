@@ -152,6 +152,10 @@ constructor(private http: HttpClient) {}
     return this.http.get(this.baseUrl + teacherId + '/GradesData/' + periodId);
   }
 
+  getUsersRecap() {
+    return this.http.get(this.baseUrl + 'UsersRecap');
+  }
+
   getTeacherClasses(teacherId) {
     return this.http.get(this.baseUrl + teacherId + '/Classes');
   }
@@ -254,7 +258,7 @@ constructor(private http: HttpClient) {}
 
   // métode poour récuperer la liste des types User
   getUserTypes() {
-    return this.http.get(this.baseUrl + 'GetUserTypes');
+    return this.http.get(this.baseUrl + 'Types');
   }
 
   getAllClassesCourses(): Observable<any[]> {

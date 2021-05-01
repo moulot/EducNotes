@@ -40,6 +40,7 @@ namespace EducNotes.API.Dtos
         public double Avg { get; set; }
         public int NbAbsences { get; set; }
         public int NbLateArrivals { get; set; }
+        public string strCreated { get; set; }
         private ICollection<Photo> photos;
         public ICollection<AgendaForListDto> AgendaItems { get; set; }
         public ICollection<PhotosForDetailedDto> Photos { get; set; }
