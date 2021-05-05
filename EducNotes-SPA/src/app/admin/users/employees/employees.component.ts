@@ -3,18 +3,18 @@ import { ActivatedRoute } from '@angular/router';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 
 @Component({
-  selector: 'app-roles',
-  templateUrl: './roles.component.html',
-  styleUrls: ['./roles.component.scss']
+  selector: 'app-employees',
+  templateUrl: './employees.component.html',
+  styleUrls: ['./employees.component.scss']
 })
-export class RolesComponent implements OnInit {
-  roles: any;
+export class EmployeesComponent implements OnInit {
+  employees: any;
 
   constructor(private route: ActivatedRoute, private alertify: AlertifyService) { }
 
   ngOnInit() {
     this.route.data.subscribe(data => {
-      this.roles = data['roles'];
+      this.employees = data['employees'];
     });
   }
 

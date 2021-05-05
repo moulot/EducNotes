@@ -6,7 +6,7 @@
     <i class="fad fa-users fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
     <div class="text-19">situation des recouvrements</div>
   </div>
-  <div class="col-md-12"><hr class="my-2"></div>
+  <!-- <div class="col-md-12"><hr class="my-2"></div>
 
   <div class="col-md-3 mb-1">
     <button type="button" mdbBtn (click)="toggleView()" size="sm" block="true"
@@ -19,7 +19,7 @@
     [ngClass]="toggleLevelChild == false ? 'btnBlue' : 'btnWhiteB'" mdbWavesEffect>
       retards paiements par enfant
     </button>
-  </div>
+  </div> -->
 </div>
 
 <div *ngIf="toggleLevelChild">
@@ -30,7 +30,7 @@
         <div class="text-16">
           niveau {{level.levelName}} 
           <span class="ml-2 text-13">
-            <a [routerLink]="['/paymentLevelChild', level.levelId]" routerLinkActive="router-link-active" >voir détails</a>
+            <a [routerLink]="['/paymentLevelChild', level.levelId]" >voir détails</a>
           </span>
         </div>
         <hr class="my-1">

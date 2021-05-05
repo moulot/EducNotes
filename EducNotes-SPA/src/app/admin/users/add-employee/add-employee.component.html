@@ -1,0 +1,153 @@
+<div class="row">
+  <div class="col-md-12">
+    <div *ngIf="!editionMode" class="d-flex">
+      <i class="fad fa-user-plus fa-2x mr-2" style="--fa-secondary-opacity: 1;
+        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <p class="text-17">ajout d'un employé</p>
+    </div>
+    <div *ngIf="editionMode" class="d-flex mb-2">
+      <i class="fad fa-user-edit fa-2x mr-2" style="--fa-secondary-opacity: 1;
+        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <div class="text-17">édition de l'employé <span class="text-capitalize">{{employee.lastName}} {{employee.firstName}}</span></div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body p-2">
+        <form [formGroup]="empForm" (ngSubmit)="addEmployee()">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-2">
+                  <div class="file-path-wrapper d-flex justify-content-center m-0 p-1">
+                    <img src="{{photoUrl || '../../../../assets/user.png'}}" class="avatar-xl rounded-lg" alt>
+                  </div>
+                  <div class="d-flex justify-content-center m-0">
+                    <div class="file-field md-form m-0">
+                      <div mdbBtn class="btnBlue px-2 waves-light" size="sm" mdbWavesEffect>
+                        <span *ngIf="!photoUrl">ajouter la photo</span>
+                        <span *ngIf="photoUrl">editer la photo</span>
+                        <input type="file" accept='image/*' mdbFileSelect (change)="imgResult($event)">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-10">
+                  <div class="row">
+                    <div *ngIf="editionMode" class="col-md-12 text-15 text-danger">le mobile et le email sont edités dans le compte de l'utilisateur</div>
+                    <div class="col-md-3">
+                      <div class="md-form mt-1 mb-0">
+                        <input mdbInput type="text" id="lastName" class="form-control" formControlName="lastName" mdbValidate>
+                        <label for="lastName" class="">nom</label>
+                      </div>
+                      <div *ngIf="empForm.get('lastName').errors && empForm.get('lastName').touched" class="text-small text-danger">
+                        le nom est obligatoire
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="md-form mt-1 mb-0">
+                        <input mdbInput type="text" id="firstName" class="form-control" formControlName="firstName" mdbValidate>
+                        <label for="firstName" class="">prénom</label>
+                      </div>
+                      <div *ngIf="empForm.get('firstName').errors && empForm.get('firstName').touched" class="text-small text-danger">
+                        le prénom est obligatoire
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="md-form my-0">
+                        <mdb-date-picker name="dateOfBirth" [placeholder]="'date de naissance'" [options]="myDatePickerOptions" formControlName="dateOfBirth"></mdb-date-picker>
+                        <div *ngIf="empForm.get('dateOfBirth').errors && empForm.get('dateOfBirth').touched"
+                          class="text-small text-danger">la date de naissance est obligatoire</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="d-flex">
+                        <mdb-select id="gender" [options]="gender" placeholder="sexe" formControlName="gender"></mdb-select>
+                      </div>
+                      <div *ngIf="empForm.get('gender').errors && empForm.get('gender').touched"
+                        class="text-small text-danger ml-2">le sexe est obligatoire</div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="d-flex">
+                        <mdb-select id="maritalStatus" [options]="maritalStatusOptions" placeholder="statut" formControlName="maritalStatus"></mdb-select>
+                      </div>
+                      <div *ngIf="empForm.get('maritalStatus').errors && empForm.get('maritalStatus').touched"
+                        class="text-small text-danger ml-2">le statut est obligatoire</div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="d-flex">
+                        <mdb-select id="district" [options]="districtOptions" placeholder="quartier de résidence" formControlName="district"></mdb-select>
+                      </div>
+                      <div *ngIf="empForm.get('district').errors && empForm.get('district').touched"
+                        class="text-small text-danger ml-2">le quartier est obligatoire</div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="md-form mt-1 mb-0">
+                        <input mdbInput type="text" [attr.readOnly]="editionMode? true : null" id="cell" class="form-control" formControlName="cell">
+                        <label for="cell" class="">portable</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="md-form mt-1 mb-0">
+                        <input mdbInput type="text" id="phone2" class="form-control" formControlName="phone2">
+                        <label for="phone2" class="">autre</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="md-form mt-1 mb-0">
+                        <input mdbInput type="text" [attr.readOnly]="editionMode? true : null" id="email" class="form-control" formControlName="email">
+                        <label for="email" class="">email</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="text-15 d-flex align-items-center mt-2"><b>roles du professeur</b></div>
+              <hr class="mt-1 mb-2">
+              <div class="row">
+                <div class="col-md-2 my-2" formArrayName="roles" *ngFor="let role of empForm.get('roles')['controls']; let i = index;">
+                  <div [formGroupName]="i">
+                    <div class="switch">
+                      <label>
+                        <input type="checkbox" formControlName="active">
+                        <span class="slider"></span>
+                        <span class="text-15 text-muted">{{role.value.name}}</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <hr class="my-1">
+              <div class="row">
+                <div class="col-md-8"></div>
+                <div class="col-md-2 mb-1">
+                  <button type="button" [routerLink]="['/employees']" mdbBtn class="btnOrange" size="sm" mdbWavesEffect
+                  block="true" [disabled]="wait">
+                    <i class="fad fa-times-circle fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+                    <span>annuler</span>
+                  </button>
+                </div>
+                <div class="col-md-2 mb-1">
+                  <button type="submit" mdbBtn class="btnBlue" size="sm" mdbWavesEffect
+                    block="true" [disabled]="!empForm.valid || wait">
+                    <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+                    <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span *ngIf="!editionMode">ajouter</span><span *ngIf="editionMode">editer</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

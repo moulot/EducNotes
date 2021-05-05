@@ -14,7 +14,7 @@ export class EmailTemplateComponent implements OnInit {
   HeadElts = ['action', 'name', 'catégorie', 'message'];
 
   constructor(private route: ActivatedRoute, private alertify: AlertifyService,
-    private commService: CommService, private router: Router) { }
+    private router: Router) { }
 
   ngOnInit() {
     this.route.data.subscribe(data => {

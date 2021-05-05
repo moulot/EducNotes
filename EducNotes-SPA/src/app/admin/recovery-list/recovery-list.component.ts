@@ -16,7 +16,7 @@ export class RecoveryListComponent implements OnInit {
 
   ngOnInit() {
     this.getLevelLatePayments();
-    this.getChildRecovery();
+    // this.getChildRecovery();
   }
 
   getLevelLatePayments() {

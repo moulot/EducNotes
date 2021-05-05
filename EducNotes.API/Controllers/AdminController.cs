@@ -77,17 +77,17 @@ namespace EducNotes.API.Controllers {
       _cloudinary = new Cloudinary (acc);
     }
 
-    [Authorize(Policy = "RequireAdminRole")]
-    [HttpGet("usersWithRoles")]
-    public async Task<IActionResult> GetUsersWithRoles () {
-      var userList = await (from user in _context.Users orderby user.UserName select new {
-        Id = user.Id,
-          UserName = user.UserName,
-          Roles = (from userRole in user.UserRoles join role in _context.Roles on userRole.RoleId equals role.Id select role.Name).ToList ()
-      }).ToListAsync ();
+    // [Authorize(Policy = "RequireAdminRole")]
+    // [HttpGet("usersWithRoles")]
+    // public async Task<IActionResult> GetUsersWithRoles () {
+    //   var userList = await (from user in _context.Users orderby user.UserName select new {
+    //     Id = user.Id,
+    //       UserName = user.UserName,
+    //       Roles = (from userRole in user.UserRoles join role in _context.Roles on userRole.RoleId equals role.Id select role.Name).ToList ()
+    //   }).ToListAsync ();
 
-      return Ok (userList);
-    }
+    //   return Ok (userList);
+    // }
 
     [Authorize(Policy = "RequireAdminRole")]
     [HttpPost("editRoles/{userName}")]
@@ -178,7 +178,8 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("GetAllTeachers")]
-    public async Task<IActionResult> GetAllTeachers () {
+    public async Task<IActionResult> GetAllTeachers()
+    {
       //recuperation de tous les professeurs
       var teachers = await _context.Users.Where (u => u.UserTypeId == teacherTypeId).ToListAsync ();
 
@@ -462,10 +463,10 @@ namespace EducNotes.API.Controllers {
         .ToListAsync ();
 
       List<Setting> settings = await _context.Settings.ToListAsync ();
-      var schoolName = settings.First (s => s.Name.ToLower () == "schoolname").Value;
-      var smsActive = settings.First (s => s.Name.ToLower () == "sendregsms").Value;
-      decimal RegistrationFee = Convert.ToDecimal (settings.First (s => s.Name.ToLower () == "regfee").Value);
-      string RegDeadLine = settings.First (s => s.Name == "RegistrationDeadLine").Value;
+      var schoolName = settings.First(s => s.Name.ToLower() == "schoolname").Value;
+      var smsActive = settings.First(s => s.Name.ToLower() == "sendregsms").Value;
+      decimal RegistrationFee = Convert.ToDecimal(settings.First(s => s.Name.ToLower() == "regfee").Value);
+      string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
 
       Boolean sendSmsToo = smsActive == "1" ? true : false;
 
@@ -475,7 +476,8 @@ namespace EducNotes.API.Controllers {
 
       var firstDeadline = deadlines.First (d => d.Seq == 1);
       List<RegistrationEmailDto> EmailData = new List<RegistrationEmailDto> ();
-      foreach (var parent in parents) {
+      foreach (var parent in parents)
+      {
         //do we already have a in-process registration for parent's children?
         if (RegTypeId == tuitionId) {
           if (parent.RegCreated == true)
@@ -693,11 +695,12 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("GetTeacher/{teacherId}")]
-    public async Task<IActionResult> GetTeacher (int teacherId)
+    public async Task<IActionResult> GetTeacher(int teacherId)
     {
       //recuperation du professeur professeurs ainsi que tous ses cours
       User teacher = await _context.Users.FirstOrDefaultAsync(u => u.Id == teacherId);
-      if (teacher != null) {
+      if(teacher != null)
+      {
         var tdetails = new TeacherForListDto ();
         tdetails.PhoneNumber = teacher.PhoneNumber;
         tdetails.SecondPhoneNumber = teacher.SecondPhoneNumber;
@@ -741,6 +744,188 @@ namespace EducNotes.API.Controllers {
       }
 
       return BadRequest("problème pour metre à jour les paramètres");
+    }
+
+    // [Authorize(Policy = "RequireAdminRole")]
+    [HttpGet("RolesWithUsers")]
+    public async Task<IActionResult> GetRolesWithUsers()
+    {
+      List<Role> rolesCached = await _cache.GetRoles();
+      List<UserRole> userRoles = await _cache.GetUserRoles();
+
+      List<RoleWithUsersDto> roles = new List<RoleWithUsersDto>();
+      foreach(var role in rolesCached)
+      {
+        RoleWithUsersDto roleWithUsers = new RoleWithUsersDto();
+        roleWithUsers.Id = role.Id;
+        roleWithUsers.Name = role.Name;
+        var users = userRoles.Where(u => u.RoleId == role.Id).Select(s => s.User).ToList();
+        roleWithUsers.Users = new List<UserInRole>();
+        foreach (var user in users)
+        {
+          UserInRole userInRole = new UserInRole();
+          userInRole.LastName = user.LastName;
+          userInRole.FirstName = user.FirstName;
+          Photo photo = user.Photos.FirstOrDefault(p => p.IsMain == true);
+          if(photo != null)
+            userInRole.PhotoUrl = photo.Url;
+          roleWithUsers.Users.Add(userInRole);
+        }
+        roles.Add(roleWithUsers);
+      }
+
+      return Ok(roles);
+    }
+
+    [HttpGet("Roles")]
+    public async Task<IActionResult> GetRoles()
+    {
+      List<Role> roles = await _cache.GetRoles();
+      return Ok(roles);
+    }
+
+    [HttpGet("EmpData")]
+    public async Task<IActionResult> GetEmpData()
+    {
+      List<Role> roles = await _cache.GetRoles();
+      List<District> districts = await _cache.GetDistricts();
+      List<MaritalStatus> maritalStatus = await _cache.GetMaritalStatus();
+      return Ok(new {
+        roles,
+        districts,
+        maritalStatus
+      });
+    }
+
+    [HttpGet("{roleId}/CapabilitiesByUserId")]
+    public async Task<IActionResult> GetCapabilitiesByRoleId(int roleId)
+    {
+      List<RoleCapability> roleCapabilities = await _cache.GetRoleCapabilities();
+      List<Capability> capabilities = roleCapabilities.Where(c => c.RoleId == roleId)
+                                                      .Select(s => s.Capability).ToList();
+      return Ok(capabilities);
+    }
+
+    [HttpGet("{userId}/RolesByUserId")]
+    public async Task<IActionResult> GetRolesByUserId(int userId)
+    {
+      List<UserRole> userRoles = await _cache.GetUserRoles();
+      List<Role> roles = userRoles.Where(r => r.UserId == userId).Select(s => s.Role).ToList();
+      return Ok(roles);
+    }
+
+    [HttpGet("{roleId}/UsersByRoleId")]
+    public async Task<IActionResult> GetUsersByRoleId(int roleId)
+    {
+      List<UserRole> userRoles = await _cache.GetUserRoles();
+      List<User> users = userRoles.Where(r => r.RoleId == roleId).Select(s => s.User).ToList();
+      return Ok(users);
+    }
+
+    [HttpGet("Capabilities")]
+    public async Task<IActionResult> GetCapabilities()
+    {
+      return Ok(await _cache.GetCapabilities());
+    }
+
+    [HttpGet("{name}/CapabilityByName")]
+    public async Task<IActionResult> GetCapabilityByName(string name)
+    {
+      List<Capability> capabilities = await _cache.GetCapabilities();
+      Capability capability = capabilities.FirstOrDefault(c => c.Name.ToUpper() == name.ToUpper());
+      return Ok(capability);
+    }
+
+    [HttpGet("{menuItemId}/CapabilitiesByMenuItemId")]
+    public async Task<IActionResult> GetCapabilitiesByMenuItelId(int menuItemId)
+    {
+      List<Capability> capabilitiesCached = await _cache.GetCapabilities();
+      List<Capability> capabilities = capabilitiesCached.Where(c => c.MenuItemId == menuItemId)
+                                                        .OrderBy(o => o.Name)
+                                                        .ToList();
+      return Ok(capabilities);
+    }
+
+    [HttpGet("{menuItemId}/RoleCapabilitiesByMenuItemId")]
+    public async Task<IActionResult> GetRoleCapabilitiesByMenuItelId(int menuItemId)
+    {
+      List<RoleCapability> roleCapabilitiesCached = await _cache.GetRoleCapabilities();
+      List<RoleCapability> roleCapabilities = roleCapabilitiesCached.Where(c => c.Capability.MenuItemId == menuItemId)
+                                                                    .ToList();
+      return Ok(roleCapabilities);
+    }
+
+    [HttpGet("{capabilityId}/RoleCapabilityByCapabilityId/{roleId}")]
+    public async Task<IActionResult> GetRoleCapabilityByCapabilityId(int capabilityId, int roleId)
+    {
+      List<RoleCapability> roleCapabilities = await _cache.GetRoleCapabilities();
+      RoleCapability roleCapability = roleCapabilities
+                      .FirstOrDefault(c => c.Capability.Id == capabilityId && c.RoleId == roleId);
+      return Ok(roleCapability);
+    }
+
+    [HttpGet("{roleId}/RoleCapabilitiesByRoleId")]
+    public async Task<IActionResult> GetRoleCapabilitiesByRoleId(int roleId)
+    {
+      List<RoleCapability> roleCapabilitiesCached = await _cache.GetRoleCapabilities();
+      List<RoleCapability> roleCapabilities = roleCapabilitiesCached.Where(c => c.RoleId == roleId).ToList();
+      return Ok(roleCapabilities);
+    }
+
+    [HttpGet("{userId}/UserRoleByUserId/{roleId}")]
+    public async Task<IActionResult> GetUserRoleByUserId(int userId, int roleId)
+    {
+      UserRole userRole = await _repo.GetUserRoleByUserId(userId, roleId);
+      return Ok(userRole);
+    }
+
+    [HttpGet("{userId}/UserInRole/{roleId}")]
+    public async Task<IActionResult> IsUserInRole(int userId, int roleId)
+    {
+      UserRole userRole = await _repo.GetUserRoleByUserId(userId, roleId);
+      return Ok(userRole != null);
+    }
+
+    [HttpGet("LoadMenu")]
+    public async Task<IActionResult> GetMenuItems()
+    {
+      List<MenuItem> menuItemsCached = await _cache.GetMenuItems();
+
+      List<MenuItem> menuItems = new List<MenuItem>();
+      foreach (var menuItem in menuItemsCached)
+      {
+        //check if the menu already exists in this object
+        if(_repo.MenuExists(menuItem.Id, menuItems) == false)
+        {
+          //doesn't exist so now check if this is a top level item
+          if(menuItem.ParentMenuId == null)
+          {
+            //top level item so just add it
+            menuItems.Add(menuItem);
+          }
+          else
+          {
+            //get the parent menu item from this object if it exists
+            MenuItem parent = _repo.GetMenuItemFromList(Convert.ToInt32(menuItem.ParentMenuId), menuItems);
+            if(parent == null)
+            {
+              //if it gets here then the parent isn't in the list yet. find the parent in the list
+              MenuItem newParentMenuItem = _repo.FindOrLoadParent(menuItems, Convert.ToInt32(menuItem.ParentMenuId));
+
+              //add the current child menu item to the newly added parent
+              newParentMenuItem.ChildMenuItems.Add(menuItem);
+            }
+            else
+            {
+              //parent already existed in this object. add this menu to the child of the parent
+              parent.ChildMenuItems.Add(menuItem);
+            }
+          }
+        }
+
+      }
+
+      return Ok(menuItems);
     }
 
   }

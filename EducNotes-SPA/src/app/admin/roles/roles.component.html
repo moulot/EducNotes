@@ -1,1 +1,47 @@
-<p>roles works!</p>
+<div class="row">
+  <div class="col-md-12 d-flex">
+    <i class="fad fa-users-cog fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+    <div class="text-19">profils utilisateurs</div>
+  </div>
+  <div class="col-md-2 my-2">
+    <button type="button" mdbBtn [routerLink]="['/addRole']"  block="true" class="btnBlue" size="sm" mdbWavesEffect>nouveau role</button>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body p-2">
+        <div class="row">
+          <div class="col-md-2">
+            <div class="text-15 textDarkBlue"><b>roles</b></div>
+          </div>
+          <div class="col-md-10">
+            <div class="text-15 textDarkBlue"><b>employés</b></div>
+          </div>
+        </div>
+        <hr class="my-1">
+        <div *ngFor="let role of roles">
+          <div class="border rounded-lg p-1 mb-1">
+            <div class="row">
+              <div class="col-md-2 my-auto">
+                <div class="text-15">{{role.name}}</div>
+              </div>
+              <div class="col-md-10">
+                <div class="row">
+                  <div *ngFor="let user of role.users" class="col-md-3">
+                    <div class="d-flex">
+                      <div class="zoom">
+                        <img class="rounded-circle" width="35" src="{{user.photoUrl || '../../../../assets/user.png'}}" alt>
+                      </div>
+                      <div class="text-15 ml-2 my-auto">{{user.lastName}} {{user.firstName}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

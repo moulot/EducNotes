@@ -1,0 +1,58 @@
+<div class="row">
+  <div class="col-md-12 d-flex">
+    <i class="fad fa-users-cog fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+    <div class="text-19">employés</div>
+  </div>
+  <div class="col-md-2 my-2">
+    <button type="button" mdbBtn [routerLink]="['/addEmployee']"  block="true" class="btnBlue" size="sm" mdbWavesEffect>nouvel employe</button>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body p-2">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="text-15 textDarkBlue ml-md-1"><b>employés</b></div>
+          </div>
+          <div class="col-md-2 text-center">
+            <div class="text-15 textDarkBlue"><b>statut</b></div>
+          </div>
+          <div class="col-md-7">
+            <div class="text-15 textDarkBlue"><b>roles</b></div>
+          </div>
+        </div>
+        <hr class="my-1">
+        <div *ngFor="let emp of employees">
+          <div class="border rounded-lg p-1 mb-1">
+            <div class="row">
+              <div class="col-md-3">
+                <div class="d-flex mt-2">
+                  <div class="zoom">
+                    <img class="rounded-circle" width="35" src="{{emp.photoUrl || '../../../../assets/user.png'}}" alt>
+                  </div>
+                  <div class="text-15 ml-2 my-auto">{{emp.lastName}} {{emp.firstName}}</div>
+                </div>
+              </div>
+              <div class="col-md-2 my-auto text-center">
+                <i *ngIf="emp.validated" class="fad fa-user-check fa-2x" style="--fa-secondary-opacity: 1;
+                  --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+                <i *ngIf="!emp.validated" class="fad fa-user-times fa-2x" style="--fa-secondary-opacity: 1;
+                  --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+                <br>  
+                {{emp.validated ? 'validé' : 'non validé'}}
+              </div>
+              <div class="col-md-7 my-auto">
+                <div class="row">
+                  <div *ngFor="let role of emp.roles" class="col-md-2">
+                    <div class="text-15">{{role.name}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

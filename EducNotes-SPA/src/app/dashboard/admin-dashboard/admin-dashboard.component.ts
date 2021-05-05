@@ -34,7 +34,6 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.createSearchForm();
-    this.getUsersRecap();
     this.loadStudentData();
 
     this.results = this.searchForm.controls.searchData.valueChanges
@@ -67,17 +66,6 @@ export class AdminDashboardComponent implements OnInit {
     this.searchForm = this.fb.group({
       searchData: ['', Validators.required],
       userid: ['', Validators.required]
-    });
-  }
-
-  getUsersRecap() {
-    this.adminService.getUsersRecap().subscribe((res: any[]) => {
-     this.admins = res.find(i => i.userTypeId === this.adminTypeId);
-     this.parents = res.find(i => i.userTypeId === this.parentTypeId);
-     this.teachers = res.find(i => i.userTypeId === this.teacherTypeId);
-     this.students = res.find(i => i.userTypeId === this.studentTypeId);
-    }, error => {
-      this.alertify.error(error);
     });
   }
 

@@ -213,6 +213,13 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.strDateOfBirth, opt => {
                     opt.MapFrom(d => d.DateOfBirth.ToString("dd/MM/yyyy", frC));
                 });
+            CreateMap<EmployeeForEditDto, User>();
+            CreateMap<User, EmployeeForEditDto>()
+                .ForMember(u => u.PhotoUrl, opt => opt
+                    .MapFrom(u => u.Photos.FirstOrDefault(p => p.IsMain).Url))
+                .ForMember(dest => dest.strDateOfBirth, opt => {
+                    opt.MapFrom(d => d.DateOfBirth.ToString("dd/MM/yyyy", frC));
+                });
             CreateMap<ImportUserDto, User>();
             CreateMap<QuickStudentAssignmentDto, User>();
             CreateMap<UserFromExelDto, User>();

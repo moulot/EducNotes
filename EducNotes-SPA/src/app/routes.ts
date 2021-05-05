@@ -147,6 +147,11 @@ import { RecoveryResolver } from './_resolvers/recovery-resolver';
 import { SchoolSettingsComponent } from './admin/school-settings/school-settings.component';
 import { SchoolSettingsResolver } from './_resolvers/school-settings-resolver';
 import { TuitionDataComponent } from './admin/tuition/tuition-data/tuition-data.component';
+import { RolesResolver } from './_resolvers/roles-resolver';
+import { EmployeesComponent } from './admin/users/employees/employees.component';
+import { EmployeesResolver } from './_resolvers/employees-resolver';
+import { AddEmployeeComponent } from './admin/users/add-employee/add-employee.component';
+import { AddRoleComponent } from './admin/add-role/add-role.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -205,13 +210,13 @@ export const appRoutes: Routes = [
         { path: 'classSchedule/:classId', component: SchedulePanelComponent, resolve: { class: ClassResolver } },
         { path: 'teachers', component: TeacherManagementComponent, resolve: { teachers: TeacherManagementResolver } },
         { path: 'addTeacher', component: NewTeacherComponent },
+        { path: 'editTeacher/:id', component: NewTeacherComponent, resolve: { teacher: EditTeacherResolver } },
         { path: 'teacherAssignment/:id', component: TeacherAssignmentComponent, resolve: { teacher: TeacherFormResolver } },
         { path: 'courses', component: CoursesPanelComponent, resolve: { courses: CoursesListResolver } },
         { path: 'addCourse', component: NewCourseComponent },
         { path: 'classAssignment', component: ClassStudentsAssignmentComponent },
         { path: 'courseShowing', component: CourseShowingComponent },
         { path: 'editCourse/:id', component: NewCourseComponent, resolve: { course: CourseFormResolver } },
-        { path: 'editTeacher/:id', component: NewTeacherComponent, resolve: { teacher: EditTeacherResolver } },
         { path: 'levelClasses/:levelId', component: LevelClassesComponent, resolve: { classes: LevelClassesResolver } },
         { path: 'studentGrades/:id', component: GradeStudentComponent},
         { path: 'studentGradesP/:id', component: GradeStudentComponent},
@@ -261,7 +266,8 @@ export const appRoutes: Routes = [
         { path: 'fileUser/:id', component: ChildFileComponent, resolve: {file: ChildFileResolver} },
         { path: 'parentFile/:id', component: ParentFileComponent, resolve: {file: ParentFileResolver} },
         { path: 'teacherFile/:id', component: TeacherFileComponent}, // resolve: {file: ChildFileResolver} },
-        { path: 'roles', component: RolesComponent},
+        { path: 'roles', component: RolesComponent, resolve: {roles: RolesResolver}},
+        { path: 'addRole', component: AddRoleComponent},
         { path: 'addFinOp/:id', component: AddPaymentComponent, resolve: {file: AddPaymentResolver} },
         { path: 'validatePayments', component: ValidatePaymentsComponent, resolve: {payments: ValidatePaymentsResolver}},
         { path: 'tuitionList', component: TuitionListComponent, resolve: {list: TuitionListResolver}},
@@ -273,9 +279,10 @@ export const appRoutes: Routes = [
         { path: 'absences', component: AbsencesComponent},
         { path: 'editAccount/:id', component: EditAccountComponent, resolve: {user: EditAccountResolver}},
         { path: 'usersValidation', component: UserValidationComponent, resolve: {users: UserValidationResolver}},
-        { path: 'usersProfile', component: UserValidationComponent, resolve: {users: UserValidationResolver}},
         { path: 'config', component: ConfigComponent},
-        { path: 'editClasses', component: EditLevelClassesComponent}
+        { path: 'editClasses', component: EditLevelClassesComponent},
+        { path: 'employees', component: EmployeesComponent, resolve: {employees: EmployeesResolver}},
+        { path: 'addEmployee', component: AddEmployeeComponent}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

@@ -180,9 +180,6 @@ namespace EducNotes.API.Data
             context.SaveChanges();
 
             var roles = new List<Role> {
-              new Role { Name = "élève" },
-              new Role { Name = "professeur" },
-              new Role { Name = "parent" },
               new Role { Name = "admin" }
             };
 
@@ -407,7 +404,7 @@ namespace EducNotes.API.Data
               new UserType { Name = "élève" },
               new UserType { Name = "enseignant" },
               new UserType { Name = "parent" },
-              new UserType { Name = "admin" }
+              new UserType { Name = "employé" }
             };
             context.AddRange(userTypes);
             context.SaveChanges();
@@ -430,7 +427,7 @@ namespace EducNotes.API.Data
             if (result.Succeeded)
             {
               var admin = userManager.FindByNameAsync("Admin").Result;
-              userManager.AddToRolesAsync(admin, new[] { "Admin", "enseignant" }).Wait();
+              userManager.AddToRolesAsync(admin, new[] { "Admin" }).Wait();
             }
 
         }

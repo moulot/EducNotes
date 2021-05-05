@@ -65,7 +65,7 @@ constructor(private http: HttpClient) {}
   }
 
   getUsersWithRoles() {
-    return this.http.get(this.baseUrl + 'usersWithRoles');
+    return this.http.get(this.baseUrl + 'UsersWithRoles');
   }
 
   updateUserRoles(user: User, roles: {}) {
@@ -272,6 +272,10 @@ constructor(private http: HttpClient) {}
 
   editUserAccount(user: FormData) {
     return this.http.post(this.baseUrl + 'EditUserAccount', user);
+  }
+
+  addEmployee(user: FormData) {
+    return this.http.post(this.baseUrl + 'AddEmployee', user);
   }
 
   addTeacher(user: FormData) {

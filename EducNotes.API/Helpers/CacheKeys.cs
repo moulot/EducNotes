@@ -23,6 +23,9 @@ namespace EducNotes.API.Helpers
     public static string Tokens { get; set; }
     public static string ProductDeadLines { get; set; }
     public static string Roles { get; set; }
+    public static string Capabilities { get; set; }
+    public static string RoleCapabilities { get; set; }
+    public static string MenuItems { get; set; }
     public static string Orders { get; set; }
     public static string OrderLines { get; set; }
     public static string OrderLineDeadLines { get; set; }
@@ -34,8 +37,6 @@ namespace EducNotes.API.Helpers
      public static string PaymentTypes  { get; set; }
     public static string Products { get; set; }
     public static string UserTypes { get; set; }
-    public static string MenuItems { get; set; }
-    public static string Capabilities { get; set; }
     public static string Schedules { get; set; }
     public static string ScheduleCourses { get; set; }
     public static string Agendas { get; set; }
@@ -44,5 +45,11 @@ namespace EducNotes.API.Helpers
     public static string CourseTypes { get; set; }
     public static string Conflicts { get; set; }
     public static string CourseConflicts { get; set; }
+    public static string UserRoles { get; set; }
+    public static string Countries { get; set; }
+    public static string Cities { get; set; }
+    public static string Districts { get; set; }
+    public static string MaritalStatus { get; set; }
+    public static string Photos { get; set; }
   }
 }

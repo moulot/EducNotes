@@ -110,37 +110,28 @@ namespace EducNotes.API.Controllers {
     }
 
     // [Authorize(Policy = "RequireAdminRole")]
-    [HttpGet("rolesWithUsers")]
-    public async Task<IActionResult> GetRolesWithUsers() {
-      var rolesFromDB = await _context.UserRoles
-        .Include(i => i.User)
-        .Include(i => i.Role)
-        .OrderBy(r => r.Role.Name).ToListAsync();
+    [HttpGet("UsersWithRoles")]
+    public async Task<IActionResult> GetUsersWithRoles()
+    {
+      List<User> usersCached = await _cache.GetEmployees();
+      List<UserRole> userRoles = await _cache.GetUserRoles();
 
-      List<RolesWithUsersDto> roles = new List<RolesWithUsersDto>();
-      foreach(var urole in rolesFromDB) {
-        RolesWithUsersDto rwud = new RolesWithUsersDto();
-        rwud.Id = urole.Role.Id;
-        rwud.Name = urole.Role.Name;
-        var usersFromList = rolesFromDB.Where(u => u.RoleId == urole.RoleId).Select(s => s.User).ToList();
-        var users = _mapper.Map<List<UserForDetailedDto>>(usersFromList);
-        rwud.RoleUsers = users;
-        roles.Add(rwud);
+      List<UserWithRolesDto> users = new List<UserWithRolesDto>();
+      foreach (var user in usersCached)
+      {
+        UserWithRolesDto userWithRoles = new UserWithRolesDto();
+        userWithRoles.Id = user.Id;
+        userWithRoles.LastName = user.LastName;
+        userWithRoles.FirstName = user.FirstName;
+        Photo photo = user.Photos.FirstOrDefault(p => p.IsMain == true);
+        if(photo != null)
+          userWithRoles.PhotoUrl = photo.Url;
+        List<Role> roles = userRoles.Where(r => r.UserId == user.Id).Select(s => s.Role).ToList();
+        userWithRoles.Roles = roles;
+        users.Add(userWithRoles);
       }
 
-      return Ok(roles);
-    }
-
-    [Authorize(Policy = "RequireAdminRole")]
-    [HttpGet("usersWithRoles")]
-    public async Task<IActionResult> GetUsersWithRoles() {
-      var userList = await(from user in _context.Users orderby user.UserName select new {
-        Id = user.Id,
-          UserName = user.UserName,
-          Roles =(from userRole in user.UserRoles join role in _context.Roles on userRole.RoleId equals role.Id select role.Name).ToList()
-      }).ToListAsync();
-
-      return Ok(userList);
+      return Ok(users);
     }
 
     [HttpGet("{id}", Name = "GetUser")]
@@ -1874,16 +1865,24 @@ namespace EducNotes.API.Controllers {
       return Ok(userOK);
     }
 
+    [HttpPost("AddEmployee")]
+    public async Task<IActionResult> AddEmployee([FromForm] EmployeeForEditDto user)
+    {
+      bool userOK = await _repo.AddEmployee(user);
+
+      if(userOK)
+      {
+        return Ok();
+      } else
+        return BadRequest("problème pour ajouter l'employé");
+    }
+
     [HttpPost("AddTeacher")]
     public async Task<IActionResult> AddTeacher([FromForm] TeacherForEditDto user)
     {
-      // int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
       bool userOK = await _repo.AddTeacher(user);
 
       if(userOK) {
-        // await _cache.LoadUsers();
-        // await _cache.LoadTeacherCourses();
-        // await _cache.LoadClassCourses();
         return Ok();
       } else
         return BadRequest("problème pour ajouter l'enseigant");
@@ -2349,5 +2348,6 @@ namespace EducNotes.API.Controllers {
 
       return Ok();
     }
+
   }
 }

@@ -40,12 +40,9 @@ import { PhotoEditorComponent } from './members/photo-editor/photo-editor.compon
 import { ListsResolver } from './_resolvers/lists.resolver';
 import { MessagesResolver } from './_resolvers/messages.resolver.';
 import { MemberMessagesComponent } from './members/member-messages/member-messages.component';
-// import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 import { HasRoleDirective } from './_directives/hasRole.directive';
-import { UserManagementComponent } from './admin/user-management/user-management.component';
 import { PhotoManagementComponent } from './admin/photo-management/photo-management.component';
 import { AdminService } from './_services/admin.service';
-import { RolesModalComponent } from './admin/roles-modal/roles-modal.component';
 import { LoginComponent } from './login/login.component';
 import { ClassService } from './_services/class.service';
 import { BooknoteComponent } from './admin/booknote/booknote.component';
@@ -279,6 +276,11 @@ import { ScheduleAddConflictComponent } from './admin/schedule-add-conflict/sche
 import { ConfigCourseTypeComponent } from './admin/config/config-course-type/config-course-type.component';
 import { ModalConflictComponent } from './admin/modal-conflict/modal-conflict.component';
 import { TuitionDataComponent } from './admin/tuition/tuition-data/tuition-data.component';
+import { RolesResolver } from './_resolvers/roles-resolver';
+import { EmployeesComponent } from './admin/users/employees/employees.component';
+import { EmployeesResolver } from './_resolvers/employees-resolver';
+import { AddEmployeeComponent } from './admin/users/add-employee/add-employee.component';
+import { AddRoleComponent } from './admin/add-role/add-role.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -300,6 +302,7 @@ export function tokenGetter() {
       MemberCardComponent,
       MemberDetailComponent,
       MemberEditComponent,
+      AddEmployeeComponent,
       PhotoEditorComponent,
       TimeAgoPipe,
       MemberMessagesComponent,
@@ -307,9 +310,7 @@ export function tokenGetter() {
       FullScreenDirective,
       BtnBackDirective,
       SpacedAmountDirective,
-      UserManagementComponent,
       PhotoManagementComponent,
-      RolesModalComponent,
       LoginComponent,
       BooknoteComponent,
       UserCardComponent,
@@ -467,7 +468,9 @@ export function tokenGetter() {
       ScheduleAddConflictComponent,
       ConfigCourseTypeComponent,
       ModalConflictComponent,
-      TuitionDataComponent
+      TuitionDataComponent,
+      EmployeesComponent,
+      AddRoleComponent
    ],
    imports: [
       FormWizardModule,
@@ -527,12 +530,14 @@ export function tokenGetter() {
       AuthGuard,
       UserService,
       MemberDetailResolver,
+      EmployeesResolver,
       MemberListResolver,
       MemberEditResolver,
       PreventUnSavedChanges,
       ListsResolver,
       MessagesResolver,
       SchoolSettingsResolver,
+      RolesResolver,
       AdminService,
       ClassService,
       EvaluationService,
@@ -585,7 +590,6 @@ export function tokenGetter() {
       // { provide: NZ_ICONS, useValue: icons }
    ],
    entryComponents: [
-      RolesModalComponent,
       SkillsModalComponent,
       AgendaModalComponent,
       ModalScheduleComponent,

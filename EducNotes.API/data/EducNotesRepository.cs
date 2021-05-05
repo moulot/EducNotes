@@ -291,7 +291,7 @@ namespace EducNotes.API.Data {
       return agendas.FirstOrDefault(a => a.Id == agendaId);
     }
 
-    public async Task<List<User>> GetUsersByClasslevel (int levelId) {
+    public async Task<List<User>> GetUsersByClasslevel(int levelId) {
       // List<User> users = await _cache.GetUsers();
       return await _context.Users.Where (u => u.ClassLevelId == levelId)
         .OrderBy (o => o.LastName).ThenBy (o => o.FirstName)
@@ -301,21 +301,22 @@ namespace EducNotes.API.Data {
     public async Task<List<Product>> GetActiveProducts()
     {
       List<Product> productsCached = await _cache.GetProducts();
-
       var products = productsCached.Where(p => p.Active)
                                    .OrderBy(o => o.DsplSeq).ThenBy(p => p.Name)
                                    .ToList();
       return products;
     }
 
-    public async Task<EmailTemplate> GetEmailTemplate (int id) {
-      // List<EmailTemplate> templates = await _cache.GetEmailTemplates();
-      return await _context.EmailTemplates.FirstOrDefaultAsync (s => s.Id == id);
+    public async Task<EmailTemplate> GetEmailTemplate(int id)
+    {
+      List<EmailTemplate> templates = await _cache.GetEmailTemplates();
+      return templates.FirstOrDefault(s => s.Id == id);
     }
 
-    public async Task<SmsTemplate> GetSmsTemplate (int id) {
-      // List<SmsTemplate> templates = await _context.SmsTemplates.ToListAsync();
-      return await _context.SmsTemplates.FirstOrDefaultAsync (s => s.Id == id);
+    public async Task<SmsTemplate> GetSmsTemplate(int id)
+    {
+      List<SmsTemplate> templates = await _context.SmsTemplates.ToListAsync();
+      return templates.FirstOrDefault(s => s.Id == id);
     }
 
     public List<int> GetWeekDays (DateTime date) {
@@ -921,8 +922,178 @@ namespace EducNotes.API.Data {
       return resultStatus;
     }
 
+    public async Task<bool> AddEmployee(EmployeeForEditDto user)
+    {
+      List<User> employees = await _cache.GetEmployees();
+      List<Role> roles = await _cache.GetRoles();
+      List<UserRole> userRoles = await _cache.GetUserRoles();
+      List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
+
+      // bool resultStatus = true;
+      using(var identityContextTransaction = _context.Database.BeginTransaction())
+      {
+        try
+        {
+          User appUser = new User();
+
+          //is it a new user
+          if(user.Id == 0)
+          {
+            var userToSave = _mapper.Map<User>(user);
+            string strDoB = user.strDateOfBirth;
+            var dateArray = user.strDateOfBirth.Split("/");
+            int year = Convert.ToInt32(dateArray[2]);
+            int month = Convert.ToInt32(dateArray[1]);
+            int day = Convert.ToInt32(dateArray[0]);
+            DateTime birthDay = new DateTime(year, month, day);
+            userToSave.DateOfBirth = birthDay;
+            var code = Guid.NewGuid();
+            userToSave.UserName = code.ToString();
+            userToSave.Validated = false;
+            userToSave.EmailConfirmed = false;
+
+            var result = await _userManager.CreateAsync(userToSave, password);
+            if(result.Succeeded)
+            {
+              appUser = await _userManager.Users.Include(i => i.Photos)
+                                                .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
+              appUser.IdNum = GetUserIDNumber(appUser.Id, appUser.LastName, appUser.FirstName);
+              await _userManager.UpdateAsync(appUser);
+            }
+            else
+            {
+              identityContextTransaction.Rollback();
+              return false;
+            }
+          }
+          else
+          {
+            appUser = employees.FirstOrDefault(u => u.Id == user.Id);
+            appUser.LastName = user.LastName;
+            appUser.FirstName = user.FirstName;
+            appUser.Gender = user.Gender;
+            var dateArray = user.strDateOfBirth.Split("/");
+            int year = Convert.ToInt32(dateArray[2]);
+            int month = Convert.ToInt32(dateArray[1]);
+            int day = Convert.ToInt32(dateArray[0]);
+            DateTime birthDay = new DateTime(year, month, day);
+            appUser.DateOfBirth = birthDay;
+            appUser.PhoneNumber = user.PhoneNumber;
+            appUser.SecondPhoneNumber = user.SecondPhoneNumber;
+            appUser.Email = user.Email;
+            appUser.DistrictId = user.DistrictId;
+            appUser.MaritalStatusId = user.MaritalStatusId;
+            Update(appUser);
+
+            //delete previous teacher courses
+            List<UserRole> prevRoles = userRoles.Where(c => c.UserId == appUser.Id).ToList();
+            DeleteAll(prevRoles);
+          }
+
+          if(user.Roles != null)
+          {
+            List<string> ids = user.RoleIds.Split(",").ToList();
+            if(ids.Count() > 0)
+            {
+              IEnumerable<string> roleNames = roles.Where(r => ids.Contains(r.Id.ToString())).Select(r => r.Name);
+              var result = _userManager.AddToRolesAsync(appUser, roleNames);
+              if(!result.Result.Succeeded)
+              {
+                identityContextTransaction.Rollback();
+                return false;
+              }
+            }
+          }
+
+          //add user photo
+          var photoFile = user.PhotoFile;
+          if(photoFile != null)
+          {
+            if(photoFile.Length > 0)
+            {
+              var uploadResult = new ImageUploadResult();
+              using(var stream = photoFile.OpenReadStream())
+              {
+                var uploadParams = new ImageUploadParams() {
+                  File = new FileDescription (photoFile.Name, stream),
+                  Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
+                };
+
+                uploadResult = _cloudinary.Upload(uploadParams);
+                if(uploadResult.StatusCode == HttpStatusCode.OK)
+                {
+                  Photo photo = new Photo();
+                  photo.Url = uploadResult.SecureUri.ToString();
+                  photo.PublicId = uploadResult.PublicId;
+                  photo.UserId = appUser.Id;
+                  photo.DateAdded = DateTime.Now;
+                  if(appUser.Photos.Any(u => u.IsMain))
+                  {
+                    var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                    oldPhoto.IsMain = false;
+                    Update(oldPhoto);
+                  }
+                  photo.IsMain = true;
+                  photo.IsApproved = true;
+                  Add(photo);
+                }
+                else
+                {
+                  identityContextTransaction.Rollback();
+                  return false;
+                }
+              }
+            }
+          }
+
+          // send the mail to update userName/pwd - add to Email table
+          if(appUser.Email != null)
+          {
+            ConfirmTeacherEmailDto emailData = new ConfirmTeacherEmailDto() {
+              Id = appUser.Id,
+              LastName = appUser.LastName,
+              FirstName = appUser.FirstName,
+              Cell = appUser.PhoneNumber,
+              Gender = appUser.Gender,
+              Email = appUser.Email,
+              Token = await _userManager.GenerateEmailConfirmationTokenAsync(appUser)
+            };
+
+            var template = emailTemplates.First(t => t.Id == teacherConfirmEmailId);
+            Email emailToSend = await SetDataForConfirmTeacherEmail(emailData, template.Body, template.Subject);
+            Add(emailToSend);
+          }
+
+          if(await SaveAll())
+          {
+            await _cache.LoadUsers();
+            await _cache.LoadUserRoles();
+            await _cache.LoadPhotos();
+            //fin de la transaction
+            identityContextTransaction.Commit();
+            return true;
+          }
+          else
+          {
+            identityContextTransaction.Rollback();
+            return false;
+          }
+        }
+        catch(Exception ex)
+        {
+          var dd = ex.Message;
+          identityContextTransaction.Rollback();
+          return false;
+        }
+
+        // return resultStatus;
+      }
+    }
+
     public async Task<bool> AddTeacher(TeacherForEditDto user)
     {
+      List<User> teachers = await _cache.GetTeachers();
+      List<TeacherCourse> teacherCourses = await _cache.GetTeacherCourses();
       List<Role> roles = await _cache.GetRoles();
       List<Course> coursesCached = await _cache.GetCourses();
       List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
@@ -958,10 +1129,8 @@ namespace EducNotes.API.Data {
             if(result.Succeeded)
             {
               // enregistrement du RoleTeacher
-              var role = roles.FirstOrDefault (a => a.Id == teacherRoleId);
               appUser = await _userManager.Users.Include (i => i.Photos)
-                .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
-              _userManager.AddToRoleAsync(appUser, role.Name).Wait();
+                                                .FirstOrDefaultAsync(u => u.NormalizedUserName == userToSave.UserName);
 
               appUser.IdNum = GetUserIDNumber(appUser.Id, appUser.LastName, appUser.FirstName);
               teacherCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
@@ -998,7 +1167,7 @@ namespace EducNotes.API.Data {
               }
             }
           } else {
-            appUser = await _context.Users.Include (i => i.Photos).FirstOrDefaultAsync (u => u.Id == user.Id);
+            appUser = teachers.FirstOrDefault(u => u.Id == user.Id);
             appUser.LastName = user.LastName;
             appUser.FirstName = user.FirstName;
             appUser.Gender = user.Gender;
@@ -1017,58 +1186,63 @@ namespace EducNotes.API.Data {
             Update (appUser);
 
             //delete previous teacher courses
-            List<TeacherCourse> prevCourses = await _context.TeacherCourses.Where (c => c.TeacherId == appUser.Id).ToListAsync ();
-            DeleteAll (prevCourses);
-            //delete previous class courses
-            // List<ClassCourse> prevClassCourses = await _context.ClassCourses.Where(c => c.TeacherId == appUser.Id).ToListAsync();
-            // DeleteAll(prevClassCourses);
+            List<TeacherCourse> prevCourses = teacherCourses.Where(c => c.TeacherId == appUser.Id).ToList();
+            DeleteAll(prevCourses);
           }
 
-          if (ids.Count () > 0) {
-            foreach (var courseId in ids) {
+          if(ids.Count() > 0)
+          {
+            foreach(var courseId in ids)
+            {
               // add new selected courses
-              TeacherCourse tc = new TeacherCourse ();
-              tc.CourseId = Convert.ToInt32 (courseId);
+              TeacherCourse tc = new TeacherCourse();
+              tc.CourseId = Convert.ToInt32(courseId);
               tc.TeacherId = appUser.Id;
-              Add (tc);
+              Add(tc);
 
               // add class courses if it's a primary class
-              if (user.EducLevelId == 1) {
-                ClassCourse cc = new ClassCourse ();
-                cc.ClassId = Convert.ToInt32 (appUser.ClassId);
+              if(user.EducLevelId == 1)
+              {
+                ClassCourse cc = new ClassCourse();
+                cc.ClassId = Convert.ToInt32(appUser.ClassId);
                 cc.TeacherId = appUser.Id;
-                cc.CourseId = Convert.ToInt32 (courseId);
-                Add (cc);
+                cc.CourseId = Convert.ToInt32(courseId);
+                Add(cc);
               }
             }
           }
 
           //add user photo
           var photoFile = user.PhotoFile;
-          if (photoFile != null) {
-            if (photoFile.Length > 0) {
-              var uploadResult = new ImageUploadResult ();
-              using (var stream = photoFile.OpenReadStream ()) {
-                var uploadParams = new ImageUploadParams () {
-                File = new FileDescription (photoFile.Name, stream),
-                Transformation = new Transformation ().Width (500).Height (500).Crop ("fill").Gravity ("face")
+          if(photoFile != null)
+          {
+            if(photoFile.Length > 0)
+            {
+              var uploadResult = new ImageUploadResult();
+              using (var stream = photoFile.OpenReadStream())
+              {
+                var uploadParams = new ImageUploadParams() {
+                  File = new FileDescription (photoFile.Name, stream),
+                  Transformation = new Transformation ().Width (500).Height (500).Crop ("fill").Gravity ("face")
                 };
 
                 uploadResult = _cloudinary.Upload (uploadParams);
-                if (uploadResult.StatusCode == HttpStatusCode.OK) {
-                  Photo photo = new Photo ();
-                  photo.Url = uploadResult.SecureUri.ToString ();
+                if(uploadResult.StatusCode == HttpStatusCode.OK)
+                {
+                  Photo photo = new Photo();
+                  photo.Url = uploadResult.SecureUri.ToString();
                   photo.PublicId = uploadResult.PublicId;
                   photo.UserId = appUser.Id;
                   photo.DateAdded = DateTime.Now;
-                  if (appUser.Photos.Any (u => u.IsMain)) {
-                    var oldPhoto = await _context.Photos.FirstAsync (p => p.UserId == user.Id && p.IsMain == true);
+                  if(appUser.Photos.Any(u => u.IsMain))
+                  {
+                    var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
                     oldPhoto.IsMain = false;
-                    Update (oldPhoto);
+                    Update(oldPhoto);
                   }
                   photo.IsMain = true;
                   photo.IsApproved = true;
-                  Add (photo);
+                  Add(photo);
                 }
               }
             }
@@ -1076,17 +1250,21 @@ namespace EducNotes.API.Data {
             resultStatus = true;
           }
 
-          if (await SaveAll ()) {
-            await _cache.LoadUsers ();
-            await _cache.LoadTeacherCourses ();
-            await _cache.LoadClassLevels ();
+          if(await SaveAll())
+          {
+            await _cache.LoadUsers();
+            await _cache.LoadTeacherCourses();
+            await _cache.LoadClassLevels();
             //fin de la transaction
-            identityContextTransaction.Commit ();
+            identityContextTransaction.Commit();
             resultStatus = true;
-          } else
+          }
+          else
             resultStatus = false;
-        } catch {
-          identityContextTransaction.Rollback ();
+        }
+        catch
+        {
+          identityContextTransaction.Rollback();
           return resultStatus = false;
         }
       }
@@ -3276,10 +3454,11 @@ namespace EducNotes.API.Data {
       return nextDueAmount;
     }
 
-    public async Task<List<ClassLevel>> GetActiveClassLevels () {
-      List<Class> classes = await _context.Classes.Include (i => i.ClassLevel).ToListAsync ();
-      var classLevels = classes.OrderBy (o => o.ClassLevel.DsplSeq)
-        .Select (s => s.ClassLevel).Distinct ().ToList ();
+    public async Task<List<ClassLevel>> GetActiveClassLevels()
+    {
+      List<Class> classes = await _cache.GetClasses();
+      var classLevels = classes.OrderBy(o => o.ClassLevel.DsplSeq).Select(s => s.ClassLevel)
+                                                                  .Distinct().ToList();
       return classLevels;
     }
 
@@ -3317,36 +3496,42 @@ namespace EducNotes.API.Data {
       return (top + "px").Replace (",", ".");
     }
 
-    public async Task<LateAmountsDto> GetLateAmountsDue () {
-      List<OrderLine> lines = await _context.OrderLines.ToListAsync ();
-      List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines ();
-      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines ();
+    public async Task<LateAmountsDto> GetLateAmountsDue()
+    {
+      List<OrderLine> lines = await _context.OrderLines.ToListAsync();
+      List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
       var today = DateTime.Now.Date;
 
-      LateAmountsDto lateAmounts = new LateAmountsDto ();
+      LateAmountsDto lateAmounts = new LateAmountsDto();
       // get amount due today
-      foreach (var line in lines) {
-        var lineDeadlines = lineDeadLinesCached.Where (o => o.OrderLineId == line.Id)
-          .OrderBy (o => o.DueDate)
-          .ToList ();
-        var amountPaid = finOpLines.Where (f => f.OrderLineId == line.Id && f.FinOp.Cashed)
-          .Sum (s => s.Amount);
+      foreach(var line in lines)
+      {
+        var lineDeadlines = lineDeadLinesCached.Where(o => o.OrderLineId == line.Id)
+                                               .OrderBy(o => o.DueDate)
+                                               .ToList();
+        var amountPaid = finOpLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+                                   .Sum (s => s.Amount);
 
         decimal lineDueAmount = 0;
         decimal balance = amountPaid;
-        if (lineDeadlines.Count () > 0) {
-          foreach (var lineD in lineDeadlines) {
-            if (lineD.DueDate.Date < today && !lineD.Paid) {
+        if(lineDeadlines.Count() > 0)
+        {
+          foreach(var lineD in lineDeadlines)
+          {
+            if(lineD.DueDate.Date < today && !lineD.Paid)
+            {
               lineDueAmount = lineD.Amount + lineD.ProductFee;
 
-              if (lineDueAmount >= balance) {
+              if(lineDueAmount >= balance)
+              {
                 decimal lateAmount = lineDueAmount - balance;
                 lateAmounts.TotalLateAmount += lateAmount;
                 balance = 0;
 
                 // split late amount in amounts of days late
-                var nbDaysLate = Math.Abs ((today - lineD.DueDate.Date).TotalDays);
-                if (nbDaysLate <= 7)
+                var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
+                if(nbDaysLate <= 7)
                   lateAmounts.LateAmount7Days += lateAmount;
                 else if (nbDaysLate > 7 && nbDaysLate <= 15)
                   lateAmounts.LateAmount15Days += lateAmount;
@@ -3363,25 +3548,29 @@ namespace EducNotes.API.Data {
           }
         } else // orderline has only one deadline (no split payments)
         {
-          if (line.Deadline.Date < today) {
-            if (line.AmountTTC >= balance) {
+          if(line.Deadline.Date < today)
+          {
+            if(line.AmountTTC >= balance)
+            {
               decimal lateAmount = line.AmountTTC - balance;
               lateAmounts.TotalLateAmount += lateAmount;
               balance = 0;
 
               // split late amount in amounts of days late
-              var nbDaysLate = Math.Abs ((today - line.Deadline.Date).TotalDays);
-              if (nbDaysLate <= 7)
+              var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
+              if(nbDaysLate <= 7)
                 lateAmounts.LateAmount7Days += lateAmount;
-              else if (nbDaysLate > 7 && nbDaysLate <= 15)
+              else if(nbDaysLate > 7 && nbDaysLate <= 15)
                 lateAmounts.LateAmount15Days += lateAmount;
-              else if (nbDaysLate > 15 && nbDaysLate <= 30)
+              else if(nbDaysLate > 15 && nbDaysLate <= 30)
                 lateAmounts.LateAmount30Days += lateAmount;
-              else if (nbDaysLate > 30 && nbDaysLate <= 60)
+              else if(nbDaysLate > 30 && nbDaysLate <= 60)
                 lateAmounts.LateAmount60Days += lateAmount;
-              else if (nbDaysLate > 60)
+              else if(nbDaysLate > 60)
                 lateAmounts.LateAmount60DaysPlus += lateAmount;
-            } else {
+            }
+            else
+            {
               balance = balance - line.AmountTTC;
             }
           }
@@ -3393,61 +3582,69 @@ namespace EducNotes.API.Data {
 
     public async Task<LateAmountsDto> GetProductLateAmountsDue(int productId, int levelId)
     {
-      // List<OrderLine> linesCached = await _cache.GetOrderLines();
-      // List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines();
-      // List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+      List<OrderLine> linesCached = await _cache.GetOrderLines();
+      List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
       var today = DateTime.Now.Date;
 
-      LateAmountsDto lateAmounts = new LateAmountsDto ();
+      LateAmountsDto lateAmounts = new LateAmountsDto();
       // get amount due today
-      var lines = await _context.OrderLines.Where (o => o.ClassLevelId == levelId && o.ProductId == productId)
-        .ToListAsync ();
-      foreach (var line in lines) {
-        var lineDeadlines = await _context.OrderLineDeadlines.Where (o => o.OrderLineId == line.Id)
-          .OrderBy (o => o.DueDate)
-          .ToListAsync ();
-        var amountPaid = await _context.FinOpOrderLines.Where (f => f.OrderLineId == line.Id && f.FinOp.Cashed)
-          .SumAsync (s => s.Amount);
+      var lines = linesCached.Where(o => o.ClassLevelId == levelId && o.ProductId == productId).ToList();
+      foreach(var line in lines)
+      {
+        var lineDeadlines = lineDeadLinesCached.Where(o => o.OrderLineId == line.Id)
+                                               .OrderBy(o => o.DueDate)
+                                               .ToList();
+        var amountPaid = finOpLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed)
+                                   .Sum(s => s.Amount);
 
         decimal lineDueAmount = 0;
         decimal balance = amountPaid;
-        if (lineDeadlines.Count () > 0) {
-          foreach (var lineD in lineDeadlines) {
-            if (lineD.DueDate.Date < today && !lineD.Paid) {
+        if(lineDeadlines.Count() > 0)
+        {
+          foreach(var lineD in lineDeadlines)
+          {
+            if(lineD.DueDate.Date < today && !lineD.Paid)
+            {
               lineDueAmount = lineD.Amount + lineD.ProductFee;
-
-              if (lineDueAmount >= balance) {
+              if(lineDueAmount >= balance)
+              {
                 decimal lateAmount = lineDueAmount - balance;
                 lateAmounts.TotalLateAmount += lateAmount;
                 balance = 0;
 
                 // split late amount in amounts of days late
-                var nbDaysLate = Math.Abs ((today - lineD.DueDate.Date).TotalDays);
+                var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
                 if (nbDaysLate <= 7)
                   lateAmounts.LateAmount7Days += lateAmount;
-                else if (nbDaysLate > 7 && nbDaysLate <= 15)
+                else if(nbDaysLate > 7 && nbDaysLate <= 15)
                   lateAmounts.LateAmount15Days += lateAmount;
-                else if (nbDaysLate > 15 && nbDaysLate <= 30)
+                else if(nbDaysLate > 15 && nbDaysLate <= 30)
                   lateAmounts.LateAmount30Days += lateAmount;
-                else if (nbDaysLate > 30 && nbDaysLate <= 60)
+                else if(nbDaysLate > 30 && nbDaysLate <= 60)
                   lateAmounts.LateAmount60Days += lateAmount;
-                else if (nbDaysLate > 60)
+                else if(nbDaysLate > 60)
                   lateAmounts.LateAmount60DaysPlus += lateAmount;
-              } else {
+              }
+              else
+              {
                 balance = balance - lineDueAmount;
               }
             }
           }
-        } else // orderline has only one deadline (no split payments)
+        }
+        else // orderline has only one deadline (no split payments)
         {
-          if (line.Deadline.Date < today) {
-            if (line.AmountTTC >= balance) {
+          if(line.Deadline.Date < today)
+          {
+            if(line.AmountTTC >= balance)
+            {
               decimal lateAmount = line.AmountTTC - balance;
               lateAmounts.TotalLateAmount += lateAmount;
               balance = 0;
 
               // split late amount in amounts of days late
-              var nbDaysLate = Math.Abs ((today - line.Deadline.Date).TotalDays);
+              var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
               if (nbDaysLate <= 7)
                 lateAmounts.LateAmount7Days += lateAmount;
               else if (nbDaysLate > 7 && nbDaysLate <= 15)
@@ -3458,7 +3655,9 @@ namespace EducNotes.API.Data {
                 lateAmounts.LateAmount60Days += lateAmount;
               else if (nbDaysLate > 60)
                 lateAmounts.LateAmount60DaysPlus += lateAmount;
-            } else {
+            }
+            else
+            {
               balance = balance - line.AmountTTC;
             }
           }
@@ -3504,7 +3703,7 @@ namespace EducNotes.API.Data {
                 balance = 0;
 
                 // split late amount in amounts of days late
-                var nbDaysLate = Math.Abs ((today - lineD.DueDate.Date).TotalDays);
+                var nbDaysLate = Math.Abs((today - lineD.DueDate.Date).TotalDays);
                 if (nbDaysLate <= 7)
                   lateAmounts.LateAmount7Days += lateAmount;
                 else if (nbDaysLate > 7 && nbDaysLate <= 15)
@@ -3534,7 +3733,7 @@ namespace EducNotes.API.Data {
               balance = 0;
 
               // split late amount in amounts of days late
-              var nbDaysLate = Math.Abs ((today - line.Deadline.Date).TotalDays);
+              var nbDaysLate = Math.Abs((today - line.Deadline.Date).TotalDays);
               if (nbDaysLate <= 7)
                 lateAmounts.LateAmount7Days += lateAmount;
               else if (nbDaysLate > 7 && nbDaysLate <= 15)
@@ -3584,13 +3783,83 @@ namespace EducNotes.API.Data {
       if(fullAddress != null)
       {
         subdomain = fullAddress[0].ToLower();
-        if(subdomain == "localhost:5000" || subdomain == "www" || subdomain == "educnotes")
+        if(subdomain == "localhost:5000" || subdomain == "test2")
         {
-          subdomain = "";
+          subdomain = "educnotes";
+        }
+        else if (subdomain == "test1" || subdomain == "www" || subdomain == "educnotes") {
+          subdomain = "demo";
         }
       }
 
       return subdomain;
     }
+
+    public async Task<UserRole> GetUserRoleByUserId(int userId, int roleId)
+    {
+      List<UserRole> userRolesCached = await _cache.GetUserRoles();
+      UserRole userRole = userRolesCached.FirstOrDefault(u => u.UserId == userId && u.RoleId == roleId);
+      return userRole;
+    }
+
+    public Boolean MenuExists(int menuItemId, List<MenuItem> menuItems)
+    {
+      return (GetMenuItemFromList(menuItemId, menuItems) != null);
+    }
+
+    public MenuItem GetMenuItemFromList(int menuItemId, List<MenuItem> menuItems)
+    {
+      foreach (var menuItem in menuItems)
+      {
+        if(menuItem.Id == menuItemId)
+        {
+          return menuItem;
+        }
+        else
+        {
+          menuItem.ChildMenuItems = new List<MenuItem>();
+          // check if this menu has children
+          if(menuItem.ChildMenuItems.Count() > 0)
+          {
+            //search the children for this item
+            MenuItem childMenuItem = menuItem.ChildMenuItems.FirstOrDefault(m => m.Id == menuItemId);
+            if(childMenuItem != null)
+            {
+              return childMenuItem;
+            }
+          }
+        }
+      }
+
+      //it wasn't found so return null
+      return null;
+    }
+
+    public MenuItem FindOrLoadParent(List<MenuItem> menuItems, int parentMenuItemId)
+    {
+      //find the menu item in the entity list
+      MenuItem parentMenuItem = menuItems.Single(m => m.Id == parentMenuItemId);
+
+      //check if it has a parent
+      if(parentMenuItem.ParentMenuId == null)
+      {
+        menuItems.Add(parentMenuItem);
+      }
+      else
+      {
+        //since this has a parent it should be added to its parent's children.
+        //try to find the parent in the list already
+        MenuItem parent = GetMenuItemFromList(Convert.ToInt32(parentMenuItem.ParentMenuId), menuItems);
+        if(parent == null)
+        {
+          //this one's parent wasn't found, so add it
+          MenuItem newParent = FindOrLoadParent(menuItems, Convert.ToInt32(parentMenuItem.ParentMenuId));
+          newParent.ChildMenuItems.Add(parentMenuItem);
+        }
+      }
+
+      return parentMenuItem;
+    }
+  
   }
 }

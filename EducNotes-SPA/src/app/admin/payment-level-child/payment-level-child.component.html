@@ -16,10 +16,10 @@
             <div class="col-md-12">
               <a class="text-13" [routerLink]="['/childFile', child.id]">voir dossier</a>
             </div>
-            <div class="col-7 text-14 text-capitalize">
+            <div class="col-7 text-13 text-capitalize">
               <b>{{child.lastName}} {{child.firstName}} {{ child.className || child.levelName }}</b>
             </div>
-            <div class="col-5 text-14 text-danger text-right">{{child.lateDueAmount | number:'':'fr-FR'}} F</div>
+            <div class="col-5 text-13 text-danger text-right">{{child.lateDueAmount | number:'':'fr-FR'}} F</div>
           </div>
         </div>
         <div class="col-md-12"><hr class="my-1"></div>

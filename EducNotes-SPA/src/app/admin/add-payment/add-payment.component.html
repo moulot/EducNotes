@@ -223,8 +223,11 @@
         </div> -->
         <div class="row">
           <div class="col-md-12">
-            <button type="submit" [disabled]="!paymentForm.valid" mdbBtn class="btnBlue" block="true"
-              size="sm" mdbWavesEffect>saisir le paiement</button>
+            <button type="submit" [disabled]="!paymentForm.valid || wait" mdbBtn class="btnBlue" block="true"
+              size="sm" mdbWavesEffect>
+              <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              saisir le paiement
+            </button>
           </div>
         </div>
       </div>

@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace EducNotes.API.Models
 {
-    public class Role : IdentityRole<int>
-    {
-        public ICollection<UserRole> UserRoles { get; set; }
-    }
+  public class Role : IdentityRole<int>
+  {
+    public ICollection<UserRole> UserRoles { get; set; }
+  }
 }

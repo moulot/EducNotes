@@ -22,8 +22,6 @@ namespace EducNotes.API.Models
     public int? EducLevelId { get; set; }
     public EducationLevel EducLevel { get; set; }
     public byte Gender { get; set; }
-    public int? DistrictId { get; set; }
-    public District District { get; set; }
     public string SecondPhoneNumber { get; set; }
     public DateTime? ValidationDate { get; set; }
     public int? ClassLevelId { get; set; }
@@ -37,12 +35,22 @@ namespace EducNotes.API.Models
     public string Introduction { get; set; }
     public string LookingFor { get; set; }
     public string Interests { get; set; }
-    public string Country { get; set; }
-    public string Cell { get; set; }
-    public int ForgotPasswordCount { get; set; }
-    public int ResetPasswordCount { get; set; }
+    public int? CountryId { get; set; }
+    public Country Country { get; set; }
     public int? CityId { get; set; }
     public City City { get; set; }
+    public int? DistrictId { get; set; }
+    public District District { get; set; }
+    public int? BirthCountryId { get; set; }
+    public Country BirthCountry { get; set; }
+    public int? BirthCityId { get; set; }
+    public City BirthCity { get; set; }
+    public int? BirthDistrictId { get; set; }
+    public District BirthDistrict { get; set; }
+    public int? MaritalStatusId { get; set; }
+    public MaritalStatus MaritalSatus { get; set; }
+    public int ForgotPasswordCount { get; set; }
+    public int ResetPasswordCount { get; set; }
     public byte TempData { get; set; }
     public Boolean RegCreated { get; set; }
     public Boolean NextRegCreated { get; set; }

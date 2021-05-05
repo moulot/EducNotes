@@ -278,8 +278,8 @@ namespace EducNotes.API.Controllers
               return BadRequest("erreur lors de l'ajout de l'inscription.");
             }
             // add user role
-            var role = roles.FirstOrDefault(a => a.Id == memberRoleId);
-            _userManager.AddToRoleAsync(user, role.Name).Wait();
+            // var role = roles.FirstOrDefault(a => a.Id == memberRoleId);
+            // _userManager.AddToRoleAsync(user, role.Name).Wait();
 
             user.IdNum = _repo.GetUserIDNumber(user.Id, user.LastName, user.FirstName);
             _repo.Update(user);
@@ -392,8 +392,8 @@ namespace EducNotes.API.Controllers
             if (result.Succeeded)
             {
               // add user role
-              var role = roles.FirstOrDefault(a => a.Id == parentRoleId);
-              _userManager.AddToRoleAsync(father, role.Name).Wait();
+              // var role = roles.FirstOrDefault(a => a.Id == parentRoleId);
+              // _userManager.AddToRoleAsync(father, role.Name).Wait();
 
               father.IdNum = father.Id.ToString().To5Digits();
               fathercode = await _userManager.GenerateEmailConfirmationTokenAsync(father);
@@ -451,8 +451,8 @@ namespace EducNotes.API.Controllers
             if (result.Succeeded)
             {
               // add user role
-              var role = roles.FirstOrDefault(a => a.Id == parentRoleId);
-              _userManager.AddToRoleAsync(mother, role.Name).Wait();
+              // var role = roles.FirstOrDefault(a => a.Id == parentRoleId);
+              // _userManager.AddToRoleAsync(mother, role.Name).Wait();
 
               mother.IdNum = mother.Id.ToString().To5Digits();
               mothercode = await _userManager.GenerateEmailConfirmationTokenAsync(mother);
@@ -655,30 +655,31 @@ namespace EducNotes.API.Controllers
     public async Task<IActionResult> GetLevelLatePayments()
     {
       var today = DateTime.Now.Date;
+      var products = await _repo.GetActiveProducts();
       var activelevels = await _repo.GetActiveClassLevels();
+
       List<RecoveryForLevelDto> levelRecovery = new List<RecoveryForLevelDto>();
       foreach (var level in activelevels)
       {
-        RecoveryForLevelDto rfld = new RecoveryForLevelDto();
-        rfld.LevelId = level.Id;
-        rfld.LevelName = level.Name;
-        rfld.ProductRecovery = new List<ProductRecoveryDto>();
+        RecoveryForLevelDto recoveryLevel = new RecoveryForLevelDto();
+        recoveryLevel.LevelId = level.Id;
+        recoveryLevel.LevelName = level.Name;
+        recoveryLevel.ProductRecovery = new List<ProductRecoveryDto>();
 
         List<ProductRecoveryDto> productRecovery = new List<ProductRecoveryDto>();
-        rfld.ProductRecovery = productRecovery;
+        recoveryLevel.ProductRecovery = productRecovery;
         decimal levelDueAmount = 0;
-        var products = await _repo.GetActiveProducts();
         foreach (var product in products)
         {
-          ProductRecoveryDto prd = new ProductRecoveryDto();
-          prd.ProductName = product.Name;
-          prd.LateAmounts = await _repo.GetProductLateAmountsDue(product.Id, level.Id);
-          levelDueAmount += prd.LateAmounts.TotalLateAmount;
-          rfld.ProductRecovery.Add(prd);
+          ProductRecoveryDto productLevel = new ProductRecoveryDto();
+          productLevel.ProductName = product.Name;
+          productLevel.LateAmounts = await _repo.GetProductLateAmountsDue(product.Id, level.Id);
+          levelDueAmount += productLevel.LateAmounts.TotalLateAmount;
+          recoveryLevel.ProductRecovery.Add(productLevel);
         }
 
-        rfld.LateAmountDue = levelDueAmount;
-        levelRecovery.Add(rfld);
+        recoveryLevel.LateAmountDue = levelDueAmount;
+        levelRecovery.Add(recoveryLevel);
       }
 
       return Ok(levelRecovery);
@@ -697,14 +698,14 @@ namespace EducNotes.API.Controllers
       List<RecoveryForChildDto> childRecovery = new List<RecoveryForChildDto>();
       foreach (var child in children)
       {
-        RecoveryForChildDto rfcd = new RecoveryForChildDto();
-        rfcd.ProductRecovery = new List<ProductRecoveryDto>();
-        rfcd.Id = child.Id;
-        rfcd.LastName = child.LastName;
-        rfcd.FirstName = child.FirstName;
-        rfcd.LevelName = child.ClassLevelName;
-        rfcd.ClassName = child.ClassName;
-        rfcd.PhotoUrl = child.PhotoUrl;
+        RecoveryForChildDto recoveryForChild = new RecoveryForChildDto();
+        recoveryForChild.ProductRecovery = new List<ProductRecoveryDto>();
+        recoveryForChild.Id = child.Id;
+        recoveryForChild.LastName = child.LastName;
+        recoveryForChild.FirstName = child.FirstName;
+        recoveryForChild.LevelName = child.ClassLevelName;
+        recoveryForChild.ClassName = child.ClassName;
+        recoveryForChild.PhotoUrl = child.PhotoUrl;
 
         decimal childDueAmount = 0;
         List<ProductRecoveryDto> productRecovery = new List<ProductRecoveryDto>();
@@ -712,15 +713,15 @@ namespace EducNotes.API.Controllers
         products = products.OrderBy(o => o.DsplSeq).ToList();
         foreach (var product in products)
         {
-          ProductRecoveryDto prd = new ProductRecoveryDto();
-          prd.ProductName = product.Name;
-          prd.LateAmounts = await _repo.GetChildLateAmountsDue(product.Id, child.Id);
-          childDueAmount += prd.LateAmounts.TotalLateAmount;
-          rfcd.ProductRecovery.Add(prd);
+          ProductRecoveryDto productLevel = new ProductRecoveryDto();
+          productLevel.ProductName = product.Name;
+          productLevel.LateAmounts = await _repo.GetChildLateAmountsDue(product.Id, child.Id);
+          childDueAmount += productLevel.LateAmounts.TotalLateAmount;
+          recoveryForChild.ProductRecovery.Add(productLevel);
         }
 
-        rfcd.LateDueAmount = childDueAmount;
-        childRecovery.Add(rfcd);
+        recoveryForChild.LateDueAmount = childDueAmount;
+        childRecovery.Add(recoveryForChild);
       }
 
       return Ok(childRecovery);
@@ -729,44 +730,44 @@ namespace EducNotes.API.Controllers
     [HttpGet("ChildLatePaymentByLevel/{levelid}")]
     public async Task<IActionResult> GetChildLatePaymentByLevel(int levelid)
     {
-      // List<User> students = await _cache.GetStudents();
+      List<User> students = await _cache.GetStudents();
       var today = DateTime.Now.Date;
 
-      var childrenFromDB = await _context.Users.Where(o => o.ClassLevelId == levelid && o.UserTypeId == studentTypeId)
+      var childrenFromDB = students.Where(o => o.ClassLevelId == levelid && o.UserTypeId == studentTypeId)
                                    .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
-                                   .ToListAsync();
+                                   .ToList();
       var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(childrenFromDB);
       List<RecoveryForChildDto> childRecovery = new List<RecoveryForChildDto>();
       foreach (var child in children)
       {
-        RecoveryForChildDto rfcd = new RecoveryForChildDto();
-        rfcd.ProductRecovery = new List<ProductRecoveryDto>();
-        rfcd.Id = child.Id;
-        rfcd.LastName = child.LastName;
-        rfcd.FirstName = child.FirstName;
-        rfcd.LevelName = child.ClassLevelName;
-        rfcd.ClassName = child.ClassName;
-        rfcd.PhotoUrl = child.PhotoUrl;
+        RecoveryForChildDto recoveryForChild = new RecoveryForChildDto();
+        recoveryForChild.ProductRecovery = new List<ProductRecoveryDto>();
+        recoveryForChild.Id = child.Id;
+        recoveryForChild.LastName = child.LastName;
+        recoveryForChild.FirstName = child.FirstName;
+        recoveryForChild.LevelName = child.ClassLevelName;
+        recoveryForChild.ClassName = child.ClassName;
+        recoveryForChild.PhotoUrl = child.PhotoUrl;
 
         decimal childDueAmount = 0;
         List<ProductRecoveryDto> productRecovery = new List<ProductRecoveryDto>();
         var products = await _repo.GetActiveProducts();
         foreach (var product in products)
         {
-          ProductRecoveryDto prd = new ProductRecoveryDto();
-          prd.ProductName = product.Name;
+          ProductRecoveryDto productLevel = new ProductRecoveryDto();
+          productLevel.ProductName = product.Name;
           decimal productDueAmount = 0;
-          prd.LateAmounts = await _repo.GetChildLateAmountsDue(product.Id, child.Id);
-          childDueAmount += prd.LateAmounts.TotalLateAmount;
-          productDueAmount += prd.LateAmounts.TotalLateAmount;
+          productLevel.LateAmounts = await _repo.GetChildLateAmountsDue(product.Id, child.Id);
+          childDueAmount += productLevel.LateAmounts.TotalLateAmount;
+          productDueAmount += productLevel.LateAmounts.TotalLateAmount;
 
           if (productDueAmount > 0)
-            rfcd.ProductRecovery.Add(prd);
+            recoveryForChild.ProductRecovery.Add(productLevel);
         }
 
-        rfcd.LateDueAmount = childDueAmount;
+        recoveryForChild.LateDueAmount = childDueAmount;
         if (childDueAmount > 0)
-          childRecovery.Add(rfcd);
+          childRecovery.Add(recoveryForChild);
       }
 
       return Ok(childRecovery);

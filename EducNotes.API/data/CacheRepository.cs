@@ -74,32 +74,74 @@ namespace EducNotes.API.data {
       return parents;
     }
 
-    public async Task<List<User>> GetTeachers () {
-      List<User> teachers = (await GetUsers ()).Where (u => u.UserTypeId == teacherTypeId).ToList ();
+    public async Task<List<User>> GetTeachers()
+    {
+      List<User> teachers = (await GetUsers()).Where(u => u.UserTypeId == teacherTypeId).ToList();
       return teachers;
     }
 
-    public async Task<List<User>> LoadUsers () {
+    public async Task<List<User>> GetEmployees()
+    {
+      List<User> employees = (await GetUsers()).Where(u => u.UserTypeId == adminTypeId).ToList();
+      return employees;
+    }
+
+    public async Task<List<User>> LoadUsers()
+    {
       List<User> users = await _context.Users
-        .Include (p => p.Photos)
-        .Include (c => c.Class)
-        .Include (i => i.EducLevel)
-        .Include (c => c.ClassLevel)
-        .Include (c => c.District)
-        .Include (c => c.City)
-        .Include (i => i.UserType)
-        .ToListAsync ();
+                                .Include(p => p.Photos)
+                                .Include(c => c.Class)
+                                .Include(i => i.EducLevel)
+                                .Include(c => c.ClassLevel)
+                                .Include(c => c.District)
+                                .Include(c => c.City)
+                                .Include(i => i.UserType)
+                                .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
+                                .ToListAsync();
 
       // Set cache options.
-      var cacheEntryOptions = new MemoryCacheEntryOptions ()
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
         // Keep in cache for this time, reset time if accessed.
-        .SetSlidingExpiration (TimeSpan.FromDays (7));
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
 
       // Save data in cache.
-      _cache.Remove (subDomain + CacheKeys.Users);
-      _cache.Set (subDomain + CacheKeys.Users, users, cacheEntryOptions);
+      _cache.Remove(subDomain + CacheKeys.Users);
+      _cache.Set(subDomain + CacheKeys.Users, users, cacheEntryOptions);
 
       return users;
+    }
+
+    public async Task<List<UserRole>> GetUserRoles()
+    {
+      List<UserRole> userRoles = new List<UserRole>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(subDomain + CacheKeys.UserRoles, out userRoles))
+      {
+        // Key not in cache, so get data.
+        userRoles = await LoadUserRoles();
+      }
+
+      return userRoles;
+    }
+
+    public async Task<List<UserRole>> LoadUserRoles()
+    {
+      List<UserRole> userRoles = await _context.UserRoles.Include(p => p.User).ThenInclude(i => i.Photos)
+                                                         .Include(i => i.Role)
+                                                         .OrderBy(o => o.Role.Name)
+                                                         .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.UserRoles);
+      _cache.Set(subDomain + CacheKeys.UserRoles, userRoles, cacheEntryOptions);
+
+      return userRoles;
     }
 
     public async Task<List<TeacherCourse>> GetTeacherCourses()
@@ -557,29 +599,32 @@ namespace EducNotes.API.data {
       return productdeadlines;
     }
 
-    public async Task<List<Role>> GetRoles () {
-      List<Role> roles = new List<Role> ();
+    public async Task<List<Role>> GetRoles()
+    {
+      List<Role> roles = new List<Role>();
 
       // Look for cache key.
-      if (!_cache.TryGetValue (subDomain + CacheKeys.Roles, out roles)) {
+      if(!_cache.TryGetValue(subDomain + CacheKeys.Roles, out roles))
+      {
         // Key not in cache, so get data.
-        roles = await LoadRoles ();
+        roles = await LoadRoles();
       }
 
       return roles;
     }
 
-    public async Task<List<Role>> LoadRoles () {
-      List<Role> roles = await _context.Roles.OrderBy (o => o.Name).ToListAsync ();
+    public async Task<List<Role>> LoadRoles()
+    {
+      List<Role> roles = await _context.Roles.OrderBy (o => o.Name).ToListAsync();
 
       // Set cache options.
-      var cacheEntryOptions = new MemoryCacheEntryOptions ()
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
         // Keep in cache for this time, reset time if accessed.
-        .SetSlidingExpiration (TimeSpan.FromDays (7));
+        .SetSlidingExpiration(TimeSpan.FromDays (7));
 
       // Save data in cache.
-      _cache.Remove (subDomain + CacheKeys.Roles);
-      _cache.Set (subDomain + CacheKeys.Roles, roles, cacheEntryOptions);
+      _cache.Remove(subDomain + CacheKeys.Roles);
+      _cache.Set(subDomain + CacheKeys.Roles, roles, cacheEntryOptions);
 
       return roles;
     }
@@ -935,6 +980,7 @@ namespace EducNotes.API.data {
     {
       List<MenuItem> menuItems = await _context.MenuItems
                                         .Include(i => i.ParentMenu)
+                                        .OrderBy(o => o.ParentMenuId).ThenBy(o => o.DsplSeq).ThenBy(o => o.DisplayName)
                                         .ToListAsync();
 
       // Set cache options.
@@ -979,6 +1025,38 @@ namespace EducNotes.API.data {
       _cache.Set(subDomain + CacheKeys.Capabilities, capabilities, cacheEntryOptions);
 
       return capabilities;
+    }
+
+    public async Task<List<RoleCapability>> GetRoleCapabilities()
+    {
+      List<RoleCapability> roleCapabilities = new List<RoleCapability>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue (subDomain + CacheKeys.RoleCapabilities, out roleCapabilities))
+      {
+        // Key not in cache, so get data.
+        roleCapabilities = await LoadRoleCapabilities();
+      }
+
+      return roleCapabilities;
+    }
+
+    public async Task<List<RoleCapability>> LoadRoleCapabilities()
+    {
+      List<RoleCapability> roleCapabilities = await _context.RoleCapabilities.Include(i => i.Role)
+                                                                             .Include(i => i.Capability)
+                                                                             .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.RoleCapabilities);
+      _cache.Set(subDomain + CacheKeys.RoleCapabilities, roleCapabilities, cacheEntryOptions);
+
+      return roleCapabilities;
     }
 
     public async Task<List<Schedule>> GetSchedules()
@@ -1241,6 +1319,156 @@ namespace EducNotes.API.data {
       _cache.Set(subDomain + CacheKeys.CourseConflicts, courseConflicts, cacheEntryOptions);
 
       return courseConflicts;
+    }
+
+    public async Task<List<MaritalStatus>> GetMaritalStatus()
+    {
+      List<MaritalStatus> status = new List<MaritalStatus>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(subDomain + CacheKeys.MaritalStatus, out status))
+      {
+        // Key not in cache, so get data.
+        status = await LoadMaritalStatus();
+      }
+
+      return status;
+    }
+
+    public async Task<List<MaritalStatus>> LoadMaritalStatus()
+    {
+      List<MaritalStatus> status = await _context.MaritalStatuses.OrderBy (o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.MaritalStatus);
+      _cache.Set(subDomain + CacheKeys.MaritalStatus, status, cacheEntryOptions);
+
+      return status;
+    }
+
+    public async Task<List<Country>> GetCountries()
+    {
+      List<Country> countries = new List<Country>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(subDomain + CacheKeys.Countries, out countries))
+      {
+        // Key not in cache, so get data.
+        countries = await LoadCountries();
+      }
+
+      return countries;
+    }
+
+    public async Task<List<Country>> LoadCountries()
+    {
+      List<Country> countries = await _context.Countries.OrderBy (o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Countries);
+      _cache.Set(subDomain + CacheKeys.Countries, countries, cacheEntryOptions);
+
+      return countries;
+    }
+
+    public async Task<List<City>> GetCities()
+    {
+      List<City> cities = new List<City>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(subDomain + CacheKeys.Cities, out cities))
+      {
+        // Key not in cache, so get data.
+        cities = await LoadCities();
+      }
+
+      return cities;
+    }
+
+    public async Task<List<City>> LoadCities()
+    {
+      List<City> cities = await _context.Cities.OrderBy (o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Cities);
+      _cache.Set(subDomain + CacheKeys.Cities, cities, cacheEntryOptions);
+
+      return cities;
+    }
+
+    public async Task<List<District>> GetDistricts()
+    {
+      List<District> districts = new List<District>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(subDomain + CacheKeys.Districts, out districts))
+      {
+        // Key not in cache, so get data.
+        districts = await LoadDistricts();
+      }
+
+      return districts;
+    }
+
+    public async Task<List<District>> LoadDistricts()
+    {
+      List<District> districts = await _context.Districts.OrderBy (o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays (7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Districts);
+      _cache.Set(subDomain + CacheKeys.Districts, districts, cacheEntryOptions);
+
+      return districts;
+    }
+
+    public async Task<List<Photo>> GetPhotos()
+    {
+      List<Photo> photos = new List<Photo>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue(subDomain + CacheKeys.Photos, out photos))
+      {
+        // Key not in cache, so get data.
+        photos = await LoadPhotos();
+      }
+
+      return photos;
+    }
+
+    public async Task<List<Photo>> LoadPhotos()
+    {
+      List<Photo> photos = await _context.Photos.ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays (7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Photos);
+      _cache.Set(subDomain + CacheKeys.Photos, photos, cacheEntryOptions);
+
+      return photos;
     }
 
   }

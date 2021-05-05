@@ -39,14 +39,14 @@
         <p class="text-17">liste des enseignants</p>
       </div>
       <div>
-        <button mdbBtn class="btnBlue" block="true" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']" routerLinkActive="router-link-active">
-          <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;--fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
+        <button mdbBtn class="btnBlue" block="true" size="sm" mdbWavesEffect [routerLink]="['/addTeacher']">
+          <i class="fad fa-user-plus fa-1x mr-1" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#f89f20;--fa-secondary-color:#f89f20;"></i>
           ajouter un enseignant
         </button>
       </div>
     </div>
   </div>
-
   <div class="col-md-12">
     <div class="row">
       <div class="col-md-4 mb-3">
@@ -57,7 +57,6 @@
       </div>
     </div>
   </div>
-
   <div class="col-md-12 d-none d-md-block">
     <div class="card mb-2" *ngFor="let teacher of filteredTeachers">
       <div class="card-body p-2">
@@ -253,6 +252,5 @@
       </mdb-card-body>
     </mdb-card>
   </div>
-
 </div>
 

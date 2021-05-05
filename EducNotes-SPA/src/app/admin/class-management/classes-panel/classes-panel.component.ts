@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AdminService } from 'src/app/_services/admin.service';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
+import { ClassService } from 'src/app/_services/class.service';
 
 @Component({
   selector: 'app-classes-panel',
@@ -16,7 +16,7 @@ export class ClassesPanelComponent implements OnInit {
   lev: any [] = [];
   // addNew = false;
 
-  constructor(private adminService: AdminService, private route: ActivatedRoute,
+  constructor(private classService: ClassService, private route: ActivatedRoute,
     private alertify: AlertifyService) {}
 
   ngOnInit() {
@@ -44,7 +44,7 @@ export class ClassesPanelComponent implements OnInit {
 
   getlevels() {
     this.levels = [];
-    this.adminService.getClassLevelsDetails().subscribe((res: any[]) => {
+    this.classService.getClassLevelsDetails().subscribe((res: any[]) => {
       this.levels = res ;
       for (let index = 0; index < this.levels.length; index++) {
         const element: any = {

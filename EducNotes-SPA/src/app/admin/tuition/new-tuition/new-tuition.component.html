@@ -4,7 +4,6 @@
       <i class="fad fa-user-plus fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
       <div class="text-19">nouvelle inscription</div>
     </div>
-    <div class="col-md-12"><hr class="my-2" style="background-color: #f89f20;"></div>
     <div class="col-md-12">
       <div class="alert alert-warning text-18" role="alert">la date limite des inscriptions est le {{regDeadline}}.</div>
     </div>
@@ -445,8 +444,11 @@
           <hr class="my-1">
           <div class="row">
             <div class="col-md-12">
-              <button type="submit" mdbBtn [disabled]="!paymentForm.valid || paymentForm.hasError('formNOK')"
-                class="btnBlue" block="true" size="sm" mdbWavesEffect>saisir le paiement</button>
+              <button type="submit" mdbBtn [disabled]="!paymentForm.valid || paymentForm.hasError('formNOK') || wait"
+                class="btnBlue" block="true" size="sm" mdbWavesEffect>
+                <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                saisir le paiement
+              </button>
             </div>
           </div>
         </div>

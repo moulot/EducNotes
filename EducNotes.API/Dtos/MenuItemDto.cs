@@ -1,17 +1,13 @@
 using System;
 using System.Collections.Generic;
+using EducNotes.API.Models;
 
-namespace EducNotes.API.Models
+namespace EducNotes.API.Dtos
 {
-  public class MenuItem : BaseEntity
+  public class MenuItemDto
   {
-    public MenuItem()
-    {
-      IsAlwaysEnabled = false;
-      ChildMenuItems = new List<MenuItem>();
-    }
-
-    public int? ParentMenuId { get; set; }
+    public int Id { get; set; }
+    public int ParentMenuId { get; set; }
     public MenuItem ParentMenu { get; set; }
     public string Name { get; set; }
     public string DisplayName { get; set; }

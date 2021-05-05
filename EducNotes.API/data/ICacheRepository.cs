@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EducNotes.API.Models;
@@ -10,6 +11,7 @@ namespace EducNotes.API.data
     Task<List<User>> GetStudents();
     Task<List<User>> GetParents();
     Task<List<User>> GetTeachers();
+    Task<List<User>> GetEmployees();
     Task<List<User>> LoadUsers();
     Task<List<TeacherCourse>> GetTeacherCourses();
     Task<List<TeacherCourse>> LoadTeacherCourses();
@@ -87,5 +89,19 @@ namespace EducNotes.API.data
     Task<List<Conflict>> LoadConflicts();
     Task<List<CourseConflict>> GetCourseConflicts();
     Task<List<CourseConflict>> LoadCourseConflicts();
+    Task<List<UserRole>> GetUserRoles();
+    Task<List<UserRole>> LoadUserRoles();
+    Task<List<Country>> GetCountries();
+    Task<List<Country>> LoadCountries();
+    Task<List<City>> GetCities();
+    Task<List<City>> LoadCities();
+    Task<List<District>> GetDistricts();
+    Task<List<District>> LoadDistricts();
+    Task<List<MaritalStatus>> GetMaritalStatus();
+    Task<List<MaritalStatus>> LoadMaritalStatus();
+    Task<List<Photo>> GetPhotos();
+    Task<List<Photo>> LoadPhotos();
+    Task<List<RoleCapability>> GetRoleCapabilities();
+    Task<List<RoleCapability>> LoadRoleCapabilities();
   }
 }
