@@ -69,6 +69,8 @@ namespace EducNotes.API.data
     Task<List<Product>> LoadProducts();
     Task<List<UserType>> GetUserTypes();
     Task<List<UserType>> LoadUserTypes();
+    Task<List<Menu>> GetMenus();
+    Task<List<Menu>> LoadMenus();
     Task<List<MenuItem>> GetMenuItems();
     Task<List<MenuItem>> LoadMenuItems();
     Task<List<Capability>> GetCapabilities();

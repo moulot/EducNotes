@@ -136,9 +136,16 @@ namespace EducNotes.API.Data
       List<int> schoolIds, List<int> classLevelIds, List<int> classIds, int msgChoice, Boolean sendToNotValidated);
     MsgRecipientsDto setRecipientsList(List<User> users, int msgChoice, Boolean sendToNotValidated);
     List<ClassDayCoursesDto> GetCoursesFromSchedules(IEnumerable<ScheduleForTimeTableDto> schedules);
-    Task<UserRole> GetUserRoleByUserId(int userId, int roleId);
+    Task<Boolean> UserInRole(int userId, int roleId);
     Boolean MenuExists(int menuItemId, List<MenuItem> menuItems);
-    MenuItem GetMenuItemFromList(int menuItemId, List<MenuItem> menuItems);
+    MenuItem GetByMenuItemId(int menuItemId, List<MenuItem> menuItems);
     MenuItem FindOrLoadParent(List<MenuItem> menuItems, int parentMenuItemId);
+    MenuItem GetByMenuItemName(string menuItemName, List<MenuItem> menuItems);
+    MenuItem GetTopMenuItem(string menuItemName, List<MenuItem> menuItems);
+    Task<UserWithRolesDto> GetUserWithRoles(int userId);
+    Task<List<MenuItem>> GetUserMenu(int userId);
+    Task<List<MenuItem>> GetUserTypeMenu(int userTypeId);
+    Task<Boolean> HasAccessToMenu(int userId, int menuItemId);
+    Task<List<MenuCapabilitiesDto>> GetMenuCapabilities(int userTypeId);
   }
 }

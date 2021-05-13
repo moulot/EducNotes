@@ -17,11 +17,10 @@ namespace EducNotes.API.data {
     int teacherTypeId, parentTypeId, studentTypeId, adminTypeId;
     public readonly IConfiguration _config;
     public string subDomain;
-    private CacheKeys ck;
-
     public readonly IHttpContextAccessor _httpContext;
 
-    public CacheRepository (DataContext context, IConfiguration config, IMemoryCache memoryCache, IHttpContextAccessor httpContext)
+    public CacheRepository (DataContext context, IConfiguration config, IMemoryCache memoryCache,
+      IHttpContextAccessor httpContext)
     {
       _httpContext = httpContext;
       _config = config;
@@ -31,18 +30,15 @@ namespace EducNotes.API.data {
       parentTypeId = _config.GetValue<int> ("AppSettings:parentTypeId");
       adminTypeId = _config.GetValue<int> ("AppSettings:adminTypeId");
       studentTypeId = _config.GetValue<int> ("AppSettings:studentTypeId");
-      // ck = new CacheKeys (context);
-      //get subdomain
       string[] fullAddress = _httpContext.HttpContext?.Request?.Headers?["Host"].ToString()?.Split('.');
       if(fullAddress != null)
       {
         subDomain = fullAddress[0].ToLower();
-        if(subDomain == "localhost:5000" || subDomain == "educnotes-test2")
+        if(subDomain == "localhost:5000" || subDomain == "test2")
         {
           subDomain = "educnotes";
         }
-        else if(subDomain == "educnotes-test1" || subDomain == "www" || subDomain == "educnotes")
-        {
+        else if (subDomain == "test1" || subDomain == "www" || subDomain == "educnotes") {
           subDomain = "demo";
         }
       }
@@ -660,8 +656,9 @@ namespace EducNotes.API.data {
       return orders;
     }
 
-    public async Task<List<OrderLine>> GetOrderLines () {
-      List<OrderLine> lines = new List<OrderLine> ();
+    public async Task<List<OrderLine>> GetOrderLines()
+    {
+      List<OrderLine> lines = new List<OrderLine>();
 
       // Look for cache key.
       if (!_cache.TryGetValue (subDomain + CacheKeys.OrderLines, out lines)) {
@@ -960,6 +957,39 @@ namespace EducNotes.API.data {
       _cache.Set(subDomain + CacheKeys.UserTypes, usertypes, cacheEntryOptions);
 
       return usertypes;
+    }
+
+    public async Task<List<Menu>> GetMenus()
+    {
+      List<Menu> menus = new List<Menu>();
+
+      // Look for cache key.
+      if(!_cache.TryGetValue (subDomain + CacheKeys.Menus, out menus))
+      {
+        // Key not in cache, so get data.
+        menus = await LoadMenus();
+      }
+
+      return menus;
+    }
+
+    public async Task<List<Menu>> LoadMenus()
+    {
+      List<Menu> menus = await _context.Menus
+                                        .Include(i => i.UserType)
+                                        .OrderBy(o => o.Name)
+                                        .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Menus);
+      _cache.Set(subDomain + CacheKeys.Menus, menus, cacheEntryOptions);
+
+      return menus;
     }
 
     public async Task<List<MenuItem>> GetMenuItems()

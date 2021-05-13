@@ -56,6 +56,7 @@ export class NewCourseComponent implements OnInit {
   createCourseForm() {
     this.courseForm = this.fb.group({
       id: [0],
+      courseTypeId: [1],
       name: ['', Validators.required],
       abbrev: [''],
       color: ['', Validators.required]

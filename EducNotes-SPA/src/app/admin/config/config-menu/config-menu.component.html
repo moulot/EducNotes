@@ -1,0 +1,27 @@
+<form [formGroup]="menuForm" (ngSubmit)="saveMenu()">
+  <div class="card">
+    <div class="card-body p-2">
+      <div class="text-15"><b>menu de l'application</b></div>
+      <hr class="my-1">
+      <button type="button" mdbBtn class="btnBlue my-2" size="sm" mdbWavesEffect>modifier tout le menu</button>
+      <hr class="my-1">
+      <div class="row">
+        <div class="col-md-2 mb-1" formArrayName="menuItems" *ngFor="let item of menuForm.get('menuItems')['controls']; let i = index;">
+          <div class="border rounded-lg p-2" [formGroupName]="i">
+            <div class="d-flex">
+              <div class="flex-grow-1 text-15 textDarkBlue"><b>{{item.value.name}}</b></div>
+              <i class="text-15 my-auto fad fa-edit" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+            </div>
+            <div *ngIf="item.value.childMenuItems.length > 0">
+              <hr class="my-1">
+              <div class="" *ngFor="let childItem of item.value.childMenuItems">
+                <div class="text-15">{{childItem.name}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

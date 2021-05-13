@@ -1,1 +1,321 @@
-<p>add-role works!</p>
+<form [formGroup]="roleForm" (ngSubmit)="saveRole()">
+  <div class="row">
+    <div class="col-md-12">
+      <div *ngIf="!editionMode" class="d-flex">
+        <i class="fad fa-users-cog fa-2x mr-2" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <div class="text-17">ajout d'un rôle</div>
+      </div>
+      <div *ngIf="editionMode" class="d-flex mb-2">
+        <i class="fad fa-users-cog fa-2x mr-2" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <div class="text-17">édition du rôle <span class="text-capitalize"></span></div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="md-form mb-1">
+        <input type="hidden" formControlName="roleId">
+        <input mdbInput type="text" id="roleName" class="form-control" formControlName="roleName" mdbValidate>
+        <label for="roleName" class="">nom du rôle</label>
+        <div *ngIf="roleForm.get('roleName').errors && roleForm.get('roleName').touched"
+          class="text-small text-danger">saisir le role svp</div>
+      </div>
+    </div>
+  </div>
+  <hr class="my-1">
+  <div class="row">
+    <div class="col-md-12 my-1" formArrayName="menuItems" *ngFor="let item of roleForm.get('menuItems')['controls']; let i = index;">
+      <div class="card" [formGroupName]="i">
+        <div class="card-body p-2">
+          <div *ngIf="item.value.capabilities.length == 0">
+            <div class="row">
+              <div class="col-md-2">
+                <div class="text-15 textDarkBlue"><b>{{item.value.name}}</b></div>
+              </div>
+            </div>
+            <div *ngIf="item.value.childItems">
+              <div *ngFor="let child of item.value.childItems; let j = index">
+                <div *ngIf="!child.capabilities">
+                  <div class="row">
+                    <div class="col-md-2">
+                      <div class="text-15 ml-2">{{child.menuItemName}}</div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="child.capabilities">
+                  <div *ngIf="child.capabilities.length === 1">
+                    <div class="row">
+                      <div class="col-md-2">
+                        <div class="text-15 ml-2">{{child.menuItemName}}</div>
+                      </div>
+                      <div class="col-md-10">
+                        <div class="row">
+                          <div class="col-md-12 mb-1">
+                            <div class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" id="none0{{i}}{{j}}" name="radio0{{i}}{{j}}"
+                                [checked]="true" (change)="setChildFlag(i, j, 0, 0)" value="0" mdbInput>
+                              <label class="form-check-label" for="none0{{i}}{{j}}">pas d'accès</label>
+                            </div>
+                            <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 1" class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" id="readonly0{{i}}{{j}}" name="radio0{{i}}{{j}}"
+                                (change)="setChildFlag(i, j, 0, 1)" value="1" mdbInput>
+                              <label class="form-check-label" for="readonly0{{i}}{{j}}">accès en lecture</label>
+                            </div>
+                            <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 2" class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" id="edit0{{i}}{{j}}" name="radio0{{i}}{{j}}"
+                                (change)="setChildFlag(i, j, 0, 2)" value="2" mdbInput>
+                              <label class="form-check-label" for="edit0{{i}}{{j}}">accès total</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="child.capabilities.length > 1">
+                    <div class="row" *ngFor="let capability of child.capabilities; let k = index">
+                      <div class="col-md-2">
+                        <div class="text-15">{{child.menuItemName}} ({{capability.name}})</div>
+                      </div>
+                      <div class="col-md-10">
+                        <div class="row">
+                          <div class="col-md-12 mb-1">
+                            <div class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" id="none0{{i}}{{j}}{{k}}" name="radio0{{i}}{{j}}{{k}}"
+                                (change)="setChildFlag(i, j, k, 0)" [checked]="true" value="0" mdbInput>
+                              <label class="form-check-label" for="none0{{i}}{{j}}{{k}}">pas d'accès</label>
+                            </div>
+                            <div *ngIf="capability.accessType == 0 || capability.accessType == 1" class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" id="readonly0{{i}}{{j}}{{k}}" name="radio0{{i}}{{j}}{{k}}"
+                                (change)="setChildFlag(i, j, k, 0)" value="1" mdbInput>
+                              <label class="form-check-label" for="readonly0{{i}}{{j}}{{k}}">accès en lecture</label>
+                            </div>
+                            <div *ngIf="capability.accessType == 0 || capability.accessType == 2" class="form-check form-check-inline">
+                              <input type="radio" class="form-check-input" id="edit0{{i}}{{j}}{{k}}" name="radio0{{i}}{{j}}{{k}}"
+                                (change)="setChildFlag(i, j, k, 0)" value="2" mdbInput>
+                              <label class="form-check-label" for="edit0{{i}}{{j}}{{k}}">accès total</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="item.value.capabilities.length > 0">
+            <div *ngIf="item.value.capabilities.length === 1">
+              <div class="row">
+                <div class="col-md-2">
+                  <div class="text-15 textDarkBlue"><b>{{item.value.name}}</b></div>
+                </div>
+                <div class="col-md-10">
+                  <div class="row">
+                    <div class="col-md-12 mb-1">
+                      <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" id="none10" name="radio10"
+                          (change)="setMenuItemFlag(i, 0, 0)" [checked]="true" value="0" mdbInput>
+                        <label class="form-check-label" for="none10">pas d'accès</label>
+                      </div>
+                      <div *ngIf="item.value.capabilities[0].accessType == 0 || item.value.capabilities[0].accessType == 1" class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" id="readonly10" name="radio10"
+                          (change)="setMenuItemFlag(i, 0, 1)" value="1" mdbInput>
+                        <label class="form-check-label" for="readonly10">accès en lecture</label>
+                      </div>
+                      <div *ngIf="item.value.capabilities[0].accessType == 0 || item.value.capabilities[0].accessType == 2" class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" id="edit10" name="radio10"
+                          (change)="setMenuItemFlag(i, 0, 2)"  value="2" mdbInput>
+                        <label class="form-check-label" for="edit10">accès total</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="item.value.childItems">
+                <div *ngFor="let child of item.value.childItems; let j = index">
+                  <div *ngIf="!child.capabilities">
+                    <div class="row">
+                      <div class="col-md-2">
+                        <div class="text-15 ml-2">{{child.menuItemName}}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="child.capabilities">
+                    <div *ngIf="child.capabilities.length === 1">
+                      <div class="row">
+                        <div class="col-md-2">
+                          <div class="text-15">{{child.menuItemName}}</div>
+                        </div>
+                        <div class="col-md-10">
+                          <div class="row">
+                            <div class="col-md-12 mb-1">
+                              <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="none1{{i}}{{j}}" name="radio1{{i}}{{j}}"
+                                  (change)="setChildFlag(i, j, 0, 0)" [checked]="true" value="0" mdbInput>
+                                <label class="form-check-label" for="none1{{i}}{{j}}">pas d'accès</label>
+                              </div>
+                              <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 1" class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="readonly1{{i}}{{j}}" name="radio1{{i}}{{j}}"
+                                  (change)="setChildFlag(i, j, 0, 1)" value="1" mdbInput>
+                                <label class="form-check-label" for="readonly1{{i}}{{j}}">accès en lecture</label>
+                              </div>
+                              <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 2" class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="edit1{{i}}{{j}}" name="radio1{{i}}{{j}}"
+                                  (change)="setChildFlag(i, j, 0, 1)"  value="2" mdbInput>
+                                <label class="form-check-label" for="edit1{{i}}{{j}}">accès total</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="child.capabilities.length > 1">
+                      <div class="row" *ngFor="let capability of child.capabilities; let k = index">
+                        <div class="col-md-2">
+                          <div class="text-15">{{child.menuItemName}} ({{capability.name}})</div>
+                        </div>
+                        <div class="col-md-10">
+                          <div class="row">
+                            <div class="col-md-12 mb-1">
+                              <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="none1{{i}}{{j}}{{k}}" name="radio1{{i}}{{j}}{{k}}"
+                                  (change)="setChildFlag(i, j, k, 0)" [checked]="true" value="0" mdbInput>
+                                <label class="form-check-label" for="none1{{i}}{{j}}{{k}}">pas d'accès</label>
+                              </div>
+                              <div *ngIf="capability.accessType == 0 || capability.accessType == 1" class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="readonly1{{i}}{{j}}{{k}}" name="radio1{{i}}{{j}}{{k}}"
+                                  (change)="setChildFlag(i, j, k, 1)"  value="1" mdbInput>
+                                <label class="form-check-label" for="readonly1{{i}}{{j}}{{k}}">accès en lecture</label>
+                              </div>
+                              <div *ngIf="capability.accessType == 0 || capability.accessType == 2" class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="edit1{{i}}{{j}}{{k}}" name="radio1{{i}}{{j}}{{k}}"
+                                  (change)="setChildFlag(i, j, k, 2)"  value="2" mdbInput>
+                                <label class="form-check-label" for="edit1{{i}}{{j}}{{k}}">accès total</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="item.value.capabilities.length > 1">
+              <div class="row" *ngFor="let capability of item.value.capabilities; let j = index">
+                <div class="col-md-2">
+                  <div class="text-15 textDarkBlue"><b>{{item.value.name}}</b> ({{capability.name}})</div>
+                </div>
+                <div class="col-md-10">
+                  <div class="row">
+                    <div class="col-md-12 mb-1">
+                      <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" id="none2{{i}}{{j}}" name="radio2{{i}}{{j}}" [checked]="true"
+                          (change)="setMenuItemFlag(i, j, 0)" value="0" mdbInput>
+                        <label class="form-check-label" for="none2{{i}}{{j}}">pas d'accès</label>
+                      </div>
+                      <div *ngIf="capability.accessType == 0 || capability.accessType == 1" class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" id="readonly2{{i}}{{j}}" name="radio2{{i}}{{j}}"
+                          (change)="setMenuItemFlag(i, j, 1)" value="1" mdbInput>
+                        <label class="form-check-label" for="readonly2{{i}}{{j}}">accès en lecture</label>
+                      </div>
+                      <div *ngIf="capability.accessType == 0 || capability.accessType == 2" class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" id="edit2{{i}}{{j}}" name="radio2{{i}}{{j}}"
+                          (change)="setMenuItemFlag(i, j, 2)" value="2" mdbInput>
+                        <label class="form-check-label" for="edit2{{i}}{{j}}">accès total</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="item.value.childItems">
+                <div *ngFor="let child of item.value.childItems; let j = index">
+                  <div *ngIf="!child.capabilities">
+                    <div class="row">
+                      <div class="col-md-2">
+                        <div class="text-15 ml-2">{{child.menuItemName}}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="child.capabilities">
+                    <div *ngIf="child.capabilities.length === 1">
+                      <div class="row">
+                        <div class="col-md-2">
+                          <div class="text-15">{{child.menuItemName}}</div>
+                        </div>
+                        <div class="col-md-10">
+                          <div class="row">
+                            <div class="col-md-12 mb-1">
+                              <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="none2{{i}}{{j}}" name="radio2{{i}}{{j}}"
+                                  [checked]="true" (change)="setChildFlag(i, j, 0, 0)" value="0" mdbInput>
+                                <label class="form-check-label" for="none2{{i}}{{j}}">pas d'accès</label>
+                              </div>
+                              <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 1" class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="readonly2{{i}}{{j}}" name="radio2{{i}}{{j}}"
+                                  (change)="setChildFlag(i, j, 0, 1)" value="1" mdbInput>
+                                <label class="form-check-label" for="readonly2{{i}}{{j}}">accès en lecture</label>
+                              </div>
+                              <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 2" class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="edit2{{i}}{{j}}" name="radio2{{i}}{{j}}"
+                                  (change)="setChildFlag(i, j, 0, 2)" value="2" mdbInput>
+                                <label class="form-check-label" for="edit2{{i}}{{j}}">accès total</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="child.capabilities.length > 1">
+                      <div class="row" *ngFor="let capability of child.capabilities; let k = index">
+                        <div class="col-md-2">
+                          <div class="text-15">{{child.menuItemName}} ({{capability.name}})</div>
+                        </div>
+                        <div class="col-md-10">
+                          <div class="row">
+                            <div class="col-md-12 mb-1">
+                              <div class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="none2{{i}}{{j}}{{k}}" name="radio2{{i}}{{j}}{{k}}"
+                                  (change)="setChildFlag(i, j, k, 0)" [checked]="true" value="0" mdbInput>
+                                <label class="form-check-label" for="none2{{i}}{{j}}{{k}}">pas d'accès</label>
+                              </div>
+                              <div *ngIf="capability.accessType == 0 || capability.accessType == 1" class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="readonly2{{i}}{{j}}{{k}}" name="radio2{{i}}{{j}}{{k}}"
+                                  (change)="setChildFlag(i, j, k, 0)" value="1" mdbInput>
+                                <label class="form-check-label" for="readonly2{{i}}{{j}}{{k}}">accès en lecture</label>
+                              </div>
+                              <div *ngIf="capability.accessType == 0 || capability.accessType == 2" class="form-check form-check-inline">
+                                <input type="radio" class="form-check-input" id="edit2{{i}}{{j}}{{k}}" name="radio2{{i}}{{j}}{{k}}"
+                                  (change)="setChildFlag(i, j, k, 0)" value="2" mdbInput>
+                                <label class="form-check-label" for="edit2{{i}}{{j}}{{k}}">accès total</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row my-2">
+    <div class="col-md-8"></div>
+    <div class="col-md-2">
+      <button type="button" [routerLink]="['/roles']" [disabled]="wait" mdbBtn block="true" size="sm" class="btnOrange" mdbWavesEffect>
+        <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        annuler
+      </button>
+    </div>
+    <div class="col-md-2">
+      <button type="submit" mdbBtn [disabled]="!roleForm.valid || wait" size="sm" block="true" class="btnBlue" mdbWavesEffect>
+        <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        saisir le rôle
+      </button>
+    </div>
+  </div>
+</form>

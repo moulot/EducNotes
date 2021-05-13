@@ -201,10 +201,10 @@ export class EvalAddFormComponent implements OnInit {
   }
 
   getTeacherCourses(teacherId) {
-    this.userService.getTeacherCourses(teacherId).subscribe((courses: any) => {
-      this.teacherCourses = courses;
-      for (let i = 0; i < courses.length; i++) {
-        const elt = courses[i];
+    this.userService.getTeacherCourses(teacherId).subscribe((data: any) => {
+      this.teacherCourses = data.courses;
+      for (let i = 0; i < data.courses.length; i++) {
+        const elt = data.courses[i];
         const element = {value: elt.id, label: elt.name};
         this.optionsCourse = [...this.optionsCourse, element];
       }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using EducNotes.API.Models;
 using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json;
 
 namespace EducNotes.API.Data
 {
@@ -11,6 +10,23 @@ namespace EducNotes.API.Data
   {
     public static void SeedTables(DataContext context, UserManager<User> userManager, RoleManager<Role> roleManager)
       {
+        // if(!context.Menus.Any() && context.Users.Any())
+        // {
+        //   var menus = new List<Menu>() {
+        //     new Menu { Name = "menu élève", UserTypeId = 1},
+        //     new Menu { Name = "menu enseignant", UserTypeId = 2},
+        //     new Menu { Name = "menu parent", UserTypeId = 3},
+        //     new Menu { Name = "menu admin", UserTypeId = 4}
+        //   };
+        //   context.AddRange(menus);
+        //   context.SaveChanges();
+
+        //   var menuItems = new List<MenuItem>() {
+        //     new MenuItem { Name = "accueil", DisplayName = "accueil", Url = "['/home']", IsAlwaysEnabled = false,
+        //       InsertDate = DateTime.Now, InsertUserId = 1, UpdateDate = DateTime.Now, UpdateUserId = 1}
+        //   };
+        // }
+
         if (!context.FileTypes.Any())
         {
           var fileTypes = new List<FileType>() {
@@ -179,17 +195,24 @@ namespace EducNotes.API.Data
             context.AddRange(prodDeadlines);
             context.SaveChanges();
 
-            var roles = new List<Role> {
-              new Role { Name = "admin" }
-            };
+            // var country = new Country { Name = "côte d'ivoire"};
+            // context.Add(country);
+            // context.SaveChanges();
 
-            foreach (var role in roles)
-            {
-              roleManager.CreateAsync(role).Wait();
-            }
+            // var city = new City {
+            //   Name = "Abidjan",
+            //   CountryId = 1
+            // };
+            // context.Add(city);
+            // context.SaveChanges();
 
-            var city = new City { Name = "Abidjan" };
-            context.Add(city);
+            // var districts = new List<District> {
+            //   new District { Name = "cocody", CityId = 1 },
+            //   new District { Name = "angré", CityId = 1 },
+            //   new District { Name = "2 Plateaux", CityId = 1 },
+            //   new District { Name = "djibi", CityId = 1 },
+            // };
+            // context.AddRange(districts);
 
             var smsTypes = new List<SmsType> {
               new SmsType { Name = "absence" },
@@ -200,14 +223,6 @@ namespace EducNotes.API.Data
             };
             context.AddRange(smsTypes);
             context.SaveChanges();
-
-            var districts = new List<District> {
-              new District { Name = "cocody", CityId = 1 },
-              new District { Name = "angré", CityId = 1 },
-              new District { Name = "2 Plateaux", CityId = 1 },
-              new District { Name = "djibi", CityId = 1 },
-            };
-            context.AddRange(districts);
 
             var smsCat = new List<SmsCategory> {
               new SmsCategory {Name = "notes"},
@@ -231,8 +246,8 @@ namespace EducNotes.API.Data
 
             var emailTemplates = new List<EmailTemplate> {
               new EmailTemplate {Name = "nouvelle inscription - informations paiement",
-                Subject ="<NOM_ECOLE> - confirmation nouvelle inscription / paiement", Body = "",
-                EmailCategoryId = 3, Internal = true},
+                Subject ="<NOM_ECOLE> - confirmation nouvelle inscription / paiement", EmailCategoryId = 3, Internal = true,
+                Body = ""},
               new EmailTemplate {Name = "re-inscription année prochaine",
                 Subject ="<NOM_ECOLE> - re-inscription pour l'année prochaine", Body = "",
                 EmailCategoryId = 3, Internal = true},
@@ -307,8 +322,7 @@ namespace EducNotes.API.Data
               new Bank { Name = "Ecobank" },
               new Bank { Name = "NSIA" },
               new Bank { Name = "SIB" },
-              new Bank { Name = "SGBCI" },
-              new Bank { Name = "" }
+              new Bank { Name = "SGBCI" }
             };
             context.AddRange(banks);
 
@@ -408,6 +422,15 @@ namespace EducNotes.API.Data
             };
             context.AddRange(userTypes);
             context.SaveChanges();
+
+            var roles = new List<Role> {
+              new Role { Name = "admin" }
+            };
+
+            foreach (var role in roles)
+            {
+              roleManager.CreateAsync(role).Wait();
+            }
 
             var adminUser = new User
             {

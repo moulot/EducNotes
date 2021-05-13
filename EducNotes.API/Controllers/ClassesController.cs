@@ -1438,6 +1438,7 @@ namespace EducNotes.API.Controllers {
       {
         var course = new Course {
           Name = courseDto.Name,
+          CourseTypeId = courseDto.CourseTypeId,
           Abbreviation = courseDto.Abbrev,
           Color = courseDto.Color
         };

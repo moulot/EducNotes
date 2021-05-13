@@ -5,7 +5,6 @@ using EducNotes.API.Data;
 using EducNotes.API.Dtos;
 using EducNotes.API.Helpers;
 using EducNotes.API.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Linq;
@@ -68,8 +67,7 @@ namespace EducNotes.API.Controllers
                     var uploadParams = new ImageUploadParams()
                     {
                         File = new FileDescription(file.Name, stream),
-                        Transformation = new Transformation()
-                            .Width(500).Height(500).Crop("fill").Gravity("face")
+                        Transformation = new Transformation().Width(500).Height(500).Crop("fill").Gravity("face")
                     };
 
                     uploadResult = _cloudinary.Upload(uploadParams);

@@ -192,6 +192,40 @@ export class NewTuitionComponent implements OnInit {
     return null;
   }
 
+  addChildItem(lname, fname, classlevelId, dob, sex): void {
+    const children = this.tuitionForm.get('children') as FormArray;
+    children.push(this.createChildItem(lname, fname, classlevelId, dob, sex));
+    this.nbChildren++;
+    this.classnames = [...this.classnames, ''];
+    this.tuitionFee = [...this.tuitionFee, 0];
+    this.downPayment = [...this.downPayment, 0];
+  }
+
+  createChildItem(lname, fname, classlevelId, dob, sex): FormGroup {
+    return this.fb.group({
+      lname: [lname, Validators.required],
+      fname: [fname, Validators.required],
+      classlevelId: [classlevelId, Validators.required],
+      dob: [dob, Validators.required],
+      sex: [sex, Validators.required]
+    });
+  }
+
+  removeChildItem(index) {
+    const children = this.tuitionForm.get('children') as FormArray;
+    children.removeAt(index);
+    this.nbChildren--;
+    this.classnames.splice(index, 1);
+    this.tuitionFee.splice(index, 1);
+    this.downPayment.splice(index, 1);
+    this.setAmountDue();
+    this.setOrderAmount();
+  }
+
+  addChild() {
+    this.addChildItem('', '', null, '', null);
+  }
+
   createPaymentForm() {
     this.paymentForm = this.fb.group({
       typeid: [null, Validators.required],
@@ -271,40 +305,6 @@ export class NewTuitionComponent implements OnInit {
     while (payments.length > 0) {
       payments.removeAt(0);
     }
-  }
-
-  addChildItem(lname, fname, classlevelId, dob, sex): void {
-    const children = this.tuitionForm.get('children') as FormArray;
-    children.push(this.createChildItem(lname, fname, classlevelId, dob, sex));
-    this.nbChildren++;
-    this.classnames = [...this.classnames, ''];
-    this.tuitionFee = [...this.tuitionFee, 0];
-    this.downPayment = [...this.downPayment, 0];
-  }
-
-  createChildItem(lname, fname, classlevelId, dob, sex): FormGroup {
-    return this.fb.group({
-      lname: [lname, Validators.required],
-      fname: [fname, Validators.required],
-      classlevelId: [classlevelId, Validators.required],
-      dob: [dob, Validators.required],
-      sex: [sex, Validators.required]
-    });
-  }
-
-  removeChildItem(index) {
-    const children = this.tuitionForm.get('children') as FormArray;
-    children.removeAt(index);
-    this.nbChildren--;
-    this.classnames.splice(index, 1);
-    this.tuitionFee.splice(index, 1);
-    this.downPayment.splice(index, 1);
-    this.setAmountDue();
-    this.setOrderAmount();
-  }
-
-  addChild() {
-    this.addChildItem('', '', null, '', null);
   }
 
   openDiv(index) {

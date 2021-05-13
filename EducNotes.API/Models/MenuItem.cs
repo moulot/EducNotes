@@ -11,6 +11,8 @@ namespace EducNotes.API.Models
       ChildMenuItems = new List<MenuItem>();
     }
 
+    public int MenuId { get; set; }
+    public Menu Menu { get; set; }
     public int? ParentMenuId { get; set; }
     public MenuItem ParentMenu { get; set; }
     public string Name { get; set; }

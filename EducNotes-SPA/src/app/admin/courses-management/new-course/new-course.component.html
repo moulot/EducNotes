@@ -14,6 +14,7 @@
       <mdb-card>
         <mdb-card-body class="px-lg-5 pt-0">
           <div class="md-form">
+            <input type="hidden" formControlName="courseTypeId">
             <input mdbInput type="text" id="name" class="form-control" formControlName="name">
             <label for="name" class="">nom</label>
             <div *ngIf="courseForm.get('name').errors && courseForm.get('name').touched"

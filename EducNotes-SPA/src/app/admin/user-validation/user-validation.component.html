@@ -11,11 +11,11 @@
   <div class="text-19">validation des comptes utilisateurs</div>
 </div>
 <div class="row my-2">
-  <div class="col-md-4 mb-1">
+  <div class="col-md-3 mb-1">
     <button (click)="selectType(0)" type="button" [ngClass]="(btnActive != 0)?'btnWhiteB':'btnBlue'" mdbBtn
       size="sm" block="true" mdbWavesEffect>tous utilisateurs</button>
   </div>
-  <div class="col-md-4 mb-1" *ngFor="let type of userTypes">
+  <div class="col-md-3 mb-1" *ngFor="let type of userTypes">
     <button (click)="selectType(type.id)" [disabled]="(type.id == parentTypeId && nbParents == 0) || (type.id == teacherTypeId && nbTeachers == 0)"
       type="button" [ngClass]="(btnActive != type.id)?'btnWhiteB':'btnBlue'" mdbBtn
       size="sm" block="true" mdbWavesEffect>voir les {{type.name}}s</button>

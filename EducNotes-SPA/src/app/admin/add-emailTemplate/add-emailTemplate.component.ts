@@ -20,9 +20,10 @@ export class AddEmailTemplateComponent implements OnInit {
   subject: string;
   body: string;
   categoryId: number;
-  internal: Boolean;
+  internal: number;
   tokens: any;
   internalOptions = [{value: 0, label: 'OUI'}, {value: 1, label: 'NON'}];
+  wait = false;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
     private commService: CommService, private router: Router, private route: ActivatedRoute) { }
@@ -36,7 +37,7 @@ export class AddEmailTemplateComponent implements OnInit {
         this.subject = this.template.subject;
         this.body = this.template.body;
         this.categoryId = this.template.emailCategoryId;
-        this.internal = this.template.internal;
+        this.internal = this.template.internal === true ? 1 : 0;
       }
     });
     this.createTemplateForm();
@@ -48,7 +49,7 @@ export class AddEmailTemplateComponent implements OnInit {
   createTemplateForm() {
     this.templateForm = this.fb.group({
       name: [this.name, Validators.required],
-      internal: [null],
+      internal: [this.internal, Validators.required],
       category: [this.categoryId, Validators.required],
       subject: [this.subject, Validators.required],
       body: [this.body, Validators.required]
@@ -76,6 +77,7 @@ export class AddEmailTemplateComponent implements OnInit {
   }
 
   saveTemplate() {
+    this.wait = true;
     const templateData = <EmailTemplate>{};
     templateData.id = this.templateId;
     templateData.name = this.templateForm.value.name;
@@ -85,9 +87,11 @@ export class AddEmailTemplateComponent implements OnInit {
     templateData.body = this.templateForm.value.body;
     this.commService.saveEmailTemplate(templateData).subscribe(() => {
       this.alertify.success('le modèle d\'email a bien été enregistré.');
+      this.wait = false;
       this.router.navigate(['/EmailTemplates']);
     }, error => {
       this.alertify.error(error);
+      this.wait = false;
     });
   }
 

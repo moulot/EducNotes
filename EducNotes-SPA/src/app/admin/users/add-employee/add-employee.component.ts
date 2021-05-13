@@ -176,9 +176,9 @@ export class AddEmployeeComponent implements OnInit {
     formData.append('secondPhoneNumber', this.empForm.value.phone2);
     formData.append('roleIds', ids);
     formData.append('userTypeId', this.adminTypeId.toString());
-    this.wait = false;
     this.userService.addEmployee(formData).subscribe(() => {
       this.alertify.success('employé ajouté avec succès');
+      this.wait = false;
       this.router.navigate(['/employees']);
     }, error => {
       this.alertify.error(error);

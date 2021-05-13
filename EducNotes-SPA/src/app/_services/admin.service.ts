@@ -3,7 +3,6 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { User } from '../_models/user';
 import { Setting } from '../_models/setting';
-import { DataForEmail } from '../_models/dataForEmail';
 
 @Injectable({
   providedIn: 'root'
@@ -83,6 +82,18 @@ export class AdminService {
 
   getRolesWithUsers() {
     return this.http.get(this.baseUrl + 'RolesWithUsers');
+  }
+
+  getUserTypeMenu(userTypeId) {
+    return this.http.get(this.baseUrl + 'LoadMenu/' + userTypeId);
+  }
+
+  getMenuWithCapabilities(userTypeId) {
+    return this.http.get(this.baseUrl + 'GetMenuCapabilities/' + userTypeId);
+  }
+
+  saveRole(role) {
+    return this.http.post(this.baseUrl + 'saveRole', role);
   }
 
 }

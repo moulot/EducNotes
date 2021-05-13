@@ -54,6 +54,7 @@
         <div formArrayName="course" *ngFor="let course of courseForm.get('course')['controls']; let i = index;">
           <div [formGroupName]="i">
             <div class="md-form form-sm mt-2 mb-1">
+              <input type="hidden" formControlName="courseTypeId">
               <input mdbInput type="text" id="name" class="form-control" formControlName="name">
               <label for="name">nom</label>
             </div>

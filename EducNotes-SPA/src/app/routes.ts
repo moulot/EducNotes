@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-
 import { HomePanelComponent } from './home/home-panel/home-panel.component';
 import { MemberListComponent } from './members/member-list/member-list.component';
 import { MessagesComponent } from './messages/messages.component';
@@ -204,7 +203,7 @@ export const appRoutes: Routes = [
         { path: 'callSheet/:id', component: ClassCallSheetComponent, resolve: { session: CallSheetResolver } },
         { path: 'classSession/:id', component: ClassSessionComponent, resolve: { session: ClassSessionResolver } },
         { path: 'inscriptions', component: InscriptionComponent },
-        { path: 'inscriptionsList', component: InscriptionsListComponent },
+        { path: 'studentsToClass', component: InscriptionsListComponent },
         { path: 'classesPanel', component: ClassesPanelComponent, resolve: { levels: ClassesListResolver } },
         { path: 'addClass', component: NewClassComponent },
         { path: 'classSchedule/:classId', component: SchedulePanelComponent, resolve: { class: ClassResolver } },
@@ -266,8 +265,8 @@ export const appRoutes: Routes = [
         { path: 'fileUser/:id', component: ChildFileComponent, resolve: {file: ChildFileResolver} },
         { path: 'parentFile/:id', component: ParentFileComponent, resolve: {file: ParentFileResolver} },
         { path: 'teacherFile/:id', component: TeacherFileComponent}, // resolve: {file: ChildFileResolver} },
-        { path: 'roles', component: RolesComponent, resolve: {roles: RolesResolver}},
-        { path: 'addRole', component: AddRoleComponent},
+        { path: 'roles', component: RolesComponent, resolve: {roles: RolesResolver} },
+        { path: 'addRole', component: AddRoleComponent}, // , resolve: {roles: RolesResolver} },
         { path: 'addFinOp/:id', component: AddPaymentComponent, resolve: {file: AddPaymentResolver} },
         { path: 'validatePayments', component: ValidatePaymentsComponent, resolve: {payments: ValidatePaymentsResolver}},
         { path: 'tuitionList', component: TuitionListComponent, resolve: {list: TuitionListResolver}},

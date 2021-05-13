@@ -33,12 +33,7 @@
       <app-classlevel-courses></app-classlevel-courses>
     </div>
     <div *ngIf="activeTabs[1]">
-      <div class="card">
-        <div class="card-body p-2">
-          <div class="text-15"><b>menu de l'application</b></div>
-          <hr class="my-1">
-        </div>
-      </div>
+      <app-config-menu></app-config-menu>
     </div>
     <div *ngIf="activeTabs[2]">
       <app-config-products></app-config-products>

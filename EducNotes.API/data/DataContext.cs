@@ -119,6 +119,7 @@ namespace EducNotes.API.Data {
       public DbSet<Conflict> Conflicts { get; set; }
       public DbSet<CourseConflict> CourseConflicts { get; set; }
       public DbSet<MaritalStatus> MaritalStatuses { get; set; }
+      public DbSet<Menu> Menus { get; set; }
 
       protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder)
       {

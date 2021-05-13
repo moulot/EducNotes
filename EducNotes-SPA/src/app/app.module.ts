@@ -281,6 +281,8 @@ import { EmployeesComponent } from './admin/users/employees/employees.component'
 import { EmployeesResolver } from './_resolvers/employees-resolver';
 import { AddEmployeeComponent } from './admin/users/add-employee/add-employee.component';
 import { AddRoleComponent } from './admin/add-role/add-role.component';
+import { ConfigMenuComponent } from './admin/config/config-menu/config-menu.component';
+import { ConfigMenuResolver } from './_resolvers/config-menu-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -470,7 +472,8 @@ export function tokenGetter() {
       ModalConflictComponent,
       TuitionDataComponent,
       EmployeesComponent,
-      AddRoleComponent
+      AddRoleComponent,
+      ConfigMenuComponent
    ],
    imports: [
       FormWizardModule,
@@ -533,6 +536,7 @@ export function tokenGetter() {
       EmployeesResolver,
       MemberListResolver,
       MemberEditResolver,
+      ConfigMenuResolver,
       PreventUnSavedChanges,
       ListsResolver,
       MessagesResolver,

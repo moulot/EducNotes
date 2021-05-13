@@ -77,6 +77,7 @@ export class CourseCardComponent implements OnInit {
   createCourseItem(course): FormGroup {
     return this.fb.group({
       id: course.id,
+      courseTypeId: course.courseTypeId,
       name: course.name,
       abbrev: course.abbreviation,
       color: course.color

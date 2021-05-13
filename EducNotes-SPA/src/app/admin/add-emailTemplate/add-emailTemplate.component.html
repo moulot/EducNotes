@@ -16,7 +16,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
           <mdb-select [options]="internalOptions" formControlName="internal" placeholder="modèle accessible à l'administration"></mdb-select>
         </div>
       </div>
@@ -46,8 +46,13 @@
       </div>
       <div class="row">
         <div class="col-md-6">
-          <button type="submit" [disabled]="!templateForm.valid" mdbBtn size="sm" class="btnBlue" mdbWavesEffect>valider</button>
-          <button type="button" class="mr-2" mdbBtn size="sm" class="btnOrange" (click)="cancelForm()" mdbWavesEffect>annuler</button>
+          <button type="button" class="mr-2" [disabled]="wait" mdbBtn size="sm" class="btnOrange" (click)="cancelForm()" mdbWavesEffect>
+            <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            annuler</button>
+          <button type="submit" [disabled]="!templateForm.valid || wait" mdbBtn size="sm" class="btnBlue" mdbWavesEffect>
+            <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            valider
+          </button>
         </div>
       </div>
     </form>

@@ -8,7 +8,6 @@ import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { AccountService } from 'src/app/_services/account.service';
 import { ConfirmToken } from 'src/app/_models/confirmToken';
 import { Utils } from 'src/app/shared/utils';
-import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-confirm-teacher-email',
@@ -34,8 +33,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   wait = false;
 
   constructor(private authService: AuthService, private fb: FormBuilder, private route: ActivatedRoute,
-    private alertify: AlertifyService,  private userService: UserService,
-    private accountService: AccountService, private router: Router) { }
+    private alertify: AlertifyService, private accountService: AccountService) { }
 
   ngOnInit() {
     this.authService.eraseSessionData();
@@ -63,9 +61,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
     this.userForm = this.fb.group({
       lastName: ['', Validators.required],
       firstName: ['', Validators.required],
-      // email: ['', Validators.required],
       userName: ['', Validators.required],
-      // cell: ['', [ Validators.required, this.phoneValidator ] ],
       pwd: ['', Validators.required],
       checkpwd: ['', [ Validators.required, this.confirmationValidator ] ]
     });
