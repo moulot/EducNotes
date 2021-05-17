@@ -1364,11 +1364,10 @@ namespace EducNotes.API.Controllers {
     [HttpGet("{teacherId}/teacherWithCourses")]
     public async Task<IActionResult> GetTeacherWithCourses(int teacherId)
     {
-      // List<ClassCourse> classCourses = await _cache.GetClassCourses();
+      List<User> teachers = await _cache.GetTeachers();
+      List<ClassCourse> classCourses = await _cache.GetClassCourses();
 
-      var teacherFromDB = await _context.Users
-                                .Include(i => i.Photos)
-                                .FirstOrDefaultAsync(u => u.Id == teacherId);
+      var teacherFromDB = teachers.FirstOrDefault(u => u.Id == teacherId);
       TeacherForEditDto teacher = _mapper.Map<TeacherForEditDto>(teacherFromDB);
 
       var courses = await _repo.GetTeacherCourses(teacherId);
@@ -1391,7 +1390,7 @@ namespace EducNotes.API.Controllers {
         cd.Abbrev = course.Abbreviation;
         // does this course has classes assigned to it?
         cd.ClassesAssigned = false;
-        var classesAssigned = await _context.ClassCourses.Where(c => c.TeacherId == teacherId && c.CourseId == course.Id).ToListAsync();
+        var classesAssigned = classCourses.Where(c => c.TeacherId == teacherId && c.CourseId == course.Id).ToList();
         if(classesAssigned.Count() > 0)
         {
           cd.ClassesAssigned = true;

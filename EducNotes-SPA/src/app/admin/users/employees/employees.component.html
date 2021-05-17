@@ -23,7 +23,7 @@
           </div>
         </div>
         <hr class="my-1">
-        <div *ngFor="let emp of employees">
+        <div *ngFor="let emp of employees | paginate: { itemsPerPage: pageSize, currentPage: page }">
           <div class="border rounded-lg p-1 mb-1">
             <div class="row">
               <div class="col-md-3">
@@ -34,10 +34,10 @@
                   <div class="text-15 ml-2 my-auto">{{emp.lastName}} {{emp.firstName}}</div>
                 </div>
               </div>
-              <div class="col-md-2 my-auto text-center">
-                <i *ngIf="emp.validated" class="fad fa-user-check fa-2x" style="--fa-secondary-opacity: 1;
+              <div class="col-md-2 my-auto text-center text-15">
+                <i *ngIf="emp.validated" class="fad fa-user-check text-20" style="--fa-secondary-opacity: 1;
                   --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-                <i *ngIf="!emp.validated" class="fad fa-user-times fa-2x" style="--fa-secondary-opacity: 1;
+                <i *ngIf="!emp.validated" class="fad fa-user-times text-20" style="--fa-secondary-opacity: 1;
                   --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
                 <br>  
                 {{emp.validated ? 'validé' : 'non validé'}}
@@ -51,6 +51,10 @@
               </div>
             </div>
           </div>
+        </div>
+        <div>
+          <pagination-controls (pageChange)="page = $event" responsive="true" directionLinks="true"
+            autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
         </div>
       </div>
     </div>

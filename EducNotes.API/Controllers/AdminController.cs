@@ -800,6 +800,36 @@ namespace EducNotes.API.Controllers
       return BadRequest("problème pour metre à jour les paramètres");
     }
 
+    [HttpGet("{roleId}/RoleWithUsers")]
+    public async Task<IActionResult> GetRoleWithUsers(int roleId)
+    {
+      List<Role> rolesCached = await _cache.GetRoles();
+      List<UserRole> userRoles = await _cache.GetUserRoles();
+      List<RoleCapability> roleCapabilities = await _cache.GetRoleCapabilities();
+
+      Role currentRole = rolesCached.First(r => r.Id == roleId);
+      RoleWithUsersDto role = new RoleWithUsersDto();
+      role.Id = currentRole.Id;
+      role.Name = currentRole.Name;
+      
+      List<User> users = userRoles.Where(u => u.RoleId == role.Id).Select(s => s.User).ToList();
+      foreach (var user in users)
+      {
+        UserInRoleDto userInRole = new UserInRoleDto();
+        userInRole.LastName = user.LastName;
+        userInRole.FirstName = user.FirstName;
+        Photo photo = user.Photos.FirstOrDefault(p => p.IsMain == true);
+        if (photo != null)
+          userInRole.PhotoUrl = photo.Url;
+        role.Users.Add(userInRole);
+      }
+
+      List<RoleCapability> capabilities = roleCapabilities.Where(c => c.RoleId == roleId).ToList();
+      role.Capabilities = capabilities;
+
+      return Ok(role);
+    }
+
     // [Authorize(Policy = "RequireAdminRole")]
     [HttpGet("RolesWithUsers")]
     public async Task<IActionResult> GetRolesWithUsers()
@@ -814,10 +844,9 @@ namespace EducNotes.API.Controllers
         roleWithUsers.Id = role.Id;
         roleWithUsers.Name = role.Name;
         var users = userRoles.Where(u => u.RoleId == role.Id).Select(s => s.User).ToList();
-        roleWithUsers.Users = new List<UserInRole>();
         foreach (var user in users)
         {
-          UserInRole userInRole = new UserInRole();
+          UserInRoleDto userInRole = new UserInRoleDto();
           userInRole.LastName = user.LastName;
           userInRole.FirstName = user.FirstName;
           Photo photo = user.Photos.FirstOrDefault(p => p.IsMain == true);
@@ -851,45 +880,6 @@ namespace EducNotes.API.Controllers
         maritalStatus
       });
     }
-
-    // [HttpGet("{roleId}/CapabilitiesByUserId")]
-    // public async Task<IActionResult> GetCapabilitiesByRoleId(int roleId)
-    // {
-    //   List<RoleCapability> roleCapabilities = await _cache.GetRoleCapabilities();
-    //   List<Capability> capabilities = roleCapabilities.Where(c => c.RoleId == roleId)
-    //                                                   .Select(s => s.Capability).ToList();
-    //   return Ok(capabilities);
-    // }
-
-    // [HttpGet("{userId}/RolesByUserId")]
-    // public async Task<IActionResult> GetRolesByUserId(int userId)
-    // {
-    //   List<UserRole> userRoles = await _cache.GetUserRoles();
-    //   List<Role> roles = userRoles.Where(r => r.UserId == userId).Select(s => s.Role).ToList();
-    //   return Ok(roles);
-    // }
-
-    // [HttpGet("{roleId}/UsersByRoleId")]
-    // public async Task<IActionResult> GetUsersByRoleId(int roleId)
-    // {
-    //   List<UserRole> userRoles = await _cache.GetUserRoles();
-    //   List<User> users = userRoles.Where(r => r.RoleId == roleId).Select(s => s.User).ToList();
-    //   return Ok(users);
-    // }
-
-    // [HttpGet("Capabilities")]
-    // public async Task<IActionResult> GetCapabilities()
-    // {
-    //   return Ok(await _cache.GetCapabilities());
-    // }
-
-    // [HttpGet("{name}/CapabilityByName")]
-    // public async Task<IActionResult> GetCapabilityByName(string name)
-    // {
-    //   List<Capability> capabilities = await _cache.GetCapabilities();
-    //   Capability capability = capabilities.FirstOrDefault(c => c.Name.ToUpper() == name.ToUpper());
-    //   return Ok(capability);
-    // }
 
     [HttpGet("{menuItemId}/CapabilitiesByMenuItemId")]
     public async Task<IActionResult> GetCapabilitiesByMenuItelId(int menuItemId)
@@ -927,124 +917,84 @@ namespace EducNotes.API.Controllers
       return Ok(roleCapabilities);
     }
 
-    // [HttpGet("{userId}/UserRoleByUserId/{roleId}")]
-    // public async Task<IActionResult> GetUserRoleByUserId(int userId, int roleId)
-    // {
-    //   UserRole userRole = await _repo.GetUserRoleByUserId(userId, roleId);
-    //   return Ok(userRole);
-    // }
-
     [HttpGet("LoadMenu/{userTypeId}")]
     public async Task<IActionResult> GetMenu(int userTypeId)
     {
-      List<MenuItem> menuItems = await _repo.GetUserTypeMenu(userTypeId);
+      int currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+      List<MenuItemDto> menuItems = await _repo.GetUserTypeMenu(userTypeId, currentUserId);
       return Ok(menuItems);
     }
 
-    [HttpGet("TopMenuItem/{menuItemName}")]
-    public MenuItem GetTopMenuItem(string menuItemName, List<MenuItem> menuItems)
-    {
-      MenuItem menuItem = _repo.GetTopMenuItem(menuItemName, menuItems);
-      return menuItem;
-    }
-
-    [HttpGet("{userId}/HasAccessToMenu/{menuItemId}")]
-    public async Task<IActionResult> HasAccessToMenu(int userId, int menuItemId)
-    {
-      Boolean userHasAccessToMenu = await _repo.HasAccessToMenu(userId, menuItemId);
-      return Ok(userHasAccessToMenu);
-    }
+    // [HttpGet("TopMenuItem/{menuItemName}")]
+    // public MenuItem GetTopMenuItem(string menuItemName, List<MenuItem> menuItems)
+    // {
+    //   MenuItem menuItem = _repo.GetTopMenuItem(menuItemName, menuItems);
+    //   return menuItem;
+    // }
 
     [HttpGet("GetMenuCapabilities/{userTypeId}")]
     public async Task<IActionResult> GetMenuCapabilities(int userTypeId)
     {
-      List<MenuCapabilitiesDto> MenuCapabilities = await _repo.GetMenuCapabilities(userTypeId);
+      int currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+      List<MenuCapabilitiesDto> MenuCapabilities = await _repo.GetMenuCapabilities(userTypeId, currentUserId);
       return Ok(MenuCapabilities);
     }
 
     [HttpPost("saveRole")]
-    public async Task<IActionResult> saveRole(RoleDto roleDto)
+    public async Task<IActionResult> saveRole(RoleDto role)
     {
-      List<RoleCapability> roleCapabilities = await _cache.GetRoleCapabilities();
-      List<Role> roles = await _cache.GetRoles();
-      DateTime today = DateTime.Now;
+      bool roleOK = await _repo.SaveRole(role);
 
-      using (var identityContextTransaction = _context.Database.BeginTransaction())
+      if(roleOK) {
+        return Ok();
+      } else
+        return BadRequest("problème pour saisir le rôle");
+    }
+
+    [HttpGet("Employees")]
+    public async Task<IActionResult> GetEmployees()
+    {
+      List<User> users = await _cache.GetEmployees();
+      return Ok(users);
+    }
+
+    [HttpGet("RoleEmployees/{roleId}")]
+    public async Task<IActionResult> GetRoleEmployees(int roleId)
+    {
+      List<UserRole> userRoles = await _cache.GetUserRoles();
+      List<User> employees = await _cache.GetEmployees();
+
+      List<UserInRoleDto> usersInRole = new List<UserInRoleDto>();
+      List<UserInRoleDto> usersNotInRole = new List<UserInRoleDto>();
+      List<UserRole> roleUsers = userRoles.Where(r => r.RoleId == roleId).ToList();
+      foreach (User emp in employees)
       {
-        try
+        UserRole userRole = roleUsers.FirstOrDefault(u => u.UserId == emp.Id);
+
+        UserInRoleDto user = new UserInRoleDto();
+        user.Id = emp.Id;
+        user.LastName = emp.LastName;
+        user.FirstName = emp.FirstName;
+        Photo photo = emp.Photos.FirstOrDefault(p => p.IsMain == true);
+        if (photo != null)
+          user.PhotoUrl = photo.Url;
+
+        if(userRole != null)
         {
-          Role role = new Role();
-          role.Id = roleDto.RoleId;
-          role.Name = roleDto.RoleName;
-
-          //is it a new role?
-          if (role.Id == 0)
-          {
-            var result = await _roleManager.CreateAsync(role);
-            if(!result.Succeeded)
-            {
-              identityContextTransaction.Rollback();
-              return BadRequest("problème pour créer le rôle");
-            }
-
-            Role newRole = await _roleManager.FindByNameAsync(role.Name);
-            foreach (RoleCapabilityDto  capability in roleDto.Capabilities)
-            {
-              RoleCapability rc = new RoleCapability();
-              rc.RoleId = newRole.Id;
-              rc.CapabilityId = capability.CapabilityId;
-              rc.AccessFlag = capability.AccesFlag;
-              rc.InsertUserId = 1;
-              rc.InsertDate = today;
-              rc.UpdateUserId = 1;
-              rc.UpdateDate = today;
-              _repo.Add(rc);
-            }
-          }
-          else
-          {
-            Role currentRole = roles.First(r => r.Id == roleDto.RoleId);
-            currentRole.Name = roleDto.RoleName;
-            _repo.Update(currentRole);
-
-            //remove previous role capabilities
-            List<RoleCapability> prevRoleCapabilities = roleCapabilities.Where(r => r.RoleId == currentRole.Id).ToList();
-            _repo.DeleteAll(prevRoleCapabilities);
-
-            //add new role capabilities
-            foreach (RoleCapabilityDto  capability in roleDto.Capabilities)
-            {
-              RoleCapability rc = new RoleCapability();
-              rc.RoleId = currentRole.Id;
-              rc.CapabilityId = capability.CapabilityId;
-              rc.AccessFlag = capability.AccesFlag;
-              rc.InsertUserId = 1;
-              rc.InsertDate = today;
-              rc.UpdateUserId = 1;
-              rc.UpdateDate = today;
-              _repo.Add(rc);
-            }
-          }
-
-          if(await _repo.SaveAll())
-          {
-            await _cache.LoadRoles();
-            await _cache.LoadRoleCapabilities();
-            identityContextTransaction.Commit();
-            return Ok();
-          }
-          else
-          {
-            identityContextTransaction.Rollback();
-            return BadRequest("problème pour enregistrer le rôle");
-          }
+          usersInRole.Add(user);
         }
-        catch
+        else
         {
-          identityContextTransaction.Rollback();
-          return BadRequest("problème pour enregistrer le rôle");
+          usersNotInRole.Add(user);
         }
       }
+
+      return Ok(new {
+        usersInRole,
+        usersNotInRole
+      });
     }
 
   }

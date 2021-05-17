@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
 import { JwtModule } from '@auth0/angular-jwt';
 import { NgxGalleryModule } from 'ngx-gallery';
 import { FileUploadModule } from 'ng2-file-upload';
-import { TimeAgoPipe } from 'time-ago-pipe';
+// import { TimeAgoPipe } from 'time-ago-pipe';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { NgxEditorModule } from 'ngx-editor';
 
@@ -148,7 +148,6 @@ import { TeacherFormResolver } from './_resolvers/teacher-form-resolver';
 
 import { BroadcastComponent } from './comm/brodcast/broadcast.component';
 import { MDBBootstrapModulesPro, MDBSpinningPreloader } from 'ng-uikit-pro-standard';
-// import { MDBSpinningPreloader } from 'ng-uikit-pro-standard';
 import { TagInputsComponent } from './views/forms/tag-inputs/tag-inputs.component';
 import { TagInputModule } from 'ngx-chips';
 import { EmailComponent } from './comm/email/email.component';
@@ -283,6 +282,8 @@ import { AddEmployeeComponent } from './admin/users/add-employee/add-employee.co
 import { AddRoleComponent } from './admin/add-role/add-role.component';
 import { ConfigMenuComponent } from './admin/config/config-menu/config-menu.component';
 import { ConfigMenuResolver } from './_resolvers/config-menu-resolver';
+import { ConfirmUserEmailComponent } from './registration/confirm-user-email/confirm-user-email.component';
+import { EditRoleResolver } from './_resolvers/edit-role-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -306,7 +307,6 @@ export function tokenGetter() {
       MemberEditComponent,
       AddEmployeeComponent,
       PhotoEditorComponent,
-      TimeAgoPipe,
       MemberMessagesComponent,
       HasRoleDirective,
       FullScreenDirective,
@@ -473,10 +473,13 @@ export function tokenGetter() {
       TuitionDataComponent,
       EmployeesComponent,
       AddRoleComponent,
-      ConfigMenuComponent
+      ConfigMenuComponent,
+      ConfirmUserEmailComponent
    ],
    imports: [
       FormWizardModule,
+      // TimeAgoPipe,
+      // TimeagoModule.forRoot(),
       SharedModule,
       HttpClientModule,
       InMemoryWebApiModule.forRoot(InMemoryDataService, { passThruUnknownUrl: true }),
@@ -535,6 +538,7 @@ export function tokenGetter() {
       MemberDetailResolver,
       EmployeesResolver,
       MemberListResolver,
+      EditRoleResolver,
       MemberEditResolver,
       ConfigMenuResolver,
       PreventUnSavedChanges,

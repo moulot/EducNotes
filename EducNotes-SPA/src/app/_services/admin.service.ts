@@ -80,6 +80,10 @@ export class AdminService {
     return this.http.get(this.baseUrl + 'EmpData');
   }
 
+  getRoleWithUsers(roleId) {
+    return this.http.get(this.baseUrl + roleId + '/RoleWithUsers');
+  }
+
   getRolesWithUsers() {
     return this.http.get(this.baseUrl + 'RolesWithUsers');
   }
@@ -94,6 +98,14 @@ export class AdminService {
 
   saveRole(role) {
     return this.http.post(this.baseUrl + 'saveRole', role);
+  }
+
+  getEmployees() {
+    return this.http.get(this.baseUrl + 'employees');
+  }
+
+  getRoleEmployees(roleId) {
+    return this.http.get(this.baseUrl + 'RoleEmployees/' + roleId);
   }
 
 }

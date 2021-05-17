@@ -151,13 +151,15 @@ import { EmployeesComponent } from './admin/users/employees/employees.component'
 import { EmployeesResolver } from './_resolvers/employees-resolver';
 import { AddEmployeeComponent } from './admin/users/add-employee/add-employee.component';
 import { AddRoleComponent } from './admin/add-role/add-role.component';
+import { ConfirmUserEmailComponent } from './registration/confirm-user-email/confirm-user-email.component';
+import { EditRoleResolver } from './_resolvers/edit-role-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
     { path: 'imgCropper', component: AppImgCropperComponent },
     { path: 'signIn', component: SigninComponent },
     { path: 'confirmEmail', component: ConfirmEmailComponent},
-    { path: 'confirmTeacherEmail', component: ConfirmTeacherEmailComponent},
+    { path: 'confirmUserEmail', component: ConfirmUserEmailComponent},
     { path: 'contactus', component: ContactUsComponent},
     { path: 'resetPassword', component: ResetPasswordComponent},
     { path: 'lockout', component: LockoutComponent},
@@ -264,9 +266,10 @@ export const appRoutes: Routes = [
         { path: 'childFile/:id', component: ChildFileComponent, resolve: {file: ChildFileResolver} },
         { path: 'fileUser/:id', component: ChildFileComponent, resolve: {file: ChildFileResolver} },
         { path: 'parentFile/:id', component: ParentFileComponent, resolve: {file: ParentFileResolver} },
-        { path: 'teacherFile/:id', component: TeacherFileComponent}, // resolve: {file: ChildFileResolver} },
+        { path: 'teacherFile/:id', component: TeacherFileComponent},
         { path: 'roles', component: RolesComponent, resolve: {roles: RolesResolver} },
-        { path: 'addRole', component: AddRoleComponent}, // , resolve: {roles: RolesResolver} },
+        { path: 'addRole', component: AddRoleComponent},
+        { path: 'editRole/:id', component: AddRoleComponent, resolve: {role: EditRoleResolver} },
         { path: 'addFinOp/:id', component: AddPaymentComponent, resolve: {file: AddPaymentResolver} },
         { path: 'validatePayments', component: ValidatePaymentsComponent, resolve: {payments: ValidatePaymentsResolver}},
         { path: 'tuitionList', component: TuitionListComponent, resolve: {list: TuitionListResolver}},

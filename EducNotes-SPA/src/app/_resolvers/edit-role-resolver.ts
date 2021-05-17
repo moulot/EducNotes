@@ -1,17 +1,17 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Resolve, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { AlertifyService } from '../_services/alertify.service';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { UserService } from '../_services/user.service';
+import { AdminService } from '../_services/admin.service';
 
 @Injectable()
-export class EditChildrenResolver implements Resolve<any> {
-  constructor(private router: Router, private userService: UserService, private alertify: AlertifyService) {}
+export class EditRoleResolver implements Resolve<any> {
+  constructor(private router: Router, private adminService: AdminService, private alertify: AlertifyService) { }
   resolve(route: ActivatedRouteSnapshot): any {
-    return this.userService.getAccountChildren(route.params['id']).pipe(
+    return this.adminService.getRoleWithUsers(route.params['id']).pipe(
       catchError(error => {
-        this.alertify.error(error);
+        console.log(error);
         this.router.navigate(['/Home']);
         return of(null);
       })

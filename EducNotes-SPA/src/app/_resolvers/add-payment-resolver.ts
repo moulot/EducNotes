@@ -11,7 +11,7 @@ export class AddPaymentResolver implements Resolve<any> {
 
   resolve(route: ActivatedRouteSnapshot): any {
     return this.userService.getChildFile(route.params['id']).pipe(
-      catchError(error => {
+      catchError(() => {
         this.alertify.error('problème de récupération de données');
         this.router.navigate(['/home']);
         return of(null);

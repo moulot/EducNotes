@@ -10,7 +10,7 @@ namespace EducNotes.API.Dtos
       Capabilities = new List<Capability>();
       ChildMenuItems = new List<MenuCapabilitiesDto>();
     }
-    
+
     public int MenuItemId { get; set; }
     public string MenuItemName { get; set; }
     public List<Capability> Capabilities { get; set; }

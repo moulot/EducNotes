@@ -8,7 +8,7 @@ namespace EducNotes.API.Models
     public MenuItem()
     {
       IsAlwaysEnabled = false;
-      ChildMenuItems = new List<MenuItem>();
+      // ChildMenuItems = new List<MenuItem>();
     }
 
     public int MenuId { get; set; }
@@ -20,6 +20,6 @@ namespace EducNotes.API.Models
     public string Url { get; set; }
     public Boolean IsAlwaysEnabled { get; set; }
     public byte DsplSeq { get; set; }
-    public List<MenuItem> ChildMenuItems { get; set; }
+    // public List<MenuItem> ChildMenuItems { get; set; }
   }
 }

@@ -19,8 +19,7 @@ export class CoursesPanelComponent implements OnInit {
   show = 'all';
   willDownload = false;
 
-   constructor(private adminService: AdminService, private route: ActivatedRoute,
-    private router: Router, private alertify: AlertifyService, private classService: ClassService) {}
+   constructor(private route: ActivatedRoute, private alertify: AlertifyService, private classService: ClassService) {}
 
   ngOnInit() {
     this.route.data.subscribe(data => {

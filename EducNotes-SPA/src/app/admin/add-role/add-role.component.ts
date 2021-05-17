@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from 'src/app/_services/admin.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { environment } from 'src/environments/environment';
@@ -12,23 +12,39 @@ import { environment } from 'src/environments/environment';
 })
 export class AddRoleComponent implements OnInit {
   adminTypeId = environment.adminTypeId;
+  role: any;
   menu: any;
   roleForm: FormGroup;
   editionMode = false;
   wait = false;
+  empsInRole: any;
+  empsNotInRole: any;
 
-  constructor(private adminService: AdminService, private alertify: AlertifyService, 
-    private fb: FormBuilder, private router: Router) { }
+  constructor(private adminService: AdminService, private alertify: AlertifyService,
+    private fb: FormBuilder, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.getMenuWithCapabilities();
+    this.route.data.subscribe(data => {
+      this.role = data['role'];
+      if (this.role) {
+        this.editionMode = true;
+      } else {
+        this.initialValues();
+      }
+      this.getMenuWithCapabilities();
+      this.getRoleEmployees(this.role.id);
+    });
     this.createRoleForm();
+  }
+
+  initialValues() {
+    this.role = {id: 0, name: ''};
   }
 
   createRoleForm() {
     this.roleForm = this.fb.group({
-      roleId: [0],
-      roleName: ['', Validators.required],
+      roleId: [this.role.id],
+      roleName: [this.role.name, Validators.required],
       menuItems: this.fb.array([])
     });
   }
@@ -47,6 +63,41 @@ export class AddRoleComponent implements OnInit {
     });
   }
 
+  // getEmployess() {
+  //   this.adminService.getEmployees().subscribe(data => {
+  //     this.employees = data;
+  //   }, () => {
+  //     this.alertify.error('problème pour récupérer les données');
+  //   });
+  // }
+
+  getRoleEmployees(roleId) {
+    this.adminService.getRoleEmployees(roleId).subscribe((data: any) => {
+      this.empsInRole = data.usersInRole;
+      this.empsNotInRole = data.usersNotInRole;
+    }, () => {
+      this.alertify.error('problème pour récupérer les données');
+    });
+  }
+
+  moveToRole(empId) {
+    const index = this.empsNotInRole.findIndex(u => u.id === empId);
+    const userToMove = this.empsNotInRole[index];
+    this.empsNotInRole.splice(index, 1);
+    this.empsInRole = [...this.empsInRole, userToMove];
+    this.empsInRole.sort((a,b) => a.lastName > b.lastName ? 1 : -1);
+  }
+
+  removeFromRole(empId) {
+    const index = this.empsInRole.findIndex(u => u.id === empId);
+    console.log('index:' + index);
+    const userToMove = this.empsInRole[index];
+    console.log(userToMove);
+    this.empsInRole.splice(index, 1);
+    this.empsNotInRole = [...this.empsNotInRole, userToMove];
+    this.empsNotInRole.sort((a,b) => a.lastName > b.lastName ? 1 : -1);
+  }
+
   getMenuWithCapabilities() {
     this.adminService.getMenuWithCapabilities(this.adminTypeId).subscribe(data => {
       this.menu = data;
@@ -54,16 +105,41 @@ export class AddRoleComponent implements OnInit {
         const mnu = this.menu[i];
         // add accessFlag property to capabilities
         for (let j = 0; j < mnu.capabilities.length; j++) {
-          mnu.capabilities[j].accessFlag = 0;
-          // this.addCapabilityItem(i, elt.id, elt.name, elt.menuItemId, elt.accessType, 0);
+          const capability = mnu.capabilities[j];
+          if (this.role.capabilities) {
+            capability.accessFlag = this.getAccessFlag(capability.id);
+          } else {
+            capability.accessFlag = 0;
+          }
         }
+
+        if (mnu.childMenuItems) {
+          for (let k = 0; k < mnu.childMenuItems.length; k++) {
+            const child = mnu.childMenuItems[k];
+            // add accessFlag property to capabilities
+            for (let j = 0; j < child.capabilities.length; j++) {
+              const capability = child.capabilities[j];
+              if (this.role.capabilities) {
+                capability.accessFlag = this.getAccessFlag(capability.id);
+              } else {
+                capability.accessFlag = 0;
+              }
+            }
+          }
+        }
+
         this.addMenuItem(mnu.menuItemId, mnu.menuItemName, mnu.capabilities, mnu.childMenuItems);
       }
-      console.log(this.menu);
     }, () => {
       this.alertify.error('problème pour récupérer les donéées');
     });
   }
+
+  getAccessFlag(capabilityId) {
+    const flagIndex = this.role.capabilities.findIndex(c => c.capabilityId === capabilityId);
+    const accessFlag = flagIndex !== -1 ? this.role.capabilities[flagIndex].accessFlag : 0;
+    return accessFlag;
+}
 
   setMenuItemFlag(itemIndex, capIndex, flag) {
     this.menu[itemIndex].capabilities[capIndex].accessFlag = flag;
@@ -76,30 +152,36 @@ export class AddRoleComponent implements OnInit {
   saveRole() {
     this.wait = true;
     const role = <any>{};
-    role.roleId = this.roleForm.value.roleId;
-    role.roleName = this.roleForm.value.roleName;
-    role.capabilities = [];
     const roleid = this.roleForm.value.roleId;
+    role.roleId = roleid;
+    role.roleName = this.roleForm.value.roleName;
+    role.usersInRole = this.empsInRole;
+    role.capabilities = [];
     for (let i = 0; i < this.menu.length; i++) {
       const elt = this.menu[i];
-      const rc = <any>{};
       for (let j = 0; j < elt.capabilities.length; j++) {
+        const rc = <any>{};
         const capability = elt.capabilities[j];
-        rc.roleId = roleid;
-        rc.capabilityId = capability.id;
-        rc.accessFlag = capability.accessFlag;
-        role.capabilities = [...role.capabilities, rc];
+        if (capability.accessFlag > 0) {
+          rc.roleId = roleid;
+          rc.capabilityId = capability.id;
+          rc.accessFlag = capability.accessFlag;
+          role.capabilities = [...role.capabilities, rc];
+        }
       }
+
       if (elt.childMenuItems.length > 0) {
         for (let k = 0; k < elt.childMenuItems.length; k++) {
           const child = elt.childMenuItems[k];
-          const childRC = <any>{};
           for (let m = 0; m < child.capabilities.length; m++) {
+            const childRC = <any>{};
             const cap = child.capabilities[m];
-            childRC.roleId = roleid;
-            childRC.capabilityId = cap.id;
-            childRC.accessFlag = cap.accesFlag;
-            role.capabilities = [...role.capabilities, childRC];
+            if (cap.accessFlag > 0) {
+              childRC.roleId = roleid;
+              childRC.capabilityId = cap.id;
+              childRC.accessFlag = cap.accessFlag;
+              role.capabilities = [...role.capabilities, childRC];
+            }
           }
         }
       }
@@ -113,6 +195,10 @@ export class AddRoleComponent implements OnInit {
       this.alertify.error('problème pour enregistrer le rôle');
       this.wait = false;
     });
+  }
+
+  goToRoles() {
+    this.router.navigate(['/roles']);
   }
 
 }

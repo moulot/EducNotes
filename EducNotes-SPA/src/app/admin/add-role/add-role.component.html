@@ -9,7 +9,7 @@
       <div *ngIf="editionMode" class="d-flex mb-2">
         <i class="fad fa-users-cog fa-2x mr-2" style="--fa-secondary-opacity: 1;
           --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-        <div class="text-17">édition du rôle <span class="text-capitalize"></span></div>
+        <div class="text-17">édition du rôle <span class="text-capitalize">{{role.name}}</span></div>
       </div>
     </div>
     <div class="col-md-3">
@@ -53,16 +53,19 @@
                           <div class="col-md-12 mb-1">
                             <div class="form-check form-check-inline">
                               <input type="radio" class="form-check-input" id="none0{{i}}{{j}}" name="radio0{{i}}{{j}}"
-                                [checked]="true" (change)="setChildFlag(i, j, 0, 0)" value="0" mdbInput>
+                                [checked]="child.capabilities[0].accessFlag === 0 ? true : false"
+                                (change)="setChildFlag(i, j, 0, 0)" value="0" mdbInput>
                               <label class="form-check-label" for="none0{{i}}{{j}}">pas d'accès</label>
                             </div>
                             <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 1" class="form-check form-check-inline">
                               <input type="radio" class="form-check-input" id="readonly0{{i}}{{j}}" name="radio0{{i}}{{j}}"
+                                [checked]="child.capabilities[0].accessFlag === 1 ? true : false"  
                                 (change)="setChildFlag(i, j, 0, 1)" value="1" mdbInput>
                               <label class="form-check-label" for="readonly0{{i}}{{j}}">accès en lecture</label>
                             </div>
                             <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 2" class="form-check form-check-inline">
                               <input type="radio" class="form-check-input" id="edit0{{i}}{{j}}" name="radio0{{i}}{{j}}"
+                              [checked]="child.capabilities[0].accessFlag === 2 ? true : false"
                                 (change)="setChildFlag(i, j, 0, 2)" value="2" mdbInput>
                               <label class="form-check-label" for="edit0{{i}}{{j}}">accès total</label>
                             </div>
@@ -81,16 +84,19 @@
                           <div class="col-md-12 mb-1">
                             <div class="form-check form-check-inline">
                               <input type="radio" class="form-check-input" id="none0{{i}}{{j}}{{k}}" name="radio0{{i}}{{j}}{{k}}"
-                                (change)="setChildFlag(i, j, k, 0)" [checked]="true" value="0" mdbInput>
+                                [checked]="capability.accessFlag === 0 ? true : false"
+                                (change)="setChildFlag(i, j, k, 0)" value="0" mdbInput>
                               <label class="form-check-label" for="none0{{i}}{{j}}{{k}}">pas d'accès</label>
                             </div>
                             <div *ngIf="capability.accessType == 0 || capability.accessType == 1" class="form-check form-check-inline">
                               <input type="radio" class="form-check-input" id="readonly0{{i}}{{j}}{{k}}" name="radio0{{i}}{{j}}{{k}}"
+                                [checked]="capability.accessFlag === 1 ? true : false"
                                 (change)="setChildFlag(i, j, k, 0)" value="1" mdbInput>
                               <label class="form-check-label" for="readonly0{{i}}{{j}}{{k}}">accès en lecture</label>
                             </div>
                             <div *ngIf="capability.accessType == 0 || capability.accessType == 2" class="form-check form-check-inline">
                               <input type="radio" class="form-check-input" id="edit0{{i}}{{j}}{{k}}" name="radio0{{i}}{{j}}{{k}}"
+                                [checked]="capability.accessFlag === 2 ? true : false"
                                 (change)="setChildFlag(i, j, k, 0)" value="2" mdbInput>
                               <label class="form-check-label" for="edit0{{i}}{{j}}{{k}}">accès total</label>
                             </div>
@@ -114,16 +120,19 @@
                     <div class="col-md-12 mb-1">
                       <div class="form-check form-check-inline">
                         <input type="radio" class="form-check-input" id="none10" name="radio10"
-                          (change)="setMenuItemFlag(i, 0, 0)" [checked]="true" value="0" mdbInput>
+                          [checked]="item.value.capabilities[0].accessFlag === 0 ? true : false"
+                          (change)="setMenuItemFlag(i, 0, 0)" value="0" mdbInput>
                         <label class="form-check-label" for="none10">pas d'accès</label>
                       </div>
                       <div *ngIf="item.value.capabilities[0].accessType == 0 || item.value.capabilities[0].accessType == 1" class="form-check form-check-inline">
                         <input type="radio" class="form-check-input" id="readonly10" name="radio10"
+                          [checked]="item.value.capabilities[0].accessFlag === 1 ? true : false"
                           (change)="setMenuItemFlag(i, 0, 1)" value="1" mdbInput>
                         <label class="form-check-label" for="readonly10">accès en lecture</label>
                       </div>
                       <div *ngIf="item.value.capabilities[0].accessType == 0 || item.value.capabilities[0].accessType == 2" class="form-check form-check-inline">
                         <input type="radio" class="form-check-input" id="edit10" name="radio10"
+                          [checked]="item.value.capabilities[0].accessFlag === 2 ? true : false"
                           (change)="setMenuItemFlag(i, 0, 2)"  value="2" mdbInput>
                         <label class="form-check-label" for="edit10">accès total</label>
                       </div>
@@ -151,16 +160,19 @@
                             <div class="col-md-12 mb-1">
                               <div class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="none1{{i}}{{j}}" name="radio1{{i}}{{j}}"
-                                  (change)="setChildFlag(i, j, 0, 0)" [checked]="true" value="0" mdbInput>
+                                  [checked]="child.capabilities[0].accessFlag === 0 ? true : false"
+                                  (change)="setChildFlag(i, j, 0, 0)" value="0" mdbInput>
                                 <label class="form-check-label" for="none1{{i}}{{j}}">pas d'accès</label>
                               </div>
                               <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 1" class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="readonly1{{i}}{{j}}" name="radio1{{i}}{{j}}"
+                                  [checked]="child.capabilities[0].accessFlag === 1 ? true : false"
                                   (change)="setChildFlag(i, j, 0, 1)" value="1" mdbInput>
                                 <label class="form-check-label" for="readonly1{{i}}{{j}}">accès en lecture</label>
                               </div>
                               <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 2" class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="edit1{{i}}{{j}}" name="radio1{{i}}{{j}}"
+                                  [checked]="child.capabilities[0].accessFlag === 2 ? true : false"
                                   (change)="setChildFlag(i, j, 0, 1)"  value="2" mdbInput>
                                 <label class="form-check-label" for="edit1{{i}}{{j}}">accès total</label>
                               </div>
@@ -179,16 +191,19 @@
                             <div class="col-md-12 mb-1">
                               <div class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="none1{{i}}{{j}}{{k}}" name="radio1{{i}}{{j}}{{k}}"
-                                  (change)="setChildFlag(i, j, k, 0)" [checked]="true" value="0" mdbInput>
+                                  [checked]="capability.accessFlag === 0 ? true : false"
+                                  (change)="setChildFlag(i, j, k, 0)" value="0" mdbInput>
                                 <label class="form-check-label" for="none1{{i}}{{j}}{{k}}">pas d'accès</label>
                               </div>
                               <div *ngIf="capability.accessType == 0 || capability.accessType == 1" class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="readonly1{{i}}{{j}}{{k}}" name="radio1{{i}}{{j}}{{k}}"
+                                  [checked]="capability.accessFlag === 1 ? true : false"
                                   (change)="setChildFlag(i, j, k, 1)"  value="1" mdbInput>
                                 <label class="form-check-label" for="readonly1{{i}}{{j}}{{k}}">accès en lecture</label>
                               </div>
                               <div *ngIf="capability.accessType == 0 || capability.accessType == 2" class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="edit1{{i}}{{j}}{{k}}" name="radio1{{i}}{{j}}{{k}}"
+                                  [checked]="capability.accessFlag === 2 ? true : false"
                                   (change)="setChildFlag(i, j, k, 2)"  value="2" mdbInput>
                                 <label class="form-check-label" for="edit1{{i}}{{j}}{{k}}">accès total</label>
                               </div>
@@ -210,17 +225,20 @@
                   <div class="row">
                     <div class="col-md-12 mb-1">
                       <div class="form-check form-check-inline">
-                        <input type="radio" class="form-check-input" id="none2{{i}}{{j}}" name="radio2{{i}}{{j}}" [checked]="true"
+                        <input type="radio" class="form-check-input" id="none2{{i}}{{j}}" name="radio2{{i}}{{j}}"
+                          [checked]="capability.accessFlag === 0 ? true : false"
                           (change)="setMenuItemFlag(i, j, 0)" value="0" mdbInput>
                         <label class="form-check-label" for="none2{{i}}{{j}}">pas d'accès</label>
                       </div>
                       <div *ngIf="capability.accessType == 0 || capability.accessType == 1" class="form-check form-check-inline">
                         <input type="radio" class="form-check-input" id="readonly2{{i}}{{j}}" name="radio2{{i}}{{j}}"
+                          [checked]="capability.accessFlag === 1 ? true : false"
                           (change)="setMenuItemFlag(i, j, 1)" value="1" mdbInput>
                         <label class="form-check-label" for="readonly2{{i}}{{j}}">accès en lecture</label>
                       </div>
                       <div *ngIf="capability.accessType == 0 || capability.accessType == 2" class="form-check form-check-inline">
                         <input type="radio" class="form-check-input" id="edit2{{i}}{{j}}" name="radio2{{i}}{{j}}"
+                          [checked]="capability.accessFlag === 2 ? true : false"
                           (change)="setMenuItemFlag(i, j, 2)" value="2" mdbInput>
                         <label class="form-check-label" for="edit2{{i}}{{j}}">accès total</label>
                       </div>
@@ -248,16 +266,19 @@
                             <div class="col-md-12 mb-1">
                               <div class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="none2{{i}}{{j}}" name="radio2{{i}}{{j}}"
-                                  [checked]="true" (change)="setChildFlag(i, j, 0, 0)" value="0" mdbInput>
+                                  [checked]="child.capabilities[0].accessFlag === 0 ? true : false"
+                                  (change)="setChildFlag(i, j, 0, 0)" value="0" mdbInput>
                                 <label class="form-check-label" for="none2{{i}}{{j}}">pas d'accès</label>
                               </div>
                               <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 1" class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="readonly2{{i}}{{j}}" name="radio2{{i}}{{j}}"
+                                  [checked]="child.capabilities[0].accessFlag === 1 ? true : false"
                                   (change)="setChildFlag(i, j, 0, 1)" value="1" mdbInput>
                                 <label class="form-check-label" for="readonly2{{i}}{{j}}">accès en lecture</label>
                               </div>
                               <div *ngIf="child.capabilities[0].accessType == 0 || child.capabilities[0].accessType == 2" class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="edit2{{i}}{{j}}" name="radio2{{i}}{{j}}"
+                                  [checked]="child.capabilities[0].accessFlag === 2 ? true : false"
                                   (change)="setChildFlag(i, j, 0, 2)" value="2" mdbInput>
                                 <label class="form-check-label" for="edit2{{i}}{{j}}">accès total</label>
                               </div>
@@ -276,16 +297,19 @@
                             <div class="col-md-12 mb-1">
                               <div class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="none2{{i}}{{j}}{{k}}" name="radio2{{i}}{{j}}{{k}}"
-                                  (change)="setChildFlag(i, j, k, 0)" [checked]="true" value="0" mdbInput>
+                                  [checked]="capability.accessFlag === 0 ? true : false"
+                                  (change)="setChildFlag(i, j, k, 0)" value="0" mdbInput>
                                 <label class="form-check-label" for="none2{{i}}{{j}}{{k}}">pas d'accès</label>
                               </div>
                               <div *ngIf="capability.accessType == 0 || capability.accessType == 1" class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="readonly2{{i}}{{j}}{{k}}" name="radio2{{i}}{{j}}{{k}}"
+                                  [checked]="capability.accessFlag === 1 ? true : false"
                                   (change)="setChildFlag(i, j, k, 0)" value="1" mdbInput>
                                 <label class="form-check-label" for="readonly2{{i}}{{j}}{{k}}">accès en lecture</label>
                               </div>
                               <div *ngIf="capability.accessType == 0 || capability.accessType == 2" class="form-check form-check-inline">
                                 <input type="radio" class="form-check-input" id="edit2{{i}}{{j}}{{k}}" name="radio2{{i}}{{j}}{{k}}"
+                                  [checked]="capability.accessFlag === 2 ? true : false"
                                   (change)="setChildFlag(i, j, k, 0)" value="2" mdbInput>
                                 <label class="form-check-label" for="edit2{{i}}{{j}}{{k}}">accès total</label>
                               </div>
@@ -303,15 +327,70 @@
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body p-2">
+          <div class="text-15 textDarkBlue"><b>utilisateurs du rôle</b></div>
+          <hr class="my-1">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="text-15">employés</div>
+              <hr class="my-1">
+              <div *ngFor="let emp of empsNotInRole" class="border rounded-lg p-1">
+                <a (click)="moveToRole(emp.id)">
+                  <div class="d-flex">
+                    <div class="zoom">
+                      <img class="rounded-circle" width="30" src="{{emp.photoUrl || '../../../../assets/user.png'}}" alt>
+                    </div>
+                    <div class="text-15 ml-2 my-auto flex-grow-1 text-capitalize">{{emp.lastName}} {{emp.firstName}}</div>
+                    <i class="fad fa-arrow-alt-right fa-2x d-none d-md-block my-auto" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                    <i class="fad fa-arrow-alt-down fa-2x d-md-none my-auto" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                </div>
+              </a>
+            </div>
+            </div>
+            <div class="col-md-2 my-auto text-center">
+              <div class="text-13 textDarkRed">clicker sur l'utilisateur pour le déplacer</div>
+              <i class="fad fa-exchange-alt fa-4x d-none d-md-block" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+              <i class="fad fa-sort-alt fa-4x d-md-none" style="--fa-secondary-opacity: 1;
+                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+            </div>
+            <div class="col-md-5">
+              <div class="text-15">employés dans le rôle</div>
+              <hr class="my-1">
+              <div *ngFor="let emp of empsInRole" class="border rounded-lg p-1">
+                <a (click)="removeFromRole(emp.id)">
+                  <div class="d-flex">
+                    <i class="fad fa-arrow-alt-left fa-2x d-none d-md-block my-auto mr-3" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                    <div class="zoom">
+                      <img class="rounded-circle" width="30" src="{{emp.photoUrl || '../../../../assets/user.png'}}" alt>
+                    </div>
+                    <div class="text-15 ml-2 my-auto flex-grow-1 text-capitalize">{{emp.lastName}} {{emp.firstName}}</div>
+                    <i class="fad fa-arrow-alt-up fa-2x d-md-none my-auto" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="row my-2">
     <div class="col-md-8"></div>
-    <div class="col-md-2">
-      <button type="button" [routerLink]="['/roles']" [disabled]="wait" mdbBtn block="true" size="sm" class="btnOrange" mdbWavesEffect>
+    <div class="col-md-2 mb-1">
+      <button type="button" (click)="goToRoles()" [disabled]="wait" mdbBtn block="true" size="sm" class="btnOrange" mdbWavesEffect>
         <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         annuler
       </button>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-2 mb-1">
       <button type="submit" mdbBtn [disabled]="!roleForm.valid || wait" size="sm" block="true" class="btnBlue" mdbWavesEffect>
         <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         saisir le rôle

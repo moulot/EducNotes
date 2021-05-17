@@ -137,15 +137,16 @@ namespace EducNotes.API.Data
     MsgRecipientsDto setRecipientsList(List<User> users, int msgChoice, Boolean sendToNotValidated);
     List<ClassDayCoursesDto> GetCoursesFromSchedules(IEnumerable<ScheduleForTimeTableDto> schedules);
     Task<Boolean> UserInRole(int userId, int roleId);
-    Boolean MenuExists(int menuItemId, List<MenuItem> menuItems);
-    MenuItem GetByMenuItemId(int menuItemId, List<MenuItem> menuItems);
-    MenuItem FindOrLoadParent(List<MenuItem> menuItems, int parentMenuItemId);
-    MenuItem GetByMenuItemName(string menuItemName, List<MenuItem> menuItems);
-    MenuItem GetTopMenuItem(string menuItemName, List<MenuItem> menuItems);
+    // Boolean MenuExists(int menuItemId, List<MenuItem> menuItems);
+    // MenuItem GetByMenuItemId(int menuItemId, List<MenuItem> menuItems);
+    // MenuItem FindOrLoadParent(List<MenuItem> menuItems, int parentMenuItemId);
+    // MenuItem GetByMenuItemName(string menuItemName, List<MenuItem> menuItems);
+    // MenuItem GetTopMenuItem(string menuItemName, List<MenuItem> menuItems);
     Task<UserWithRolesDto> GetUserWithRoles(int userId);
-    Task<List<MenuItem>> GetUserMenu(int userId);
-    Task<List<MenuItem>> GetUserTypeMenu(int userTypeId);
-    Task<Boolean> HasAccessToMenu(int userId, int menuItemId);
-    Task<List<MenuCapabilitiesDto>> GetMenuCapabilities(int userTypeId);
+    Task<List<MenuItemDto>> GetUserMenu(int userId);
+    Task<List<MenuItemDto>> GetUserTypeMenu(int userTypeId, int userId);
+    // Task<Boolean> HasAccessToMenu(int userId, int menuItemId);
+    Task<List<MenuCapabilitiesDto>> GetMenuCapabilities(int userTypeId, int userId);
+    Task<bool> SaveRole(RoleDto user);
   }
 }

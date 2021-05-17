@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { env } from 'process';
 import { Utils } from 'src/app/shared/utils';
 import { AdminService } from 'src/app/_services/admin.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { AuthService } from 'src/app/_services/auth.service';
 import { UserService } from 'src/app/_services/user.service';
 import { environment } from 'src/environments/environment';
 
@@ -148,14 +146,14 @@ export class AddEmployeeComponent implements OnInit {
   addEmployee() {
     this.wait = true;
     // get the selected roles for the teacher
-    let ids = '';
+    let roles = '';
     for (let i = 0; i < this.empForm.value.roles.length; i++) {
       const elt = this.empForm.value.roles[i];
       if (elt.active === true) {
-        if (ids === '') {
-          ids = elt.roleid.toString();
+        if (roles === '') {
+          roles = elt.name.toString();
         } else {
-          ids += ',' + elt.roleid.toString();
+          roles += ',' + elt.name.toString();
         }
       }
     }
@@ -174,7 +172,7 @@ export class AddEmployeeComponent implements OnInit {
     formData.append('email', this.empForm.value.email);
     formData.append('phoneNumber', this.empForm.value.cell);
     formData.append('secondPhoneNumber', this.empForm.value.phone2);
-    formData.append('roleIds', ids);
+    formData.append('roles', roles);
     formData.append('userTypeId', this.adminTypeId.toString());
     this.userService.addEmployee(formData).subscribe(() => {
       this.alertify.success('employé ajouté avec succès');

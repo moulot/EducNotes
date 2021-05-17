@@ -8,16 +8,14 @@ import { EmailTemplate } from '../_models/emailTemplate';
 
 @Injectable()
 export class EditEmailTemplateResolver implements Resolve<EmailTemplate> {
-    constructor(private commService: CommService, private router: Router, private alertify: AlertifyService) {}
-
-    resolve(route: ActivatedRouteSnapshot): Observable<EmailTemplate> {
-      console.log(route.params['id']);
-        return this.commService.getEmailTemplateById(route.params['id']).pipe(
-            catchError(error => {
-                this.alertify.error('problème de récupération de données');
-                this.router.navigate(['/home']);
-                return of(null);
-            })
-        );
-    }
+  constructor(private commService: CommService, private router: Router, private alertify: AlertifyService) {}
+  resolve(route: ActivatedRouteSnapshot): Observable<EmailTemplate> {
+    return this.commService.getEmailTemplateById(route.params['id']).pipe(
+      catchError(() => {
+        this.alertify.error('problème de récupération de données');
+        this.router.navigate(['/home']);
+        return of(null);
+      })
+    );
+  }
 }

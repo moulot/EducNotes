@@ -9,11 +9,11 @@ import { ConfirmToken } from 'src/app/_models/confirmToken';
 import { Utils } from 'src/app/shared/utils';
 
 @Component({
-  selector: 'app-confirm-teacher-email',
-  templateUrl: './confirm-teacher-email.component.html',
-  styleUrls: ['./confirm-teacher-email.component.scss']
+  selector: 'app-confirm-user-email',
+  templateUrl: './confirm-user-email.component.html',
+  styleUrls: ['./confirm-user-email.component.scss']
 })
-export class ConfirmTeacherEmailComponent implements OnInit {
+export class ConfirmUserEmailComponent implements OnInit {
   user: User;
   userForm: FormGroup;
   phoneForm: FormGroup;
@@ -23,7 +23,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
   validAccount = false;
   phoneValidationSteps = 0;
   phoneOk = true;
-  teacherOk = false;
+  userOk = false;
   userid: any;
   userToken: any;
   username: string;
@@ -102,7 +102,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
     this.accountService.confirmEmail(confirmEmail).subscribe((data: any) => {
       this.emailOK = data.emailOK;
       this.user = data.user;
-      this.teacherOk = this.user.validated;
+      this.userOk = this.user.validated;
       this.validAccount = data.accountValidated;
       this.initialValues();
       this.wait = false;
@@ -168,7 +168,7 @@ export class ConfirmTeacherEmailComponent implements OnInit {
 
   updateUser(): void {
     this.authService.setUserAccountData(this.user.id, this.userForm.value).subscribe(() => {
-      this.teacherOk = true;
+      this.userOk = true;
       this.validAccount = this.user.validated;
     }, error => {
       this.alertify.error(error);

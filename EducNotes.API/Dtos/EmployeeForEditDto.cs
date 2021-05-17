@@ -23,7 +23,6 @@ namespace EducNotes.API.Dtos
     public DateTime LastActive { get; set; }
     public string PhotoUrl { get; set; }
     public IFormFile PhotoFile { get; set; }
-    public string RoleIds { get; set; }
-    public List<Role> Roles { get; set; }
+    public string Roles { get; set; }
   }
 }
