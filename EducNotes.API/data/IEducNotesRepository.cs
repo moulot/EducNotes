@@ -147,6 +147,6 @@ namespace EducNotes.API.Data
     Task<List<MenuItemDto>> GetUserTypeMenu(int userTypeId, int userId);
     // Task<Boolean> HasAccessToMenu(int userId, int menuItemId);
     Task<List<MenuCapabilitiesDto>> GetMenuCapabilities(int userTypeId, int userId);
-    Task<bool> SaveRole(RoleDto user);
+    Task<ErrorDto> SaveRole(RoleDto user);
   }
 }

@@ -257,18 +257,16 @@ namespace EducNotes.API.Controllers
             }
           }
 
-          if (await _repo.SaveAll())
-          {
-            // await _cache.LoadOrders();
-            // await _cache.LoadFinOps();
-            // await _cache.LoadFinOpOrderLines();
-            // await _cache.LoadCheques();
-            // await _cache.LoadOrderLines();
-            // await _cache.LoadOrderLineDeadLines();
-            // await _cache.LoadUsers();
-            identityContextTransaction.Commit();
-            return Ok();
-          }
+          await _repo.SaveAll();
+          identityContextTransaction.Commit();
+          // await _cache.LoadOrders();
+          // await _cache.LoadFinOps();
+          // await _cache.LoadFinOpOrderLines();
+          // await _cache.LoadCheques();
+          // await _cache.LoadOrderLines();
+          // await _cache.LoadOrderLineDeadLines();
+          // await _cache.LoadUsers();
+          return Ok();
         }
         catch(Exception ex)
         {
@@ -277,7 +275,7 @@ namespace EducNotes.API.Controllers
           return BadRequest("erreur lors de l'ajout du paiement.");
         }
 
-        return BadRequest("problème pour saisir le paiement.");
+        // return BadRequest("problème pour saisir le paiement.");
       }
     }
 

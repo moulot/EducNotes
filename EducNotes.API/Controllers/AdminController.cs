@@ -803,11 +803,13 @@ namespace EducNotes.API.Controllers
     [HttpGet("{roleId}/RoleWithUsers")]
     public async Task<IActionResult> GetRoleWithUsers(int roleId)
     {
-      List<Role> rolesCached = await _cache.GetRoles();
-      List<UserRole> userRoles = await _cache.GetUserRoles();
-      List<RoleCapability> roleCapabilities = await _cache.GetRoleCapabilities();
+      // List<Role> rolesCached = await _cache.GetRoles();
+      List<UserRole> userRoles = await _context.UserRoles.Include(a => a.User)
+                                                         .ThenInclude(i => i.Photos)
+                                                         .ToListAsync();
+      List<RoleCapability> roleCapabilities = await _context.RoleCapabilities.ToListAsync();
 
-      Role currentRole = rolesCached.First(r => r.Id == roleId);
+      Role currentRole = await _context.Roles.FirstAsync(r => r.Id == roleId);
       RoleWithUsersDto role = new RoleWithUsersDto();
       role.Id = currentRole.Id;
       role.Name = currentRole.Name;
@@ -834,8 +836,10 @@ namespace EducNotes.API.Controllers
     [HttpGet("RolesWithUsers")]
     public async Task<IActionResult> GetRolesWithUsers()
     {
-      List<Role> rolesCached = await _cache.GetRoles();
-      List<UserRole> userRoles = await _cache.GetUserRoles();
+      List<Role> rolesCached = await _context.Roles.OrderBy(r => r.Name).ToListAsync();//_cache.GetRoles();//
+      List<UserRole> userRoles = await _context.UserRoles
+                                        .Include( a=> a.User).ThenInclude(i => i.Photos)
+                                            .ToListAsync();
 
       List<RoleWithUsersDto> roles = new List<RoleWithUsersDto>();
       foreach (var role in rolesCached)
@@ -926,13 +930,6 @@ namespace EducNotes.API.Controllers
       return Ok(menuItems);
     }
 
-    // [HttpGet("TopMenuItem/{menuItemName}")]
-    // public MenuItem GetTopMenuItem(string menuItemName, List<MenuItem> menuItems)
-    // {
-    //   MenuItem menuItem = _repo.GetTopMenuItem(menuItemName, menuItems);
-    //   return menuItem;
-    // }
-
     [HttpGet("GetMenuCapabilities/{userTypeId}")]
     public async Task<IActionResult> GetMenuCapabilities(int userTypeId)
     {
@@ -945,12 +942,12 @@ namespace EducNotes.API.Controllers
     [HttpPost("saveRole")]
     public async Task<IActionResult> saveRole(RoleDto role)
     {
-      bool roleOK = await _repo.SaveRole(role);
-
-      if(roleOK) {
+      ErrorDto error = await _repo.SaveRole(role);
+      
+      if(error.NoError)
         return Ok();
-      } else
-        return BadRequest("problème pour saisir le rôle");
+      else
+        return BadRequest(error);
     }
 
     [HttpGet("Employees")]
@@ -963,12 +960,14 @@ namespace EducNotes.API.Controllers
     [HttpGet("RoleEmployees/{roleId}")]
     public async Task<IActionResult> GetRoleEmployees(int roleId)
     {
-      List<UserRole> userRoles = await _cache.GetUserRoles();
-      List<User> employees = await _cache.GetEmployees();
+      // List<UserRole> userRoles = await _cache.GetUserRoles();
+      List<User> employees = await _context.Users
+                                                 .Include(i => i.Photos)
+                                                 .Where(u => u.UserTypeId == adminTypeId).ToListAsync(); //_cache.GetEmployees();
 
       List<UserInRoleDto> usersInRole = new List<UserInRoleDto>();
       List<UserInRoleDto> usersNotInRole = new List<UserInRoleDto>();
-      List<UserRole> roleUsers = userRoles.Where(r => r.RoleId == roleId).ToList();
+      List<UserRole> roleUsers = await _context.UserRoles.Where(r => r.RoleId == roleId).ToListAsync();
       foreach (User emp in employees)
       {
         UserRole userRole = roleUsers.FirstOrDefault(u => u.UserId == emp.Id);

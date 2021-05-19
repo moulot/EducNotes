@@ -293,9 +293,9 @@ namespace EducNotes.API.Controllers {
 
             if(await _repo.SaveAll())
             {
+              identityContextTransaction.Commit();
               await _cache.LoadSchedules();
               await _cache.LoadScheduleCourses();
-              identityContextTransaction.Commit();
               deleteOK = true;
               return Ok(deleteOK);
             }
@@ -877,9 +877,9 @@ namespace EducNotes.API.Controllers {
 
           if(await _repo.SaveAll())
           {
+            identityContextTransaction.Commit();
             await _cache.LoadScheduleCourses();
             await _cache.LoadSchedules();
-            identityContextTransaction.Commit();
             return NoContent();
           }
         }
@@ -982,15 +982,13 @@ namespace EducNotes.API.Controllers {
             }
           }
 
-          if(await _repo.SaveAll())
-          {
-            await _cache.LoadSchedules();
-            await _cache.LoadScheduleCourses();
-            // await _cache.LoadConflicts();
-            // await _cache.LoadCourseConflicts();
-            identityContextTransaction.Commit();
-            return NoContent();
-          }
+          await _repo.SaveAll();
+          identityContextTransaction.Commit();
+          await _cache.LoadSchedules();
+          await _cache.LoadScheduleCourses();
+          // await _cache.LoadConflicts();
+          // await _cache.LoadCourseConflicts();
+          return NoContent();
         }
         catch(Exception ex)
         {
@@ -2521,8 +2519,8 @@ namespace EducNotes.API.Controllers {
           }
 
           await _repo.SaveAll();
-          await _cache.LoadCourseTypes();
           identityContextTransaction.Commit();
+          await _cache.LoadCourseTypes();
           return Ok();
         }
         catch

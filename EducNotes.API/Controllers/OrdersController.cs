@@ -490,19 +490,17 @@ namespace EducNotes.API.Controllers
           var RegEmails = await _repo.SetEmailDataForRegistration(emails, template.Body, RegDeadLine);
           _context.AddRange(RegEmails);
 
-          if (await _repo.SaveAll())
-          {
-            await _cache.LoadOrders();
-            await _cache.LoadOrderLines();
-            await _cache.LoadOrderLineDeadLines();
-            await _cache.LoadUsers();
-            await _cache.LoadUserLinks();
-            identityContextTransaction.Commit();
-            return Ok(new {
-              orderId = order.Id,
-              orderlines = linesDto
-            });
-          }
+          await _repo.SaveAll();
+          identityContextTransaction.Commit();
+          await _cache.LoadOrders();
+          await _cache.LoadOrderLines();
+          await _cache.LoadOrderLineDeadLines();
+          await _cache.LoadUsers();
+          await _cache.LoadUserLinks();
+          return Ok(new {
+            orderId = order.Id,
+            orderlines = linesDto
+          });
         }
         catch
         {

@@ -906,9 +906,9 @@ on courses.ClassId equals classes.Id
 
           if (await SaveAll())
           {
-            await _cache.LoadUsers();
             // validate transaction
             identityContextTransaction.Commit();
+            await _cache.LoadUsers();
             resultStatus = true;
           }
           else
@@ -1003,9 +1003,9 @@ on courses.ClassId equals classes.Id
             var result = await _userManager.UpdateAsync(appUser);
             if (result.Succeeded)
             {
-              await _cache.LoadUsers();
               // fin de la transaction
               identityContextTransaction.Commit();
+              await _cache.LoadUsers();
               resultStatus = true;
             }
             else
@@ -1019,9 +1019,9 @@ on courses.ClassId equals classes.Id
             var result = await _userManager.UpdateAsync(appUser);
             if (result.Succeeded)
             {
-              await _cache.LoadUsers();
               // fin de la transaction
               identityContextTransaction.Commit();
+              await _cache.LoadUsers();
               resultStatus = true;
             }
             else
@@ -1145,13 +1145,13 @@ on courses.ClassId equals classes.Id
                   publicId = uploadResult.PublicId;
 
                   Photo photo = new Photo();
+                  photo.UserId = appUser.Id;
                   photo.Url = uploadResult.SecureUri.ToString();
                   photo.PublicId = uploadResult.PublicId;
-                  photo.UserId = appUser.Id;
                   photo.DateAdded = DateTime.Now;
                   if (appUser.Photos.Any(u => u.IsMain))
                   {
-                    var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == user.Id && p.IsMain == true);
+                    var oldPhoto = await _context.Photos.FirstAsync(p => p.UserId == appUser.Id && p.IsMain == true);
                     oldPhoto.IsMain = false;
                     Update(oldPhoto);
                   }
@@ -1189,11 +1189,11 @@ on courses.ClassId equals classes.Id
 
           if (await SaveAll())
           {
+            identityContextTransaction.Commit();
             await _cache.LoadUsers();
             await _cache.LoadUserRoles();
             await _cache.LoadPhotos();
             //fin de la transaction
-            identityContextTransaction.Commit();
             return true;
           }
           else
@@ -1380,12 +1380,12 @@ on courses.ClassId equals classes.Id
 
           if (await SaveAll())
           {
+            identityContextTransaction.Commit();
             await _cache.LoadUsers();
             await _cache.LoadTeacherCourses();
             await _cache.LoadCourses();
             await _cache.LoadClassCourses();
             //fin de la transaction
-            identityContextTransaction.Commit();
             resultStatus = true;
           }
           else
@@ -1792,7 +1792,7 @@ on courses.ClassId equals classes.Id
           if (await SaveAll())
             identityContextTransaction.Commit();
         }
-        catch (System.Exception)
+        catch(System.Exception)
         {
           identityContextTransaction.Rollback();
           usersSpaCode = new List<UserSpaCodeDto>();
@@ -4557,15 +4557,17 @@ on courses.ClassId equals classes.Id
       return menuCapabilities;
     }
 
-    public async Task<Boolean> SaveRole(RoleDto roleDto)
+    public async Task<ErrorDto> SaveRole(RoleDto roleDto)
     {
-      List<RoleCapability> roleCapabilities = await _cache.GetRoleCapabilities();
-      List<UserRole> rolesUsers = await _cache.GetUserRoles();
-      List<Role> roles = await _cache.GetRoles();
+      // List<RoleCapability> roleCapabilities = await _cache.GetRoleCapabilities();
+      // List<UserRole> rolesUsers = await _cache.GetUserRoles();
+      // List<Role> roles = await _cache.GetRoles();
       DateTime today = DateTime.Now;
 
-      using (var identityContextTransaction = _context.Database.BeginTransaction())
+      using(var identityContextTransaction = _context.Database.BeginTransaction())
       {
+        ErrorDto error = new ErrorDto();
+        error.NoError = true;
         try
         {
           Role role = new Role();
@@ -4576,30 +4578,26 @@ on courses.ClassId equals classes.Id
           if (role.Id == 0)
           {
             var result = await _roleManager.CreateAsync(role);
-            if (!result.Succeeded)
-            {
-              identityContextTransaction.Rollback();
-              return false;
-            }
+            // if (!result.Succeeded)
+            // {
+            //   identityContextTransaction.Rollback();
+            //   return false;
+            // }
           }
           else
           {
-            role = roles.First(r => r.Id == roleDto.RoleId);
+            role = await _context.Roles.FirstAsync(r => r.Id == roleDto.RoleId);
             role.Name = roleDto.RoleName;
+            role.NormalizedName = roleDto.RoleName.ToUpper();
+            // role.ConcurrencyStamp =  Guid.NewGuid().ToString();
             Update(role);
-            // var result = _roleManager.UpdateAsync(role);
-            // if(!result.Result.Succeeded)
-            // {
-            //   identityContextTransaction.Rollback();
-            //   return BadRequest("problème pour mettre à jour le rôle");
-            // }
 
             //remove previous role capabilities
-            List<RoleCapability> prevRoleCapabilities = roleCapabilities.Where(r => r.RoleId == role.Id).ToList();
+            List<RoleCapability> prevRoleCapabilities = await _context.RoleCapabilities.Where(r => r.RoleId == role.Id).ToListAsync();
             DeleteAll(prevRoleCapabilities);
 
             //remove previous users in the role
-            List<UserRole> prevUsersInRole = rolesUsers.Where(r => r.RoleId == role.Id).ToList();
+            List<UserRole> prevUsersInRole = await _context.UserRoles.Where(r => r.RoleId == role.Id).ToListAsync();
             DeleteAll(prevUsersInRole);
           }
 
@@ -4620,7 +4618,6 @@ on courses.ClassId equals classes.Id
             }
           }
 
-          //add users in role
           foreach (UserInRoleDto user in roleDto.UsersInRole)
           {
             UserRole userRole = new UserRole();
@@ -4629,26 +4626,24 @@ on courses.ClassId equals classes.Id
             Add(userRole);
           }
 
-          if (await SaveAll())
-          {
-            await _cache.LoadRoles();
-            await _cache.LoadRoleCapabilities();
-            await _cache.LoadUserRoles();
-            identityContextTransaction.Commit();
-            return true;
-          }
-          else
-          {
-            identityContextTransaction.Rollback();
-            return false;
-          }
+          await SaveAll();
+          identityContextTransaction.Commit();
+          return error;
         }
         catch (Exception ex)
         {
           var de = ex.Message;
           identityContextTransaction.Rollback();
-          return false;
+          error.Message = ex.Message;
+          error.NoError = false;
+          return error;
         }
+        // finally
+        // {
+        //   await _cache.LoadRoles();
+        //   await _cache.LoadRoleCapabilities();
+        //   await _cache.LoadUserRoles();
+        // }
       }
     }
 

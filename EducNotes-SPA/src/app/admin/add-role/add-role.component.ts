@@ -90,9 +90,7 @@ export class AddRoleComponent implements OnInit {
 
   removeFromRole(empId) {
     const index = this.empsInRole.findIndex(u => u.id === empId);
-    console.log('index:' + index);
     const userToMove = this.empsInRole[index];
-    console.log(userToMove);
     this.empsInRole.splice(index, 1);
     this.empsNotInRole = [...this.empsNotInRole, userToMove];
     this.empsNotInRole.sort((a,b) => a.lastName > b.lastName ? 1 : -1);
@@ -191,8 +189,9 @@ export class AddRoleComponent implements OnInit {
       this.alertify.success('le rôle est bien enregistré');
       this.router.navigate(['/roles']);
       this.wait = false;
-    }, () => {
+    }, error => {
       this.alertify.error('problème pour enregistrer le rôle');
+      console.log(error);
       this.wait = false;
     });
   }

@@ -284,6 +284,7 @@ import { ConfigMenuComponent } from './admin/config/config-menu/config-menu.comp
 import { ConfigMenuResolver } from './_resolvers/config-menu-resolver';
 import { ConfirmUserEmailComponent } from './registration/confirm-user-email/confirm-user-email.component';
 import { EditRoleResolver } from './_resolvers/edit-role-resolver';
+import { ConfigProductFeesComponent } from './admin/config/config-product-fees/config-product-fees.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -474,7 +475,8 @@ export function tokenGetter() {
       EmployeesComponent,
       AddRoleComponent,
       ConfigMenuComponent,
-      ConfirmUserEmailComponent
+      ConfirmUserEmailComponent,
+      ConfigProductFeesComponent
    ],
    imports: [
       FormWizardModule,
