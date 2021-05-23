@@ -204,6 +204,9 @@ namespace EducNotes.API.Helpers {
             CreateMap<PhotoForCreationDto, Photo>();
             CreateMap<UserForRegisterDto, User>();
             CreateMap<ClassLevel, ClassLevelDto>();
+            CreateMap<ProductDeadLine, ProductDealineDto>()
+                .ForMember(dest => dest.strDueDate, opt => opt
+                  .MapFrom(u => u.DueDate.ToString("dd/MM/yyyy", frC)));
             CreateMap<User, TeacherInfoDto>()
                 .ForMember(u => u.PhotoUrl, opt => opt
                   .MapFrom(u => u.Photos.FirstOrDefault (p => p.IsMain).Url));

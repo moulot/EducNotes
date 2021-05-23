@@ -38,7 +38,7 @@ namespace EducNotes.API.Controllers
     int renewRegEmailId, tuitionId, nextYearTuitionId;
     byte lastClassLevelSeq;
     CultureInfo frC = new CultureInfo("fr-FR");
-    public ICacheRepository _cache { get; }
+    public readonly ICacheRepository _cache;
     public readonly RoleManager<Role> _roleManager;
 
     public AdminController(DataContext context, UserManager<User> userManager, IConfiguration config,
@@ -961,8 +961,7 @@ namespace EducNotes.API.Controllers
     public async Task<IActionResult> GetRoleEmployees(int roleId)
     {
       // List<UserRole> userRoles = await _cache.GetUserRoles();
-      List<User> employees = await _context.Users
-                                                 .Include(i => i.Photos)
+      List<User> employees = await _context.Users.Include(i => i.Photos)
                                                  .Where(u => u.UserTypeId == adminTypeId).ToListAsync(); //_cache.GetEmployees();
 
       List<UserInRoleDto> usersInRole = new List<UserInRoleDto>();
@@ -990,10 +989,68 @@ namespace EducNotes.API.Controllers
         }
       }
 
+      usersInRole = usersInRole.OrderBy(o => o.LastName).ThenBy(o => o.FirstName).ToList();
+      usersNotInRole = usersNotInRole.OrderBy(o => o.LastName).ThenBy(o => o.FirstName).ToList();
+
       return Ok(new {
         usersInRole,
         usersNotInRole
       });
+    }
+
+    [HttpGet("tuitionFees")]
+    public async Task<IActionResult> GetTuitionFees()
+    {
+      List<ClassLevelProduct> levelProducts = await _cache.GetClassLevelProducts();
+      List<Product> products = await _cache.GetProducts();
+      List<ProductDeadLine> productsDeadlines = await _cache.GetProductDeadLines();
+
+      Product tuition = products.First(p => p.Id == tuitionId);
+      List<ClassLevelProduct> tuitionLevels = levelProducts.Where(p => p.ProductId == tuitionId).ToList();
+      
+      TuitionFeeDto tuitionFees = new TuitionFeeDto();
+      tuitionFees.ProductId = tuition.Id;
+      tuitionFees.ProductName = tuition.Name;
+      List<LevelProductPriceDto> levelFees = new List<LevelProductPriceDto>();
+      foreach (var item in tuitionLevels)
+      {
+        LevelProductPriceDto levelFee = new LevelProductPriceDto();
+        levelFee.Id = item.Id;
+        levelFee.LevelId = item.ClassLevelId;
+        levelFee.LevelName = item.ClassLevel.Name;
+        levelFee.Price = item.Price;
+        levelFees.Add(levelFee);
+      }
+      tuitionFees.LevelFees = levelFees;
+      
+      List<ProductDeadLine> dueDatesFromDB = productsDeadlines.OrderBy(o => o.Seq)
+                                                              .Where(p => p.ProductId == tuitionId).ToList();
+      List<ProductDealineDto> dueDates = _mapper.Map<List<ProductDealineDto>>(dueDatesFromDB);
+      
+      return Ok(new {
+        tuitionFees,
+        dueDates
+      });
+    }
+
+    // [HttpPost("SaveClassLevelProducts")]
+    // public async Task<IActionResult> SaveClassLevelProducts(List<ClasslevelProductDto> levelProducts)
+    // {
+    //   ErrorDto error = await _repo.SaveClassLevelProducts(levelProducts);
+    //   if(error.NoError == true)
+    //     return Ok();
+    //   else
+    //     return BadRequest(error.Message);
+    // }
+
+    [HttpPost("saveLevelTuitionFees")]
+    public async Task<IActionResult> SaveLevelTuitionFees(ScheduleDueDateFeeDto tuitionFeeData)
+    {
+      ErrorDto error = await _repo.SaveLevelTuitionFees(tuitionFeeData);
+      if(error.NoError == true)
+        return Ok();
+      else
+        return BadRequest(error.Message);
     }
 
   }

@@ -68,7 +68,7 @@ export class ConfigCourseTypeComponent implements OnInit {
     }
   }
 
-  resetCourseTypetem(index) {
+  resetCourseTypeItem(index) {
     const coursetypes = this.courseTypeForm.get('coursetypes') as FormArray;
     coursetypes.at(index).get('toBeDeleted').setValue(false);
   }

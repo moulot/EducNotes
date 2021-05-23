@@ -1043,14 +1043,15 @@ on courses.ClassId equals classes.Id
     public async Task<bool> AddEmployee(EmployeeForEditDto user)
     {
       List<User> employees = await _cache.GetEmployees();
-      List<Role> roles = await _cache.GetRoles();
-      List<UserRole> userRoles = await _cache.GetUserRoles();
+      List<Role> roles = await _context.Roles.OrderBy(o => o.Name).ToListAsync();// _cache.GetRoles();
+      // List<UserRole> userRoles = await _cache.GetUserRoles();
       List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
 
       // bool resultStatus = true;
       using (var identityContextTransaction = _context.Database.BeginTransaction())
       {
         string publicId = "";
+        Boolean photoExists = false;
         try
         {
           User appUser = new User();
@@ -1079,11 +1080,11 @@ on courses.ClassId equals classes.Id
               appUser.IdNum = GetUserIDNumber(appUser.Id, appUser.LastName, appUser.FirstName);
               await _userManager.UpdateAsync(appUser);
             }
-            else
-            {
-              identityContextTransaction.Rollback();
-              return false;
-            }
+            // else
+            // {
+            //   identityContextTransaction.Rollback();
+            //   return false;
+            // }
           }
           else
           {
@@ -1105,7 +1106,7 @@ on courses.ClassId equals classes.Id
             Update(appUser);
 
             //delete previous employee roles
-            List<UserRole> prevRoles = userRoles.Where(c => c.UserId == appUser.Id).ToList();
+            List<UserRole> prevRoles = await _context.UserRoles.Where(c => c.UserId == appUser.Id).ToListAsync();
             DeleteAll(prevRoles);
           }
 
@@ -1130,6 +1131,7 @@ on courses.ClassId equals classes.Id
           {
             if (photoFile.Length > 0)
             {
+              photoExists = true;
               var uploadResult = new ImageUploadResult();
               using (var stream = photoFile.OpenReadStream())
               {
@@ -1159,11 +1161,11 @@ on courses.ClassId equals classes.Id
                   photo.IsApproved = true;
                   Add(photo);
                 }
-                else
-                {
-                  identityContextTransaction.Rollback();
-                  return false;
-                }
+                // else
+                // {
+                //   identityContextTransaction.Rollback();
+                //   return false;
+                // }
               }
             }
           }
@@ -1187,28 +1189,23 @@ on courses.ClassId equals classes.Id
             Add(emailToSend);
           }
 
-          if (await SaveAll())
-          {
-            identityContextTransaction.Commit();
-            await _cache.LoadUsers();
-            await _cache.LoadUserRoles();
-            await _cache.LoadPhotos();
-            //fin de la transaction
-            return true;
-          }
-          else
-          {
-            identityContextTransaction.Rollback();
-            DeletePhotoFromCloudinary(publicId);
-            return false;
-          }
+          await SaveAll();
+          identityContextTransaction.Commit();
+          return true;
         }
         catch (Exception ex)
         {
           var dd = ex.Message;
           identityContextTransaction.Rollback();
-          DeletePhotoFromCloudinary(publicId);
+          if(photoExists)
+            DeletePhotoFromCloudinary(publicId);
           return false;
+        }
+        finally
+        {
+          await _cache.LoadUsers();
+          await _cache.LoadUserRoles();
+          await _cache.LoadPhotos();
         }
       }
     }
@@ -4638,13 +4635,148 @@ on courses.ClassId equals classes.Id
           error.NoError = false;
           return error;
         }
-        // finally
-        // {
-        //   await _cache.LoadRoles();
-        //   await _cache.LoadRoleCapabilities();
-        //   await _cache.LoadUserRoles();
-        // }
+        finally
+        {
+          await _cache.LoadRoles();
+          await _cache.LoadRoleCapabilities();
+          await _cache.LoadUserRoles();
+        }
       }
+    }
+
+    public async Task<ErrorDto> SaveLevelTuitionFees(ScheduleDueDateFeeDto tuitionFeeData)
+    {
+      List<ProductDeadLine> productDeadlinesCached = await _cache.GetProductDeadLines();
+      List<ClassLevelProduct> classlevelProducts = await _cache.GetClassLevelProducts();
+
+      List<ClasslevelProductDto> levelProducts = tuitionFeeData.LevelProducts;
+      List<ProductDealineDto> productDealines = tuitionFeeData.ProductDeadlines;
+
+      ErrorDto error = new ErrorDto();
+      error.NoError = true;
+
+      using(var identityContextTransaction = _context.Database.BeginTransaction())
+      {
+        try
+        {
+          //SAVE CLASSLEVELPRODUCTS
+          foreach(var levelProd in levelProducts)
+          {
+            if(levelProd.Id == 0)
+            {
+              ClassLevelProduct classlevelProd = new ClassLevelProduct {
+                ProductId = levelProd.ProductId,
+                ClassLevelId = levelProd.ClassLevelId,
+                Price = levelProd.Price
+              };
+              Add(classlevelProd);
+            }
+            else
+            {
+              ClassLevelProduct classlevelProd = classlevelProducts.First(c => c.Id == levelProd.Id);
+              classlevelProd.ProductId = levelProd.ProductId;
+              classlevelProd.ClassLevelId = levelProd.ClassLevelId;
+              classlevelProd.Price = levelProd.Price;
+              Update(classlevelProd);
+            }
+          }
+
+          // SAVE PRODUCTDEADLINES
+          foreach (var item in productDealines)
+          {
+            string strDueDate = item.strDueDate;
+            var dateData = strDueDate.Split("/");
+            int day = Convert.ToInt32(dateData[0]);
+            int month = Convert.ToInt32(dateData[1]);
+            int year = Convert.ToInt32(dateData[2]);
+            DateTime dueDate = new DateTime(year, month, day);
+
+            if(item.Id == 0)
+            {
+              ProductDeadLine newProdDeadline = new ProductDeadLine {
+                ProductId = item.ProductId,
+                DueDate = dueDate,
+                DeadLineName = item.DeadLineName,
+                Percentage = item.Percentage / 100,
+                Seq = item.Seq
+              };
+              Add(newProdDeadline);
+            }
+            else
+            {
+              ProductDeadLine prodDeadline = productDeadlinesCached.First(c => c.Id == item.Id);
+              prodDeadline.ProductId = item.ProductId;
+              prodDeadline.DueDate = dueDate;
+              prodDeadline.DeadLineName = item.DeadLineName;
+              prodDeadline.Percentage = item.Percentage / 100;
+              prodDeadline.Seq = item.Seq;
+              Update(prodDeadline);
+            }
+          }
+
+          await SaveAll();
+          identityContextTransaction.Commit();
+          await _cache.LoadClassLevelProducts();
+          await _cache.LoadProductDeadLines();
+          return error;
+        }
+        catch (System.Exception)
+        {
+          identityContextTransaction.Rollback();
+          error.NoError = false;
+          error.Message = "problème pour enregistrer les données";
+          return error;
+        }
+      }
+
+    }
+
+    public async Task<ErrorDto> SaveProductDeadLines(List<ProductDealineDto> productDeadLines)
+    {
+      List<ProductDeadLine> productDeadlinesCached = await _cache.GetProductDeadLines();
+
+      ErrorDto error = new ErrorDto();
+      error.NoError = true;
+
+      foreach (var item in productDeadLines)
+      {
+        string strDueDate = item.strDueDate;
+        var dateData = strDueDate.Split("/");
+        int day = Convert.ToInt32(dateData[0]);
+        int month = Convert.ToInt32(dateData[1]);
+        int year = Convert.ToInt32(dateData[2]);
+        DateTime dueDate = new DateTime(year, month, day);
+
+        if(item.Id == 0)
+        {
+          ProductDeadLine newProdDeadline = new ProductDeadLine {
+            ProductId = item.ProductId,
+            DueDate = dueDate,
+            DeadLineName = item.DeadLineName,
+            Percentage = item.Percentage,
+            Seq = item.Seq
+          };
+          Add(newProdDeadline);
+        }
+        else
+        {
+          ProductDeadLine prodDeadline = productDeadlinesCached.First(c => c.Id == item.Id);
+          prodDeadline.ProductId = item.ProductId;
+          prodDeadline.DueDate = dueDate;
+          prodDeadline.DeadLineName = item.DeadLineName;
+          prodDeadline.Percentage = item.Percentage;
+          prodDeadline.Seq = item.Seq;
+          Update(prodDeadline);
+        }
+      }
+
+      if(!await SaveAll())
+      {
+        error.NoError = false;
+        error.Message = "problème pour enregistrer les données";
+      }
+
+      return error;
     }
 
   }

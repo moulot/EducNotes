@@ -329,15 +329,15 @@
   </div>
   <div class="row">
     <div class="col-md-12">
-      <div class="card">
-        <div class="card-body p-2">
-          <div class="text-15 textDarkBlue"><b>utilisateurs du rôle</b></div>
-          <hr class="my-1">
-          <div class="row">
-            <div class="col-md-5">
-              <div class="text-15">employés</div>
-              <hr class="my-1">
-              <div *ngFor="let emp of empsNotInRole" class="border rounded-lg p-1">
+      <div class="text-17 textDarkBlue"><b>utilisateurs du rôle</b></div>
+      <hr class="my-1">
+      <div class="row">
+        <div class="col-md-5">
+          <div class="card h-100" style="border: 1px solid #192C47;">
+            <div class="card-header text-15 textDarkBlue"><b>employés</b></div>
+            <div class="card-body p-2">
+              <div *ngFor="let emp of empsNotInRole | paginate: { id:'notInRole', itemsPerPage: notInRolePageSize, 
+                currentPage: notInRolePage }; let i = index" class="border rounded-lg p-1">
                 <a (click)="moveToRole(emp.id)">
                   <div class="d-flex">
                     <div class="zoom">
@@ -348,21 +348,30 @@
                       --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
                     <i class="fad fa-arrow-alt-down fa-2x d-md-none my-auto" style="--fa-secondary-opacity: 1;
                       --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                </div>
-              </a>
+                  </div>
+                </a>
+              </div>
+              <div class="mt-2">
+                <pagination-controls (pageChange)="notInRolePage = $event" id="notInRole" responsive="true"
+                  directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
+              </div>
             </div>
-            </div>
-            <div class="col-md-2 my-auto text-center">
-              <div class="text-13 textDarkRed">clicker sur l'utilisateur pour le déplacer</div>
-              <i class="fad fa-exchange-alt fa-4x d-none d-md-block" style="--fa-secondary-opacity: 1;
-                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-              <i class="fad fa-sort-alt fa-4x d-md-none" style="--fa-secondary-opacity: 1;
-                --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-            </div>
-            <div class="col-md-5">
-              <div class="text-15">employés dans le rôle</div>
-              <hr class="my-1">
-              <div *ngFor="let emp of empsInRole" class="border rounded-lg p-1">
+          </div>
+        </div>
+        <div class="col-md-2 my-auto text-center">
+          <div class="text-13 textDarkRed">clicker sur l'utilisateur pour le déplacer</div>
+          <i class="fad fa-exchange-alt fa-4x d-none d-md-block" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+          <i class="fad fa-sort-alt fa-4x d-md-none" style="--fa-secondary-opacity: 1;
+            --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        </div>
+        <div class="col-md-5">
+          <div class="card h-100" style="border: 1px solid #192C47;">
+            <div class="card-header text-15 textDarkBlue"><b>employés dans le rôle</b></div>
+            <div class="card-body p-2">
+              <hr class="my-2">
+              <div *ngFor="let emp of empsInRole | paginate: { id: 'inRole', itemsPerPage: inRolePageSize,
+                currentPage: inRolePage }; let i = index" class="border rounded-lg p-1">
                 <a (click)="removeFromRole(emp.id)">
                   <div class="d-flex">
                     <i class="fad fa-arrow-alt-left fa-2x d-none d-md-block my-auto mr-3" style="--fa-secondary-opacity: 1;
@@ -375,6 +384,10 @@
                       --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
                   </div>
                 </a>
+              </div>
+              <div class="mt-2">
+                <pagination-controls (pageChange)="inRolePage = $event" id="inRole" responsive="true"
+                  directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
               </div>
             </div>
           </div>

@@ -10,7 +10,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 export class EmployeesComponent implements OnInit {
   employees: any;
   page = 1;
-  pageSize = 5;
+  pageSize = 10;
 
   constructor(private route: ActivatedRoute, private alertify: AlertifyService) { }
 

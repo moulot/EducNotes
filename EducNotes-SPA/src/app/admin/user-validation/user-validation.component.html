@@ -53,55 +53,55 @@
                   paginate: { id: 'parent1', itemsPerPage: parentpageSize, currentPage: parentpage }; let i = index;">
                   <div class="card" [formGroupName]="i">
                     <div class="card-body p-2">
-                    <div class="row">
-                      <div class="col-md-2">
-                        <div class="d-md-flex">
-                          <a (click)="toggleEditDiv(type.id, i)">
-                            <i class="text-20 fad fa-edit mr-2" style="--fa-secondary-opacity: 1;
-                              --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-                          </a>
-                          <div *ngIf="parent.value.email && !usersDivs[type.id].editDiv[i]" class="blue-text">
-                            <a (click)="sendUserConfirmEmail(type.id, parent.value.id)">email de confirmation</a>
-                          </div>
-                          <div *ngIf="!parent.value.email && !usersDivs[type.id].editDiv[i]" class="blue-text">
-                            <a (click)="toggleEditDiv(type.id, i)">saisir email & cell</a>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-md-3 text-15 text-capitalize"><b>{{parent.value.lname}} {{parent.value.fname}}</b></div>
-                      <div *ngIf="parent.value.email" class="col-md-4 text-15">{{parent.value.email}}</div>
-                      <div *ngIf="!parent.value.email" class="col-md-4 text-15">N/A</div>
-                      <div *ngIf="parent.value.cell" class="col-md-3 text-15">{{parent.value.cell}}</div>
-                      <div *ngIf="!parent.value.cell" class="col-md-3 text-15">N/A</div>
-                    </div>
-                    <div *ngIf="usersDivs[type.id].editDiv[i]">
                       <div class="row">
-                        <div class="col-md-12"><hr class="my-1"></div>
-                        <div class="col-md-12 text-14 text-muted my-1">saisir le email afin de valider ses infos</div>
-                        <div class="col-md-4">
-                          <div class="md-form my-1">
-                            <input mdbInput type="text" id="email" class="form-control" formControlName="email">
-                            <label for="email" class="">email</label>
-                            <div *ngIf="parent.get('email').errors && parent.get('email').touched"
-                              class="text-small text-danger">l'email est incorrect</div>
+                        <div class="col-md-2">
+                          <div class="d-md-flex">
+                            <a (click)="toggleEditDiv(type.id, i)">
+                              <i class="text-20 fad fa-edit mr-2" style="--fa-secondary-opacity: 1;
+                                --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+                            </a>
+                            <div *ngIf="parent.value.email && !usersDivs[type.id].editDiv[i]" class="blue-text">
+                              <a (click)="sendUserConfirmEmail(type.id, parent.value.id)">email de confirmation</a>
+                            </div>
+                            <div *ngIf="!parent.value.email && !usersDivs[type.id].editDiv[i]" class="blue-text">
+                              <a (click)="toggleEditDiv(type.id, i)">saisir email & cell</a>
+                            </div>
                           </div>
                         </div>
-                        <div class="col-md-2">
-                          <div class="md-form my-1">
-                            <input mdbInput type="text" id="cell" class="form-control" formControlName="cell" mdbValidate>
-                            <label for="cell" class="">mobile</label>
-                          </div>          
-                        </div>
-                        <div class="col-md-2 mt-1">
-                          <button type="button" mdbBtn (click)="cancelEdit(type.id, parent.value.id, i)"
-                            class="btnBlue" size="sm" block="true" mdbWavesEffect>annuler</button>
-                        </div>
-                        <div class="col-md-2 mt-1">
-                          <button type="button" mdbBtn (click)="editUser(type.id, i)" class="btnBlue" size="sm" block="true"
-                          [disabled]="parent.get('email').errors || parent.value.email == ''" mdbWavesEffect>OK</button>
+                        <div class="col-md-3 text-15 text-capitalize"><b>{{parent.value.lname}} {{parent.value.fname}}</b></div>
+                        <div *ngIf="parent.value.email" class="col-md-4 text-15">{{parent.value.email}}</div>
+                        <div *ngIf="!parent.value.email" class="col-md-4 text-15">N/A</div>
+                        <div *ngIf="parent.value.cell" class="col-md-3 text-15">{{parent.value.cell}}</div>
+                        <div *ngIf="!parent.value.cell" class="col-md-3 text-15">N/A</div>
+                      </div>
+                      <div *ngIf="usersDivs[type.id].editDiv[i]">
+                        <div class="row">
+                          <div class="col-md-12"><hr class="my-1"></div>
+                          <div class="col-md-12 text-14 text-muted my-1">saisir le email afin de valider ses infos</div>
+                          <div class="col-md-4">
+                            <div class="md-form my-1">
+                              <input mdbInput type="text" id="email" class="form-control" formControlName="email">
+                              <label for="email" class="">email</label>
+                              <div *ngIf="parent.get('email').errors && parent.get('email').touched"
+                                class="text-small text-danger">l'email est incorrect</div>
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="md-form my-1">
+                              <input mdbInput type="text" id="cell" class="form-control" formControlName="cell" mdbValidate>
+                              <label for="cell" class="">mobile</label>
+                            </div>          
+                          </div>
+                          <div class="col-md-2 mt-1">
+                            <button type="button" mdbBtn (click)="cancelEdit(type.id, parent.value.id, i)"
+                              class="btnBlue" size="sm" block="true" mdbWavesEffect>annuler</button>
+                          </div>
+                          <div class="col-md-2 mt-1">
+                            <button type="button" mdbBtn (click)="editUser(type.id, i)" class="btnBlue" size="sm" block="true"
+                            [disabled]="parent.get('email').errors || parent.value.email == ''" mdbWavesEffect>OK</button>
+                          </div>
                         </div>
                       </div>
-                    </div>
                     </div>
                   </div>
                 </div>

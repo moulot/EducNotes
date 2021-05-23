@@ -508,8 +508,6 @@ namespace EducNotes.API.Controllers
           return BadRequest("problème pour ajouter l'inscription");
         }
       }
-
-      return BadRequest("problème pour ajouter l'inscription");
     }
 
     [HttpGet("TuitionFigures")]

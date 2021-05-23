@@ -264,7 +264,10 @@ namespace EducNotes.API.data
 
     public async Task<List<ClassLevelProduct>> LoadClassLevelProducts()
     {
-      List<ClassLevelProduct> levelproducts = await _context.ClassLevelProducts.ToListAsync();
+      List<ClassLevelProduct> levelproducts = await _context.ClassLevelProducts.Include(i => i.ClassLevel)
+                                                                               .Include(i => i.Product)
+                                                                               .OrderBy(o => o.ClassLevel.DsplSeq)
+                                                                               .ToListAsync();
 
       // Set cache options.
       var cacheEntryOptions = new MemoryCacheEntryOptions()

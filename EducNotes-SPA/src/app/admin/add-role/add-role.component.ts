@@ -19,6 +19,10 @@ export class AddRoleComponent implements OnInit {
   wait = false;
   empsInRole: any;
   empsNotInRole: any;
+  inRolePage = 1;
+  inRolePageSize = 5;
+  notInRolePage = 1;
+  notInRolePageSize = 5;
 
   constructor(private adminService: AdminService, private alertify: AlertifyService,
     private fb: FormBuilder, private router: Router, private route: ActivatedRoute) { }
@@ -85,15 +89,20 @@ export class AddRoleComponent implements OnInit {
     const userToMove = this.empsNotInRole[index];
     this.empsNotInRole.splice(index, 1);
     this.empsInRole = [...this.empsInRole, userToMove];
-    this.empsInRole.sort((a,b) => a.lastName > b.lastName ? 1 : -1);
+    this.empsInRole.sort((a,b) => a.lastName < b.lastName ? -1 : 1);
+    this.empsInRole.sort((a,b) => a.firstName < b.firstName ? -1 : 1);
   }
 
   removeFromRole(empId) {
     const index = this.empsInRole.findIndex(u => u.id === empId);
     const userToMove = this.empsInRole[index];
     this.empsInRole.splice(index, 1);
+    // console.log(this.empsNotInRole);
     this.empsNotInRole = [...this.empsNotInRole, userToMove];
-    this.empsNotInRole.sort((a,b) => a.lastName > b.lastName ? 1 : -1);
+    // console.log(this.empsNotInRole);
+    this.empsNotInRole.sort((a,b) => a.lastName < b.lastName ? -1 : a.lastName > b.lastName ? 1 : 0);
+    this.empsNotInRole.sort((a,b) => a.firstName < b.firstName ? -1 : a.firstName > b.firstName ? 1 : 0);
+    // console.log(this.empsNotInRole);
   }
 
   getMenuWithCapabilities() {

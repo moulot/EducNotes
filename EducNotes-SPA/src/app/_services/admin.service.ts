@@ -108,4 +108,12 @@ export class AdminService {
     return this.http.get(this.baseUrl + 'RoleEmployees/' + roleId);
   }
 
+  getTuitionFees() {
+    return this.http.get(this.baseUrl + 'TuitionFees');
+  }
+
+  saveLevelTuitionFees(tuitionFeeData) {
+    return this.http.post(this.baseUrl + 'saveLevelTuitionFees', tuitionFeeData);
+  }
+
 }

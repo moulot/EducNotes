@@ -8,7 +8,7 @@ namespace EducNotes.API.Models
       {
         Seq = 0;
       }
-        public int id { get; set; }
+        public int Id { get; set; }
         public int ProductId { get; set; }
         public Product Product { get; set; }
         public DateTime DueDate { get; set; }

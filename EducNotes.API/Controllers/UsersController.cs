@@ -114,7 +114,7 @@ namespace EducNotes.API.Controllers {
     public async Task<IActionResult> GetUsersWithRoles()
     {
       List<User> usersCached = await _cache.GetEmployees();
-      List<UserRole> userRoles = await _cache.GetUserRoles();
+      // List<UserRole> userRoles = await _cache.GetUserRoles();
 
       List<UserWithRolesDto> users = new List<UserWithRolesDto>();
       foreach (var user in usersCached)
@@ -126,7 +126,7 @@ namespace EducNotes.API.Controllers {
         Photo photo = user.Photos.FirstOrDefault(p => p.IsMain == true);
         if(photo != null)
           userWithRoles.PhotoUrl = photo.Url;
-        List<Role> roles = userRoles.Where(r => r.UserId == user.Id).Select(s => s.Role).ToList();
+        List<Role> roles = _context.UserRoles.Include(i => i.Role).Where(r => r.UserId == user.Id).Select(s => s.Role).ToList();
         userWithRoles.Roles = roles;
         users.Add(userWithRoles);
       }

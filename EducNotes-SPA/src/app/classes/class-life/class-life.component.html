@@ -91,8 +91,9 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-12 mt-3" *ngIf="filteredEvents?.length">
-                <pagination-controls (pageChange)="page = $event" previousLabel="" nextLabel=""></pagination-controls>
+              <div class="col-md-12 mt-3">
+                <pagination-controls (pageChange)="page = $event" responsive="true" directionLinks="true"
+                  autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
               </div>        
             </div>
             <div *ngIf="filteredEvents?.length <= 0">
