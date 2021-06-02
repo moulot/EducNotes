@@ -259,13 +259,13 @@ namespace EducNotes.API.Controllers
 
           await _repo.SaveAll();
           identityContextTransaction.Commit();
-          // await _cache.LoadOrders();
-          // await _cache.LoadFinOps();
-          // await _cache.LoadFinOpOrderLines();
-          // await _cache.LoadCheques();
-          // await _cache.LoadOrderLines();
-          // await _cache.LoadOrderLineDeadLines();
-          // await _cache.LoadUsers();
+          await _cache.LoadOrders();
+          await _cache.LoadFinOps();
+          await _cache.LoadFinOpOrderLines();
+          await _cache.LoadCheques();
+          await _cache.LoadOrderLines();
+          await _cache.LoadOrderLineDeadLines();
+          await _cache.LoadUsers();
           return Ok();
         }
         catch(Exception ex)
@@ -285,18 +285,17 @@ namespace EducNotes.API.Controllers
       List<FinOp> finOps = await _cache.GetFinOps();
       List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
 
-      var paymentsFromDB = finOps
-                            .Where(f => f.Rejected == false && f.Cashed == false)
-                            .OrderBy(o => o.FinOpDate)
-                            .ToList();
+      var paymentsFromDB = finOps.Where(f => f.Rejected == false && f.Cashed == false)
+                                 .OrderBy(o => o.FinOpDate)
+                                 .ToList();
       var payments = _mapper.Map<List<FinOpDto>>(paymentsFromDB);
-      for (int i = 0; i < payments.Count(); i++)
+      for(int i = 0; i < payments.Count(); i++)
       {
         var pay = payments[i];
         var linesFromDB = finOpLines.Where(f => f.FinOpId == pay.Id).ToList();
         var lines = _mapper.Map<List<PaymentDto>>(linesFromDB);
         payments[i].LinePayments = new List<PaymentDto>();
-        foreach (var line in lines)
+        foreach(var line in lines)
         {
           payments[i].LinePayments.Add(line);
         }

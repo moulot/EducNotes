@@ -375,7 +375,7 @@
                     renseigner un montant pour chaque enfant svp
                   </div>
                   <div *ngIf="paymentForm.hasError('dueamntNOK')" class="col-md-12 text-13 text-danger">
-                    les montants attribués sont incohérents p/r au montant dû! recommencez svp
+                    les montants attribués sont incohérents p/r au montant total payé!
                   </div>
                   <div class="col-md-12" formArrayName="payments" *ngFor="let payment of paymentForm.get('payments')['controls']; let i = index;">
                     <div [formGroupName]="i">

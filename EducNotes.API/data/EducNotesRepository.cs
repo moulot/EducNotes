@@ -1042,10 +1042,8 @@ on courses.ClassId equals classes.Id
 
     public async Task<bool> AddEmployee(EmployeeForEditDto user)
     {
-      List<User> employees = await _cache.GetEmployees();
-      List<Role> roles = await _context.Roles.OrderBy(o => o.Name).ToListAsync();// _cache.GetRoles();
+      // List<User> employees = await _cache.GetEmployees();
       // List<UserRole> userRoles = await _cache.GetUserRoles();
-      List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
 
       // bool resultStatus = true;
       using (var identityContextTransaction = _context.Database.BeginTransaction())
@@ -1056,16 +1054,17 @@ on courses.ClassId equals classes.Id
         {
           User appUser = new User();
 
+          var dateArray = user.strDateOfBirth.Split("/");
+          int year = Convert.ToInt32(dateArray[2]);
+          int month = Convert.ToInt32(dateArray[1]);
+          int day = Convert.ToInt32(dateArray[0]);
+          DateTime birthDay = new DateTime(year, month, day);
+
           //is it a new user
           if (user.Id == 0)
           {
             var userToSave = _mapper.Map<User>(user);
             string strDoB = user.strDateOfBirth;
-            var dateArray = user.strDateOfBirth.Split("/");
-            int year = Convert.ToInt32(dateArray[2]);
-            int month = Convert.ToInt32(dateArray[1]);
-            int day = Convert.ToInt32(dateArray[0]);
-            DateTime birthDay = new DateTime(year, month, day);
             userToSave.DateOfBirth = birthDay;
             var code = Guid.NewGuid();
             userToSave.UserName = code.ToString();
@@ -1080,23 +1079,13 @@ on courses.ClassId equals classes.Id
               appUser.IdNum = GetUserIDNumber(appUser.Id, appUser.LastName, appUser.FirstName);
               await _userManager.UpdateAsync(appUser);
             }
-            // else
-            // {
-            //   identityContextTransaction.Rollback();
-            //   return false;
-            // }
           }
           else
           {
-            appUser = employees.FirstOrDefault(u => u.Id == user.Id);
+            appUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
             appUser.LastName = user.LastName;
             appUser.FirstName = user.FirstName;
             appUser.Gender = user.Gender;
-            var dateArray = user.strDateOfBirth.Split("/");
-            int year = Convert.ToInt32(dateArray[2]);
-            int month = Convert.ToInt32(dateArray[1]);
-            int day = Convert.ToInt32(dateArray[0]);
-            DateTime birthDay = new DateTime(year, month, day);
             appUser.DateOfBirth = birthDay;
             appUser.PhoneNumber = user.PhoneNumber;
             appUser.SecondPhoneNumber = user.SecondPhoneNumber;
@@ -1115,6 +1104,7 @@ on courses.ClassId equals classes.Id
             List<string> rolesList = user.Roles.Split(",").ToList();
             if (rolesList.Count() > 0)
             {
+              List<Role> roles = await _context.Roles.ToListAsync();
               IEnumerable<string> roleNames = roles.Where(r => rolesList.Contains(r.Name)).Select(r => r.Name);
               var result = _userManager.AddToRolesAsync(appUser, roleNames);
               if (!result.Result.Succeeded)
@@ -1184,6 +1174,7 @@ on courses.ClassId equals classes.Id
               Token = await _userManager.GenerateEmailConfirmationTokenAsync(appUser)
             };
 
+            List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
             var template = emailTemplates.First(t => t.Id == employeeConfirmEmailId);
             Email emailToSend = await SetDataForConfirmEmployeeEmail(emailData, template.Body, template.Subject);
             Add(emailToSend);
@@ -3888,18 +3879,35 @@ on courses.ClassId equals classes.Id
       return classLevels;
     }
 
+    public async Task<List<OrderLinePaidDto>> GetChildOrderLinesPaid(int childId)
+    {
+      List<OrderLine> lines = await _cache.GetOrderLines();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+
+      List<OrderLinePaidDto> linesPaid = new List<OrderLinePaidDto>();
+      List<OrderLine> childLines = lines.Where(o => o.ChildId == childId).ToList();
+      foreach(var line in childLines)
+      {
+        OrderLinePaidDto linePaid = new OrderLinePaidDto();
+        linePaid.OrderLineId = line.Id;
+        linePaid.Amount = finOpLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed).Sum(s => s.Amount);
+        linesPaid.Add(linePaid);
+      }
+      return linesPaid;
+    }
+
     public async Task<List<OrderLinePaidDto>> GetOrderLinesPaid()
     {
       List<OrderLine> lines = await _cache.GetOrderLines();
       List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
 
       List<OrderLinePaidDto> linesPaid = new List<OrderLinePaidDto>();
-      foreach (var line in lines)
+      foreach(var line in lines)
       {
-        OrderLinePaidDto olpd = new OrderLinePaidDto();
-        olpd.OrderLineId = line.Id;
-        olpd.Amount = finOpLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed).Sum(s => s.Amount);
-        linesPaid.Add(olpd);
+        OrderLinePaidDto linePaid = new OrderLinePaidDto();
+        linePaid.OrderLineId = line.Id;
+        linePaid.Amount = finOpLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed).Sum(s => s.Amount);
+        linesPaid.Add(linePaid);
       }
       return linesPaid;
     }
@@ -3941,14 +3949,14 @@ on courses.ClassId equals classes.Id
 
         decimal lineDueAmount = 0;
         decimal balance = amountPaid;
-        if (lineDeadlines.Count() > 0)
+        if(lineDeadlines.Count() > 0)
         {
-          foreach (var lineD in lineDeadlines)
+          foreach(var lineD in lineDeadlines)
           {
-            if (lineD.DueDate.Date < today && !lineD.Paid)
-            {
-              lineDueAmount = lineD.Amount + lineD.ProductFee;
+            lineDueAmount = lineD.Amount + lineD.ProductFee;
 
+            if(lineD.DueDate.Date < today && !lineD.Paid)
+            {
               if (lineDueAmount >= balance)
               {
                 decimal lateAmount = lineDueAmount - balance;
@@ -3969,6 +3977,13 @@ on courses.ClassId equals classes.Id
                   lateAmounts.LateAmount60DaysPlus += lateAmount;
               }
               else
+              {
+                balance = balance - lineDueAmount;
+              }
+            }
+            else
+            {
+              if(lineD.Paid)
               {
                 balance = balance - lineDueAmount;
               }
@@ -4326,10 +4341,10 @@ on courses.ClassId equals classes.Id
 
     public async Task<UserWithRolesDto> GetUserWithRoles(int userId)
     {
-      List<User> users = await _cache.GetEmployees();
-      List<UserRole> userRoles = await _cache.GetUserRoles();
+      // List<User> users = await _cache.GetEmployees();
+      // List<UserRole> userRoles = await _cache.GetUserRoles();
 
-      User user = users.First(u => u.Id == userId);
+      User user = await _context.Users.Include(i => i.Photos).FirstAsync(u => u.Id == userId);
       UserWithRolesDto userWithRoles = new UserWithRolesDto();
       userWithRoles.Id = user.Id;
       userWithRoles.LastName = user.LastName;
@@ -4337,7 +4352,10 @@ on courses.ClassId equals classes.Id
       Photo photo = user.Photos.FirstOrDefault(p => p.IsMain == true);
       if (photo != null)
         userWithRoles.PhotoUrl = photo.Url;
-      List<Role> roles = userRoles.Where(r => r.UserId == user.Id).Select(s => s.Role).ToList();
+      List<UserRole> rolesFromDB = await _context.UserRoles.Include(i => i.Role)
+                                                           .Where(r => r.UserId == user.Id)
+                                                           .ToListAsync();
+      List<Role> roles = rolesFromDB.Select(s => s.Role).ToList();
       userWithRoles.Roles = roles;
 
       return userWithRoles;
@@ -4349,11 +4367,14 @@ on courses.ClassId equals classes.Id
 
       User user = users.First(u => u.Id == userId);
       List<MenuItemDto> userTypeMenu = await GetUserTypeMenu(user.UserTypeId, userId);
+      List<UserRole> userRolesFromDB = await _context.UserRoles.Include(i => i.Role).Where(r => r.UserId == userId).ToListAsync();
+      List<Role> userRoles = userRolesFromDB.Select(u => u.Role).ToList();
+      List<RoleCapability> capabilities = await _context.RoleCapabilities.ToListAsync();
 
       List<MenuItemDto> userMenu = new List<MenuItemDto>();
       foreach (MenuItemDto menuItem in userTypeMenu)
       {
-        Boolean hasAccess = await HasAccessToMenu(userId, menuItem);
+        Boolean hasAccess = await HasAccessToMenu(userId, menuItem, userRoles, capabilities);
         if (hasAccess)
         {
           userMenu.Add(menuItem);
@@ -4413,18 +4434,21 @@ on courses.ClassId equals classes.Id
 
     public async Task<List<MenuItemDto>> GetUserTypeMenu(int userTypeId, int userId)
     {
-      List<Menu> menus = await _cache.GetMenus();
-      List<MenuItem> menuItemsCached = await _cache.GetMenuItems();
+      // List<Menu> menus = await _cache.GetMenus();
+      // List<MenuItem> menuItemsCached = await _cache.GetMenuItems();
 
       //get userType menu
-      Menu menu = menus.First(m => m.UserTypeId == userTypeId);
-      List<MenuItem> menuItemsByMenuId = menuItemsCached.Where(m => m.MenuId == menu.Id).ToList();
+      Menu menu = await _context.Menus.FirstAsync(m => m.UserTypeId == userTypeId);
+      List<MenuItem> menuItemsByMenuId = await _context.MenuItems.Where(m => m.MenuId == menu.Id).ToListAsync();
       List<MenuItemDto> userMenuItems = _mapper.Map<List<MenuItemDto>>(menuItemsByMenuId);
+      List<UserRole> userRolesFromDB = await _context.UserRoles.Include(i => i.Role).Where(r => r.UserId == userId).ToListAsync();
+      List<Role> userRoles = userRolesFromDB.Select(u => u.Role).ToList();
+      List<RoleCapability> capabilities = await _context.RoleCapabilities.Include(i => i.Capability).ToListAsync();
 
       List<MenuItemDto> menuItems = new List<MenuItemDto>();
       foreach (var menuItem in userMenuItems)
       {
-        Boolean hasAccessToMenuItem = await HasAccessToMenu(userId, menuItem);
+        Boolean hasAccessToMenuItem = await HasAccessToMenu(userId, menuItem, userRoles, capabilities);
         if (hasAccessToMenuItem)
         {
           //check if the menu already exists in this object
@@ -4463,13 +4487,12 @@ on courses.ClassId equals classes.Id
       return menuItems;
     }
 
-    public async Task<Boolean> HasAccessToMenu(int userId, MenuItemDto menuItem)
+    public async Task<Boolean> HasAccessToMenu(int userId, MenuItemDto menuItem, List<Role> userRoles, List<RoleCapability> capabilities)
     {
       // List<MenuItem> menuItems = await _cache.GetMenuItems();
-      List<RoleCapability> rolesCapabilities = await _cache.GetRoleCapabilities();
+      // List<RoleCapability> rolesCapabilities = await _cache.GetRoleCapabilities();
 
       // MenuItem menuItem = menuItems.First(m => m.Id == menuItemId);
-      UserWithRolesDto user = await GetUserWithRoles(userId);
 
       if (menuItem.IsAlwaysEnabled)
       {
@@ -4480,7 +4503,7 @@ on courses.ClassId equals classes.Id
         //Loop through all the roles this user is in. The first time the user has
         //access to the menu item return true. If you get through all the
         //roles then the user does not have access to this menu item.
-        foreach (Role role in user.Roles)
+        foreach (Role role in userRoles)
         {
           //check if the user is in this role
           // Boolean userInRole = await UserInRole(userId, role.Id);
@@ -4488,9 +4511,9 @@ on courses.ClassId equals classes.Id
           // {
           // }
           //try to find the capability with the menu item id
-          List<RoleCapability> capabilities = rolesCapabilities
-                                .Where(r => r.Capability.MenuItemId == menuItem.Id && r.RoleId == role.Id).ToList();
-          foreach (RoleCapability capability in capabilities)
+          List<RoleCapability> capabilitiesList = capabilities.Where(r => r.Capability.MenuItemId == menuItem.Id && r.RoleId == role.Id)
+                                                              .ToList();
+          foreach (RoleCapability capability in capabilitiesList)
           {
             if ((capability != null) && (capability.AccessFlag != (byte)Enums.CapabilityAccessFlag.None))
             {
@@ -4509,7 +4532,7 @@ on courses.ClassId equals classes.Id
       {
         foreach (MenuItemDto child in menuItem.ChildMenuItems)
         {
-          Boolean childInRole = await HasAccessToMenu(userId, child);
+          Boolean childInRole = await HasAccessToMenu(userId, child, userRoles, capabilities);
           if (childInRole)
           {
             return true;
@@ -4650,7 +4673,7 @@ on courses.ClassId equals classes.Id
       List<ClassLevelProduct> classlevelProducts = await _cache.GetClassLevelProducts();
 
       List<ClasslevelProductDto> levelProducts = tuitionFeeData.LevelProducts;
-      List<ProductDealineDto> productDealines = tuitionFeeData.ProductDeadlines;
+      List<ProductDeadlineDto> productDealines = tuitionFeeData.ProductDeadlines;
 
       ErrorDto error = new ErrorDto();
       error.NoError = true;
@@ -4681,7 +4704,10 @@ on courses.ClassId equals classes.Id
             }
           }
 
-          // SAVE PRODUCTDEADLINES
+          //delete previous dueDates
+          List<ProductDeadLine> prevDueDates = productDeadlinesCached.Where(p => p.ProductId == productDealines[0].ProductId).ToList();
+          DeleteAll(prevDueDates);
+
           foreach (var item in productDealines)
           {
             string strDueDate = item.strDueDate;
@@ -4691,27 +4717,14 @@ on courses.ClassId equals classes.Id
             int year = Convert.ToInt32(dateData[2]);
             DateTime dueDate = new DateTime(year, month, day);
 
-            if(item.Id == 0)
-            {
-              ProductDeadLine newProdDeadline = new ProductDeadLine {
-                ProductId = item.ProductId,
-                DueDate = dueDate,
-                DeadLineName = item.DeadLineName,
-                Percentage = item.Percentage / 100,
-                Seq = item.Seq
-              };
-              Add(newProdDeadline);
-            }
-            else
-            {
-              ProductDeadLine prodDeadline = productDeadlinesCached.First(c => c.Id == item.Id);
-              prodDeadline.ProductId = item.ProductId;
-              prodDeadline.DueDate = dueDate;
-              prodDeadline.DeadLineName = item.DeadLineName;
-              prodDeadline.Percentage = item.Percentage / 100;
-              prodDeadline.Seq = item.Seq;
-              Update(prodDeadline);
-            }
+            ProductDeadLine newProdDeadline = new ProductDeadLine {
+              ProductId = item.ProductId,
+              DueDate = dueDate,
+              DeadLineName = item.DeadLineName,
+              Percentage = item.Percentage / 100,
+              Seq = item.Seq
+            };
+            Add(newProdDeadline);
           }
 
           await SaveAll();
@@ -4731,7 +4744,7 @@ on courses.ClassId equals classes.Id
 
     }
 
-    public async Task<ErrorDto> SaveProductDeadLines(List<ProductDealineDto> productDeadLines)
+    public async Task<ErrorDto> SaveProductDeadLines(List<ProductDeadlineDto> productDeadLines)
     {
       List<ProductDeadLine> productDeadlinesCached = await _cache.GetProductDeadLines();
 

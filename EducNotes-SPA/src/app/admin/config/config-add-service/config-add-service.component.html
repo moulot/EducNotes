@@ -1,0 +1,15 @@
+<form [formGroup]="serviceForm" (ngSubmit)="saveService()">
+  <div class="row">
+    <div class="col-md-12">
+      <div *ngIf="!editionMode" class="d-flex">
+        <i class="fad fa-user-plus fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <div class="text-17">ajout d'un service</div>
+      </div>
+      <div *ngIf="editionMode" class="d-flex mb-2">
+        <i class="fad fa-user-edit fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <div class="text-17">édition de l'enseignant <span class="text-capitalize">{{product.name}}</span></div>
+      </div>
+    </div>
+    
+  </div>
+</form>

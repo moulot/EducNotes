@@ -115,6 +115,7 @@ namespace EducNotes.API.Controllers
       var lines = await _repo.GetOrderLines(tuition.Id);
       tuition.Lines = _mapper.Map<List<OrderLineDto>>(lines);
       var payments = await _repo.GetChildPayments(id);
+      payments = payments.OrderByDescending(o => o.FinOp.FinOpDate).ToList();
       tuition.NbPayRejected = payments.Where(p => p.FinOp.Rejected).Count();
       tuition.LinePayments = _mapper.Map<List<PaymentDto>>(payments);
       tuition.AmountPaid = tuition.LinePayments.Where(f => f.FinOpTypeId == finOpTypePayment && f.Cashed).Sum(a => a.Amount);
@@ -173,6 +174,37 @@ namespace EducNotes.API.Controllers
     {
       LateAmountsDto lateAmounts = await _repo.GetLateAmountsDue();
       return Ok(lateAmounts);
+    }
+
+    [HttpGet("ChildBalanceData/{childId}")]
+    public async Task<IActionResult> GetChildBalanceData(int childId)
+    {
+      List<OrderLine> lines = await _cache.GetOrderLines();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+      var today = DateTime.Now.Date;
+
+      // invoiced amount
+      var invoiced = lines.Where(o => o.ChildId == childId).Sum(s => s.AmountTTC);
+      // cashed amount
+      var cashed = finOpLines
+                    .Where(o => o.FinOp.Cashed == true && o.OrderLine.ChildId == childId && o.FinOp.FinOpTypeId == finOpTypePayment)
+                    .Sum(s => s.Amount);
+      // in validation amount
+      var toBeValidated = finOpLines
+                          .Where(o => o.FinOp.Cashed == false && o.FinOp.Rejected == false && o.FinOp.FinOpTypeId == finOpTypePayment)
+                          .Sum(s => s.Amount);
+      // outstanding balance
+      var openBalance = await _context.OrderLineHistories.Where(f => f.Cashed == true && f.OrderLine.ChildId == childId)
+                                                         .SumAsync(b => b.Delta);
+
+      return Ok(new
+      {
+        invoiced,
+        cashed,
+        openBalance,
+        toBeValidated
+        // lateAmounts
+      });
     }
 
     [HttpGet("BalanceData")]
@@ -580,15 +612,16 @@ namespace EducNotes.API.Controllers
       });
     }
 
-    [HttpGet("AmountByDeadline")]
-    public async Task<IActionResult> GetOrderAmountWithDeadlines()
+    [HttpGet("ChildAmountByDeadline/{childId}")]
+    public async Task<IActionResult> GetChildOrderAmountWithDeadlines(int childId)
     {
       List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
+      List<OrderLineDeadline> userLineDeadlines = lineDeadlinesCached.Where(o => o.OrderLine.ChildId == childId).ToList();
 
-      var balanceLinesPaid = await _repo.GetOrderLinesPaid();
+      var balanceLinesPaid = await _repo.GetChildOrderLinesPaid(childId);
       var today = DateTime.Now.Date;
-      List<OrderLineDeadline> lineDeadLines = lineDeadlinesCached.ToList();
-      var duedates = lineDeadLines.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
+      var duedates = lineDeadlinesCached.Where(o => o.OrderLine.ChildId == childId).OrderBy(o => o.DueDate)
+                                        .Select(s => s.DueDate).Distinct();
       List<AmountWithDeadlinesDto> amountDeadlines = new List<AmountWithDeadlinesDto>();
       int i = 0;
       var olddate = new DateTime();
@@ -597,20 +630,152 @@ namespace EducNotes.API.Controllers
         var linedeadlines = new List<OrderLineDeadline>();
         if (i == 0)
         {
-          linedeadlines = lineDeadLines.Where(o => o.DueDate <= duedate).ToList();
+          linedeadlines = userLineDeadlines.Where(o => o.DueDate <= duedate).ToList();
         }
         else
         {
-          linedeadlines = lineDeadLines.OrderBy(o => o.DueDate)
-                                       .Where(o => o.DueDate > olddate && o.DueDate <= duedate).ToList();
+          linedeadlines = userLineDeadlines.OrderBy(o => o.DueDate)
+                                             .Where(o => o.DueDate > olddate && o.DueDate <= duedate)
+                                             .ToList();
         }
 
         decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
 
         var lineids = linedeadlines.Select(s => s.OrderLineId);
-        // decimal linePaid = 0;
         decimal paid = 0;
-        foreach (var lineid in lineids)
+        foreach(var lineid in lineids)
+        {
+          var linePaid = balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount;
+          var lined = linedeadlines.First(d => d.OrderLineId == lineid);
+          var lineDueAmount = lined.Amount + lined.ProductFee;
+          decimal amountpaid = 0;
+          if (linePaid >= lineDueAmount)
+          {
+            paid += lineDueAmount;
+            amountpaid = lineDueAmount;
+          }
+          else
+          {
+            paid += linePaid;
+            amountpaid = linePaid;
+          }
+          balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount -= amountpaid;
+        }
+
+        decimal balance = invoiced - paid;
+
+        AmountWithDeadlinesDto awd = new AmountWithDeadlinesDto();
+        awd.DueDate = duedate;
+        awd.strDueDate = duedate.ToString("dd/MM/yyyy", frC);
+        awd.Invoiced = invoiced;
+        awd.Paid = paid;
+        awd.Balance = balance;
+        awd.IsLate = duedate.Date < today ? true : false;
+        amountDeadlines.Add(awd);
+
+        olddate = duedate;
+        i++;
+      }
+
+      return Ok(amountDeadlines);
+    }
+
+    [HttpGet("AmountByDeadline")]
+    public async Task<IActionResult> GetOrderAmountWithDeadlines()
+    {
+      List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
+
+      var balanceLinesPaid = await _repo.GetOrderLinesPaid();
+      var today = DateTime.Now.Date;
+      var duedates = lineDeadlinesCached.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
+      List<AmountWithDeadlinesDto> amountDeadlines = new List<AmountWithDeadlinesDto>();
+      int i = 0;
+      var olddate = new DateTime();
+      foreach (var duedate in duedates)
+      {
+        var linedeadlines = new List<OrderLineDeadline>();
+        if (i == 0)
+        {
+          linedeadlines = lineDeadlinesCached.Where(o => o.DueDate <= duedate).ToList();
+        }
+        else
+        {
+          linedeadlines = lineDeadlinesCached.OrderBy(o => o.DueDate)
+                                             .Where(o => o.DueDate > olddate && o.DueDate <= duedate)
+                                             .ToList();
+        }
+
+        decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
+
+        var lineids = linedeadlines.Select(s => s.OrderLineId);
+        decimal paid = 0;
+        foreach(var lineid in lineids)
+        {
+          var linePaid = balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount;
+          var lined = linedeadlines.First(d => d.OrderLineId == lineid);
+          var lineDueAmount = lined.Amount + lined.ProductFee;
+          decimal amountpaid = 0;
+          if (linePaid >= lineDueAmount)
+          {
+            paid += lineDueAmount;
+            amountpaid = lineDueAmount;
+          }
+          else
+          {
+            paid += linePaid;
+            amountpaid = linePaid;
+          }
+          balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount -= amountpaid;
+        }
+
+        decimal balance = invoiced - paid;
+
+        AmountWithDeadlinesDto awd = new AmountWithDeadlinesDto();
+        awd.DueDate = duedate;
+        awd.strDueDate = duedate.ToString("dd/MM/yyyy", frC);
+        awd.Invoiced = invoiced;
+        awd.Paid = paid;
+        awd.Balance = balance;
+        awd.IsLate = duedate.Date < today ? true : false;
+        amountDeadlines.Add(awd);
+
+        olddate = duedate;
+        i++;
+      }
+
+      return Ok(amountDeadlines);
+    }
+
+    [HttpGet("AmountByDeadlineXX")]
+    public async Task<IActionResult> GeXXtOrderAmountWithDeadlines()
+    {
+      List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
+
+      var balanceLinesPaid = await _repo.GetOrderLinesPaid();
+      var today = DateTime.Now.Date;
+      var duedates = lineDeadlinesCached.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
+      List<AmountWithDeadlinesDto> amountDeadlines = new List<AmountWithDeadlinesDto>();
+      int i = 0;
+      var olddate = new DateTime();
+      foreach (var duedate in duedates)
+      {
+        var linedeadlines = new List<OrderLineDeadline>();
+        if (i == 0)
+        {
+          linedeadlines = lineDeadlinesCached.Where(o => o.DueDate <= duedate).ToList();
+        }
+        else
+        {
+          linedeadlines = lineDeadlinesCached.OrderBy(o => o.DueDate)
+                                             .Where(o => o.DueDate > olddate && o.DueDate <= duedate)
+                                             .ToList();
+        }
+
+        decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
+
+        var lineids = linedeadlines.Select(s => s.OrderLineId);
+        decimal paid = 0;
+        foreach(var lineid in lineids)
         {
           var linePaid = balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount;
           var lined = linedeadlines.First(d => d.OrderLineId == lineid);

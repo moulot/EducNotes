@@ -19,19 +19,67 @@ export class ChildFileTuitionComponent implements OnInit {
   payCheque = environment.payCheque;
   payWire = environment.payWire;
   payMobile = environment.payMobile;
+  totalPaid: number;
+  invoiced: string;
+  cashed: string;
+  tuitionBalance: number;
+  toBeValidated: number;
+  amountByDeadline: any;
+  lateAmountsDue: any;
+  wait = false;
+  dataReady = 0;
 
   constructor( private route: ActivatedRoute, private alertify: AlertifyService, private router: Router,
     private orderService: OrderService, private paymentService: PaymentService) { }
 
   ngOnInit() {
     this.getTuition(this.id);
+    this.getBalanceData(this.id);
+    this.getAmountByDeadline(this.id);
   }
 
   getTuition(id) {
+    this.wait = true;
     this.orderService.getTuitionFromChild(id).subscribe(data => {
+      this.dataReady++;
+      if (this.dataReady === 3) {
+        this.wait = false;
+      }
       this.tuition = data;
+      this.totalPaid = this.tuition.amountInvoiced - this.tuition.balance;
     }, error => {
       this.alertify.error(error);
+    });
+  }
+
+  getBalanceData(childId) {
+    this.wait = true;
+    this.orderService.getChildBalanceData(childId).subscribe((data: any) => {
+      this.dataReady++;
+      if (this.dataReady === 3) {
+        this.wait = false;
+      }
+      this.invoiced = data.invoiced;
+      this.cashed = data.cashed;
+      this.toBeValidated = data.toBeValidated;
+      this.tuitionBalance = data.openBalance - this.toBeValidated;
+    }, error => {
+      this.alertify.error(error);
+      this.wait = false;
+    });
+  }
+
+  getAmountByDeadline(childId) {
+    this.wait = true;
+    this.orderService.getChildOrderAmountByDeadline(childId).subscribe(data => {
+      this.dataReady++;
+      if (this.dataReady === 3) {
+        this.wait = false;
+      }
+      this.amountByDeadline = data;
+    }, error => {
+      this.alertify.error(error);
+      this.wait = false;
     });
   }
 

@@ -7,10 +7,7 @@ import { Utils } from '../utils';
 })
 export class DataLayerService {
 
-    constructor(
-        private http: HttpClient
-    ) { }
-
+    constructor(private http: HttpClient) { }
 
     getInvoices() {
         return this.http.get<any[]>('/api/invoices');

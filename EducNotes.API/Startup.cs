@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+// using Rollbar;
 
 namespace EducNotes.API
 {
@@ -79,9 +80,6 @@ namespace EducNotes.API
             options.AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));
           });
 
-          // requires
-          // using Microsoft.AspNetCore.Identity.UI.Services;
-          // using WebPWrecover.Services;
           services.AddTransient<IEmailSender, EmailSender>();
           services.Configure<AuthMessageSenderOptions>(Configuration);
 
@@ -99,6 +97,7 @@ namespace EducNotes.API
             });
 
           services.AddCors();
+          services.AddMemoryCache();
           services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
           //Mapper.Reset();
           services.AddAutoMapper(typeof(EducNotesRepository).Assembly);
@@ -112,12 +111,6 @@ namespace EducNotes.API
         //  This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            // var cultureInfo = new CultureInfo("fr-FR");
-            // cultureInfo.NumberFormat.CurrencySymbol = "F";
-
-            // CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-            // CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-
             if (env.IsDevelopment())
             {
               app.UseDeveloperExceptionPage();
@@ -140,6 +133,7 @@ namespace EducNotes.API
               app.UseHsts();
             }
             app.UseDeveloperExceptionPage();
+            
             app.UseHttpsRedirection();
             // app.UseCors(x => x.WithOrigins("http://localhost:4200")
             //      .AllowAnyHeader().AllowAnyMethod().AllowCredentials());

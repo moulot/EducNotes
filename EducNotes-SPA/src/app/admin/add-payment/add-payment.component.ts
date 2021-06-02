@@ -33,9 +33,8 @@ export class AddPaymentComponent implements OnInit {
   childid: any;
   showInfos = false;
 
-  constructor(private fb: FormBuilder, private alertify: AlertifyService,
-    private router: Router, private paymentService: PaymentService,
-    private route: ActivatedRoute) { }
+  constructor(private fb: FormBuilder, private alertify: AlertifyService, private router: Router,
+    private paymentService: PaymentService, private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.route.data.subscribe((data: any) => {

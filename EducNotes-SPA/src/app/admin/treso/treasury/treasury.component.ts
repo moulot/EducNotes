@@ -14,11 +14,11 @@ export class TreasuryComponent implements OnInit {
   settings: Setting[];
   regDate: Date;
   regActive = false;
-  nbTuitionPays: number;
+  // nbTuitionPays: number;
   invoiced: string;
   cashed: string;
-  tuitionBalance: string;
-  toBeValidated: string;
+  tuitionBalance: number;
+  toBeValidated: number;
   amountByDeadline: any;
   lateAmountsDue: any;
   wait = false;
@@ -35,7 +35,7 @@ export class TreasuryComponent implements OnInit {
     if (today >= this.regDate) {
       this.regActive = true;
     }
-    this.nbTuitionPays = Number(this.settings.find(s => s.name === 'NbTuitionPayments').value);
+    // this.nbTuitionPays = Number(this.settings.find(s => s.name === 'NbTuitionPayments').value);
     this.getBalanceData();
     this.getAmountByDeadline();
   }
@@ -49,8 +49,8 @@ export class TreasuryComponent implements OnInit {
       }
       this.invoiced = data.invoiced;
       this.cashed = data.cashed;
-      this.tuitionBalance = data.openBalance;
       this.toBeValidated = data.toBeValidated;
+      this.tuitionBalance = data.openBalance - this.toBeValidated;
     }, error => {
       this.alertify.error(error);
     });

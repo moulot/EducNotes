@@ -2211,10 +2211,11 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("ClassEvents")]
-    public async Task<IActionResult> GetClassEvents () {
+    public async Task<IActionResult> GetClassEvents()
+    {
       _context.ProductTypes.FromSql("");
-      var events = await _context.ClassEvents.OrderByDescending (e => e.Name).ToListAsync ();
-      return Ok (events);
+      var events = await _context.ClassEvents.OrderByDescending(e => e.Name).ToListAsync();
+      return Ok(events);
     }
 
     [HttpPost ("courseShowing")]

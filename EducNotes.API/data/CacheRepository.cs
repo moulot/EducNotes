@@ -985,7 +985,11 @@ namespace EducNotes.API.data
 
     public async Task<List<Product>> LoadProducts()
     {
-      List<Product> products = await _context.Products.OrderBy(o => o.Name).ToListAsync();
+      List<Product> products = await _context.Products.Include (a => a.Periodicity)
+                                                      .Include (a => a.PayableAt)
+                                                      .Include(i => i.ProductType)
+                                                      .OrderBy(o => o.DsplSeq)
+                                                      .ToListAsync();
 
       // Set cache options.
       var cacheEntryOptions = new MemoryCacheEntryOptions()

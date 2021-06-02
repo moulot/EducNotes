@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { id } from '@swimlane/ngx-datatable/release/utils';
 import { Utils } from 'src/app/shared/utils';
 import { AdminService } from 'src/app/_services/admin.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { ClassService } from 'src/app/_services/class.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -19,7 +17,7 @@ export class ConfigProductFeesComponent implements OnInit {
   tuitionFees: any;
   dueDates: any;
   levels: any;
-  levelOptions = [];
+  wait = false;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService,
     private adminService: AdminService) { }
@@ -132,12 +130,7 @@ export class ConfigProductFeesComponent implements OnInit {
 
   removeDueDatetem(index) {
     const dueDates = this.prodFeesForm.get('dueDates') as FormArray;
-    const id = dueDates.at(index).get('id').value;
-    if (id === 0) {
-      dueDates.removeAt(index);
-    } else {
-      dueDates.at(index).get('toBeDeleted').setValue(true);
-    }
+    dueDates.removeAt(index);
   }
 
   resetDueDateItem(index) {
@@ -150,15 +143,43 @@ export class ConfigProductFeesComponent implements OnInit {
   }
 
   getTuitionFees() {
+    this.wait = true;
     this.adminService.getTuitionFees().subscribe((data: any) => {
       this.tuitionFees = data.tuitionFees;
       this.dueDates = data.dueDates;
       this.addLevelFeeItems();
       this.addDueDateItems();
+      this.wait = false;
+    }, () => {
+      this.alertify.error('problème pour récupérer les données');
+      this.wait = false;
     });
   }
 
+  removeAllDueDates() {
+    const dueDates = this.prodFeesForm.get('dueDates') as FormArray;
+    while (dueDates.length > 0) {
+      dueDates.removeAt(0);
+    }
+  }
+
+  sortDueDates() {
+    const dueDates = this.prodFeesForm.value.dueDates.sort((a, b) => {
+      const date1 = a.dueDate.split('/');
+      const date2 = b.dueDate.split('/');
+      const num1 = Number(date1[2] + date1[1] + date1[0]);
+      const num2 = Number(date2[2] + date2[1] + date2[0]);
+      return num1 < num2 ? -1 : 1;
+    });
+    this.removeAllDueDates();
+    for (let i = 0; i < dueDates.length; i++) {
+      const elt = dueDates[i];
+      this.addDueDateItem(elt.id, elt.dueDate, elt.name, i + 1, elt.percent);
+    }
+  }
+
   save() {
+    this.wait = true;
     let levelProducts = [];
     let prodDeadlines = [];
     const prodid = this.prodFeesForm.value.productId;
@@ -171,8 +192,8 @@ export class ConfigProductFeesComponent implements OnInit {
 
     for (let i = 0; i < this.prodFeesForm.value.dueDates.length; i++) {
       const elt = this.prodFeesForm.value.dueDates[i];
-      const dueDate = {id: elt.id, productId: elt.prodid, strDueDate: elt.dueDate, deadLineName: elt.name,
-        percentage: elt.percent, seq: elt.seq};
+      const dueDate = {id: elt.id, productId: prodid, strDueDate: elt.dueDate, deadLineName: elt.name,
+        percentage: elt.percent, seq: elt.seq, toBeDeleted: elt.toBeDeleted};
       prodDeadlines = [...prodDeadlines, dueDate];
     }
 
@@ -180,11 +201,12 @@ export class ConfigProductFeesComponent implements OnInit {
     dueDateFees.levelProducts = levelProducts;
     dueDateFees.productDeadlines = prodDeadlines;
     this.adminService.saveLevelTuitionFees(dueDateFees).subscribe(() => {
+      this.wait = false;
       Utils.smoothScrollToTop(40);
       this.alertify.success('les données ont été enregistrées');
     }, error => {
       this.alertify.error(error);
-      console.log(error);
+      this.wait = false;
     });
   }
 

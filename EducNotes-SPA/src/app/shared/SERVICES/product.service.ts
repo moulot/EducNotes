@@ -11,6 +11,7 @@ export class ProductService {
   ) { }
 
   getProducts() {
+    console.log('in gull service');
     return this.http.get('api/products');
   }
 }

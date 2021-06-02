@@ -19,7 +19,6 @@ import { ClassStudentsComponent } from './classes/class-students/class-students.
 import { ClassAgendaComponent } from './classes/class-agenda/class-agenda.component';
 import { UserHomeResolver } from './_resolvers/user-home-resolver';
 import { TeacherDashboardComponent } from './dashboard/teacher-dashboard/teacher-dashboard.component';
-import { InscriptionComponent } from './views/forms/inscription/inscription.component';
 import { ConfirmEmailComponent } from './registration/confirm-email/confirm-email.component';
 import { ForgotComponent } from './views/sessions/forgot/forgot.component';
 import { ResetPasswordComponent } from './registration/reset-password/reset-password.component';
@@ -111,7 +110,6 @@ import { EditChildrenComponent } from './users/edit-children/edit-children.compo
 import { EditChildrenResolver } from './_resolvers/edit-children-resolver';
 import { InvalidAccountComponent } from './registration/invalid-account/invalid-account.component';
 import { TreasuryComponent } from './admin/treso/treasury/treasury.component';
-import { ConfirmTeacherEmailComponent } from './registration/confirm-teacher-email/confirm-teacher-email.component';
 import { RolesComponent } from './admin/roles/roles.component';
 import { ChildFileResolver } from './_resolvers/child-file-resolver';
 import { AddPaymentComponent } from './admin/add-payment/add-payment.component';
@@ -153,6 +151,8 @@ import { AddEmployeeComponent } from './admin/users/add-employee/add-employee.co
 import { AddRoleComponent } from './admin/add-role/add-role.component';
 import { ConfirmUserEmailComponent } from './registration/confirm-user-email/confirm-user-email.component';
 import { EditRoleResolver } from './_resolvers/edit-role-resolver';
+import { ConfigAddServiceComponent } from './admin/config/config-add-service/config-add-service.component';
+import { AddServiceResolver } from './_resolvers/add-service-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -196,7 +196,6 @@ export const appRoutes: Routes = [
         { path: 'studentFromP/:id', component: StudentDashboardComponent },
         { path: 'teacher', component: TeacherDashboardComponent, resolve: { teacher: UserHomeResolver } },
         { path: 'admins', component: AdminDashboardComponent, resolve: { admin: UserHomeResolver } },
-        { path: 'inscriptions', component: InscriptionComponent },
         { path: 'classStaff/:id', component: ClassTeachersComponent },
         { path: 'classStaffP/:id', component: ClassTeachersComponent },
         { path: 'studentSchedule/:id', component: StudentScheduleComponent },
@@ -204,7 +203,6 @@ export const appRoutes: Routes = [
         { path: 'addEval', component: EvalAddFormComponent },
         { path: 'callSheet/:id', component: ClassCallSheetComponent, resolve: { session: CallSheetResolver } },
         { path: 'classSession/:id', component: ClassSessionComponent, resolve: { session: ClassSessionResolver } },
-        { path: 'inscriptions', component: InscriptionComponent },
         { path: 'studentsToClass', component: InscriptionsListComponent },
         { path: 'classesPanel', component: ClassesPanelComponent, resolve: { levels: ClassesListResolver } },
         { path: 'addClass', component: NewClassComponent },
@@ -284,7 +282,8 @@ export const appRoutes: Routes = [
         { path: 'config', component: ConfigComponent},
         { path: 'editClasses', component: EditLevelClassesComponent},
         { path: 'employees', component: EmployeesComponent, resolve: {employees: EmployeesResolver}},
-        { path: 'addEmployee', component: AddEmployeeComponent}
+        { path: 'addEmployee', component: AddEmployeeComponent},
+        { path: 'addService/:id', component: ConfigAddServiceComponent, resolve: {product: AddServiceResolver}}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

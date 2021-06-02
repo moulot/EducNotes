@@ -14,8 +14,8 @@ import { NgxEditorModule } from 'ngx-editor';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
-import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
-import { InMemoryDataService } from './shared/inmemory-db/inmemory-db.service';
+// import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
+// import { InMemoryDataService } from './shared/inmemory-db/inmemory-db.service';
 
 
 import { AppComponent } from './app.component';
@@ -285,6 +285,9 @@ import { ConfigMenuResolver } from './_resolvers/config-menu-resolver';
 import { ConfirmUserEmailComponent } from './registration/confirm-user-email/confirm-user-email.component';
 import { EditRoleResolver } from './_resolvers/edit-role-resolver';
 import { ConfigProductFeesComponent } from './admin/config/config-product-fees/config-product-fees.component';
+import { ConfigServicesComponent } from './admin/config/config-services/config-services.component';
+import { ConfigAddServiceComponent } from './admin/config/config-add-service/config-add-service.component';
+import { AddServiceResolver } from './_resolvers/add-service-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -476,7 +479,9 @@ export function tokenGetter() {
       AddRoleComponent,
       ConfigMenuComponent,
       ConfirmUserEmailComponent,
-      ConfigProductFeesComponent
+      ConfigProductFeesComponent,
+      ConfigServicesComponent,
+      ConfigAddServiceComponent
    ],
    imports: [
       FormWizardModule,
@@ -484,12 +489,11 @@ export function tokenGetter() {
       // TimeagoModule.forRoot(),
       SharedModule,
       HttpClientModule,
-      InMemoryWebApiModule.forRoot(InMemoryDataService, { passThruUnknownUrl: true }),
+      // InMemoryWebApiModule.forRoot(InMemoryDataService, { passThruUnknownUrl: true }),
       AppRoutingModule,
       BrowserModule,
       BrowserAnimationsModule,
       NgZorroAntdModule,
-      HttpClientModule,
       FormsModule,
       ReactiveFormsModule,
       BsDropdownModule.forRoot(),
@@ -568,6 +572,7 @@ export function tokenGetter() {
       CoefficientFormResolver,
       PeriodicitiesListResolver,
       PeriodicityFormResolver,
+      AddServiceResolver,
       PayableAtListResolver,
       PayableFormResolver,
       SmsTemplateResolver,

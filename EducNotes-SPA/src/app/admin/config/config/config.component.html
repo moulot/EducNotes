@@ -32,6 +32,10 @@
     <button type='button' mdbBtn (click)="showTab(4)" [ngClass]="activeTabs[4] ? 'btnBlueW' : 'btnWhiteB'"
       size="sm" block="true">frais de scolarité</button>
   </div>
+  <div class="col-md-2 mb-1">
+    <button type='button' mdbBtn (click)="showTab(5)" [ngClass]="activeTabs[5] ? 'btnBlueW' : 'btnWhiteB'"
+      size="sm" block="true">services</button>
+  </div>
   <div class="col-md-12 mt-3">
     <div *ngIf="activeTabs[0]">
       <app-classlevel-courses></app-classlevel-courses>
@@ -47,6 +51,9 @@
     </div>
     <div *ngIf="activeTabs[4]">
       <app-config-product-fees></app-config-product-fees>
+    </div>
+    <div *ngIf="activeTabs[5]">
+      <app-config-services></app-config-services>
     </div>
   </div>
 </div>

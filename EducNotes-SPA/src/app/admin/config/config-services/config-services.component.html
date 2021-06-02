@@ -1,0 +1,79 @@
+<div *ngIf="wait" class="spinning-preloader-container">
+  <div class="preloader-wrapper big active">
+    <div class="spinner-layer spinner-blue">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-red">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-yellow">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-green">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="!wait">
+  <div class="card">
+    <div class="card-body p-2">
+      <div class="text-17 textDarkBlue">liste des produits</div>
+      <hr class="my-1">
+      <div *ngFor="let product of products" class="row my-2">
+        <div class="col-md-1 text-md-center my-auto">
+          <a (click)="editerProduct(product.id)">
+            <i class="fad fa-edit fa-2x" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
+              --fa-secondary-color:#f89f20;"></i>
+          </a>
+        </div>
+        <div class="col-md-2">
+          <div class="text-13 textDarkRed">nom</div>
+          <div class="text-15 textDarkBlue"><b>{{product.name}}</b></div>
+        </div>
+        <div class="col-md-1">
+          <div class="text-13 textDarkRed">type</div>
+          <div class="text-15 textDarkBlue"><b>{{product.typeName}}</b></div>
+        </div>
+        <div class="col-md-1">
+          <div class="text-13 textDarkRed">payé cash</div>
+          <div class="text-15 textDarkBlue"><b>{{product.isPaidCash ? 'oui' : 'non'}}</b></div>
+        </div>
+        <div class="col-md-2">
+          <div class="text-13 textDarkRed">prix</div>
+          <div class="text-15 textDarkBlue"><b>{{product.isPaidCash ? product.price : 'par niveau de classe'}}</b></div>
+        </div>
+        <div class="col-md-3">
+          <div class="text-13 textDarkRed">échéances</div>
+          <div *ngIf="!product.isPaidCash" class="text-13 textDarkBlue">
+            <div class="row">
+              <div class="col-md-4" *ngFor="let date of product.dueDates"><b>{{date.strDueDate}}</b></div>
+            </div>
+          </div>
+          <div *ngIf="product.isPaidCash" class="text-15 textDarkBlue"><b>n/a</b></div>
+        </div>
+        <div class="col-md-1">
+          <div class="text-13 textDarkRed">relance</div>
+          <div class="text-15 textDarkBlue"><b>{{product.payableAtDayCount}} jours</b></div>
+        </div>
+        <div class="col-md-12"><hr class="my-1"></div>
+      </div>
+    </div>
+  </div>
+</div>
+

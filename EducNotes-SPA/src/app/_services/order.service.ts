@@ -22,6 +22,10 @@ export class OrderService {
     return this.http.get(this.baseUrl + 'BalanceData');
   }
 
+  getChildBalanceData(childId) {
+    return this.http.get(this.baseUrl + 'ChildBalanceData/' + childId);
+  }
+
   getRecoveryData() {
     return this.http.get(this.baseUrl + 'RecoveryData');
   }
@@ -48,6 +52,10 @@ export class OrderService {
 
   getOrderAmountByDeadline() {
     return this.http.get(this.baseUrl + 'AmountByDeadline');
+  }
+
+  getChildOrderAmountByDeadline(childId) {
+    return this.http.get(this.baseUrl + 'ChildAmountByDeadline/' + childId);
   }
 
   getLevelLatePayments() {

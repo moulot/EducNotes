@@ -20,7 +20,6 @@ using CloudinaryDotNet;
 using EducNotes.API.Helpers;
 using Microsoft.Extensions.Options;
 using EducNotes.API.data;
-using Rollbar;
 
 namespace EducNotes.API.Controllers
 {
@@ -163,8 +162,8 @@ namespace EducNotes.API.Controllers
     [HttpPost("Login")]
     public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
     {
-      RollbarLocator.RollbarInstance.Configure(new RollbarConfig("13e83bd7d4794996b0535c4990db269e"));
-      RollbarLocator.RollbarInstance.Info("Rollbar is configured properly.");
+      // RollbarLocator.RollbarInstance.Configure(new RollbarConfig("13e83bd7d4794996b0535c4990db269e"));
+      // RollbarLocator.RollbarInstance.Info("Rollbar is configured properly.");
 
       // verification de l'existence du userName
       if (await _repo.UserNameExist(userForLoginDto.Username.ToLower(), 0))

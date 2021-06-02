@@ -1,90 +1,121 @@
-<div class="card">
-  <div class="card-body p-2">
-    <div class="text-17 textDarkBlue"><b>frais de scolarité</b></div>
-    <hr class="my-1">
-    <form [formGroup]="prodFeesForm" (ngSubmit)="save()">
-      <input type="hidden" formControlName="productId">
-      <div class="row">
-        <div class="col-md-12" formArrayName="levelFees" *ngFor="let levelFee of prodFeesForm.get('levelFees')['controls']; let i = index;">
-          <div [formGroupName]="i">
-            <input type="hidden" formControlName="levelid">
-            <div class="border rounded-lg p-2 mb-1">
-              <div class="row">
-                <div class="col-md-2 my-auto">
-                  <div class="text-15"><b>niveau {{levelFee.value.name}}</b></div>
-                </div>
-                <div class="col-md-2">
-                  <div class="md-form my-0">
-                    <input type="number" id="price" class="form-control" formControlName="price" mdbInput>
-                    <label for="price">prix du niveau</label>
-                  </div>
-                </div>
-                <div class="col-md-2 text-17 my-auto"><b>{{levelFee.value.price | number:'':'fr-FR'}} F</b></div>
-              </div>
-            </div>
-          </div>
-        </div>
+<div *ngIf="wait" class="spinning-preloader-container">
+  <div class="preloader-wrapper big active">
+    <div class="spinner-layer spinner-blue">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
       </div>
-      <div class="text-17 textDarkBlue my-2"><b>échéancier des frais de scolarité</b></div>
-      <div class="row">
-        <div class="col-md-12" formArrayName="dueDates" *ngFor="let dueDate of prodFeesForm.get('dueDates')['controls']; let i = index;">
-          <div [formGroupName]="i">
-            <input type="hidden" formControlName="id">
-            <input type="hidden" formControlName="toBeDeleted">
-            <div class="border rounded-lg p-2 mb-1">
-              <div *ngIf="dueDate.value.toBeDeleted" class="text-danger text-15">supprimé</div>
-              <div class="row">
-                <div class="col-md-1 my-auto">
-                  <a *ngIf="!dueDate.value.toBeDeleted" (click)="removeDueDatetem(i)">
-                    <i class="fad fa-trash-alt fa-2x" style="--fa-secondary-opacity: 1;
-                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                  </a>
-                  <a *ngIf="dueDate.value.toBeDeleted" (click)="resetDueDateItem(i)">
-                    <i class="fad fa-times-circle fa-2x" style="--fa-secondary-opacity: 1;
-                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
-                  </a>
-                </div>
-                <div class="col-md-3">
-                  <div class="md-form mt-2 mb-0">
-                    <input type="text" id="name" class="form-control" formControlName="name" mdbInput>
-                    <label for="name">libellé</label>
+    </div>
+    <div class="spinner-layer spinner-red">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-yellow">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+    <div class="spinner-layer spinner-green">
+      <div class="circle-clipper left">
+        <div class="circle"> </div>
+      </div> <div class="gap-patch">
+        <div class="circle"> </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="!wait">
+  <div class="card">
+    <div class="card-body p-2">
+      <div class="text-17 textDarkBlue"><b>frais de scolarité</b></div>
+      <hr class="my-1">
+      <form [formGroup]="prodFeesForm" (ngSubmit)="save()">
+        <input type="hidden" formControlName="productId">
+        <div class="row">
+          <div class="col-md-12" formArrayName="levelFees" *ngFor="let levelFee of prodFeesForm.get('levelFees')['controls']; let i = index;">
+            <div [formGroupName]="i">
+              <input type="hidden" formControlName="levelid">
+              <div class="border rounded-lg p-2 mb-1">
+                <div class="row">
+                  <div class="col-md-2 my-auto">
+                    <div class="text-15"><b>niveau {{levelFee.value.name}}</b></div>
                   </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="md-form my-0">
-                    <mdb-date-picker name="dueDate" [placeholder]="'date échéance'" [options]="myDatePickerOptions"
-                      formControlName="dueDate"></mdb-date-picker>
-                    <div *ngIf="dueDate.get('dueDate').errors && dueDate.get('dueDate').touched"
-                      class="text-small text-danger">l'échéance est obligatoire</div>
+                  <div class="col-md-2">
+                    <div class="md-form my-0">
+                      <input type="number" id="price" class="form-control" formControlName="price" mdbInput>
+                      <label for="price">prix du niveau</label>
+                    </div>
                   </div>
-                </div>
-                <div class="col-md-1">
-                  <div class="md-form my-0">
-                    <input type="number" id="percent" class="form-control" formControlName="percent" mdbInput>
-                    <label for="percent">% du prix</label>
-                  </div>
-                </div>
-                <div class="col-md-1">
-                  <div class="md-form my-0">
-                    <input type="number" id="seq" class="form-control" formControlName="seq" mdbInput>
-                    <label for="seq">séquence</label>
-                  </div>
+                  <div class="col-md-2 text-17 my-auto"><b>{{levelFee.value.price | number:'':'fr-FR'}} F</b></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div *ngIf="prodFeesForm.hasError('formNOK')" class="my-2 text-white border rounded-lg p-2" style="background-color: red;">
-        <div *ngIf="prodFeesForm.hasError('pctNOK')" class="text-15">les pourcentages sont incohérents.</div>
-        <div *ngIf="prodFeesForm.hasError('seqNOK')" class="text-15">la séquence est incohérente.</div>
-        <div *ngIf="prodFeesForm.hasError('feesNOK')">un ou plusieurs prix par niveau sont incorrectes.</div>
-      </div>
-      <div class="text-15 textBlue my-1"><a (click)="addDueDate()">ajouter une échéance</a></div>
-      <div class="my-2">
-        <button type="submit" mdbBtn [disabled]="prodFeesForm.hasError('formNOK')" block="true" class="btnBlue"
-          size="sm" mdbWavesEffect>enregistrer les frais de scolarité</button>
-      </div>
-    </form>
+        <div class="text-17 textDarkBlue my-2"><b>échéancier des frais de scolarité</b></div>
+        <div class="row">
+          <div class="col-md-12" formArrayName="dueDates" *ngFor="let dueDate of prodFeesForm.get('dueDates')['controls']; let i = index;">
+            <div [formGroupName]="i">
+              <input type="hidden" formControlName="id">
+              <input type="hidden" formControlName="toBeDeleted">
+              <div class="border rounded-lg p-2 mb-1">
+                <div *ngIf="dueDate.value.toBeDeleted" class="text-danger text-15">supprimé</div>
+                <div class="row">
+                  <div class="col-md-1 my-auto">
+                    <a *ngIf="!dueDate.value.toBeDeleted" (click)="removeDueDatetem(i)">
+                      <i class="fad fa-trash-alt fa-2x" style="--fa-secondary-opacity: 1;
+                        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                    </a>
+                    <a *ngIf="dueDate.value.toBeDeleted" (click)="resetDueDateItem(i)">
+                      <i class="fad fa-times-circle fa-2x" style="--fa-secondary-opacity: 1;
+                        --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                    </a>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="md-form mt-2 mb-0">
+                      <input type="text" id="name" class="form-control" formControlName="name" mdbInput>
+                      <label for="name">libellé</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="md-form mt-1 mb-0">
+                      <mdb-date-picker name="dueDate" [placeholder]="'date échéance'" [options]="myDatePickerOptions"
+                        formControlName="dueDate" (ngModelChange)="sortDueDates()"></mdb-date-picker>
+                      <div *ngIf="dueDate.get('dueDate').errors && dueDate.get('dueDate').touched"
+                        class="text-small text-danger">l'échéance est obligatoire</div>
+                    </div>
+                  </div>
+                  <div class="col-md-1">
+                    <div class="md-form mt-2 mb-0">
+                      <input type="number" id="percent" class="form-control" formControlName="percent" mdbInput>
+                      <label for="percent">% du prix</label>
+                    </div>
+                  </div>
+                  <input type="hidden" formControlName="seq">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-15 textBlue my-1"><a (click)="addDueDate()">ajouter une échéance</a></div>
+        <div *ngIf="prodFeesForm.hasError('formNOK')" class="my-2 text-white border rounded-lg p-2" style="background-color: red;">
+          <div *ngIf="prodFeesForm.hasError('pctNOK')" class="text-15">les pourcentages sont incohérents.</div>
+          <div *ngIf="prodFeesForm.hasError('seqNOK')" class="text-15">la séquence est incohérente.</div>
+          <div *ngIf="prodFeesForm.hasError('feesNOK')">un ou plusieurs prix par niveau sont incorrectes.</div>
+        </div>
+        <div class="my-2">
+          <button type="submit" mdbBtn [disabled]="prodFeesForm.hasError('formNOK') || wait" block="true" class="btnBlue" size="sm" mdbWavesEffect>
+            <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            enregistrer les frais de scolarité
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

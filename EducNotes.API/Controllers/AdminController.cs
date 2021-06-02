@@ -1025,7 +1025,7 @@ namespace EducNotes.API.Controllers
       
       List<ProductDeadLine> dueDatesFromDB = productsDeadlines.OrderBy(o => o.Seq)
                                                               .Where(p => p.ProductId == tuitionId).ToList();
-      List<ProductDealineDto> dueDates = _mapper.Map<List<ProductDealineDto>>(dueDatesFromDB);
+      List<ProductDeadlineDto> dueDates = _mapper.Map<List<ProductDeadlineDto>>(dueDatesFromDB);
       
       return Ok(new {
         tuitionFees,

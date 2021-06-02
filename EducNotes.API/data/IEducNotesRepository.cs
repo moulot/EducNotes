@@ -149,6 +149,7 @@ namespace EducNotes.API.Data
     Task<List<MenuCapabilitiesDto>> GetMenuCapabilities(int userTypeId, int userId);
     Task<ErrorDto> SaveRole(RoleDto user);
     Task<ErrorDto> SaveLevelTuitionFees(ScheduleDueDateFeeDto tuitionFeeData);
-    Task<ErrorDto> SaveProductDeadLines(List<ProductDealineDto> productDeadLines);
+    Task<ErrorDto> SaveProductDeadLines(List<ProductDeadlineDto> productDeadLines);
+    Task<List<OrderLinePaidDto>> GetChildOrderLinesPaid(int childId);
   }
 }

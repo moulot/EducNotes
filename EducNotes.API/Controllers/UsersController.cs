@@ -98,7 +98,8 @@ namespace EducNotes.API.Controllers {
     // }
 
     [HttpGet]
-    public async Task<IActionResult> GetUsers() {
+    public async Task<IActionResult> GetUsers()
+    {
       var users = await _context.Users
         .Include(i => i.Class)
         .Include(i => i.UserType)
@@ -113,20 +114,25 @@ namespace EducNotes.API.Controllers {
     [HttpGet("UsersWithRoles")]
     public async Task<IActionResult> GetUsersWithRoles()
     {
-      List<User> usersCached = await _cache.GetEmployees();
+      // List<User> usersCached = await _cache.GetEmployees();
+      List<User> usersFromDB = await _context.Users.Include(i => i.Photos)
+                                                   .OrderBy(o => o.LastName).ThenBy(i => i.FirstName)
+                                                   .Where(u => u.UserTypeId == adminTypeId).ToListAsync();
       // List<UserRole> userRoles = await _cache.GetUserRoles();
+      List<UserRole> userRoles = await _context.UserRoles.Include(i => i.Role).ToListAsync();
 
       List<UserWithRolesDto> users = new List<UserWithRolesDto>();
-      foreach (var user in usersCached)
+      foreach (var user in usersFromDB)
       {
         UserWithRolesDto userWithRoles = new UserWithRolesDto();
         userWithRoles.Id = user.Id;
         userWithRoles.LastName = user.LastName;
         userWithRoles.FirstName = user.FirstName;
+        userWithRoles.Validated = user.Validated;
         Photo photo = user.Photos.FirstOrDefault(p => p.IsMain == true);
         if(photo != null)
           userWithRoles.PhotoUrl = photo.Url;
-        List<Role> roles = _context.UserRoles.Include(i => i.Role).Where(r => r.UserId == user.Id).Select(s => s.Role).ToList();
+        List<Role> roles = userRoles.Where(r => r.UserId == user.Id).Select(s => s.Role).ToList();
         userWithRoles.Roles = roles;
         users.Add(userWithRoles);
       }
@@ -135,7 +141,8 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet("{id}", Name = "GetUser")]
-    public async Task<IActionResult> GetUser(int id) {
+    public async Task<IActionResult> GetUser(int id)
+    {
       var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == id;
       var user = await _repo.GetUser(id, isCurrentUser);
       var userToReturn = _mapper.Map<UserForDetailedDto>(user);
@@ -239,9 +246,9 @@ namespace EducNotes.API.Controllers {
     {
       // List<OrderLine> lines = await _cache.GetOrderLines();
 
-      var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == childId;
-      if(!isCurrentUser)
-        Unauthorized();
+      // var isCurrentUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value) == childId;
+      // if(!isCurrentUser)
+      //   Unauthorized();
 
       var childFromRepo = await _repo.GetUser(childId, false);
       var child = _mapper.Map<UserForDetailedDto>(childFromRepo);
@@ -289,13 +296,13 @@ namespace EducNotes.API.Controllers {
         }
       }
 
-      var parentsChildren = await _repo.GetParentsChildren(userFile.MotherId, userFile.FatherId);
-      parentsChildren.Remove(childFromRepo);
+      var childrenFromDB = await _repo.GetParentsChildren(userFile.MotherId, userFile.FatherId);
+      var parentsChildren = childrenFromDB.Where(c => c.Id != childFromRepo.Id).ToList();
       var children = _mapper.Map<List<UserForDetailedDto>>(parentsChildren);
       userFile.Siblings = children;
 
       var line = await _context.OrderLines.Where(l => l.Order.isReg && l.ChildId == childId)
-                      .FirstOrDefaultAsync();
+                                          .FirstOrDefaultAsync();
       if(line != null)
       {
         userFile.OrderId = line.OrderId;
@@ -2022,7 +2029,8 @@ namespace EducNotes.API.Controllers {
         .ToListAsync();
 
       List<SearchUsersDataDto> data = new List<SearchUsersDataDto>();
-      foreach(var user in users) {
+      foreach(var user in users)
+      {
         string fname = user.FirstName == null ? "" : user.FirstName.ToLower().FirstLetterToUpper();
         string lname = user.LastName == null ? "" : user.LastName.ToLower().FirstLetterToUpper();
         string idNum = user.IdNum == null ? "" : user.IdNum;
@@ -2052,7 +2060,8 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpPost("LoadUserFile")]
-    public async Task<IActionResult> LoadUserFile(UserFileDataDto userFileDataDto) {
+    public async Task<IActionResult> LoadUserFile(UserFileDataDto userFileDataDto)
+    {
       var childId = userFileDataDto.UserId;
       var searchData = userFileDataDto.SearchData;
 
@@ -2076,7 +2085,8 @@ namespace EducNotes.API.Controllers {
 
       var parentsFromRepo = await _repo.GetParents(childId);
       var parents = _mapper.Map<IEnumerable<UserForDetailedDto>>(parentsFromRepo);
-      foreach(var parent in parents) {
+      foreach(var parent in parents)
+      {
         if(parent.UserTypeId == parentTypeId && parent.Gender == 0) {
           userFile.MotherId = parent.Id;
           userFile.MotherLastName = parent.LastName;
@@ -2106,12 +2116,16 @@ namespace EducNotes.API.Controllers {
       string firstNameWhere = "";
       string idNumWhere = "";
 
-      foreach(var word in words) {
-        if(lastNameWhere == "") {
+      foreach(var word in words)
+      {
+        if(lastNameWhere == "")
+        {
           lastNameWhere = " LastName like '%" + word + "%' ";
           firstNameWhere = " FirstName like '%" + word + "%' ";
           idNumWhere = " IdNum like '%" + word + "%' ";
-        } else {
+        }
+        else
+        {
           lastNameWhere += " OR LastName like '%" + word + "%' ";
           firstNameWhere += " OR FirstName like '%" + word + "%' ";
           idNumWhere += " OR IdNum like '%" + word + "%' ";
