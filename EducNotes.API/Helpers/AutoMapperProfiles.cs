@@ -197,7 +197,9 @@ namespace EducNotes.API.Helpers {
                     opt.MapFrom(src => src.Evaluation.Coeff);
                 });
             CreateMap<MenuItem, MenuItemDto>();
-            CreateMap<Class, ClassDetailDto>();
+            CreateMap<Class, ClassDetailDto>()
+                .ForMember(dest => dest.LevelName, opt => opt
+                  .MapFrom(u => u.ClassLevel.Name));
             CreateMap<Photo, PhotosForDetailedDto>();
             CreateMap<UserForUpdateDto, User>();
             CreateMap<Photo, PhotoForReturnDto>();

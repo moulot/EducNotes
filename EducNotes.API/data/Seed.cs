@@ -147,22 +147,22 @@ namespace EducNotes.API.Data
             context.SaveChanges();
 
             var classLevels = new List<ClassLevel> {
-              new ClassLevel { Name = "TPS", DsplSeq = 1, CycleId = 1, SchoolId = 1, EducationLevelId =1 },
-              new ClassLevel { Name = "MS", DsplSeq = 2, CycleId = 1, SchoolId = 1, EducationLevelId =1  },
-              new ClassLevel { Name = "PS", DsplSeq = 3, CycleId = 1, SchoolId = 1, EducationLevelId =1  },
-              new ClassLevel { Name = "CP1", DsplSeq = 4, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
-              new ClassLevel { Name = "CP2", DsplSeq = 5, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
-              new ClassLevel { Name = "CE1", DsplSeq = 6, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
-              new ClassLevel { Name = "CE2", DsplSeq = 7, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
-              new ClassLevel { Name = "CM1", DsplSeq = 8, CycleId = 3, SchoolId = 2, EducationLevelId =1  },
-              new ClassLevel { Name = "CM2", DsplSeq = 9, CycleId = 3, SchoolId = 2, EducationLevelId =1  },
-              new ClassLevel { Name = "6e", DsplSeq = 10, CycleId = 3, SchoolId = 3, EducationLevelId = 2 },
-              new ClassLevel { Name = "5e", DsplSeq = 11, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
-              new ClassLevel { Name = "4e", DsplSeq = 12, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
-              new ClassLevel { Name = "3e", DsplSeq = 13, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
-              new ClassLevel { Name = "2nde", DsplSeq = 14, SchoolId = 4, EducationLevelId = 2 },
-              new ClassLevel { Name = "1ere", DsplSeq = 15, SchoolId = 4, EducationLevelId = 2 },
-              new ClassLevel { Name = "Tle", DsplSeq = 16, SchoolId = 4, EducationLevelId = 2 }
+              new ClassLevel { Name = "très petite section", NameAbbrev = "TPS", DsplSeq = 1, CycleId = 1, SchoolId = 1, EducationLevelId =1 },
+              new ClassLevel { Name = "petite section", NameAbbrev = "PS", DsplSeq = 2, CycleId = 1, SchoolId = 1, EducationLevelId =1  },
+              new ClassLevel { Name = "moyenne section", NameAbbrev = "MS", DsplSeq = 3, CycleId = 1, SchoolId = 1, EducationLevelId =1  },
+              new ClassLevel { Name = "cours préparatoire 1", NameAbbrev = "CP1", DsplSeq = 4, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
+              new ClassLevel { Name = "cours préparatoire 2", NameAbbrev = "CP2", DsplSeq = 5, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
+              new ClassLevel { Name = "cours élémentaire 1", NameAbbrev = "CE1", DsplSeq = 6, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
+              new ClassLevel { Name = "cours élémentaire 2", NameAbbrev = "CE2", DsplSeq = 7, CycleId = 2, SchoolId = 2, EducationLevelId =1  },
+              new ClassLevel { Name = "cours moyen 1", NameAbbrev = "CM1", DsplSeq = 8, CycleId = 3, SchoolId = 2, EducationLevelId =1  },
+              new ClassLevel { Name = "cours moyen 2", NameAbbrev = "CM2", DsplSeq = 9, CycleId = 3, SchoolId = 2, EducationLevelId =1  },
+              new ClassLevel { Name = "sixième", NameAbbrev = "6e", DsplSeq = 10, CycleId = 3, SchoolId = 3, EducationLevelId = 2 },
+              new ClassLevel { Name = "cinquième", NameAbbrev = "5e", DsplSeq = 11, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
+              new ClassLevel { Name = "quatrième", NameAbbrev = "4e", DsplSeq = 12, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
+              new ClassLevel { Name = "troisième", NameAbbrev = "3e", DsplSeq = 13, CycleId = 4, SchoolId = 3, EducationLevelId = 2 },
+              new ClassLevel { Name = "seconde", NameAbbrev = "2nde", DsplSeq = 14, SchoolId = 4, EducationLevelId = 2 },
+              new ClassLevel { Name = "première", NameAbbrev = "1ere", DsplSeq = 15, SchoolId = 4, EducationLevelId = 2 },
+              new ClassLevel { Name = "terminale", NameAbbrev = "Tle", DsplSeq = 16, SchoolId = 4, EducationLevelId = 2 }
             };
             context.AddRange(classLevels);
             context.SaveChanges();

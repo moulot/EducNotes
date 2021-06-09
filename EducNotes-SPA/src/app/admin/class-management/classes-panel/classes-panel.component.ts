@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
 import { ClassService } from 'src/app/_services/class.service';
 
@@ -12,9 +12,7 @@ import { ClassService } from 'src/app/_services/class.service';
 })
 export class ClassesPanelComponent implements OnInit {
   levels: any[];
-  filledLevels: any[] = [];
-  lev: any [] = [];
-  // addNew = false;
+  filledLevels = [];
 
   constructor(private classService: ClassService, private route: ActivatedRoute,
     private alertify: AlertifyService) {}
@@ -29,32 +27,21 @@ export class ClassesPanelComponent implements OnInit {
         }
       }
     });
-    for (let index = 0; index < this.levels.length; index++) {
-      const element: any = {
-        id: this.levels[index].id,
-        name: this.levels[index].name
-      };
-      this.lev = [...this.lev, element];
-    }
-  }
-
-  newClass() {
-    // this.addNew = !this.addNew;
   }
 
   getlevels() {
     this.levels = [];
-    this.classService.getClassLevelsDetails().subscribe((res: any[]) => {
-      this.levels = res ;
-      for (let index = 0; index < this.levels.length; index++) {
-        const element: any = {
-          id: this.levels[index].id,
-          name: this.levels[index].name
-        };
-        this.lev = [...this.lev, element];
+    this.filledLevels = [];
+    this.classService.getClassLevelsDetails().subscribe((data: any) => {
+      this.levels = data;
+      for (let i = 0; i < this.levels.length; i++) {
+        const elt = this.levels[i];
+        if (elt.classes.length > 0) {
+          this.filledLevels = [... this.filledLevels, elt];
+        }
       }
-    }, error => {
-      console.log(error);
+    }, () => {
+      this.alertify.error('problème pour récupérer les données');
     }) ;
   }
 

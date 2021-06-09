@@ -244,6 +244,10 @@ export class ClassService {
     return this.http.get(this.baseUrl + 'ClassLevels');
   }
 
+  getLevel(id) {
+    return this.http.get(this.baseUrl + 'ClassLevels/' + id);
+  }
+
   getLevelsWithClasses() {
     return this.http.get(this.baseUrl + 'LevelsWithClasses');
   }
@@ -281,8 +285,16 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'ClassLevelsWithClasses', ids);
   }
 
+  addClassToLevel(classData) {
+    return this.http.post(this.baseUrl + 'AddClassToLevel', classData);
+  }
+
   saveClasses(classes: any) {
     return this.http.post(this.baseUrl + 'SaveClasses', classes);
+  }
+
+  editClasses(classes) {
+    return this.http.post(this.baseUrl + 'EditClasses', classes);
   }
 
   deleteClass(classId: number) {

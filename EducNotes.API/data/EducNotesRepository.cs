@@ -1604,7 +1604,9 @@ on courses.ClassId equals classes.Id
 
     public async Task<IEnumerable<ClassType>> GetClassTypes()
     {
-      return await _context.ClassTypes.ToListAsync();
+      List<ClassType> classTypesCached = await _cache.GetClassTypes();
+      List<ClassType> classTypes = classTypesCached.OrderBy(c => c.Name).ToList();
+      return classTypes;
     }
 
     public async Task<List<string>> GetEmails()

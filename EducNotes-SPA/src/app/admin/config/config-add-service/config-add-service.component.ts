@@ -24,6 +24,7 @@ export class ConfigAddServiceComponent implements OnInit {
       if (this.product) {
         this.editionMode = true;
       } else {
+        this.initValues();
       }
     });
 
@@ -32,32 +33,48 @@ export class ConfigAddServiceComponent implements OnInit {
 
   createServiceForm() {
     this.serviceForm = this.fb.group({
-      services: this.fb.array([])
+      name: ['', Validators.required],
+      typeid: [this.product.typeid, Validators.required],
+      isPaidCash: [this.product.isPaidCash, Validators.required],
+      price: [this.product.price],
+      isByLevel: [this.product.isByLevel],
+      
     });
   }
 
-  addProductItem(id, name): void {
-    const services = this.serviceForm.get('services') as FormArray;
-    services.push(this.createServiceItem(id, name));
+  initValues() {
+    this.product = {
+      id: 0,
+      name: '',
+      typeiI: null,
+      isPaidCash: true,
+      price: null,
+      dueDates: null
+    };
   }
 
-  createServiceItem(id, name): FormGroup {
-    return this.fb.group({
-      id: [id],
-      name: [name, Validators.required],
-      toBeDeleted: [false]
-    });
-  }
+  // addProductItem(id, name): void {
+  //   const services = this.serviceForm.get('services') as FormArray;
+  //   services.push(this.createServiceItem(id, name));
+  // }
 
-  removeServicetem(index) {
-    const services = this.serviceForm.get('services') as FormArray;
-    const id = services.at(index).get('id').value;
-    if (id === 0) {
-      services.removeAt(index);
-    } else {
-      services.at(index).get('toBeDeleted').setValue(true);
-    }
-  }
+  // createServiceItem(id, name, typeid): FormGroup {
+  //   return this.fb.group({
+  //     id: [id],
+  //     name: [name, Validators.required],
+  //     toBeDeleted: [false]
+  //   });
+  // }
+
+  // removeServicetem(index) {
+  //   const services = this.serviceForm.get('services') as FormArray;
+  //   const id = services.at(index).get('id').value;
+  //   if (id === 0) {
+  //     services.removeAt(index);
+  //   } else {
+  //     services.at(index).get('toBeDeleted').setValue(true);
+  //   }
+  // }
 
   saveService() {
 

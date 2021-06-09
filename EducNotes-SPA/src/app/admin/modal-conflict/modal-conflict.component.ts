@@ -14,7 +14,7 @@ export class ModalConflictComponent implements OnInit {
   endHM: string;
   dayName: string;
   @Output() reloadScheduleModal = new EventEmitter();
-  modalRef: MDBModalRef;
+  // modalRef: MDBModalRef;
 
   constructor(public classService: ClassService, public alertify: AlertifyService, public activeModal: MDBModalRef) { }
 

@@ -1262,9 +1262,18 @@ namespace EducNotes.API.Controllers {
     }
 
     [HttpGet ("ClassLevels")]
-    public async Task<IActionResult> GetLevels () {
-      var levels = await _context.ClassLevels.OrderBy (c => c.DsplSeq).ToListAsync ();
-      return Ok (levels);
+    public async Task<IActionResult> GetLevels()
+    {
+      var levels = await _context.ClassLevels.OrderBy(c => c.DsplSeq).ToListAsync();
+      return Ok(levels);
+    }
+
+    [HttpGet ("ClassLevels/{id}")]
+    public async Task<IActionResult> GetLevelById(int id)
+    {
+      List<ClassLevel> levels = await _cache.GetClassLevels();
+      ClassLevel level = levels.First(c => c.Id == id);
+      return Ok(level);
     }
 
     [HttpGet("ClassLevelCourses")]
@@ -1408,15 +1417,17 @@ namespace EducNotes.API.Controllers {
       return Ok(classLevels);
     }
 
-    [HttpGet ("{classLevelId}/ClassesByLevelId")]
-    public async Task<IActionResult> ClassesByLevelId (int classLevelId)
+    [HttpGet("{classLevelId}/ClassesByLevelId")]
+    public async Task<IActionResult> ClassesByLevelId(int classLevelId)
     {
-      var classes = await _context.Classes
-        .Where (c => c.ClassLevelId == classLevelId)
-        .ToListAsync ();
+      List<Class> classesCached = await _cache.GetClasses();
 
-      var classesToReturn = _mapper.Map<IEnumerable<ClassDetailDto>> (classes);
-      return Ok (classesToReturn);
+      List<Class> classes = classesCached.OrderBy(o => o.Name)
+                                         .Where(c => c.ClassLevelId == classLevelId)
+                                         .ToList();
+
+      var classesToReturn = _mapper.Map<IEnumerable<ClassDetailDto>>(classes);
+      return Ok(classesToReturn);
     }
 
     [HttpPost ("{classId}/DeleteClass")]
@@ -1830,13 +1841,84 @@ namespace EducNotes.API.Controllers {
       return Ok (data);
     }
 
+    [HttpPost("AddClassToLevel")]
+    public async Task<IActionResult> AddClassToClassLevel(AddClassDataDto classData)
+    {
+      int levelId = classData.LevelId;
+      int classTypeId = classData.ClassTypeId;
+      int maxStudent = classData.MaxStudent;
+
+      List<Class> classes = await _cache.GetClasses();
+      List<ClassType> classTypes = await _cache.GetClassTypes();
+      List<ClassLevel> classLevels = await _cache.GetClassLevels();
+
+      Class lastClass = classes.OrderByDescending(o => o.Name)
+                               .Where(c => c.ClassLevelId == levelId).First();
+      string className = lastClass.Name;
+      var suffix = className.Last();
+
+      string newSuffix = "";
+      if(suffix.ToString().IsNumeric())
+      {
+        newSuffix = (Convert.ToInt32(suffix.ToString()) + 1).ToString();
+      }
+      else
+      {
+        newSuffix = ((char)(((int)suffix) + 1)).ToString();
+      }
+
+      string classTypeCode = "";
+      if(classTypeId != 0)
+      {
+        classTypeCode = (classTypes.First(t => t.Id == classTypeId)).Code;
+      }
+
+      string levelName = (classLevels.First(c => c.Id == levelId)).NameAbbrev;
+
+      string newClassName = "";
+      if(classTypeId != 0)
+      {
+        newClassName = levelName + " " + classTypeCode + " " + newSuffix;
+      }
+      else
+      {
+        newClassName = levelName + " " + newSuffix;
+      }
+
+      Class newClass = new Class ();
+      newClass.ClassLevelId = levelId;
+      if(classTypeId != 0)
+        newClass.ClassTypeId = classTypeId;
+      newClass.Name = newClassName;
+      newClass.Active = 1;
+      newClass.MaxStudent = maxStudent;
+      _repo.Add(newClass);
+
+      if(await _repo.SaveAll())
+      {
+        await _cache.LoadClasses();
+        return Ok();
+      }
+
+      return BadRequest("problème pour ajouter la classe");
+    }
+
     [HttpPost("SaveClasses")]
     public async Task<IActionResult> SaveClasses(ClassForSaveDto classToSave)
     {
       try
       {
         List<ClassLevel> classlevels = await _cache.GetClassLevels();
-        var levelName = (classlevels.FirstOrDefault(e => e.Id == classToSave.LevelId)).Name + " " + classToSave.Name;
+        var levelName = "";
+        string levelAbbrev = (classlevels.FirstOrDefault(e => e.Id == classToSave.LevelId)).NameAbbrev;
+        if(classToSave.Name != "")
+        {
+          levelName = levelAbbrev + " " + classToSave.Name;
+        }
+        else
+        {
+          levelName = levelAbbrev;
+        }
 
         if (classToSave.suffixe != null)
         {
@@ -1850,7 +1932,7 @@ namespace EducNotes.API.Controllers {
               if(compteur <= classToSave.NbClass)
               {
                 var newClass = new Class {
-                  Name = levelName + " " + classToSave.ClassTypeCode + " " + i,
+                  Name = levelName + " " + i,
                   ClassLevelId = classToSave.LevelId,
                   Active = 1,
                   ClassTypeId = classToSave.classTypeId,
@@ -1867,7 +1949,7 @@ namespace EducNotes.API.Controllers {
             for(int i = 1; i <= classToSave.NbClass; i++)
             {
               var newClass = new Class {
-                Name = levelName + " " + classToSave.ClassTypeCode + " " + i,
+                Name = levelName + " " + i,
                 ClassLevelId = classToSave.LevelId,
                 Active = 1,
                 ClassTypeId = classToSave.classTypeId,
@@ -2061,8 +2143,8 @@ namespace EducNotes.API.Controllers {
     [HttpGet("Course/{courseId}")]
     public async Task<IActionResult> Course(int courseId)
     {
-      var course = await _context.Courses.FirstOrDefaultAsync (c => c.Id == courseId);
-      return Ok (course);
+      var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+      return Ok(course);
     }
 
     [HttpGet("ClassTypes")]

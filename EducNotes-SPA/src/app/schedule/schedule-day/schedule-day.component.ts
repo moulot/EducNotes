@@ -54,6 +54,6 @@ export class ScheduleDayComponent implements OnInit {
     this.modalRef.content.reloadScheduleModal.subscribe(() => {
       this.reloadSchedule.emit();
     });
-}
+  }
 
 }

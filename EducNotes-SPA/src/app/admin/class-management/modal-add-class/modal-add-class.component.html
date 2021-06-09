@@ -1,0 +1,38 @@
+<div class="modal-content">
+  <form [formGroup]="classForm" (ngSubmit)="addClass(level.id)">
+    <div class="modal-header">
+      <button type="button" class="close pull-right" aria-label="Close" (click)="activeModal.hide()">
+        <span aria-hidden="true">×</span>
+      </button>
+      <h4 class="text-15 textDarkBlue w-100" id="myModalLabel"><b>niveau {{level.name}} - ajout d'une classe</b></h4>
+    </div>
+    <div class="modal-body">
+      <div class="text-15 my-1"><b>{{level.classes.length > 1 ? 'classes existantes' : 'classe existante'}}</b></div>
+      <div class="row">
+        <div *ngFor="let class of level.classes" class="col-md-12 text-15 ml-2">{{class.name}} ({{class.maxStudent}} élèves max.)</div>
+      </div>
+      <hr class="my-1">
+      <div class="text-15 my-1"><b>nouvelle classe</b></div>
+      <div class="row">
+        <div *ngIf="needClassType" class="col-md-6 mb-0">
+          <mdb-select [options]="classTypeOptions" formControlName="classTypeId" placeholder="type de classe"></mdb-select>
+          <div *ngIf="classForm.get('classTypeId').errors && classForm.get('classTypeId').touched"
+            class="text-small text-danger">saisir le type de classe svp</div>
+        </div>
+        <div class="col-md-6">
+          <div class="md-form my-1">
+            <input mdbInput type="number" id="maxStudents" class="form-control" formControlName="maxStudents" mdbValidate>
+            <label for="maxStudents" class="">nombre max d'élèves</label>
+            <div *ngIf="classForm.get('maxStudents').errors && classForm.get('maxStudents').touched"
+              class="text-small text-danger">saisir le nbre d'élèves svp</div>
+          </div>
+        </div>
+      </div>
+      <div class="my-2">
+        <button type="button" mdbBtn (click)="activeModal.hide()" class="btnOrange" block="true" size="sm" mdbWavesEffect>annuler</button>
+        <button type="submit" mdbBtn [disabled]="classForm.get('maxStudents').errors || (!classForm.valid && needClassType)"
+          class="btnBlue" block="true" size="sm" mdbWavesEffect>ajouter une classe de {{level.name}}</button>
+      </div>
+    </div>
+  </form>
+</div>

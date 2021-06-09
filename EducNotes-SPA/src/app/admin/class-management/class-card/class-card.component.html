@@ -1,12 +1,8 @@
 <mdb-flipping-card #card>
   <div class="face front card tp-box_side tp-box_front">
     <div class="content p-2">
-      <div class="d-flex flex align-items-center">
-        <div class="flex-grow-1 text-17">niveau {{level.name}}</div>
-        <button size="sm" mdbBtn class="btnBlue p-2 text-lowercase" style="letter-spacing: 1px;" mdbWavesEffect (click)="card.toggle()">détails</button>
-        <button size="sm" mdbBtn [routerLink]="['/editClasses']" class="btnBlue p-2 text-lowercase" style="letter-spacing: 1px;">editer</button>
-      </div>
-      <hr class="my-1" style="background-color: #f89f20;">
+      <div class="text-17 text-center">niveau {{level.name}}</div>
+      <hr class="my-1">
       <div class="text-center">
         <span class="text-15 text-muted">classes</span>
         <h4 class="m-0">{{level.classes.length}}</h4>
@@ -16,9 +12,15 @@
         <h4 *ngIf="level.totalStudents == 0" class="m-0">aucun élève</h4>
         <h4 *ngIf="level.totalStudents > 0" class="m-0">{{level.totalStudents}} élèves</h4>
       </div>
-      <!-- <div class="text-center">
-        <button size="sm" mdbBtn class="btnBlue" mdbWavesEffect (click)="card.toggle()">details</button>
-      </div> -->
+      <div class="row mt-4">
+        <div class="col-12"><hr class="my-1"></div>
+        <div class="col-6">
+          <a class="textBlue text-13 mr-2" (click)="card.toggle()"><b>détails</b></a>
+        </div>
+        <div class="col-6">
+          <a class="textDarkRed text-13" (click)="openModal(level)"><b>ajouter une classe</b></a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -52,4 +54,3 @@
     </div>
   </div>
 </mdb-flipping-card>
-

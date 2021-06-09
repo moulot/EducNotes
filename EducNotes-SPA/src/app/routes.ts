@@ -278,9 +278,9 @@ export const appRoutes: Routes = [
         { path: 'paymentLevelChild/:id', component: PaymentLevelChildComponent, resolve: {children: PaymentLevelChildResolver}},
         { path: 'absences', component: AbsencesComponent},
         { path: 'editAccount/:id', component: EditAccountComponent, resolve: {user: EditAccountResolver}},
-        { path: 'usersValidation', component: UserValidationComponent, resolve: {users: UserValidationResolver}},
+        { path: 'usersValidation', component: UserValidationComponent, resolve: {users: UserValidationResolver} },
         { path: 'config', component: ConfigComponent},
-        { path: 'editClasses', component: EditLevelClassesComponent},
+        { path: 'editClasses/:levelId', component: EditLevelClassesComponent, resolve: { classes: LevelClassesResolver } },
         { path: 'employees', component: EmployeesComponent, resolve: {employees: EmployeesResolver}},
         { path: 'addEmployee', component: AddEmployeeComponent},
         { path: 'addService/:id', component: ConfigAddServiceComponent, resolve: {product: AddServiceResolver}}

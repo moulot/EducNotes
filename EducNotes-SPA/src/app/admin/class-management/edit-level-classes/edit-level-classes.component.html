@@ -1,1 +1,57 @@
-<p>edit-level-classes works!</p>
+<div class="row animated zoomInDown">
+  <div class="col-md-12 d-none d-md-block">
+    <div class="d-flex">
+      <i class="fad fa-users-class fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+      <div class="text-17 flex-grow-1">edition des classes de {{classes[0].levelName}}</div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <hr class="my-1">
+    <form [formGroup]="classesForm" (ngSubmit)="saveClasses()">
+      <div class="row">
+        <div class="col-md-12" formArrayName="classes" *ngFor="let type of classesForm.get('classes')['controls']; let i = index;">
+          <div [formGroupName]="i">
+            <input type="hidden" formControlName="id">
+            <input type="hidden" formControlName="toBeDeleted">
+            <div class="border rounded-lg p-2 mb-1">
+              <div *ngIf="type.value.toBeDeleted" class="text-danger text-15">supprimé</div>
+              <div class="row">
+                <div class="col-md-1 text-center my-auto">
+                  <a *ngIf="!type.value.toBeDeleted" (click)="removeClassItem(i)">
+                    <i class="fad fa-trash-alt fa-2x" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                  </a>
+                  <a *ngIf="type.value.toBeDeleted" (click)="resetClassItem(i)">
+                    <i class="fad fa-times-circle fa-2x" style="--fa-secondary-opacity: 1;
+                      --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                  </a>
+                </div>
+                <div class="col-md-2 text-15">
+                  <!-- <b>{{classes[0].levelName}}</b> -->
+                  <div class="md-form mt-1 mb-0">
+                    <input type="text" id="name" class="form-control" formControlName="name" mdbInput>
+                    <label for="name">nom de la classe</label>
+                  </div>
+                </div>
+                <div *ngIf="showType" class="col-md-2">
+                  <div class="md-form mt-0 mb-0">
+                    <mdb-select [options]="classTypeOptions" formControlName="typeId" placeholder="série des classes">
+                    </mdb-select>
+                    <div *ngIf="classesForm.errors && classesForm.get('classTypeId').touched"
+                      class="text-small text-danger">la série de la classe est obligatoire</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <a (click)="addClass()" class="text-15 textBlue text-center text-md-left"><u><b>ajouter une classe</b></u></a>
+        </div>
+      </div>
+      <div class="my-2">
+        <button type="submit" mdbBtn block="true" class="btnBlue" size="sm" mdbWavesEffect>enregistrer les classes</button>
+      </div>
+    </form>
+  </div>
+</div>

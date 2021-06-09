@@ -1,5 +1,4 @@
 <div class="row animated zoomInDown">
-
   <div class="col-md-12 d-none d-md-block">
     <div class="d-flex">
       <i class="fad fa-users-class fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
@@ -30,13 +29,11 @@
       </div>
     </div>
   </div>
-
   <div class="col-md-12 mt-2">
     <div class="row">
       <div class="col-md-3 mb-2" *ngFor="let level of filledLevels">
-        <app-class-card [level]="level"></app-class-card>
+        <app-class-card (reloadClasses)="getlevels()" [level]="level"></app-class-card>
       </div>
     </div>
   </div>
-    
 </div>

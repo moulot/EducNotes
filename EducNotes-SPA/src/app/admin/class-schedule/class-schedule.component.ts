@@ -3,8 +3,8 @@ import { ClassService } from 'src/app/_services/class.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Schedule } from 'src/app/_models/schedule';
-import { ActivatedRoute, Router } from '@angular/router';
-import { MDBModalService, MDBModalRef } from 'ng-uikit-pro-standard';
+import { ActivatedRoute } from '@angular/router';
+import { MDBModalRef } from 'ng-uikit-pro-standard';
 
 @Component({
   selector: 'app-class-schedule',

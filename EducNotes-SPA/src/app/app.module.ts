@@ -288,6 +288,7 @@ import { ConfigProductFeesComponent } from './admin/config/config-product-fees/c
 import { ConfigServicesComponent } from './admin/config/config-services/config-services.component';
 import { ConfigAddServiceComponent } from './admin/config/config-add-service/config-add-service.component';
 import { AddServiceResolver } from './_resolvers/add-service-resolver';
+import { ModalAddClassComponent } from './admin/class-management/modal-add-class/modal-add-class.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -481,7 +482,8 @@ export function tokenGetter() {
       ConfirmUserEmailComponent,
       ConfigProductFeesComponent,
       ConfigServicesComponent,
-      ConfigAddServiceComponent
+      ConfigAddServiceComponent,
+      ModalAddClassComponent
    ],
    imports: [
       FormWizardModule,
@@ -608,7 +610,8 @@ export function tokenGetter() {
       SkillsModalComponent,
       AgendaModalComponent,
       ModalScheduleComponent,
-      ModalConflictComponent
+      ModalConflictComponent,
+      ModalAddClassComponent
    ],
    bootstrap: [AppComponent],
    schemas: [ NO_ERRORS_SCHEMA ]
