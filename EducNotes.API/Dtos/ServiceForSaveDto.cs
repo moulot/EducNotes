@@ -1,12 +1,10 @@
-namespace EducNotes.API.Models {
-  public class Product {
-    public Product()
-    {
-        IsRequired = false;
-        IsPaidCash = true;
-        Active = true;
-        DsplSeq = 0;
-    }
+using System.Collections.Generic;
+using EducNotes.API.Models;
+
+namespace EducNotes.API.Dtos
+{
+  public class ServiceForSaveDto
+  {
     public int Id { get; set; }
     public string Name { get; set; }
     public string Comment { get; set; }
@@ -15,13 +13,12 @@ namespace EducNotes.API.Models {
     public bool IsPaidCash { get; set; }
     public bool IsByLevel { get; set; }
     public bool IsPeriodic { get; set; }
-    public ProductType ProductType { get; set; }
     public int? PeriodicityId { get; set; }
-    public Periodicity Periodicity { get; set; }
     public int? PayableAtId { get; set; }
-    public PayableAt PayableAt { get; set; }
     public bool IsRequired { get; set; }
     public bool Active { get; set; }
     public byte DsplSeq { get; set; }
+    public List<ProductDeadlineDto> DueDates { get; set; }
+    public List<ClassLevelProduct> LevelPrices { get; set; }
   }
 }

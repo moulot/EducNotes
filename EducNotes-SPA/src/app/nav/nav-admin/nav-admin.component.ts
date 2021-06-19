@@ -29,6 +29,7 @@ export class NavAdminComponent implements OnInit {
   getMenu() {
     this.adminService.getUserTypeMenu(this.adminTypeId).subscribe(data => {
       this.menu = data;
+      // console.log(this.menu);
     });
   }
 

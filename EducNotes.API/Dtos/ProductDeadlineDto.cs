@@ -6,6 +6,7 @@ namespace EducNotes.API.Dtos
   {
     public int Id { get; set; }
     public int ProductId { get; set; }
+    public string Comment { get; set; }
     public DateTime DueDate { get; set; }
     public string strDueDate { get; set; }
     public string DeadLineName { get; set; }

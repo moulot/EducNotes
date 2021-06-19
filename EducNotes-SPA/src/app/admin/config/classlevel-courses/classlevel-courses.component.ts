@@ -30,9 +30,9 @@ export class ClasslevelCoursesComponent implements OnInit {
   }
 
   addLevelItems() {
-    const levelss = this.levelCoursesForm.get('levels') as FormArray;
+    const levels = this.levelCoursesForm.get('levels') as FormArray;
     this.levels.forEach(x => {
-      levelss.push(this.fb.group({
+      levels.push(this.fb.group({
         id: x.id,
         name: x.name,
         courses: this.addCourseItems(x.id)

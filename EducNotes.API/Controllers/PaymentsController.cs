@@ -23,7 +23,7 @@ namespace EducNotes.API.Controllers
     private readonly IMapper _mapper;
     private readonly IConfiguration _config;
     int chequeTypeId, cashTypeId, bankTransferTypeId, mobileMoneyTypeId;
-    int tuitionTypeId, finOpTypeInvoice, finOpTypePayment;
+    int finOpTypeInvoice, finOpTypePayment;
     public readonly ICacheRepository _cache;
 
     public PaymentsController(DataContext context, IEducNotesRepository repo, IMapper mapper, IConfiguration config,

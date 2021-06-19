@@ -1,0 +1,169 @@
+<form [formGroup]="serviceForm" (ngSubmit)="saveService()">
+  <div class="row">
+    <div class="col-md-12">
+      <div *ngIf="!editionMode" class="d-flex">
+        <i class="fad fa-user-plus fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <div class="text-17">ajout d'un service</div>
+      </div>
+      <div *ngIf="editionMode" class="d-flex mb-2">
+        <i class="fad fa-sync-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+        <div class="text-17">édition du service <span class="text-capitalize">{{product.name}}</span></div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="border rounded-lg p-2 mb-1">
+                <div class="row">
+                  <div class="col-md-3 text-15 textDarkBlue my-auto"><b>nom</b></div>
+                  <div class="col-md-6">
+                    <div class="md-form mt-1 mb-0">
+                      <input mdbInput type="text" id="name" class="form-control" formControlName="name" mdbValidate>
+                      <label for="name">nom</label>
+                    </div>
+                    <div *ngIf="serviceForm.get('name').errors && serviceForm.get('name').touched" class="text-small text-danger">
+                      le nom est obligatoire
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="border rounded-lg p-2 mb-1">
+                <div class="row">
+                  <div class="col-md-4 text-15 textDarkBlue my-auto"><b>type service</b></div>
+                  <div class="col-md-6 mb-2">
+                    <mdb-select [options]="typeOptions" formControlName="typeId" placeholder="type de classe"></mdb-select>
+                    <div *ngIf="serviceForm.get('typeId').errors && serviceForm.get('typeId').touched"
+                      class="text-small text-danger">saisir le type du service svp</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+             <div class="border rounded-lg p-2 mb-1">
+              <div class="text-15 textDarkBlue"><b>prix</b></div>
+              <hr class="my-1">
+                <div class="row mb-2">
+                  <div class="col-md-2 text-15 my-auto">prix par niveau</div>
+                  <div class="col-md-2 mb-0">
+                    <mdb-select (ngModelChange)="toggleByLevel($event)" [options]="trueFalseOptions" formControlName="isByLevel" placeholder=""></mdb-select>
+                  </div>
+                </div>
+                <div *ngIf="showUniquePrice" class="row">
+                  <!-- <div class="col-md-12"><hr class="my-2"></div> -->
+                  <div class="col-md-2 text-15 my-auto">prix</div>
+                  <div class="col-md-2">
+                    <div class="md-form mt-2 mb-0">
+                      <input mdbInput type="number" id="price" class="form-control" formControlName="price" mdbValidate>
+                      <label for="price">prix du service</label>
+                      <div *ngIf="serviceForm.value.isPaidCash && serviceForm.get('price').errors &&
+                        serviceForm.get('price').touched" class="text-small text-danger">le prix est obligatoire</div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="showLevels" class="row">
+                  <div class="col-md-2" formArrayName="levelPrices" *ngFor="let level of serviceForm.get('levelPrices')['controls']; let i = index;">
+                    <div [formGroupName]="i">
+                      <div class="md-form mt-2 mb-0">
+                        <input mdbInput type="number" id="price" class="form-control" formControlName="price" mdbValidate>
+                        <label for="price">{{level.value.levelname}}</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="border rounded-lg p-2 mb-1">
+                <div class="text-15 textDarkBlue"><b>échéances</b></div>
+                <hr class="my-1">
+                <div class="row">
+                  <div class="col-md-2 text-15 my-auto">payé cash</div>
+                  <div class="col-md-2 mb-0">
+                    <mdb-select (ngModelChange)="togglePaidCash($event)" [options]="trueFalseOptions" formControlName="isPaidCash" placeholder=""></mdb-select>
+                    <div *ngIf="serviceForm.get('isPaidCash').errors && serviceForm.get('isPaidCash').touched"
+                      class="text-small text-danger">choisir le paiement svp</div>
+                  </div>
+                </div>
+                <div *ngIf="showDueDates">
+                  <hr class="my-2">
+                  <div class="text-15">échéances</div>
+                  <hr class="my-1">
+                  <div class="row text-15 textDarkBlue my-1">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2">échéance</div>
+                    <div class="col-md-3">libellé échéance</div>
+                    <div class="col-md-2">pourcentage</div>
+                  </div>
+                  <div formArrayName="duedates" *ngFor="let dueDate of serviceForm.get('duedates')['controls']; let i = index;">
+                    <div class="border rounded-lg p-1 mb-1">
+                      <div class="row" [formGroupName]="i">
+                        <div class="col-md-1 text-17 mt-md-3 text-md-center">{{i + 1}}.</div>
+                        <div class="col-md-2">
+                          <div class="md-form mt-0 mb-0">
+                            <mdb-date-picker name="dueDate" (ngModelChange)="sortDueDates()" [placeholder]="'date échéance'" [options]="myDatePickerOptions"
+                              formControlName="dueDate"></mdb-date-picker>
+                            <div *ngIf="dueDate.get('dueDate').errors && dueDate.get('dueDate').touched"
+                              class="text-small text-danger">l'échéance est obligatoire</div>
+                          </div>
+                        </div>      
+                        <div class="col-md-3">
+                          <div class="md-form mt-1 mb-0">
+                            <input type="text" id="name" class="form-control" formControlName="deadlineName" mdbInput>
+                            <label for="name">libellé</label>
+                          </div>
+                        </div>        
+                        <div class="col-md-2">
+                          <div class="md-form mt-1 mb-0">
+                            <input type="number" id="pct" class="form-control" formControlName="pct" mdbInput>
+                            <label for="pct">% du montant</label>
+                          </div>
+                        </div>
+                        <div class="col-md-1 my-auto">
+                          <a (click)="removeDueDateItem(i)">
+                            <i class="fad fa-trash-alt fa-2x" style="--fa-secondary-opacity: 1;
+                              --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
+                          </a>
+                        </div>    
+                        <!-- <input type="text" formControlName="seq"> -->
+                      </div>
+                    </div>
+                  </div>
+                  <a (click)="addDueDate()" class="text-13 textBlue my-2" style="font-family: arial;"><u>ajouter une échéance</u></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr class="mt-3 mb-2">
+          <div *ngIf="serviceForm.hasError('formNOK')" class="my-2 text-white border rounded-lg p-2" style="background-color: red;">
+            <div *ngIf="showLevels && serviceForm.hasError('feesNOK')">un ou plusieurs prix par niveau sont incorrects.</div>
+            <div *ngIf="!showLevels && serviceForm.hasError('feeNOK')">le prix du service est incorrect.</div>
+            <div *ngIf="showDueDates && serviceForm.hasError('pctNOK')" class="text-15">les pourcentages des échéances sont incohérents.</div>
+            <div *ngIf="showDueDates && serviceForm.hasError('datesNOK')">une ou plusieurs dates des échances sont incorrectes.</div>
+            <div *ngIf="showDueDates && serviceForm.hasError('labelsNOK')">un ou plusieurs libellés des échances sont incorrects.</div>
+          </div>  
+          <div class="row">
+            <div class="col-md-8"></div>
+            <div class="col-md-2">
+              <button type="button" [routerLink]="['/services']" mdbBtn class="btnOrange" block="true" size="sm" mdbWavesEffect>annuler</button>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" [disabled]="serviceForm.hasError('formNOK') || wait" mdbBtn class="btnBlue"
+                block="true" size="sm" mdbWavesEffect>
+                <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

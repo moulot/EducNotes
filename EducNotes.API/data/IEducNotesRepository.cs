@@ -143,7 +143,7 @@ namespace EducNotes.API.Data
     // MenuItem GetByMenuItemName(string menuItemName, List<MenuItem> menuItems);
     // MenuItem GetTopMenuItem(string menuItemName, List<MenuItem> menuItems);
     Task<UserWithRolesDto> GetUserWithRoles(int userId);
-    Task<List<MenuItemDto>> GetUserMenu(int userId);
+    // Task<List<MenuItemDto>> GetUserMenu(int userId);
     Task<List<MenuItemDto>> GetUserTypeMenu(int userTypeId, int userId);
     // Task<Boolean> HasAccessToMenu(int userId, int menuItemId);
     Task<List<MenuCapabilitiesDto>> GetMenuCapabilities(int userTypeId, int userId);

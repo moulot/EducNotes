@@ -26,7 +26,7 @@ namespace EducNotes.API.Controllers
     private readonly UserManager<User> _userManager;
     CultureInfo frC = new CultureInfo("fr-FR");
     public ICacheRepository _cache { get; }
-    int tuitionId;
+    int tuitionId, serviceTypeId, schoolingTypeId;
 
     public ProductsController(DataContext context, UserManager<User> userManager, IConfiguration config,
       IEducNotesRepository repo, IMapper mapper, ICacheRepository cache)
@@ -38,6 +38,8 @@ namespace EducNotes.API.Controllers
       _repo = repo;
       _mapper = mapper;
       tuitionId = _config.GetValue<int>("AppSettings:tuitionId");
+      serviceTypeId = _config.GetValue<int>("AppSettings:serviceTypeId");
+      schoolingTypeId = _config.GetValue<int>("AppSettings:schoolingTypeId");
     }
 
     [HttpGet]
@@ -56,25 +58,45 @@ namespace EducNotes.API.Controllers
       return Ok(products);
     }
 
+    [HttpGet("Services")]
+    public async Task<IActionResult> GetServices()
+    {
+      List<Product> productsCached = await _cache.GetProducts();
+      List<ProductDeadLine> productDueDates = await _cache.GetProductDeadLines();
+
+      List<Product> services = productsCached.Where(p => p.ProductTypeId == serviceTypeId).ToList();
+      List<ProductForConfigDto> products = _mapper.Map<List<ProductForConfigDto>>(services);
+      foreach(var product in products)
+      {
+        List<ProductDeadLine> dueDates = productDueDates.OrderBy(o => o.DueDate).Where(d => d.ProductId == product.Id).ToList();
+        product.DueDates = _mapper.Map<List<ProductDeadlineDto>>(dueDates);
+      }
+
+      return Ok(products);
+    }
+
     [HttpGet("{id}", Name = "GetProduct")]
     public async Task<IActionResult> GetProduct(int id)
     {
       List<Product> productsCached = await _cache.GetProducts();
       List<ProductDeadLine> productDueDates = await _cache.GetProductDeadLines();
+      List<ClassLevelProduct> classLevelProducts = await _cache.GetClassLevelProducts();
 
       Product productFromDB = productsCached.First(p => p.Id == id);
       ProductForConfigDto product = _mapper.Map<ProductForConfigDto>(productFromDB);
       List<ProductDeadLine> dueDates = productDueDates.OrderBy(o => o.DueDate).Where(d => d.ProductId == product.Id).ToList();
       product.DueDates = _mapper.Map<List<ProductDeadlineDto>>(dueDates);
+      List<ClassLevelProduct> levelPrices = classLevelProducts.Where(c => c.ProductId == product.Id).ToList();
+      product.LevelPrices = _mapper.Map<List<ClasslevelProductDto>>(levelPrices);
 
       return Ok(product);
     }
 
-    [HttpGet("GetProductTypes")]
+    [HttpGet("ProductTypes")]
     public async Task<IActionResult> GetProductTypes()
     {
-      var producTypes = await _context.ProductTypes.OrderBy(p => p.Name).ToListAsync();
-      return Ok(producTypes);
+      List<ProductType> productTypes = await _cache.GetProductTypes();
+      return Ok(productTypes);
     }
 
     [HttpGet("GetDeadLines")]
@@ -85,51 +107,51 @@ namespace EducNotes.API.Controllers
       return Ok(res);
     }
 
-    [HttpGet("GetServices")]
-    public async Task<IActionResult> GetServices()
-    {
-      // var products = await _context.Products.OrderBy (p => p.Name).ToListAsync ();
-      // return Ok(products);
-      int schoolServiceTypeId = _config.GetValue<int>("AppSettings:schoolServiceTypeId");
-      var prods = await _context.Products.Include(a => a.Periodicity)
-                                         .Include(a => a.PayableAt)
-                                         .Where(p => p.ProductTypeId == schoolServiceTypeId)
-                                         .OrderBy(a => a.Name)
-                                         .ToListAsync();
+    // [HttpGet("GetServices")]
+    // public async Task<IActionResult> GetServices()
+    // {
+    //   // var products = await _context.Products.OrderBy (p => p.Name).ToListAsync ();
+    //   // return Ok(products);
+    //   int schoolServiceTypeId = _config.GetValue<int>("AppSettings:schoolServiceTypeId");
+    //   var prods = await _context.Products.Include(a => a.Periodicity)
+    //                                      .Include(a => a.PayableAt)
+    //                                      .Where(p => p.ProductTypeId == schoolServiceTypeId)
+    //                                      .OrderBy(a => a.Name)
+    //                                      .ToListAsync();
 
-      var produits = new List<SchoolServicesDto>();
-      foreach(var prod in prods)
-      {
-        var produit = new SchoolServicesDto
-        {
-          id = prod.Id,
-          Name = prod.Name,
-          Comment = prod.Comment,
-          Price = prod.Price,
-          IsByLevel = prod.IsByLevel,
-          IsPeriodic = prod.IsPeriodic,
-          Periodicity = prod.Periodicity,
-          PayableAt = prod.PayableAt
-        };
+    //   var produits = new List<SchoolServicesDto>();
+    //   foreach(var prod in prods)
+    //   {
+    //     var produit = new SchoolServicesDto
+    //     {
+    //       id = prod.Id,
+    //       Name = prod.Name,
+    //       Comment = prod.Comment,
+    //       Price = prod.Price,
+    //       IsByLevel = prod.IsByLevel,
+    //       IsPeriodic = prod.IsPeriodic,
+    //       Periodicity = prod.Periodicity,
+    //       PayableAt = prod.PayableAt
+    //     };
 
-        if (!prod.IsPeriodic)
-        {
-          produit.ProductDeadLines = await _context.ProductDeadLines.Where (p => p.ProductId == prod.Id)
-                                                                    .ToListAsync ();
-        }
+    //     if (!prod.IsPeriodic)
+    //     {
+    //       produit.ProductDeadLines = await _context.ProductDeadLines.Where (p => p.ProductId == prod.Id)
+    //                                                                 .ToListAsync ();
+    //     }
 
-        if (prod.IsByLevel)
-        {
-          produit.ClassLevelProducts = await _context.ClassLevelProducts.Include(d => d.ClassLevel)
-                                                                        .Where (p => p.ProductId == prod.Id)
-                                                                        .ToListAsync ();
-        }
+    //     if (prod.IsByLevel)
+    //     {
+    //       produit.ClassLevelProducts = await _context.ClassLevelProducts.Include(d => d.ClassLevel)
+    //                                                                     .Where (p => p.ProductId == prod.Id)
+    //                                                                     .ToListAsync ();
+    //     }
 
-        produits.Add(produit);
-      }
+    //     produits.Add(produit);
+    //   }
 
-      return Ok(produits);
-    }
+    //   return Ok(produits);
+    // }
 
     [HttpGet("GetPeriodicities")]
     public async Task<IActionResult> GetPeriodicicities()

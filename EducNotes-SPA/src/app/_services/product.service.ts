@@ -14,8 +14,16 @@ export class ProductService {
     return this.http.get(this.baseUrl);
   }
 
+  getServices() {
+    return this.http.get(this.baseUrl + 'Services');
+  }
+
   getProduct(id) {
     return this.http.get(this.baseUrl + id);
+  }
+
+  getProductTypes() {
+    return this.http.get(this.baseUrl + 'ProductTypes');
   }
 
 }

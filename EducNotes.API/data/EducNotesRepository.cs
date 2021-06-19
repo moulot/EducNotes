@@ -4363,28 +4363,28 @@ on courses.ClassId equals classes.Id
       return userWithRoles;
     }
 
-    public async Task<List<MenuItemDto>> GetUserMenu(int userId)
-    {
-      List<User> users = await _cache.GetUsers();
+    // public async Task<List<MenuItemDto>> GetUserMenu(int userId)
+    // {
+    //   List<User> users = await _cache.GetUsers();
 
-      User user = users.First(u => u.Id == userId);
-      List<MenuItemDto> userTypeMenu = await GetUserTypeMenu(user.UserTypeId, userId);
-      List<UserRole> userRolesFromDB = await _context.UserRoles.Include(i => i.Role).Where(r => r.UserId == userId).ToListAsync();
-      List<Role> userRoles = userRolesFromDB.Select(u => u.Role).ToList();
-      List<RoleCapability> capabilities = await _context.RoleCapabilities.ToListAsync();
+    //   User user = users.First(u => u.Id == userId);
+    //   List<MenuItemDto> userTypeMenu = await GetUserTypeMenu(user.UserTypeId, userId);
+    //   List<UserRole> userRolesFromDB = await _context.UserRoles.Include(i => i.Role).Where(r => r.UserId == userId).ToListAsync();
+    //   List<Role> userRoles = userRolesFromDB.Select(u => u.Role).ToList();
+    //   List<RoleCapability> capabilities = await _context.RoleCapabilities.ToListAsync();
 
-      List<MenuItemDto> userMenu = new List<MenuItemDto>();
-      foreach (MenuItemDto menuItem in userTypeMenu)
-      {
-        Boolean hasAccess = await HasAccessToMenu(userId, menuItem, userRoles, capabilities);
-        if (hasAccess)
-        {
-          userMenu.Add(menuItem);
-        }
-      }
+    //   List<MenuItemDto> userMenu = new List<MenuItemDto>();
+    //   foreach (MenuItemDto menuItem in userTypeMenu)
+    //   {
+    //     Boolean hasAccess = await HasAccessToMenu(userId, menuItem, userRoles, capabilities);
+    //     if (hasAccess)
+    //     {
+    //       userMenu.Add(menuItem);
+    //     }
+    //   }
 
-      return userMenu;
-    }
+    //   return userMenu;
+    // }
 
     public async Task<List<MenuItemDto>> GetMenu(int userTypeId)
     {
@@ -4441,7 +4441,9 @@ on courses.ClassId equals classes.Id
 
       //get userType menu
       Menu menu = await _context.Menus.FirstAsync(m => m.UserTypeId == userTypeId);
-      List<MenuItem> menuItemsByMenuId = await _context.MenuItems.Where(m => m.MenuId == menu.Id).ToListAsync();
+      List<MenuItem> menuItemsByMenuId = await _context.MenuItems
+                                          .OrderBy(o => o.ParentMenuId).ThenBy(o => o.DsplSeq).ThenBy(o => o.DisplayName)
+                                          .Where(m => m.MenuId == menu.Id).ToListAsync();
       List<MenuItemDto> userMenuItems = _mapper.Map<List<MenuItemDto>>(menuItemsByMenuId);
       List<UserRole> userRolesFromDB = await _context.UserRoles.Include(i => i.Role).Where(r => r.UserId == userId).ToListAsync();
       List<Role> userRoles = userRolesFromDB.Select(u => u.Role).ToList();
@@ -4450,7 +4452,7 @@ on courses.ClassId equals classes.Id
       List<MenuItemDto> menuItems = new List<MenuItemDto>();
       foreach (var menuItem in userMenuItems)
       {
-        Boolean hasAccessToMenuItem = await HasAccessToMenu(userId, menuItem, userRoles, capabilities);
+        Boolean hasAccessToMenuItem = await HasAccessToMenu(userId, menuItem, userRoles, userMenuItems, capabilities);
         if (hasAccessToMenuItem)
         {
           //check if the menu already exists in this object
@@ -4489,7 +4491,7 @@ on courses.ClassId equals classes.Id
       return menuItems;
     }
 
-    public async Task<Boolean> HasAccessToMenu(int userId, MenuItemDto menuItem, List<Role> userRoles, List<RoleCapability> capabilities)
+    public async Task<Boolean> HasAccessToMenu(int userId, MenuItemDto menuItem, List<Role> userRoles, List<MenuItemDto> menuItems, List<RoleCapability> capabilities)
     {
       // List<MenuItem> menuItems = await _cache.GetMenuItems();
       // List<RoleCapability> rolesCapabilities = await _cache.GetRoleCapabilities();
@@ -4530,11 +4532,12 @@ on courses.ClassId equals classes.Id
       //If it gets here then the user didn’t have access to this menu item. BUT they
       //may have access to one of its children, now check the children and if they
       //have access to any of them return true.
-      if (menuItem.ChildMenuItems.Count > 0)
+      List<MenuItemDto> menuChildItems = menuItems.Where(m => m.ParentMenuId == menuItem.Id).ToList();
+      if (menuChildItems.Count > 0)
       {
-        foreach (MenuItemDto child in menuItem.ChildMenuItems)
+        foreach (MenuItemDto child in menuChildItems)
         {
-          Boolean childInRole = await HasAccessToMenu(userId, child, userRoles, capabilities);
+          Boolean childInRole = await HasAccessToMenu(userId, child, userRoles, menuItems, capabilities);
           if (childInRole)
           {
             return true;

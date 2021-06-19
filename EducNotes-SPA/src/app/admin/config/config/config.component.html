@@ -34,7 +34,7 @@
   </div>
   <div class="col-md-2 mb-1">
     <button type='button' mdbBtn (click)="showTab(5)" [ngClass]="activeTabs[5] ? 'btnBlueW' : 'btnWhiteB'"
-      size="sm" block="true">services</button>
+      size="sm" block="true">zones</button>
   </div>
   <div class="col-md-12 mt-3">
     <div *ngIf="activeTabs[0]">
@@ -53,7 +53,7 @@
       <app-config-product-fees></app-config-product-fees>
     </div>
     <div *ngIf="activeTabs[5]">
-      <app-config-services></app-config-services>
+      <app-config-zones></app-config-zones>
     </div>
   </div>
 </div>

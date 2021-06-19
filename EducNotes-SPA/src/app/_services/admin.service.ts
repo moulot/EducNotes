@@ -116,4 +116,8 @@ export class AdminService {
     return this.http.post(this.baseUrl + 'saveLevelTuitionFees', tuitionFeeData);
   }
 
+  saveService(service) {
+    return this.http.post(this.baseUrl + 'SaveService', service);
+  }
+
 }

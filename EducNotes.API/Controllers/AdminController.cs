@@ -1053,5 +1053,79 @@ namespace EducNotes.API.Controllers
         return BadRequest(error.Message);
     }
 
+    [HttpPost("SaveService")]
+    public async Task<IActionResult> SaveService(ServiceForSaveDto serviceDto)
+    {
+      List<Product> products = await _cache.GetProducts();
+      List<ClassLevelProduct> classlevelProducts = await _cache.GetClassLevelProducts();
+      List<ProductDeadLine> productDeadLines = await _cache.GetProductDeadLines();
+
+      using(var identityContextTransaction = _context.Database.BeginTransaction())
+      {
+        try
+        {
+          int serviceId = serviceDto.Id;
+          Product service = products.Single(p => p.Id == serviceId);
+          service.Name = serviceDto.Name;
+          service.ProductTypeId = serviceDto.ProductTypeId;
+
+          // delete previous by classlevel prices
+          List<ClassLevelProduct> prevLevelPrices = classlevelProducts.Where(c => c.ProductId == serviceId).ToList();
+          _repo.DeleteAll(prevLevelPrices);
+          if(serviceDto.IsByLevel)
+          {
+            service.IsByLevel = true;
+            service.Price = null;
+            await _context.AddRangeAsync(serviceDto.LevelPrices);
+          }
+          else
+          {
+            service.IsByLevel = false;
+            service.Price = serviceDto.Price;
+          }
+
+          List<ProductDeadLine> prevDeadlines = productDeadLines.Where(p => p.ProductId == serviceId).ToList();
+          _repo.DeleteAll(prevDeadlines);
+          if(serviceDto.IsPaidCash)
+          {
+            service.IsPaidCash = true;
+          }
+          else
+          {
+            service.IsPaidCash = false;
+            byte i = 1;
+            foreach(ProductDeadlineDto dueDate in serviceDto.DueDates)
+            {
+              ProductDeadLine productDueDate = new ProductDeadLine();
+              productDueDate.ProductId = serviceId;
+              var dateArray = dueDate.strDueDate.Split("/");
+              var day = Convert.ToInt32(dateArray[0]);
+              var month = Convert.ToInt32(dateArray[1]);
+              var year = Convert.ToInt32(dateArray[2]);
+              productDueDate.DueDate = new DateTime(year, month, day);
+              productDueDate.DeadLineName = dueDate.DeadLineName;
+              productDueDate.Seq = i++;
+              productDueDate.Percentage = dueDate.Percentage / 100;
+              _repo.Add(productDueDate);
+            }
+          }
+
+          _repo.Update(service);
+          await _repo.SaveAll();
+          identityContextTransaction.Commit();
+          await _cache.LoadProducts();
+          await _cache.LoadClassLevelProducts();
+          await _cache.LoadProductDeadLines();
+          return Ok();
+        }
+        catch(Exception ex)
+        {
+          var dd = ex.Message;
+          identityContextTransaction.Rollback();
+          return BadRequest("problème pour enregistrer le service.");
+        }
+      }
+    }
+
   }
 }

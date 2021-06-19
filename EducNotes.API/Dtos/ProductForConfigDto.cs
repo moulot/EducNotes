@@ -22,5 +22,6 @@ namespace EducNotes.API.Dtos
     public Boolean Active { get; set; }
     public byte DspSeq { get; set; }
     public List<ProductDeadlineDto> DueDates { get; set; }
+    public List<ClasslevelProductDto> LevelPrices { get; set; }
   }
 }

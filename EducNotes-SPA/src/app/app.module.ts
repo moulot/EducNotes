@@ -289,6 +289,10 @@ import { ConfigServicesComponent } from './admin/config/config-services/config-s
 import { ConfigAddServiceComponent } from './admin/config/config-add-service/config-add-service.component';
 import { AddServiceResolver } from './_resolvers/add-service-resolver';
 import { ModalAddClassComponent } from './admin/class-management/modal-add-class/modal-add-class.component';
+import { ServicesComponent } from './admin/services/services/services.component';
+import { ServicesResolver } from './_resolvers/services-resolver';
+import { AddServiceComponent } from './admin/services/add-service/add-service.component';
+import { ConfigZonesComponent } from './admin/config/config-zones/config-zones.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -483,7 +487,10 @@ export function tokenGetter() {
       ConfigProductFeesComponent,
       ConfigServicesComponent,
       ConfigAddServiceComponent,
-      ModalAddClassComponent
+      ModalAddClassComponent,
+      ServicesComponent,
+      AddServiceComponent,
+      ConfigZonesComponent
    ],
    imports: [
       FormWizardModule,
@@ -598,6 +605,7 @@ export function tokenGetter() {
       OrderService,
       AccountService,
       ParentFileResolver,
+      ServicesResolver,
       UserValidationResolver,
       EditAccountResolver,
       ClassScheduleResolver,

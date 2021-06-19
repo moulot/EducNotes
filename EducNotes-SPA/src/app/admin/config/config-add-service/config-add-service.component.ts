@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AlertifyService } from 'src/app/_services/alertify.service';
+import { ProductService } from 'src/app/_services/product.service';
 
 @Component({
   selector: 'app-config-add-service',
@@ -12,9 +13,11 @@ export class ConfigAddServiceComponent implements OnInit {
   product: any;
   serviceForm: FormGroup;
   editionMode = false;
+  typeOptions = [];
+  trueFalseOptions = [{value: false, label: 'NON'}, {value: true, label: 'OUI'}];
   wait = false;
 
-  constructor(private fb: FormBuilder, private alertify: AlertifyService,
+  constructor(private fb: FormBuilder, private alertify: AlertifyService, private productService: ProductService,
     private route: ActivatedRoute) { }
 
   ngOnInit() {
@@ -28,17 +31,17 @@ export class ConfigAddServiceComponent implements OnInit {
       }
     });
 
+    this.getProductTypes();
     this.createServiceForm();
   }
 
   createServiceForm() {
     this.serviceForm = this.fb.group({
-      name: ['', Validators.required],
-      typeid: [this.product.typeid, Validators.required],
-      isPaidCash: [this.product.isPaidCash, Validators.required],
+      name: [this.product.name, Validators.required],
+      typeId: [this.product.productTypeId, Validators.required],
       price: [this.product.price],
-      isByLevel: [this.product.isByLevel],
-      
+      isPaidCash: [this.product.isPaidCash, Validators.required],
+      isByLevel: [this.product.isByLevel]
     });
   }
 
@@ -51,6 +54,18 @@ export class ConfigAddServiceComponent implements OnInit {
       price: null,
       dueDates: null
     };
+  }
+
+  getProductTypes() {
+    this.productService.getProductTypes().subscribe((data: any) => {
+      for (let i = 0; i < data.length; i++) {
+        const elt = data[i];
+        const type = {value: elt.id, label: elt.name};
+        this.typeOptions = [...this.typeOptions, type];
+      }
+    }, () => {
+      this.alertify.error('problème pour récupérer les données');
+    });
   }
 
   // addProductItem(id, name): void {

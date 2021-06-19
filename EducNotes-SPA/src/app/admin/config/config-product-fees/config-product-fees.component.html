@@ -107,7 +107,7 @@
         <div *ngIf="prodFeesForm.hasError('formNOK')" class="my-2 text-white border rounded-lg p-2" style="background-color: red;">
           <div *ngIf="prodFeesForm.hasError('pctNOK')" class="text-15">les pourcentages sont incohérents.</div>
           <div *ngIf="prodFeesForm.hasError('seqNOK')" class="text-15">la séquence est incohérente.</div>
-          <div *ngIf="prodFeesForm.hasError('feesNOK')">un ou plusieurs prix par niveau sont incorrectes.</div>
+          <div *ngIf="prodFeesForm.hasError('feesNOK')">un ou plusieurs prix par niveau sont incorrects.</div>
         </div>
         <div class="my-2">
           <button type="submit" mdbBtn [disabled]="prodFeesForm.hasError('formNOK') || wait" block="true" class="btnBlue" size="sm" mdbWavesEffect>

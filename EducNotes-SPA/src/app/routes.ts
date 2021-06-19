@@ -153,6 +153,9 @@ import { ConfirmUserEmailComponent } from './registration/confirm-user-email/con
 import { EditRoleResolver } from './_resolvers/edit-role-resolver';
 import { ConfigAddServiceComponent } from './admin/config/config-add-service/config-add-service.component';
 import { AddServiceResolver } from './_resolvers/add-service-resolver';
+import { ServicesComponent } from './admin/services/services/services.component';
+import { ServicesResolver } from './_resolvers/services-resolver';
+import { AddServiceComponent } from './admin/services/add-service/add-service.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -283,7 +286,8 @@ export const appRoutes: Routes = [
         { path: 'editClasses/:levelId', component: EditLevelClassesComponent, resolve: { classes: LevelClassesResolver } },
         { path: 'employees', component: EmployeesComponent, resolve: {employees: EmployeesResolver}},
         { path: 'addEmployee', component: AddEmployeeComponent},
-        { path: 'addService/:id', component: ConfigAddServiceComponent, resolve: {product: AddServiceResolver}}
+        { path: 'services', component: ServicesComponent, resolve: {services: ServicesResolver}},
+        { path: 'addService/:id', component: AddServiceComponent, resolve: {product: AddServiceResolver}}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

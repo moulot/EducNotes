@@ -2292,12 +2292,56 @@ namespace EducNotes.API.Controllers {
       return Ok (periods);
     }
 
-    [HttpGet ("ClassEvents")]
+    [HttpGet("ClassEvents")]
     public async Task<IActionResult> GetClassEvents()
     {
       _context.ProductTypes.FromSql("");
       var events = await _context.ClassEvents.OrderByDescending(e => e.Name).ToListAsync();
       return Ok(events);
+    }
+
+    [HttpGet("LevelProductPrices/{productId}")]
+    public async Task<IActionResult> GetClassLevelProductPrices(int productId)
+    {
+      List<ClassLevelProduct> classLevelProducts = await _cache.GetClassLevelProducts();
+      List<ClassLevel> levels = await _repo.GetActiveClassLevels();
+
+      List<ClasslevelProductDto> levelPrices = new List<ClasslevelProductDto>();
+      List<ClassLevelProduct> productPrices = classLevelProducts.Where(p => p.ProductId == productId).ToList();
+      if(productPrices.Count() > 0)
+      {
+        foreach (ClassLevel level in levels)
+        {
+          ClasslevelProductDto levelProduct = new ClasslevelProductDto();
+          ClassLevelProduct levelPrice = productPrices.First(p => p.ClassLevelId == level.Id);
+          levelProduct.Id = levelPrice.Id;
+          levelProduct.ProductId = levelPrice.ProductId;
+          levelProduct.ProductName = levelPrice.Product.Name;
+          levelProduct.ClassLevelId = levelPrice.ClassLevelId;
+          levelProduct.LevelName = levelPrice.ClassLevel.NameAbbrev;
+          levelProduct.Price = levelPrice.Price;
+          levelPrices.Add(levelProduct);
+        }
+      }
+      else
+      {
+        List<Product> products = await _cache.GetProducts();
+        Product product = products.First(p => p.Id == productId);
+
+        foreach (ClassLevel level in levels)
+        {
+          ClasslevelProductDto levelProduct = new ClasslevelProductDto();
+          levelProduct.Id = 0;
+          levelProduct.ProductId = productId;
+          levelProduct.ProductName = product.Name;
+          levelProduct.ClassLevelId = level.Id;
+          levelProduct.LevelName = level.NameAbbrev;
+          levelProduct.Price = 0;
+          levelPrices.Add(levelProduct);
+        }
+      }
+
+      return Ok(levelPrices);
     }
 
     [HttpPost ("courseShowing")]

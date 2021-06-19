@@ -26,7 +26,7 @@ export class TresoService {
   constructor(private http: HttpClient) { }
 
   getProductTypes() {
-    return this.http.get(this.baseUrl + 'treso/GetProductTypes');
+    return this.http.get(this.baseUrl + 'treso/ProductTypes');
   }
 
   getDeadlines(): Observable<DeadLine[]> {

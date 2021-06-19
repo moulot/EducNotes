@@ -1003,6 +1003,37 @@ namespace EducNotes.API.data
       return products;
     }
 
+    public async Task<List<ProductType>> GetProductTypes()
+    {
+      List<ProductType> productTypes = new List<ProductType>();
+
+      // Look for cache key.
+      if (!_cache.TryGetValue(subDomain + CacheKeys.ProductTypes, out productTypes))
+      {
+        // Key not in cache, so get data.
+        productTypes = await LoadProductTypes();
+      }
+
+      return productTypes;
+    }
+
+    public async Task<List<ProductType>> LoadProductTypes()
+    {
+      List<ProductType> productTypes = await _context.ProductTypes.OrderBy(o => o.Name)
+                                                                  .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.ProductTypes);
+      _cache.Set(subDomain + CacheKeys.ProductTypes, productTypes, cacheEntryOptions);
+
+      return productTypes;
+    }
+
     public async Task<List<UserType>> GetUserTypes()
     {
       List<UserType> usertypes = new List<UserType>();

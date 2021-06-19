@@ -120,6 +120,9 @@ namespace EducNotes.API.Data {
       public DbSet<CourseConflict> CourseConflicts { get; set; }
       public DbSet<MaritalStatus> MaritalStatuses { get; set; }
       public DbSet<Menu> Menus { get; set; }
+      public DbSet<Zone> Zones { get; set; }
+      public DbSet<ProductZone> ProductZones { get; set; }
+      public DbSet<LocationZone> LocationZones { get; set; }
 
       protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder)
       {
