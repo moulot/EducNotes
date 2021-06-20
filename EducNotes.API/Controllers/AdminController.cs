@@ -1127,5 +1127,116 @@ namespace EducNotes.API.Controllers
       }
     }
 
+    [HttpGet("Zones")]
+    public async Task<IActionResult> GetZones()
+    {
+      List<Zone> zonesCached = await _cache.GetZones();
+      List<LocationZone> locationZones = await _cache.GetLocationZones();
+
+      List<ZoneDto> zones = new List<ZoneDto>();
+      foreach (Zone zone in zonesCached)
+      {
+        ZoneDto zoneDto = new ZoneDto();
+        zoneDto.Id = zone.Id;
+        zoneDto.Name = zone.Name;
+
+        List<LocationZone> zoneLocations = locationZones.Where(z => z.ZoneId == zone.Id).ToList();
+        if(zoneLocations.Count() > 0)
+        {
+          foreach (LocationZone location in zoneLocations)
+          {
+            LocationZoneDto locationDto = new LocationZoneDto();
+            locationDto.ZoneId = zone.Id;
+            if(location.DistrictId != null)
+            {
+              locationDto.DistrictId = Convert.ToInt32(location.DistrictId);
+              locationDto.DistrictName = location.District.Name;
+            }
+            if(location.CityId != null)
+            {
+              locationDto.CityId = Convert.ToInt32(location.CityId);
+              locationDto.CityName = location.City.Name;
+            }
+            if(location.CountryId != null)
+            {
+              locationDto.CountryId = Convert.ToInt32(location.CountryId);
+              locationDto.CountryName = location.Country.Name;
+            }
+
+            zoneDto.Locations.Add(locationDto);
+          }
+        }
+
+        zones.Add(zoneDto);
+      }
+
+      List<District> districtsFromDB = await _repo.GetDistricts();
+      List<DistrictDto> districts = _mapper.Map<List<DistrictDto>>(districtsFromDB);
+
+      return Ok(new {
+        zones,
+        districts
+        });
+    }
+
+    [HttpPost("SaveZone")]
+    public async Task<IActionResult> SaveZone(ZoneDto zoneDto)
+    {
+      List<Zone> zones = await _cache.GetZones();
+      List<District> districts = await _cache.GetDistricts();
+      List<LocationZone> locations = await _cache.GetLocationZones();
+
+      using(var identityContextTransaction = _context.Database.BeginTransaction())
+      {
+        try
+        {
+          int zoneId = zoneDto.Id;
+          Zone zone = new Zone();
+          if(zoneId == 0)
+          {
+            zone.Name = zoneDto.Name;
+            _repo.Add(zone);
+            _context.SaveChanges();
+          }
+          else
+          {
+            zone = zones.Single(z => z.Id == zoneId);
+            zone.Name = zoneDto.Name;
+
+            List<LocationZone> prevLocations = locations.Where(l => l.ZoneId == zone.Id).ToList();
+            _repo.DeleteAll(prevLocations);
+          }
+
+          foreach(LocationZoneDto locationDto in zoneDto.Locations)
+          {
+            LocationZone location = new LocationZone();
+            location.ZoneId = zone.Id;
+            location.DistrictId = locationDto.DistrictId;
+            location.CityId = districts.Single(d => d.Id == locationDto.DistrictId).CityId;
+            _repo.Add(location);
+          }
+
+          await _repo.SaveAll();
+          await _cache.LoadZones();
+          await _cache.LoadLocationZones();
+          identityContextTransaction.Commit();
+          return Ok();
+        }
+        catch
+        {
+          identityContextTransaction.Rollback();
+          return BadRequest("problème pour enregistrer la zone");
+        }
+      }
+    }
+
+    [HttpGet("Districts")]
+    public async Task<IActionResult> GetDistricts()
+    {
+      List<District> districtsFromDB = await _repo.GetDistricts();
+      List<DistrictDto> districts = _mapper.Map<List<DistrictDto>>(districtsFromDB);
+      return Ok(districts);
+    }
+
   }
 }

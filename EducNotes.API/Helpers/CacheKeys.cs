@@ -53,5 +53,7 @@ namespace EducNotes.API.Helpers
     public static string Districts { get { return "_Districts"; } }
     public static string MaritalStatus { get { return "_MaritalStatus"; } }
     public static string Photos { get { return "_Photos"; } }
+    public static string Zones { get { return "_Zones"; } }
+    public static string LocationZones { get { return "_LacationZones"; } }
   }
 }

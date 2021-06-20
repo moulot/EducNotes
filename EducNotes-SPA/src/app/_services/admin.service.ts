@@ -104,6 +104,10 @@ export class AdminService {
     return this.http.get(this.baseUrl + 'employees');
   }
 
+  getDistricts() {
+    return this.http.get(this.baseUrl + 'Districts');
+  }
+
   getRoleEmployees(roleId) {
     return this.http.get(this.baseUrl + 'RoleEmployees/' + roleId);
   }
@@ -118,6 +122,14 @@ export class AdminService {
 
   saveService(service) {
     return this.http.post(this.baseUrl + 'SaveService', service);
+  }
+
+  getZones() {
+    return this.http.get(this.baseUrl + 'zones');
+  }
+
+  saveZone(zone) {
+    return this.http.post(this.baseUrl + 'saveZone', zone);
   }
 
 }

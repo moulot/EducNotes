@@ -107,5 +107,9 @@ namespace EducNotes.API.data
     Task<List<Photo>> LoadPhotos();
     Task<List<RoleCapability>> GetRoleCapabilities();
     Task<List<RoleCapability>> LoadRoleCapabilities();
+    Task<List<Zone>> GetZones();
+    Task<List<Zone>> LoadZones();
+    Task<List<LocationZone>> GetLocationZones();
+    Task<List<LocationZone>> LoadLocationZones();
   }
 }

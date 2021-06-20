@@ -742,6 +742,10 @@ namespace EducNotes.API.Helpers {
                 .ForMember(dest => dest.Cell, opt => {
                   opt.MapFrom(src => src.PhoneNumber);
                 });
+            CreateMap<District, DistrictDto>()
+                .ForMember(dest => dest.CityName, opt => {
+                  opt.MapFrom(src => src.City.Name);
+                });
         }
     }
 }

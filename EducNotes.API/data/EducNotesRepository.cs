@@ -4797,5 +4797,11 @@ on courses.ClassId equals classes.Id
       return error;
     }
 
+    public async Task<List<District>> GetDistricts()
+    {
+      List<District> districts = await _cache.GetDistricts();
+      return districts;
+    }
+
   }
 }

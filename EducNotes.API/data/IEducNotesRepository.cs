@@ -151,5 +151,6 @@ namespace EducNotes.API.Data
     Task<ErrorDto> SaveLevelTuitionFees(ScheduleDueDateFeeDto tuitionFeeData);
     Task<ErrorDto> SaveProductDeadLines(List<ProductDeadlineDto> productDeadLines);
     Task<List<OrderLinePaidDto>> GetChildOrderLinesPaid(int childId);
+    Task<List<District>> GetDistricts();
   }
 }

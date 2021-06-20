@@ -1564,7 +1564,7 @@ namespace EducNotes.API.data
 
     public async Task<List<District>> LoadDistricts()
     {
-      List<District> districts = await _context.Districts.OrderBy(o => o.Name).ToListAsync();
+      List<District> districts = await _context.Districts.Include(i => i.City).OrderBy(o => o.Name).ToListAsync();
 
       // Set cache options.
       var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -1606,6 +1606,66 @@ namespace EducNotes.API.data
       _cache.Set(subDomain + CacheKeys.Photos, photos, cacheEntryOptions);
 
       return photos;
+    }
+
+    public async Task<List<Zone>> GetZones()
+    {
+      List<Zone> zones = new List<Zone>();
+
+      // Look for cache key.
+      if (!_cache.TryGetValue(subDomain + CacheKeys.Zones, out zones))
+      {
+        // Key not in cache, so get data.
+        zones = await LoadZones();
+      }
+
+      return zones;
+    }
+
+    public async Task<List<Zone>> LoadZones()
+    {
+      List<Zone> zones = await _context.Zones.OrderBy(o => o.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Zones);
+      _cache.Set(subDomain + CacheKeys.Zones, zones, cacheEntryOptions);
+
+      return zones;
+    }
+
+    public async Task<List<LocationZone>> GetLocationZones()
+    {
+      List<LocationZone> locationzones = new List<LocationZone>();
+
+      // Look for cache key.
+      if (!_cache.TryGetValue(subDomain + CacheKeys.LocationZones, out locationzones))
+      {
+        // Key not in cache, so get data.
+        locationzones = await LoadLocationZones();
+      }
+
+      return locationzones;
+    }
+
+    public async Task<List<LocationZone>> LoadLocationZones()
+    {
+      List<LocationZone> locationzones = await _context.LocationZones.ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.LocationZones);
+      _cache.Set(subDomain + CacheKeys.LocationZones, locationzones, cacheEntryOptions);
+
+      return locationzones;
     }
 
   }
