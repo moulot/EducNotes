@@ -128,8 +128,8 @@ export class AdminService {
     return this.http.get(this.baseUrl + 'zones');
   }
 
-  saveZone(zone) {
-    return this.http.post(this.baseUrl + 'saveZone', zone);
+  saveZones(zones) {
+    return this.http.post(this.baseUrl + 'saveZones', zones);
   }
 
 }

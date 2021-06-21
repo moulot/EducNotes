@@ -5,6 +5,13 @@ namespace EducNotes.API.Dtos
 {
   public class ProductForConfigDto
   {
+    public ProductForConfigDto()
+    {
+      DueDates = new List<ProductDeadlineDto>();
+      LevelPrices = new List<ClasslevelProductDto>();
+      Zones = new List<ProductZoneDto>();
+    }
+
     public int Id { get; set; }
     public string Name { get; set; }
     public string Comment { get; set; }
@@ -13,6 +20,7 @@ namespace EducNotes.API.Dtos
     public decimal Price { get; set; }
     public Boolean IsPaidCash { get; set; }
     public Boolean IsByLevel { get; set; }
+    public Boolean IsByZone { get; set; }
     public Boolean IsPeriodic { get; set; }
     public string PeriodicityName { get; set; }
     public int PayableAtId { get; set; }
@@ -23,5 +31,6 @@ namespace EducNotes.API.Dtos
     public byte DspSeq { get; set; }
     public List<ProductDeadlineDto> DueDates { get; set; }
     public List<ClasslevelProductDto> LevelPrices { get; set; }
+    public List<ProductZoneDto> Zones { get; set; }
   }
 }

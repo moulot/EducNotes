@@ -18,10 +18,13 @@ export class AddServiceComponent implements OnInit {
   editionMode = false;
   typeOptions = [];
   trueFalseOptions = [{value: 0, label: 'NON'}, {value: 1, label: 'OUI'}];
+  priceByOptions = [{value: 0, label: 'Unique'}, {value: 1, label: 'Par niveau'}, {value: 2, label: 'Par niveau'}];
   myDatePickerOptions = Utils.myDatePickerOptions;
   wait = false;
   levelProducts: any;
+  zones: any;
   showLevels = false;
+  showZones = false;
   showUniquePrice = false;
   showDueDates = false;
 
@@ -32,7 +35,7 @@ export class AddServiceComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe(data => {
       this.product = data['product'];
-      // console.log(this.product);
+      console.log(this.product);
       if (this.product) {
         this.editionMode = true;
         if (this.product.isByLevel) {
@@ -41,6 +44,9 @@ export class AddServiceComponent implements OnInit {
         }
         if (!this.product.isPaidCash) {
           this.showDueDates = true;
+        }
+        if (this.product.isByZone) {
+          this.showZones = true;
         }
       } else {
         this.initValues();
@@ -58,15 +64,16 @@ export class AddServiceComponent implements OnInit {
 
   createServiceForm() {
     const paidCash = this.product.isPaidCash ? 1 : 0;
-    const byLevel = this.product.isByLevel ? 1 : 0;
+    const byLevel = this.product.isByLevel ? 1 : this.product.isByZone ? 2 : 0;
     this.serviceForm = this.fb.group({
       name: [this.product.name, Validators.required],
       typeId: [this.product.productTypeId, Validators.required],
       price: [this.product.price],
       isPaidCash: [paidCash, Validators.required],
-      isByLevel: [byLevel],
+      priceBy: [byLevel],
       duedates: this.fb.array([]),
-      levelPrices: this.fb.array([])
+      levelPrices: this.fb.array([]),
+      zones: this.fb.array([])
     }, {validators: this.formValidator});
   }
 
@@ -84,7 +91,6 @@ export class AddServiceComponent implements OnInit {
     if (isByLevel === 1) {
       for (let i = 0; i < levelPrices.length; i++) {
         const fee = levelPrices[i].price;
-        console.log(fee);
         if (fee === null || fee === '' || fee === 0) {
           feesNOK = true;
           formNOK = true;
@@ -102,7 +108,6 @@ export class AddServiceComponent implements OnInit {
     let pctNOK = false;
     let datesNOK = false;
     let labelsNOK = false;
-  // let pct0NOK = false;
     for (let i = 0; i < duedates.length; i++) {
       const pct = duedates[i].pct;
       totalPct += pct;
@@ -130,18 +135,7 @@ export class AddServiceComponent implements OnInit {
       formNOK = true;
     }
 
-    // checks sequences sum : n(n + 1)/2
-    // let seqNOK = false;
-    // const n = duedates.length;
-    // const sum = n * (n + 1) / 2;
-    // if (sum !== totalSeq) {
-    //   seqNOK = true;
-    //   formNOK = true;
-    // } else {
-
-    // }
-
-    return {'formNOK': formNOK, 'feesNOK': feesNOK, 'feeNOK': feeNOK, 'pctNOK': pctNOK, 'datesNOK': datesNOK, 'labelsNOK': labelsNOK}; // , 'seqNOK': seqNOK};
+    return {'formNOK': formNOK, 'feesNOK': feesNOK, 'feeNOK': feeNOK, 'pctNOK': pctNOK, 'datesNOK': datesNOK, 'labelsNOK': labelsNOK};
   }
 
   addDueDateItem(id, prodid, duedate, deadlinename, pct): void {
@@ -164,11 +158,6 @@ export class AddServiceComponent implements OnInit {
   removeDueDateItem(index) {
     const duedates = this.serviceForm.get('duedates') as FormArray;
     duedates.removeAt(index);
-    // const dates = this.serviceForm.value.duedates;
-    // for (let i = 0; i < dates.length; i++) {
-    //   console.log(this.serviceForm.value.duedates[i].seq);
-    //   duedates.at(index).get('dueDate').setValue(i + 1);
-    // }
     this.sortDueDates();
   }
 
@@ -211,13 +200,19 @@ export class AddServiceComponent implements OnInit {
     }
   }
 
-  toggleByLevel(value) {
-    if (value) {
+  togglePriceBy(value) {
+    if (value === 1) {
       this.showLevels = true;
       this.showUniquePrice = false;
-    } else {
+      this.showZones = false;
+    } else if (value === 2) {
+      this.showZones = true;
       this.showLevels = false;
+      this.showUniquePrice = false;
+    } else {
       this.showUniquePrice = true;
+      this.showLevels = false;
+      this.showZones = false;
     }
   }
 

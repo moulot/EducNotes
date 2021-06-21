@@ -745,6 +745,13 @@ namespace EducNotes.API.Helpers {
             CreateMap<District, DistrictDto>()
                 .ForMember(dest => dest.CityName, opt => {
                   opt.MapFrom(src => src.City.Name);
+                })
+            CreateMap<ProductZone, ProductZoneDto>()
+                .ForMember(dest => dest.ProductName, opt => {
+                  opt.MapFrom(src => src.Product.Name);
+                })
+                .ForMember(dest => dest.ZoneName, opt => {
+                  opt.MapFrom(src => src.Zone.Name);
                 });
         }
     }

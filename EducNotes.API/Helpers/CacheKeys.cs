@@ -55,5 +55,6 @@ namespace EducNotes.API.Helpers
     public static string Photos { get { return "_Photos"; } }
     public static string Zones { get { return "_Zones"; } }
     public static string LocationZones { get { return "_LacationZones"; } }
+    public static string ProductZones { get { return "_ProductZones"; } }
   }
 }

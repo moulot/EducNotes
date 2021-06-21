@@ -46,7 +46,7 @@
                     <i class="fad fa-trash-alt text-20" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
                       --fa-secondary-color:#f89f20;"></i>
                   </a>
-                  <div class="md-form mt-1">
+                  <div class="md-form mt-1 mb-0">
                     <input mdbInput type="text" id="name" class="form-control" formControlName="name" mdbValidate>
                     <label for="name" class="">nom de la zone</label>
                   </div>
@@ -74,6 +74,10 @@
             </div>
           </div>
         </div>
+        <div *ngIf="zonesForm.hasError('formNOK')" class="my-2 text-white border rounded-lg p-2" style="background-color: red;">
+          <div *ngIf="zonesForm.hasError('namesNOK')">un ou plusieurs noms de zone sont incorrects.</div>
+          <div *ngIf="zonesForm.hasError('locNOK')">un ou plusieurs quartiers sont incorrects.</div>
+        </div>  
         <a (click)="addZone()" class="text-15 textBlue">ajouter une zone</a>
         <div *ngIf="zonesForm.value.zones.length > 0" class="my-2">
           <button type="submit" mdbBtn [disabled]="zonesForm.hasError('formNOK') || wait" block="true" class="btnBlue" size="sm" mdbWavesEffect>

@@ -49,9 +49,9 @@
               <div class="text-15 textDarkBlue"><b>prix</b></div>
               <hr class="my-1">
                 <div class="row mb-2">
-                  <div class="col-md-2 text-15 my-auto">prix par niveau</div>
+                  <div class="col-md-2 text-15 my-auto">prix </div>
                   <div class="col-md-2 mb-0">
-                    <mdb-select (ngModelChange)="toggleByLevel($event)" [options]="trueFalseOptions" formControlName="isByLevel" placeholder=""></mdb-select>
+                    <mdb-select (ngModelChange)="togglePriceBy($event)" [options]="priceByOptions" formControlName="priceBy" placeholder=""></mdb-select>
                   </div>
                 </div>
                 <div *ngIf="showUniquePrice" class="row">

@@ -63,6 +63,7 @@ namespace EducNotes.API.Controllers
     {
       List<Product> productsCached = await _cache.GetProducts();
       List<ProductDeadLine> productDueDates = await _cache.GetProductDeadLines();
+      List<ProductZone> productZones = await _cache.GetProductZones();
 
       List<Product> services = productsCached.Where(p => p.ProductTypeId == serviceTypeId).ToList();
       List<ProductForConfigDto> products = _mapper.Map<List<ProductForConfigDto>>(services);
@@ -70,6 +71,9 @@ namespace EducNotes.API.Controllers
       {
         List<ProductDeadLine> dueDates = productDueDates.OrderBy(o => o.DueDate).Where(d => d.ProductId == product.Id).ToList();
         product.DueDates = _mapper.Map<List<ProductDeadlineDto>>(dueDates);
+
+        List<ProductZone> zones = productZones.OrderBy(o => o.Zone.Name).Where(p => p.ProductId == product.Id).ToList();
+        product.Zones = _mapper.Map<List<ProductZoneDto>>(zones);
       }
 
       return Ok(products);

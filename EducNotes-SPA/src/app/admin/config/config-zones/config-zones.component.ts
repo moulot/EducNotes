@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FormatInputPathObject } from 'path';
+import { Router } from '@angular/router';
+import { Utils } from 'src/app/shared/utils';
 import { AdminService } from 'src/app/_services/admin.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 
@@ -17,7 +18,7 @@ export class ConfigZonesComponent implements OnInit {
   wait = false;
 
   constructor(private adminService: AdminService, private alertify: AlertifyService,
-    private fb: FormBuilder) { }
+    private fb: FormBuilder, private router: Router) { }
 
   ngOnInit() {
     this.createZonesForm();
@@ -31,8 +32,31 @@ export class ConfigZonesComponent implements OnInit {
   }
 
   formValidator(g: FormGroup) {
+    let formNOK = false;
+    const zones = g.get('zones').value;
 
-    return false;
+    let namesNOK = false;
+    let locNOK = false;
+    for (let i = 0; i < zones.length; i++) {
+      const zone = zones[i];
+      // console.log(zone);
+      const name = zone.name;
+      if (name === '' || name === null) {
+        formNOK = true;
+        namesNOK = true;
+      }
+      const locations = zone.locations;
+      for (let j = 0; j < locations.length; j++) {
+        const loc = locations[j].districtId;
+        // console.log('loc: ' + loc);
+        if (loc === 0 || loc === null) {
+          formNOK = true;
+          locNOK = true;
+        }
+      }
+    }
+
+    return {'formNOK': formNOK, 'namesNOK': namesNOK, 'locNOK': locNOK};
   }
 
   addZoneItems() {
@@ -55,13 +79,20 @@ export class ConfigZonesComponent implements OnInit {
     return this.fb.group({
       id: [id],
       name: [name, Validators.required],
-      locations: this.fb.array([0])
+      locations: this.addLocationItems([{districtId: 0}])
     });
   }
 
   removeZoneItem(index) {
     const zones = this.zonesForm.get('zones') as FormArray;
     zones.removeAt(index);
+  }
+
+  removeAllZones() {
+    const zones = this.zonesForm.get('zones') as FormArray;
+    while (zones.length > 0) {
+      zones.removeAt(0);
+    }
   }
 
   addLocationItems(locations) {
@@ -117,8 +148,42 @@ export class ConfigZonesComponent implements OnInit {
     });
   }
 
-  saveZones() {
+  reloadZones() {
+    this.removeAllZones();
+    this.adminService.getZones().subscribe((data: any) => {
+      this.zones = data.zones;
+      this.addZoneItems();
+    }, () => {
+      this.alertify.error('problème pour récupérer les données');
+    });
+  }
 
+  saveZones() {
+    this.wait = true;
+    let zones = [];
+
+    for (let i = 0; i < this.zonesForm.value.zones.length; i++) {
+      const item = this.zonesForm.value.zones[i];
+      const locations = item.locations;
+      let districts = [];
+      for (let j = 0; j < locations.length; j++) {
+        const districtid = locations[j].districtId;
+        const loc = {districtId: districtid};
+        districts = [...districts, loc];
+      }
+      const zone = {id: item.id, name: item.name, locations: districts};
+      zones = [...zones, zone];
+    }
+
+    this.adminService.saveZones(zones).subscribe(() => {
+      this.reloadZones();
+      this.wait = false;
+      Utils.smoothScrollToTop(40);
+      this.alertify.success('les zones ont été enregistrées');
+    }, error => {
+      this.alertify.error(error);
+      this.wait = false;
+    });
   }
 
 }

@@ -1179,8 +1179,8 @@ namespace EducNotes.API.Controllers
         });
     }
 
-    [HttpPost("SaveZone")]
-    public async Task<IActionResult> SaveZone(ZoneDto zoneDto)
+    [HttpPost("SaveZones")]
+    public async Task<IActionResult> SaveZone(List<ZoneDto> zonesDto)
     {
       List<Zone> zones = await _cache.GetZones();
       List<District> districts = await _cache.GetDistricts();
@@ -1190,30 +1190,34 @@ namespace EducNotes.API.Controllers
       {
         try
         {
-          int zoneId = zoneDto.Id;
-          Zone zone = new Zone();
-          if(zoneId == 0)
+          foreach (ZoneDto zoneDto in zonesDto)
           {
-            zone.Name = zoneDto.Name;
-            _repo.Add(zone);
-            _context.SaveChanges();
-          }
-          else
-          {
-            zone = zones.Single(z => z.Id == zoneId);
-            zone.Name = zoneDto.Name;
+            int zoneId = zoneDto.Id;
+            Zone zone = new Zone();
+            if(zoneId == 0)
+            {
+              zone.Name = zoneDto.Name;
+              _repo.Add(zone);
+              _context.SaveChanges();
+            }
+            else
+            {
+              zone = zones.Single(z => z.Id == zoneId);
+              zone.Name = zoneDto.Name;
+              _repo.Update(zone);
 
-            List<LocationZone> prevLocations = locations.Where(l => l.ZoneId == zone.Id).ToList();
-            _repo.DeleteAll(prevLocations);
-          }
+              List<LocationZone> prevLocations = locations.Where(l => l.ZoneId == zone.Id).ToList();
+              _repo.DeleteAll(prevLocations);
+            }
 
-          foreach(LocationZoneDto locationDto in zoneDto.Locations)
-          {
-            LocationZone location = new LocationZone();
-            location.ZoneId = zone.Id;
-            location.DistrictId = locationDto.DistrictId;
-            location.CityId = districts.Single(d => d.Id == locationDto.DistrictId).CityId;
-            _repo.Add(location);
+            foreach(LocationZoneDto locationDto in zoneDto.Locations)
+            {
+              LocationZone location = new LocationZone();
+              location.ZoneId = zone.Id;
+              location.DistrictId = locationDto.DistrictId;
+              location.CityId = districts.Single(d => d.Id == locationDto.DistrictId).CityId;
+              _repo.Add(location);
+            }
           }
 
           await _repo.SaveAll();

@@ -4,6 +4,8 @@ namespace EducNotes.API.Models {
     {
         IsRequired = false;
         IsPaidCash = true;
+        IsByLevel = false;
+        IsByZone = false;
         Active = true;
         DsplSeq = 0;
     }
@@ -14,6 +16,7 @@ namespace EducNotes.API.Models {
     public decimal? Price { get; set; }
     public bool IsPaidCash { get; set; }
     public bool IsByLevel { get; set; }
+    public bool IsByZone { get; set; }
     public bool IsPeriodic { get; set; }
     public ProductType ProductType { get; set; }
     public int? PeriodicityId { get; set; }

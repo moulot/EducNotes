@@ -1654,7 +1654,10 @@ namespace EducNotes.API.data
 
     public async Task<List<LocationZone>> LoadLocationZones()
     {
-      List<LocationZone> locationzones = await _context.LocationZones.ToListAsync();
+      List<LocationZone> locationzones = await _context.LocationZones.Include(i => i.District)
+                                                                     .Include(i => i.City)
+                                                                     .Include(i => i.Country)
+                                                                     .ToListAsync();
 
       // Set cache options.
       var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -1666,6 +1669,38 @@ namespace EducNotes.API.data
       _cache.Set(subDomain + CacheKeys.LocationZones, locationzones, cacheEntryOptions);
 
       return locationzones;
+    }
+
+    public async Task<List<ProductZone>> GetProductZones()
+    {
+      List<ProductZone> productZones = new List<ProductZone>();
+
+      // Look for cache key.
+      if (!_cache.TryGetValue(subDomain + CacheKeys.ProductZones, out productZones))
+      {
+        // Key not in cache, so get data.
+        productZones = await LoadProductZones();
+      }
+
+      return productZones;
+    }
+
+    public async Task<List<ProductZone>> LoadProductZones()
+    {
+      List<ProductZone> productZones = await _context.ProductZones.Include(i => i.Product)
+                                                                  .Include(i => i.Zone)
+                                                                  .ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.ProductZones);
+      _cache.Set(subDomain + CacheKeys.ProductZones, productZones, cacheEntryOptions);
+
+      return productZones;
     }
 
   }

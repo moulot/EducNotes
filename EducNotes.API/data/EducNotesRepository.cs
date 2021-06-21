@@ -4803,5 +4803,11 @@ on courses.ClassId equals classes.Id
       return districts;
     }
 
+    public async Task<List<Zone>> GetZones()
+    {
+      List<Zone> zones = await _cache.GetZones();
+      return zones;
+    }
+
   }
 }
