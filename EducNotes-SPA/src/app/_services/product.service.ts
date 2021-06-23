@@ -26,4 +26,12 @@ export class ProductService {
     return this.http.get(this.baseUrl + 'ProductTypes');
   }
 
+  getLevelPrices(productId) {
+    return this.http.get(this.baseUrl + 'LevelPrices/' + productId);
+  }
+
+  getZonePrices(productId) {
+    return this.http.get(this.baseUrl + 'ZonePrices/' + productId);
+  }
+
 }

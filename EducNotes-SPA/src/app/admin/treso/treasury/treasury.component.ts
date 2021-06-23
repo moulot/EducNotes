@@ -14,7 +14,6 @@ export class TreasuryComponent implements OnInit {
   settings: Setting[];
   regDate: Date;
   regActive = false;
-  // nbTuitionPays: number;
   invoiced: string;
   cashed: string;
   tuitionBalance: number;
@@ -24,8 +23,7 @@ export class TreasuryComponent implements OnInit {
   wait = false;
   dataReady = 0;
 
-  constructor(private authService: AuthService, private orderService: OrderService,
-    private alertify: AlertifyService) { }
+  constructor(private authService: AuthService, private orderService: OrderService, private alertify: AlertifyService) { }
 
   ngOnInit() {
     this.settings = this.authService.settings;

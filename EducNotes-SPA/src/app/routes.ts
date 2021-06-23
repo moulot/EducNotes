@@ -156,6 +156,7 @@ import { AddServiceResolver } from './_resolvers/add-service-resolver';
 import { ServicesComponent } from './admin/services/services/services.component';
 import { ServicesResolver } from './_resolvers/services-resolver';
 import { AddServiceComponent } from './admin/services/add-service/add-service.component';
+import { TreasuryDetailsComponent } from './admin/treso/treasury-details/treasury-details.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -287,7 +288,8 @@ export const appRoutes: Routes = [
         { path: 'employees', component: EmployeesComponent, resolve: {employees: EmployeesResolver}},
         { path: 'addEmployee', component: AddEmployeeComponent},
         { path: 'services', component: ServicesComponent, resolve: {services: ServicesResolver}},
-        { path: 'addService/:id', component: AddServiceComponent, resolve: {product: AddServiceResolver}}
+        { path: 'addService/:id', component: AddServiceComponent, resolve: {product: AddServiceResolver}},
+        { path: 'treasuryDetails', component: TreasuryDetailsComponent}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

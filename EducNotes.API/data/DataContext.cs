@@ -123,6 +123,8 @@ namespace EducNotes.API.Data {
       public DbSet<Zone> Zones { get; set; }
       public DbSet<ProductZone> ProductZones { get; set; }
       public DbSet<LocationZone> LocationZones { get; set; }
+      public DbSet<Nationality> Nationalities { get; set; }
+      public DbSet<Job> Job { get; set; }
 
       protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder)
       {

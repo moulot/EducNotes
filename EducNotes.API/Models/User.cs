@@ -13,7 +13,9 @@ namespace EducNotes.API.Models
       RegCreated = false;
       NextRegCreated = false;
       Created = DateTime.Now;
+      Scholarship = false;
     }
+
     public string IdNum { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
@@ -61,6 +63,11 @@ namespace EducNotes.API.Models
     public Boolean AccountDataValidated { get; set; }
     public DateTime? ResetPasswordDate { get; set; }
     public DateTime? ForgotPasswordDate { get; set; }
+    public Boolean Scholarship { get; set; }
+    public int? NationalityId { get; set; }
+    public Nationality Nationality { get; set; }
+    public int? JobId { get; set; }
+    public Job Job { get; set; }
     public ICollection<Photo> Photos { get; set; }
     public ICollection<Like> Likers { get; set; }
     public ICollection<Like> Likees { get; set; }

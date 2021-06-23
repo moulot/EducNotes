@@ -124,8 +124,12 @@ export class AdminService {
     return this.http.post(this.baseUrl + 'SaveService', service);
   }
 
+  getZonesWithLocations() {
+    return this.http.get(this.baseUrl + 'ZonesWithLocations');
+  }
+
   getZones() {
-    return this.http.get(this.baseUrl + 'zones');
+    return this.http.get(this.baseUrl + 'Zones');
   }
 
   saveZones(zones) {

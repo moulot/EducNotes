@@ -12,6 +12,7 @@ namespace EducNotes.API.Dtos
     public decimal? Price { get; set; }
     public bool IsPaidCash { get; set; }
     public bool IsByLevel { get; set; }
+    public bool IsByZone { get; set; }
     public bool IsPeriodic { get; set; }
     public int? PeriodicityId { get; set; }
     public int? PayableAtId { get; set; }
@@ -20,5 +21,6 @@ namespace EducNotes.API.Dtos
     public byte DsplSeq { get; set; }
     public List<ProductDeadlineDto> DueDates { get; set; }
     public List<ClassLevelProduct> LevelPrices { get; set; }
+    public List<ProductZone> ZonePrices { get; set; }
   }
 }

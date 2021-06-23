@@ -427,8 +427,4 @@ export class ClassService {
     return this.http.post(this.baseUrl + 'saveCourseTypes', courseTypes);
   }
 
-  getLevelProductPrices(productId) {
-    return this.http.get(this.baseUrl + 'LevelProductPrices/' + productId);
-  }
-
 }

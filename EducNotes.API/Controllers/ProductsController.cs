@@ -408,5 +408,93 @@ namespace EducNotes.API.Controllers
       return NotFound ();
     }
 
+    [HttpGet("LevelPrices/{productId}")]
+    public async Task<IActionResult> GetClassLevelPrices(int productId)
+    {
+      List<ClassLevelProduct> classLevelProducts = await _cache.GetClassLevelProducts();
+      List<ClassLevel> levels = await _repo.GetActiveClassLevels();
+
+      List<ClasslevelProductDto> levelPrices = new List<ClasslevelProductDto>();
+      List<ClassLevelProduct> productPrices = classLevelProducts.Where(p => p.ProductId == productId).ToList();
+      if(productPrices.Count() > 0)
+      {
+        foreach (ClassLevel level in levels)
+        {
+          ClasslevelProductDto levelProduct = new ClasslevelProductDto();
+          ClassLevelProduct levelPrice = productPrices.First(p => p.ClassLevelId == level.Id);
+          levelProduct.Id = levelPrice.Id;
+          levelProduct.ProductId = levelPrice.ProductId;
+          levelProduct.ProductName = levelPrice.Product.Name;
+          levelProduct.ClassLevelId = levelPrice.ClassLevelId;
+          levelProduct.LevelName = levelPrice.ClassLevel.NameAbbrev;
+          levelProduct.Price = levelPrice.Price;
+          levelPrices.Add(levelProduct);
+        }
+      }
+      else
+      {
+        List<Product> products = await _cache.GetProducts();
+        Product product = products.First(p => p.Id == productId);
+
+        foreach (ClassLevel level in levels)
+        {
+          ClasslevelProductDto levelProduct = new ClasslevelProductDto();
+          levelProduct.Id = 0;
+          levelProduct.ProductId = productId;
+          levelProduct.ProductName = product.Name;
+          levelProduct.ClassLevelId = level.Id;
+          levelProduct.LevelName = level.NameAbbrev;
+          levelProduct.Price = 0;
+          levelPrices.Add(levelProduct);
+        }
+      }
+
+      return Ok(levelPrices);
+    }
+
+    [HttpGet("ZonePrices/{productId}")]
+    public async Task<IActionResult> GetZonePrices(int productId)
+    {
+      List<ProductZone> zoneProducts = await _cache.GetProductZones();
+      List<Zone> zones = await _cache.GetZones();
+
+      List<ProductZoneDto> zonePrices = new List<ProductZoneDto>();
+      List<ProductZone> productPrices = zoneProducts.Where(p => p.ProductId == productId).ToList();
+      if(productPrices.Count() > 0)
+      {
+        foreach (Zone zone in zones)
+        {
+          ProductZoneDto zoneProduct = new ProductZoneDto();
+          ProductZone zonePrice = productPrices.First(p => p.ZoneId == zone.Id);
+          zoneProduct.Id = zonePrice.Id;
+          zoneProduct.ProductId = zonePrice.ProductId;
+          zoneProduct.ProductName = zonePrice.Product.Name;
+          zoneProduct.ZoneId = zonePrice.ZoneId;
+          zoneProduct.ZoneName = zonePrice.Zone.Name;
+          zoneProduct.Price = zonePrice.Price;
+          zonePrices.Add(zoneProduct);
+        }
+      }
+      else
+      {
+        List<Product> products = await _cache.GetProducts();
+        Product product = products.First(p => p.Id == productId);
+
+        foreach (Zone zone in zones)
+        {
+          ProductZoneDto zoneProduct = new ProductZoneDto();
+          zoneProduct.Id = 0;
+          zoneProduct.ProductId = productId;
+          zoneProduct.ProductName = product.Name;
+          zoneProduct.ZoneId = zone.Id;
+          zoneProduct.ZoneName = zone.Name;
+          zoneProduct.Price = 0;
+          zonePrices.Add(zoneProduct);
+        }
+      }
+
+      return Ok(zonePrices);
+    }
+
   }
 }

@@ -134,7 +134,7 @@ export class ConfigZonesComponent implements OnInit {
   }
 
   getZones() {
-    this.adminService.getZones().subscribe((data: any) => {
+    this.adminService.getZonesWithLocations().subscribe((data: any) => {
       this.zones = data.zones;
       this.districts = data.districts;
       for (let i = 0; i < this.districts.length; i++) {

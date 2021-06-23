@@ -293,6 +293,7 @@ import { ServicesComponent } from './admin/services/services/services.component'
 import { ServicesResolver } from './_resolvers/services-resolver';
 import { AddServiceComponent } from './admin/services/add-service/add-service.component';
 import { ConfigZonesComponent } from './admin/config/config-zones/config-zones.component';
+import { TreasuryDetailsComponent } from './admin/treso/treasury-details/treasury-details.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -490,7 +491,8 @@ export function tokenGetter() {
       ModalAddClassComponent,
       ServicesComponent,
       AddServiceComponent,
-      ConfigZonesComponent
+      ConfigZonesComponent,
+      TreasuryDetailsComponent
    ],
    imports: [
       FormWizardModule,

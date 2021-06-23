@@ -1058,6 +1058,7 @@ namespace EducNotes.API.Controllers
     {
       List<Product> products = await _cache.GetProducts();
       List<ClassLevelProduct> classlevelProducts = await _cache.GetClassLevelProducts();
+      List<ProductZone> productZones = await _cache.GetProductZones();
       List<ProductDeadLine> productDeadLines = await _cache.GetProductDeadLines();
 
       using(var identityContextTransaction = _context.Database.BeginTransaction())
@@ -1072,20 +1073,35 @@ namespace EducNotes.API.Controllers
           // delete previous by classlevel prices
           List<ClassLevelProduct> prevLevelPrices = classlevelProducts.Where(c => c.ProductId == serviceId).ToList();
           _repo.DeleteAll(prevLevelPrices);
+          // delete previous by zone prices
+          List<ProductZone> prevZonePrices = productZones.Where(z => z.ProductId == serviceId).ToList();
+          _repo.DeleteAll(prevZonePrices);
+
           if(serviceDto.IsByLevel)
           {
             service.IsByLevel = true;
+            service.IsByZone = false;
             service.Price = null;
             await _context.AddRangeAsync(serviceDto.LevelPrices);
+          }
+          else if(serviceDto.IsByZone)
+          {
+            service.IsByZone = true;
+            service.IsByLevel = false;
+            service.Price = null;
+            await _context.AddRangeAsync(serviceDto.ZonePrices);
           }
           else
           {
             service.IsByLevel = false;
+            service.IsByZone = false;
             service.Price = serviceDto.Price;
           }
 
+          //delete previous dueDates
           List<ProductDeadLine> prevDeadlines = productDeadLines.Where(p => p.ProductId == serviceId).ToList();
           _repo.DeleteAll(prevDeadlines);
+
           if(serviceDto.IsPaidCash)
           {
             service.IsPaidCash = true;
@@ -1116,6 +1132,7 @@ namespace EducNotes.API.Controllers
           await _cache.LoadProducts();
           await _cache.LoadClassLevelProducts();
           await _cache.LoadProductDeadLines();
+          await _cache.LoadProductZones();
           return Ok();
         }
         catch(Exception ex)
@@ -1129,6 +1146,24 @@ namespace EducNotes.API.Controllers
 
     [HttpGet("Zones")]
     public async Task<IActionResult> GetZones()
+    {
+      List<Zone> zonesCached = await _cache.GetZones();
+
+      List<ZoneDto> zones = new List<ZoneDto>();
+      foreach (Zone zone in zonesCached)
+      {
+        ZoneDto zoneDto = new ZoneDto();
+        zoneDto.Id = zone.Id;
+        zoneDto.Name = zone.Name;
+
+        zones.Add(zoneDto);
+      }
+
+      return Ok(zones);
+    }
+
+    [HttpGet("ZonesWithLocations")]
+    public async Task<IActionResult> GetZonesWithLocations()
     {
       List<Zone> zonesCached = await _cache.GetZones();
       List<LocationZone> locationZones = await _cache.GetLocationZones();

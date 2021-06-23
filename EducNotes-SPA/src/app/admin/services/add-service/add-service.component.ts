@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { id } from '@swimlane/ngx-datatable/release/utils';
 import { Utils } from 'src/app/shared/utils';
 import { AdminService } from 'src/app/_services/admin.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
@@ -18,15 +19,15 @@ export class AddServiceComponent implements OnInit {
   editionMode = false;
   typeOptions = [];
   trueFalseOptions = [{value: 0, label: 'NON'}, {value: 1, label: 'OUI'}];
-  priceByOptions = [{value: 0, label: 'Unique'}, {value: 1, label: 'Par niveau'}, {value: 2, label: 'Par niveau'}];
+  priceByOptions = [{value: 0, label: 'Unique'}, {value: 1, label: 'Par niveaux'}, {value: 2, label: 'Par zones'}];
   myDatePickerOptions = Utils.myDatePickerOptions;
   wait = false;
   levelProducts: any;
-  zones: any;
   showLevels = false;
   showZones = false;
   showUniquePrice = false;
   showDueDates = false;
+  zones: any;
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private productService: ProductService,
     private route: ActivatedRoute, private classService: ClassService, private adminService: AdminService,
@@ -35,18 +36,23 @@ export class AddServiceComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe(data => {
       this.product = data['product'];
-      console.log(this.product);
+      // console.log(this.product);
       if (this.product) {
         this.editionMode = true;
         if (this.product.isByLevel) {
           this.showLevels = true;
           this.showUniquePrice = false;
+          this.showZones = false;
         }
         if (!this.product.isPaidCash) {
           this.showDueDates = true;
+          this.showZones = false;
+          this.showUniquePrice = false;
         }
         if (this.product.isByZone) {
           this.showZones = true;
+          this.showDueDates = false;
+          this.showUniquePrice = false;
         }
       } else {
         this.initValues();
@@ -60,17 +66,18 @@ export class AddServiceComponent implements OnInit {
 
     this.getProductTypes();
     this.getClassLevels();
+    this.getZonePrices();
   }
 
   createServiceForm() {
     const paidCash = this.product.isPaidCash ? 1 : 0;
-    const byLevel = this.product.isByLevel ? 1 : this.product.isByZone ? 2 : 0;
+    const priceBy = this.product.isByLevel ? 1 : this.product.isByZone ? 2 : 0;
     this.serviceForm = this.fb.group({
       name: [this.product.name, Validators.required],
       typeId: [this.product.productTypeId, Validators.required],
       price: [this.product.price],
       isPaidCash: [paidCash, Validators.required],
-      priceBy: [byLevel],
+      priceBy: [priceBy],
       duedates: this.fb.array([]),
       levelPrices: this.fb.array([]),
       zones: this.fb.array([])
@@ -81,26 +88,44 @@ export class AddServiceComponent implements OnInit {
     let totalPct = 0;
     const duedates = g.get('duedates').value;
     const levelPrices = g.get('levelPrices').value;
+    const zones = g.get('zones').value;
     const prodPrice = g.get('price').value;
-    const isByLevel = g.get('isByLevel').value;
+    const priceBy = g.get('priceBy').value;
     let formNOK = false;
+    console.log('----------------------------------------------------------');
 
     // check classlevel product fees
     let feesNOK = false;
     let feeNOK = false;
-    if (isByLevel === 1) {
+    if (priceBy === 1) {
       for (let i = 0; i < levelPrices.length; i++) {
         const fee = levelPrices[i].price;
         if (fee === null || fee === '' || fee === 0) {
           feesNOK = true;
           formNOK = true;
+          console.log('price level formNOK: ' + formNOK + '-' + feesNOK);
           break;
         }
       }
-    } else {
+    } else if (priceBy === 0) {
       if (prodPrice <= 0) {
         feeNOK = true;
         formNOK = true;
+        console.log('price unique formNOK: ' + formNOK + '-' + feeNOK);
+      }
+    }
+
+    // check zone prices
+    let zonesNOK = false;
+    if (priceBy === 2) {
+      for (let i = 0; i < zones.length; i++) {
+        const fee = zones[i].price;
+        if (fee === null || fee === '' || fee === 0) {
+          zonesNOK = true;
+          formNOK = true;
+          console.log('price zones formNOK: ' + formNOK + '-' + zonesNOK);
+          break;
+        }
       }
     }
 
@@ -114,28 +139,32 @@ export class AddServiceComponent implements OnInit {
       if (pct <= 0) {
         pctNOK = true;
         formNOK = true;
+        console.log('pct < 0 formNOK: ' + formNOK + '-' + pctNOK);
       }
-      // const seq = duedates[i].seq;
-      // totalSeq += seq;
 
       const date = duedates[i].dueDate;
       if (!date) {
         formNOK = true;
         datesNOK = true;
+        console.log('dates formNOK: ' + formNOK + '-' + datesNOK);
       }
 
       const label = duedates[i].deadlineName;
-      if (!label) {
+      if (!label || label === '') {
         formNOK = true;
         labelsNOK = true;
+        console.log('label formNOK: ' + formNOK + '-' + labelsNOK);
       }
     }
-    if (totalPct !== 100) {
+
+    if (duedates.length > 1 && totalPct !== 100) {
       pctNOK = true;
       formNOK = true;
+      console.log('totalPct formNOK: ' + formNOK + '-' + pctNOK);
     }
 
-    return {'formNOK': formNOK, 'feesNOK': feesNOK, 'feeNOK': feeNOK, 'pctNOK': pctNOK, 'datesNOK': datesNOK, 'labelsNOK': labelsNOK};
+    return {'formNOK': formNOK, 'feesNOK': feesNOK, 'feeNOK': feeNOK, 'pctNOK': pctNOK,
+            'datesNOK': datesNOK, 'labelsNOK': labelsNOK, 'zonesNOK': zonesNOK};
   }
 
   addDueDateItem(id, prodid, duedate, deadlinename, pct): void {
@@ -149,7 +178,6 @@ export class AddServiceComponent implements OnInit {
       productId: [prodid],
       dueDate: [duedate, Validators.required],
       deadlineName: [deadlinename, Validators.required],
-      // seq: [seq, Validators.required],
       pct: [pct, Validators.required],
       toBeDeleted: [false]
     });
@@ -164,6 +192,24 @@ export class AddServiceComponent implements OnInit {
   resetDueDateItem(index) {
     const coursetypes = this.serviceForm.get('duedates') as FormArray;
     coursetypes.at(index).get('toBeDeleted').setValue(false);
+  }
+
+  addZonePriceItem(zoneid, name, price): void {
+    const zones = this.serviceForm.get('zones') as FormArray;
+    zones.push(this.createZonePriceItem(zoneid, name, price));
+  }
+
+  createZonePriceItem(zoneid, name, price): FormGroup {
+    return this.fb.group({
+      zoneId: zoneid,
+      zoneName: name,
+      price: price
+    });
+  }
+
+  removeZoneItem(index) {
+    const zones = this.serviceForm.get('zones') as FormArray;
+    zones.removeAt(index);
   }
 
   addLevelPriceItem(levelid, levelname, price): void {
@@ -191,7 +237,7 @@ export class AddServiceComponent implements OnInit {
   }
 
   togglePaidCash(value) {
-    if (value) {
+    if (value === 1) {
       this.showDueDates = false;
       this.removeAllDueDates();
     } else {
@@ -234,11 +280,23 @@ export class AddServiceComponent implements OnInit {
   }
 
   getClassLevels() {
-    this.classService.getLevelProductPrices(this.product.id).subscribe(data => {
+    this.productService.getLevelPrices(this.product.id).subscribe(data => {
       this.levelProducts = data;
       for (let i = 0; i < this.levelProducts.length; i++) {
         const elt = this.levelProducts[i];
         this.addLevelPriceItem(elt.classLevelId, elt.levelName, elt.price);
+      }
+    }, () => {
+      this.alertify.error('problème pour récupérer les données');
+    });
+  }
+
+  getZonePrices() {
+    this.productService.getZonePrices(this.product.id).subscribe(data => {
+      this.zones = data;
+      for (let i = 0; i < this.zones.length; i++) {
+        const elt = this.zones[i];
+        this.addZonePriceItem(elt.zoneId, elt.zoneName, elt.price);
       }
     }, () => {
       this.alertify.error('problème pour récupérer les données');
@@ -282,6 +340,7 @@ export class AddServiceComponent implements OnInit {
   saveService() {
     this.wait = true;
     let levelPrices = [];
+    let zonePrices = [];
     let dueDates = [];
     const prodid = this.product.id;
 
@@ -289,6 +348,12 @@ export class AddServiceComponent implements OnInit {
       const elt = this.serviceForm.value.levelPrices[i];
       const levelPrice = {id: 0, productId: prodid, classLevelId: elt.levelId, price: elt.price};
       levelPrices = [...levelPrices, levelPrice];
+    }
+
+    for (let i = 0; i < this.serviceForm.value.zones.length; i++) {
+      const elt = this.serviceForm.value.zones[i];
+      const zonePrice = {id: 0, productId: prodid, zoneId: elt.zoneId, price: elt.price};
+      zonePrices = [...zonePrices, zonePrice];
     }
 
     for (let i = 0; i < this.serviceForm.value.duedates.length; i++) {
@@ -303,8 +368,10 @@ export class AddServiceComponent implements OnInit {
     service.name = this.serviceForm.value.name;
     service.productTypeId = this.serviceForm.value.typeId;
     service.isPaidCash = this.serviceForm.value.isPaidCash === 1 ? true : false;
-    service.isByLevel = this.serviceForm.value.isByLevel === 1 ? true : false;
+    service.isByLevel = this.serviceForm.value.priceBy === 1 ? true : false;
+    service.isByZone = this.serviceForm.value.priceBy === 2 ? true : false;
     service.levelPrices = levelPrices;
+    service.zonePrices = zonePrices;
     service.dueDates = dueDates;
     // console.log(service);
     this.adminService.saveService(service).subscribe(() => {

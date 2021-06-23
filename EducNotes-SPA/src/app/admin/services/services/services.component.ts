@@ -15,16 +15,8 @@ export class ServicesComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe(data => {
       this.services = data['services'];
-      // console.log(this.services);
     });
   }
-
-  // getProducts() {
-  //   this.productService.getProducts().subscribe(data => {
-  //     this.products = data;
-  //     console.log(data);
-  //   });
-  // }
 
   editerService(id) {
     this.router.navigate(['addService', id]);

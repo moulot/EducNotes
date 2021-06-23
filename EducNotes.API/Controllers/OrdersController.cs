@@ -711,8 +711,8 @@ namespace EducNotes.API.Controllers
         decimal paid = 0;
         foreach(var lineid in lineids)
         {
-          var linePaid = balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount;
-          var lined = linedeadlines.First(d => d.OrderLineId == lineid);
+          var linePaid = balanceLinesPaid.Single(f => f.OrderLineId == lineid).Amount;
+          var lined = linedeadlines.Single(d => d.OrderLineId == lineid);
           var lineDueAmount = lined.Amount + lined.ProductFee;
           decimal amountpaid = 0;
           if (linePaid >= lineDueAmount)
@@ -730,14 +730,14 @@ namespace EducNotes.API.Controllers
 
         decimal balance = invoiced - paid;
 
-        AmountWithDeadlinesDto awd = new AmountWithDeadlinesDto();
-        awd.DueDate = duedate;
-        awd.strDueDate = duedate.ToString("dd/MM/yyyy", frC);
-        awd.Invoiced = invoiced;
-        awd.Paid = paid;
-        awd.Balance = balance;
-        awd.IsLate = duedate.Date < today ? true : false;
-        amountDeadlines.Add(awd);
+        AmountWithDeadlinesDto amountDeadlineDto = new AmountWithDeadlinesDto();
+        amountDeadlineDto.DueDate = duedate;
+        amountDeadlineDto.strDueDate = duedate.ToString("dd/MM/yyyy", frC);
+        amountDeadlineDto.Invoiced = invoiced;
+        amountDeadlineDto.Paid = paid;
+        amountDeadlineDto.Balance = balance;
+        amountDeadlineDto.IsLate = duedate.Date < today ? true : false;
+        amountDeadlines.Add(amountDeadlineDto);
 
         olddate = duedate;
         i++;
@@ -913,7 +913,7 @@ namespace EducNotes.API.Controllers
         decimal childDueAmount = 0;
         List<ProductRecoveryDto> productRecovery = new List<ProductRecoveryDto>();
         var products = await _repo.GetActiveProducts();
-        foreach (var product in products)
+        foreach(var product in products)
         {
           ProductRecoveryDto productLevel = new ProductRecoveryDto();
           productLevel.ProductName = product.Name;
@@ -922,7 +922,7 @@ namespace EducNotes.API.Controllers
           childDueAmount += productLevel.LateAmounts.TotalLateAmount;
           productDueAmount += productLevel.LateAmounts.TotalLateAmount;
 
-          if (productDueAmount > 0)
+          if(productDueAmount > 0)
             recoveryForChild.ProductRecovery.Add(productLevel);
         }
 

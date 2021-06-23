@@ -7,5 +7,6 @@ namespace EducNotes.API.Models
     public Product Product { get; set; }
     public int ZoneId { get; set; }
     public Zone Zone { get; set; }
+    public decimal Price { get; set; }
   }
 }

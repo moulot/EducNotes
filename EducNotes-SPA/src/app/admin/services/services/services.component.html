@@ -52,7 +52,9 @@
         </div>
         <div class="col-md-2">
           <div class="text-13 textDarkRed">prix</div>
-          <div class="text-15 textDarkBlue"><b>{{service.isByLevel ? 'par niveau de classe' : service.price}}</b></div>
+          <div class="text-15 textDarkBlue">
+            <b>{{service.isByLevel ? 'par niveau de classe' : service.isByZone ? 'par zone' : service.price}}</b>
+          </div>
         </div>
         <div class="col-md-1">
           <div class="text-13 textDarkRed">payé cash</div>
@@ -67,10 +69,10 @@
           </div>
           <div *ngIf="service.isPaidCash" class="text-15 textDarkBlue"><b>n/a</b></div>
         </div>
-        <div class="col-md-1">
+        <!-- <div class="col-md-1">
           <div class="text-13 textDarkRed">relance</div>
           <div class="text-15 textDarkBlue"><b>{{service.payableAtDayCount}} jours</b></div>
-        </div>
+        </div> -->
         <div class="col-md-12"><hr class="my-1"></div>
       </div>
     </div>
