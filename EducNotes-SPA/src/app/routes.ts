@@ -156,7 +156,8 @@ import { AddServiceResolver } from './_resolvers/add-service-resolver';
 import { ServicesComponent } from './admin/services/services/services.component';
 import { ServicesResolver } from './_resolvers/services-resolver';
 import { AddServiceComponent } from './admin/services/add-service/add-service.component';
-import { TreasuryDetailsComponent } from './admin/treso/treasury-details/treasury-details.component';
+import { DuedateDetailsComponent } from './admin/treso/duedate-details/duedate-details.component';
+import { DuedateDetailsResolver } from './_resolvers/duedate-details-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -289,7 +290,7 @@ export const appRoutes: Routes = [
         { path: 'addEmployee', component: AddEmployeeComponent},
         { path: 'services', component: ServicesComponent, resolve: {services: ServicesResolver}},
         { path: 'addService/:id', component: AddServiceComponent, resolve: {product: AddServiceResolver}},
-        { path: 'treasuryDetails', component: TreasuryDetailsComponent}
+        { path: 'dueDateDetails/:duedate/:invoiced/:paid', component: DuedateDetailsComponent, resolve: {dueDate: DuedateDetailsResolver}}
       ]
     },
     { path: '**', redirectTo: '', pathMatch: 'full' }

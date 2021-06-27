@@ -293,7 +293,8 @@ import { ServicesComponent } from './admin/services/services/services.component'
 import { ServicesResolver } from './_resolvers/services-resolver';
 import { AddServiceComponent } from './admin/services/add-service/add-service.component';
 import { ConfigZonesComponent } from './admin/config/config-zones/config-zones.component';
-import { TreasuryDetailsComponent } from './admin/treso/treasury-details/treasury-details.component';
+import { DuedateDetailsComponent } from './admin/treso/duedate-details/duedate-details.component';
+import { DuedateDetailsResolver } from './_resolvers/duedate-details-resolver';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -492,7 +493,7 @@ export function tokenGetter() {
       ServicesComponent,
       AddServiceComponent,
       ConfigZonesComponent,
-      TreasuryDetailsComponent
+      DuedateDetailsComponent
    ],
    imports: [
       FormWizardModule,
@@ -558,6 +559,7 @@ export function tokenGetter() {
       EditRoleResolver,
       MemberEditResolver,
       ConfigMenuResolver,
+      DuedateDetailsResolver,
       PreventUnSavedChanges,
       ListsResolver,
       MessagesResolver,

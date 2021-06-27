@@ -3907,6 +3907,8 @@ on courses.ClassId equals classes.Id
       foreach(var line in lines)
       {
         OrderLinePaidDto linePaid = new OrderLinePaidDto();
+        if(line.ChildId != null)
+          linePaid.ChildId = Convert.ToInt32(line.ChildId);
         linePaid.OrderLineId = line.Id;
         linePaid.Amount = finOpLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed).Sum(s => s.Amount);
         linesPaid.Add(linePaid);
@@ -4245,39 +4247,6 @@ on courses.ClassId equals classes.Id
       return (userRolesCached != null);
     }
 
-    // public Boolean MenuExists(int menuItemId, List<MenuItem> menuItems)
-    // {
-    //   return(GetByMenuItemId(menuItemId, menuItems) != null);
-    // }
-
-    // public MenuItem GetByMenuItemId(int menuItemId, List<MenuItem> menuItems)
-    // {
-    //   foreach(var menuItem in menuItems)
-    //   {
-    //     //check if this is the item we are looking for
-    //     if(menuItem.Id == menuItemId)
-    //     {
-    //       return menuItem;
-    //     }
-    //     else
-    //     {
-    //       // check if this menu has children
-    //       if(menuItem.ChildMenuItems.Count() > 0)
-    //       {
-    //         //search the children for this item
-    //         MenuItem childMenuItem = GetByMenuItemId(menuItemId, menuItem.ChildMenuItems);
-    //         if(childMenuItem != null)
-    //         {
-    //           return childMenuItem;
-    //         }
-    //       }
-    //     }
-    //   }
-
-    //   //it wasn't found so return null
-    //   return null;
-    // }
-
     public MenuItemDto FindOrLoadParent(List<MenuItemDto> menuItems, List<MenuItemDto> userMenuItems, int parentMenuItemId)
     {
       //find the menu item in the entity list
@@ -4300,52 +4269,8 @@ on courses.ClassId equals classes.Id
       return parentMenuItem;
     }
 
-    // public MenuItem GetTopMenuItem(string menuItemName, List<MenuItem> menuItems)
-    // {
-    //   MenuItem menuItem = GetByMenuItemName(menuItemName, menuItems);
-    //   while(menuItem.ParentMenuId != null)
-    //   {
-    //     menuItem = GetByMenuItemId(Convert.ToInt32(menuItem.ParentMenuId), menuItems);
-    //   }
-
-    //   return menuItem;
-    // }
-
-    // public MenuItem GetByMenuItemName(string menuItemName, List<MenuItem> menuItems)
-    // {
-    //   foreach(var menuItem in menuItems)
-    //   {
-    //     //check if this is the item we're looking for
-    //     if(menuItem.Name == menuItemName)
-    //     {
-    //       return menuItem;
-    //     }
-    //     else
-    //     {
-    //       //check if this menu has children
-    //       if(menuItem.ChildMenuItems.Count() > 0)
-    //       {
-    //         //search the children for this item
-    //         MenuItem childMenuItem = GetByMenuItemName(menuItemName, menuItem.ChildMenuItems);
-
-    //         //if the menu is found in the children then it won't be null
-    //         if(childMenuItem != null)
-    //         {
-    //           return childMenuItem;
-    //         }
-    //       }
-    //     }
-    //   }
-
-    //   //it wasn't found so return null
-    //   return null;
-    // }
-
     public async Task<UserWithRolesDto> GetUserWithRoles(int userId)
     {
-      // List<User> users = await _cache.GetEmployees();
-      // List<UserRole> userRoles = await _cache.GetUserRoles();
-
       User user = await _context.Users.Include(i => i.Photos).FirstAsync(u => u.Id == userId);
       UserWithRolesDto userWithRoles = new UserWithRolesDto();
       userWithRoles.Id = user.Id;
@@ -4362,29 +4287,6 @@ on courses.ClassId equals classes.Id
 
       return userWithRoles;
     }
-
-    // public async Task<List<MenuItemDto>> GetUserMenu(int userId)
-    // {
-    //   List<User> users = await _cache.GetUsers();
-
-    //   User user = users.First(u => u.Id == userId);
-    //   List<MenuItemDto> userTypeMenu = await GetUserTypeMenu(user.UserTypeId, userId);
-    //   List<UserRole> userRolesFromDB = await _context.UserRoles.Include(i => i.Role).Where(r => r.UserId == userId).ToListAsync();
-    //   List<Role> userRoles = userRolesFromDB.Select(u => u.Role).ToList();
-    //   List<RoleCapability> capabilities = await _context.RoleCapabilities.ToListAsync();
-
-    //   List<MenuItemDto> userMenu = new List<MenuItemDto>();
-    //   foreach (MenuItemDto menuItem in userTypeMenu)
-    //   {
-    //     Boolean hasAccess = await HasAccessToMenu(userId, menuItem, userRoles, capabilities);
-    //     if (hasAccess)
-    //     {
-    //       userMenu.Add(menuItem);
-    //     }
-    //   }
-
-    //   return userMenu;
-    // }
 
     public async Task<List<MenuItemDto>> GetMenu(int userTypeId)
     {
@@ -4436,9 +4338,6 @@ on courses.ClassId equals classes.Id
 
     public async Task<List<MenuItemDto>> GetUserTypeMenu(int userTypeId, int userId)
     {
-      // List<Menu> menus = await _cache.GetMenus();
-      // List<MenuItem> menuItemsCached = await _cache.GetMenuItems();
-
       //get userType menu
       Menu menu = await _context.Menus.FirstAsync(m => m.UserTypeId == userTypeId);
       List<MenuItem> menuItemsByMenuId = await _context.MenuItems
@@ -4493,11 +4392,6 @@ on courses.ClassId equals classes.Id
 
     public async Task<Boolean> HasAccessToMenu(int userId, MenuItemDto menuItem, List<Role> userRoles, List<MenuItemDto> menuItems, List<RoleCapability> capabilities)
     {
-      // List<MenuItem> menuItems = await _cache.GetMenuItems();
-      // List<RoleCapability> rolesCapabilities = await _cache.GetRoleCapabilities();
-
-      // MenuItem menuItem = menuItems.First(m => m.Id == menuItemId);
-
       if (menuItem.IsAlwaysEnabled)
       {
         return true;
@@ -4584,9 +4478,6 @@ on courses.ClassId equals classes.Id
 
     public async Task<ErrorDto> SaveRole(RoleDto roleDto)
     {
-      // List<RoleCapability> roleCapabilities = await _cache.GetRoleCapabilities();
-      // List<UserRole> rolesUsers = await _cache.GetUserRoles();
-      // List<Role> roles = await _cache.GetRoles();
       DateTime today = DateTime.Now;
 
       using(var identityContextTransaction = _context.Database.BeginTransaction())
@@ -4603,11 +4494,6 @@ on courses.ClassId equals classes.Id
           if (role.Id == 0)
           {
             var result = await _roleManager.CreateAsync(role);
-            // if (!result.Succeeded)
-            // {
-            //   identityContextTransaction.Rollback();
-            //   return false;
-            // }
           }
           else
           {
@@ -4807,6 +4693,72 @@ on courses.ClassId equals classes.Id
     {
       List<Zone> zones = await _cache.GetZones();
       return zones;
+    }
+
+    public async Task<List<DueDateWithLinesDto>> GetDueDatesWithLines()
+    {
+      List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
+
+      var balanceLinesPaid = await GetOrderLinesPaid();
+      var today = DateTime.Now.Date;
+      var duedates = lineDeadlinesCached.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
+      List<DueDateWithLinesDto> dueDateLines = new List<DueDateWithLinesDto>();
+      int i = 0;
+      var olddate = new DateTime();
+      foreach (var duedate in duedates)
+      {
+        var linedeadlines = new List<OrderLineDeadline>();
+        if (i == 0)
+        {
+          linedeadlines = lineDeadlinesCached.Where(o => o.DueDate <= duedate).ToList();
+        }
+        else
+        {
+          linedeadlines = lineDeadlinesCached.OrderBy(o => o.DueDate)
+                                             .Where(o => o.DueDate > olddate && o.DueDate <= duedate)
+                                             .ToList();
+        }
+
+        decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
+
+        var lineids = linedeadlines.Select(s => s.OrderLineId);
+        decimal paid = 0;
+        foreach(var lineid in lineids)
+        {
+          var linePaid = balanceLinesPaid.Single(f => f.OrderLineId == lineid).Amount;
+          var lined = linedeadlines.Single(d => d.OrderLineId == lineid);
+          var lineDueAmount = lined.Amount + lined.ProductFee;
+          decimal amountpaid = 0;
+          if (linePaid >= lineDueAmount)
+          {
+            paid += lineDueAmount;
+            amountpaid = lineDueAmount;
+          }
+          else
+          {
+            paid += linePaid;
+            amountpaid = linePaid;
+          }
+          balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount -= amountpaid;
+        }
+
+        decimal balance = invoiced - paid;
+
+        DueDateWithLinesDto dueDateDto = new DueDateWithLinesDto();
+        dueDateDto.DueDate = duedate;
+        dueDateDto.strDueDate = duedate.ToString("dd/MM/yyyy", frC);
+        dueDateDto.Invoiced = invoiced;
+        dueDateDto.Paid = paid;
+        dueDateDto.Balance = balance;
+        dueDateDto.IsLate = duedate.Date < today ? true : false;
+        dueDateDto.LineDeadlines = linedeadlines;
+        dueDateLines.Add(dueDateDto);
+
+        olddate = duedate;
+        i++;
+      }
+
+      return dueDateLines;
     }
 
   }

@@ -54,8 +54,12 @@ export class OrderService {
     return this.http.get(this.baseUrl + 'AmountByDeadline');
   }
 
-  getChildOrderAmountByDeadline(childId) {
-    return this.http.get(this.baseUrl + 'ChildAmountByDeadline/' + childId);
+  getAmountByChildByDeadline(childId) {
+    return this.http.get(this.baseUrl + 'AmountsByChildByDeadline/' + childId);
+  }
+
+  getChildrenAmountsByDeadline(duedateData) {
+    return this.http.post(this.baseUrl + 'ChildrenAmountsByDeadline', duedateData);
   }
 
   getLevelLatePayments() {

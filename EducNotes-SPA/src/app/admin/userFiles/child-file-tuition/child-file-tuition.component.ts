@@ -71,7 +71,7 @@ export class ChildFileTuitionComponent implements OnInit {
 
   getAmountByDeadline(childId) {
     this.wait = true;
-    this.orderService.getChildOrderAmountByDeadline(childId).subscribe(data => {
+    this.orderService.getAmountByChildByDeadline(childId).subscribe(data => {
       this.dataReady++;
       if (this.dataReady === 3) {
         this.wait = false;

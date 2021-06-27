@@ -1,0 +1,55 @@
+<div class="row mb-2">
+  <div class="col-md-12 d-md-flex">
+    <a appBtnBack>
+      <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;
+        --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    </a>
+    <i class="fad fa-usd-circle fa-2x mr-2" style="--fa-secondary-opacity: 1;
+      --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+    <div class="text-19">échéance du <b>{{dueDate.strDueDate}}</b> - paiements en retard</div>
+  </div>
+  <div class="col-md-12"><hr class="my-2"></div>
+  
+  <div class="col-md-12 mb-2" *ngFor="let child of dueDate.children">
+    <div *ngIf="child.lateDueAmount > 0" class="border rounded-lg p-2">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="row">
+            <div class="col-md-12">
+              <a class="text-13" [routerLink]="['/childFile', child.id]">voir dossier</a>
+            </div>
+            <div class="col-2 text-13 text-capitalize">
+              <b>{{child.lastName}} {{child.firstName}} {{ child.className || child.levelName }}</b>
+            </div>
+            <div class="col-md-10">
+              <div class="row textDarkBlue text-13 font-weight-bold text-right">
+                <div class="col-md-2">total</div>
+                <div class="col-md-2">7 jours</div>
+                <div class="col-md-2">8 à 15 jours</div>
+                <div class="col-md-2">16 à 30 jours</div>
+                <div class="col-md-2">31 à 60 jours</div>
+                <div class="col-md-2">60 jours +</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12"><hr class="my-1"></div>
+        <div class="col-md-12" *ngFor="let prod of child.productRecovery">
+          <div class="row">
+            <div class="col-2 text-15">{{prod.productName}}</div>
+            <div class="col-10">
+              <div class="row text-15 text-right">
+                <div class="col-md-2">{{prod.lateAmounts.totalLateAmount | number:'':'fr-FR'}} F</div>
+                <div class="col-md-2">{{prod.lateAmounts.lateAmount7Days | number:'':'fr-FR'}} F</div>
+                <div class="col-md-2">{{prod.lateAmounts.lateAmount15Days | number:'':'fr-FR'}} F</div>
+                <div class="col-md-2">{{prod.lateAmounts.lateAmount30Days | number:'':'fr-FR'}} F</div>
+                <div class="col-md-2">{{prod.lateAmounts.lateAmount60Days | number:'':'fr-FR'}} F</div>
+                <div class="col-md-2">{{prod.lateAmounts.lateAmount60DaysPlus | number:'':'fr-FR'}} F</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

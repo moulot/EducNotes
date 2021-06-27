@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/_services/auth.service';
 import { OrderService } from 'src/app/_services/order.service';
 import { Utils } from 'src/app/shared/utils';
 import { AlertifyService } from 'src/app/_services/alertify.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-treasury',
@@ -23,7 +24,8 @@ export class TreasuryComponent implements OnInit {
   wait = false;
   dataReady = 0;
 
-  constructor(private authService: AuthService, private orderService: OrderService, private alertify: AlertifyService) { }
+  constructor(private authService: AuthService, private orderService: OrderService, private alertify: AlertifyService,
+    private router: Router) { }
 
   ngOnInit() {
     this.settings = this.authService.settings;
@@ -65,6 +67,11 @@ export class TreasuryComponent implements OnInit {
     }, error => {
       this.alertify.error(error);
     });
+  }
+
+  goToDetails(duedate, invoiced, paid) {
+    console.log(duedate);
+    this.router.navigate(['dueDateDetails', duedate, invoiced, paid]);
   }
 
   counter(i: number) {

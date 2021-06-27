@@ -755,7 +755,7 @@ namespace EducNotes.API.data
     public async Task<List<OrderLineDeadline>> LoadOrderLineDeadLines()
     {
       List<OrderLineDeadline> linedeadlines = await _context.OrderLineDeadlines
-        .Include(i => i.OrderLine)
+        .Include(i => i.OrderLine).ThenInclude(i => i.Child).ThenInclude(i => i.Photos)
         .ToListAsync();
 
       // Set cache options.

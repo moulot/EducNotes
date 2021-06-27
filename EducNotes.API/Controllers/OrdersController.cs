@@ -612,7 +612,7 @@ namespace EducNotes.API.Controllers
       });
     }
 
-    [HttpGet("ChildAmountByDeadline/{childId}")]
+    [HttpGet("AmountsByChildByDeadline/{childId}")]
     public async Task<IActionResult> GetChildOrderAmountWithDeadlines(int childId)
     {
       List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
@@ -635,8 +635,8 @@ namespace EducNotes.API.Controllers
         else
         {
           linedeadlines = userLineDeadlines.OrderBy(o => o.DueDate)
-                                             .Where(o => o.DueDate > olddate && o.DueDate <= duedate)
-                                             .ToList();
+                                           .Where(o => o.DueDate > olddate && o.DueDate <= duedate)
+                                           .ToList();
         }
 
         decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
@@ -678,6 +678,82 @@ namespace EducNotes.API.Controllers
       }
 
       return Ok(amountDeadlines);
+    }
+
+    [HttpPost("ChildrenAmountsByDeadline")]
+    public async Task<IActionResult> GetChildrenAmountsByDeadline(DueDateDataDto dueDateData)
+    {
+      List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
+      string strDueDate = dueDateData.strDueDate;
+      decimal totalInvoiced = dueDateData.Invoiced;
+      decimal totalPaid = dueDateData.Paid;
+
+      var today = DateTime.Now.Date;
+      var dateData = strDueDate.Split("/");
+      int day = Convert.ToInt32(dateData[0]);
+      int month = Convert.ToInt32(dateData[1]);
+      int year = Convert.ToInt32(dateData[2]);
+      DateTime duedate = new DateTime(year, month, day);
+
+      List<DueDateWithLinesDto> duedates = await _repo.GetDueDatesWithLines();
+      DueDateWithLinesDto deadline = duedates.Single(d => d.DueDate == duedate);
+      
+      var childrenFromDB = deadline.LineDeadlines.Select(d => d.OrderLine.Child).Distinct();
+      var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(childrenFromDB);
+      List<DueDateChildDto> dueDateChildren = new List<DueDateChildDto>();
+      foreach (var child in children)
+      {
+        var childLineDeadlines = deadline.LineDeadlines.Where(d => d.OrderLine.ChildId == child.Id).ToList();
+        
+        DueDateChildDto dueDateChild = new DueDateChildDto();
+        dueDateChild.ChildId = child.Id;
+        dueDateChild.LastName = child.LastName;
+        dueDateChild.FirstName = child.FirstName;
+        dueDateChild.PhotoUrl = child.PhotoUrl;
+        dueDateChild.LevelName = child.ClassLevelName;
+        dueDateChild.ClassName = child.ClassName;
+        dueDateChild.DueDate = duedate;
+        dueDateChild.strDueDate = strDueDate;
+
+        var balanceLinesPaid = await _repo.GetChildOrderLinesPaid(child.Id);
+        List<OrderLineDeadline> linedeadlines = deadline.LineDeadlines
+                                              .Where(o => o.DueDate == duedate && o.OrderLine.ChildId == child.Id).ToList();
+        
+        decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
+        dueDateChild.Invoiced = invoiced;
+
+        var lineids = linedeadlines.Select(s => s.OrderLineId);
+        decimal paid = 0;
+        foreach(var lineid in lineids)
+        {
+          var linePaid = balanceLinesPaid.Single(f => f.OrderLineId == lineid).Amount;
+          var lined = linedeadlines.Single(d => d.OrderLineId == lineid);
+          var lineDueAmount = lined.Amount + lined.ProductFee;
+          decimal amountpaid = 0;
+          if (linePaid >= lineDueAmount)
+          {
+            paid += lineDueAmount;
+            amountpaid = lineDueAmount;
+          }
+          else
+          {
+            paid += linePaid;
+            amountpaid = linePaid;
+          }
+          balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount -= amountpaid;
+        }
+
+        decimal balance = invoiced - paid;
+
+        dueDateChild.Invoiced = invoiced;
+        dueDateChild.Paid = paid;
+        dueDateChild.Balance = balance;
+        dueDateChild.IsLate = duedate.Date < today ? true : false;
+
+        dueDateChildren.Add(dueDateChild);
+      }
+
+      return Ok(dueDateChildren);
     }
 
     [HttpGet("AmountByDeadline")]
