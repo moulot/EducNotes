@@ -685,8 +685,8 @@ namespace EducNotes.API.Controllers
     {
       List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
       string strDueDate = dueDateData.strDueDate;
-      decimal totalInvoiced = dueDateData.Invoiced;
-      decimal totalPaid = dueDateData.Paid;
+      // decimal totalInvoiced = dueDateData.Invoiced;
+      // decimal totalPaid = dueDateData.Paid;
 
       var today = DateTime.Now.Date;
       var dateData = strDueDate.Split("/");
@@ -697,14 +697,19 @@ namespace EducNotes.API.Controllers
 
       List<DueDateWithLinesDto> duedates = await _repo.GetDueDatesWithLines();
       DueDateWithLinesDto deadline = duedates.Single(d => d.DueDate == duedate);
-      
+
       var childrenFromDB = deadline.LineDeadlines.Select(d => d.OrderLine.Child).Distinct();
       var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(childrenFromDB);
+
+      decimal totalInvoiced = 0;
+      decimal totalPaid = 0;
+      decimal totalBalance = 0;
+      
       List<DueDateChildDto> dueDateChildren = new List<DueDateChildDto>();
-      foreach (var child in children)
+      foreach(var child in children.OrderBy(o => o.LastName).ThenBy(o => o.FirstName))
       {
         var childLineDeadlines = deadline.LineDeadlines.Where(d => d.OrderLine.ChildId == child.Id).ToList();
-        
+
         DueDateChildDto dueDateChild = new DueDateChildDto();
         dueDateChild.ChildId = child.Id;
         dueDateChild.LastName = child.LastName;
@@ -712,48 +717,74 @@ namespace EducNotes.API.Controllers
         dueDateChild.PhotoUrl = child.PhotoUrl;
         dueDateChild.LevelName = child.ClassLevelName;
         dueDateChild.ClassName = child.ClassName;
-        dueDateChild.DueDate = duedate;
-        dueDateChild.strDueDate = strDueDate;
+        // dueDateChild.IsLate = duedate.Date < today ? true : false;
 
-        var balanceLinesPaid = await _repo.GetChildOrderLinesPaid(child.Id);
-        List<OrderLineDeadline> linedeadlines = deadline.LineDeadlines
-                                              .Where(o => o.DueDate == duedate && o.OrderLine.ChildId == child.Id).ToList();
-        
-        decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
-        dueDateChild.Invoiced = invoiced;
-
-        var lineids = linedeadlines.Select(s => s.OrderLineId);
-        decimal paid = 0;
-        foreach(var lineid in lineids)
+        List<Product> products = await _repo.GetActiveProducts();
+        foreach(Product product in products)
         {
-          var linePaid = balanceLinesPaid.Single(f => f.OrderLineId == lineid).Amount;
-          var lined = linedeadlines.Single(d => d.OrderLineId == lineid);
-          var lineDueAmount = lined.Amount + lined.ProductFee;
-          decimal amountpaid = 0;
-          if (linePaid >= lineDueAmount)
+          DueDateProductDto dueDateProduct = new DueDateProductDto();
+          dueDateProduct.ProductName = product.Name;
+          
+          List<OrderLineDeadline> linedeadlines = deadline.LineDeadlines
+            .Where(o => o.DueDate == duedate && o.OrderLine.ChildId == child.Id && o.OrderLine.ProductId == product.Id).ToList();
+          
+          decimal invoiced = linedeadlines.Sum(s => s.Amount + s.ProductFee);
+          totalInvoiced += invoiced;
+          if(invoiced > 0)
           {
-            paid += lineDueAmount;
-            amountpaid = lineDueAmount;
+            var prevPaid = await _repo.GetPrevChildProductPaid(duedate, child.Id, product.Id);
+            var linesPaid = await _repo.GetChildProductLinesPaid(childLineDeadlines, child.Id, product.Id);
+
+
+            var lineids = linedeadlines.Select(s => s.OrderLineId);
+            decimal paid = 0;
+            foreach(var lineid in lineids)
+            {
+              var linePaid = linesPaid.Single(f => f.OrderLineId == lineid).Amount - prevPaid;
+              if(linePaid < 0)
+                linePaid = 0;
+              var lined = linedeadlines.Single(d => d.OrderLineId == lineid);
+              var lineDueAmount = lined.Amount + lined.ProductFee;
+              decimal amountpaid = 0;
+              if (linePaid >= lineDueAmount)
+              {
+                paid += lineDueAmount;
+                amountpaid = lineDueAmount;
+              }
+              else
+              {
+                paid += linePaid;
+                amountpaid = linePaid;
+              }
+              linesPaid.First(f => f.OrderLineId == lineid).Amount -= amountpaid;
+            }
+
+            decimal balance = invoiced - paid;
+            totalPaid += paid;
+            totalBalance += balance;
+
+            if(balance > 0)
+            {
+              dueDateProduct.Invoiced = invoiced;
+              dueDateProduct.Paid = paid;
+              dueDateProduct.Balance = balance;
+
+              dueDateChild.Products.Add(dueDateProduct);
+            }
           }
-          else
-          {
-            paid += linePaid;
-            amountpaid = linePaid;
-          }
-          balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount -= amountpaid;
         }
 
-        decimal balance = invoiced - paid;
-
-        dueDateChild.Invoiced = invoiced;
-        dueDateChild.Paid = paid;
-        dueDateChild.Balance = balance;
-        dueDateChild.IsLate = duedate.Date < today ? true : false;
-
-        dueDateChildren.Add(dueDateChild);
+        if(dueDateChild.Products.Count() > 0)
+          dueDateChildren.Add(dueDateChild);
       }
 
-      return Ok(dueDateChildren);
+      return Ok(new {
+        date = strDueDate,
+        children = dueDateChildren,
+        totalInvoiced,
+        totalPaid,
+        totalBalance
+      });
     }
 
     [HttpGet("AmountByDeadline")]
@@ -896,7 +927,7 @@ namespace EducNotes.API.Controllers
       var activelevels = await _repo.GetActiveClassLevels();
 
       List<RecoveryForLevelDto> levelRecovery = new List<RecoveryForLevelDto>();
-      foreach (var level in activelevels)
+      foreach(var level in activelevels)
       {
         RecoveryForLevelDto recoveryLevel = new RecoveryForLevelDto();
         recoveryLevel.LevelId = level.Id;
@@ -906,7 +937,7 @@ namespace EducNotes.API.Controllers
         List<ProductRecoveryDto> productRecovery = new List<ProductRecoveryDto>();
         recoveryLevel.ProductRecovery = productRecovery;
         decimal levelDueAmount = 0;
-        foreach (var product in products)
+        foreach(var product in products)
         {
           ProductRecoveryDto productLevel = new ProductRecoveryDto();
           productLevel.ProductName = product.Name;

@@ -6,50 +6,101 @@
     </a>
     <i class="fad fa-usd-circle fa-2x mr-2" style="--fa-secondary-opacity: 1;
       --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
-    <div class="text-19">échéance du <b>{{dueDate.strDueDate}}</b> - paiements en retard</div>
+    <div class="text-19">échéance du <b>{{dueDate}}</b> - paiements en retard</div>
   </div>
   <div class="col-md-12"><hr class="my-2"></div>
-  
-  <div class="col-md-12 mb-2" *ngFor="let child of dueDate.children">
-    <div *ngIf="child.lateDueAmount > 0" class="border rounded-lg p-2">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="row">
-            <div class="col-md-12">
-              <a class="text-13" [routerLink]="['/childFile', child.id]">voir dossier</a>
+  <div class="col-md-12">
+    <div class="card mb-1">
+      <div class="card-body p-2">
+        <div class="row">
+          <div class="col-md-2  textDarkBlue text-14 my-auto"><b>échéance du {{dueDate}}</b></div>
+          <div class="col-md-10">
+            <div class="row textDarkBlue text-12 font-weight-bold text-md-right">
+              <div class="col-md-2">facturé<br><span class="text-14">{{totalInvoiced | number:'':'fr-FR'}} F</span></div>
+              <div class="col-md-2">payé<br><span class="text-14">{{totalPaid | number:'':'fr-FR'}} F</span></div>
+              <div class="col-md-2 text-danger">solde à recouvrer<br><span class="text-14">{{totalBalance | number:'':'fr-FR'}} F</span></div>
             </div>
-            <div class="col-2 text-13 text-capitalize">
-              <b>{{child.lastName}} {{child.firstName}} {{ child.className || child.levelName }}</b>
-            </div>
-            <div class="col-md-10">
-              <div class="row textDarkBlue text-13 font-weight-bold text-right">
-                <div class="col-md-2">total</div>
-                <div class="col-md-2">7 jours</div>
-                <div class="col-md-2">8 à 15 jours</div>
-                <div class="col-md-2">16 à 30 jours</div>
-                <div class="col-md-2">31 à 60 jours</div>
-                <div class="col-md-2">60 jours +</div>
-              </div>
+          </div>
+          <div class="col-md-12"><hr class="my-1"></div>
+          <div class="col-md-3">
+            <div class="md-form form-sm my-1">
+              <input mdbInput type="text" id="search" [formControl]="searchControl" class="form-control">
+              <label for="search">rechercher des élèves</label>
             </div>
           </div>
         </div>
-        <div class="col-md-12"><hr class="my-1"></div>
-        <div class="col-md-12" *ngFor="let prod of child.productRecovery">
-          <div class="row">
-            <div class="col-2 text-15">{{prod.productName}}</div>
-            <div class="col-10">
-              <div class="row text-15 text-right">
-                <div class="col-md-2">{{prod.lateAmounts.totalLateAmount | number:'':'fr-FR'}} F</div>
-                <div class="col-md-2">{{prod.lateAmounts.lateAmount7Days | number:'':'fr-FR'}} F</div>
-                <div class="col-md-2">{{prod.lateAmounts.lateAmount15Days | number:'':'fr-FR'}} F</div>
-                <div class="col-md-2">{{prod.lateAmounts.lateAmount30Days | number:'':'fr-FR'}} F</div>
-                <div class="col-md-2">{{prod.lateAmounts.lateAmount60Days | number:'':'fr-FR'}} F</div>
-                <div class="col-md-2">{{prod.lateAmounts.lateAmount60DaysPlus | number:'':'fr-FR'}} F</div>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="col-md-12">
+    <div class="card mb-1">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-2">
+            <div class="d-md-flex text-15">
+              <mdb-checkbox class="mr-4">email</mdb-checkbox>
+              <mdb-checkbox>sms</mdb-checkbox>
+              </div>
+            </div>
+          <div class="col-md-3">
+            <button type="button" mdbBtn size="sm" class="btnBlue" block="true" mdbWavesEffect>relancer tous les retardataires</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <div class="col-md-12 mt-1">
+    <pagination-controls (pageChange)="page = $event" responsive="true"
+      directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
+  </div>
+  <div class="col-md-12 mb-2" *ngFor="let child of filteredChildren | paginate: { itemsPerPage: pageSize, currentPage: page }">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <!-- <div class="col-md-1 text-center my-auto">
+            relancer
+            <mdb-checkbox></mdb-checkbox>
+          </div> -->
+          <div class="col-md-12">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="row">
+                  <div class="col-md-12">
+                    <a class="text-14" [routerLink]="['/childFile', child.childId]">voir dossier</a>
+                  </div>
+                  <div class="col-2 text-13 text-capitalize">
+                    <b>{{child.lastName}} {{child.firstName}} {{ child.className || child.levelName }}</b>
+                  </div>
+                  <div class="col-md-10">
+                    <div class="row textDarkBlue text-13 font-weight-bold text-right">
+                      <div class="col-md-2">facturé</div>
+                      <div class="col-md-2">payé</div>
+                      <div class="col-md-2 text-danger">solde à recouvrer</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12"><hr class="my-1"></div>
+              <div class="col-md-12" *ngFor="let prod of child.products">
+                <div class="row">
+                  <div class="col-2 text-15">{{prod.productName}}</div>
+                  <div class="col-10">
+                    <div class="row text-14 text-right">
+                      <div class="col-md-2">{{prod.invoiced | number:'':'fr-FR'}} F</div>
+                      <div class="col-md-2">{{prod.paid | number:'':'fr-FR'}} F</div>
+                      <div class="col-md-2 text-danger">{{prod.balance | number:'':'fr-FR'}} F</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+  <div class="col-md-12 mt-1">
+    <pagination-controls (pageChange)="page = $event" responsive="true"
+      directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
   </div>
 </div>

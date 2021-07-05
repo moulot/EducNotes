@@ -4,6 +4,7 @@ namespace EducNotes.API.Dtos
   {
     public int OrderLineId { get; set; }
     public int ChildId { get; set; }
+    public int ProductId { get; set; }
     public decimal Amount { get; set; }
   }
 }

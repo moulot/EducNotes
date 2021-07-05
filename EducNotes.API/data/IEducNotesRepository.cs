@@ -146,5 +146,7 @@ namespace EducNotes.API.Data
     Task<List<OrderLinePaidDto>> GetChildOrderLinesPaid(int childId);
     Task<List<District>> GetDistricts();
     Task<List<DueDateWithLinesDto>> GetDueDatesWithLines();
+    Task<List<OrderLinePaidDto>> GetChildProductLinesPaid(List<OrderLineDeadline> childLineDeadlines, int childId, int productId);
+    Task<decimal> GetPrevChildProductPaid(DateTime currentDueDate, int childId, int productId);
   }
 }

@@ -3881,6 +3881,69 @@ on courses.ClassId equals classes.Id
       return classLevels;
     }
 
+    public async Task<decimal> GetPrevChildProductPaid(DateTime currentDueDate, int childId, int productId)
+    {
+      List<DueDateWithLinesDto> duedates = await GetDueDatesWithLines();
+
+      decimal prevPayments = 0;
+      foreach (var duedate in duedates)
+      {
+        var lines = duedate.LineDeadlines.Where(d => d.OrderLine.ProductId == productId && d.OrderLine.ChildId == childId);
+        var linesPaid = await GetOrderLinesPaid();
+
+        if(duedate.DueDate != currentDueDate)
+        {
+          var lineids = lines.Select(s => s.OrderLineId);
+          decimal paid = 0;
+          foreach(var lineid in lineids)
+          {
+            var linePaid = linesPaid.Single(f => f.OrderLineId == lineid).Amount;
+            var lined = lines.Single(d => d.OrderLineId == lineid);
+            var lineDueAmount = lined.Amount + lined.ProductFee;
+            decimal amountpaid = 0;
+            if (linePaid >= lineDueAmount)
+            {
+              paid += lineDueAmount;
+              amountpaid = lineDueAmount;
+            }
+            else
+            {
+              paid += linePaid;
+              amountpaid = linePaid;
+            }
+            linesPaid.First(f => f.OrderLineId == lineid).Amount -= amountpaid;
+          }
+
+          prevPayments += paid;
+        }
+        else
+        {
+          break;
+        }
+      }
+
+      return prevPayments;
+    }
+
+    public async Task<List<OrderLinePaidDto>> GetChildProductLinesPaid(List<OrderLineDeadline> childLineDeadlines, int childId,
+      int productId)
+    {
+      List<OrderLine> lines = await _cache.GetOrderLines();
+      List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
+
+      List<OrderLinePaidDto> linesPaid = new List<OrderLinePaidDto>();
+      foreach(var lineDeadline in childLineDeadlines)
+      {
+        OrderLinePaidDto linePaid = new OrderLinePaidDto();
+        linePaid.OrderLineId = lineDeadline.OrderLineId;
+        linePaid.Amount = finOpLines
+                        .Where(f => f.OrderLineId == lineDeadline.OrderLineId && f.OrderLine.ProductId == productId && f.FinOp.Cashed)
+                        .Sum(s => s.Amount);
+        linesPaid.Add(linePaid);
+      }
+      return linesPaid;
+    }
+
     public async Task<List<OrderLinePaidDto>> GetChildOrderLinesPaid(int childId)
     {
       List<OrderLine> lines = await _cache.GetOrderLines();
@@ -3909,6 +3972,7 @@ on courses.ClassId equals classes.Id
         OrderLinePaidDto linePaid = new OrderLinePaidDto();
         if(line.ChildId != null)
           linePaid.ChildId = Convert.ToInt32(line.ChildId);
+        linePaid.ProductId = line.ProductId;
         linePaid.OrderLineId = line.Id;
         linePaid.Amount = finOpLines.Where(f => f.OrderLineId == line.Id && f.FinOp.Cashed).Sum(s => s.Amount);
         linesPaid.Add(linePaid);
@@ -3936,14 +4000,14 @@ on courses.ClassId equals classes.Id
 
     public async Task<LateAmountsDto> GetLateAmountsDue()
     {
-      List<OrderLine> lines = await _context.OrderLines.ToListAsync();
+      List<OrderLine> lines = await _cache.GetOrderLines();
       List<OrderLineDeadline> lineDeadLinesCached = await _cache.GetOrderLineDeadLines();
       List<FinOpOrderLine> finOpLines = await _cache.GetFinOpOrderLines();
       var today = DateTime.Now.Date;
 
       LateAmountsDto lateAmounts = new LateAmountsDto();
       // get amount due today
-      foreach (var line in lines)
+      foreach(var line in lines)
       {
         var lineDeadlines = lineDeadLinesCached.Where(o => o.OrderLineId == line.Id)
                                                .OrderBy(o => o.DueDate)
@@ -3961,7 +4025,7 @@ on courses.ClassId equals classes.Id
 
             if(lineD.DueDate.Date < today && !lineD.Paid)
             {
-              if (lineDueAmount >= balance)
+              if(lineDueAmount >= balance)
               {
                 decimal lateAmount = lineDueAmount - balance;
                 lateAmounts.TotalLateAmount += lateAmount;
@@ -3996,9 +4060,9 @@ on courses.ClassId equals classes.Id
         }
         else // orderline has only one deadline(no split payments)
         {
-          if (line.Deadline.Date < today)
+          if(line.Deadline.Date < today)
           {
-            if (line.AmountTTC >= balance)
+            if(line.AmountTTC >= balance)
             {
               decimal lateAmount = line.AmountTTC - balance;
               lateAmounts.TotalLateAmount += lateAmount;
@@ -4038,7 +4102,7 @@ on courses.ClassId equals classes.Id
       LateAmountsDto lateAmounts = new LateAmountsDto();
       // get amount due today
       var lines = linesCached.Where(o => o.ClassLevelId == levelId && o.ProductId == productId).ToList();
-      foreach (var line in lines)
+      foreach(var line in lines)
       {
         var lineDeadlines = lineDeadLinesCached.Where(o => o.OrderLineId == line.Id)
                                                .OrderBy(o => o.DueDate)
@@ -4048,13 +4112,14 @@ on courses.ClassId equals classes.Id
 
         decimal lineDueAmount = 0;
         decimal balance = amountPaid;
-        if (lineDeadlines.Count() > 0)
+        if(lineDeadlines.Count() > 0)
         {
           foreach (var lineD in lineDeadlines)
           {
+            lineDueAmount = lineD.Amount + lineD.ProductFee;
+
             if (lineD.DueDate.Date < today && !lineD.Paid)
             {
-              lineDueAmount = lineD.Amount + lineD.ProductFee;
               if (lineDueAmount >= balance)
               {
                 decimal lateAmount = lineDueAmount - balance;
@@ -4075,6 +4140,13 @@ on courses.ClassId equals classes.Id
                   lateAmounts.LateAmount60DaysPlus += lateAmount;
               }
               else
+              {
+                balance = balance - lineDueAmount;
+              }
+            }
+            else
+            {
+              if(lineD.Paid)
               {
                 balance = balance - lineDueAmount;
               }
@@ -4699,7 +4771,7 @@ on courses.ClassId equals classes.Id
     {
       List<OrderLineDeadline> lineDeadlinesCached = await _cache.GetOrderLineDeadLines();
 
-      var balanceLinesPaid = await GetOrderLinesPaid();
+      var linesPaid = await GetOrderLinesPaid();
       var today = DateTime.Now.Date;
       var duedates = lineDeadlinesCached.OrderBy(o => o.DueDate).Select(s => s.DueDate).Distinct();
       List<DueDateWithLinesDto> dueDateLines = new List<DueDateWithLinesDto>();
@@ -4725,7 +4797,7 @@ on courses.ClassId equals classes.Id
         decimal paid = 0;
         foreach(var lineid in lineids)
         {
-          var linePaid = balanceLinesPaid.Single(f => f.OrderLineId == lineid).Amount;
+          var linePaid = linesPaid.Single(f => f.OrderLineId == lineid).Amount;
           var lined = linedeadlines.Single(d => d.OrderLineId == lineid);
           var lineDueAmount = lined.Amount + lined.ProductFee;
           decimal amountpaid = 0;
@@ -4739,7 +4811,7 @@ on courses.ClassId equals classes.Id
             paid += linePaid;
             amountpaid = linePaid;
           }
-          balanceLinesPaid.First(f => f.OrderLineId == lineid).Amount -= amountpaid;
+          linesPaid.First(f => f.OrderLineId == lineid).Amount -= amountpaid;
         }
 
         decimal balance = invoiced - paid;

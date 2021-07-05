@@ -7,12 +7,25 @@
 
   <div class="col-md-12 text-17 text-muted mt-2">situation des recouvrements</div>
   <div class="col-md-12"><hr class="my-1"></div>
+  <div class="col-md-12">
+    <div class="border rounded-lg p-1 my-1">
+      <div class="row">
+        <div class="col-md-3">
+          <button type="button" mdbBtn [routerLink]="['/latePayments']" size="sm"
+            block="true" class="btnBlue my-1" mdbWavesEffect>tréso par niveau de classe</button>
+        </div>
+        <div class="col-md-3">
+          <button type="button" mdbBtn size="sm" block="true" class="btnBlue my-1" mdbWavesEffect>tréso par élèves</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="col-md-2 my-2">
     <div class="card">
       <div class="card-body p-1 text-center">
         <div class="text-15">en recouvrement</div>
-        <div class="text-15 text-danger">{{ lateAmountsDue?.totalLateAmount | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-14"><a [routerLink]="['/latePayments']">voir les détails</a></div>
+        <div class="text-15 text-danger"><b>{{ lateAmountsDue?.totalLateAmount | number: '1.0-0': 'fr-FR' }} F</b></div>
+        <!-- <div class="text-14"><a [routerLink]="['/latePayments']">voir les détails</a></div> -->
       </div>
     </div>
   </div>
@@ -20,8 +33,7 @@
     <div class="card">
       <div class="card-body p-1 text-center">
         <div class="text-15">7 jours</div>
-        <div class="text-15">{{ lateAmountsDue?.lateAmount7Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-14"><a>voir les détails</a></div>
+        <div class="text-15"><b>{{ lateAmountsDue?.lateAmount7Days | number: '1.0-0': 'fr-FR' }} F</b></div>
       </div>
     </div>
   </div>
@@ -29,8 +41,7 @@
     <div class="card">
       <div class="card-body p-1 text-center">
         <div class="text-15">8 à 15 jours</div>
-        <div class="text-15">{{ lateAmountsDue?.lateAmount15Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-14"><a>voir les détails</a></div>
+        <div class="text-15"><b>{{ lateAmountsDue?.lateAmount15Days | number: '1.0-0': 'fr-FR' }} F</b></div>
       </div>
     </div>
   </div>
@@ -38,8 +49,7 @@
     <div class="card">
       <div class="card-body p-1 text-center">
         <div class="text-15">16 à 30 jours</div>
-        <div class="text-15">{{ lateAmountsDue?.lateAmount30Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-14"><a>voir les détails</a></div>
+        <div class="text-15"><b>{{ lateAmountsDue?.lateAmount30Days | number: '1.0-0': 'fr-FR' }} F</b></div>
       </div>
     </div>
   </div>
@@ -47,8 +57,7 @@
     <div class="card">
       <div class="card-body p-1 text-center">
         <div class="text-15">31 à 60 jours</div>
-        <div class="text-15">{{ lateAmountsDue?.lateAmount60Days | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-14"><a>voir les détails</a></div>
+        <div class="text-15"><b>{{ lateAmountsDue?.lateAmount60Days | number: '1.0-0': 'fr-FR' }} F</b></div>
       </div>
     </div>
   </div>
@@ -56,8 +65,7 @@
     <div class="card">
       <div class="card-body p-1 text-center">
         <div class="text-15">60 jours et plus</div>
-        <div class="text-15">{{ lateAmountsDue?.lateAmount60DaysPlus | number: '1.0-0': 'fr-FR' }} F CFA</div>
-        <div class="text-14"><a>voir les détails</a></div>
+        <div class="text-15"><b>{{ lateAmountsDue?.lateAmount60DaysPlus | number: '1.0-0': 'fr-FR' }} F</b></div>
       </div>
     </div>
   </div>

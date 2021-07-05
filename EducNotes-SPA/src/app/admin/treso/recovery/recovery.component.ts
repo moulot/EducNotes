@@ -18,15 +18,6 @@ export class RecoveryComponent implements OnInit {
     this.route.data.subscribe((data: any) => {
       this.lateAmountsDue = data['lateAmounts'];
     });
-    // this.getRecoveryData();
   }
-
-  // getRecoveryData() {
-  //   this.orderService.getRecoveryData().subscribe((data: any) => {
-  //     this.lateAmountsDue = data;
-  //   }, error => {
-  //     this.alertify.error(error);
-  //   });
-  // }
 
 }
