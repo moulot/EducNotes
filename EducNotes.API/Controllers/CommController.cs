@@ -33,7 +33,8 @@ namespace EducNotes.API.Controllers
     private readonly IEducNotesRepository _repo;
     private readonly IConfiguration _config;
     public readonly ICacheRepository _cache;
-    int teacherTypeId, parentTypeId, studentTypeId, adminTypeId, emailBroacastCatId, smsBroacastCatId;
+    int teacherTypeId, parentTypeId, studentTypeId, adminTypeId, emailBroacastCatId;
+    int smsBroacastCatId, emailCommTypeId, smsCommTypeId, recoveryEmailId;
 
     public CommController(DataContext context, IMapper mapper, IEducNotesRepository repo,
       IConfiguration config, ICacheRepository cache)
@@ -49,6 +50,9 @@ namespace EducNotes.API.Controllers
       studentTypeId = _config.GetValue<int> ("AppSettings:studentTypeId");
       emailBroacastCatId = _config.GetValue<int> ("AppSettings:emailBroadcastCatId");
       smsBroacastCatId = _config.GetValue<int> ("AppSettings:smsBroadcastCatId");
+      emailCommTypeId = _config.GetValue<int>("AppSettings:emailCommTypeId");
+      smsCommTypeId = _config.GetValue<int>("AppSettings:SmsCommTypeId");
+      recoveryEmailId = _config.GetValue<int>("AppSettings:recoveryEmailId");
     }
 
     [HttpPost("Twilio_SendSMS")]
@@ -446,8 +450,6 @@ namespace EducNotes.API.Controllers
     {
       int loggedUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
       var tokens = await _repo.GetTokens();
-      int emailCommTypeId = _config.GetValue<int>("AppSettings:emailCommTypeId");
-      int smsCommTypeId = _config.GetValue<int>("AppSettings:SmsCommTypeId");
       int msgChoice = users[0].msgChoice;
 
       if(msgChoice == 1) //email
@@ -721,7 +723,7 @@ namespace EducNotes.API.Controllers
       });
     }
 
-    [HttpPost ("SendBatchEmail")]
+    [HttpPost("SendBatchEmail")]
     public async Task<IActionResult> SendBatchEmail (DataForEmail dataForEmail) {
       var currentUserId = int.Parse (User.FindFirst (ClaimTypes.NameIdentifier).Value);
 
@@ -788,6 +790,66 @@ namespace EducNotes.API.Controllers
       } else {
         return BadRequest ("problème pour envoyer l\' email");
       }
+    }
+
+    [HttpPost("sendRecoveryComm")]
+    public async Task<IActionResult> SendRecoveryComm(List<RecoveryForParentDto> parents)
+    {
+      List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
+      var template = emailTemplates.Single(t => t.Id == recoveryEmailId);
+
+      int loggedUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+      var tokens = await _repo.GetTokens();
+
+      foreach(var parent in parents)
+      {
+        if(parent.ByEmail == true)
+        {
+          if(parent.FatherId > 0)
+          {
+            Email email = new Email();
+            email.EmailTypeId = emailCommTypeId;
+            email.ToAddress = parent.FatherEmail;
+            email.FromAddress = "no-reply@educnotes.com";
+            email.Subject = template.Subject;
+            List<TokenDto> tags = await _repo.GetRecoveryMsgTokenValues(tokens, parent);
+            email.Body = _repo.ReplaceTokens(tags, template.Body);
+            email.InsertUserId = loggedUserId;
+            email.InsertDate = DateTime.Now;
+            email.UpdateUserId = loggedUserId;
+            email.UpdateDate = DateTime.Now;
+            email.ToUserId = parent.FatherId;
+            _repo.Add(email);
+          }
+
+          if(parent.MotherId > 0)
+          {
+            Email email = new Email();
+            email.EmailTypeId = emailCommTypeId;
+            email.ToAddress = parent.FatherEmail;
+            email.FromAddress = "no-reply@educnotes.com";
+            email.Subject = "user.Subject";
+            List<TokenDto> tags = await _repo.GetRecoveryMsgTokenValues(tokens, parent);
+            email.Body = _repo.ReplaceTokens(tags, template.Body);
+            email.InsertUserId = loggedUserId;
+            email.InsertDate = DateTime.Now;
+            email.UpdateUserId = loggedUserId;
+            email.UpdateDate = DateTime.Now;
+            email.ToUserId = parent.FatherId;
+            _repo.Add(email);
+          }
+        }
+
+        if(parent.BySms == true)
+        {
+          
+        }
+      }
+
+      if(await _repo.SaveAll())
+        return Ok();
+
+      return BadRequest("problème pour envoyer les emails de relance");
     }
   }
 }

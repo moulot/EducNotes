@@ -11,11 +11,12 @@
     <div class="border rounded-lg p-1 my-1">
       <div class="row">
         <div class="col-md-3">
-          <button type="button" mdbBtn [routerLink]="['/latePayments']" size="sm"
+          <button type="button" mdbBtn [routerLink]="['/levelLatePayments']" size="sm"
             block="true" class="btnBlue my-1" mdbWavesEffect>tréso par niveau de classe</button>
         </div>
         <div class="col-md-3">
-          <button type="button" mdbBtn size="sm" block="true" class="btnBlue my-1" mdbWavesEffect>tréso par élèves</button>
+          <button type="button" mdbBtn [routerLink]="['/childLatePayments']" size="sm"
+            block="true" class="btnBlue my-1" mdbWavesEffect>tréso par élèves</button>
         </div>
       </div>
     </div>
@@ -25,7 +26,7 @@
       <div class="card-body p-1 text-center">
         <div class="text-15">en recouvrement</div>
         <div class="text-15 text-danger"><b>{{ lateAmountsDue?.totalLateAmount | number: '1.0-0': 'fr-FR' }} F</b></div>
-        <!-- <div class="text-14"><a [routerLink]="['/latePayments']">voir les détails</a></div> -->
+        <!-- <div class="text-14"><a [routerLink]="['/levelLatePayments']">voir les détails</a></div> -->
       </div>
     </div>
   </div>

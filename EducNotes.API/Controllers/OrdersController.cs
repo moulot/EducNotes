@@ -954,17 +954,14 @@ namespace EducNotes.API.Controllers
     }
 
     [HttpGet("ChildLatePayments")]
-    public async Task<IActionResult> GetChildrenRecoveryData()
+    public async Task<IActionResult> GetChildLatePayments()
     {
       List<User> students = await _cache.GetStudents();
-
       var today = DateTime.Now.Date;
-      var childrenFromDB = students.Where(o => o.UserTypeId == studentTypeId)
-                                   .OrderBy(o => o.LastName).ThenBy(o => o.FirstName)
-                                   .ToList();
-      var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(childrenFromDB);
-      List<RecoveryForChildDto> childRecovery = new List<RecoveryForChildDto>();
-      foreach (var child in children)
+
+      var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(students);
+      List<RecoveryForParentDto> parentRecovery = new List<RecoveryForParentDto>();
+      foreach(var child in children)
       {
         RecoveryForChildDto recoveryForChild = new RecoveryForChildDto();
         recoveryForChild.ProductRecovery = new List<ProductRecoveryDto>();
@@ -978,21 +975,67 @@ namespace EducNotes.API.Controllers
         decimal childDueAmount = 0;
         List<ProductRecoveryDto> productRecovery = new List<ProductRecoveryDto>();
         var products = await _repo.GetActiveProducts();
-        products = products.OrderBy(o => o.DsplSeq).ToList();
-        foreach (var product in products)
+        foreach(var product in products)
         {
           ProductRecoveryDto productLevel = new ProductRecoveryDto();
           productLevel.ProductName = product.Name;
+          decimal productDueAmount = 0;
           productLevel.LateAmounts = await _repo.GetChildLateAmountsDue(product.Id, child.Id);
           childDueAmount += productLevel.LateAmounts.TotalLateAmount;
-          recoveryForChild.ProductRecovery.Add(productLevel);
+          productDueAmount += productLevel.LateAmounts.TotalLateAmount;
+
+          if(productDueAmount > 0)
+            recoveryForChild.ProductRecovery.Add(productLevel);
         }
 
         recoveryForChild.LateDueAmount = childDueAmount;
-        childRecovery.Add(recoveryForChild);
+
+        List<User> parents = await _repo.GetParents(child.Id);
+
+        if (childDueAmount > 0)
+        {
+          //does the parent(s) exists on the list?
+          var parentIds = parents.Select(s => s.Id);
+          var parentExists = parentRecovery.SingleOrDefault(p => parentIds.Contains(p.FatherId) || parentIds.Contains(p.MotherId));
+          if(parentExists != null)
+          {
+            parentExists.LateDueAmount = parentExists.LateDueAmount + childDueAmount;
+            parentExists.Children.Add(recoveryForChild);
+          }
+          else
+          {
+            RecoveryForParentDto recoveryForParent = new RecoveryForParentDto();
+            foreach(User parent in parents)
+            {
+              if(parent.Gender == 0)
+              {
+                recoveryForParent.MotherId = parent.Id;
+                recoveryForParent.MotherFirstName = parent.FirstName.FirstLetterToUpper();
+                recoveryForParent.MotherLastName = parent.LastName.FirstLetterToUpper();
+                recoveryForParent.MotherEmail = parent.Email;
+                recoveryForParent.MotherMobile = parent.PhoneNumber.FormatPhoneNumber();
+                recoveryForParent.MotherGender = parent.Gender;
+              }
+              else
+              {
+                recoveryForParent.FatherId = parent.Id;
+                recoveryForParent.FatherFirstName = parent.FirstName.FirstLetterToUpper();
+                recoveryForParent.FatherLastName = parent.LastName.FirstLetterToUpper();
+                recoveryForParent.FatherEmail = parent.Email;
+                recoveryForParent.FatherMobile = parent.PhoneNumber.FormatPhoneNumber();
+                recoveryForParent.FatherGender = parent.Gender;
+              }
+
+              recoveryForParent.LateDueAmount = childDueAmount;
+              recoveryForParent.Children.Add(recoveryForChild);
+            }
+
+            parentRecovery.Add(recoveryForParent);
+          }
+        }
       }
 
-      return Ok(childRecovery);
+      return Ok(parentRecovery);
     }
 
     [HttpGet("ChildLatePaymentByLevel/{levelid}")]

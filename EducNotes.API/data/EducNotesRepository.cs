@@ -2794,7 +2794,7 @@ on courses.ClassId equals classes.Id
     {
       List<TokenDto> tokenValues = new List<TokenDto>();
 
-      foreach (var token in tokens)
+      foreach(var token in tokens)
       {
         TokenDto td = new TokenDto();
         td.TokenString = token.TokenString;
@@ -2924,6 +2924,67 @@ on courses.ClassId equals classes.Id
               url = string.Format(baseUrl, "");
             td.Value = string.Format("{0}/confirmUserEmail?id={1}&token={2}", url,
               teacherId, HttpUtility.UrlEncode(emailData.Token));
+            break;
+          default:
+            break;
+        }
+
+        tokenValues.Add(td);
+      }
+
+      return tokenValues;
+    }
+
+    public async Task<List<TokenDto>> GetRecoveryMsgTokenValues(IEnumerable<Token> tokens, RecoveryForParentDto parent)
+    {
+      List<PaymentType> paymentTypesCached = await _cache.GetPaymentTypes();
+      List<TokenDto> tokenValues = new List<TokenDto>();
+
+      var subDomain = GetAppSubDomain();
+
+      //set children registration data
+      string accountInfos = "";
+      byte num = 1;
+      foreach(var child in parent.Children)
+      {
+        string childFirstName = child.FirstName.FirstLetterToUpper();
+        string childLastName = child.LastName.FirstLetterToUpper();
+        string className = child.ClassName != "" ? child.ClassName : child.LevelName;
+        accountInfos += "<div><br></><div><span style=\"font-size: 1rem;\">" + num + ". <b>" + childLastName + " " + childFirstName +
+          ".</b></span><b style=\"font-size: 1rem;\"> classe " + className + "</b><span style=\"font-size: 1rem;\">" + ".</span>" +
+          "<span style=\"font-size: 1rem;\">" + ".</span><span style=\"font-color: #ff0000;\"> montant total dû :" + child.LateDueAmount +
+          "</span></div>";
+        num++;
+      }
+
+      string parentLastName = "";
+      byte parentGender = 0;
+      if(parent.FatherId != 0)
+      {
+        parentLastName = parent.FatherLastName;
+        parentGender = parent.FatherGender;
+      }
+      else
+      {
+        parentLastName = parent.MotherLastName;
+        parentGender = parent.MotherGender;
+      }
+
+      foreach (var token in tokens)
+      {
+        TokenDto td = new TokenDto();
+        td.TokenString = token.TokenString;
+
+        switch (td.TokenString)
+        {
+          case "<N_PARENT>":
+            td.Value = parentLastName.FirstLetterToUpper();
+            break;
+          case "<M_MME>":
+            td.Value = parentGender == 0 ? "Mme" : "M.";
+            break;
+          case "<INFOS_COMPTE_PARENT>":
+            td.Value = accountInfos;
             break;
           default:
             break;
@@ -4212,10 +4273,10 @@ on courses.ClassId equals classes.Id
         {
           foreach (var lineD in lineDeadlines)
           {
+            lineDueAmount = lineD.Amount + lineD.ProductFee;
+
             if (lineD.DueDate.Date < today && !lineD.Paid)
             {
-              lineDueAmount = lineD.Amount + lineD.ProductFee;
-
               if (lineDueAmount >= balance)
               {
                 decimal lateAmount = lineDueAmount - balance;
@@ -4236,6 +4297,13 @@ on courses.ClassId equals classes.Id
                   lateAmounts.LateAmount60DaysPlus += lateAmount;
               }
               else
+              {
+                balance = balance - lineDueAmount;
+              }
+            }
+            else
+            {
+              if(lineD.Paid)
               {
                 balance = balance - lineDueAmount;
               }

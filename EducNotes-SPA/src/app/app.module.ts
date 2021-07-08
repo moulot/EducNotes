@@ -295,6 +295,8 @@ import { AddServiceComponent } from './admin/services/add-service/add-service.co
 import { ConfigZonesComponent } from './admin/config/config-zones/config-zones.component';
 import { DuedateDetailsComponent } from './admin/treso/duedate-details/duedate-details.component';
 import { DuedateDetailsResolver } from './_resolvers/duedate-details-resolver';
+import { ChildLatePaymentsResolver } from './_resolvers/child-latePayments-resolver';
+import { ChildrenRecoveryComponent } from './admin/treso/children-recovery/children-recovery.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -493,7 +495,8 @@ export function tokenGetter() {
       ServicesComponent,
       AddServiceComponent,
       ConfigZonesComponent,
-      DuedateDetailsComponent
+      DuedateDetailsComponent,
+      ChildrenRecoveryComponent
    ],
    imports: [
       FormWizardModule,
@@ -560,6 +563,7 @@ export function tokenGetter() {
       MemberEditResolver,
       ConfigMenuResolver,
       DuedateDetailsResolver,
+      ChildLatePaymentsResolver,
       PreventUnSavedChanges,
       ListsResolver,
       MessagesResolver,

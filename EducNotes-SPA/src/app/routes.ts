@@ -158,6 +158,8 @@ import { ServicesResolver } from './_resolvers/services-resolver';
 import { AddServiceComponent } from './admin/services/add-service/add-service.component';
 import { DuedateDetailsComponent } from './admin/treso/duedate-details/duedate-details.component';
 import { DuedateDetailsResolver } from './_resolvers/duedate-details-resolver';
+import { ChildrenRecoveryComponent } from './admin/treso/children-recovery/children-recovery.component';
+import { ChildLatePaymentsResolver } from './_resolvers/child-latePayments-resolver';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -279,7 +281,8 @@ export const appRoutes: Routes = [
         { path: 'tuitionData', component: TuitionDataComponent},
         { path: 'tuitionDetails/:levelId', component: TuitionDetailsComponent, resolve: {users: TuitionDetailsResolver}},
         { path: 'tuitionFees', component: TuitionFeesComponent, resolve: {fees: TuitionFeesResolver}},
-        { path: 'latePayments', component: RecoveryListComponent},
+        { path: 'levelLatePayments', component: RecoveryListComponent},
+        { path: 'childLatePayments', component: ChildrenRecoveryComponent, resolve: {parents: ChildLatePaymentsResolver}},
         { path: 'paymentLevelChild/:id', component: PaymentLevelChildComponent, resolve: {children: PaymentLevelChildResolver}},
         { path: 'absences', component: AbsencesComponent},
         { path: 'editAccount/:id', component: EditAccountComponent, resolve: {user: EditAccountResolver}},

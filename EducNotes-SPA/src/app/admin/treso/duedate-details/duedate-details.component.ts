@@ -31,7 +31,7 @@ export class DuedateDetailsComponent implements OnInit {
       this.totalPaid = dueDateData.totalPaid;
       this.totalBalance = dueDateData.totalBalance;
     });
-    console.log(this.children);
+    // console.log(this.children);
     this.searchControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
       this.filerData(value);
     });

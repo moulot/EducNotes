@@ -234,10 +234,10 @@ namespace EducNotes.API.Helpers
       {
         if(phone == null)
           return phone;
-        if (phone.Length == 8)
+        if (phone.Length == 10)
         {
-          return String.Format("{0}.{1}.{2}.{3}", phone.Substring(0, 2), phone.Substring(2, 2),
-            phone.Substring(4, 2), phone.Substring(6));
+          return String.Format("{0}.{1}.{2}.{3}.{4}", phone.Substring(0, 2), phone.Substring(2, 2),
+            phone.Substring(4, 2), phone.Substring(6, 2), phone.Substring(8));
         }
         return phone;
       }

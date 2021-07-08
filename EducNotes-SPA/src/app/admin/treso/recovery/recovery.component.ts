@@ -11,8 +11,7 @@ import { OrderService } from 'src/app/_services/order.service';
 export class RecoveryComponent implements OnInit {
   lateAmountsDue: any;
 
-  constructor(private orderService: OrderService, private alertify: AlertifyService,
-    private route: ActivatedRoute) { }
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.route.data.subscribe((data: any) => {

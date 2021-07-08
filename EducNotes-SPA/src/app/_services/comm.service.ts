@@ -99,4 +99,8 @@ export class CommService {
   sendEmail(dataForEmail: DataForEmail) {
     return this.http.post(this.baseUrl + 'SendBatchEmail', dataForEmail);
   }
+
+  sendRecoveryComm(parents) {
+    return this.http.post(this.baseUrl + 'sendRecoveryComm', parents);
+  }
 }
