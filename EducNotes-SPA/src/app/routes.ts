@@ -151,7 +151,6 @@ import { AddEmployeeComponent } from './admin/users/add-employee/add-employee.co
 import { AddRoleComponent } from './admin/add-role/add-role.component';
 import { ConfirmUserEmailComponent } from './registration/confirm-user-email/confirm-user-email.component';
 import { EditRoleResolver } from './_resolvers/edit-role-resolver';
-import { ConfigAddServiceComponent } from './admin/config/config-add-service/config-add-service.component';
 import { AddServiceResolver } from './_resolvers/add-service-resolver';
 import { ServicesComponent } from './admin/services/services/services.component';
 import { ServicesResolver } from './_resolvers/services-resolver';
@@ -160,6 +159,7 @@ import { DuedateDetailsComponent } from './admin/treso/duedate-details/duedate-d
 import { DuedateDetailsResolver } from './_resolvers/duedate-details-resolver';
 import { ChildrenRecoveryComponent } from './admin/treso/children-recovery/children-recovery.component';
 import { ChildLatePaymentsResolver } from './_resolvers/child-latePayments-resolver';
+import { LevelRecoveryComponent } from './admin/treso/level-recovery/level-recovery.component';
 
 export const appRoutes: Routes = [
     { path: 'forgotPassword', component: ForgotComponent },
@@ -250,7 +250,7 @@ export const appRoutes: Routes = [
         { path: 'editPayable/:id', component: PayableFormComponent , resolve: { payableAt: PayableFormResolver }},
         { path: 'createPDF', component: ConvertToPDFComponent },
         { path: 'sendSms', component: SendSmsComponent},
-        { path: 'userAccount/:id', component: UserAccountComponent}, // , resolve: { account: UserAccountResolver } },
+        { path: 'userAccount/:id', component: UserAccountComponent},
         { path: 'SmsTemplates', component: SmsTemplateComponent, resolve: { templates: SmsTemplateResolver} },
         { path: 'AddSmsTemplate', component: AddSmsTemplateComponent},
         { path: 'EditSmsTemplate/:id', component: AddSmsTemplateComponent, resolve: { template: EditSmsTemplateResolver} },
@@ -283,7 +283,7 @@ export const appRoutes: Routes = [
         { path: 'tuitionFees', component: TuitionFeesComponent, resolve: {fees: TuitionFeesResolver}},
         { path: 'levelLatePayments', component: RecoveryListComponent},
         { path: 'childLatePayments', component: ChildrenRecoveryComponent, resolve: {parents: ChildLatePaymentsResolver}},
-        { path: 'paymentLevelChild/:id', component: PaymentLevelChildComponent, resolve: {children: PaymentLevelChildResolver}},
+        { path: 'paymentLevelChild/:id', component: LevelRecoveryComponent, resolve: {parents: PaymentLevelChildResolver}},
         { path: 'absences', component: AbsencesComponent},
         { path: 'editAccount/:id', component: EditAccountComponent, resolve: {user: EditAccountResolver}},
         { path: 'usersValidation', component: UserValidationComponent, resolve: {users: UserValidationResolver} },

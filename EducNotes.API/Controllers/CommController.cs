@@ -34,7 +34,7 @@ namespace EducNotes.API.Controllers
     private readonly IConfiguration _config;
     public readonly ICacheRepository _cache;
     int teacherTypeId, parentTypeId, studentTypeId, adminTypeId, emailBroacastCatId;
-    int smsBroacastCatId, emailCommTypeId, smsCommTypeId, recoveryEmailId;
+    int smsBroacastCatId, emailCommTypeId, smsCommTypeId, recoveryEmailId, recoverySmsId, smsRecoveryTypeId, emailRecoveryTypeId;
 
     public CommController(DataContext context, IMapper mapper, IEducNotesRepository repo,
       IConfiguration config, ICacheRepository cache)
@@ -53,6 +53,9 @@ namespace EducNotes.API.Controllers
       emailCommTypeId = _config.GetValue<int>("AppSettings:emailCommTypeId");
       smsCommTypeId = _config.GetValue<int>("AppSettings:SmsCommTypeId");
       recoveryEmailId = _config.GetValue<int>("AppSettings:recoveryEmailId");
+      recoverySmsId = _config.GetValue<int>("AppSettings:recoverySms");
+      smsRecoveryTypeId = _config.GetValue<int>("AppSettings:smsRecoveryTypeId");
+      emailRecoveryTypeId = _config.GetValue<int>("AppSettings:emailRecoveryTypeId");
     }
 
     [HttpPost("Twilio_SendSMS")]
@@ -258,6 +261,7 @@ namespace EducNotes.API.Controllers
       if(await _repo.SaveAll())
       {
         await _cache.LoadEmailTemplates();
+        await _cache.LoadTokens();
         return Ok();
       }
 
@@ -796,7 +800,10 @@ namespace EducNotes.API.Controllers
     public async Task<IActionResult> SendRecoveryComm(List<RecoveryForParentDto> parents)
     {
       List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
-      var template = emailTemplates.Single(t => t.Id == recoveryEmailId);
+      List<SmsTemplate> smsTemplates = await _cache.GetSmsTemplates();
+
+      var emailTemplate = emailTemplates.Single(t => t.Id == recoveryEmailId);
+      var smsTemplate = smsTemplates.Single(t => t.Id == recoverySmsId);
 
       int loggedUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
       var tokens = await _repo.GetTokens();
@@ -808,12 +815,12 @@ namespace EducNotes.API.Controllers
           if(parent.FatherId > 0)
           {
             Email email = new Email();
-            email.EmailTypeId = emailCommTypeId;
+            email.EmailTypeId = emailRecoveryTypeId;
             email.ToAddress = parent.FatherEmail;
             email.FromAddress = "no-reply@educnotes.com";
-            email.Subject = template.Subject;
-            List<TokenDto> tags = await _repo.GetRecoveryMsgTokenValues(tokens, parent);
-            email.Body = _repo.ReplaceTokens(tags, template.Body);
+            email.Subject = emailTemplate.Subject;
+            List<TokenDto> tags = _repo.GetRecoveryMsgTokenValues(tokens, parent);
+            email.Body = _repo.ReplaceTokens(tags, emailTemplate.Body);
             email.InsertUserId = loggedUserId;
             email.InsertDate = DateTime.Now;
             email.UpdateUserId = loggedUserId;
@@ -825,12 +832,12 @@ namespace EducNotes.API.Controllers
           if(parent.MotherId > 0)
           {
             Email email = new Email();
-            email.EmailTypeId = emailCommTypeId;
+            email.EmailTypeId = emailRecoveryTypeId;
             email.ToAddress = parent.FatherEmail;
             email.FromAddress = "no-reply@educnotes.com";
-            email.Subject = "user.Subject";
-            List<TokenDto> tags = await _repo.GetRecoveryMsgTokenValues(tokens, parent);
-            email.Body = _repo.ReplaceTokens(tags, template.Body);
+            email.Subject = emailTemplate.Subject;
+            List<TokenDto> tags = _repo.GetRecoveryMsgTokenValues(tokens, parent);
+            email.Body = _repo.ReplaceTokens(tags, emailTemplate.Body);
             email.InsertUserId = loggedUserId;
             email.InsertDate = DateTime.Now;
             email.UpdateUserId = loggedUserId;
@@ -842,7 +849,39 @@ namespace EducNotes.API.Controllers
 
         if(parent.BySms == true)
         {
-          
+          if(parent.FatherId > 0)
+          {
+            Sms sms = new Sms();
+            sms.SmsTypeId = smsRecoveryTypeId;
+            sms.To = parent.FatherMobile.Replace(".", "");
+            // sms.StudentId = user.ChildId;
+            sms.ToUserId = parent.FatherId;
+            sms.validityPeriod = 1;
+            // replace tokens with dynamic data
+            List<TokenDto> tags = _repo.GetRecoverySmsTokenValues(tokens, parent);
+            sms.Content = _repo.ReplaceTokens(tags, smsTemplate.Content);
+            sms.InsertUserId = loggedUserId;
+            sms.InsertDate = DateTime.Now;
+            sms.UpdateDate = DateTime.Now;
+            _repo.Add(sms);
+          }
+
+          if(parent.MotherId > 0)
+          {
+            Sms sms = new Sms();
+            sms.SmsTypeId = smsRecoveryTypeId;
+            sms.To = parent.MotherMobile.Replace(".", "");
+            // sms.StudentId = user.ChildId;
+            sms.ToUserId = parent.MotherId;
+            sms.validityPeriod = 1;
+            // replace tokens with dynamic data
+            List<TokenDto> tags = _repo.GetRecoverySmsTokenValues(tokens, parent);
+            sms.Content = _repo.ReplaceTokens(tags, smsTemplate.Content);
+            sms.InsertUserId = loggedUserId;
+            sms.InsertDate = DateTime.Now;
+            sms.UpdateDate = DateTime.Now;
+            _repo.Add(sms);
+          }
         }
       }
 

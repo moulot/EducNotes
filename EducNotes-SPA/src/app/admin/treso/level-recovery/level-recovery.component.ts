@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { debounceTime, filter } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { CommService } from 'src/app/_services/comm.service';
 
 @Component({
-  selector: 'app-children-recovery',
-  templateUrl: './children-recovery.component.html',
-  styleUrls: ['./children-recovery.component.scss']
+  selector: 'app-level-recovery',
+  templateUrl: './level-recovery.component.html',
+  styleUrls: ['./level-recovery.component.scss']
 })
-export class ChildrenRecoveryComponent implements OnInit {
+export class LevelRecoveryComponent implements OnInit {
   parents: any;
   searchControl: FormControl = new FormControl();
   filteredParents: any[] = [];
@@ -20,6 +20,7 @@ export class ChildrenRecoveryComponent implements OnInit {
   showCustomBtn = false;
   selectAllText = 'tout sélectionner';
   wait = false;
+  className: string;
 
   constructor(private route: ActivatedRoute, private fb: FormBuilder, private commService: CommService,
     private alertify: AlertifyService) { }
@@ -28,6 +29,8 @@ export class ChildrenRecoveryComponent implements OnInit {
     this.createRecoveryForm();
     this.route.data.subscribe((data: any) => {
       this.parents = data['parents'];
+      const cname = this.parents[0].children[0].className;
+      this.className = cname != null ? cname : this.parents[0].children[0].levelName;
       this.addParentSelections();
       this.filteredParents = this.parents;
     });

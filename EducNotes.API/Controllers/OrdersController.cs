@@ -1038,6 +1038,92 @@ namespace EducNotes.API.Controllers
       return Ok(parentRecovery);
     }
 
+    [HttpGet("ChildByLevelLatePayments/{levelId}")]
+    public async Task<IActionResult> GetChildByLevelLatePayments(int levelId)
+    {
+      List<User> students = await _cache.GetStudents();
+      var today = DateTime.Now.Date;
+
+      List<User> levelStudents = students.Where(s => s.ClassLevelId == levelId).ToList();
+      var children = _mapper.Map<IEnumerable<UserForDetailedDto>>(levelStudents);
+      List<RecoveryForParentDto> parentRecovery = new List<RecoveryForParentDto>();
+      foreach(var child in children)
+      {
+        RecoveryForChildDto recoveryForChild = new RecoveryForChildDto();
+        recoveryForChild.ProductRecovery = new List<ProductRecoveryDto>();
+        recoveryForChild.Id = child.Id;
+        recoveryForChild.LastName = child.LastName;
+        recoveryForChild.FirstName = child.FirstName;
+        recoveryForChild.LevelName = child.ClassLevelName;
+        recoveryForChild.ClassName = child.ClassName;
+        recoveryForChild.PhotoUrl = child.PhotoUrl;
+
+        decimal childDueAmount = 0;
+        List<ProductRecoveryDto> productRecovery = new List<ProductRecoveryDto>();
+        var products = await _repo.GetActiveProducts();
+        foreach(var product in products)
+        {
+          ProductRecoveryDto productLevel = new ProductRecoveryDto();
+          productLevel.ProductName = product.Name;
+          decimal productDueAmount = 0;
+          productLevel.LateAmounts = await _repo.GetChildLateAmountsDue(product.Id, child.Id);
+          childDueAmount += productLevel.LateAmounts.TotalLateAmount;
+          productDueAmount += productLevel.LateAmounts.TotalLateAmount;
+
+          if(productDueAmount > 0)
+            recoveryForChild.ProductRecovery.Add(productLevel);
+        }
+
+        recoveryForChild.LateDueAmount = childDueAmount;
+
+        List<User> parents = await _repo.GetParents(child.Id);
+
+        if (childDueAmount > 0)
+        {
+          //does the parent(s) exists on the list?
+          var parentIds = parents.Select(s => s.Id);
+          var parentExists = parentRecovery.SingleOrDefault(p => parentIds.Contains(p.FatherId) || parentIds.Contains(p.MotherId));
+          if(parentExists != null)
+          {
+            parentExists.LateDueAmount = parentExists.LateDueAmount + childDueAmount;
+            parentExists.Children.Add(recoveryForChild);
+          }
+          else
+          {
+            RecoveryForParentDto recoveryForParent = new RecoveryForParentDto();
+            foreach(User parent in parents)
+            {
+              if(parent.Gender == 0)
+              {
+                recoveryForParent.MotherId = parent.Id;
+                recoveryForParent.MotherFirstName = parent.FirstName.FirstLetterToUpper();
+                recoveryForParent.MotherLastName = parent.LastName.FirstLetterToUpper();
+                recoveryForParent.MotherEmail = parent.Email;
+                recoveryForParent.MotherMobile = parent.PhoneNumber.FormatPhoneNumber();
+                recoveryForParent.MotherGender = parent.Gender;
+              }
+              else
+              {
+                recoveryForParent.FatherId = parent.Id;
+                recoveryForParent.FatherFirstName = parent.FirstName.FirstLetterToUpper();
+                recoveryForParent.FatherLastName = parent.LastName.FirstLetterToUpper();
+                recoveryForParent.FatherEmail = parent.Email;
+                recoveryForParent.FatherMobile = parent.PhoneNumber.FormatPhoneNumber();
+                recoveryForParent.FatherGender = parent.Gender;
+              }
+
+              recoveryForParent.LateDueAmount = childDueAmount;
+              recoveryForParent.Children.Add(recoveryForChild);
+            }
+
+            parentRecovery.Add(recoveryForParent);
+          }
+        }
+      }
+
+      return Ok(parentRecovery);
+    }
+
     [HttpGet("ChildLatePaymentByLevel/{levelid}")]
     public async Task<IActionResult> GetChildLatePaymentByLevel(int levelid)
     {

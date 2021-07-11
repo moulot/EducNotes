@@ -297,6 +297,7 @@ import { DuedateDetailsComponent } from './admin/treso/duedate-details/duedate-d
 import { DuedateDetailsResolver } from './_resolvers/duedate-details-resolver';
 import { ChildLatePaymentsResolver } from './_resolvers/child-latePayments-resolver';
 import { ChildrenRecoveryComponent } from './admin/treso/children-recovery/children-recovery.component';
+import { LevelRecoveryComponent } from './admin/treso/level-recovery/level-recovery.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeFr, 'fr');
@@ -496,7 +497,8 @@ export function tokenGetter() {
       AddServiceComponent,
       ConfigZonesComponent,
       DuedateDetailsComponent,
-      ChildrenRecoveryComponent
+      ChildrenRecoveryComponent,
+      LevelRecoveryComponent
    ],
    imports: [
       FormWizardModule,

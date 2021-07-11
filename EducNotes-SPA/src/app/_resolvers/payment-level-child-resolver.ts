@@ -10,7 +10,7 @@ export class PaymentLevelChildResolver implements Resolve<any> {
   constructor(private orderService: OrderService, private router: Router, private alertify: AlertifyService) {}
 
   resolve(route: ActivatedRouteSnapshot): any {
-    return this.orderService.getChildLatePaymentByLevel(route.params['id']).pipe(
+    return this.orderService.getChildByLevelLatePayments(route.params['id']).pipe(
       catchError(error => {
         this.alertify.error('problème de récupération de données');
         this.router.navigate(['/home']);

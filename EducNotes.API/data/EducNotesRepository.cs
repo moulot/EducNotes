@@ -735,81 +735,6 @@ on courses.ClassId equals classes.Id
       return evalsToReturn;
     }
 
-    // public async Task<bool> AddUserPreInscription(UserForRegisterDto userForRegister, int insertUserId)
-    // {
-    //     var userToCreate = _mapper.Map<User>(userForRegister);
-    //     var code = Guid.NewGuid();
-    //     userToCreate.UserName = code.ToString();
-    //     userToCreate.ValidationCode = code.ToString();
-    //     userToCreate.Validated = false;
-    //     userToCreate.EmailConfirmed = false;
-    //     userToCreate.UserName = code.ToString();
-    //     bool resultStatus = false;
-
-    //     using(var identityContextTransaction = _context.Database.BeginTransaction())
-    //     {
-    //         try
-    //         {
-    //             if(userToCreate.UserTypeId == teacherTypeId)
-    //             {
-    //                 //enregistrement du teacher
-    //                 var result = await _userManager.CreateAsync(userToCreate, password);
-    //                 if(result.Succeeded)
-    //                 {
-    //                     // enregistrement du RoleTeacher
-    //                     var role = await _context.Roles.FirstOrDefaultAsync(a => a.Id == teacherRoleId);
-    //                     var appUser = await _userManager.Users
-    //                         .FirstOrDefaultAsync(u => u.NormalizedUserName == userToCreate.UserName);
-    //                     _userManager.AddToRoleAsync(appUser, role.Name).Wait();
-
-    //                     //enregistrement de des cours du professeur
-    //                     if(userForRegister.CourseIds != null)
-    //                     {
-    //                         foreach(var course in userForRegister.CourseIds)
-    //                         {
-    //                             Add(new TeacherCourse { CourseId = course, TeacherId = userToCreate.Id });
-    //                         }
-    //                     }
-
-    //                     // Enregistrement dans la table Email
-    //                     if(userToCreate.Email != null)
-    //                     {
-    //                         var callbackUrl = _config.GetValue<String>("AppSettings:DefaultEmailValidationLink") + userToCreate.ValidationCode;
-
-    //                         var emailToSend = new Email
-    //                         {
-    //                             InsertUserId = insertUserId,
-    //                             UpdateUserId = userToCreate.Id,
-    //                             StatusFlag = 0,
-    //                             Subject = "Confirmation de compte",
-    //                             ToAddress = userToCreate.Email,
-    //                             Body = $"veuillez confirmez votre code au lien suivant : <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicker ici</a>.",
-    //                             FromAddress = "no-reply@educnotes.com",
-    //                             EmailTypeId = _config.GetValue<int>("AppSettings:confirmationEmailtypeId")
-    //                         };
-    //                         Add(emailToSend);
-    //                     }
-    //                     if(await SaveAll())
-    //                     {
-    //                         // fin de la transaction
-    //                         identityContextTransaction.Commit();
-    //                         resultStatus = true;
-    //                     }
-    //                     else
-    //                         resultStatus = true;
-    //                 }
-    //                 else
-    //                     resultStatus = false;
-    //             }
-    //         }
-    //         catch(System.Exception)
-    //         {
-    //             return resultStatus = false;
-    //         }
-    //     }
-    //     return resultStatus;
-    // }
-
     public async Task<bool> UpdateChildren(ChildrenForEditDto users)
     {
       List<User> usersCached = await _cache.GetUsers();
@@ -2713,7 +2638,8 @@ on courses.ClassId equals classes.Id
             break;
         }
 
-        tokenValues.Add(td);
+        if(td.Value != null)
+          tokenValues.Add(td);
       }
 
       return tokenValues;
@@ -2823,7 +2749,8 @@ on courses.ClassId equals classes.Id
             break;
         }
 
-        tokenValues.Add(td);
+        if(td.Value != null)
+          tokenValues.Add(td);
       }
 
       return tokenValues;
@@ -2876,7 +2803,8 @@ on courses.ClassId equals classes.Id
             break;
         }
 
-        tokenValues.Add(td);
+        if(td.Value != null)
+          tokenValues.Add(td);
       }
 
       return tokenValues;
@@ -2929,18 +2857,92 @@ on courses.ClassId equals classes.Id
             break;
         }
 
-        tokenValues.Add(td);
+        if(td.Value != null)
+          tokenValues.Add(td);
       }
 
       return tokenValues;
     }
 
-    public async Task<List<TokenDto>> GetRecoveryMsgTokenValues(IEnumerable<Token> tokens, RecoveryForParentDto parent)
+    public List<TokenDto> GetRecoverySmsTokenValues(IEnumerable<Token> tokens, RecoveryForParentDto parent)
     {
-      List<PaymentType> paymentTypesCached = await _cache.GetPaymentTypes();
+      var subDomain = GetAppSubDomain();
       List<TokenDto> tokenValues = new List<TokenDto>();
 
-      var subDomain = GetAppSubDomain();
+      //set children registration data
+      string dueAmountsInfos = "";
+      byte num = 1;
+      foreach(var child in parent.Children)
+      {
+        string childFirstName = child.FirstName.FirstLetterToUpper();
+        string childLastName = child.LastName.FirstLetterToUpper();
+        string className = child.ClassName != "" ? child.ClassName : child.LevelName;
+        dueAmountsInfos += num + ". " + childLastName + " " + childFirstName + " " + className + "\n";
+        foreach (var product in child.ProductRecovery)
+        {
+          dueAmountsInfos += product.ProductName + " (" + product.NbDaysLate + "j) : " +
+            product.LateAmounts.TotalLateAmount.ToString("N0") + " F\n";
+        };
+        num++;
+      }
+
+      int parentId = 0;
+      string parentLastName = "";
+      byte parentGender = 0;
+      if(parent.FatherId != 0)
+      {
+        parentId = parent.FatherId;
+        parentLastName = parent.FatherLastName;
+        parentGender = parent.FatherGender;
+      }
+      else
+      {
+        parentId = parent.MotherId;
+        parentLastName = parent.MotherLastName;
+        parentGender = parent.MotherGender;
+      }
+
+      foreach (var token in tokens)
+      {
+        TokenDto td = new TokenDto();
+        td.TokenString = token.TokenString;
+
+        switch (td.TokenString)
+        {
+          case "<N_PARENT>":
+            td.Value = parentLastName.FirstLetterToUpper();
+            break;
+          case "<M_MME>":
+            td.Value = parentGender == 0 ? "Mme" : "M.";
+            break;
+          case "<MONTANT_TOTAL_DU>":
+            td.Value = parent.LateDueAmount.ToString("N0") + " F";
+            break;
+          case "<DETAILS_MONTANTS_DUS>":
+            td.Value = dueAmountsInfos;
+            break;
+          case "<LIEN_MONTANTS_DUS>":
+            string url = "";
+            if (subDomain != "")
+              url = string.Format(baseUrl, subDomain + ".");
+            else
+              url = string.Format(baseUrl, "");
+            td.Value = string.Format("{0}/viewAccountHistory?id={1}", url, parentId);
+            break;
+          default:
+            break;
+        }
+
+        if(td.Value != null)
+          tokenValues.Add(td);
+      }
+
+      return tokenValues;
+    }
+
+    public List<TokenDto> GetRecoveryMsgTokenValues(IEnumerable<Token> tokens, RecoveryForParentDto parent)
+    {
+      List<TokenDto> tokenValues = new List<TokenDto>();
 
       //set children registration data
       string accountInfos = "";
@@ -2949,7 +2951,7 @@ on courses.ClassId equals classes.Id
       {
         string childFirstName = child.FirstName.FirstLetterToUpper();
         string childLastName = child.LastName.FirstLetterToUpper();
-        string className = child.ClassName != "" ? child.ClassName : child.LevelName;
+        string className = child.ClassName != null ? child.ClassName : child.LevelName;
         accountInfos += "<div><br></><div><span style=\"font-size: 1rem;\">" + num + ". <b>" + childLastName + " " + childFirstName +
           ".</b></span><b style=\"font-size: 1rem;\"> classe " + className + "</b><span style=\"font-size: 1rem;\">" + ".</span>" +
           "<span style=\"font-size: 1rem;\">" + ".</span><span style=\"font-color: #ff0000;\"> montant total dû :" + child.LateDueAmount +
@@ -2986,11 +2988,15 @@ on courses.ClassId equals classes.Id
           case "<INFOS_COMPTE_PARENT>":
             td.Value = accountInfos;
             break;
+          case "<MONTANT_TOTAL_DU>":
+            td.Value = parent.LateDueAmount.ToString("N0") + " F";
+            break;
           default:
             break;
         }
 
-        tokenValues.Add(td);
+        if(td.Value != null)
+          tokenValues.Add(td);
       }
 
       return tokenValues;
@@ -3087,7 +3093,8 @@ on courses.ClassId equals classes.Id
             break;
         }
 
-        tokenValues.Add(td);
+        if(td.Value != null)
+          tokenValues.Add(td);
       }
 
       return tokenValues;
@@ -3157,7 +3164,8 @@ on courses.ClassId equals classes.Id
             break;
         }
 
-        tokenValues.Add(td);
+        if(td.Value != null)
+          tokenValues.Add(td);
       }
 
       return tokenValues;
@@ -3199,7 +3207,8 @@ on courses.ClassId equals classes.Id
             break;
         }
 
-        tokenValues.Add(td);
+        if(td.Value != null)
+          tokenValues.Add(td);
       }
 
       return tokenValues;
@@ -3300,7 +3309,8 @@ on courses.ClassId equals classes.Id
             break;
         }
 
-        tokenValues.Add(td);
+        if(td.Value != null)
+          tokenValues.Add(td);
       }
 
       return tokenValues;

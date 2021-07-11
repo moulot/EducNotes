@@ -97,12 +97,9 @@ export class AddRoleComponent implements OnInit {
     const index = this.empsInRole.findIndex(u => u.id === empId);
     const userToMove = this.empsInRole[index];
     this.empsInRole.splice(index, 1);
-    // console.log(this.empsNotInRole);
     this.empsNotInRole = [...this.empsNotInRole, userToMove];
-    // console.log(this.empsNotInRole);
     this.empsNotInRole.sort((a,b) => a.lastName < b.lastName ? -1 : a.lastName > b.lastName ? 1 : 0);
     this.empsNotInRole.sort((a,b) => a.firstName < b.firstName ? -1 : a.firstName > b.firstName ? 1 : 0);
-    // console.log(this.empsNotInRole);
   }
 
   getMenuWithCapabilities() {
@@ -145,6 +142,7 @@ export class AddRoleComponent implements OnInit {
   getAccessFlag(capabilityId) {
     const flagIndex = this.role.capabilities.findIndex(c => c.capabilityId === capabilityId);
     const accessFlag = flagIndex !== -1 ? this.role.capabilities[flagIndex].accessFlag : 0;
+    // console.log('cap:' + capabilityId + '-' + accessFlag);
     return accessFlag;
 }
 
@@ -198,9 +196,9 @@ export class AddRoleComponent implements OnInit {
       this.alertify.success('le rôle est bien enregistré');
       this.router.navigate(['/roles']);
       this.wait = false;
-    }, error => {
+    }, () => {
       this.alertify.error('problème pour enregistrer le rôle');
-      console.log(error);
+      // console.log(error);
       this.wait = false;
     });
   }

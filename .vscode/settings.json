@@ -1,4 +1,7 @@
 {
-  "appService.deploySubpath": "EducNotes.API\\bin\\release\\netcoreapp2.2\\publish",
-  "appService.defaultWebAppToDeploy": "/subscriptions/3bc02956-6df5-4312-9282-85f6afda2535/resourceGroups/educnotes-ressource-group/providers/Microsoft.Web/sites/educnotes"
+  "editor.linkedEditing": true,
+  "workbench.editor.enablePreview": false,
+  "appService.defaultWebAppToDeploy": "/subscriptions/3bc02956-6df5-4312-9282-85f6afda2535/resourceGroups/educnotes-ressource-group/providers/Microsoft.Web/sites/educnotes/slots/test1",
+  "appService.deploySubpath": "EducNotes.API\\bin\\Release1\\netcoreapp2.2\\publish",
+  "angular.enable-strict-mode-prompt": false
 }

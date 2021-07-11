@@ -1,0 +1,167 @@
+<form [formGroup]="recoveryForm" (ngSubmit)="sendRecoveryComm()">
+  <div class="row mb-2">
+    <div class="col-md-12 d-flex">
+      <a appBtnBack>
+        <i class="fad fa-undo-alt fa-2x mr-2" style="--fa-secondary-opacity: 1;
+          --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+      </a>
+      <i class="fad fa-users fa-2x mr-2" style="--fa-secondary-opacity: 1;
+        --fa-primary-color:#f89f20;--fa-secondary-color:#192C47;"></i>
+      <div class="text-17">situation des recouvrements par classe de {{className}}</div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card mb-1">
+        <div class="card-body p-2">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="md-form form-sm my-1">
+                <input mdbInput type="text" id="search" [formControl]="searchControl" class="form-control">
+                <label for="search">rechercher des parents</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body p-2">
+          <div class="row">
+            <div class="col-md-2">
+              <mdb-checkbox class="mr-4" (change)="selectAll($event)">{{selectAllText}}</mdb-checkbox>
+            </div>
+            <div class="col-md-2">
+              <div class="d-md-flex text-15">
+                <mdb-checkbox class="mr-4" formControlName="byEmail">email</mdb-checkbox>
+                <mdb-checkbox formControlName="bySms">sms</mdb-checkbox>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <button type="submit" mdbBtn [disabled]="recoveryForm.hasError('formNOK') || wait" block="true" class="btnBlue" size="sm" mdbWavesEffect>
+                <span *ngIf="wait" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                relancer les retardataires sélectionnés
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 text-15 textDarkRed my-2">sélectionner les parents pour lesquels il faut envoyer une relance de recouvrement</div>
+    <div class="col-md-12 mt-1">
+      <pagination-controls (pageChange)="page = $event" responsive="true"
+        directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
+    </div>
+    <div class="col-md-12 mb-1"formArrayName="selectedParents" *ngFor="let parent of filteredParents | 
+      paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index">
+      <div [formGroupName]="i">
+        <div class="border rounded-lg p-1">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="d-none d-md-block">
+                <div class="d-flex text-14 textDarkBlue">
+                  <div class="my-auto mr-1"><mdb-checkbox formControlName="selected"></mdb-checkbox></div>
+                  <div *ngIf="parent.fatherLastName" class="mr-3">
+                    <b>père</b> : {{parent.fatherLastName}} {{parent.fatherFirstName}}. {{parent.fatherEmail}} / {{parent.fatherMobile}}
+                  </div>
+                  <div *ngIf="parent.motherLastName">
+                    <b>mère</b> : {{parent.motherLastName}} {{parent.motherFirstName}}. {{parent.motherEmail}} / {{parent.motherMobile}}
+                  </div>
+                </div>
+                <div class="text-danger"><b>total à recouvrer : {{parent.lateDueAmount | number:'':'fr-FR'}} F</b></div>
+              </div>
+              <div class="d-md-none text-15 textDarkBlue">
+                <div class="border rounded-lg p-1">
+                  <div class="my-auto mr-1"><mdb-checkbox formControlName="selected">relancer les parents</mdb-checkbox></div>
+                  <hr class="my-1">
+                  <div *ngIf="parent.fatherLastName">
+                  <div><b>père</b></div>
+                  <div style="overflow-x: auto;">{{parent.fatherLastName}} {{parent.fatherFirstName}}</div>
+                  <div style="overflow-x: auto;">{{parent.fatherEmail}}</div>
+                  <div>{{parent.fatherMobile}}</div>
+                  </div>
+                  <div *ngIf="parent.motherLastName">
+                    <div><b>mère</b></div>
+                    <div style="overflow-x: auto;">{{parent.motherLastName}} {{parent.motherFirstName}}</div>
+                    <div style="overflow-x: auto;">{{parent.motherEmail}}</div>
+                    <div>{{parent.motherMobile}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12"><hr class="my-1"></div>
+            <div class="col-md-12">
+              <!-- <div *ngIf="child.lateDueAmount> 0" class="text-14"> -->
+              <div *ngFor="let child of parent.children" class="row">
+                <div class="col-md-3">
+                  <div class="d-flex">
+                    <div class="my-auto mr-2"><img class="rounded-circle" width="45" src="{{child.photoUrl || '../../../../assets/user.png'}}" alt></div>
+                    <div>
+                      <div><a class="text-13" [routerLink]="['/childFile', child.id]">voir dossier</a></div>
+                      <div><b>{{child.lastName}} {{child.firstName}} {{ child.className || child.levelName }}</b></div>
+                      <div class="text-danger">à recouvrer : {{child.lateDueAmount | number:'':'fr-FR'}} F</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="d-none d-md-block">
+                      <div class="row" *ngFor="let prod of child.productRecovery">
+                        <div class="col-md-12"><b>{{prod.productName}}</b></div>
+                        <div class="col-md-2 text-13 text-right">total dû<br><span class="text-danger">{{prod.lateAmounts.totalLateAmount | number:'':'fr-FR'}} F</span></div>
+                        <div class="col-md-2 text-13 text-right">7 jours<br><span class="text-danger">{{prod.lateAmounts.lateAmount7Days | number:'':'fr-FR'}} F</span></div>
+                        <div class="col-md-2 text-13 text-right">15 jours<br><span class="text-danger">{{prod.lateAmounts.lateAmount15Days | number:'':'fr-FR'}} F</span></div>
+                        <div class="col-md-2 text-13 text-right">30 jours<br><span class="text-danger">{{prod.lateAmounts.lateAmount30Days | number:'':'fr-FR'}} F</span></div>
+                        <div class="col-md-2 text-13 text-right">60 jours<br><span class="text-danger">{{prod.lateAmounts.lateAmount60Days | number:'':'fr-FR'}} F</span></div>
+                        <div class="col-md-2 text-13 text-right">60+ jours<br><span class="text-danger">{{prod.lateAmounts.lateAmount60DaysPlus | number:'':'fr-FR'}} F</span></div>
+                      </div>
+                    </div>
+                    <div class="d-md-none">
+                      <div *ngFor="let prod of child.productRecovery">
+                        <div class="row">
+                          <div class="col-12 my-1"><b>{{prod.productName}}</b></div>
+                          <div class="col-4 text-15"><b>total dû</b></div>
+                          <div class="col-1 text-15"><b>:</b></div>
+                          <div class="col-6 text-15 text-danger text-right"><b>{{prod.lateAmounts.totalLateAmount | number:'':'fr-FR'}} F</b></div>
+                        </div>
+                        <div class="row">
+                          <div class="col-4 text-15">7 jours</div>
+                          <div class="col-1 text-15">:</div>
+                          <div class="col-6 text-15 text-danger text-right">{{prod.lateAmounts.lateAmount7Days | number:'':'fr-FR'}} F</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-4 text-15">15 jours</div>
+                          <div class="col-1 text-15">:</div>
+                          <div class="col-6 text-15 text-danger text-right">{{prod.lateAmounts.lateAmount15Days | number:'':'fr-FR'}} F</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-4 text-15">30 jours</div>
+                          <div class="col-1 text-15">:</div>
+                          <div class="col-6 text-15 text-danger text-right">{{prod.lateAmounts.lateAmount30Days | number:'':'fr-FR'}} F</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-4 text-15">60 jours</div>
+                          <div class="col-1 text-15">:</div>
+                          <div class="col-6 text-15 text-danger text-right">{{prod.lateAmounts.lateAmount60Days | number:'':'fr-FR'}} F</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-4 text-15">60+ jours</div>
+                          <div class="col-1 text-15">:</div>
+                          <div class="col-6 text-15 text-danger text-right">{{prod.lateAmounts.lateAmount60DaysPlus | number:'':'fr-FR'}} F</div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+              <!-- </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 mt-1">
+      <pagination-controls (pageChange)="page = $event" responsive="true"
+        directionLinks="true" autoHide="true" previousLabel="" nextLabel=""></pagination-controls>
+    </div>
+  </div>
+</form>

@@ -70,6 +70,10 @@ export class OrderService {
     return this.http.get(this.baseUrl + 'ChildLatePayments');
   }
 
+  getChildByLevelLatePayments(levelid) {
+    return this.http.get(this.baseUrl + 'ChildByLevelLatePayments/' + levelid);
+  }
+
   getChildLatePaymentByLevel(levelid) {
     return this.http.get(this.baseUrl + 'ChildLatePaymentByLevel/' + levelid);
   }

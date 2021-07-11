@@ -803,7 +803,6 @@ namespace EducNotes.API.Controllers
     [HttpGet("{roleId}/RoleWithUsers")]
     public async Task<IActionResult> GetRoleWithUsers(int roleId)
     {
-      // List<Role> rolesCached = await _cache.GetRoles();
       List<UserRole> userRoles = await _context.UserRoles.Include(a => a.User)
                                                          .ThenInclude(i => i.Photos)
                                                          .ToListAsync();
@@ -813,9 +812,9 @@ namespace EducNotes.API.Controllers
       RoleWithUsersDto role = new RoleWithUsersDto();
       role.Id = currentRole.Id;
       role.Name = currentRole.Name;
-      
+
       List<User> users = userRoles.Where(u => u.RoleId == role.Id).Select(s => s.User).ToList();
-      foreach (var user in users)
+      foreach(var user in users)
       {
         UserInRoleDto userInRole = new UserInRoleDto();
         userInRole.LastName = user.LastName;

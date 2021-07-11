@@ -119,22 +119,22 @@
                   <div class="row">
                     <div class="col-md-12 mb-1">
                       <div class="form-check form-check-inline">
-                        <input type="radio" class="form-check-input" id="none10" name="radio10"
+                        <input type="radio" class="form-check-input" id="none0{{i}}" name="radio0{{i}}"
                           [checked]="item.value.capabilities[0].accessFlag === 0 ? true : false"
                           (change)="setMenuItemFlag(i, 0, 0)" value="0" mdbInput>
-                        <label class="form-check-label" for="none10">pas d'accès</label>
+                        <label class="form-check-label" for="none0{{i}}">pas d'accès</label>
                       </div>
                       <div *ngIf="item.value.capabilities[0].accessType == 0 || item.value.capabilities[0].accessType == 1" class="form-check form-check-inline">
-                        <input type="radio" class="form-check-input" id="readonly10" name="radio10"
+                        <input type="radio" class="form-check-input" id="readonly0{{i}}" name="radio0{{i}}"
                           [checked]="item.value.capabilities[0].accessFlag === 1 ? true : false"
                           (change)="setMenuItemFlag(i, 0, 1)" value="1" mdbInput>
-                        <label class="form-check-label" for="readonly10">accès en lecture</label>
+                        <label class="form-check-label" for="readonly0{{i}}">accès en lecture</label>
                       </div>
                       <div *ngIf="item.value.capabilities[0].accessType == 0 || item.value.capabilities[0].accessType == 2" class="form-check form-check-inline">
-                        <input type="radio" class="form-check-input" id="edit10" name="radio10"
+                        <input type="radio" class="form-check-input" id="edit0{{i}}" name="radio0{{i}}"
                           [checked]="item.value.capabilities[0].accessFlag === 2 ? true : false"
                           (change)="setMenuItemFlag(i, 0, 2)"  value="2" mdbInput>
-                        <label class="form-check-label" for="edit10">accès total</label>
+                        <label class="form-check-label" for="edit0{{i}}">accès total</label>
                       </div>
                     </div>
                   </div>
