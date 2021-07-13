@@ -2881,7 +2881,7 @@ on courses.ClassId equals classes.Id
         foreach (var product in child.ProductRecovery)
         {
           dueAmountsInfos += product.ProductName + " (" + product.NbDaysLate + "j) : " +
-            product.LateAmounts.TotalLateAmount.ToString("N0") + " F\n";
+            product.LateAmounts.TotalLateAmount.ToString("N0", frC) + " F\n";
         };
         num++;
       }
@@ -2916,7 +2916,7 @@ on courses.ClassId equals classes.Id
             td.Value = parentGender == 0 ? "Mme" : "M.";
             break;
           case "<MONTANT_TOTAL_DU>":
-            td.Value = parent.LateDueAmount.ToString("N0") + " F";
+            td.Value = parent.LateDueAmount.ToString("N0", frC) + " F";
             break;
           case "<DETAILS_MONTANTS_DUS>":
             td.Value = dueAmountsInfos;
@@ -2952,10 +2952,16 @@ on courses.ClassId equals classes.Id
         string childFirstName = child.FirstName.FirstLetterToUpper();
         string childLastName = child.LastName.FirstLetterToUpper();
         string className = child.ClassName != null ? child.ClassName : child.LevelName;
-        accountInfos += "<div><br></><div><span style=\"font-size: 1rem;\">" + num + ". <b>" + childLastName + " " + childFirstName +
-          ".</b></span><b style=\"font-size: 1rem;\"> classe " + className + "</b><span style=\"font-size: 1rem;\">" + ".</span>" +
-          "<span style=\"font-size: 1rem;\">" + ".</span><span style=\"font-color: #ff0000;\"> montant total dû :" + child.LateDueAmount +
-          "</span></div>";
+        accountInfos += "<div><br></div><div><span style=\"font-size: 1rem;\"><b>" + num + ". " + childLastName + " " + childFirstName +
+          ", " + className + ".</b></span><span style=\"color: #ff0000;\"> montant total dû : " +
+          child.LateDueAmount.ToString("N0", frC) + " F</span></div>";
+        
+        foreach (var product in child.ProductRecovery)
+        {
+          accountInfos += "<div>" +  product.ProductName + " (" + product.NbDaysLate + " jours) : " +
+            product.LateAmounts.TotalLateAmount.ToString("N0", frC) + " F</div>";
+        }
+
         num++;
       }
 
@@ -2985,11 +2991,17 @@ on courses.ClassId equals classes.Id
           case "<M_MME>":
             td.Value = parentGender == 0 ? "Mme" : "M.";
             break;
+          case "<MAX_JOURS_RETARD>":
+            td.Value = "0";
+            break;
+          case "<NB_JOURS_MAX_PAIEMENT>":
+            td.Value = "3";
+            break;
           case "<INFOS_COMPTE_PARENT>":
             td.Value = accountInfos;
             break;
           case "<MONTANT_TOTAL_DU>":
-            td.Value = parent.LateDueAmount.ToString("N0") + " F";
+            td.Value = parent.LateDueAmount.ToString("N0", frC) + " F";
             break;
           default:
             break;
@@ -4909,6 +4921,18 @@ on courses.ClassId equals classes.Id
       }
 
       return dueDateLines;
+    }
+
+    public async Task<List<Periodicity>> GetPeriodicities()
+    {
+      List<Periodicity> periodicities = await _cache.GetPeriodicities();
+      return periodicities;
+    }
+
+    public async Task<List<PayableAt>> GetPayableAts()
+    {
+      List<PayableAt> payableAts= await _cache.GetPayableAts();
+      return payableAts;
     }
 
   }

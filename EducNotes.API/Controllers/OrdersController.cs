@@ -119,7 +119,7 @@ namespace EducNotes.API.Controllers
       tuition.NbPayRejected = payments.Where(p => p.FinOp.Rejected).Count();
       tuition.LinePayments = _mapper.Map<List<PaymentDto>>(payments);
       tuition.AmountPaid = tuition.LinePayments.Where(f => f.FinOpTypeId == finOpTypePayment && f.Cashed).Sum(a => a.Amount);
-      tuition.strAmountPaid = tuition.AmountPaid.ToString("N0") + " F";
+      tuition.strAmountPaid = tuition.AmountPaid.ToString("N0", frC) + " F";
 
       var child = tuition.Lines.Where(c => c.ChildId == id).First();
       tuition.ChildLevelName = child.ClassLevelName;
@@ -131,14 +131,14 @@ namespace EducNotes.API.Controllers
       }
 
       tuition.AmountInvoiced = tuition.Lines.Where(f => f.ChildId == id).Sum(a => a.AmountTTC);
-      tuition.strAmountInvoiced = tuition.AmountInvoiced.ToString("N0") + " F";
+      tuition.strAmountInvoiced = tuition.AmountInvoiced.ToString("N0", frC) + " F";
       tuition.Balance = tuition.AmountInvoiced - tuition.AmountPaid;
       var baba = _context.OrderLineHistories.Sum(s => s.Delta);
-      tuition.strBalance = tuition.Balance.ToString("N0") + " F";
+      tuition.strBalance = tuition.Balance.ToString("N0", frC) + " F";
       tuition.AmountToValidate = tuition.LinePayments
                     .Where(p => p.FinOpTypeId == finOpTypePayment && p.Cashed == false && p.Rejected == false)
                                 .Sum(s => s.Amount);
-      tuition.strAmountToValidate = tuition.AmountToValidate.ToString("N0") + " F";
+      tuition.strAmountToValidate = tuition.AmountToValidate.ToString("N0", frC) + " F";
       var lineDeadline = lineDeadlines
                               .Where(l => l.OrderLine.ChildId == id)
                               .OrderBy(o => o.DueDate)
@@ -160,11 +160,11 @@ namespace EducNotes.API.Controllers
       order.Payments = await _repo.GetOrderPayments(order.Id);
 
       order.AmountPaid = order.Payments.Where(f => f.Cashed).Sum(a => a.Amount);
-      order.strAmountPaid = order.AmountPaid.ToString("N0") + " F";
+      order.strAmountPaid = order.AmountPaid.ToString("N0", frC) + " F";
       order.Balance = order.AmountTTC - order.AmountPaid;
-      order.strBalance = order.Balance.ToString("N0") + " F";
+      order.strBalance = order.Balance.ToString("N0", frC) + " F";
       order.AmountToValidate = order.Payments.Where(p => p.Received == true || p.DepositedToBank == true).Sum(s => s.Amount);
-      order.strAmountToValidate = order.AmountToValidate.ToString("N0") + " F";
+      order.strAmountToValidate = order.AmountToValidate.ToString("N0", frC) + " F";
 
       return Ok(order);
     }
@@ -390,11 +390,11 @@ namespace EducNotes.API.Controllers
             crd.LastName = child.LastName;
             crd.FirstName = child.FirstName;
             crd.NextClass = nextClassLevel.Name;
-            crd.RegistrationFee = child.RegFee.ToString("N0");
-            crd.TuitionAmount = classProduct.Price.ToString("N0");
-            crd.DueAmountPct = (DPPct * 100).ToString("N0") + "%";
-            crd.DueAmount = DownPayment.ToString("N0");
-            crd.TotalDueForChild = (child.RegFee + DownPayment).ToString("N0");
+            crd.RegistrationFee = child.RegFee.ToString("N0", frC);
+            crd.TuitionAmount = classProduct.Price.ToString("N0", frC);
+            crd.DueAmountPct = (DPPct * 100).ToString("N0", frC) + "%";
+            crd.DueAmount = DownPayment.ToString("N0", frC);
+            crd.TotalDueForChild = (child.RegFee + DownPayment).ToString("N0", frC);
             children.Add(crd);
           }
 
@@ -454,7 +454,7 @@ namespace EducNotes.API.Controllers
             fatherEmail.OrderNum = order.OrderNum;
             fatherEmail.Token = fathercode;
             fatherEmail.DueDate = firstDeadline.DueDate.ToString("dd/MM/yyyy", frC);
-            fatherEmail.TotalAmount = newTuition.DueAmount.ToString("N0");
+            fatherEmail.TotalAmount = newTuition.DueAmount.ToString("N0", frC);
             fatherEmail.Children = children;
           }
 
@@ -513,7 +513,7 @@ namespace EducNotes.API.Controllers
             motherEmail.OrderNum = order.OrderNum;
             motherEmail.Token = mothercode;
             motherEmail.DueDate = firstDeadline.DueDate.ToString("dd/MM/yyyy", frC);
-            motherEmail.TotalAmount = newTuition.DueAmount.ToString("N0");
+            motherEmail.TotalAmount = newTuition.DueAmount.ToString("N0", frC);
             motherEmail.Children = children;
           }
 
@@ -596,9 +596,9 @@ namespace EducNotes.API.Controllers
           tuitionLevel.PctTotalOfMax = Math.Round(((decimal)nbTuitions / (decimal)tuitionLevel.NbMaxTuitions) * 100, 1);
           tuitionLevel.PctValidatedOfMax = Math.Round(((decimal)tuitionLevel.NbTuitionsOK / (decimal)tuitionLevel.NbMaxTuitions) * 100, 1);
           tuitionLevel.LevelAmount = orderlines.Where(f => f.ClassLevelId == level.Id).Sum(o => o.AmountTTC);
-          tuitionLevel.strLevelAmount = tuitionLevel.LevelAmount.ToString("N0") + " F";
+          tuitionLevel.strLevelAmount = tuitionLevel.LevelAmount.ToString("N0", frC) + " F";
           tuitionLevel.LevelAmountOK = finOpLines.Where(o => o.OrderLine.ClassLevelId == level.Id && o.OrderLine.Validated).Sum(o => o.Amount);
-          tuitionLevel.strLevelAmountOK = tuitionLevel.LevelAmountOK.ToString("N0") + " F";
+          tuitionLevel.strLevelAmountOK = tuitionLevel.LevelAmountOK.ToString("N0", frC) + " F";
           tuitionList.Add(tuitionLevel);
         }
       }

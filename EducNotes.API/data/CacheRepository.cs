@@ -1703,6 +1703,66 @@ namespace EducNotes.API.data
       return productZones;
     }
 
+    public async Task<List<Periodicity>> GetPeriodicities()
+    {
+      List<Periodicity> periodicities = new List<Periodicity>();
+
+      // Look for cache key.
+      if (!_cache.TryGetValue(subDomain + CacheKeys.Periodicities, out periodicities))
+      {
+        // Key not in cache, so get data.
+        periodicities = await LoadPeriodicities();
+      }
+
+      return periodicities;
+    }
+
+    public async Task<List<Periodicity>> LoadPeriodicities()
+    {
+      List<Periodicity> periodicities = await _context.Periodicities.OrderBy(p => p.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.Periodicities);
+      _cache.Set(subDomain + CacheKeys.Periodicities, periodicities, cacheEntryOptions);
+
+      return periodicities;
+    }
+
+    public async Task<List<PayableAt>> GetPayableAts()
+    {
+      List<PayableAt> payableAts = new List<PayableAt>();
+
+      // Look for cache key.
+      if (!_cache.TryGetValue(subDomain + CacheKeys.PayableAts, out payableAts))
+      {
+        // Key not in cache, so get data.
+        payableAts = await LoadPayableAts();
+      }
+
+      return payableAts;
+    }
+
+    public async Task<List<PayableAt>> LoadPayableAts()
+    {
+      List<PayableAt> payableAts = await _context.PayableAts.OrderBy(p => p.Name).ToListAsync();
+
+      // Set cache options.
+      var cacheEntryOptions = new MemoryCacheEntryOptions()
+        // Keep in cache for this time, reset time if accessed.
+        .SetSlidingExpiration(TimeSpan.FromDays(7));
+
+      // Save data in cache.
+      _cache.Remove(subDomain + CacheKeys.PayableAts);
+      _cache.Set(subDomain + CacheKeys.PayableAts, payableAts, cacheEntryOptions);
+
+      return payableAts;
+    }
+
   }
 
 }

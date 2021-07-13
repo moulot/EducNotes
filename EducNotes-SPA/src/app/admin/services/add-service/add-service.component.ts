@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { id } from '@swimlane/ngx-datatable/release/utils';
 import { Utils } from 'src/app/shared/utils';
 import { AdminService } from 'src/app/_services/admin.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
@@ -27,7 +26,12 @@ export class AddServiceComponent implements OnInit {
   showZones = false;
   showUniquePrice = false;
   showDueDates = false;
+  showPeriodicities = false;
   zones: any;
+  periodicities: any;
+  payableAts: any;
+  periodicityOptions = [];
+  payableAtOptions = [];
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private productService: ProductService,
     private route: ActivatedRoute, private classService: ClassService, private adminService: AdminService,
@@ -54,6 +58,9 @@ export class AddServiceComponent implements OnInit {
           this.showDueDates = false;
           this.showUniquePrice = false;
         }
+        if (this.product.isPeriodic) {
+          this.showPeriodicities = true;
+        }
       } else {
         this.initValues();
       }
@@ -67,6 +74,7 @@ export class AddServiceComponent implements OnInit {
     this.getProductTypes();
     this.getClassLevels();
     this.getZonePrices();
+    this.getProductData();
   }
 
   createServiceForm() {
@@ -75,6 +83,8 @@ export class AddServiceComponent implements OnInit {
     this.serviceForm = this.fb.group({
       name: [this.product.name, Validators.required],
       typeId: [this.product.productTypeId, Validators.required],
+      periodicityId: [this.product.periodicityId],
+      isPeriodic: [this.product.isPeriodic],
       price: [this.product.price],
       isPaidCash: [paidCash, Validators.required],
       priceBy: [priceBy],
@@ -92,7 +102,6 @@ export class AddServiceComponent implements OnInit {
     const prodPrice = g.get('price').value;
     const priceBy = g.get('priceBy').value;
     let formNOK = false;
-    console.log('----------------------------------------------------------');
 
     // check classlevel product fees
     let feesNOK = false;
@@ -160,11 +169,19 @@ export class AddServiceComponent implements OnInit {
     if (duedates.length > 1 && totalPct !== 100) {
       pctNOK = true;
       formNOK = true;
-      console.log('totalPct formNOK: ' + formNOK + '-' + pctNOK);
+    }
+
+    const isPeriodic = g.get('isPeriodic').value;
+    const periodicityId = g.get('periodicityId').value;
+    let periodicityNOK = false;
+    if (isPeriodic === true && !periodicityId)
+    {
+      periodicityNOK = true;
+      formNOK = true;
     }
 
     return {'formNOK': formNOK, 'feesNOK': feesNOK, 'feeNOK': feeNOK, 'pctNOK': pctNOK,
-            'datesNOK': datesNOK, 'labelsNOK': labelsNOK, 'zonesNOK': zonesNOK};
+            'datesNOK': datesNOK, 'labelsNOK': labelsNOK, 'zonesNOK': zonesNOK, 'periodicityNOK': periodicityNOK};
   }
 
   addDueDateItem(id, prodid, duedate, deadlinename, pct): void {
@@ -236,13 +253,28 @@ export class AddServiceComponent implements OnInit {
     };
   }
 
+  togglePeriodic(value) {
+    if (value.checked) {
+      this.showPeriodicities = true;
+    } else {
+      this.showPeriodicities = false;
+      this.serviceForm.get('periodicityId').setValue('');
+    }
+  }
+
   togglePaidCash(value) {
     if (value === 1) {
       this.showDueDates = false;
       this.removeAllDueDates();
     } else {
       this.showDueDates = true;
-      this.addDueDate();
+      const dueDates = this.serviceForm.get('duedates') as FormArray;
+      if(dueDates.length === 0) {
+        this.addDueDate();
+      }
+      this.serviceForm.get('isPeriodic').setValue(false);
+      this.serviceForm.get('periodicityId').setValue('');
+      this.showPeriodicities = false;
     }
   }
 
@@ -297,6 +329,25 @@ export class AddServiceComponent implements OnInit {
       for (let i = 0; i < this.zones.length; i++) {
         const elt = this.zones[i];
         this.addZonePriceItem(elt.zoneId, elt.zoneName, elt.price);
+      }
+    }, () => {
+      this.alertify.error('problème pour récupérer les données');
+    });
+  }
+
+  getProductData() {
+    this.productService.getProductData().subscribe((data: any) => {
+      this.periodicities = data.periodicities;
+      for (let i = 0; i < this.periodicities.length; i++) {
+        const elt = this.periodicities[i];
+        const periodicity = {value: elt.id, label: elt.name};
+        this.periodicityOptions = [...this.periodicityOptions, periodicity];
+      }
+      this.payableAts = data.payableAts;
+      for (let i = 0; i < this.payableAts.length; i++) {
+        const elt = this.payableAts[i];
+        const payableAt = {value: elt.id, label: elt.name};
+        this.payableAtOptions = [...this.payableAtOptions, payableAt];
       }
     }, () => {
       this.alertify.error('problème pour récupérer les données');
@@ -368,6 +419,8 @@ export class AddServiceComponent implements OnInit {
     service.name = this.serviceForm.value.name;
     service.productTypeId = this.serviceForm.value.typeId;
     service.isPaidCash = this.serviceForm.value.isPaidCash === 1 ? true : false;
+    service.periodicityId = this.serviceForm.value.isPeriodic ? this.serviceForm.value.periodicityId : null;
+    service.isPeriodic = this.serviceForm.value.isPeriodic === true ? true : false;
     service.isByLevel = this.serviceForm.value.priceBy === 1 ? true : false;
     service.isByZone = this.serviceForm.value.priceBy === 2 ? true : false;
     service.levelPrices = levelPrices;

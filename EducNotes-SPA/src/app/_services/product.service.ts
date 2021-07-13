@@ -34,4 +34,16 @@ export class ProductService {
     return this.http.get(this.baseUrl + 'ZonePrices/' + productId);
   }
 
+  getPeriodicities() {
+    return this.http.get(this.baseUrl + 'Periodicities');
+  }
+
+  getPayableAts() {
+    return this.http.get(this.baseUrl + 'PayableAts');
+  }
+
+  getProductData() {
+    return this.http.get(this.baseUrl + 'ProductData');
+  }
+
 }

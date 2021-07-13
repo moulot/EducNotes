@@ -150,5 +150,7 @@ namespace EducNotes.API.Data
     Task<decimal> GetPrevChildProductPaid(DateTime currentDueDate, int childId, int productId);
     List<TokenDto> GetRecoveryMsgTokenValues(IEnumerable<Token> tokens, RecoveryForParentDto parent); 
     List<TokenDto> GetRecoverySmsTokenValues(IEnumerable<Token> tokens, RecoveryForParentDto parent);
+    Task<List<Periodicity>> GetPeriodicities();
+    Task<List<PayableAt>> GetPayableAts();
   }
 }

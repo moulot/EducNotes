@@ -22,7 +22,9 @@ namespace EducNotes.API.Dtos
     public Boolean IsByLevel { get; set; }
     public Boolean IsByZone { get; set; }
     public Boolean IsPeriodic { get; set; }
+    public int PeriodicityId { get; set; }
     public string PeriodicityName { get; set; }
+    public byte PeriodicityNbDays { get; set; }
     public int PayableAtId { get; set; }
     public string PayableAtName { get; set; }
     public int PayableAtDayCount { get; set; }

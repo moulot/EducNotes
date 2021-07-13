@@ -833,7 +833,7 @@ namespace EducNotes.API.Controllers
           {
             Email email = new Email();
             email.EmailTypeId = emailRecoveryTypeId;
-            email.ToAddress = parent.FatherEmail;
+            email.ToAddress = parent.MotherEmail;
             email.FromAddress = "no-reply@educnotes.com";
             email.Subject = emailTemplate.Subject;
             List<TokenDto> tags = _repo.GetRecoveryMsgTokenValues(tokens, parent);
@@ -842,7 +842,7 @@ namespace EducNotes.API.Controllers
             email.InsertDate = DateTime.Now;
             email.UpdateUserId = loggedUserId;
             email.UpdateDate = DateTime.Now;
-            email.ToUserId = parent.FatherId;
+            email.ToUserId = parent.MotherId;
             _repo.Add(email);
           }
         }

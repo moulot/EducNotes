@@ -113,5 +113,9 @@ namespace EducNotes.API.data
     Task<List<LocationZone>> LoadLocationZones();
     Task<List<ProductZone>> GetProductZones();
     Task<List<ProductZone>> LoadProductZones();
+    Task<List<Periodicity>> GetPeriodicities();
+    Task<List<Periodicity>> LoadPeriodicities();
+    Task<List<PayableAt>> GetPayableAts();
+    Task<List<PayableAt>> LoadPayableAts();
   }
 }

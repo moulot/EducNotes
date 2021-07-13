@@ -1064,17 +1064,30 @@ namespace EducNotes.API.Controllers
       {
         try
         {
+          // delete previous by classlevel prices
+          List<ClassLevelProduct> prevLevelPrices = classlevelProducts.Where(c => c.ProductId == serviceDto.Id).ToList();
+          _repo.DeleteAll(prevLevelPrices);
+          // delete previous by zone prices
+          List<ProductZone> prevZonePrices = productZones.Where(z => z.ProductId == serviceDto.Id).ToList();
+          _repo.DeleteAll(prevZonePrices);
+          //delete previous dueDates
+          List<ProductDeadLine> prevDeadlines = productDeadLines.Where(p => p.ProductId == serviceDto.Id).ToList();
+          _repo.DeleteAll(prevDeadlines);
+
           int serviceId = serviceDto.Id;
           Product service = products.Single(p => p.Id == serviceId);
           service.Name = serviceDto.Name;
           service.ProductTypeId = serviceDto.ProductTypeId;
 
-          // delete previous by classlevel prices
-          List<ClassLevelProduct> prevLevelPrices = classlevelProducts.Where(c => c.ProductId == serviceId).ToList();
-          _repo.DeleteAll(prevLevelPrices);
-          // delete previous by zone prices
-          List<ProductZone> prevZonePrices = productZones.Where(z => z.ProductId == serviceId).ToList();
-          _repo.DeleteAll(prevZonePrices);
+          if(serviceDto.IsPeriodic) {
+            service.IsPeriodic = true;
+            service.PeriodicityId = serviceDto.PeriodicityId;
+          }
+          else
+          {
+            service.IsPeriodic = false;
+            service.PeriodicityId = null;
+          }
 
           if(serviceDto.IsByLevel)
           {
@@ -1096,10 +1109,6 @@ namespace EducNotes.API.Controllers
             service.IsByZone = false;
             service.Price = serviceDto.Price;
           }
-
-          //delete previous dueDates
-          List<ProductDeadLine> prevDeadlines = productDeadLines.Where(p => p.ProductId == serviceId).ToList();
-          _repo.DeleteAll(prevDeadlines);
 
           if(serviceDto.IsPaidCash)
           {
@@ -1126,6 +1135,7 @@ namespace EducNotes.API.Controllers
           }
 
           _repo.Update(service);
+
           await _repo.SaveAll();
           identityContextTransaction.Commit();
           await _cache.LoadProducts();

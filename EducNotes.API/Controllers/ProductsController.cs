@@ -111,72 +111,31 @@ namespace EducNotes.API.Controllers
       return Ok(res);
     }
 
-    // [HttpGet("GetServices")]
-    // public async Task<IActionResult> GetServices()
-    // {
-    //   // var products = await _context.Products.OrderBy (p => p.Name).ToListAsync ();
-    //   // return Ok(products);
-    //   int schoolServiceTypeId = _config.GetValue<int>("AppSettings:schoolServiceTypeId");
-    //   var prods = await _context.Products.Include(a => a.Periodicity)
-    //                                      .Include(a => a.PayableAt)
-    //                                      .Where(p => p.ProductTypeId == schoolServiceTypeId)
-    //                                      .OrderBy(a => a.Name)
-    //                                      .ToListAsync();
-
-    //   var produits = new List<SchoolServicesDto>();
-    //   foreach(var prod in prods)
-    //   {
-    //     var produit = new SchoolServicesDto
-    //     {
-    //       id = prod.Id,
-    //       Name = prod.Name,
-    //       Comment = prod.Comment,
-    //       Price = prod.Price,
-    //       IsByLevel = prod.IsByLevel,
-    //       IsPeriodic = prod.IsPeriodic,
-    //       Periodicity = prod.Periodicity,
-    //       PayableAt = prod.PayableAt
-    //     };
-
-    //     if (!prod.IsPeriodic)
-    //     {
-    //       produit.ProductDeadLines = await _context.ProductDeadLines.Where (p => p.ProductId == prod.Id)
-    //                                                                 .ToListAsync ();
-    //     }
-
-    //     if (prod.IsByLevel)
-    //     {
-    //       produit.ClassLevelProducts = await _context.ClassLevelProducts.Include(d => d.ClassLevel)
-    //                                                                     .Where (p => p.ProductId == prod.Id)
-    //                                                                     .ToListAsync ();
-    //     }
-
-    //     produits.Add(produit);
-    //   }
-
-    //   return Ok(produits);
-    // }
-
-    [HttpGet("GetPeriodicities")]
+    [HttpGet("Periodicities")]
     public async Task<IActionResult> GetPeriodicicities()
     {
-      var periodicities = await _context.Periodicities.OrderBy(p => p.Name).ToListAsync();
+      List<Periodicity> periodicities = await _repo.GetPeriodicities();
       return Ok(periodicities);
     }
 
-    [HttpGet("GetPayableAts")]
+    [HttpGet("PayableAts")]
     public async Task<IActionResult> GetPayableAts()
     {
-      var ats = await _context.PayableAts.OrderBy (p => p.Name).ToListAsync();
-      return Ok(ats);
+      var payableAts = await _repo.GetPayableAts();
+      return Ok(payableAts);
     }
 
-    // [HttpGet("GetProduct/{productId}")]
-    // public async Task<IActionResult> GetProduct(int productId)
-    // {
-    //   var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
-    //   return Ok(product);
-    // }
+    [HttpGet("ProductData")]
+    public async Task<IActionResult> GetProductData()
+    {
+      List<Periodicity> periodicities = await _repo.GetPeriodicities();
+      List<PayableAt> payableAts = await _repo.GetPayableAts();
+
+      return Ok(new {
+        periodicities,
+        payableAts
+      });
+    }
 
     [HttpGet("GetProducts/{productTypeId}")]
     public async Task<IActionResult> GetProductsByTypeId(int productTypeId)

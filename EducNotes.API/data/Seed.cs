@@ -402,8 +402,8 @@ namespace EducNotes.API.Data
             context.AddRange(eventTypes);
 
             var periodicities = new List<Periodicity> {
-              new Periodicity {Name = "mensuel"},
-              new Periodicity {Name = "trimestriel"}
+              new Periodicity {Name = "mensuel", NbDays = 30},
+              new Periodicity {Name = "trimestriel", NbDays = 90}
             };
             context.AddRange(periodicities);
 

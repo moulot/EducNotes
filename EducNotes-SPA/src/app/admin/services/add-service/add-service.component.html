@@ -95,11 +95,27 @@
                 <div class="text-15 textDarkBlue"><b>échéances</b></div>
                 <hr class="my-1">
                 <div class="row">
-                  <div class="col-md-2 text-15 my-auto">payé cash</div>
-                  <div class="col-md-2 mb-0">
-                    <mdb-select (ngModelChange)="togglePaidCash($event)" [options]="trueFalseOptions" formControlName="isPaidCash" placeholder=""></mdb-select>
-                    <div *ngIf="serviceForm.get('isPaidCash').errors && serviceForm.get('isPaidCash').touched"
-                      class="text-small text-danger">choisir le paiement svp</div>
+                  <div class="col-md-3">
+                    <div class="row">
+                      <div class="col-md-5 text-15 mt-3">payé cash</div>
+                      <div class="col-md-5 mb-0">
+                        <mdb-select (ngModelChange)="togglePaidCash($event)" [options]="trueFalseOptions" formControlName="isPaidCash" placeholder=""></mdb-select>
+                        <div *ngIf="serviceForm.get('isPaidCash').errors && serviceForm.get('isPaidCash').touched"
+                          class="text-small text-danger">choisir le paiement svp</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="row">
+                      <div *ngIf="!showDueDates" class="col-md-6 mt-3">
+                        <mdb-checkbox (change)="togglePeriodic($event)" formControlName="isPeriodic">paiment périodique</mdb-checkbox>
+                      </div>
+                      <div class="col-md-6" *ngIf="showPeriodicities">
+                        <mdb-select [options]="periodicityOptions" formControlName="periodicityId" placeholder="périodicité"></mdb-select>
+                        <div *ngIf="serviceForm.get('periodicityId').errors && serviceForm.get('periodicityId').touched"
+                          class="text-small text-danger">choisir la périodicité svp</div>
+                      </div>  
+                    </div>
                   </div>
                 </div>
                 <div *ngIf="showDueDates">
@@ -159,6 +175,7 @@
             <div *ngIf="showDueDates && serviceForm.hasError('pctNOK')" class="text-15">les pourcentages des échéances sont incohérents.</div>
             <div *ngIf="showDueDates && serviceForm.hasError('datesNOK')">une ou plusieurs dates des échances sont incorrectes.</div>
             <div *ngIf="showDueDates && serviceForm.hasError('labelsNOK')">un ou plusieurs libellés des échances sont incorrects.</div>
+            <div *ngIf="serviceForm.hasError('periodicityNOK')">le paiement périodique est coché. sélectionner la périodicité svp</div>
           </div>  
           <div class="row">
             <div class="col-md-8"></div>
