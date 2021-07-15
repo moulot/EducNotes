@@ -12,6 +12,7 @@ import { TuitionData } from 'src/app/_models/tuitionData';
 import { TuitionChildData } from 'src/app/_models/tuitionChildData';
 import { Router } from '@angular/router';
 import { PaymentService } from 'src/app/_services/payment.service';
+import { ProductService } from 'src/app/_services/product.service';
 
 @Component({
   selector: 'app-new-tuition',
@@ -69,10 +70,15 @@ export class NewTuitionComponent implements OnInit {
   invoiceid: any;
   wait = false;
   showChildPayments = false;
+  services: any;
+  nationalityOptions = [];
+  cityOptions = [];
+  districtOptions = [];
+  jobOptions = [];
 
   constructor(private fb: FormBuilder, private alertify: AlertifyService, private router: Router,
     private authService: AuthService, private classService: ClassService, private orderService: OrderService,
-    private paymentService: PaymentService) { }
+    private paymentService: PaymentService, private productService: ProductService) { }
 
   ngOnInit() {
     this.createTuitionForm();
@@ -81,10 +87,10 @@ export class NewTuitionComponent implements OnInit {
     this.regFee = Number(this.settings.find(s => s.name === 'RegFee').value);
     this.regDeadline = this.settings.find(s => s.name === 'RegistrationDeadLine').value;
     this.daysToValidateReg = this.settings.find(s => s.name === 'DaysToValidateReg').value;
-    this.addChildItem('', '', null, '', null);
     this.getClassLevels();
     this.getTuitionData();
     this.getPaymentData();
+    this.getServices();
 
   }
 
@@ -128,16 +134,39 @@ export class NewTuitionComponent implements OnInit {
     });
   }
 
+  getServices() {
+    this.productService.getServices().subscribe(data => {
+      this.services = data;
+      this.addChild();
+    }, () => {
+      this.alertify.error('problème pour récupérer les données');
+    });
+  }
+
   createTuitionForm() {
     this.tuitionForm = this.fb.group({
       fLastName: [''],
       fFirstName: [''],
       fEmail: ['', Validators.email],
       fCell: [''],
+      fDateOfBirth: [''],
+      fBirthCityId: [],
+      fNationalityId: [],
+      fJobId: [],
+      fDistrictId: [],
+      fCityId: [],
+      fPostalBox: [''],
       mLastName: [''],
       mFirstName: [''],
       mEmail: [''],
       mCell: [''],
+      mDateOfBirth: [''],
+      mBirthCityId: [],
+      mNationalityId: [],
+      mJobId: [],
+      mDistrictId: [],
+      mCityId: [],
+      mPostalBox: [''],
       children: this.fb.array([])
     }, {validator: this.formValidator});
   }
@@ -207,7 +236,11 @@ export class NewTuitionComponent implements OnInit {
       fname: [fname, Validators.required],
       classlevelId: [classlevelId, Validators.required],
       dob: [dob, Validators.required],
-      sex: [sex, Validators.required]
+      sex: [sex, Validators.required],
+      birthCityId: [],
+      birthCountryId: [],
+      scholarship: [false],
+      services: this.addServiceItems(this.services)
     });
   }
 
@@ -224,6 +257,30 @@ export class NewTuitionComponent implements OnInit {
 
   addChild() {
     this.addChildItem('', '', null, '', null);
+  }
+
+  addServiceItems(services) {
+    const arr = new FormArray([]);
+    services.forEach(x => {
+      arr.push(this.fb.group({
+        serviceId: [x.serviceId],
+        name: [x.name],
+        selected: false
+      }));
+    });
+    return arr;
+  }
+
+  addServiceItem(name, selected): void {
+    const children = this.tuitionForm.get('children') as FormArray;
+    children.push(this.createServiceItem(name, selected));
+  }
+
+  createServiceItem(name, selected): FormGroup {
+    return this.fb.group({
+      name: name,
+      selected: selected
+    });
   }
 
   createPaymentForm() {

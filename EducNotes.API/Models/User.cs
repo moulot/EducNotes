@@ -68,6 +68,7 @@ namespace EducNotes.API.Models
     public Nationality Nationality { get; set; }
     public int? JobId { get; set; }
     public Job Job { get; set; }
+    public string PostalBox { get; set; }
     public ICollection<Photo> Photos { get; set; }
     public ICollection<Like> Likers { get; set; }
     public ICollection<Like> Likees { get; set; }

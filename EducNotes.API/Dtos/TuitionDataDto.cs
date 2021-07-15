@@ -19,5 +19,7 @@ public string FLastName { get; set; }
     public decimal DueAmount { get; set; }
     public DateTime Deadline { get; set; }
     public DateTime Validity { get; set; }
-    public List<TuitionChildDataDto> Children { get; set; }  }
+    public List<TuitionChildDataDto> Children { get; set; }
+    public List<int> ServiceIds { get; set; }
+
 }

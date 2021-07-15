@@ -1156,7 +1156,7 @@ namespace EducNotes.API.Controllers
     [HttpGet("Zones")]
     public async Task<IActionResult> GetZones()
     {
-      List<Zone> zonesCached = await _cache.GetZones();
+      List<Zone> zonesCached = await _context.Zones.OrderBy(o => o.Name).ToListAsync();
 
       List<ZoneDto> zones = new List<ZoneDto>();
       foreach (Zone zone in zonesCached)
@@ -1174,7 +1174,7 @@ namespace EducNotes.API.Controllers
     [HttpGet("ZonesWithLocations")]
     public async Task<IActionResult> GetZonesWithLocations()
     {
-      List<Zone> zonesCached = await _cache.GetZones();
+      List<Zone> zonesCached = await _context.Zones.OrderBy(o => o.Name).ToListAsync();
       List<LocationZone> locationZones = await _cache.GetLocationZones();
 
       List<ZoneDto> zones = new List<ZoneDto>();
@@ -1226,9 +1226,9 @@ namespace EducNotes.API.Controllers
     [HttpPost("SaveZones")]
     public async Task<IActionResult> SaveZone(List<ZoneDto> zonesDto)
     {
-      List<Zone> zones = await _cache.GetZones();
+      List<Zone> zones = await _context.Zones.OrderBy(o => o.Name).ToListAsync();
       List<District> districts = await _cache.GetDistricts();
-      List<LocationZone> locations = await _cache.GetLocationZones();
+      List<LocationZone> locations = await _context.LocationZones.ToListAsync();//.GetLocationZones();
 
       using(var identityContextTransaction = _context.Database.BeginTransaction())
       {

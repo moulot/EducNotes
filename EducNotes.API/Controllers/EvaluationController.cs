@@ -247,7 +247,7 @@ namespace EducNotes.API.Controllers
               {
                 pad.activated = false;
               }
-              if(currPeriod.Id == period.Id)
+              if(currPeriod != null && currPeriod.Id == period.Id)
                 pad.Active = true;
               else
                 pad.Active = false;
@@ -290,7 +290,7 @@ namespace EducNotes.API.Controllers
               {
                 pad.activated = false;
               }
-              if(currPeriod.Id == period.Id)
+              if(currPeriod != null && currPeriod.Id == period.Id)
                 pad.Active = true;
               else
                 pad.Active = false;

@@ -134,6 +134,7 @@ export class ConfigZonesComponent implements OnInit {
   }
 
   getZones() {
+    this.wait = true;
     this.adminService.getZonesWithLocations().subscribe((data: any) => {
       this.zones = data.zones;
       this.districts = data.districts;
@@ -143,18 +144,23 @@ export class ConfigZonesComponent implements OnInit {
         this.districtOptions = [...this.districtOptions, district];
       }
       this.addZoneItems();
+      this.wait = false;
     }, () => {
       this.alertify.error('problème pour récupérer les données');
+      this.wait = false;
     });
   }
 
   reloadZones() {
+    this.wait = true;
     this.removeAllZones();
-    this.adminService.getZones().subscribe((data: any) => {
+    this.adminService.getZonesWithLocations().subscribe((data: any) => {
       this.zones = data.zones;
       this.addZoneItems();
+      this.wait = false;
     }, () => {
       this.alertify.error('problème pour récupérer les données');
+      this.wait = false;
     });
   }
 

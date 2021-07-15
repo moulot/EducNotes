@@ -1756,7 +1756,7 @@ on courses.ClassId equals classes.Id
           ped.PeriodId = period.Id;
           ped.PeriodName = period.Name;
           ped.PeriodAbbrev = period.Abbrev;
-          if (currPeriod.Id == period.Id)
+          if (currPeriod != null && currPeriod.Id == period.Id)
             ped.Active = true;
           else
             ped.Active = false;
