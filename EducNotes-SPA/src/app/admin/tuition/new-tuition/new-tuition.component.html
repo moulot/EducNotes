@@ -266,12 +266,22 @@
                             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
                         </a>
                       </div>
+                      <div class="col-md-2">
+                        <div class="md-form my-0">
+                          <mdb-select [options]="nationalityOptions" formControlName="nationalityId" placeholder="nationalité"></mdb-select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="md-form my-0">
+                          <mdb-select [options]="cityOptions" formControlName="birthCityId" placeholder="ville de naissance"></mdb-select>
+                        </div>
+                      </div>
                       <div class="col-12"><hr class="my-1"></div>
                       <div class="col-12">
                         <div class="row">
                           <div class="col-md-2 my-1" formArrayName="services" *ngFor="let service of child.get('services')['controls']; let j = index;">
                             <div [formGroupName]="j">
-                              <mdb-checkbox formControlName="serviceId">{{service.value.name}}</mdb-checkbox>
+                              <mdb-checkbox formControlName="selected">{{service.value.name}}</mdb-checkbox>
                             </div>
                           </div>
                         </div>

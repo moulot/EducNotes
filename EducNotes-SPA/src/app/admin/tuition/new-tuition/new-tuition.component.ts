@@ -221,24 +221,24 @@ export class NewTuitionComponent implements OnInit {
     return null;
   }
 
-  addChildItem(lname, fname, classlevelId, dob, sex): void {
+  addChildItem(lname, fname, classlevelId, dob, sex, nationalityId, birthCityId): void {
     const children = this.tuitionForm.get('children') as FormArray;
-    children.push(this.createChildItem(lname, fname, classlevelId, dob, sex));
+    children.push(this.createChildItem(lname, fname, classlevelId, dob, sex, nationalityId, birthCityId));
     this.nbChildren++;
     this.classnames = [...this.classnames, ''];
     this.tuitionFee = [...this.tuitionFee, 0];
     this.downPayment = [...this.downPayment, 0];
   }
 
-  createChildItem(lname, fname, classlevelId, dob, sex): FormGroup {
+  createChildItem(lname, fname, classlevelId, dob, sex, nationalityId, birthCityId): FormGroup {
     return this.fb.group({
       lname: [lname, Validators.required],
       fname: [fname, Validators.required],
       classlevelId: [classlevelId, Validators.required],
       dob: [dob, Validators.required],
       sex: [sex, Validators.required],
-      birthCityId: [],
-      birthCountryId: [],
+      birthCityId: [birthCityId],
+      nationalityId: [nationalityId],
       scholarship: [false],
       services: this.addServiceItems(this.services)
     });
@@ -256,14 +256,14 @@ export class NewTuitionComponent implements OnInit {
   }
 
   addChild() {
-    this.addChildItem('', '', null, '', null);
+    this.addChildItem('', '', null, '', null, null, null);
   }
 
   addServiceItems(services) {
     const arr = new FormArray([]);
     services.forEach(x => {
       arr.push(this.fb.group({
-        serviceId: [x.serviceId],
+        serviceId: [x.id],
         name: [x.name],
         selected: false
       }));
@@ -321,7 +321,6 @@ export class NewTuitionComponent implements OnInit {
     }
 
     const dueAmount = Number(g.get('amount').value);
-    // console.log(dueAmount + '-' + totalpay);
     let dueamnterror = false;
     if (dueAmount !== totalpay) {
       dueamnterror = true;
@@ -549,6 +548,13 @@ export class NewTuitionComponent implements OnInit {
       child.tuitionFee = this.tuitionFee[i];
       child.regFee = this.regFee;
       child.downPayment = this.downPayment[i];
+      child.serviceIds = [];
+      for (let j = 0; j < elt.services.length; j++) {
+        const sce = elt.services[j];
+        if(sce.selected === true) {
+          child.serviceIds = [...child.serviceIds, sce.serviceId];
+        }
+      }
       this.tuitionData.children = [...this.tuitionData.children, child];
     }
   }

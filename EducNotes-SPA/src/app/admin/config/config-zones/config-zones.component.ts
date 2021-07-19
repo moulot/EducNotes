@@ -65,20 +65,22 @@ export class ConfigZonesComponent implements OnInit {
       zones.push(this.fb.group({
         id: x.id,
         name: x.name,
+        used: x.used,
         locations: this.addLocationItems(x.locations)
       }));
     });
   }
 
-  addZoneItem(id, name): void {
+  addZoneItem(id, name, used): void {
     const zones = this.zonesForm.get('zones') as FormArray;
-    zones.push(this.createZoneItem(id, name));
+    zones.push(this.createZoneItem(id, name, used));
   }
 
-  createZoneItem(id, name): FormGroup {
+  createZoneItem(id, name, used): FormGroup {
     return this.fb.group({
       id: [id],
       name: [name, Validators.required],
+      used: [used, Validators.required],
       locations: this.addLocationItems([{districtId: 0}])
     });
   }

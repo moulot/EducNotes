@@ -14,10 +14,10 @@
       <div class="card">
         <div class="card-body">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="border rounded-lg p-2 mb-1">
                 <div class="row">
-                  <div class="col-md-3 text-15 textDarkBlue my-auto"><b>nom</b></div>
+                  <div class="col-md-2 text-15 textDarkBlue my-auto"><b>nom</b></div>
                   <div class="col-md-6">
                     <div class="md-form mt-1 mb-0">
                       <input mdbInput type="text" id="name" class="form-control" formControlName="name" mdbValidate>
@@ -30,10 +30,22 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="border rounded-lg p-2 mb-1">
                 <div class="row">
-                  <div class="col-md-4 text-15 textDarkBlue my-auto"><b>type service</b></div>
+                  <div class="col-md-6 text-15 textDarkBlue my-auto"><b>début du service</b></div>
+                  <div class="col-md-6 mb-2">
+                    <mdb-select [options]="typeOptions" formControlName="typeId" placeholder="type de classe"></mdb-select>
+                    <div *ngIf="serviceForm.get('typeId').errors && serviceForm.get('typeId').touched"
+                      class="text-small text-danger">saisir le type du service svp</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="border rounded-lg p-2 mb-1">
+                <div class="row">
+                  <div class="col-md-4 text-15 textDarkBlue my-auto"><b>relance à </b></div>
                   <div class="col-md-6 mb-2">
                     <mdb-select [options]="typeOptions" formControlName="typeId" placeholder="type de classe"></mdb-select>
                     <div *ngIf="serviceForm.get('typeId').errors && serviceForm.get('typeId').touched"

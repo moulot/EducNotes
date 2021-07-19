@@ -40,7 +40,6 @@ export class AddServiceComponent implements OnInit {
   ngOnInit() {
     this.route.data.subscribe(data => {
       this.product = data['product'];
-      // console.log(this.product);
       if (this.product) {
         this.editionMode = true;
         if (this.product.isByLevel) {
@@ -85,6 +84,7 @@ export class AddServiceComponent implements OnInit {
       typeId: [this.product.productTypeId, Validators.required],
       periodicityId: [this.product.periodicityId],
       isPeriodic: [this.product.isPeriodic],
+      startDate: [this.product.serviceStartDate],
       price: [this.product.price],
       isPaidCash: [paidCash, Validators.required],
       priceBy: [priceBy],
@@ -112,7 +112,6 @@ export class AddServiceComponent implements OnInit {
         if (fee === null || fee === '' || fee === 0) {
           feesNOK = true;
           formNOK = true;
-          console.log('price level formNOK: ' + formNOK + '-' + feesNOK);
           break;
         }
       }
@@ -120,7 +119,6 @@ export class AddServiceComponent implements OnInit {
       if (prodPrice <= 0) {
         feeNOK = true;
         formNOK = true;
-        console.log('price unique formNOK: ' + formNOK + '-' + feeNOK);
       }
     }
 
@@ -132,7 +130,6 @@ export class AddServiceComponent implements OnInit {
         if (fee === null || fee === '' || fee === 0) {
           zonesNOK = true;
           formNOK = true;
-          console.log('price zones formNOK: ' + formNOK + '-' + zonesNOK);
           break;
         }
       }
@@ -148,21 +145,18 @@ export class AddServiceComponent implements OnInit {
       if (pct <= 0) {
         pctNOK = true;
         formNOK = true;
-        console.log('pct < 0 formNOK: ' + formNOK + '-' + pctNOK);
       }
 
       const date = duedates[i].dueDate;
       if (!date) {
         formNOK = true;
         datesNOK = true;
-        console.log('dates formNOK: ' + formNOK + '-' + datesNOK);
       }
 
       const label = duedates[i].deadlineName;
       if (!label || label === '') {
         formNOK = true;
         labelsNOK = true;
-        console.log('label formNOK: ' + formNOK + '-' + labelsNOK);
       }
     }
 
@@ -426,7 +420,6 @@ export class AddServiceComponent implements OnInit {
     service.levelPrices = levelPrices;
     service.zonePrices = zonePrices;
     service.dueDates = dueDates;
-    // console.log(service);
     this.adminService.saveService(service).subscribe(() => {
       this.wait = false;
       this.router.navigate(['services']);

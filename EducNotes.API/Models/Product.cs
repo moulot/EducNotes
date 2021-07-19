@@ -1,7 +1,10 @@
+using System;
+
 namespace EducNotes.API.Models {
   public class Product {
     public Product()
     {
+      ServiceStartDate = new DateTime();
         IsRequired = false;
         IsPaidCash = true;
         IsByLevel = false;
@@ -21,6 +24,7 @@ namespace EducNotes.API.Models {
     public ProductType ProductType { get; set; }
     public int? PeriodicityId { get; set; }
     public Periodicity Periodicity { get; set; }
+    public DateTime ServiceStartDate { get; set; }
     public int? PayableAtId { get; set; }
     public PayableAt PayableAt { get; set; }
     public bool IsRequired { get; set; }

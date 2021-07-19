@@ -242,25 +242,26 @@ namespace EducNotes.API.Controllers
     [HttpPost("NewTuition")]
     public async Task<IActionResult> AddNewTuition(TuitionDataDto newTuition)
     {
+      int loggedUser = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
       List<RegistrationEmailDto> emails = new List<RegistrationEmailDto>();
       using (var identityContextTransaction = _context.Database.BeginTransaction())
       {
         try
         {
+          List<Product> products = await _cache.GetProducts();
           List<ProductDeadLine> ProdDeadLines = await _cache.GetProductDeadLines();
           List<Setting> settings = await _cache.GetSettings();
           List<ClassLevel> classlevels = await _cache.GetClassLevels();
           List<ClassLevelProduct> levelProducts = await _cache.GetClassLevelProducts();
-          List<Role> roles = await _context.Roles.ToListAsync();
+          // List<Role> roles = await _context.Roles.ToListAsync();
           List<EmailTemplate> emailTemplates = await _cache.GetEmailTemplates();
 
-          // List<Setting> settings = await _context.Settings.ToListAsync();
           var schoolName = settings.First(s => s.Name.ToLower() == "schoolname").Value;
           string RegDeadLine = settings.First(s => s.Name == "RegistrationDeadLine").Value;
 
-          var deadlines = ProdDeadLines
-                                .OrderBy(o => o.DueDate)
-                                .Where(p => p.ProductId == tuitionId).ToList();
+          var deadlines = ProdDeadLines.OrderBy(o => o.DueDate)
+                                       .Where(p => p.ProductId == tuitionId).ToList();
           var firstDeadline = deadlines.First();
           var firstDeadlineDate = firstDeadline.DueDate.Date;
 
@@ -276,10 +277,9 @@ namespace EducNotes.API.Controllers
           order.TotalHT = newTuition.OrderAmount;
           order.AmountHT = order.TotalHT - order.Discount;
           order.AmountTTC = order.TotalHT;
-          // order.Created = true;
           order.isReg = true;
-          order.InsertUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-          order.UpdateUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+          order.InsertUserId = loggedUser;
+          order.UpdateUserId = loggedUser;
           _repo.Add(order);
 
           if (!await _repo.SaveAll())
@@ -309,9 +309,6 @@ namespace EducNotes.API.Controllers
               identityContextTransaction.Rollback();
               return BadRequest("erreur lors de l'ajout de l'inscription.");
             }
-            // add user role
-            // var role = roles.FirstOrDefault(a => a.Id == memberRoleId);
-            // _userManager.AddToRoleAsync(user, role.Name).Wait();
 
             user.IdNum = _repo.GetUserIDNumber(user.Id, user.LastName, user.FirstName);
             _repo.Update(user);
@@ -319,7 +316,7 @@ namespace EducNotes.API.Controllers
 
             var nextClassLevel = classlevels.First(c => c.Id == child.ClassLevelId);
             var classProduct = levelProducts.First(c => c.ClassLevelId == nextClassLevel.Id && c.ProductId == tuitionId);
-            decimal tuitionFee = Convert.ToDecimal(classProduct.Price);
+            decimal tuitionFee = classProduct.Price;
             decimal DPPct = firstDeadline.Percentage;
             decimal DownPayment = DPPct * tuitionFee;
 
@@ -344,7 +341,7 @@ namespace EducNotes.API.Controllers
             //add data for orderline history
             OrderLineHistory orderlineHistory = new OrderLineHistory();
             orderlineHistory.OrderLineId = line.Id;
-            orderlineHistory.UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            orderlineHistory.UserId = loggedUser;
             orderlineHistory.OpDate = order.OrderDate;
             orderlineHistory.Action = "ADD";
             orderlineHistory.OldAmount = 0;
@@ -378,13 +375,19 @@ namespace EducNotes.API.Controllers
             Invoice invoice = new Invoice();
             invoice.InvoiceDate = DateTime.Now;
             invoice.Amount = line.AmountTTC;
-            invoice.UserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            invoice.UserId = loggedUser;
             invoice.OrderId = order.Id;
             invoice.OrderLineId = line.Id;
             _repo.Add(invoice);
             _context.SaveChanges();
             invoice.InvoiceNum = _repo.GetInvoiceNumber(invoice.Id);
             _context.Update(invoice);
+
+            //add services for the current user
+            foreach (var id in child.ServiceIds)
+            {
+              
+            }
 
             ChildRegistrationDto crd = new ChildRegistrationDto();
             crd.LastName = child.LastName;
@@ -423,10 +426,6 @@ namespace EducNotes.API.Controllers
             }
             if (result.Succeeded)
             {
-              // add user role
-              // var role = roles.FirstOrDefault(a => a.Id == parentRoleId);
-              // _userManager.AddToRoleAsync(father, role.Name).Wait();
-
               father.IdNum = father.Id.ToString().To5Digits();
               fathercode = await _userManager.GenerateEmailConfirmationTokenAsync(father);
               _repo.Update(father);
@@ -482,10 +481,6 @@ namespace EducNotes.API.Controllers
             }
             if (result.Succeeded)
             {
-              // add user role
-              // var role = roles.FirstOrDefault(a => a.Id == parentRoleId);
-              // _userManager.AddToRoleAsync(mother, role.Name).Wait();
-
               mother.IdNum = mother.Id.ToString().To5Digits();
               mothercode = await _userManager.GenerateEmailConfirmationTokenAsync(mother);
               _repo.Update(mother);

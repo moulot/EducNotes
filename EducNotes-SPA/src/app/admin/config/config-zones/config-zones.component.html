@@ -42,7 +42,7 @@
             <div class="row">
               <div class="col-md-2">
                 <div class="d-flex">
-                  <a class="my-auto mr-3" (click)="removeZoneItem(i)">
+                  <a *ngIf="!zone.value.used" class="my-auto mr-3" (click)="removeZoneItem(i)">
                     <i class="fad fa-trash-alt text-20" style="--fa-secondary-opacity: 1;--fa-primary-color:#192C47;
                       --fa-secondary-color:#f89f20;"></i>
                   </a>

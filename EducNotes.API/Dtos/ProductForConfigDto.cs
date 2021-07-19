@@ -25,6 +25,8 @@ namespace EducNotes.API.Dtos
     public int PeriodicityId { get; set; }
     public string PeriodicityName { get; set; }
     public byte PeriodicityNbDays { get; set; }
+    public DateTime ServiceStartDate { get; set; }
+    public string strStartDate { get; set; }
     public int PayableAtId { get; set; }
     public string PayableAtName { get; set; }
     public int PayableAtDayCount { get; set; }

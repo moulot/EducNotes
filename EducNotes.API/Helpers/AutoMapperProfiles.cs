@@ -213,6 +213,8 @@ namespace EducNotes.API.Helpers {
                   .MapFrom(u => u.Periodicity.Name))
                 .ForMember(dest => dest.PeriodicityNbDays, opt => opt
                   .MapFrom(u => u.Periodicity.NbDays))
+                .ForMember(dest => dest.strStartDate, opt => opt
+                  .MapFrom(u => u.ServiceStartDate.ToString("dd/MM/yyyy", frC)))
                 .ForMember(dest => dest.PayableAtName, opt => opt
                   .MapFrom(u => u.PayableAt.Name))
                 .ForMember(dest => dest.PayableAtDayCount, opt => opt

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace EducNotes.API.Dtos
 {
@@ -15,5 +16,6 @@ namespace EducNotes.API.Dtos
     public decimal TuitionFee { get; set; }
     public decimal RegFee { get; set; }
     public decimal DownPayment { get; set; }
+    public List<int> ServiceIds { get; set; }
   }
 }

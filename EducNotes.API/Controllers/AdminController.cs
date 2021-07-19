@@ -1174,15 +1174,20 @@ namespace EducNotes.API.Controllers
     [HttpGet("ZonesWithLocations")]
     public async Task<IActionResult> GetZonesWithLocations()
     {
-      List<Zone> zonesCached = await _context.Zones.OrderBy(o => o.Name).ToListAsync();
-      List<LocationZone> locationZones = await _cache.GetLocationZones();
+      List<ProductZone> productZones = await _cache.GetProductZones();
+      List<Zone> zonesCached = await _cache.GetZones(); // _context.Zones.OrderBy(o => o.Name).ToListAsync();
+      List<LocationZone> locationZones = await _cache.GetLocationZones(); // _context.LocationZones.Include(i => i.City)
+                                                                    //  .Include(i => i.District)
+                                                                    //  .Include(i => i.Country).ToListAsync();
 
+      Boolean zoneUsed = productZones.Count() > 0 ? true : false;
       List<ZoneDto> zones = new List<ZoneDto>();
       foreach (Zone zone in zonesCached)
       {
         ZoneDto zoneDto = new ZoneDto();
         zoneDto.Id = zone.Id;
         zoneDto.Name = zone.Name;
+        zoneDto.Used = zoneUsed;
 
         List<LocationZone> zoneLocations = locationZones.Where(z => z.ZoneId == zone.Id).ToList();
         if(zoneLocations.Count() > 0)
@@ -1226,14 +1231,18 @@ namespace EducNotes.API.Controllers
     [HttpPost("SaveZones")]
     public async Task<IActionResult> SaveZone(List<ZoneDto> zonesDto)
     {
-      List<Zone> zones = await _context.Zones.OrderBy(o => o.Name).ToListAsync();
+      List<Zone> zones = await _cache.GetZones(); // _context.Zones.OrderBy(o => o.Name).ToListAsync();
       List<District> districts = await _cache.GetDistricts();
-      List<LocationZone> locations = await _context.LocationZones.ToListAsync();//.GetLocationZones();
+      List<LocationZone> locations = await _cache.GetLocationZones(); // _context.LocationZones.ToListAsync();//.GetLocationZones();
 
       using(var identityContextTransaction = _context.Database.BeginTransaction())
       {
         try
         {
+          //delete all previous zones and their locations
+          // _repo.DeleteAll(locations);
+          // _repo.DeleteAll(zones);
+
           foreach (ZoneDto zoneDto in zonesDto)
           {
             int zoneId = zoneDto.Id;
@@ -1265,15 +1274,20 @@ namespace EducNotes.API.Controllers
           }
 
           await _repo.SaveAll();
+          identityContextTransaction.Commit();
           await _cache.LoadZones();
           await _cache.LoadLocationZones();
-          identityContextTransaction.Commit();
           return Ok();
         }
-        catch
+        catch(Exception ex)
         {
+          var dd = ex.Message;
+          var errorNum = ex.HResult;
           identityContextTransaction.Rollback();
-          return BadRequest("problème pour enregistrer la zone");
+          if(errorNum == -2146233088)
+            return BadRequest("les zones sont déjà utilisées pour les produits et services");
+          else
+            return BadRequest("problème pour enregistrer la zone");
         }
       }
     }
