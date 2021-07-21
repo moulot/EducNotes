@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using EducNotes.API.Models;
 
@@ -16,6 +17,8 @@ namespace EducNotes.API.Dtos
     public bool IsPeriodic { get; set; }
     public int? PeriodicityId { get; set; }
     public int? PayableAtId { get; set; }
+    public DateTime ServiceStartDate { get; set; }
+    public string strStartDate { get; set; }
     public bool IsRequired { get; set; }
     public bool Active { get; set; }
     public byte DsplSeq { get; set; }

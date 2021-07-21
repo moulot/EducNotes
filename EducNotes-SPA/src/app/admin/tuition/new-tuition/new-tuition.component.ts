@@ -187,14 +187,31 @@ export class NewTuitionComponent implements OnInit {
     const ffname = g.get('fFirstName').value;
     const fcell = g.get('fCell').value;
     const femail = g.get('fEmail').value;
+    const fdateOfBirth = g.get('fDateOfBirth').value;
+    const fbirthCityId = g.get('fBirthCityId').value;
+    const fnationalityId = g.get('fNationalityId').value;
+    const fjobId = g.get('fJobId').value;
+    const fdistrictId = g.get('fDistrictId').value;
+    const fcityId = g.get('fCityId').value;
+    const fpostalBox = g.get('fPostalBox').value;
+
     const mlname = g.get('mLastName').value;
     const mfname = g.get('mFirstName').value;
     const mcell = g.get('mCell').value;
     const memail = g.get('mEmail').value;
+    const mdateOfBirth = g.get('mDateOfBirth').value;
+    const mbirthCityId = g.get('mBirthCityId').value;
+    const mnationalityId = g.get('mNationalityId').value;
+    const mjobId = g.get('mJobId').value;
+    const mdistrictId = g.get('mDistrictId').value;
+    const mcityId = g.get('mCityId').value;
+    const mpostalBox = g.get('mPostalBox').value;
 
     let parenterror = false;
-    if (flname === '' && ffname === '' && fcell === '' && femail === '' && mlname === ''
-      && mfname === '' && mcell === '' && memail === '') {
+    if (flname === '' && ffname === '' && fcell === '' && femail === '' && fdateOfBirth === '' && fbirthCityId === '' &&
+        fnationalityId === '' && fjobId === '' && fdistrictId === '' && fpostalBox === '' &&
+        mlname === '' && mfname === '' && mcell === '' && memail === '' && mdateOfBirth === '' && mbirthCityId === '' &&
+        mnationalityId === '' && mjobId === '' && mdistrictId === '' && mpostalBox === '') {
       parenterror = true;
     }
 

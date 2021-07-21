@@ -414,42 +414,36 @@ namespace EducNotes.API.Controllers
     [HttpGet("ZonePrices/{productId}")]
     public async Task<IActionResult> GetZonePrices(int productId)
     {
+      List<Product> products = await _cache.GetProducts();
       List<ProductZone> zoneProducts = await _cache.GetProductZones();
       List<Zone> zones = await _cache.GetZones();
 
       List<ProductZoneDto> zonePrices = new List<ProductZoneDto>();
       List<ProductZone> productPrices = zoneProducts.Where(p => p.ProductId == productId).ToList();
-      if(productPrices.Count() > 0)
+      foreach(Zone zone in zones)
       {
-        foreach (Zone zone in zones)
+        ProductZoneDto zoneProduct = new ProductZoneDto();
+        ProductZone zonePrice = productPrices.SingleOrDefault(p => p.ZoneId == zone.Id);
+        if(zonePrice != null)
         {
-          ProductZoneDto zoneProduct = new ProductZoneDto();
-          ProductZone zonePrice = productPrices.First(p => p.ZoneId == zone.Id);
           zoneProduct.Id = zonePrice.Id;
           zoneProduct.ProductId = zonePrice.ProductId;
           zoneProduct.ProductName = zonePrice.Product.Name;
           zoneProduct.ZoneId = zonePrice.ZoneId;
           zoneProduct.ZoneName = zonePrice.Zone.Name;
           zoneProduct.Price = zonePrice.Price;
-          zonePrices.Add(zoneProduct);
         }
-      }
-      else
-      {
-        List<Product> products = await _cache.GetProducts();
-        Product product = products.First(p => p.Id == productId);
-
-        foreach (Zone zone in zones)
+        else
         {
-          ProductZoneDto zoneProduct = new ProductZoneDto();
+          Product product = products.First(p => p.Id == productId);
           zoneProduct.Id = 0;
           zoneProduct.ProductId = productId;
           zoneProduct.ProductName = product.Name;
           zoneProduct.ZoneId = zone.Id;
           zoneProduct.ZoneName = zone.Name;
           zoneProduct.Price = 0;
-          zonePrices.Add(zoneProduct);
         }
+        zonePrices.Add(zoneProduct);
       }
 
       return Ok(zonePrices);

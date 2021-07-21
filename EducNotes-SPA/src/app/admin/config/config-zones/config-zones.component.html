@@ -35,9 +35,10 @@
     <div class="card-body p-2">
       <div class="text-17 textDarkBlue"><b>zones de transport</b></div>
       <hr class="my-1">
+      <button type="button" mdbBtn (click)="LoadInitialZones()" class="btnOrange my-2" size="sm" mdbWavesEffect>revenir aux zones initiales</button>
       <form [formGroup]="zonesForm" (ngSubmit)="saveZones()">
         <div formArrayName="zones" *ngFor="let zone of zonesForm.get('zones')['controls']; let i = index;">
-          <div [formGroupName]="i">
+          <div *ngIf="zone.value.deleted == false" [formGroupName]="i">
             <div class="border rounded-lg p-1 mb-1">
             <div class="row">
               <div class="col-md-2">

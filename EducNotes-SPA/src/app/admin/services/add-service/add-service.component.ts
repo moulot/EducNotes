@@ -57,6 +57,9 @@ export class AddServiceComponent implements OnInit {
           this.showDueDates = false;
           this.showUniquePrice = false;
         }
+        if (this.product.price !== 0) {
+          this.showUniquePrice = true;
+        }
         if (this.product.isPeriodic) {
           this.showPeriodicities = true;
         }
@@ -81,10 +84,11 @@ export class AddServiceComponent implements OnInit {
     const priceBy = this.product.isByLevel ? 1 : this.product.isByZone ? 2 : 0;
     this.serviceForm = this.fb.group({
       name: [this.product.name, Validators.required],
-      typeId: [this.product.productTypeId, Validators.required],
+      // typeId: [this.product.productTypeId, Validators.required],
       periodicityId: [this.product.periodicityId],
       isPeriodic: [this.product.isPeriodic],
-      startDate: [this.product.serviceStartDate],
+      startDate: [this.product.strStartDate],
+      payableAtId: [this.product.payableAtId],
       price: [this.product.price],
       isPaidCash: [paidCash, Validators.required],
       priceBy: [priceBy],
@@ -301,7 +305,7 @@ export class AddServiceComponent implements OnInit {
         this.typeOptions = [...this.typeOptions, type];
       }
     }, () => {
-      this.alertify.error('problème pour récupérer les données');
+      this.alertify.error('problème pour récupérer les types produits');
     });
   }
 
@@ -313,7 +317,7 @@ export class AddServiceComponent implements OnInit {
         this.addLevelPriceItem(elt.classLevelId, elt.levelName, elt.price);
       }
     }, () => {
-      this.alertify.error('problème pour récupérer les données');
+      this.alertify.error('problème pour récupérer les niveaux de classe');
     });
   }
 
@@ -325,7 +329,7 @@ export class AddServiceComponent implements OnInit {
         this.addZonePriceItem(elt.zoneId, elt.zoneName, elt.price);
       }
     }, () => {
-      this.alertify.error('problème pour récupérer les données');
+      this.alertify.error('problème pour récupérer les prix des zones');
     });
   }
 
@@ -340,11 +344,11 @@ export class AddServiceComponent implements OnInit {
       this.payableAts = data.payableAts;
       for (let i = 0; i < this.payableAts.length; i++) {
         const elt = this.payableAts[i];
-        const payableAt = {value: elt.id, label: elt.name};
+        const payableAt = {value: elt.id, label: elt.name + ' (' + elt.dayCount + ' jrs)'};
         this.payableAtOptions = [...this.payableAtOptions, payableAt];
       }
     }, () => {
-      this.alertify.error('problème pour récupérer les données');
+      this.alertify.error('problème pour récupérer les données des produits');
     });
   }
 
@@ -417,6 +421,10 @@ export class AddServiceComponent implements OnInit {
     service.isPeriodic = this.serviceForm.value.isPeriodic === true ? true : false;
     service.isByLevel = this.serviceForm.value.priceBy === 1 ? true : false;
     service.isByZone = this.serviceForm.value.priceBy === 2 ? true : false;
+    service.price = this.serviceForm.value.price;
+    service.serviceStartDate = this.serviceForm.value.startDate;
+    service.strStartDate = this.serviceForm.value.startDate;
+    service.payableAtId = this.serviceForm.value.payableAtId;
     service.levelPrices = levelPrices;
     service.zonePrices = zonePrices;
     service.dueDates = dueDates;

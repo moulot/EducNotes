@@ -13,6 +13,7 @@ import { AlertifyService } from 'src/app/_services/alertify.service';
 export class ConfigZonesComponent implements OnInit {
   zonesForm: FormGroup;
   zones: any;
+  initialZones: any;
   districts: any;
   districtOptions = [];
   wait = false;
@@ -66,28 +67,31 @@ export class ConfigZonesComponent implements OnInit {
         id: x.id,
         name: x.name,
         used: x.used,
+        deleted: x.deleted,
         locations: this.addLocationItems(x.locations)
       }));
     });
   }
 
-  addZoneItem(id, name, used): void {
+  addZoneItem(id, name, used, deleted): void {
     const zones = this.zonesForm.get('zones') as FormArray;
-    zones.push(this.createZoneItem(id, name, used));
+    zones.push(this.createZoneItem(id, name, used, deleted));
   }
 
-  createZoneItem(id, name, used): FormGroup {
+  createZoneItem(id, name, used, deleted): FormGroup {
     return this.fb.group({
       id: [id],
       name: [name, Validators.required],
       used: [used, Validators.required],
+      deleted: [deleted, Validators.required],
       locations: this.addLocationItems([{districtId: 0}])
     });
   }
 
   removeZoneItem(index) {
     const zones = this.zonesForm.get('zones') as FormArray;
-    zones.removeAt(index);
+    zones.at(index).get('deleted').setValue(true);
+    // zones.removeAt(index);
   }
 
   removeAllZones() {
@@ -132,13 +136,14 @@ export class ConfigZonesComponent implements OnInit {
   }
 
   addZone() {
-    this.addZoneItem(0, '');
+    this.addZoneItem(0, '', false, false);
   }
 
   getZones() {
     this.wait = true;
     this.adminService.getZonesWithLocations().subscribe((data: any) => {
       this.zones = data.zones;
+      this.initialZones = data.zones;
       this.districts = data.districts;
       for (let i = 0; i < this.districts.length; i++) {
         const elt = this.districts[i];
@@ -153,11 +158,18 @@ export class ConfigZonesComponent implements OnInit {
     });
   }
 
+  LoadInitialZones() {
+    this.removeAllZones();
+    this.zones = this.initialZones;
+    this.addZoneItems();
+  }
+
   reloadZones() {
     this.wait = true;
     this.removeAllZones();
     this.adminService.getZonesWithLocations().subscribe((data: any) => {
       this.zones = data.zones;
+      this.initialZones = data.zones;
       this.addZoneItems();
       this.wait = false;
     }, () => {
@@ -179,7 +191,7 @@ export class ConfigZonesComponent implements OnInit {
         const loc = {districtId: districtid};
         districts = [...districts, loc];
       }
-      const zone = {id: item.id, name: item.name, locations: districts};
+      const zone = {id: item.id, name: item.name, deleted: item.deleted, locations: districts};
       zones = [...zones, zone];
     }
 

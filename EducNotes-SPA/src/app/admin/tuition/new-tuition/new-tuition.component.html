@@ -54,7 +54,7 @@
                     </div>
                     <div class="col-md-4">
                       <div class="md-form my-0">
-                        <mdb-select [options]="districtOptions" formControlName="fDistrictId" placeholder="lieu de résidence"></mdb-select>
+                        <mdb-select [options]="jobOptions" formControlName="fJobId" placeholder="profession"></mdb-select>
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -84,7 +84,12 @@
                     </div>
                     <div class="col-md-4">
                       <div class="md-form my-0">
-                        <mdb-select [options]="jobOptions" formControlName="fJobId" placeholder="profession"></mdb-select>
+                        <mdb-select [options]="districtOptions" formControlName="fDistrictId" placeholder="quartier"></mdb-select>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="md-form my-0">
+                        <mdb-select [options]="districtOptions" formControlName="fCityId" placeholder="ville de résidence"></mdb-select>
                       </div>
                     </div>
                   </div>
@@ -129,7 +134,7 @@
                     </div>
                     <div class="col-md-4">
                       <div class="md-form my-0">
-                        <mdb-select [options]="districtOptions" formControlName="mDistrictId" placeholder="lieu de résidence"></mdb-select>
+                        <mdb-select [options]="jobOptions" formControlName="mJobId" placeholder="profession"></mdb-select>
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -159,7 +164,12 @@
                     </div>
                     <div class="col-md-4">
                       <div class="md-form my-0">
-                        <mdb-select [options]="jobOptions" formControlName="mJobId" placeholder="profession"></mdb-select>
+                        <mdb-select [options]="districtOptions" formControlName="mDistrictId" placeholder="quartier"></mdb-select>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="md-form my-0">
+                        <mdb-select [options]="districtOptions" formControlName="mCityId" placeholder="ville de résidence"></mdb-select>
                       </div>
                     </div>
                   </div>
@@ -247,13 +257,6 @@
                       </div>
                       <div class="col-md-2">
                         <div class="md-form my-0">
-                          <mdb-select [options]="sexOptions" formControlName="sex" placeholder="sexe"></mdb-select>
-                          <div *ngIf="child.value.sex === '' && child.get('sex').touched"
-                            class="text-small text-danger">saisir le sexe svp</div>
-                        </div>
-                      </div>
-                      <div class="col-md-2">
-                        <div class="md-form my-0">
                           <mdb-select [options]="levelOptions" (ngModelChange)="setClassLevel($event, i)"
                             formControlName="classlevelId" placeholder="classe"></mdb-select>
                             <div *ngIf="child.value.dob === '' && child.get('dob').touched"
@@ -266,22 +269,36 @@
                             --fa-primary-color:#192C47;--fa-secondary-color:#f89f20;"></i>
                         </a>
                       </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-2">
+                        <div class="md-form my-0">
+                          <mdb-select [options]="sexOptions" formControlName="sex" placeholder="sexe"></mdb-select>
+                          <div *ngIf="child.value.sex === '' && child.get('sex').touched"
+                            class="text-small text-danger">saisir le sexe svp</div>
+                        </div>
+                      </div>
                       <div class="col-md-2">
                         <div class="md-form my-0">
                           <mdb-select [options]="nationalityOptions" formControlName="nationalityId" placeholder="nationalité"></mdb-select>
                         </div>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-2">
                         <div class="md-form my-0">
                           <mdb-select [options]="cityOptions" formControlName="birthCityId" placeholder="ville de naissance"></mdb-select>
                         </div>
                       </div>
                       <div class="col-12"><hr class="my-1"></div>
+                      <div class="col-md-12">
+                        <mdb-checkbox formControlName="scholarship">enfant boursier</mdb-checkbox>
+                      </div>
+                      <div class="col-12"><hr class="my-1"></div>
+                      <div class="col-md-12 textDarkBlue text-15 my-1"><b>services associés</b></div>
                       <div class="col-12">
                         <div class="row">
-                          <div class="col-md-2 my-1" formArrayName="services" *ngFor="let service of child.get('services')['controls']; let j = index;">
+                          <div class="col-md-12 my-1" formArrayName="services" *ngFor="let service of child.get('services')['controls']; let j = index;">
                             <div [formGroupName]="j">
-                              <mdb-checkbox formControlName="selected">{{service.value.name}}</mdb-checkbox>
+                              <mdb-checkbox formControlName="selected" class="text-15">{{service.value.name}}</mdb-checkbox>
                             </div>
                           </div>
                         </div>

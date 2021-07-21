@@ -12,7 +12,7 @@ export class AddServiceResolver implements Resolve<any> {
     resolve(route: ActivatedRouteSnapshot): any {
         return this.productService.getProduct(route.params['id']).pipe(
             catchError(() => {
-                this.alertify.error('problème de récupération de données');
+                this.alertify.error('problème de récupération de données initiales');
                 this.router.navigate(['/home']);
                 return of(null);
             })

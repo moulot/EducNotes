@@ -4,6 +4,7 @@ namespace EducNotes.API.Models
   {
     public int Id { get; set; }
     public int ZoneId { get; set; }
+    public Zone Zone { get; set; }
     public int? DistrictId { get; set; }
     public District District { get; set; }
     public int? CityId { get; set; }

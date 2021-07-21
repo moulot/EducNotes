@@ -35,10 +35,13 @@
                 <div class="row">
                   <div class="col-md-6 text-15 textDarkBlue my-auto"><b>début du service</b></div>
                   <div class="col-md-6 mb-2">
-                    <mdb-select [options]="typeOptions" formControlName="typeId" placeholder="type de classe"></mdb-select>
-                    <div *ngIf="serviceForm.get('typeId').errors && serviceForm.get('typeId').touched"
-                      class="text-small text-danger">saisir le type du service svp</div>
-                  </div>
+                    <div class="md-form my-0">
+                      <mdb-date-picker name="startDate" [placeholder]="'debut du service'" [options]="myDatePickerOptions"
+                        formControlName="startDate"></mdb-date-picker>
+                      <div *ngIf="serviceForm.get('startDate').errors && serviceForm.get('startDate').touched"
+                        class="text-small text-danger">la date est obligatoire</div>
+                    </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -47,9 +50,9 @@
                 <div class="row">
                   <div class="col-md-4 text-15 textDarkBlue my-auto"><b>relance à </b></div>
                   <div class="col-md-6 mb-2">
-                    <mdb-select [options]="typeOptions" formControlName="typeId" placeholder="type de classe"></mdb-select>
-                    <div *ngIf="serviceForm.get('typeId').errors && serviceForm.get('typeId').touched"
-                      class="text-small text-danger">saisir le type du service svp</div>
+                    <mdb-select [options]="payableAtOptions" formControlName="payableAtId" placeholder="payer à"></mdb-select>
+                    <div *ngIf="serviceForm.get('payableAtId').errors && serviceForm.get('payableAtId').touched"
+                      class="text-small text-danger">saisir délai pour paiement svp</div>
                   </div>
                 </div>
               </div>

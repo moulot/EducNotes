@@ -1077,7 +1077,13 @@ namespace EducNotes.API.Controllers
           int serviceId = serviceDto.Id;
           Product service = products.Single(p => p.Id == serviceId);
           service.Name = serviceDto.Name;
-          service.ProductTypeId = serviceDto.ProductTypeId;
+          // service.ProductTypeId = serviceDto.ProductTypeId;
+          service.PayableAtId = serviceDto.PayableAtId;
+          var startDateArray = serviceDto.strStartDate.Split("/");
+          var dateday = Convert.ToInt32(startDateArray[0]);
+          var datemonth = Convert.ToInt32(startDateArray[1]);
+          var dateyear = Convert.ToInt32(startDateArray[2]);
+          service.ServiceStartDate = new DateTime(dateyear, datemonth, dateday);;
 
           if(serviceDto.IsPeriodic) {
             service.IsPeriodic = true;
@@ -1239,10 +1245,6 @@ namespace EducNotes.API.Controllers
       {
         try
         {
-          //delete all previous zones and their locations
-          // _repo.DeleteAll(locations);
-          // _repo.DeleteAll(zones);
-
           foreach (ZoneDto zoneDto in zonesDto)
           {
             int zoneId = zoneDto.Id;
@@ -1256,8 +1258,15 @@ namespace EducNotes.API.Controllers
             else
             {
               zone = zones.Single(z => z.Id == zoneId);
-              zone.Name = zoneDto.Name;
-              _repo.Update(zone);
+              if(zoneDto.Deleted == true)
+              {
+                _repo.Delete(zone);
+              }
+              else
+              {
+                zone.Name = zoneDto.Name;
+                _repo.Update(zone);
+              }
 
               List<LocationZone> prevLocations = locations.Where(l => l.ZoneId == zone.Id).ToList();
               _repo.DeleteAll(prevLocations);
